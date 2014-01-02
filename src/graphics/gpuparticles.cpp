@@ -296,73 +296,78 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
 	dirZ = particledir.Z / size;
 }
 
+struct ParticleData
+{
+	float PositionX;
+	float PositionY;
+	float PositionZ;
+	float Lifetime;
+	float DirectionX;
+	float DirectionY;
+	float DirectionZ;
+	float Size;
+};
+
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
-	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
-
+	ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
 
 	for (unsigned i = 0; i < count; i++) {
-		particles[COMPONENTCOUNT * i] = 0;
-		particles[COMPONENTCOUNT * i + 1] = 0;
-		particles[COMPONENTCOUNT * i + 2] = 0;
+		particles[i].PositionX = 0;
+		particles[i].PositionY = 0;
+		particles[i].PositionZ = 0;
 		// Initial lifetime is >1
-		particles[COMPONENTCOUNT * i + 3] = 2.;
+		particles[i].Lifetime = 2.;
 
-		memcpy(&initialvalue[COMPONENTCOUNT * i], &particles[COMPONENTCOUNT * i], 3 * sizeof(float));
-		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
-			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
-		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
+		memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
+
+		generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
+			initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
+
+		memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
 	delete[] particles;
 	delete[] initialvalue;
 }
 
 void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *emitter)
 {
-	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
-	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
-
-	float sizeMin = emitter->getMinStartSize().Height;
-	float sizeMax = emitter->getMaxStartSize().Height;
+	ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
 
 	const core::vector3df& extent = emitter->getBox().getExtent();
 
 	for (unsigned i = 0; i < count; i++) {
-		particles[COMPONENTCOUNT * i] = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
-		particles[COMPONENTCOUNT * i + 1] = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
-		particles[COMPONENTCOUNT * i + 2] = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
+		particles[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
+		particles[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
+		particles[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
 		// Initial lifetime is > 1
-		particles[COMPONENTCOUNT * i + 3] = os::Randomizer::frand();
+		particles[i].Lifetime = os::Randomizer::frand();
 
-		memcpy(&initialvalue[COMPONENTCOUNT * i], &particles[COMPONENTCOUNT * i], 3 * sizeof(float));
-		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
-			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
-		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
+		memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
+		generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
+			initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
+		memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionZ), 4 * sizeof(float));
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
 	delete[] particles;
 	delete[] initialvalue;
 }
 
 void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *emitter)
 {
-	float *particles = new float[COMPONENTCOUNT * count], *initialvalue = new float[COMPONENTCOUNT * count];
-	unsigned lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
-
-	float sizeMin = emitter->getMinStartSize().Height;
-	float sizeMax = emitter->getMaxStartSize().Height;
+	ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
 
 	for (unsigned i = 0; i < count; i++) {
 		// Random distance from center
@@ -374,23 +379,23 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
 		pos.rotateYZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
 		pos.rotateXZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
 
-		particles[COMPONENTCOUNT * i] = pos.X;
-		particles[COMPONENTCOUNT * i + 1] = pos.Y;
-		particles[COMPONENTCOUNT * i + 2] = pos.Z;
+		particles[i].PositionX = pos.X;
+		particles[i].PositionY = pos.Y;
+		particles[i].PositionZ = pos.Z;
 		// Initial lifetime is > 1
-		particles[COMPONENTCOUNT * i + 3] = 2.;
+		particles[i].Lifetime = 2.;
 
-		memcpy(&initialvalue[COMPONENTCOUNT * i], &particles[COMPONENTCOUNT * i], 3 * sizeof(float));
-		generateLifetimeSizeDirection(emitter, initialvalue[COMPONENTCOUNT * i + 3], initialvalue[COMPONENTCOUNT * i + 7],
-			initialvalue[COMPONENTCOUNT * i + 4], initialvalue[COMPONENTCOUNT * i + 5], initialvalue[COMPONENTCOUNT * i + 6]);
-		memcpy(&particles[COMPONENTCOUNT * i + 4], &initialvalue[COMPONENTCOUNT * i + 4], 4 * sizeof(float));
+		memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
+		generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
+			initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
+		memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
 	}
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), initialvalue, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), particles, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-	glBufferData(GL_ARRAY_BUFFER, COMPONENTCOUNT * count * sizeof(float), 0, GL_STREAM_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
 	delete[] particles;
 	delete[] initialvalue;
 }
@@ -529,19 +534,19 @@ void ParticleSystemProxy::simulate()
 	glEnableVertexAttribArray(attrib_velocity);
 	glEnableVertexAttribArray(attrib_size);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
-	glVertexAttribPointer(attrib_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-	glVertexAttribPointer(attrib_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
-	glVertexAttribPointer(attrib_size, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(7 * sizeof(float)));
+	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
+	glVertexAttribPointer(attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
+	glVertexAttribPointer(attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
+	glVertexAttribPointer(attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(attrib_initial_position);
 	glEnableVertexAttribArray(attrib_initial_lifetime);
 	glEnableVertexAttribArray(attrib_initial_velocity);
 	glEnableVertexAttribArray(attrib_initial_size);
 	glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-	glVertexAttribPointer(attrib_initial_position, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)0);
-	glVertexAttribPointer(attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(3 * sizeof(float)));
-	glVertexAttribPointer(attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(4 * sizeof(float)));
-	glVertexAttribPointer(attrib_initial_size, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid*)(7 * sizeof(float)));
+	glVertexAttribPointer(attrib_initial_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
+	glVertexAttribPointer(attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
+	glVertexAttribPointer(attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
+	glVertexAttribPointer(attrib_initial_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
 	glUniform1i(uniform_dt, timediff);
@@ -599,9 +604,9 @@ void ParticleSystemProxy::draw()
 	glVertexAttribPointer(attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glVertexAttribPointer(attrib_pos, 3, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), 0);
-	glVertexAttribPointer(attrib_lf, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid *) (3 * sizeof(float)));
-	glVertexAttribPointer(attrib_sz, 1, GL_FLOAT, GL_FALSE, COMPONENTCOUNT * sizeof(float), (GLvoid *)(7 * sizeof(float)));
+	glVertexAttribPointer(attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
+	glVertexAttribPointer(attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
+	glVertexAttribPointer(attrib_sz, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
 
 	glVertexAttribDivisor(attrib_lf, 1);
 	glVertexAttribDivisor(attrib_pos, 1);
