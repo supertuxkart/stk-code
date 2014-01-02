@@ -29,6 +29,7 @@ public:
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
+	video::SMaterial fakemat;
 	GLuint tfb_buffers[2], initial_values_buffer;
 	bool m_alpha_additive;
 

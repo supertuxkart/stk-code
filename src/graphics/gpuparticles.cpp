@@ -240,6 +240,11 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	const core::vector3df& rotation,
 	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
 	initGL();
+	fakemat.Lighting = false;
+	fakemat.ZWriteEnable = false;
+	fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
+	fakemat.Thickness = 200;
+	fakemat.setTexture(0, getMaterial(0).getTexture(0));
 	glGenBuffers(1, &initial_values_buffer);
 	glGenBuffers(2, tfb_buffers);
 	if (quad_vertex_buffer)
@@ -650,7 +655,6 @@ void ParticleSystemProxy::draw()
 	glDisableVertexAttribArray(attrib_sz);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
-	glDepthMask(GL_TRUE);
 	glEnable(GL_CULL_FACE);
 }
 
@@ -664,7 +668,7 @@ void ParticleSystemProxy::render() {
 	draw();
 	// We need to force irrlicht to update its internal states
 	irr::video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-	drv->setMaterial(getMaterial(0));
+	drv->setMaterial(fakemat);
 	static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
 }
 
