@@ -2036,6 +2036,8 @@ video::ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
     return m_render_target_texture;
 }
 
+// ----------------------------------------------------------------------------
+
 void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimlit)
 {
     if (!m_glsl)
@@ -2102,6 +2104,8 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     }
 }
 
+// ----------------------------------------------------------------------------
+
 void IrrDriver::applyObjectPassShader()
 {
     if (!m_glsl)
@@ -2110,15 +2114,17 @@ void IrrDriver::applyObjectPassShader()
     applyObjectPassShader(m_scene_manager->getRootSceneNode());
 }
 
-scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float radius,
-                     float energy, float r, float g, float b, bool sun, scene::ISceneNode* parent)
+// ----------------------------------------------------------------------------
+
+scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
+    float r, float g, float b, bool sun, scene::ISceneNode* parent)
 {
     if (m_glsl)
     {
         LightNode *light = NULL;
 
         if (!sun)
-            light = new LightNode(m_scene_manager, parent, radius, energy, r, g, b);
+            light = new LightNode(m_scene_manager, parent, energy, r, g, b);
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
@@ -2148,9 +2154,11 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float radius,
     }
     else
     {
-        return m_scene_manager->addLightSceneNode(NULL, pos, video::SColorf(r, g, b), radius);
+        return NULL;
     }
 }
+
+// ----------------------------------------------------------------------------
 
 void IrrDriver::clearLights()
 {

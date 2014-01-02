@@ -587,15 +587,15 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
     xml_node.get("color", &m_color);
     const video::SColorf colorf(m_color);
 
-    m_distance = 25.0f;
-    xml_node.get("distance", &m_distance);
+    //m_distance = 25.0f;
+    //xml_node.get("distance", &m_distance);
 
     m_energy = 1.0f;
     xml_node.get("energy", &m_energy);
 
     if (irr_driver->isGLSL())
     {
-        m_node = irr_driver->addLight(m_init_xyz, m_distance, m_energy, colorf.r, colorf.g, colorf.b, false, parent);
+        m_node = irr_driver->addLight(m_init_xyz, m_energy, colorf.r, colorf.g, colorf.b, false, parent);
     }
     else
     {
