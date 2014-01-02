@@ -609,6 +609,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                       "This track contains an empty LOD group.");
             return;
         }
+        node->updateAbsolutePosition();
     }
     node->updateAbsolutePosition();
 
@@ -1084,6 +1085,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                 node->setPosition(xyz);
                 node->setRotation(hpr);
                 node->setScale(scale);
+                node->updateAbsolutePosition();
 
                 m_all_nodes.push_back( node );
             }
