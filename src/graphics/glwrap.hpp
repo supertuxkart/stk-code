@@ -57,6 +57,8 @@ extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 extern PFNGLACTIVETEXTUREPROC glActiveTexture;
 extern PFNGLUNIFORM2FPROC glUniform2f;
 extern PFNGLUNIFORM1IPROC glUniform1i;
+extern PFNGLUNIFORM3IPROC glUniform3i;
+extern PFNGLUNIFORM4IPROC glUniform4i;
 extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
 extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
@@ -74,4 +76,6 @@ void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>
 	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
 	const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
 
+void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
+	const irr::core::rect<s32>* clip = 0);
 #endif

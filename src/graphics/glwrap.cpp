@@ -35,6 +35,8 @@ PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
 PFNGLACTIVETEXTUREPROC glActiveTexture;
 PFNGLUNIFORM2FPROC glUniform2f;
 PFNGLUNIFORM1IPROC glUniform1i;
+PFNGLUNIFORM3IPROC glUniform3i;
+PFNGLUNIFORM4IPROC glUniform4i;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
@@ -79,6 +81,8 @@ void initGL()
 	glGetShaderInfoLog = (PFNGLGETSHADERINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetShaderInfoLog");
 	glActiveTexture = (PFNGLACTIVETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glActiveTexture");
 	glUniform2f = (PFNGLUNIFORM2FPROC)IRR_OGL_LOAD_EXTENSION("glUniform2f");
+	glUniform4i = (PFNGLUNIFORM4IPROC)IRR_OGL_LOAD_EXTENSION("glUniform4i");
+	glUniform3i = (PFNGLUNIFORM3IPROC)IRR_OGL_LOAD_EXTENSION("glUniform3i");
 	glUniform1i = (PFNGLUNIFORM1IPROC)IRR_OGL_LOAD_EXTENSION("glUniform1i");
 	glGetProgramiv = (PFNGLGETPROGRAMIVPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramiv");
 	glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
@@ -252,6 +256,75 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(TexturedQuadAttribPosition);
 	glDisableVertexAttribArray(TexturedQuadAttribTexCoord);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+#endif
+}
+
+static GLuint ColoredQuadShader;
+static GLuint ColoredQuadUniformCenter;
+static GLuint ColoredQuadUniformSize;
+static GLuint ColoredQuadUniformColor;
+
+void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
+	const core::rect<s32>* clip)
+{
+
+#ifndef OGL32CTX
+	irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
+#else
+	core::dimension2d<u32> frame_size =
+		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+	const int screen_w = frame_size.Width;
+	const int screen_h = frame_size.Height;
+	float center_pos_x = position.UpperLeftCorner.X + position.LowerRightCorner.X;
+	center_pos_x /= screen_w;
+	center_pos_x -= 1;
+	float center_pos_y = position.UpperLeftCorner.Y + position.LowerRightCorner.Y;
+	center_pos_y /= screen_h;
+	center_pos_y = 1 - center_pos_y;
+	float width = position.LowerRightCorner.X - position.UpperLeftCorner.X;
+	width /= screen_w;
+	float height = position.LowerRightCorner.Y - position.UpperLeftCorner.Y;
+	height /= screen_h;
+
+	initGL();
+	const float quad_vertex[] =
+	{
+		-1., -1., 0., 1.,
+		-1., 1., 0., 0.,
+		1., -1., 1., 1.,
+		1., 1., 1., 0.
+	};
+
+	if (color.getAlpha() < 255)
+	{
+		glEnable(GL_BLEND);
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.f);
+	}
+	else
+	{
+		glDisable(GL_BLEND);
+		glDisable(GL_ALPHA_TEST);
+	}
+
+	if (!ColoredQuadShader)
+	{
+		ColoredQuadShader = LoadProgram(file_manager->getAsset("shaders/coloredquad.vert").c_str(), file_manager->getAsset("shaders/coloredquad.frag").c_str());
+		glGenBuffers(1, &quad_buffer);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+		glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
+		ColoredQuadUniformColor = glGetUniformLocation(ColoredQuadShader, "color");
+	}
+	glUseProgram(ColoredQuadShader);
+	glUniform2f(ColoredQuadUniformCenter, center_pos_x, center_pos_y);
+	glUniform2f(ColoredQuadUniformSize, width, height);
+	glUniform4i(ColoredQuadUniformColor, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 #endif
 }

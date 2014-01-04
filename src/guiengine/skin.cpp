@@ -2061,12 +2061,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
                 center.Y + (int)(((int)rect.LowerRightCorner.Y
                                 - (int)center.Y)*texture_size);
         }
-        GUIEngine::getDriver()->draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
+        GL32_draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
 
         core::recti innerArea = borderArea;
         innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
         innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
-        GUIEngine::getDriver()->draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
+		GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)
@@ -2130,7 +2130,7 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-    GUIEngine::getDriver()->draw2DRectangle( color,
+	GL32_draw2DRectangle(color,
                                             core::recti(position2d< s32 >(0,0),
                        GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }   // drawBGFadeColor
@@ -2178,7 +2178,7 @@ void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
     SColor color = SColor(150, 96, 74, 196);
-    GUIEngine::getDriver()->draw2DRectangle(color, rect);
+	GL32_draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------
