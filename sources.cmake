@@ -34,6 +34,7 @@ src/graphics/camera.cpp
 src/graphics/CBatchingMesh.cpp
 src/graphics/explosion.cpp
 src/graphics/glow.cpp
+src/graphics/glwrap.cpp
 src/graphics/gpuparticles.cpp
 src/graphics/hardware_skinning.cpp
 src/graphics/hit_sfx.cpp

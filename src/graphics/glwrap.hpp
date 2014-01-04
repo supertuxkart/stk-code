@@ -4,6 +4,7 @@
 #if defined(__APPLE__)
 #    include <OpenGL/gl.h>
 #    include <OpenGL/gl3.h>
+#    define OGL32CTX
 #elif defined(ANDROID)
 #    include <GLES/gl.h>
 #elif defined(WIN32)
@@ -14,7 +15,6 @@
 #else
 #define GL_GLEXT_PROTOTYPES
 #    include <GL/gl.h>
-#    include <GL/glext.h>
 #endif
 
 void initGL();
@@ -25,9 +25,8 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
 
 // already includes glext.h, which defines useful GL constants.
 // COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
-#ifdef WIN32
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLDriver.h"
-
+#ifdef WIN32
 extern PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
 extern PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
 extern PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
