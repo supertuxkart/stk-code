@@ -219,7 +219,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     }
     else if (s == "skybox")
     {
-        printf("[sam] Coucou\n");
         m_graphical_effect = GE_SKYBOX;
     }
     else if (s == "splatting")
@@ -809,13 +808,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     
     if(m_graphical_effect == GE_SKYBOX && irr_driver->isGLSL())
     {
-        printf("[sam]    Hello world :)\n");
         ITexture* tex = irr_driver->getTexture("cloud_mask.png");
         m->setTexture(1, tex);
-        if(m->getTexture(1) == NULL)
-        {
-            printf("[sam] Error :( \n");
-        }
+
         
         m->MaterialType = irr_driver->getShader(ES_SKYBOX);
     }
