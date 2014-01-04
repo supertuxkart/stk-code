@@ -270,7 +270,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 {
 
 #ifndef OGL32CTX
-	irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
+	irr_driver->getVideoDriver()->draw2DRectangle(color, position, clip);
 #else
 	core::dimension2d<u32> frame_size =
 		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
