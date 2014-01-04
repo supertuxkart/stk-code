@@ -1397,8 +1397,14 @@ void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getFont();
 
-    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
-
+    if(UserConfigParams::m_artist_debug_mode)
+    {
+        irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,50),NULL);
+    }
+    else
+    {
+        irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
+    }
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
     const int NO_TRUST_COUNT = 200;
@@ -2148,6 +2154,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
             m_suncam->updateAbsolutePosition();
 
             ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
+            ((SkyboxProvider *) m_shaders->m_callbacks[ES_SKYBOX])->setSunPosition(pos);
         }
 
         return light;

@@ -25,6 +25,7 @@ using namespace irr;
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \
     ACT(ES_NORMAL_MAP_LIGHTMAP) \
+    ACT(ES_SKYBOX) \
     ACT(ES_SPLATTING) \
     ACT(ES_WATER) \
     ACT(ES_WATER_SURFACE) \

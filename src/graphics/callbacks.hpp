@@ -156,6 +156,23 @@ private:
 
 //
 
+class SkyboxProvider: public CallBase
+{
+public:
+    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
+    
+    void setSunPosition(const core::vector3df &in)
+    {
+        m_sunpos = in;
+        //m_sunpos.normalize();
+    }
+
+private:
+    core::vector3df m_sunpos;
+};
+
+//
+
 class SplattingProvider: public CallBase
 {
 public:

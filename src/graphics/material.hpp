@@ -54,6 +54,7 @@ public:
                           GE_WATER_SHADER,
                           GE_SPHERE_MAP,
                           GE_SPLATTING,
+                          GE_SKYBOX,
                           GE_NORMAL_MAP,
                           GE_CAUSTICS};
 

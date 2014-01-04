@@ -152,6 +152,25 @@ void ColorLevelsProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 }
 
 //-------------------------------------
+void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
+{
+    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+    srv->setVertexShaderConstant("time", &time, 1);
+
+    vector3df sun_pos = m_sunpos;
+    srv->setVertexShaderConstant("sun_pos", &sun_pos.X, 3);
+    
+    if (!firstdone)
+    {
+        s32 tex = 0;
+        srv->setPixelShaderConstant("tex", &tex, 1);
+        s32 glow_tex = 1;
+        srv->setPixelShaderConstant("glow_tex", &glow_tex, 1);
+        firstdone = true;
+    }
+}
+
+//-------------------------------------
 
 void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {

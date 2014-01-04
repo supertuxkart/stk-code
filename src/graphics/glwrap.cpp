@@ -1,4 +1,4 @@
-#include "graphics\glwrap.hpp"
+#include "graphics/glwrap.hpp"
 #include <fstream>
 #include <string>
 

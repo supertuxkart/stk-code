@@ -217,6 +217,11 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     {
         m_graphical_effect = GE_SPHERE_MAP;
     }
+    else if (s == "skybox")
+    {
+        printf("[sam] Coucou\n");
+        m_graphical_effect = GE_SKYBOX;
+    }
     else if (s == "splatting")
     {
         m_graphical_effect = GE_SPLATTING;
@@ -800,6 +805,19 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->MaterialTypeParam = m_parallax_height;
         m->SpecularColor.set(0,0,0,0);
         modes++;
+    }
+    
+    if(m_graphical_effect == GE_SKYBOX && irr_driver->isGLSL())
+    {
+        printf("[sam]    Hello world :)\n");
+        ITexture* tex = irr_driver->getTexture("cloud_mask.png");
+        m->setTexture(1, tex);
+        if(m->getTexture(1) == NULL)
+        {
+            printf("[sam] Error :( \n");
+        }
+        
+        m->MaterialType = irr_driver->getShader(ES_SKYBOX);
     }
     if (m_graphical_effect == GE_SPLATTING)
     {
