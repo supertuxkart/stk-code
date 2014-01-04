@@ -1313,6 +1313,17 @@ namespace GUIEngine
 			1., -1., 1., 1.,
 			1., 1., 1., 0.
 		};
+		if (useAlphaChannelOfTexture)
+		{
+			glEnable(GL_BLEND);
+			glEnable(GL_ALPHA_TEST);
+			glAlphaFunc(GL_GREATER, 0.f);
+		}
+		else
+		{
+			glDisable(GL_BLEND);
+			glDisable(GL_ALPHA_TEST);
+		}
 		if (!TexturedQuadShader) {
 			TexturedQuadShader = LoadProgram(file_manager->getAsset("shaders/texturedquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
 			glGenBuffers(1, &quad_buffer);
