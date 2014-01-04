@@ -32,6 +32,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
+#include "graphics/glwrap.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -366,7 +367,7 @@ void Skin::drawBgImage()
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
-    GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area,
+    draw2DImage(bg_image, dest, source_area,
                                         /* no clipping */0, /*color*/ 0,
                                         /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);

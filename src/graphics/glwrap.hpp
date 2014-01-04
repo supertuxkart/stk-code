@@ -66,4 +66,12 @@ extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 #endif
 
+// core::rect<s32> needs these includes
+#include <rect.h>
+#include "utils/vec3.hpp"
+
+void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
+	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
+	const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
+
 #endif
