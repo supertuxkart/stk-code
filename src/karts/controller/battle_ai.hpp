@@ -35,10 +35,8 @@ class Vec3;
 
 namespace irr
 {
-    namespace scene
-    {
-        class ISceneNode;
-    }
+    namespace scene { class ISceneNode; }
+    namespace video { class ITexture; }
 }
 
 class BattleAI : public AIBaseController
@@ -47,15 +45,21 @@ class BattleAI : public AIBaseController
 private: 
 
     int m_current_node;
+    int m_next_node;
+    int m_target_node;
+
+    std::vector<std::pair<Vec3,Vec3> > portals;
 
     float m_target_angle;
 
     float m_time_since_stuck;
     bool m_currently_reversing;
 
-    void handleAcceleration(const float dt) {};
+    float determineTurnRadius(std::vector<Vec3>& points);
+    void findPortals(int start, int end, std::vector<std::pair<Vec3,Vec3> > &portals);
+    void handleAcceleration(const float dt) ;
     void handleSteering(const float dt);
-    void handleBraking() {};
+    void handleBraking();
     void handleGetUnstuck(const float dt);    
 
 protected:

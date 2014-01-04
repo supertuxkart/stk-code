@@ -104,11 +104,12 @@ void BattleAI::reset()
 
 void BattleAI::update(float dt)
 {
-    m_controls->m_accel     = 0.5f;
+    //m_controls->m_accel     = 0.5f;
  //   m_controls->m_steer     = 0;
    // updateCurrentNode();
- 
+    handleAcceleration(dt);
     handleSteering(dt);
+    handleBraking();
     handleGetUnstuck(dt);
     AIBaseController::update(dt);
 }   //BattleAI
@@ -156,7 +157,8 @@ void BattleAI::handleSteering(const float dt)
     PlayerController* pcontroller = (PlayerController*)kart->getController();
 
     int player_node = pcontroller->getCurrentNode();    
-   // std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
+    m_target_node   =   player_node;
+    // std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
     if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
     if(player_node == m_current_node)
     {
@@ -165,24 +167,196 @@ void BattleAI::handleSteering(const float dt)
     }
     else
     {    
-    int next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
+    m_next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
   
    // std::cout<<"Aiming at "<<next_node<<"\n";
-    if(next_node == -1) return;
-    target_point = NavMesh::get()->getCenterOfPoly(next_node);
+    if(m_next_node == -1) return;
+    target_point = NavMesh::get()->getCenterOfPoly(m_next_node);
     } 
     m_target_angle = steerToPoint(target_point);
   //  std::cout<<"Target nalge: "<<m_target_angle << "  normalized:"<<normalizeAngle(m_target_angle)<<std::endl;
-    setSteering(m_target_angle,dt);
+      setSteering(m_target_angle,dt);
     
 #ifdef AI_DEBUG
         m_debug_sphere->setPosition(target_point.toIrrVector());
         Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
 #endif
-      
+      findPortals(m_current_node, m_target_node, portals);
 }
 
 
+void BattleAI::findPortals(int start, int end, std::vector<std::pair<Vec3,Vec3> >& portals)
+{
+   int this_node = start;
+   int next_node = NULL;
+   portals.clear();
+
+   while(next_node != end && this_node != -1 && next_node != -1 && this_node != end)
+   {
+       next_node = BattleGraph::get()->getNextShortestPathPoly(this_node, end);
+       
+       const std::vector<int> this_node_verts = 
+                    NavMesh::get()->getNavPoly(this_node).getVerticesIndex();
+       const std::vector<int> next_node_verts=
+                    NavMesh::get()->getNavPoly(next_node).getVerticesIndex();
+       
+       Vec3 portalLeft, portalRight;
+       bool flag = 0;
+       for(unsigned int n_i=0; n_i<next_node_verts.size(); n_i++)
+       {
+           for(unsigned int t_i=0; t_i< this_node_verts.size(); t_i++)
+           {
+               if(next_node_verts[n_i] == this_node_verts[t_i])
+               {
+                   if(flag == 0)
+                   {
+                       portalLeft = NavMesh::get()->getVertex(next_node_verts[n_i]);
+                       flag=1;
+                   }
+                   else
+                       portalRight = NavMesh::get()->getVertex(next_node_verts[n_i]);
+
+               }
+           }
+       }
+       portals.push_back(std::make_pair(portalLeft,portalRight));
+       //irr_driver->getVideoDriver()->draw3DLine(Vec3(portalLeft+Vec3(0,2,0)).toIrrVector(),Vec3(portalRight+Vec3(0,2,0)).toIrrVector(),video::SColor(255,0,0,255));
+       //m_debug_sphere->setPosition(Vec3((portalLeft+portalRight)/2).toIrrVector());
+       this_node=next_node;
+   }
+}
+
+
+void BattleAI::handleAcceleration( const float dt)
+{
+    //Do not accelerate until we have delayed the start enough
+   /* if( m_start_delay > 0.0f )
+    {
+        m_start_delay -= dt;
+        m_controls->m_accel = 0.0f;
+        return;
+    }
+    */
+
+    if( m_controls->m_brake )
+    {
+        m_controls->m_accel = 0.0f;
+        return;
+    }
+
+    if(m_kart->getBlockedByPlungerTime()>0)
+    {
+        if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
+            m_controls->m_accel = 0.05f;
+        else
+            m_controls->m_accel = 0.0f;
+        return;
+    }
+
+    m_controls->m_accel = stk_config->m_ai_acceleration;
+
+}   // handleAcceleration
+
+
+
+void BattleAI::handleBraking()
+{
+    m_controls->m_brake = false;
+    
+
+    // A kart will not brake when the speed is already slower than this
+    // value. This prevents a kart from going too slow (or even backwards)
+    // in tight curves.
+    const float MIN_SPEED = 5.0f;
+
+    std::vector<Vec3> points;
+    
+    if(m_current_node == -1 || m_next_node == -1 || m_target_node == -1) 
+        return;
+
+    points.push_back(m_kart->getXYZ());
+    points.push_back(NavMesh::get()->getCenterOfPoly(m_next_node));
+    points.push_back(NavMesh::get()->getCenterOfPoly(m_target_node));
+    
+    float current_curve_radius = BattleAI::determineTurnRadius(points);
+    std::cout<<"\n Radius: " << current_curve_radius;
+    float max_turn_speed =
+            m_kart->getKartProperties()
+                   ->getSpeedForTurnRadius(current_curve_radius);
+
+        if(m_kart->getSpeed() > max_turn_speed  &&
+            m_kart->getSpeed()>MIN_SPEED )//            &&
+            //fabsf(m_controls->m_steer) > 0.95f          )
+        {
+            m_controls->m_brake = true;
+            std::cout<<"Braking"<<std::endl;
+#ifdef DEBUG
+            if(m_ai_debug)
+                Log::debug("SkiddingAI",
+                       "speed %f too tight curve: radius %f ",
+                       m_kart->getSpeed(),
+                       m_kart->getIdent().c_str(),
+                       m_current_curve_radius);
+#endif
+        }
+        return;
+   
+}   // handleBraking
+
+// Fit parabola to 3 points.
+// Solve AX=B
+float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
+{
+    // Declaring variables
+    float a,b,c;
+    irr::core::CMatrix4<float> A;
+    irr::core::CMatrix4<float> X;
+    irr::core::CMatrix4<float> B;
+    
+    //Populating matrices
+    for(unsigned int i=0; i<3; i++)
+    {
+        A(i,0)= points[i].x()*points[i].x();
+        A(i,1)= points[i].x();
+       // std::cout<<"X"<<points[i].x();
+        A(i,2)= 1.0f;
+        A(i,3)= 0.0f;
+    }
+    A(3,0)=A(3,1)=A(3,2) = 0.0f;
+    A(3,3) = 1.0f;
+    
+    for(unsigned int i=0; i<3; i++)
+    {
+        B(i,0)= points[i].z();
+        //std::cout<<"Z"<<points[i].z()<<"\n";
+        B(i,1)= 0.0f;
+        B(i,2)= 0.0f;
+        B(i,3)= 0.0f;
+    }
+    B(3,0)=B(3,1)=B(3,2)=B(3,3) = 0.0f;
+    
+    //Computing inverse : X = inv(A)*B
+    irr::core::CMatrix4<float> invA;
+    if(!A.getInverse(invA))
+    {
+        return -1;    
+    }
+
+    X = invA*B;
+    a = X(0,0);
+    b = X(0,1);
+    c = X(0,2);
+
+    float x = points.front().x();
+    float z = a*pow(x,2) + b*x + c;
+    float zD1 = 2*a*x + b;
+    float zD2 = 2*a;
+
+    float radius = pow(abs(1 + pow(zD1,2)),1.5f)/ abs(zD2);
+
+    return radius;
+
+}
 
 /*
 float BattleAI::isStuck(const float dt)
@@ -207,56 +381,3 @@ float BattleAI::isStuck(const float dt)
 
 */
 
-
-/*
-void BattleAI::updateCurrentNode()
-{
-    std::cout<<"Current Node \t"<< m_current_node << std::endl;
-
-    // if unknown location, search everywhere
-   
-
-    if(m_current_node != BattleGraph::UNKNOWN_POLY)
-    {
-        //check if the kart is still on the same node
-        const NavPoly& p = BattleGraph::get()->getPolyOfNode(m_current_node);
-        if(p.pointInPoly(m_kart->getXYZ())) return;
-
-        //if not then check all adjacent polys
-        const std::vector<int>& adjacents = 
-                            NavMesh::get()->getAdjacentPolys(m_current_node);
-        
-        // Set m_current_node to unknown so that if no adjacent poly checks true
-        // we look everywhere the next time updateCurrentNode is called. This is
-        // useful in cases when you are "teleported" to some other poly, ex. rescue
-        m_current_node = BattleGraph::UNKNOWN_POLY;
-        
-        
-        for(unsigned int i=0; i<adjacents.size(); i++)
-        {
-            const NavPoly& p_temp = 
-                    BattleGraph::get()->getPolyOfNode(adjacents[i]);
-            if(p_temp.pointInPoly(m_kart->getXYZ())) m_current_node = adjacents[i];
-        }
-        
-    }
-
-    if(m_current_node == BattleGraph::UNKNOWN_POLY)
-    {
-        int max_count = BattleGraph::get()->getNumNodes();
-        //float min_dist = 9999.99f;
-        for(unsigned int i =0; i<max_count; i++)
-        {
-            const NavPoly& p = BattleGraph::get()->getPolyOfNode(i);
-            if((p.pointInPoly(m_kart->getXYZ())))
-            {
-                m_current_node = i;
-                //min_dist = (p.getCenter() - m_kart->getXYZ()).length_2d();
-            }
-        }
-        
-    }
-
-    return;
-}
-*/
