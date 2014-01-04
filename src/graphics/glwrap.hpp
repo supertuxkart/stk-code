@@ -12,11 +12,59 @@
 #    include <windows.h>
 #    include <GL/gl.h>
 #else
+#define GL_GLEXT_PROTOTYPES
 #    include <GL/gl.h>
+#    include <GL/glext.h>
 #endif
+
+void initGL();
+GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path);
+GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
+void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUnit);
+
 
 // already includes glext.h, which defines useful GL constants.
 // COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
+#ifdef WIN32
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLDriver.h"
+
+extern PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
+extern PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
+extern PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
+extern PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
+extern PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
+extern PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
+extern PFNGLBINDBUFFERBASEPROC glBindBufferBase;
+extern PFNGLGENBUFFERSPROC glGenBuffers;
+extern PFNGLBINDBUFFERPROC glBindBuffer;
+extern PFNGLBUFFERDATAPROC glBufferData;
+extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
+extern PFNGLCREATESHADERPROC glCreateShader;
+extern PFNGLCOMPILESHADERPROC glCompileShader;
+extern PFNGLSHADERSOURCEPROC glShaderSource;
+extern PFNGLCREATEPROGRAMPROC glCreateProgram;
+extern PFNGLATTACHSHADERPROC glAttachShader;
+extern PFNGLLINKPROGRAMPROC glLinkProgram;
+extern PFNGLUSEPROGRAMPROC glUseProgram;
+extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
+extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
+extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
+extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+extern PFNGLUNIFORM1FPROC glUniform1f;
+extern PFNGLUNIFORM3FPROC glUniform3f;
+extern PFNGLDELETESHADERPROC glDeleteShader;
+extern PFNGLGETSHADERIVPROC glGetShaderiv;
+extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+extern PFNGLACTIVETEXTUREPROC glActiveTexture;
+extern PFNGLUNIFORM2FPROC glUniform2f;
+extern PFNGLUNIFORM1IPROC glUniform1i;
+extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
+extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+extern PFNGLBLENDEQUATIONPROC glBlendEquation;
+extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
+extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+#endif
 
 #endif
