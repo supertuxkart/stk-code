@@ -179,8 +179,6 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
 	glUniform1i(location, textureUnit);
 }
 
-#define OGL32CTX
-
 static GLuint quad_buffer;
 static GLuint TexturedQuadShader;
 static GLuint TexturedQuadAttribPosition;
