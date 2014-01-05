@@ -382,7 +382,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         else
         {
             m_node = ParticleSystemProxy::addParticleNode();
-			static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(type->getMaterial()->isAlphaAdditive());
+            if (irr_driver->isGLSL())
+                static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(type->getMaterial()->isAlphaAdditive());
         }
 
         if (m_parent != NULL)

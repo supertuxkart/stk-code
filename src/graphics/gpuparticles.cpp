@@ -46,6 +46,8 @@ scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
 	const core::vector3df& position,
 	const core::vector3df& rotation,
 	const core::vector3df& scale) {
+	if (!irr_driver->isGLSL())
+		return irr_driver->addParticleNode();
 	if (!parent)
 		parent = irr_driver->getSceneManager()->getRootSceneNode();
 
