@@ -291,6 +291,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	default:
 		assert(0 && "Wrong particle type");
 	}
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	texture = getTextureGLuint(getMaterial(0).getTexture(0));
 	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
