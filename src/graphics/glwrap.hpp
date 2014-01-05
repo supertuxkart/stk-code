@@ -14,6 +14,7 @@
 #    include <GL/gl.h>
 #else
 #define GL_GLEXT_PROTOTYPES
+#define DEBUG_OUTPUT_DECLARED
 #    include <GL/gl.h>
 #endif
 

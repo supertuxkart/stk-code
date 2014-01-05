@@ -49,6 +49,7 @@ PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 static GLuint quad_buffer;
 static bool is_gl_init = false;
 
+#ifdef DEBUG_OUTPUT_DECLARED
 static
 void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
   const GLchar* msg, const void *userparam)
@@ -111,6 +112,7 @@ void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsiz
     }
     printf("%s\n", msg);
 }
+#endif
 
 void initGL()
 {
@@ -158,7 +160,7 @@ void initGL()
 	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
 	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
 #endif
-#if DEBUG
+#ifdef DEBUG_OUTPUT_DECLARED
 	glDebugMessageCallbackARB(debugCallback, NULL);
 #endif
 	const float quad_vertex[] = {
