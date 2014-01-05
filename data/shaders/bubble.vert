@@ -17,7 +17,7 @@
 
 
 // Creates a bubble (wave) effect by distorting the texture depending on time
-
+#version 130
 uniform float time;
 varying vec2 uv;
 

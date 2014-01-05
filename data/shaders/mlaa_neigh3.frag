@@ -1,3 +1,4 @@
+#version 130
 varying vec4 offset[2];
 
 uniform sampler2D blendMap;

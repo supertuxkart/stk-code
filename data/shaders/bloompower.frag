@@ -1,3 +1,4 @@
+#version 130
 uniform float power;
 uniform sampler2D tex;
 

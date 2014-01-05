@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D ntex;
 
 uniform vec4 center[16];

@@ -21,6 +21,7 @@
 // The actual boost amount (which linearly scales the blur to be shown).
 // should be in the range [0.0, 1.0], though a larger value might make
 // the blurring too string. Atm we are using [0, 0.5].
+#version 130
 uniform float boost_amount;
 
 // The color buffer to use.

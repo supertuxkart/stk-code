@@ -19,7 +19,7 @@
 // Jean-manuel clemencon (c) supertuxkart 2013
 // bubble gum shield
 // TODO: Add a nice texture and soft edges when intersect with geometry
-
+#version 130
 uniform sampler2D tex;
 uniform float transparency;
 

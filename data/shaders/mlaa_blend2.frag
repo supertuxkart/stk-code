@@ -1,3 +1,4 @@
+#version 130
 #define MAX_SEARCH_STEPS 8.0
 #define MAX_DISTANCE 33.0
 

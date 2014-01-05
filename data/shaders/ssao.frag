@@ -1,4 +1,4 @@
-#version 120
+#version 130
 uniform sampler2D normals_and_depth;
 uniform mat4 invprojm;
 uniform mat4 projm;

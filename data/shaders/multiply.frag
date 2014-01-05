@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D tex1;
 uniform sampler2D tex2;
 

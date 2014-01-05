@@ -21,7 +21,7 @@
 // Original idea: http://udn.epicgames.com/Three/VolumetricLightbeamTutorial.html
 // TODO: Soft edges when it intesects geometry
 // Some artefacts are still visible
-
+#version 130
 uniform sampler2D tex;
 uniform float transparency;
 

@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D diffuse;
 uniform sampler2D specular;
 uniform sampler2D ambient_occlusion;

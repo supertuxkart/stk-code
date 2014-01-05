@@ -1,3 +1,4 @@
+#version 130
 uniform vec3 col;
 
 void main()

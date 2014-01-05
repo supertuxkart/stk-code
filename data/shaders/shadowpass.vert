@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D warpx;
 uniform sampler2D warpy;
 

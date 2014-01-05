@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D tex;
 uniform vec2 pixel;
 

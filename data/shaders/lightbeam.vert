@@ -18,7 +18,7 @@
 
 // Jean-manuel clemencon (C) Copyright supertuxkart
 // Creates a cone lightbeam effect by smoothing edges
-
+#version 130
 varying vec2 uv;
 varying vec3 eyeVec;
 varying vec3 normal;

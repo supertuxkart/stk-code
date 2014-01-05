@@ -1,3 +1,4 @@
+#version 130
 varying float camdist;
 
 void main() {

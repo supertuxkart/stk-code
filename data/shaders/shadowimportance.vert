@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D dtex;
 uniform mat4 ipvmat;
 uniform mat4 shadowmat;

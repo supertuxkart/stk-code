@@ -22,7 +22,7 @@
 // TODO: The texture should reflect the strength of the shield, 
 // such that the user gets to know whether the shield has several 
 // "layers" or whether the shield is about to break. 
-
+#version 130
 varying vec2 uv;
 varying vec3 eyeVec;
 varying vec3 normal;

@@ -1,3 +1,4 @@
+#version 130
 varying vec4 offset[2];
 uniform vec2 PIXEL_SIZE;
 
