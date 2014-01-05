@@ -28,18 +28,18 @@ varying vec2 uv_fast;
 
 void main()
 {
-
+  vec2 uv_temp = uv;
   vec3 V = normalize(vertex);
   vec3 L = normalize(vec3(sun_pos));
   
-  vec3 col = texture2D(tex, vec2((L.y + 1.0) / 2.0, V.y));
+  vec3 col = texture2D(tex, vec2((L.y + 1.0) / 2.0, V.y)).xyz;
   
   float vl = clamp(dot(V, L), 0, 1);
 
-	vec3 paint = texture2D(tex, uv * 3).a;
+	float paint = texture2D(tex, uv_temp * 3).a;
 	
-	uv += 20;
-	vec3 paint2 = texture2D(tex, uv * 5).a;
+	uv_temp += 20;
+	float paint2 = texture2D(tex, uv_temp * 5).a;
 	
 	// Get the general cloud mask
 	
