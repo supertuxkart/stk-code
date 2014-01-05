@@ -1,5 +1,5 @@
 #version 130
-uniform vec4 color;
+uniform ivec4 color;
 
 void main()
 {
