@@ -227,18 +227,15 @@ void RainEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float screenw = (float)UserConfigParams::m_width;
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 90.0f;
-    const matrix4 viewm = srv->getVideoDriver()->getTransform(ETS_VIEW);
-	matrix4 invproj = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-	invproj.makeInverse();
     const vector3df campos = irr_driver->getSceneManager()->getActiveCamera()->getPosition();
 	float screen[2] = { (float)UserConfigParams::m_width,
 		(float)UserConfigParams::m_height };
 
     srv->setVertexShaderConstant("screenw", &screenw, 1);
     srv->setVertexShaderConstant("time", &time, 1);
-    srv->setVertexShaderConstant("viewm", viewm.pointer(), 16);
+    srv->setVertexShaderConstant("viewm", irr_driver->getViewMatrix().pointer(), 16);
     srv->setVertexShaderConstant("campos", &campos.X, 3);
-	srv->setPixelShaderConstant("invproj", invproj.pointer(), 16);
+	srv->setPixelShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
 	srv->setPixelShaderConstant("screen", screen, 2);
 	s32 tex = 0;
 	srv->setPixelShaderConstant("tex", &tex, 1);
@@ -375,14 +372,13 @@ void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    int lightcount = m_color.size() / 4;
     srv->setVertexShaderConstant("screen", m_screen, 2);
     srv->setVertexShaderConstant("spec", &m_specular, 1);
-    srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
+    srv->setVertexShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
     srv->setVertexShaderConstant("energy[0]", m_energy.data(), m_energy.size());
     srv->setVertexShaderConstant("col[0]", m_color.data(), m_color.size());
     srv->setVertexShaderConstant("center[0]", m_pos.data(), m_pos.size());
-    srv->setVertexShaderConstant("viewm", m_view.pointer(), 16);
+    srv->setVertexShaderConstant("viewm", irr_driver->getViewMatrix().pointer(), 16);
 
     if (!firstdone)
     {
@@ -406,7 +402,7 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("screen", m_screen, 2);
     srv->setVertexShaderConstant("col", m_color, 3);
     srv->setVertexShaderConstant("center", m_pos, 3);
-    srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
+    srv->setVertexShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
     srv->setVertexShaderConstant("hasclouds", &hasclouds, 1);
 
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -529,8 +525,8 @@ void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void SSAOProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    srv->setPixelShaderConstant("invprojm", invprojm.pointer(), 16);
-    srv->setPixelShaderConstant("projm", projm.pointer(), 16);
+    srv->setPixelShaderConstant("invprojm", irr_driver->getInvProjMatrix().pointer(), 16);
+    srv->setPixelShaderConstant("projm", irr_driver->getProjMatrix().pointer(), 16);
     srv->setPixelShaderConstant("samplePoints[0]", array, 64);
 
     if (!firstdone)

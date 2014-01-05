@@ -342,7 +342,6 @@ void ParticleSystemProxy::simulate()
 		return;
 	}
 
-	u32 now = time;
 	u32 timediff = time - LastEmitTime;
 	LastEmitTime = time;
 
@@ -398,8 +397,7 @@ void ParticleSystemProxy::draw()
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
-	core::matrix4 projm = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-	core::matrix4 viewm = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+
 	if (m_alpha_additive)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	else
@@ -415,16 +413,14 @@ void ParticleSystemProxy::draw()
 		(float)UserConfigParams::m_width,
 		(float)UserConfigParams::m_height
 	};
-	irr::core::matrix4 invproj = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_PROJECTION);
-	invproj.makeInverse();
 
 	bindUniformToTextureUnit(uniform_texture, texture, 0);
 	bindUniformToTextureUnit(uniform_normal_and_depths, normal_and_depth, 1);
 
-	glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
+	glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 	glUniform2f(uniform_screen, screen[0], screen[1]);
-	glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, projm.pointer());
-	glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, viewm.pointer());
+	glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
+	glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
 
 	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
 	glVertexAttribPointer(attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);

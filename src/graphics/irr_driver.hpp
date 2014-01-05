@@ -99,6 +99,9 @@ private:
     /** The main MRT setup. */
     core::array<video::IRenderTarget> m_mrt;
 
+    /** Matrixes used in several places stored here to avoid recomputation. */
+    core::matrix4 m_ViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
+
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
      *  change to new resolution and trigger confirmation dialog.
@@ -462,7 +465,15 @@ public:
     void clearLights();
     // ------------------------------------------------------------------------
     scene::IMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
-
+    // ------------------------------------------------------------------------
+    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; }
+    const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
+    void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
+    const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
+    const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
+    void genProjViewMatrix() { m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
+    const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
+    const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }

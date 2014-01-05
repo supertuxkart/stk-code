@@ -421,17 +421,7 @@ public:
       m_energy = e;
     }
 
-    void updateIPVMatrix()
-    {
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-        m_view = drv->getTransform(video::ETS_VIEW);
-        m_invproj = drv->getTransform(video::ETS_PROJECTION);
-        m_invproj.makeInverse();
-    }
-
 private:
-    core::matrix4 m_invproj, m_view;
-
     std::vector<float> m_color;
     std::vector<float> m_pos;
     std::vector<float> m_energy;
@@ -476,22 +466,13 @@ public:
         m_pos[2] = pos.Z;
     }
 
-    void updateIPVMatrix()
-    {
-        // Update the IPV matrix, only once per frame since it's costly
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        m_invproj = drv->getTransform(video::ETS_PROJECTION);
-        m_invproj.makeInverse();
-    }
-
     void setShadowMatrix(const core::matrix4 &mat)
     {
         m_shadowmat = mat;
     }
 
 private:
-    core::matrix4 m_invproj, m_shadowmat;
+    core::matrix4 m_shadowmat;
     float m_color[3];
     float m_pos[3];
     float m_screen[2];
@@ -542,7 +523,6 @@ public:
 class SSAOProvider: public CallBase
 {
 private:
-    core::matrix4 projm, invprojm;
     float array[64];
 public:
     SSAOProvider() : CallBase() {
@@ -569,14 +549,6 @@ public:
     }
 
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-    void updateIPVMatrix()
-    {
-        // Update the IPV matrix, only once per frame since it's costly
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        projm = drv->getTransform(video::ETS_PROJECTION);
-        projm.getInverse(invprojm);
-    }
 };
 
 //

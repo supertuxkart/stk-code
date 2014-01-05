@@ -194,6 +194,9 @@ void IrrDriver::renderGLSL(float dt)
 
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         m_scene_manager->drawAll(m_renderpass);
+        irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
+        irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+        irr_driver->genProjViewMatrix();
 
         ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
                                                  irr_driver->getCallback(ES_SHADOW_IMPORTANCE);
@@ -684,18 +687,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                                         video::SColor(0, 0, 0, 0));
 
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-    PointLightProvider * const pcb = (PointLightProvider *) irr_driver->
-                                        getCallback(ES_POINTLIGHT);
-    pcb->updateIPVMatrix();
-    SunLightProvider * const scb = (SunLightProvider *) irr_driver->
-                                        getCallback(ES_SUNLIGHT);
-    scb->updateIPVMatrix();
     FogProvider * const fogcb = (FogProvider *) irr_driver->
                                         getCallback(ES_FOG);
     fogcb->updateIPVMatrix();
-    SSAOProvider * const ssaocb = (SSAOProvider *) irr_driver->
-                                        getCallback(ES_SSAO);
-    ssaocb->updateIPVMatrix();
 
 
     const u32 lightcount = m_lights.size();
