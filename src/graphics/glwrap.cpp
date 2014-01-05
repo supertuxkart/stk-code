@@ -98,8 +98,8 @@ void initGL()
 	const float quad_vertex[] = {
 		-1., -1., -1., 1., // UpperLeft
 		-1., 1., -1., -1., // LowerLeft
+		1., -1., 1., 1., // UpperRight
 		1., 1., 1., -1., // LowerRight
-		1., -1., 1., 1. // UpperRight
 	};
 	glGenBuffers(1, &quad_buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
@@ -285,7 +285,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
 	glVertexAttribPointer(TexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glVertexAttribPointer(TexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-	glDrawArrays(GL_QUADS, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(TexturedQuadAttribPosition);
 	glDisableVertexAttribArray(TexturedQuadAttribTexCoord);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
