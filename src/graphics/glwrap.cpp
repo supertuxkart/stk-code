@@ -49,6 +49,69 @@ PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 static GLuint quad_buffer;
 static bool is_gl_init = false;
 
+static
+void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
+  const GLchar* msg, const void *userparam)
+{
+    switch(source)
+    {
+    case GL_DEBUG_SOURCE_API_ARB:
+        printf("[API]");
+        break;
+    case GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB:
+        printf("[WINDOW_SYSTEM]");
+        break;
+    case GL_DEBUG_SOURCE_SHADER_COMPILER_ARB:
+        printf("[SHADER_COMPILER]");
+        break;
+    case GL_DEBUG_SOURCE_THIRD_PARTY_ARB:
+        printf("[THIRD_PARTY]");
+        break;
+    case GL_DEBUG_SOURCE_APPLICATION_ARB:
+        printf("[APPLICATION]");
+        break;
+    case GL_DEBUG_SOURCE_OTHER_ARB:
+        printf("[OTHER]");
+        break;
+    }
+
+    switch(type)
+    {
+    case GL_DEBUG_TYPE_ERROR_ARB:
+        printf("[ERROR]");
+        break;
+    case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR_ARB:
+        printf("[DEPRECATED_BEHAVIOR]");
+        break;
+    case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR_ARB:
+        printf("[UNDEFINED_BEHAVIOR]");
+        break;
+    case GL_DEBUG_TYPE_PORTABILITY_ARB:
+        printf("[PORTABILITY]");
+        break;
+    case GL_DEBUG_TYPE_PERFORMANCE_ARB:
+        printf("[PERFORMANCE]");
+        break;
+    case GL_DEBUG_TYPE_OTHER_ARB:
+        printf("[OTHER]");
+        break;
+    }
+
+    switch(severity)
+    {
+    case GL_DEBUG_SEVERITY_HIGH_ARB:
+        printf("[HIGH]");
+        break;
+    case GL_DEBUG_SEVERITY_MEDIUM_ARB:
+        printf("[MEDIUM]");
+        break;
+    case GL_DEBUG_SEVERITY_LOW_ARB:
+        printf("[LOW]");
+        break;
+    }
+    printf("%s\n", msg);
+}
+
 void initGL()
 {
 	if (is_gl_init)
@@ -94,6 +157,9 @@ void initGL()
 	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
 	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
 	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
+#endif
+#if DEBUG
+	glDebugMessageCallbackARB(debugCallback, NULL);
 #endif
 	const float quad_vertex[] = {
 		-1., -1., -1., 1., // UpperLeft

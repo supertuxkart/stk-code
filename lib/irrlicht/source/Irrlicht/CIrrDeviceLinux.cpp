@@ -724,8 +724,23 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
+			int context_attribs[] =
+				{
+					GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+					GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+					// Uncomment to discard deprecated features
+					//GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+#if DEBUG
+					GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+#endif
+					None
+				};
+			
+			PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
+			glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
+								glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
 			// create glx context
-			Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
+			Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, context_attribs);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))
