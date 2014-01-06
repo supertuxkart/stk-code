@@ -331,14 +331,14 @@ void ParticleEmitter::setCreationRateAbsolute(float f)
         m_node->setEmitter(m_emitter);
     }
 #endif
-	if (f <= 0.0f)
+/*	if (f <= 0.0f)
 	{
 		m_node->setVisible(false);
 	}
 	else
 	{
 		m_node->setVisible(true);
-	}
+	}*/
 }   // setCreationRateAbsolute
 
 //-----------------------------------------------------------------------------

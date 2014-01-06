@@ -2,6 +2,7 @@
 uniform int dt;
 uniform mat4 sourcematrix;
 uniform mat4 tinvsourcematrix;
+uniform int level;
 
 in vec3 particle_position_initial;
 in float lifetime_initial;
@@ -24,9 +25,11 @@ void main(void)
   vec4 adjusted_initial_velocity = tinvsourcematrix * vec4(particle_velocity_initial, 1.0);
   adjusted_initial_velocity /= adjusted_initial_velocity.w;
   float adjusted_lifetime = lifetime  + (float(dt)/lifetime_initial);
-  new_particle_position = (adjusted_lifetime < 1.) ? particle_position + particle_velocity.xyz * float(dt) : initialposition.xyz;
-  new_lifetime = (adjusted_lifetime < 1.) ? adjusted_lifetime : 0.;
-  new_particle_velocity = (adjusted_lifetime < 1.) ? particle_velocity : adjusted_initial_velocity.xyz;
-  new_size = (adjusted_lifetime < 1.) ? size : size_initial;
+  bool reset = (adjusted_lifetime > 1.) && (gl_VertexID <= level);
+  reset = reset || (lifetime < 0.);
+  new_particle_position = !reset ? particle_position + particle_velocity.xyz * float(dt) : initialposition.xyz;
+  new_lifetime = !reset ? adjusted_lifetime : 0.;
+  new_particle_velocity = !reset ? particle_velocity : adjusted_initial_velocity.xyz;
+  new_size = !reset ? size : size_initial;
   gl_Position = vec4(0.);
 }

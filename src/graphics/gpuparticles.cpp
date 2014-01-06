@@ -172,7 +172,7 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 		particles[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
 		particles[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
 		particles[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
-		// Initial lifetime is > 1
+		// Initial lifetime is random
 		particles[i].Lifetime = os::Randomizer::frand();
 
 		memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
@@ -207,8 +207,8 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
 		particles[i].PositionX = pos.X;
 		particles[i].PositionY = pos.Y;
 		particles[i].PositionZ = pos.Z;
-		// Initial lifetime is > 1
-		particles[i].Lifetime = 2.;
+		// Initial lifetime is < 0
+		particles[i].Lifetime = -1.;
 
 		memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
 		generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
@@ -239,6 +239,7 @@ GLuint ParticleSystemProxy::attrib_initial_size;
 GLuint ParticleSystemProxy::uniform_sourcematrix;
 GLuint ParticleSystemProxy::uniform_tinvsourcematrix;
 GLuint ParticleSystemProxy::uniform_dt;
+GLuint ParticleSystemProxy::uniform_level;
 
 
 GLuint ParticleSystemProxy::attrib_pos;
@@ -311,6 +312,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	uniform_dt = glGetUniformLocation(SimulationProgram, "dt");
 	uniform_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
 	uniform_tinvsourcematrix = glGetUniformLocation(SimulationProgram, "tinvsourcematrix");
+	uniform_level = glGetUniformLocation(SimulationProgram, "level");
 
 	attrib_position = glGetAttribLocation(SimulationProgram, "particle_position");
 	attrib_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
@@ -347,7 +349,7 @@ void ParticleSystemProxy::simulate()
 
 	u32 timediff = time - LastEmitTime;
 	LastEmitTime = time;
-
+	int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
 	core::matrix4 matrix = getAbsoluteTransformation();
 	core::matrix4 tinvmatrix;
 	matrix.getInverse(tinvmatrix);
@@ -375,6 +377,7 @@ void ParticleSystemProxy::simulate()
 	glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
 
 	glUniform1i(uniform_dt, timediff);
+	glUniform1i(uniform_level, active_count);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glUniformMatrix4fv(uniform_tinvsourcematrix, 1, GL_FALSE, tinvmatrix.pointer());
 	glBeginTransformFeedback(GL_POINTS);
@@ -390,13 +393,11 @@ void ParticleSystemProxy::simulate()
 	glDisableVertexAttribArray(attrib_initial_size);
 	glDisable(GL_RASTERIZER_DISCARD);
 	std::swap(tfb_buffers[0], tfb_buffers[1]);
+
 }
 
 void ParticleSystemProxy::draw()
 {
-	unsigned active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
-	// No max in windows ??
-	active_count = (active_count > count) ? count : active_count;
 	glDepthMask(GL_FALSE);
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
@@ -437,8 +438,7 @@ void ParticleSystemProxy::draw()
 	glVertexAttribDivisor(attrib_pos, 1);
 	glVertexAttribDivisor(attrib_sz, 1);
 
-	if (active_count)
-		glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, active_count);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 	glVertexAttribDivisor(attrib_lf, 0);
 	glVertexAttribDivisor(attrib_pos, 0);
 	glVertexAttribDivisor(attrib_sz, 0);

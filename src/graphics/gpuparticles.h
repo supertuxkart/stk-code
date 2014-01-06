@@ -32,7 +32,7 @@ protected:
 
 	static GLuint SimulationProgram;
 	static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-	static GLuint uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt;
+	static GLuint uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt, uniform_level;
 
 	static GLuint RenderProgram;
 	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
