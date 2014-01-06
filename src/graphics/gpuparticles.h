@@ -2,19 +2,24 @@
 #define GPUPARTICLES_H
 
 #include "graphics/glwrap.hpp"
+
 #include "../lib/irrlicht/source/Irrlicht/CParticleSystemSceneNode.h"
 #include <ISceneManager.h>
 #include <IParticleSystemSceneNode.h>
 
+namespace irr { namespace video{ class ITexture; } }
+
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 
-class GPUParticle : public scene::ISceneNode {
+class GPUParticle : public scene::ISceneNode
+{
 protected:
 	video::SMaterial fakemat;
 	virtual void simulate() = 0;
 	virtual void draw() = 0;
 public:
-	GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex);
+	GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, 
+                video::ITexture *tex);
 	virtual void render();
 	virtual void OnRegisterSceneNode();
 };
@@ -79,7 +84,7 @@ protected:
   virtual void draw();
 public:
   PointEmitter(scene::ISceneNode *parent,
-    scene::ISceneManager* mgr, ITexture *tex,
+    scene::ISceneManager* mgr, video::ITexture *tex,
     const core::vector3df& dir,
     u32 minParticlesPerSecond,
     u32 maxParticlesPerSecond,
@@ -109,7 +114,7 @@ protected:
 	virtual void simulate();
 	virtual void draw();
 public:
-	RainNode(scene::ISceneManager* mgr, ITexture *tex);
+	RainNode(scene::ISceneManager* mgr, video::ITexture *tex);
 	virtual const core::aabbox3d<f32>& getBoundingBox() const;
 	virtual u32 getMaterialCount() const { return 1; }
 };

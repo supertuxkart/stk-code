@@ -1635,6 +1635,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (!irr_driver->isGLSL())
     {
         scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
+
         sun->setLightType(video::ELT_DIRECTIONAL);
 
         // The angle of the light is rather important - let the sun

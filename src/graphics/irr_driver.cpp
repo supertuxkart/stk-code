@@ -2161,7 +2161,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
     }
     else
     {
-		return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(), pos, video::SColor(1., r, g, b));
+		return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(),
+                                                  pos, video::SColor(1.0f, r, g, b));
     }
 }
 

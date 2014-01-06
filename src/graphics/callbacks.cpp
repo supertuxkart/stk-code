@@ -15,6 +15,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/callbacks.hpp"
+
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"

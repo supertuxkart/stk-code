@@ -25,6 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/command_line.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -105,7 +106,7 @@ FileManager* file_manager = 0;
  *  exists) changed in reInit().
  *
  */
-FileManager::FileManager(char *argv[])
+FileManager::FileManager()
 {
     m_subdir_name.resize(ASSET_COUNT);
     m_subdir_name[CHALLENGE  ] = "challenges";
@@ -144,8 +145,8 @@ FileManager::FileManager(char *argv[])
     // This is esp. useful for Visual Studio, since it's not necessary
     // to define the working directory when debugging, it works automatically.
     std::string root_dir;
-    if(m_file_system->existFile(argv[0]))
-        exe_path = m_file_system->getFileDir(argv[0]);
+    if(m_file_system->existFile(CommandLine::getExecName().c_str()))
+        exe_path = m_file_system->getFileDir(CommandLine::getExecName().c_str());
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )

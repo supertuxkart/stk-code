@@ -18,7 +18,9 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/gpuparticles.h"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
@@ -30,9 +32,9 @@
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
+
 #include <ISceneManager.h>
 #include <SMeshBuffer.h>
-#include "graphics/gpuparticles.h"
 
 using namespace video;
 using namespace scene;

@@ -25,6 +25,7 @@
 #include "karts/controller/controller.hpp"
 
 class AbstractKart;
+class Camera;
 class Player;
 class SFXBase;
 

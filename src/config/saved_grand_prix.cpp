@@ -19,6 +19,7 @@
 
 #include "config/saved_grand_prix.hpp"
 
+#include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"

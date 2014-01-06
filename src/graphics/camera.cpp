@@ -71,13 +71,6 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_target_speed   = 10.0f;
     m_rotation_range = 0.4f;
     m_rotation_range = 0.0f;
-    // TODO: Make this per user too if the one above goes that way.
-    switch(UserConfigParams::m_camera_style)
-    {
-        case 1: m_camera_style = CS_CLASSIC; break;
-        case 0:
-        default: m_camera_style = CS_MODERN; break;
-    }
     reset();
 }   // Camera
 
@@ -373,16 +366,6 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
     switch(m_mode)
     {
     case CM_NORMAL:
-        if(m_camera_style==CS_CLASSIC)
-        {
-            *above_kart = 0.3f;
-            *cam_angle  = kp->getCameraBackwardUpAngle();
-            *sideway    = 0.0f;
-            *distance   = -1.5f*m_distance;
-            *smoothing  = true;
-            break;
-        }
-        // Fall through to falling mode.
     case CM_FALLING:
         {
             if(UserConfigParams::m_camera_debug==2)

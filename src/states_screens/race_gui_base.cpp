@@ -21,6 +21,7 @@
 #include "states_screens/race_gui_base.hpp"
 
 #include "audio/music_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"

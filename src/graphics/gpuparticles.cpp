@@ -102,7 +102,7 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
 {
 	float sizeMin = emitter->getMinStartSize().Height;
 	float sizeMax = emitter->getMaxStartSize().Height;
-	float lifetime_range = emitter->getMaxLifeTime() - emitter->getMinLifeTime();
+	float lifetime_range = float(emitter->getMaxLifeTime() - emitter->getMinLifeTime());
 
 	lifetime = os::Randomizer::frand() * lifetime_range;
 	lifetime += emitter->getMinLifeTime();

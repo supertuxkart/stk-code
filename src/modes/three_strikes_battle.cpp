@@ -23,6 +23,7 @@
 #include <IMeshSceneNode.h>
 
 #include "audio/music_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
