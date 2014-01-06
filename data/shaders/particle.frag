@@ -21,5 +21,5 @@ void main(void)
 	float len = dot(vec3(1.0), abs(texture2D(normals_and_depth, xy).xyz));
 	float alpha = (len < 0.2) ? 1. : clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
 	color = texture2D(texture, tc);
-    color.a *= alpha * (1. - lf);
+    color.a *= alpha * smoothstep(1., 0.8, lf);
 }

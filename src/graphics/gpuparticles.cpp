@@ -116,9 +116,9 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
 	particledir.rotateYZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 	particledir.rotateXZBy(os::Randomizer::frand() * emitter->getMaxAngleDegrees());
 
-	dirX = particledir.X / size;
-	dirY = particledir.Y / size;
-	dirZ = particledir.Z / size;
+	dirX = particledir.X;
+	dirY = particledir.Y;
+	dirZ = particledir.Z;
 }
 
 struct ParticleData
