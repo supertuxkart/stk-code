@@ -29,10 +29,11 @@ protected:
 	video::SMaterial fakemat;
 	GLuint tfb_buffers[2], initial_values_buffer;
 	bool m_alpha_additive;
+	float size_increase_factor;
 
 	static GLuint SimulationProgram;
 	static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-	static GLuint uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt, uniform_level;
+	static GLuint uniform_sourcematrix, uniform_tinvsourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
 
 	static GLuint RenderProgram;
 	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
@@ -65,6 +66,7 @@ public:
 	virtual void setEmitter(scene::IParticleEmitter* emitter);
 	virtual void render();
 	void setAlphaAdditive(bool);
+	void setIncreaseFactor(float);
 };
 
 class PointEmitter : public GPUParticle

@@ -556,6 +556,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                 m_node->createScaleParticleAffector(factor);
             m_node->addAffector(scale_affector);
             scale_affector->drop();
+            if (irr_driver->isGLSL())
+                static_cast<ParticleSystemProxy *>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
         }
 
         const float windspeed = type->getWindSpeed();

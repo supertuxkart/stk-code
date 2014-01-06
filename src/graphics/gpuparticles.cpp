@@ -75,6 +75,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	fakemat.BackfaceCulling = false;
 	glGenBuffers(1, &initial_values_buffer);
 	glGenBuffers(2, tfb_buffers);
+	size_increase_factor = 0.;
 	if (quad_vertex_buffer)
 		return;
 	static const GLfloat quad_vertex[] = {
@@ -95,7 +96,9 @@ ParticleSystemProxy::~ParticleSystemProxy()
 	glDeleteBuffers(1, &initial_values_buffer);
 }
 
-void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val;  }
+void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val; }
+
+void ParticleSystemProxy::setIncreaseFactor(float val) { size_increase_factor = val; }
 
 static
 void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &lifetime, float &size, float &dirX, float &dirY, float &dirZ)
@@ -240,6 +243,7 @@ GLuint ParticleSystemProxy::uniform_sourcematrix;
 GLuint ParticleSystemProxy::uniform_tinvsourcematrix;
 GLuint ParticleSystemProxy::uniform_dt;
 GLuint ParticleSystemProxy::uniform_level;
+GLuint ParticleSystemProxy::uniform_size_increase_factor;
 
 
 GLuint ParticleSystemProxy::attrib_pos;
@@ -313,6 +317,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	uniform_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
 	uniform_tinvsourcematrix = glGetUniformLocation(SimulationProgram, "tinvsourcematrix");
 	uniform_level = glGetUniformLocation(SimulationProgram, "level");
+	uniform_size_increase_factor = glGetUniformLocation(SimulationProgram, "size_increase_factor");
 
 	attrib_position = glGetAttribLocation(SimulationProgram, "particle_position");
 	attrib_lifetime = glGetAttribLocation(SimulationProgram, "lifetime");
@@ -380,6 +385,7 @@ void ParticleSystemProxy::simulate()
 	glUniform1i(uniform_level, active_count);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glUniformMatrix4fv(uniform_tinvsourcematrix, 1, GL_FALSE, tinvmatrix.pointer());
+	glUniform1f(uniform_size_increase_factor, size_increase_factor);
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, count);
 	glEndTransformFeedback();

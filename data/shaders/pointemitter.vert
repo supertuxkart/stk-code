@@ -3,6 +3,7 @@ uniform int dt;
 uniform mat4 sourcematrix;
 uniform mat4 tinvsourcematrix;
 uniform int level;
+uniform float size_increase_factor;
 
 in vec3 particle_position_initial;
 in float lifetime_initial;
@@ -30,6 +31,6 @@ void main(void)
   new_particle_position = !reset ? particle_position + particle_velocity.xyz * float(dt) : initialposition.xyz;
   new_lifetime = !reset ? adjusted_lifetime : 0.;
   new_particle_velocity = !reset ? particle_velocity : adjusted_initial_velocity.xyz;
-  new_size = !reset ? size : size_initial;
+  new_size = !reset ? mix(size_initial, size_initial * size_increase_factor, adjusted_lifetime) : size_initial;
   gl_Position = vec4(0.);
 }
