@@ -18,6 +18,7 @@
 
 #include "input/input_manager.hpp"
 #include "main_loop.hpp"
+#include "graphics/camera.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
