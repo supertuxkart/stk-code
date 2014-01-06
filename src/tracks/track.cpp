@@ -1761,6 +1761,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
 
                 file_manager->pushTextureSearchPath(lib_path + "/");
                 file_manager->pushModelSearchPath  (lib_path);
+                material_manager->pushTempMaterial(lib_path + "/materials.xml");
                 library_nodes[name] = libroot;
 
                 // Load LOD groups
