@@ -497,7 +497,7 @@ int handleCmdLinePreliminary()
     if( CommandLine::has( "--stk-config", &s))
     {
         stk_config->load(file_manager->getAsset(s));
-        Log::info("main", "STK config will be read from %s.",s);
+        Log::info("main", "STK config will be read from %s.",s.c_str());
     }
     if( CommandLine::has( "--trackdir", &s))
         TrackManager::addTrackSearchDir(s);
