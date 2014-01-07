@@ -133,14 +133,11 @@ void OverWorld::update(float dt)
         if(!obj->isGarage())
             continue;
 
-        Vec3 m_garage_pos = obj->getPosition();
         float m_distance = obj->getDistance();
-        
+        Vec3 m_garage_pos = obj->getPosition();
         Vec3 m_kart_pos = getKart(0)->getXYZ();
-        
-        // Distance should be written as m_distance*m_distance. Look at
-        // m_distance_2 variable in item.cpp file.
-        if ((m_garage_pos-m_kart_pos).length2_2d() > m_distance*m_distance)
+
+        if ((m_garage_pos-m_kart_pos).length_2d() > m_distance)
         {
             obj->reset();
         }
