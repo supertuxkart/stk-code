@@ -585,6 +585,17 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
     HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
     m_node->addAffector(hmca);
     hmca->drop();
+    if (irr_driver->isGLSL()) {
+        const Vec3* aabb_min;
+        const Vec3* aabb_max;
+        t->getAABB(&aabb_min, &aabb_max);
+        float track_x = aabb_min->getX();
+        float track_z = aabb_min->getZ();
+        const float track_x_len = aabb_max->getX() - aabb_min->getX();
+        const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
+        static_cast<ParticleSystemProxy *>(m_node)->setHeightmap(t->buildHeightMap(),
+            track_x, track_z, track_x_len, track_z_len);
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -94,11 +94,39 @@ ParticleSystemProxy::~ParticleSystemProxy()
 {
 	glDeleteBuffers(2, tfb_buffers);
 	glDeleteBuffers(1, &initial_values_buffer);
+	if (has_height_map)
+		glDeleteBuffers(1, &heighmapbuffer);
 }
 
 void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val; }
 
 void ParticleSystemProxy::setIncreaseFactor(float val) { size_increase_factor = val; }
+
+void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &hm,
+	float f1, float f2, float f3, float f4) {
+	track_x = f1, track_z = f2, track_x_len = f3, track_z_len = f4;
+	printf("track_x is %f, track_x_len is %f, track_z is %f, track_z_len is %f\n", 
+		track_x, track_x_len, track_z, track_z_len);
+	unsigned width = hm.size();
+	unsigned height = hm[0].size();
+	float *hm_array = new float[width * height];
+	for (unsigned i = 0; i < width; i++)
+	{
+		for (unsigned j = 0; j < height; j++)
+		{
+			hm_array[i * height + j] = hm[i][j];
+		}
+	}
+	has_height_map = true;
+	glGenBuffers(1, &heighmapbuffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, heighmapbuffer);
+	glBufferData(GL_TEXTURE_BUFFER, width * height * sizeof(float), hm_array, GL_STATIC_DRAW);
+	glGenTextures(1, &heightmaptexture);
+	glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+	glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
+	glBindBuffer(GL_TEXTURE_BUFFER, 0);
+	delete[] hm_array;
+}
 
 static
 void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &lifetime, float &size, float &dirX, float &dirY, float &dirZ)
@@ -243,6 +271,12 @@ GLuint ParticleSystemProxy::uniform_sourcematrix;
 GLuint ParticleSystemProxy::uniform_dt;
 GLuint ParticleSystemProxy::uniform_level;
 GLuint ParticleSystemProxy::uniform_size_increase_factor;
+GLuint ParticleSystemProxy::uniform_has_heightmap;
+GLuint ParticleSystemProxy::uniform_heightmap;
+GLuint ParticleSystemProxy::uniform_track_x;
+GLuint ParticleSystemProxy::uniform_track_x_len;
+GLuint ParticleSystemProxy::uniform_track_z;
+GLuint ParticleSystemProxy::uniform_track_z_len;
 
 
 GLuint ParticleSystemProxy::attrib_pos;
@@ -275,6 +309,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	CParticleSystemSceneNode::setEmitter(emitter);
 	if (!emitter || !isGPUParticleType(emitter->getType()))
 		return;
+	has_height_map = false;
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
 	setAutomaticCulling(0);
@@ -339,6 +374,12 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	uniform_invproj = glGetUniformLocation(RenderProgram, "invproj");
 	uniform_screen = glGetUniformLocation(RenderProgram, "screen");
 	uniform_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
+	uniform_has_heightmap = glGetUniformLocation(RenderProgram, "hasHeightMap");
+	uniform_heightmap = glGetUniformLocation(RenderProgram, "heightmap");
+	uniform_track_x = glGetUniformLocation(RenderProgram, "track_x");
+	uniform_track_x_len = glGetUniformLocation(RenderProgram, "track_x_len");
+	uniform_track_z = glGetUniformLocation(RenderProgram, "track_z");
+	uniform_track_z_len = glGetUniformLocation(RenderProgram, "track_z_len");
 }
 
 void ParticleSystemProxy::simulate()
@@ -380,6 +421,7 @@ void ParticleSystemProxy::simulate()
 	glUniform1i(uniform_level, active_count);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
 	glUniform1f(uniform_size_increase_factor, size_increase_factor);
+
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, count);
 	glEndTransformFeedback();
@@ -425,6 +467,18 @@ void ParticleSystemProxy::draw()
 	glUniform2f(uniform_screen, screen[0], screen[1]);
 	glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
 	glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+
+	glUniform1i(uniform_has_heightmap, has_height_map);
+	if (has_height_map)
+	{
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+		glUniform1i(uniform_heightmap, 2);
+		glUniform1f(uniform_track_x, track_x);
+		glUniform1f(uniform_track_z, track_z);
+		glUniform1f(uniform_track_x_len, track_x_len);
+		glUniform1f(uniform_track_z_len, track_z_len);
+	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
 	glVertexAttribPointer(attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
