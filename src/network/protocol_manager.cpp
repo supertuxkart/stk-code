@@ -114,7 +114,7 @@ void ProtocolManager::notifyEvent(Event* event)
     pthread_mutex_lock(&m_events_mutex);
     Event* event2 = new Event(*event);
     // register protocols that will receive this event
-    std::vector<int> protocols_ids;
+    std::vector<unsigned int> protocols_ids;
     PROTOCOL_TYPE searchedProtocol = PROTOCOL_NONE;
     if (event2->type == EVENT_TYPE_MESSAGE)
     {

@@ -58,7 +58,7 @@ public:
 
         if (event.EventType == EET_KEY_INPUT_EVENT && event.KeyInput.PressedDown)
         {
-            for (int n=0; n<m_listeners.size(); n++)
+            for (unsigned int n=0; n<m_listeners.size(); n++)
             {
                 m_listeners[n].onTextUpdated();
             }

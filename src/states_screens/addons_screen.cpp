@@ -255,7 +255,7 @@ void AddonsScreen::loadList()
         getWidget<GUIEngine::ListWidget>("list_addons");
     w_list->clear();
 
-    for(int i=0; i<sorted_list.size(); i++)
+    for(unsigned int i=0; i<sorted_list.size(); i++)
     {
         const Addon *addon = &(sorted_list[i]);
         // Ignore addons of a different type

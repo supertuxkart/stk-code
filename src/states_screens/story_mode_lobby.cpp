@@ -57,7 +57,7 @@ void StoryModeLobbyScreen::init()
 
     if (UserConfigParams::m_default_player.toString().size() > 0)
     {
-        for (int n=0; n<players.size(); n++)
+        for (unsigned int n=0; n<players.size(); n++)
         {
             if (players[n].getName() == UserConfigParams::m_default_player.toString())
             {
@@ -68,7 +68,7 @@ void StoryModeLobbyScreen::init()
         }
     }
 
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         if (players[n].isGuestAccount()) continue;
 
@@ -109,7 +109,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
         bool slot_found = false;
 
         PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-        for (int n=0; n<players.size(); n++)
+        for (unsigned int n=0; n<players.size(); n++)
         {
             if (list->getSelectionLabel() == players[n].getName())
             {
@@ -151,7 +151,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
     bool slot_found = false;
 
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         if (players[n].getName() == newName)
         {

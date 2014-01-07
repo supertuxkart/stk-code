@@ -277,10 +277,6 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
             Log::info("STKHost", "Message received but the ip address didn't match the expected one.");
         }
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
-		uint32_t addr1 = addr.sin_addr.s_addr;
-		uint32_t addr2 = sender.ip;
-		uint32_t addr3 = ntohl(addr1);
-		uint32_t addr4 = ntohl(addr2);
         StkTime::sleep(1); // wait 1 millisecond between two checks
         if (i >= max_tries && max_tries != -1)
         {

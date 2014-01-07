@@ -284,7 +284,7 @@ void UnlockManager::save()
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
         std::string name = "unknown player";
-        for (int i = 0; i < UserConfigParams::m_all_players.size(); i++)
+        for (unsigned int i = 0; i < UserConfigParams::m_all_players.size(); i++)
         {
             if (UserConfigParams::m_all_players[i].getUniqueID() == it->second->getPlayerID())
             {
@@ -310,7 +310,7 @@ bool UnlockManager::createSlotsIfNeeded()
 
     // make sure all players have at least one game slot associated
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         bool exists = false;
 
@@ -409,7 +409,7 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
 PlayerProfile* UnlockManager::getCurrentPlayer()
 {
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         if (players[n].getUniqueID() == m_current_game_slot) return players.get(n);
     }

@@ -127,7 +127,7 @@ void OverWorld::update(float dt)
 
     TrackObjectManager* tom = getTrack()->getTrackObjectManager();
     PtrVector<TrackObject>& objects = tom->getObjects();
-    for(int i=0; i<objects.size(); i++)
+    for(unsigned int i=0; i<objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
         if(!obj->isGarage())

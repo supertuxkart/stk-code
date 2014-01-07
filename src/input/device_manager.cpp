@@ -151,11 +151,11 @@ void DeviceManager::setAssignMode(const PlayerAssignMode assignMode)
     // when going back to no-assign mode, do some cleanup
     if (assignMode == NO_ASSIGN)
     {
-        for (int i=0; i < m_gamepads.size(); i++)
+        for (unsigned int i=0; i < m_gamepads.size(); i++)
         {
             m_gamepads[i].setPlayer(NULL);
         }
-        for (int i=0; i < m_keyboards.size(); i++)
+        for (unsigned int i=0; i < m_keyboards.size(); i++)
         {
             m_keyboards[i].setPlayer(NULL);
         }
@@ -191,7 +191,7 @@ bool DeviceManager::getConfigForGamepad(const int irr_id,
     bool configCreated = false;
 
     // Find appropriate configuration
-    for(int n=0; n < m_gamepad_configs.size(); n++)
+    for(unsigned int n=0; n < m_gamepad_configs.size(); n++)
     {
         if(m_gamepad_configs[n].getName() == name.c_str())
         {
@@ -249,7 +249,7 @@ void DeviceManager::addGamepad(GamePadDevice* d)
 
 bool DeviceManager::deleteConfig(DeviceConfig* config)
 {
-    for (int n=0; n<m_keyboards.size(); n++)
+    for (unsigned int n=0; n<m_keyboards.size(); n++)
     {
         if (m_keyboards[n].getConfiguration() == config)
         {
@@ -257,7 +257,7 @@ bool DeviceManager::deleteConfig(DeviceConfig* config)
             n--;
         }
     }
-    for (int n=0; n<m_gamepads.size(); n++)
+    for (unsigned int n=0; n<m_gamepads.size(); n++)
     {
         if (m_gamepads[n].getConfiguration() == config)
         {
@@ -573,11 +573,11 @@ void DeviceManager::serialize()
 
     configfile << "<input version=\"" << INPUT_FILE_VERSION << "\">\n\n";
 
-    for(int n=0; n<m_keyboard_configs.size(); n++)
+    for(unsigned int n=0; n<m_keyboard_configs.size(); n++)
     {
         m_keyboard_configs[n].serialize(configfile);
     }
-    for(int n=0; n<m_gamepad_configs.size(); n++)
+    for(unsigned int n=0; n<m_gamepad_configs.size(); n++)
     {
         m_gamepad_configs[n].serialize(configfile);
     }

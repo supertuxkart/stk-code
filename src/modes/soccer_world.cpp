@@ -109,7 +109,7 @@ void SoccerWorld::reset()
     m_blueScoreTimes.clear();
     m_lastKartToHitBall = -1;
     PtrVector<TrackObject>& objects = tom->getObjects();
-    for(int i=0; i<objects.size(); i++)
+    for(unsigned int i=0; i<objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())
@@ -198,7 +198,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
     assert(tom);
 
     PtrVector<TrackObject>& objects = tom->getObjects();
-    for(int i=0; i<objects.size(); i++)
+    for(unsigned int i=0; i<objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())

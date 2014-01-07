@@ -1912,8 +1912,8 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     }
 
     assert(m_rtt_main_node != NULL);
-    assert(mesh.size() == (int)mesh_location.size());
-    assert(mesh.size() == (int)model_frames.size());
+    assert(mesh.size() == mesh_location.size());
+    assert(mesh.size() == model_frames.size());
 
     const int mesh_amount = mesh.size();
     for (int n=1; n<mesh_amount; n++)

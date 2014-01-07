@@ -45,7 +45,7 @@ const char RibbonWidget::NO_ITEM_ID[] = "?";
 
 RibbonWidget::RibbonWidget(const RibbonType type) : Widget(WTYPE_RIBBON)
 {
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_selection[n] = -1;
     }
@@ -89,7 +89,7 @@ void RibbonWidget::add()
     m_element = btn;
 
     m_active_children.clearWithoutDeleting(); // Is just a copy of m_children without the deactivated children. m_children takes care of memory.
-    for (int i=0; i<m_children.size(); i++)
+    for (unsigned int i=0; i<m_children.size(); i++)
     {
         if (m_children[i].isVisible())
         {
@@ -149,10 +149,9 @@ void RibbonWidget::add()
 
     const int min_free_space = 50;
     global_zoom = (float)m_w / (float)( m_w - free_w_space + min_free_space );
-    //free_w_space = (int)(m_w - total_needed_space*global_zoom);
 
     const int one_button_space =
-        (int)roundf((float)m_w / (float)subbuttons_amount);
+        int(roundf((float)m_w / (float)subbuttons_amount));
 
     int widget_x = -1;
 
@@ -346,10 +345,10 @@ void RibbonWidget::add()
             int old_w = m_active_children[i].m_w;
             int old_h = m_active_children[i].m_h;
 
-            m_active_children[i].m_x = widget_x - (int)(image_w*zoom/2.0f);
+            m_active_children[i].m_x = widget_x - int(image_w*zoom/2.0f);
             m_active_children[i].m_y = button_y;
-            m_active_children[i].m_w = (int)(image_w*zoom);
-            m_active_children[i].m_h = (int)(image_h*zoom);
+            m_active_children[i].m_w = int(image_w*zoom);
+            m_active_children[i].m_h = int(image_h*zoom);
 
             IconButtonWidget* icon = ((IconButtonWidget*)m_active_children.get(i));
 
@@ -483,7 +482,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
 
     m_selection[playerID]++;
 
-    if (m_selection[playerID] >= m_active_children.size())
+    if (m_selection[playerID] >= int(m_active_children.size()))
     {
         if (m_listener != NULL) m_listener->onRibbonWidgetScroll(1);
 
@@ -503,7 +502,7 @@ EventPropagation RibbonWidget::rightPressed(const int playerID)
     // if we reached a filler item, move again (but don't wrap)
     if (getSelectionIDString(playerID) == RibbonWidget::NO_ITEM_ID)
     {
-        if (m_selection[playerID] + 1 < m_active_children.size())
+        if (m_selection[playerID] + 1 < int(m_active_children.size()))
         {
             rightPressed(playerID);
         }
@@ -595,7 +594,7 @@ void RibbonWidget::unfocused(const int playerID, Widget* new_focus)
 {
     if (new_focus != NULL && new_focus != this && !m_active_children.contains(new_focus))
     {
-        if (m_selection[playerID] >= 0 && m_selection[playerID] < m_children.size())
+        if (m_selection[playerID] >= 0 && m_selection[playerID] < int(m_children.size()))
         {
             m_active_children.get(m_selection[playerID])->unfocused(playerID, new_focus);
         }
@@ -650,7 +649,7 @@ const std::string& RibbonWidget::getSelectionIDString(const int playerID)
     // to be removed. If this tab group was previously selected, an
     // invalid array element would be accessed. In this case just pretend
     // that the first child was selected previously.
-    if(m_selection[playerID]>=m_active_children.size())
+    if(m_selection[playerID]>=(int)m_active_children.size())
         return m_active_children[0].m_properties[PROP_ID];
     return m_active_children[m_selection[playerID]].m_properties[PROP_ID];
 }   // getSelectionIDString
@@ -664,7 +663,7 @@ void RibbonWidget::updateSelection()
 
     //std::cout << "----\n";
     // Update selection flags for mouse player
-    for (int p=0; p<MAX_PLAYER_COUNT; p++)
+    for (unsigned int p=0; p<MAX_PLAYER_COUNT; p++)
     {
         for (int i=0; i<subbuttons_amount; i++)
         {
@@ -723,7 +722,7 @@ EventPropagation RibbonWidget::transmitEvent(Widget* w,
 }   // transmitEvent
 
 // ----------------------------------------------------------------------------
-void RibbonWidget::setLabel(const int id, irr::core::stringw new_name)
+void RibbonWidget::setLabel(const unsigned int id, irr::core::stringw new_name)
 {
     // This method should only be called AFTER a widget is added
     assert(m_element != NULL);

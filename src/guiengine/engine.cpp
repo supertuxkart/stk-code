@@ -752,7 +752,7 @@ namespace GUIEngine
     }   // showMessage
 
     // ------------------------------------------------------------------------
-    Widget* getFocusForPlayer(const int playerID)
+    Widget* getFocusForPlayer(const unsigned int playerID)
     {
         assert(playerID >= 0);
         assert(playerID < MAX_PLAYER_COUNT);
@@ -761,7 +761,7 @@ namespace GUIEngine
     }   // getFocusForPlayer
 
     // ------------------------------------------------------------------------
-    void focusNothingForPlayer(const int playerID)
+    void focusNothingForPlayer(const unsigned int playerID)
     {
         Widget* focus = getFocusForPlayer(playerID);
         if (focus != NULL) focus->unsetFocusForPlayer(playerID);
@@ -770,7 +770,7 @@ namespace GUIEngine
     }   // focusNothingForPlayer
 
     // ------------------------------------------------------------------------
-    bool isFocusedForPlayer(const Widget* w, const int playerID)
+    bool isFocusedForPlayer(const Widget* w, const unsigned int playerID)
     {
         assert(w != NULL);
         assert(playerID >= 0);
@@ -956,7 +956,7 @@ namespace GUIEngine
         //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
 
-        for (int i=0; i<g_loaded_screens.size(); i++)
+        for (unsigned int i=0; i<g_loaded_screens.size(); i++)
         {
             g_loaded_screens[i].unload();
         }
@@ -1006,7 +1006,7 @@ namespace GUIEngine
         g_driver = driver_a;
         g_state_manager = state_manager;
 
-        for (int n=0; n<MAX_PLAYER_COUNT; n++)
+        for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
         {
             g_focus_for_player[n] = NULL;
         }

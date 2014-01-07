@@ -97,7 +97,7 @@ public:
     }   // get
 
     // ------------------------------------------------------------------------
-    int size() const
+    unsigned int size() const
     {
         return m_contents_vector.size();
     }   // size
@@ -296,7 +296,7 @@ public:
 };   // class ptrVector
 
 
-#define for_in( VAR, VECTOR ) for (int _foreach_i = 0; \
+#define for_in( VAR, VECTOR ) for (unsigned int _foreach_i = 0; \
            VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL),\
            _foreach_i < VECTOR.size(); _foreach_i++)
 

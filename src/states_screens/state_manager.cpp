@@ -63,7 +63,7 @@ void StateManager::deallocate()
 StateManager::ActivePlayer* StateManager::getActivePlayer(const int id)
 {
     ActivePlayer *returnPlayer = NULL;
-    if (id < m_active_players.size() && id >= 0)
+    if (id < (int)m_active_players.size() && id >= 0)
     {
         returnPlayer = m_active_players.get(id);
     }
@@ -124,7 +124,7 @@ void StateManager::removeActivePlayer(int id)
 
 // ----------------------------------------------------------------------------
 
-int StateManager::activePlayerCount()
+unsigned int StateManager::activePlayerCount()
 {
     return m_active_players.size();
 }   // activePlayerCount

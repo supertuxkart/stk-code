@@ -145,7 +145,7 @@ void SavedGrandPrix::loadKarts(std::vector<RaceManager::KartStatus> & kart_list)
 {
     //Fix aikarts
     int aikarts = 0;
-    for(int i = 0; i < m_karts.size(); i++)
+    for(unsigned int i = 0; i < m_karts.size(); i++)
     {
         const KartProperties *kp = kart_properties_manager->getKart(m_karts[i].m_ident);
 

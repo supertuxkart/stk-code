@@ -1263,7 +1263,7 @@ int main(int argc, char *argv[] )
             // hack to have a running game slot :
             PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
             if (UserConfigParams::m_default_player.toString().size() > 0)
-                for (int n=0; n<players.size(); n++)
+                for (unsigned int n=0; n<players.size(); n++)
                     if (players[n].getName() == UserConfigParams::m_default_player.toString())
                         unlock_manager->setCurrentSlot(players[n].getUniqueID());
 
