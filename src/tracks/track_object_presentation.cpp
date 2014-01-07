@@ -139,6 +139,8 @@ TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
 
 TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 {
+    if (m_node)
+        irr_driver->removeNode(m_node);
 }
 
 // ----------------------------------------------------------------------------
