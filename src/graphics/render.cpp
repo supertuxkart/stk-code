@@ -706,7 +706,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
           m_lights[i]->render();
           continue;
         }
-        const core::vector3df &lightpos = (m_lights[i]->getPosition() - campos);
+        const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
         unsigned idx = (unsigned)(lightpos.getLength() / 10);
         if (idx > 14)
           continue;

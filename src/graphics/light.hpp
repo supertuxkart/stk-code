@@ -30,9 +30,15 @@ namespace irr
     namespace scene { class IMesh; }
 }
 
+//#define __LIGHT_NODE_VISUALISATION__
+
 // The actual node
 class LightNode: public scene::ISceneNode
 {
+#ifdef __LIGHT_NODE_VISUALISATION__
+    bool m_viz_added;
+#endif
+
 public:
     LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float energy, float r, float g, float b);
     virtual ~LightNode();

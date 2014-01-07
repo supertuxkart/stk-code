@@ -42,6 +42,10 @@ LightNode::LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float
     m_color[0] = r;
     m_color[1] = g;
     m_color[2] = b;
+
+#ifdef __LIGHT_NODE_VISUALISATION__
+    m_viz_added = false;
+#endif
 }
 
 LightNode::~LightNode()
@@ -94,4 +98,13 @@ void LightNode::renderLightSet(const std::vector<float> &positions, const std::v
 
 void LightNode::OnRegisterSceneNode()
 { // This node is only drawn manually.
+
+#ifdef __LIGHT_NODE_VISUALISATION__
+    if (!m_viz_added)
+    {
+        scene::IMeshSceneNode* viz = irr_driver->addSphere(0.5f, video::SColor(255, m_color[0]*255, m_color[1]*255, m_color[2]*255));
+        viz->setPosition(this->getAbsolutePosition());
+        m_viz_added = true;
+    }
+#endif
 }
