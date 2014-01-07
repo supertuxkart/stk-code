@@ -240,7 +240,6 @@ GLuint ParticleSystemProxy::attrib_initial_lifetime;
 GLuint ParticleSystemProxy::attrib_size;
 GLuint ParticleSystemProxy::attrib_initial_size;
 GLuint ParticleSystemProxy::uniform_sourcematrix;
-GLuint ParticleSystemProxy::uniform_tinvsourcematrix;
 GLuint ParticleSystemProxy::uniform_dt;
 GLuint ParticleSystemProxy::uniform_level;
 GLuint ParticleSystemProxy::uniform_size_increase_factor;
@@ -315,7 +314,6 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 	uniform_dt = glGetUniformLocation(SimulationProgram, "dt");
 	uniform_sourcematrix = glGetUniformLocation(SimulationProgram, "sourcematrix");
-	uniform_tinvsourcematrix = glGetUniformLocation(SimulationProgram, "tinvsourcematrix");
 	uniform_level = glGetUniformLocation(SimulationProgram, "level");
 	uniform_size_increase_factor = glGetUniformLocation(SimulationProgram, "size_increase_factor");
 
@@ -356,9 +354,6 @@ void ParticleSystemProxy::simulate()
 	LastEmitTime = time;
 	int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
 	core::matrix4 matrix = getAbsoluteTransformation();
-	core::matrix4 tinvmatrix;
-	matrix.getInverse(tinvmatrix);
-	tinvmatrix = tinvmatrix.getTransposed();
 	glUseProgram(SimulationProgram);
 	glEnable(GL_RASTERIZER_DISCARD);
 	glEnableVertexAttribArray(attrib_position);
@@ -384,7 +379,6 @@ void ParticleSystemProxy::simulate()
 	glUniform1i(uniform_dt, timediff);
 	glUniform1i(uniform_level, active_count);
 	glUniformMatrix4fv(uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
-	glUniformMatrix4fv(uniform_tinvsourcematrix, 1, GL_FALSE, tinvmatrix.pointer());
 	glUniform1f(uniform_size_increase_factor, size_increase_factor);
 	glBeginTransformFeedback(GL_POINTS);
 	glDrawArrays(GL_POINTS, 0, count);

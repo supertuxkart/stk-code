@@ -1,7 +1,6 @@
 #version 130
 uniform int dt;
 uniform mat4 sourcematrix;
-uniform mat4 tinvsourcematrix;
 uniform int level;
 uniform float size_increase_factor;
 
@@ -23,8 +22,7 @@ out float new_size;
 void main(void)
 {
   vec4 initialposition = sourcematrix * vec4(particle_position_initial, 1.0);
-  vec4 adjusted_initial_velocity = tinvsourcematrix * vec4(particle_velocity_initial, 1.0);
-  adjusted_initial_velocity /= adjusted_initial_velocity.w;
+  vec4 adjusted_initial_velocity = sourcematrix * vec4(particle_position_initial + particle_velocity_initial, 1.0) - initialposition;
   float adjusted_lifetime = lifetime  + (float(dt)/lifetime_initial);
   bool reset = (adjusted_lifetime > 1.) && (gl_VertexID <= level);
   reset = reset || (lifetime < 0.);
