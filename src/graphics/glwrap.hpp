@@ -67,6 +67,9 @@ extern PFNGLBLENDEQUATIONPROC glBlendEquation;
 extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 #endif
 
 // core::rect<s32> needs these includes

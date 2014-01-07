@@ -44,6 +44,9 @@ PFNGLBLENDEQUATIONPROC glBlendEquation;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
+PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
+PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
+PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 #endif
 
 static GLuint quad_buffer;
@@ -161,6 +164,9 @@ void initGL()
 	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
 	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
 	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
+	glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glGenVertexArrays");
+	glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)IRR_OGL_LOAD_EXTENSION("glBindVertexArray");
+	glDeleteVertexArrays = (PFNGLDELETEVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteVertexArrays");
 #endif
 #if ENABLE_ARB_DEBUG_OUTPUT
 	glDebugMessageCallbackARB(debugCallback, NULL);
