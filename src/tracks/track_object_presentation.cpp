@@ -470,7 +470,7 @@ void TrackObjectPresentationBillboard::update(float dt)
     if (m_fade_out_when_close)
     {
         scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-        const float dist =  m_node->getPosition().getDistanceFrom( curr_cam->getPosition() );
+        const float dist =  m_node->getAbsolutePosition().getDistanceFrom( curr_cam->getPosition() );
 
         scene::IBillboardSceneNode* node = (scene::IBillboardSceneNode*)m_node;
 
