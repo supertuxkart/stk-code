@@ -95,7 +95,11 @@ ParticleSystemProxy::~ParticleSystemProxy()
 	glDeleteBuffers(2, tfb_buffers);
 	glDeleteBuffers(1, &initial_values_buffer);
 	if (has_height_map)
+	{
 		glDeleteBuffers(1, &heighmapbuffer);
+		glDeleteTextures(1, &heightmaptexture);
+	}
+		
 }
 
 void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val; }
