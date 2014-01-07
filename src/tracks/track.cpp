@@ -2210,7 +2210,7 @@ bool Track::findGround(AbstractKart *kart)
     bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
                                              &m, &normal);
     const Vec3 &xyz = kart->getXYZ();
-    if(!over_ground || !m)
+    if(!over_ground)
     {
         Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
                   xyz.getX(),xyz.getY(),xyz.getZ());
@@ -2219,11 +2219,11 @@ bool Track::findGround(AbstractKart *kart)
 
     // Check if the material the kart is about to be placed on would trigger
     // a reset. If so, this is not a valid position.
-    if(m->isDriveReset())
+    if(m && m->isDriveReset())
     {
         Log::warn("physics","Kart at (%f %f %f) over reset terrain '%s'",
                    xyz.getX(),xyz.getY(),xyz.getZ(),
-            m->getTexFname().c_str());
+                   m->getTexFname().c_str());
         return false;
     }
 
