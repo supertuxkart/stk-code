@@ -30,7 +30,8 @@
 #include <string>
 #include <assert.h>
 
-namespace Online{
+namespace Online
+{
 
     // ============================================================================
 

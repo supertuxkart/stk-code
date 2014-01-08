@@ -182,7 +182,7 @@ void OnlineUserSearch::onUpdate(float dt, irr::video::IVideoDriver*)
         {
             if(m_search_request->isSuccess())
             {
-                parseResult(m_search_request->getResult());
+                parseResult(m_search_request->getXMLData());
                 showList();
             }
             else

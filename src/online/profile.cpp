@@ -141,20 +141,21 @@ namespace Online{
     {
         assert(CurrentUser::get()->isRegisteredUser() && !m_is_current_user);
         AchievementsRequest * request = new AchievementsRequest();
-        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        request->setParameter("action",std::string("get-achievements"));
-        request->setParameter("token", CurrentUser::get()->getToken());
-        request->setParameter("userid", CurrentUser::get()->getID());
-        request->setParameter("visitingid", m_id);
+        request->setServerURL("client-user.php");
+        request->addParameter("action",std::string("get-achievements"));
+        request->addParameter("token", CurrentUser::get()->getToken());
+        request->addParameter("userid", CurrentUser::get()->getID());
+        request->addParameter("visitingid", m_id);
         HTTPManager::get()->addRequest(request);
     }
 
     void Profile::AchievementsRequest::callback()
     {
         uint32_t user_id(0);
-        m_result->get("visitingid", &user_id);
+        getXMLData()->get("visitingid", &user_id);
         if( ProfileManager::get()->getProfileByID(user_id) != NULL )
-            ProfileManager::get()->getProfileByID(user_id)->achievementsCallback(m_result);
+            ProfileManager::get()->getProfileByID(user_id)
+                                 ->achievementsCallback(getXMLData());
     }
 
     // ============================================================================
@@ -196,20 +197,21 @@ namespace Online{
     {
         assert(CurrentUser::get()->isRegisteredUser());
         FriendsListRequest * request = new FriendsListRequest();
-        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-        request->setParameter("action",std::string("get-friends-list"));
-        request->setParameter("token", CurrentUser::get()->getToken());
-        request->setParameter("userid", CurrentUser::get()->getID());
-        request->setParameter("visitingid", m_id);
+        request->setServerURL("client-user.php");
+        request->addParameter("action",std::string("get-friends-list"));
+        request->addParameter("token", CurrentUser::get()->getToken());
+        request->addParameter("userid", CurrentUser::get()->getID());
+        request->addParameter("visitingid", m_id);
         HTTPManager::get()->addRequest(request);
     }
 
     void Profile::FriendsListRequest::callback()
     {
         uint32_t user_id(0);
-        m_result->get("visitingid", &user_id);
+        getXMLData()->get("visitingid", &user_id);
         if( ProfileManager::get()->getProfileByID(user_id) != NULL )
-            ProfileManager::get()->getProfileByID(user_id)->friendsListCallback(m_result);
+            ProfileManager::get()->getProfileByID(user_id)
+                                ->friendsListCallback(getXMLData());
     }
 
     // ============================================================================

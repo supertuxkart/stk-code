@@ -221,7 +221,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         Online::ServersManager::RefreshRequest* request = ServersManager::get()->refreshRequest(false);
         if (request != NULL) // consider request done
         {
-            Online::HTTPManager::get()->synchronousRequest(request);
+            request->executeNow();
             delete request;
         }
         else
@@ -235,7 +235,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
         Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::get()->requestServerJoin( server->getServerId(), false);
         if (request2)
         {
-            Online::HTTPManager::get()->synchronousRequest(request2);
+            request2->executeNow();
             if (request2->isSuccess())
             {
                 delete request2;

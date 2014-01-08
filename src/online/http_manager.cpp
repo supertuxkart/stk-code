@@ -43,6 +43,7 @@ namespace Online{
 
     static HTTPManager * http_singleton = NULL;
 
+    // ------------------------------------------------------------------------
     HTTPManager* HTTPManager::get()
     {
         if (http_singleton == NULL)
@@ -52,6 +53,9 @@ namespace Online{
         return http_singleton;
     }   // get
 
+    // ------------------------------------------------------------------------
+    /** Deletes the http manager.
+     */
     void HTTPManager::deallocate()
     {
         if (http_singleton != NULL)
@@ -61,20 +65,25 @@ namespace Online{
         }
     }   // deallocate
 
+    // ------------------------------------------------------------------------
+    /** Checks if the http manager is running.
+     */
     bool HTTPManager::isRunning()
     {
         return http_singleton != NULL;
-    }
+    }   // isRunning
+    // ------------------------------------------------------------------------
 
 
-    HTTPManager::HTTPManager(){
+    HTTPManager::HTTPManager()
+    {
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
         m_time_since_poll = MENU_POLLING_INTERVAL * 0.9;
     }
 
-    // ============================================================================
+    // ------------------------------------------------------------------------
     HTTPManager::~HTTPManager(){
         m_thread_id.lock();
         pthread_join(*m_thread_id.getData(), NULL);
@@ -85,7 +94,7 @@ namespace Online{
     }
 
 
-    // ---------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Start the actual network thread. This can not be done as part of
      *  the constructor, since the assignment to the global network_http
      *  variable has not been assigned at that stage, and the thread might
@@ -110,14 +119,14 @@ namespace Online{
             delete m_thread_id.getData();
             m_thread_id.unlock();
             m_thread_id.setAtomic(0);
-            Log::error("HTTP Manager", "Could not create thread, error=%d.\n", errno);
+            Log::error("HTTP Manager", "Could not create thread, error=%d.",
+                       errno);
         }
         pthread_attr_destroy(&attr);
         CurrentUser::get()->requestSavedSession();
     }   // startNetworkThread
 
-
-    // ---------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** This function inserts a high priority request to quit into the request
      *  queue of the network thead, and also aborts any ongoing download.
      *  Separating this allows more time for the thread to finish cleanly,
@@ -136,8 +145,7 @@ namespace Online{
         addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
-
-    // ----------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Signals to the progress function to request any ongoing download to be
      *  cancelled. This function can also be called if there is actually no
      *  download atm. The function progressDownload checks m_abort and will
@@ -149,15 +157,14 @@ namespace Online{
         // be sure that HTTP_MAX_PRIORITY requests still get executed.
     }   // cancelAllDownloads
 
-
-    // ----------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Inserts a request into the queue of all requests. The request will be
      *  sorted by priority.
      *  \param request The pointer to the new request to insert.
      */
     void HTTPManager::addRequest(Request *request)
     {
-        assert(request->isAllowedToAdd());
+        assert(request->isPreparing());
         request->setBusy();
         m_request_queue.lock();
         m_request_queue.getData().push(request);
@@ -166,21 +173,7 @@ namespace Online{
         m_request_queue.unlock();
     }   // addRequest
 
-
-    // ----------------------------------------------------------------------------
-    /** Immediately performs a request synchronously
-     *  \param request The pointer to the request to execute.
-     */
-    void HTTPManager::synchronousRequest(Request *request)
-    {
-        assert(request->isAllowedToAdd());
-        request->setBusy();
-        request->execute();
-        request->callback();
-        request->setDone();
-    }   // synchronousRequest
-
-    // ---------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** The actual main loop, which is started as a separate thread from the
      *  constructor. After testing for a new server, fetching news, the list
      *  of packages to download, it will wait for commands to be issued.
@@ -230,22 +223,22 @@ namespace Online{
         return 0;
     }   // mainLoop
 
-    // ----------------------------------------------------------------------------
+    // ------------------------------------------------------------------------
     /** Inserts a request into the queue of results.
      *  \param request The pointer to the request to insert.
      */
     void HTTPManager::addResult(Online::Request *request)
     {
-        assert(request->isBusy());
+        assert(request->hasBeenExecuted());
         m_result_queue.lock();
         m_result_queue.getData().push(request);
         m_result_queue.unlock();
-    }
+    }   // addResult
 
-    // ----------------------------------------------------------------------------
-    /**
-     * Takes a request out of the result queue, if any is present.
-     * Calls the callback method of the request and takes care of memory management if necessary.
+    // ------------------------------------------------------------------------
+    /** Takes a request out of the result queue, if any is present.
+     *  Calls the callback method of the request and takes care of memory
+     *  management if necessary.
      */
     void HTTPManager::handleResultQueue()
     {
@@ -270,12 +263,12 @@ namespace Online{
         }
     }
 
-    // ----------------------------------------------------------------------------
-    /**
-     * Should be called every frame and takes care of processing the result queue
-     * and polling the database server if a user is signed in.
+    // ------------------------------------------------------------------------
+    /** Should be called every frame and takes care of processing the result
+     *  queue and polling the database server if a user is signed in.
      */
-    void HTTPManager::update(float dt){
+    void HTTPManager::update(float dt)
+    {
         handleResultQueue();
 
         //Database polling starts here, only needed for registered users
@@ -292,7 +285,7 @@ namespace Online{
             CurrentUser::get()->requestPoll();
         }
 
-    }
+    }   // update
 } // namespace Online
 
 

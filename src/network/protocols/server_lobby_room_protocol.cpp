@@ -183,17 +183,17 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         last_poll_time = StkTime::getRealTime();
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
-        request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        request->setParameter("id",Online::CurrentUser::get()->getProfile()->getID());
-        request->setParameter("token",Online::CurrentUser::get()->getToken());
-        request->setParameter("address",addr.ip);
-        request->setParameter("port",addr.port);
-        request->setParameter("action","poll-connection-requests");
+        request->setServerURL("address-management.php");
+        request->addParameter("id",Online::CurrentUser::get()->getProfile()->getID());
+        request->addParameter("token",Online::CurrentUser::get()->getToken());
+        request->addParameter("address",addr.ip);
+        request->addParameter("port",addr.port);
+        request->addParameter("action","poll-connection-requests");
 
-        Online::HTTPManager::get()->synchronousRequest(request);
+        request->executeNow();
         assert(request->isDone());
 
-        const XMLNode * result = request->getResult();
+        const XMLNode * result = request->getXMLData();
         std::string rec_success;
         if(result->get("success", &rec_success))
         {

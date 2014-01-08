@@ -42,14 +42,14 @@ void StartServer::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        m_request->setParameter("id",Online::CurrentUser::get()->getID());
-        m_request->setParameter("token",Online::CurrentUser::get()->getToken());
-        m_request->setParameter("address",addr.ip);
-        m_request->setParameter("port",addr.port);
-        m_request->setParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
-        m_request->setParameter("max_players",UserConfigParams::m_server_max_players);
-        m_request->setParameter("action","start-server");
+        m_request->setServerURL("address-management.php");
+        m_request->addParameter("id",Online::CurrentUser::get()->getID());
+        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+        m_request->addParameter("address",addr.ip);
+        m_request->addParameter("port",addr.port);
+        m_request->addParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
+        m_request->addParameter("max_players",UserConfigParams::m_server_max_players);
+        m_request->addParameter("action","start-server");
         Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
 
         Online::HTTPManager::get()->addRequest(m_request);
@@ -57,7 +57,7 @@ void StartServer::asynchronousUpdate()
     }
     else if (m_state == REQUEST_PENDING && m_request->isDone())
     {
-        const XMLNode * result = m_request->getResult();
+        const XMLNode * result = m_request->getXMLData();
         std::string rec_success;
 
         if(result->get("success", &rec_success))
