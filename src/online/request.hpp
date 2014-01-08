@@ -260,7 +260,7 @@ namespace Online{
          *  \pre request has to be done
          *  \return get the result string from the request reply
          */
-        const std::string & HTTPRequest::getData() const
+        const std::string & getData() const
         {
             assert(hasBeenExecuted());
             return m_string_buffer;
@@ -337,7 +337,7 @@ namespace Online{
          *  \pre request has to be executed.
          *  \return get the complete result from the request reply.
          */
-        const XMLNode * XMLRequest::getXMLData() const
+        const XMLNode * getXMLData() const
         {
             assert(hasBeenExecuted());
             return m_xml_data;
@@ -349,7 +349,7 @@ namespace Online{
         * \pre request had to be executed.
         * \return get the info from the request reply
         */
-        const irr::core::stringw & XMLRequest::getInfo()   const
+        const irr::core::stringw & getInfo()   const
         {
             assert(hasBeenExecuted());
             return m_info;
