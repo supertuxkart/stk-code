@@ -34,17 +34,19 @@ void main()
   
   vec3 col = texture2D(tex, vec2((L.y + 1.0) / 2.0, V.y)).xyz;
   
-  float vl = clamp(dot(V, L), 0, 1);
+  float vl = clamp(dot(V, L), 0., 1.);
 
 	float paint = texture2D(tex, uv_temp * 3).a;
 	
 	uv_temp += 20;
-	float paint2 = texture2D(tex, uv_temp * 5).a;
+	//float paint2 = texture2D(tex, uv_temp * 5).a;
+	
+	float paint2 = texture2D(tex, uv * 5.).a;
 	
 	// Get the general cloud mask
 	
 	
-	float hello = texture2D(glow_tex, (uv_cl + paint2 * 0.07) *2).g;
+	float hello = texture2D(glow_tex, (uv_cl + paint2 * 0.07) *2.).g;
 	
 	float cld_mask = texture2D(glow_tex, (uv_anim + hello * 0.007 )).r;
 	
@@ -55,12 +57,12 @@ void main()
 
 	
 	cld_mask = (cld_mask * hello * 0.5);
-  cld_fast = (cld_fast + hello );
+  cld_fast = (cld_fast * hello );
 
-	col = cld_mask + col*(1 - cld_mask);
-	col = cld_fast + col*(1 - cld_fast);
+	col = cld_mask + col*(1. - cld_mask);
+	col = cld_fast + col*(1. - cld_fast);
 	
-  gl_FragColor = vec4( (col * paint2 * paint), 1.0);
+  gl_FragColor = vec4( vec3(col * paint * paint2), 1.0);
   
 
   //gl_FragColor = vec4(vec3(ou), 1.0);
