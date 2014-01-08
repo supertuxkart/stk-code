@@ -355,7 +355,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 		quaternions[4 * i] = rotationdir.X;
 		quaternions[4 * i + 1] = rotationdir.Y;
 		quaternions[4 * i + 2] = rotationdir.Z;
-		quaternions[4 * i + 3] = 3.14; // 10 rotation during lifetime
+		quaternions[4 * i + 3] = 31.4 * os::Randomizer::frand(); // 10 rotation during lifetime at max
 	}
 	glGenBuffers(1, &quaternionsbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
@@ -533,11 +533,15 @@ void ParticleSystemProxy::draw()
 	glVertexAttribDivisor(attrib_lf, 1);
 	glVertexAttribDivisor(attrib_pos, 1);
 	glVertexAttribDivisor(attrib_sz, 1);
+	glVertexAttribDivisor(attrib_rotationvec, 1);
+	glVertexAttribDivisor(attrib_anglespeed, 1);
 
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 	glVertexAttribDivisor(attrib_lf, 0);
 	glVertexAttribDivisor(attrib_pos, 0);
 	glVertexAttribDivisor(attrib_sz, 0);
+	glVertexAttribDivisor(attrib_rotationvec, 0);
+	glVertexAttribDivisor(attrib_anglespeed, 0);
 	glDisableVertexAttribArray(attrib_pos);
 	glDisableVertexAttribArray(attrib_lf);
 	glDisableVertexAttribArray(attrib_quadcorner);
