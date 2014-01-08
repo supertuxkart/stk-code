@@ -5,9 +5,11 @@ uniform sampler2D ambient_occlusion;
 uniform sampler2D specular_map;
 uniform vec3 ambient;
 
+in vec2 uv;
+
 void main()
 {
-	vec2 texc = gl_TexCoord[0].xy;
+	vec2 texc = uv;
 
 	vec3 diffuse = texture2D(diffuse, texc).xyz;
 	vec3 spec = texture2D(specular, texc).xyz;

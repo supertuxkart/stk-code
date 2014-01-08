@@ -4,6 +4,8 @@ uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
+in vec2 uv;
+
 const float strengh = 4.;
 const float radius = .4f;
 
@@ -16,8 +18,6 @@ void main(void)
 	// A set of Random(tm) vec2's. 8 1s, 6 0.7s, 2 0.4
 	// Again not using const because of broken Intel Windows drivers
 
-
-	vec2 uv = gl_TexCoord[0].xy;
 
 	vec4 cur = texture2D(normals_and_depth, uv);
 	float curdepth = texture2D(normals_and_depth, uv).a;

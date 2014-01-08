@@ -126,14 +126,14 @@ void Shaders::loadShaders()
     m_shaders[ES_MOTIONBLUR] = glsl(std::string(""), dir + "motion_blur.frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
-    m_shaders[ES_GAUSSIAN3H] = glslmat(std::string(""), dir + "gaussian3h.frag",
+	m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "gaussian3h.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_GAUSSIAN3V] = glslmat(std::string(""), dir + "gaussian3v.frag",
+	m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "gaussian3v.frag",
                                     m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-    m_shaders[ES_GAUSSIAN6H] = glslmat(std::string(""), dir + "gaussian6h.frag",
+	m_shaders[ES_GAUSSIAN6H] = glslmat(dir + "pass.vert", dir + "gaussian6h.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_GAUSSIAN6V] = glslmat(std::string(""), dir + "gaussian6v.frag",
+	m_shaders[ES_GAUSSIAN6V] = glslmat(dir + "pass.vert", dir + "gaussian6v.frag",
                                     m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
     m_shaders[ES_MIPVIZ] = glslmat(std::string(""), dir + "mipviz.frag",
@@ -170,10 +170,10 @@ void Shaders::loadShaders()
     m_shaders[ES_OBJECTPASS_RIMLIT] = glslmat(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag",
                                     m_callbacks[ES_OBJECTPASS], EMT_SOLID);
 
-    m_shaders[ES_LIGHTBLEND] = glslmat(std::string(""), dir + "lightblend.frag",
+	m_shaders[ES_LIGHTBLEND] = glslmat(dir + "pass.vert", dir + "lightblend.frag",
                                     m_callbacks[ES_LIGHTBLEND], EMT_ONETEXTURE_BLEND);
 
-    m_shaders[ES_POINTLIGHT] = glslmat(std::string(""), dir + "pointlight.frag",
+	m_shaders[ES_POINTLIGHT] = glslmat(dir + "pass.vert", dir + "pointlight.frag",
                                     m_callbacks[ES_POINTLIGHT], EMT_ONETEXTURE_BLEND);
 
     m_shaders[ES_SUNLIGHT] = glslmat(std::string(""), dir + "sunlight.frag",
@@ -188,7 +188,7 @@ void Shaders::loadShaders()
     m_shaders[ES_MLAA_NEIGH3] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_neigh3.frag",
                                     m_callbacks[ES_MLAA_NEIGH3]);
 
-    m_shaders[ES_SSAO] = glsl(std::string(""), dir + "ssao.frag", m_callbacks[ES_SSAO]);
+    m_shaders[ES_SSAO] = glsl(dir + "pass.vert", dir + "ssao.frag", m_callbacks[ES_SSAO]);
 
     m_shaders[ES_GODFADE] = glsl(std::string(""), dir + "godfade.frag", m_callbacks[ES_COLORIZE]);
     m_shaders[ES_GODRAY] = glsl(std::string(""), dir + "godray.frag", m_callbacks[ES_GODRAY]);
@@ -233,7 +233,7 @@ void Shaders::loadShaders()
     m_shaders[ES_PASSFAR] = glsl(dir + "farplane.vert", dir + "colorize.frag",
                                   m_callbacks[ES_COLORIZE]);
 
-    m_shaders[ES_FOG] = glslmat(std::string(""), dir + "fog.frag",
+	m_shaders[ES_FOG] = glslmat(dir + "pass.vert", dir + "fog.frag",
                                     m_callbacks[ES_FOG], EMT_ONETEXTURE_BLEND);
 
     // Check that all successfully loaded

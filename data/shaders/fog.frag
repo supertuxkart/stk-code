@@ -10,9 +10,11 @@ uniform vec3 col;
 uniform vec3 campos;
 uniform mat4 ipvmat;
 
+in vec2 uv;
+
 void main()
 {
-	float z = texture2D(tex, gl_TexCoord[0].xy).a;
+	float z = texture2D(tex, uv).a;
 
 	vec3 tmp = vec3(gl_TexCoord[0].xy, z);
 	tmp = tmp * 2.0 - 1.0;
