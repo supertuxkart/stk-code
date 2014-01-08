@@ -1,4 +1,4 @@
-#version 130
+#version 140
 uniform sampler2D texture;
 uniform sampler2D normals_and_depth;
 uniform mat4 invproj;
