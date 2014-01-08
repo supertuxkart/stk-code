@@ -27,8 +27,8 @@ public:
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
 	video::SMaterial fakemat;
-	GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture;
-	bool m_alpha_additive, has_height_map;
+	GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;
+	bool m_alpha_additive, has_height_map, flip;
 	float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
 
 	static GLuint SimulationProgram;
@@ -36,8 +36,8 @@ protected:
 	static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor, uniform_has_heightmap, uniform_heightmap;
 
 	static GLuint RenderProgram;
-	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
-	static GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz, attrib_rotationvec, attrib_anglespeed;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj, uniform_flips;
 
 	static GLuint uniform_track_x, uniform_track_z, uniform_track_x_len, uniform_track_z_len;
 
@@ -70,6 +70,7 @@ public:
 	void setAlphaAdditive(bool);
 	void setIncreaseFactor(float);
 	void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);
+	void setFlip();
 };
 
 class PointEmitter : public GPUParticle

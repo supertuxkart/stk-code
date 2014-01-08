@@ -572,8 +572,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         if (flips)
         {
 			if (irr_driver->isGLSL())
-				m_node->getMaterial(0).MaterialType = irr_driver->getShader(ES_SNOW);
-            m_node->getMaterial(0).BlendOperation = video::EBO_ADD;
+				static_cast<ParticleSystemProxy *>(m_node)->setFlip();
+            //m_node->getMaterial(0).BlendOperation = video::EBO_ADD;
         }
     }
 }   // setParticleType

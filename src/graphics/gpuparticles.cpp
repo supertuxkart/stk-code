@@ -75,6 +75,7 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	fakemat.BackfaceCulling = false;
 	glGenBuffers(1, &initial_values_buffer);
 	glGenBuffers(2, tfb_buffers);
+	glGenBuffers(1, &quaternionsbuffer);
 	size_increase_factor = 0.;
 	if (quad_vertex_buffer)
 		return;
@@ -94,6 +95,7 @@ ParticleSystemProxy::~ParticleSystemProxy()
 {
 	glDeleteBuffers(2, tfb_buffers);
 	glDeleteBuffers(1, &initial_values_buffer);
+	glDeleteBuffers(1, &quaternionsbuffer);
 	if (has_height_map)
 	{
 		glDeleteBuffers(1, &heighmapbuffer);
@@ -105,6 +107,10 @@ ParticleSystemProxy::~ParticleSystemProxy()
 void ParticleSystemProxy::setAlphaAdditive(bool val) { m_alpha_additive = val; }
 
 void ParticleSystemProxy::setIncreaseFactor(float val) { size_increase_factor = val; }
+
+void ParticleSystemProxy::setFlip() {
+	flip = true; 
+}
 
 void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &hm,
 	float f1, float f2, float f3, float f4) {
@@ -281,6 +287,7 @@ GLuint ParticleSystemProxy::uniform_track_x;
 GLuint ParticleSystemProxy::uniform_track_x_len;
 GLuint ParticleSystemProxy::uniform_track_z;
 GLuint ParticleSystemProxy::uniform_track_z_len;
+GLuint ParticleSystemProxy::uniform_flips;
 
 
 GLuint ParticleSystemProxy::attrib_pos;
@@ -288,6 +295,8 @@ GLuint ParticleSystemProxy::attrib_lf;
 GLuint ParticleSystemProxy::attrib_quadcorner;
 GLuint ParticleSystemProxy::attrib_texcoord;
 GLuint ParticleSystemProxy::attrib_sz;
+GLuint ParticleSystemProxy::attrib_rotationvec;
+GLuint ParticleSystemProxy::attrib_anglespeed;
 GLuint ParticleSystemProxy::uniform_matrix;
 GLuint ParticleSystemProxy::uniform_viewmatrix;
 GLuint ParticleSystemProxy::uniform_texture;
@@ -314,6 +323,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	if (!emitter || !isGPUParticleType(emitter->getType()))
 		return;
 	has_height_map = false;
+	flip = false;
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
 	setAutomaticCulling(0);
@@ -334,6 +344,24 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	default:
 		assert(0 && "Wrong particle type");
 	}
+
+	float *quaternions = new float[4 * count];
+	for (unsigned i = 0; i < count; i++)
+	{
+		core::vector3df rotationdir(1., 0., 0.);
+		rotationdir.rotateXYBy(os::Randomizer::frand() * 180.);
+		rotationdir.rotateYZBy(os::Randomizer::frand() * 180.);
+		rotationdir.rotateXZBy(os::Randomizer::frand() * 180.);
+		quaternions[4 * i] = rotationdir.X;
+		quaternions[4 * i + 1] = rotationdir.Y;
+		quaternions[4 * i + 2] = rotationdir.Z;
+		quaternions[4 * i + 3] = 3.14; // 10 rotation during lifetime
+	}
+	glGenBuffers(1, &quaternionsbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
+	glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STATIC_DRAW);
+	delete[] quaternions;
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	texture = getTextureGLuint(getMaterial(0).getTexture(0));
@@ -371,6 +399,9 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	attrib_lf = glGetAttribLocation(RenderProgram, "lifetime");
 	attrib_quadcorner = glGetAttribLocation(RenderProgram, "quadcorner");
 	attrib_texcoord = glGetAttribLocation(RenderProgram, "texcoord");
+	attrib_rotationvec = glGetAttribLocation(RenderProgram, "rotationvec");
+	attrib_anglespeed = glGetAttribLocation(RenderProgram, "anglespeed");
+
 
 	uniform_matrix = glGetUniformLocation(RenderProgram, "ProjectionMatrix");
 	uniform_viewmatrix = glGetUniformLocation(RenderProgram, "ViewMatrix");
@@ -384,6 +415,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	uniform_track_x_len = glGetUniformLocation(RenderProgram, "track_x_len");
 	uniform_track_z = glGetUniformLocation(RenderProgram, "track_z");
 	uniform_track_z_len = glGetUniformLocation(RenderProgram, "track_z_len");
+	uniform_flips = glGetUniformLocation(RenderProgram, "flips");
 }
 
 void ParticleSystemProxy::simulate()
@@ -483,6 +515,12 @@ void ParticleSystemProxy::draw()
 		glUniform1f(uniform_track_x_len, track_x_len);
 		glUniform1f(uniform_track_z_len, track_z_len);
 	}
+	glEnableVertexAttribArray(attrib_rotationvec);
+	glEnableVertexAttribArray(attrib_anglespeed);
+	glUniform1i(uniform_flips, flip);
+	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
+	glVertexAttribPointer(attrib_rotationvec, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(attrib_anglespeed, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
 
 	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
 	glVertexAttribPointer(attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
@@ -505,6 +543,8 @@ void ParticleSystemProxy::draw()
 	glDisableVertexAttribArray(attrib_quadcorner);
 	glDisableVertexAttribArray(attrib_texcoord);
 	glDisableVertexAttribArray(attrib_sz);
+	glDisableVertexAttribArray(attrib_rotationvec);
+	glDisableVertexAttribArray(attrib_anglespeed);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glDisable(GL_BLEND);
