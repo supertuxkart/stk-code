@@ -2313,7 +2313,7 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 
         m_sky_particles_emitter =
             new ParticleEmitter(track->getSkyParticles(),
-                                core::vector3df(0.0f, 40.0f, 100.0f),
+                                core::vector3df(0.0f, 20.0f, 100.0f),
                                 getNode());
 
         // FIXME: in multiplayer mode, this will result in several instances

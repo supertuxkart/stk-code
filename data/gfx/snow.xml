@@ -5,9 +5,9 @@
 
     <spreading angle="3"           />
     
-    <velocity  x="0.0"
+    <velocity  x="-0.01"
                y="-0.01"
-               z="0.0"             />
+               z="-0.02"             />
     
     <material  file="snowflake.png" clampu="Y" clampv="Y" />
     
