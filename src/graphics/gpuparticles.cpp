@@ -348,14 +348,14 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	float *quaternions = new float[4 * count];
 	for (unsigned i = 0; i < count; i++)
 	{
-		core::vector3df rotationdir(1., 0., 0.);
-		rotationdir.rotateXYBy(os::Randomizer::frand() * 180.);
+		core::vector3df rotationdir(0., 1., 0.);
+		/*rotationdir.rotateXYBy(os::Randomizer::frand() * 180.);
 		rotationdir.rotateYZBy(os::Randomizer::frand() * 180.);
-		rotationdir.rotateXZBy(os::Randomizer::frand() * 180.);
+		rotationdir.rotateXZBy(os::Randomizer::frand() * 180.);*/
 		quaternions[4 * i] = rotationdir.X;
 		quaternions[4 * i + 1] = rotationdir.Y;
 		quaternions[4 * i + 2] = rotationdir.Z;
-		quaternions[4 * i + 3] = 31.4 * os::Randomizer::frand(); // 10 rotation during lifetime at max
+		quaternions[4 * i + 3] = 3.14 * 3. * ( 2. * os::Randomizer::frand() - 1.); // 3 half rotation during lifetime at max
 	}
 	glGenBuffers(1, &quaternionsbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
