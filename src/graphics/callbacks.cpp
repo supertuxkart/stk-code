@@ -185,6 +185,17 @@ void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
+    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
+
     if (!firstdone)
     {
         s32 tex_layout = 1;

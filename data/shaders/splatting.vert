@@ -17,17 +17,17 @@
 
 #version 130
 uniform vec3 lightdir;
+uniform mat4 ModelViewProjectionMatrix;
+uniform mat4 TransposeInverseModelView;
 
 noperspective out vec3 nor;
 out vec2 uv;
 out vec2 uv_bis;
-out vec4 color;
 
 void main()
 {
-    uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
-    uv_bis = (gl_TextureMatrix[1] * gl_MultiTexCoord1).st;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	color = gl_Color;
-    nor = gl_NormalMatrix * gl_Normal;
+    uv = gl_MultiTexCoord0.st;
+    uv_bis = gl_MultiTexCoord1.st;
+    gl_Position = ModelViewProjectionMatrix * gl_Vertex;
+    nor = (TransposeInverseModelView * vec4(gl_Normal, 1.)).xyz;
 }

@@ -9,7 +9,6 @@ uniform sampler2D tex_detail3;
 noperspective in vec3 nor;
 in vec2 uv;
 in vec2 uv_bis;
-in vec4 color;
 
 void main() {
 	// Splatting part
@@ -25,8 +24,7 @@ void main() {
 			splatting.g * detail1 +
 			splatting.b * detail2 +
 			(1.0 - splatting.r - splatting.g - splatting.b) * detail3 +
-			(1.0 - splatting.a) * detail4)
-			* color;
+			(1.0 - splatting.a) * detail4);
 
 	gl_FragData[0] = vec4(splatted.xyz, 1.);
 
