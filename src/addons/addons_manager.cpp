@@ -463,13 +463,24 @@ bool AddonsManager::uninstall(const Addon &addon)
     if (file_manager->fileExists(addon.getDataDir()))
     {
         error = !file_manager->removeDirectory(addon.getDataDir());
+
+        // Even if an error happened when removing the data files
+        // still remove the addon, since it is unknown if e.g. only
+        // some files were successfully removed. Since we can not
+        // know if the addon is still functional, better remove it.
+        // On the other hand, in case of a problem the user will have
+        // the option in the GUI to try again. In this case 
+        // removeTrack/Kart would not find the addon and assert. So 
+        // check first if the track is still known.
         if(addon.getType()=="kart")
         {
-            kart_properties_manager->removeKart(addon.getId());
+            if(kart_properties_manager->getKart(addon.getId()))
+               kart_properties_manager->removeKart(addon.getId());
         }
         else if(addon.getType()=="track" || addon.getType()=="arena")
         {
-            track_manager->removeTrack(addon.getId());
+            if(track_manager->getTrack(addon.getId()))
+               track_manager->removeTrack(addon.getId());
         }
     }
     saveInstalled();
