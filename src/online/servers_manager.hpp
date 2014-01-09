@@ -22,7 +22,8 @@
 #include "utils/ptr_vector.hpp"
 #include "utils/types.hpp"
 #include "online/server.hpp"
-#include "http_manager.hpp"
+#include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 #include "utils/synchronised.hpp"
 
 

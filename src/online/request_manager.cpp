@@ -18,7 +18,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 
 #include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
@@ -37,18 +37,19 @@
 
 using namespace Online;
 
-namespace Online{
+namespace Online
+{
     #define MENU_POLLING_INTERVAL 10.0f
     #define GAME_POLLING_INTERVAL 15.0f
 
-    static HTTPManager * http_singleton = NULL;
+    static RequestManager * http_singleton = NULL;
 
     // ------------------------------------------------------------------------
-    HTTPManager* HTTPManager::get()
+    RequestManager* RequestManager::get()
     {
         if (http_singleton == NULL)
         {
-            http_singleton = new HTTPManager();
+            http_singleton = new RequestManager();
         }
         return http_singleton;
     }   // get
@@ -56,7 +57,7 @@ namespace Online{
     // ------------------------------------------------------------------------
     /** Deletes the http manager.
      */
-    void HTTPManager::deallocate()
+    void RequestManager::deallocate()
     {
         if (http_singleton != NULL)
         {
@@ -68,14 +69,14 @@ namespace Online{
     // ------------------------------------------------------------------------
     /** Checks if the http manager is running.
      */
-    bool HTTPManager::isRunning()
+    bool RequestManager::isRunning()
     {
         return http_singleton != NULL;
     }   // isRunning
     // ------------------------------------------------------------------------
 
 
-    HTTPManager::HTTPManager()
+    RequestManager::RequestManager()
     {
         curl_global_init(CURL_GLOBAL_DEFAULT);
         pthread_cond_init(&m_cond_request, NULL);
@@ -84,7 +85,8 @@ namespace Online{
     }
 
     // ------------------------------------------------------------------------
-    HTTPManager::~HTTPManager(){
+    RequestManager::~RequestManager()
+    {
         m_thread_id.lock();
         pthread_join(*m_thread_id.getData(), NULL);
         delete m_thread_id.getData();
@@ -101,7 +103,7 @@ namespace Online{
      *  use network_http - a very subtle race condition. So the thread can
      *  only be started after the assignment (in main) has been done.
      */
-    void HTTPManager::startNetworkThread()
+    void RequestManager::startNetworkThread()
     {
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
@@ -112,7 +114,7 @@ namespace Online{
 
         m_thread_id.setAtomic(new pthread_t());
         int error = pthread_create(m_thread_id.getData(), &attr,
-                                   &HTTPManager::mainLoop, this);
+                                   &RequestManager::mainLoop, this);
         if(error)
         {
             m_thread_id.lock();
@@ -132,7 +134,7 @@ namespace Online{
      *  Separating this allows more time for the thread to finish cleanly,
      *  before it gets cancelled in the destructor.
      */
-    void HTTPManager::stopNetworkThread()
+    void RequestManager::stopNetworkThread()
     {
         // If a download should be active (which means it was cancelled by the
         // user, in which case it will still be ongoing in the background)
@@ -150,7 +152,7 @@ namespace Online{
      *  cancelled. This function can also be called if there is actually no
      *  download atm. The function progressDownload checks m_abort and will
      *  return a non-zero value which causes libcurl to abort. */
-    void HTTPManager::cancelAllDownloads()
+    void RequestManager::cancelAllDownloads()
     {
         m_abort.setAtomic(true);
         // FIXME doesn't get called at the moment. When using this again, 
@@ -162,7 +164,7 @@ namespace Online{
      *  sorted by priority.
      *  \param request The pointer to the new request to insert.
      */
-    void HTTPManager::addRequest(Request *request)
+    void RequestManager::addRequest(Request *request)
     {
         assert(request->isPreparing());
         request->setBusy();
@@ -179,9 +181,9 @@ namespace Online{
      *  of packages to download, it will wait for commands to be issued.
      *  \param obj: A pointer to this object, passed on by pthread_create
      */
-    void *HTTPManager::mainLoop(void *obj)
+    void *RequestManager::mainLoop(void *obj)
     {
-        HTTPManager *me = (HTTPManager*) obj;
+        RequestManager *me = (RequestManager*) obj;
 
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
 
@@ -227,7 +229,7 @@ namespace Online{
     /** Inserts a request into the queue of results.
      *  \param request The pointer to the request to insert.
      */
-    void HTTPManager::addResult(Online::Request *request)
+    void RequestManager::addResult(Online::Request *request)
     {
         assert(request->hasBeenExecuted());
         m_result_queue.lock();
@@ -240,7 +242,7 @@ namespace Online{
      *  Calls the callback method of the request and takes care of memory
      *  management if necessary.
      */
-    void HTTPManager::handleResultQueue()
+    void RequestManager::handleResultQueue()
     {
         Request * request = NULL;
         m_result_queue.lock();
@@ -267,7 +269,7 @@ namespace Online{
     /** Should be called every frame and takes care of processing the result
      *  queue and polling the database server if a user is signed in.
      */
-    void HTTPManager::update(float dt)
+    void RequestManager::update(float dt)
     {
         handleResultQueue();
 

@@ -20,7 +20,7 @@
 
 #include "network/network_manager.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "config/user_config.hpp"
 #include "utils/log.hpp"
 
@@ -49,7 +49,7 @@ void QuickJoinProtocol::asynchronousUpdate()
         m_request->addParameter("token",Online::CurrentUser::get()->getToken());
         m_request->addParameter("action","quick-join");
 
-        Online::HTTPManager::get()->addRequest(m_request);
+        Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }
     else if (m_state == REQUEST_PENDING && m_request->isDone())

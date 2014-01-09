@@ -77,7 +77,7 @@ namespace Online
         request->addParameter("action", std::string("recovery"));
         request->addParameter("username", username);
         request->addParameter("email", email);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -97,7 +97,7 @@ namespace Online
         request->addParameter("password_confirm", password_confirm);
         request->addParameter("email", email);
         request->addParameter("terms", std::string("on"));
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -112,7 +112,7 @@ namespace Online
             request->addParameter("action",std::string("saved-session"));
             request->addParameter("userid", UserConfigParams::m_saved_user);
             request->addParameter("token", UserConfigParams::m_saved_token.c_str());
-            HTTPManager::get()->addRequest(request);
+            RequestManager::get()->addRequest(request);
             m_state = US_SIGNING_IN;
         }
     }
@@ -131,7 +131,7 @@ namespace Online
         request->addParameter("save-session", StringUtils::boolstr(save_session));
         if (request_now)
         {
-            HTTPManager::get()->addRequest(request);
+            RequestManager::get()->addRequest(request);
             m_state = US_SIGNING_IN;
         }
         return request;
@@ -200,7 +200,7 @@ namespace Online
         request->addParameter("userid",           getID());
         request->addParameter("name",             name);
         request->addParameter("max_players",      max_players);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -222,7 +222,7 @@ namespace Online
         request->addParameter("action",std::string("disconnect"));
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         m_state = US_SIGNING_OUT;
     }
 
@@ -260,7 +260,7 @@ namespace Online
         request->addParameter("id", getID());
         request->addParameter("server_id", server_id);
         if (request_now)
-            HTTPManager::get()->addRequest(request);
+            RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -286,7 +286,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("addonid", addon_id.substr(6));
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -304,7 +304,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("search-string", search_string);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -324,7 +324,7 @@ namespace Online
         request->addParameter("userid", getID());
         request->addParameter("addonid", addon_id.substr(6));
         request->addParameter("rating", rating);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
         return request;
     }
 
@@ -357,7 +357,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -394,7 +394,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -432,7 +432,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -471,7 +471,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -510,7 +510,7 @@ namespace Online
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -554,7 +554,7 @@ namespace Online
         request->addParameter("current", current_password);
         request->addParameter("new1", new_password);
         request->addParameter("new2", new_password_ver);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -586,7 +586,7 @@ namespace Online
         request->addParameter("action", std::string("poll"));
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     /**
@@ -713,12 +713,12 @@ namespace Online
     {
         if(isRegisteredUser())
         {
-            HTTPRequest * request = new HTTPRequest(true, HTTPManager::HTTP_MAX_PRIORITY);
+            HTTPRequest * request = new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
             request->setServerURL("client-user.php");
             request->addParameter("action", std::string("client-quit"));
             request->addParameter("token", getToken());
             request->addParameter("userid", getID());
-            HTTPManager::get()->addRequest(request);
+            RequestManager::get()->addRequest(request);
         }
     }
 
@@ -737,7 +737,7 @@ namespace Online
             request->addParameter("token", getToken());
             request->addParameter("userid", getID());
             request->addParameter("achievementid", achievement_id);
-            HTTPManager::get()->addRequest(request);
+            RequestManager::get()->addRequest(request);
         }
     }
 

@@ -20,7 +20,7 @@
 
 #include "network/protocol_manager.hpp"
 #include "network/network_manager.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"
 #include "utils/log.hpp"
@@ -51,7 +51,7 @@ void GetPeerAddress::asynchronousUpdate()
         m_request->addParameter("peer_id",m_peer_id);
         m_request->addParameter("action","get");
 
-        Online::HTTPManager::get()->addRequest(m_request);
+        Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }
     else if (m_state == REQUEST_PENDING && m_request->isDone())

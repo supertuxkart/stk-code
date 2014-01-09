@@ -27,7 +27,7 @@
 #include "network/protocols/start_game_protocol.hpp"
 
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "utils/log.hpp"

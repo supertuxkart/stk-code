@@ -20,7 +20,7 @@
 
 #include "network/network_manager.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "config/user_config.hpp"
 
 StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
@@ -55,7 +55,7 @@ void StopServer::asynchronousUpdate()
         m_request->addParameter("action","stop-server");
         Log::info("StopServer", "address %u, port %d", addr.ip, addr.port);
 
-        Online::HTTPManager::get()->addRequest(m_request);
+        Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }
     else if (m_state == REQUEST_PENDING && m_request->isDone())

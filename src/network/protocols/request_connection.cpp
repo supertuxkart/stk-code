@@ -19,7 +19,7 @@
 #include "network/protocols/request_connection.hpp"
 
 #include "network/protocol_manager.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"
 
@@ -50,7 +50,7 @@ void RequestConnection::asynchronousUpdate()
             m_request->addParameter("server_id",m_server_id);
             m_request->addParameter("action","request-connection");
 
-            Online::HTTPManager::get()->addRequest(m_request);
+            Online::RequestManager::get()->addRequest(m_request);
             m_state = REQUEST_PENDING;
             break;
         }

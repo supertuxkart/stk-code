@@ -19,9 +19,10 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/profile.hpp"
+#include "online/xml_request.hpp"
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
 

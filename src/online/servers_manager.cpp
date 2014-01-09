@@ -78,7 +78,7 @@ namespace Online{
             request->setServerURL("client-user.php");
             request->addParameter("action",std::string("get_server_list"));
             if (request_now)
-                HTTPManager::get()->addRequest(request);
+                RequestManager::get()->addRequest(request);
         }
         return request;
     }

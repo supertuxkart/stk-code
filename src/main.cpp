@@ -176,13 +176,13 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -1027,7 +1027,7 @@ void initRest()
     // to network_http (since the thread might use network_http, otherwise
     // a race condition can be introduced resulting in a crash).
     INetworkHttp::get()->startNetworkThread();
-    Online::HTTPManager::get()->startNetworkThread();
+    Online::RequestManager::get()->startNetworkThread();
     AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
@@ -1083,12 +1083,12 @@ static void cleanSuperTuxKart()
 
     if(INetworkHttp::get())
         INetworkHttp::get()->stopNetworkThread();
-    if(Online::HTTPManager::isRunning())
-        Online::HTTPManager::get()->stopNetworkThread();
+    if(Online::RequestManager::isRunning())
+        Online::RequestManager::get()->stopNetworkThread();
 
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
-    Online::HTTPManager::deallocate();
+    Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
     Online::ProfileManager::deallocate();
     AchievementsManager::deallocate();

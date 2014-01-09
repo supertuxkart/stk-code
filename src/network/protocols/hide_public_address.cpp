@@ -19,7 +19,7 @@
 #include "network/protocols/hide_public_address.hpp"
 
 #include "network/protocol_manager.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"
 #include "utils/log.hpp"
@@ -47,7 +47,7 @@ void HidePublicAddress::asynchronousUpdate()
         m_request->addParameter("token",Online::CurrentUser::get()->getToken());
         m_request->addParameter("action","unset");
 
-        Online::HTTPManager::get()->addRequest(m_request);
+        Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }
     else if (m_state == REQUEST_PENDING && m_request->isDone())

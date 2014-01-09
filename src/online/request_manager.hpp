@@ -18,8 +18,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HTTP_MANAGER_HPP
-#define HTTP_MANAGER_HPP
+#ifndef HEADER_REQUEST_MANAGER_HPP
+#define HEADER_REQUEST_MANAGER_HPP
 
 #include "io/xml_node.hpp"
 #include "online/request.hpp"
@@ -39,13 +39,14 @@
 #include <pthread.h>
 
 
-namespace Online{
+namespace Online
+{
 
     /**
       * \brief Class to connect with a server over HTTP(S)
       * \ingroup online
       */
-    class HTTPManager
+    class RequestManager
     {
         protected:
 
@@ -79,14 +80,14 @@ namespace Online{
 
             static void  *mainLoop(void *obj);
 
-            HTTPManager(); //const std::string &url
-            ~HTTPManager();
+            RequestManager(); //const std::string &url
+            ~RequestManager();
 
         public:
             static const int HTTP_MAX_PRIORITY = 9999;
 
             // singleton
-            static HTTPManager* get();
+            static RequestManager* get();
             static void deallocate();
             static bool isRunning();
 
@@ -98,9 +99,9 @@ namespace Online{
             bool getAbort(){ return m_abort.getAtomic(); };
             void update(float dt);
 
-    }; //class HTTPManager
+    }; //class RequestManager
 } // namespace Online
 
-#endif // HTTP_MANAGER_HPP
+#endif // request_manager_HPP
 
 /*EOF*/

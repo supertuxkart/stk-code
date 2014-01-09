@@ -31,7 +31,8 @@
 #include <assert.h>
 #include <string>
 
-namespace Online{
+namespace Online
+{
 
     /** Stores a request for the HTTP Manager. They will be sorted by 
      *  prioritiy.  Requests have four different states they can be in, and
@@ -40,7 +41,7 @@ namespace Online{
      *  and code to the main thread. The states are:
      *  - Preparing\n The request is created, and parameter are set. 
      *        Only the main thread can access this object.
-     *  - Busy\n The request is put into the http_manager queue. It remains
+     *  - Busy\n The request is put into the request_manager queue. It remains
      *        in this states till its operation is finished. No more changes
      *        to this object by the main thread are allowed, only the manager
      *        thread can change it now.
@@ -75,15 +76,15 @@ namespace Online{
          *  - S_PREPARING:\n The request is created and can be configured, it
          *      is not yet started.
          *  - S_BUSY:\n The request is added to the execution queue of the 
-         *      http_manager (and potentially executing). This implies that
-         *      now only the http_manager thread should access the requests's
+         *      request_manager (and potentially executing). This implies that
+         *      now only the request_manager thread should access the requests's
          *      data structures.
          *  - S_EXECUTED:\n The request was executed, but was not yet marked
-         *       as finished in the http_manager. This importantly indicates
+         *       as finished in the request_manager. This importantly indicates
          *       that the main thread should not yet access this request,
          *       since the http thread is still executing it.
          *  - S_DONE:\n The request is finished, and it is marked as
-         *      finished in the http_manager. This implies that the main
+         *      finished in the request_manager. This implies that the main
          *      stk thread can access its data safely now.
          */
         enum State
@@ -199,173 +200,9 @@ namespace Online{
             {
                 return a->getPriority() < b->getPriority();
             }
-        };   // Compare
-    };   // Request
+        };   // class Compare
+    };   // class Request
 
-
-    // ========================================================================
-    /** A http request.
-     */
-    class HTTPRequest : public Request
-    {
-    private:
-        typedef std::map<std::string, std::string>  Parameters;
-
-        /** The progress indicator. 0 untill it is started and the first
-         *  packet is downloaded. Guaranteed to be <1 while the download
-         *  is in progress, it will be set to either -1 (error) or 1
-         *  (everything ok) at the end. */
-        Synchronised<float> m_progress;
-
-        /** The url to download. */
-        std::string m_url;
-
-        /** The POST parameters that will be send with the request. */
-        Parameters *m_parameters;
-
-        /** Pointer to the curl data structure for this request. */
-        CURL *m_curl_session;
-
-        /** curl return code. */
-        CURLcode m_curl_code;
-
-        /** String to store the received data in. */
-        std::string m_string_buffer;
-
-    protected:
-        virtual void prepareOperation() OVERRIDE;
-        virtual void operation() OVERRIDE;
-        virtual void afterOperation() OVERRIDE;
-
-        static int progressDownload(void *clientp, double dltotal,
-                                    double dlnow,  double ultotal,
-                                    double ulnow);
-
-        static size_t writeCallback(void *contents, size_t size,
-                                    size_t nmemb,   void *userp);
-
-
-    public :
-                           HTTPRequest(bool manage_memory = false, 
-                                       int priority = 1);
-        virtual           ~HTTPRequest();
-        virtual bool       isAllowedToAdd() OVERRIDE;
-        void               setServerURL(const std::string& url);
-        // ------------------------------------------------------------------------
-        /** Returns the curl error status of the request.
-         */
-        CURLcode getResult() const { return m_curl_code; }
-        // ------------------------------------------------------------------------
-        /** Returns the downloaded string.
-         *  \pre request has to be done
-         *  \return get the result string from the request reply
-         */
-        const std::string & getData() const
-        {
-            assert(hasBeenExecuted());
-            return m_string_buffer;
-        }   // getData
-
-        // --------------------------------------------------------------------
-        /** Sets a parameter to 'value' (std::string).
-         */
-        void addParameter(const std::string & name, const std::string &value)
-        {
-            assert(isPreparing());
-            (*m_parameters)[name] = value;
-        };   // addParameter
-        // --------------------------------------------------------------------
-        /** Sets a parameter to 'value' (stringw).
-         */
-        void addParameter(const std::string & name, 
-                          const irr::core::stringw &value)
-        {
-            assert(isPreparing());
-            (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
-        }   // addParameter
-        // --------------------------------------------------------------------
-        /** Sets a parameter to 'value' (arbitrary types).
-         */
-        template <typename T>
-        void addParameter(const std::string & name, const T& value){
-            assert(isPreparing());
-            (*m_parameters)[name] = StringUtils::toString(value);
-        }   // addParameter
-        // --------------------------------------------------------------------
-        /** Returns the current progress. */
-        float getProgress() const { return m_progress.getAtomic(); }
-        // --------------------------------------------------------------------
-        /** Sets the current progress. */
-        void setProgress(float f)  { m_progress.setAtomic(f); }
-        // --------------------------------------------------------------------
-        const std::string & getURL() const { assert(isBusy()); return m_url;}
-        // --------------------------------------------------------------------
-        /** Sets the URL for this request. */
-        void setURL(const std::string & url) 
-        {
-            assert(isPreparing()); 
-            m_url = url;
-        }   // setURL
-
-    };   // class HTTPRequest
-
-    // ========================================================================
-    /** A http request expecting a xml return value.
-     */
-    class XMLRequest : public HTTPRequest
-    {
-    private:
-        /** On a successful download contains the converted XML tree. */
-        XMLNode *m_xml_data;
-
-        /** Additional info contained the downloaded data (or an error
-         *  message if a problem occurred). */
-        irr::core::stringw m_info;
-
-        /** True if the request was successful executed on the server. */
-        bool m_success;
-
-    protected:
-        virtual void afterOperation() OVERRIDE;
-
-    public :
-                 XMLRequest(bool manage_memory = false, int priority = 1);
-        virtual ~XMLRequest();
-
-        // ------------------------------------------------------------------------
-        /** Get the downloaded XML tree.
-         *  \pre request has to be executed.
-         *  \return get the complete result from the request reply.
-         */
-        const XMLNode * getXMLData() const
-        {
-            assert(hasBeenExecuted());
-            return m_xml_data;
-        }   // getXMLData
-
-        // ------------------------------------------------------------------------
-        /** Returns the additional information (or error message) contained in 
-         *  a finished request.
-        * \pre request had to be executed.
-        * \return get the info from the request reply
-        */
-        const irr::core::stringw & getInfo()   const
-        {
-            assert(hasBeenExecuted());
-            return m_info;
-        }   // getInfo
-
-        // --------------------------------------------------------------------
-        /** Returns whether the request was successfully executed on the server.
-         * \pre request had to be executed.
-         * \return whether or not the request was a success. */
-        bool isSuccess() const 
-        {
-            assert(hasBeenExecuted());
-            return m_success; 
-        }   // isSuccess
-
-    };   // class XMLRequest
 
 } //namespace Online
 

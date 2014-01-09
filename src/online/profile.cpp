@@ -20,7 +20,7 @@
 #include "online/profile.hpp"
 
 #include "online/profile_manager.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "config/user_config.hpp"
 #include "online/current_user.hpp"
 #include "utils/log.hpp"
@@ -146,7 +146,7 @@ namespace Online{
         request->addParameter("token", CurrentUser::get()->getToken());
         request->addParameter("userid", CurrentUser::get()->getID());
         request->addParameter("visitingid", m_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     void Profile::AchievementsRequest::callback()
@@ -202,7 +202,7 @@ namespace Online{
         request->addParameter("token", CurrentUser::get()->getToken());
         request->addParameter("userid", CurrentUser::get()->getID());
         request->addParameter("visitingid", m_id);
-        HTTPManager::get()->addRequest(request);
+        RequestManager::get()->addRequest(request);
     }
 
     void Profile::FriendsListRequest::callback()
