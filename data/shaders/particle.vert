@@ -34,7 +34,7 @@ void main(void)
 
 	if (hasHeightMap) {
 		float h = position.y - texelFetch(heightmap, i * 256 + j).r;
-		newposition.y = (h > 0.)? position.y : position.y - h;
+		newposition.y = (h > 0.)? position.y : 1000.;
 	}
 
 	if (flips)
