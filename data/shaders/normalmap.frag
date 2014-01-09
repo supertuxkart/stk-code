@@ -5,11 +5,12 @@ uniform sampler2D normalMap; //The bump-map
 noperspective in vec3 tangent;
 noperspective in vec3 bitangent;
 noperspective in vec3 normal;
+in vec2 uv;
 
 void main()
 {
 	// normal in Tangent Space
-	vec3 TS_normal = 2.0 * texture2D (normalMap, gl_TexCoord[0].st).rgb - 1.0;
+	vec3 TS_normal = 2.0 * texture2D (normalMap, uv).rgb - 1.0;
 	// Because of interpolation, we need to renormalize
 	vec3 Frag_tangent = normalize(tangent);
 	vec3 Frag_bitangent = normalize(cross(normal, tangent));
@@ -20,7 +21,7 @@ void main()
 	FragmentNormal = normalize(FragmentNormal);
 	
 
-	gl_FragData[0] = texture2D (texture, gl_TexCoord[0].st);
+	gl_FragData[0] = texture2D (texture, uv);
 	gl_FragData[1] = vec4(0.5 * FragmentNormal + 0.5, gl_FragCoord.z);
 	gl_FragData[2] = vec4(0.);
 }
