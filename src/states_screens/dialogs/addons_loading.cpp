@@ -398,8 +398,8 @@ void AddonsLoading::doUninstall()
 
         RibbonWidget* r = getWidget<RibbonWidget>("actions");
         r->setVisible(true);
-
-        m_install_button->setLabel(_("Try again"));
+        IconButtonWidget *u = getWidget<IconButtonWidget> ("uninstall" );
+        u->setLabel(_("Try again"));
     }
     else
     {
