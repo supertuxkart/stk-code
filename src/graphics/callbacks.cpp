@@ -754,6 +754,13 @@ void CausticsProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    core::matrix4 ModelViewMatrix = srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ProjectionMatrix", ProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("ModelViewMatrix", ModelViewMatrix.pointer(), 16);
+
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
     const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
 
