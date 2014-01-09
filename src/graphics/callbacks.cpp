@@ -239,6 +239,12 @@ void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
     const float diff = (time - start) / 3.0f;
 
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (visible)
     {
         transparency = diff;
