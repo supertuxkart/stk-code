@@ -17,11 +17,12 @@
 
 #version 130
 uniform sampler2D texture;
-varying vec3 normal;
 uniform vec3 lightdir;
-varying vec4 vertex_color;
-varying vec3 eyeVec;
-varying vec3 lightVec;
+
+noperspective in vec3 normal;
+in vec4 vertex_color;
+noperspective in vec3 eyeVec;
+noperspective in vec3 lightVec;
 
 void main()
 {

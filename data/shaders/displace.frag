@@ -4,11 +4,13 @@ uniform vec2 screen;
 uniform vec2 dir;
 uniform vec2 dir2;
 
-varying float camdist;
+in vec2 uv;
+in vec2 edger_uv;
+in float camdist;
 
 void main()
 {
-	vec2 tc = gl_TexCoord[0].xy;
+	vec2 tc = uv;
 
 	vec4 col = vec4(0.0);
 	const float maxlen = 0.02;
@@ -24,7 +26,7 @@ void main()
 	float fade = 1.0 - smoothstep(1.0, 100.0, camdist);
 
 	// Fade according to distance from the edges
-	vec2 edger = gl_TexCoord[1].xy;
+	vec2 edger = edger_uv;
 	const float mindist = 0.1;
 	fade *= smoothstep(0.0, mindist, edger.x) * smoothstep(0.0, mindist, edger.y) *
 		(1.0 - smoothstep(1.0 - mindist, 1.0, edger.x)) *

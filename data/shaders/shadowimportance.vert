@@ -3,8 +3,8 @@ uniform sampler2D dtex;
 uniform mat4 ipvmat;
 uniform mat4 shadowmat;
 
-varying vec3 wpos;
-varying vec2 texc;
+out vec3 wpos;
+out vec2 texc;
 
 float decdepth(vec4 rgba) {
 	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));

@@ -1,10 +1,13 @@
 #version 130
-varying float camdist;
+
+out vec2 uv;
+out vec2 edger_uv;
+out float camdist;
 
 void main() {
 	gl_Position = ftransform();
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_TexCoord[1] = gl_MultiTexCoord1;
+	uv = gl_MultiTexCoord0.xy;
+	edger_uv = gl_MultiTexCoord1.xy;
 
 	camdist = length((gl_ModelViewMatrix * gl_Vertex).xyz);
 }

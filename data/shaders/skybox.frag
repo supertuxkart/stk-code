@@ -20,11 +20,11 @@ uniform sampler2D glow_tex;
 uniform float transparency;
 uniform vec3 sun_pos;
 
-varying vec2 uv_anim;
-varying vec2 uv;
-varying vec2 uv_cl;
-varying vec3 vertex;
-varying vec2 uv_fast;
+in vec2 uv_anim;
+in vec2 uv;
+in vec2 uv_cl;
+in vec3 vertex;
+in vec2 uv_fast;
 
 void main()
 {

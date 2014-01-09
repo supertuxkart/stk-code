@@ -25,9 +25,9 @@
 uniform sampler2D tex;
 uniform float transparency;
 
-varying vec2 uv;
-varying vec3 eyeVec;
-varying vec3 normal;
+in vec2 uv;
+noperspective in vec3 eyeVec;
+noperspective in vec3 normal;
 
 void main()
 {

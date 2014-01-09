@@ -98,7 +98,7 @@ void Shaders::loadShaders()
     m_shaders[ES_SKYBOX] = glslmat(dir + "skybox.vert", dir + "skybox.frag",
                                    m_callbacks[ES_SKYBOX], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_SPLATTING] = glslmat(dir + "objectpass.vert", dir + "splatting.frag",
+    m_shaders[ES_SPLATTING] = glslmat(dir + "splatting.vert", dir + "splatting.frag",
                                    m_callbacks[ES_SPLATTING], EMT_SOLID);
 
     m_shaders[ES_WATER] = glslmat(dir + "water.vert", dir + "water.frag",

@@ -5,6 +5,8 @@ uniform int viz;
 uniform int wireframe;
 uniform float objectid;
 
+in vec2 uv;
+
 vec4 encdepth(float v) {
 	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
 	enc = fract(enc);
@@ -15,7 +17,7 @@ vec4 encdepth(float v) {
 void main() {
 
 	if (hastex != 0) {
-		float alpha = texture2D(tex, gl_TexCoord[0].xy).a;
+		float alpha = texture2D(tex, uv).a;
 
 		if (alpha < 0.5)
 			discard;
@@ -29,7 +31,7 @@ void main() {
 		if (wireframe > 0)
 			gl_FragColor = vec4(1.0);
 		else
-			gl_FragColor = texture2D(tex, gl_TexCoord[0].xy);
+			gl_FragColor = texture2D(tex, uv);
 	}
 }
 

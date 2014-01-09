@@ -4,8 +4,8 @@ uniform sampler2D ctex;
 uniform vec3 campos;
 uniform int low;
 
-varying vec3 wpos;
-varying vec2 texc;
+in vec3 wpos;
+in vec2 texc;
 
 float luminanceImp()
 {

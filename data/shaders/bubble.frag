@@ -17,7 +17,7 @@
 #version 130
 uniform sampler2D tex;
 uniform float transparency;
-varying vec2 uv;
+in vec2 uv;
 
 void main()
 {

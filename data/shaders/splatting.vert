@@ -18,13 +18,16 @@
 #version 130
 uniform vec3 lightdir;
 
-noperspective out vec3 normal;
+noperspective out vec3 nor;
+out vec2 uv;
+out vec2 uv_bis;
+out vec4 color;
 
 void main()
 {
-    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-    gl_TexCoord[1] = gl_TextureMatrix[1] * gl_MultiTexCoord1;
+    uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
+    uv_bis = (gl_TextureMatrix[1] * gl_MultiTexCoord1).st;
     gl_Position = ftransform();
-
-    normal = gl_NormalMatrix * gl_Normal;
+	color = gl_Color;
+    nor = gl_NormalMatrix * gl_Normal;
 }

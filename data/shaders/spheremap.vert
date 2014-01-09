@@ -16,15 +16,15 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #version 130
-varying vec3 normal;
-varying vec4 vertex_color;
-varying vec3 eyeVec;
-varying vec3 lightVec;
 uniform vec3 lightdir;
+
+noperspective out vec3 normal;
+out vec4 vertex_color;
+noperspective out vec3 eyeVec;
+noperspective out vec3 lightVec;
 
 void main()
 {
-	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
     gl_Position = ftransform();
     vertex_color = gl_Color;
 

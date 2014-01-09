@@ -2,6 +2,8 @@
 uniform sampler2D warpx;
 uniform sampler2D warpy;
 
+out vec2 uv;
+
 float decdepth(vec4 rgba) {
 	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
 }
@@ -9,7 +11,7 @@ float decdepth(vec4 rgba) {
 void main()
 {
 	vec4 pos = ftransform();
-	gl_TexCoord[0] = gl_MultiTexCoord0;
+	uv = gl_MultiTexCoord0.xy;
 
 	vec2 tc = pos.xy * vec2(0.5) + vec2(0.5);
 
