@@ -121,8 +121,17 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 
     // Pre-multiply on the cpu
     vector3df wind = irr_driver->getWind() * strength;
+    core::matrix4 ModelViewProjectionMatrix = drv->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= drv->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= drv->getTransform(ETS_WORLD);
+    core::matrix4 TransposeInverseModelView = drv->getTransform(ETS_VIEW);
+    TransposeInverseModelView *= drv->getTransform(ETS_WORLD);
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
     srv->setVertexShaderConstant("windDir", &wind.X, 3);
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
 
     if (!firstdone)
     {
