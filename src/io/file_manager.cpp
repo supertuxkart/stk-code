@@ -1066,8 +1066,7 @@ bool FileManager::removeDirectory(const std::string &name) const
         if(UserConfigParams::logMisc())
             Log::verbose("FileManager", "Deleting directory '%s'.",
                          (*i).c_str());
-        std::string full_path=name+"/"+*i;
-        if(isDirectory(full_path))
+        if(isDirectory(*i))
         {
             // This should not be necessary (since this function is only
             // used to remove addons), and it limits the damage in case
@@ -1076,7 +1075,7 @@ bool FileManager::removeDirectory(const std::string &name) const
         }
         else
         {
-            removeFile(full_path);
+            removeFile(*i);
         }
     }
 #if defined(WIN32)
