@@ -25,7 +25,7 @@ noperspective out vec3 lightVec;
 
 void main()
 {
-    gl_Position = ftransform();
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
     vertex_color = gl_Color;
 
     //vec3 normal3 = normalize(gl_Normal);

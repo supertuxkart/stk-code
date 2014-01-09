@@ -9,6 +9,6 @@ void main()
 	normal = gl_NormalMatrix * gl_Normal;
 	tangent = gl_NormalMatrix * gl_MultiTexCoord1.xyz;
 	bitangent = gl_NormalMatrix * gl_MultiTexCoord2.xyz;
-	gl_Position = ftransform();
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
 }

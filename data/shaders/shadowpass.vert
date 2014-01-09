@@ -10,7 +10,7 @@ float decdepth(vec4 rgba) {
 
 void main()
 {
-	vec4 pos = ftransform();
+	vec4 pos = gl_ModelViewProjectionMatrix * gl_Vertex;
 	uv = gl_MultiTexCoord0.xy;
 
 	vec2 tc = pos.xy * vec2(0.5) + vec2(0.5);

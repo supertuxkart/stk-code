@@ -27,7 +27,7 @@ void main()
 {
     uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
     uv_bis = (gl_TextureMatrix[1] * gl_MultiTexCoord1).st;
-    gl_Position = ftransform();
+    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 	color = gl_Color;
     nor = gl_NormalMatrix * gl_Normal;
 }

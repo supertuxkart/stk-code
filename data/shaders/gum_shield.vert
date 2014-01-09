@@ -34,7 +34,7 @@ void main()
 	eyeVec = normalize(-viewp).xyz;
 	normal = gl_NormalMatrix * gl_Normal;
 
-	gl_Position = ftransform();
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 
 	uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
 }
