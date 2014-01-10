@@ -4,11 +4,13 @@ uniform int hastex;
 uniform float objectid;
 
 noperspective in vec3 nor;
+in vec2 uv0;
+in vec2 uv1;
 
 void main() {
 
 	//if (hastex != 0) {
-		vec4 col = texture2D(tex, gl_TexCoord[0].xy);
+		vec4 col = texture2D(tex, uv0);
 
 		if (col.a < 0.5)
 			discard;

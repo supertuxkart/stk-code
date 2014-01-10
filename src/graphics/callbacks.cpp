@@ -381,6 +381,19 @@ void GlowProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
+    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
+    srv->setVertexShaderConstant("TextureMatrix0", mat.getTextureMatrix(0).pointer(), 16);
+    srv->setVertexShaderConstant("TextureMatrix1", mat.getTextureMatrix(1).pointer(), 16);
+
     const int hastex = mat.TextureLayer[0].Texture != NULL;
     srv->setVertexShaderConstant("hastex", &hastex, 1);
 
