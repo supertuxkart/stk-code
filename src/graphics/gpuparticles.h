@@ -31,21 +31,15 @@ protected:
 	bool m_alpha_additive, has_height_map, flip;
 	float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
 
-	static GLuint SimulationProgram;
-	static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-	static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor, uniform_has_heightmap, uniform_heightmap;
-
-	static GLuint RenderProgram;
-	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz, attrib_rotationvec, attrib_anglespeed;
-	static GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj, uniform_flips;
-
-	static GLuint uniform_track_x, uniform_track_z, uniform_track_x_len, uniform_track_z_len;
-
 	static GLuint quad_vertex_buffer;
 
 	GLuint texture, normal_and_depth;
 	unsigned duration, count, LastEmitTime;
 
+	void simulateHeightmap();
+	void simulateNoHeightmap();
+	void drawFlip();
+	void drawNotFlip();
 	virtual void simulate();
 	virtual void draw();
 	void generateParticlesFromPointEmitter(scene::IParticlePointEmitter *);
