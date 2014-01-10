@@ -67,39 +67,6 @@ public:
 	void setFlip();
 };
 
-class PointEmitter : public GPUParticle
-{
-protected:
-  GLuint SimulationProgram, RenderProgram;
-  GLuint loc_duration, loc_sourcematrix, loc_dt, loc_matrix, loc_texture, loc_normal_and_depths, loc_screen, loc_invproj;
-  GLuint loc_position, loc_velocity, loc_lifetime;
-  GLuint tfb_buffers[2];
-  GLuint texture, normal_and_depth;
-  unsigned duration, count;
-  core::vector3df direction;
-  core::aabbox3d<f32> box;
-  scene::IParticleSystemSceneNode *m_node;
-
-  virtual void simulate();
-  virtual void draw();
-public:
-  PointEmitter(scene::ISceneNode *parent,
-    scene::ISceneManager* mgr, video::ITexture *tex,
-    const core::vector3df& dir,
-    u32 minParticlesPerSecond,
-    u32 maxParticlesPerSecond,
-    const video::SColor& minStartColor,
-    const video::SColor& maxStartColor,
-    u32 lifeTimeMin, u32 lifeTimeMax,
-    s32 maxAngleDegrees
-//    const core::dimension2df& minStartSize,
-//    const core::dimension2df& maxStartSize
-  );
-  void set_m_node(scene::IParticleSystemSceneNode *nd) { m_node = nd; }
-  virtual const core::aabbox3d<f32>& getBoundingBox() const { return box; }
-  virtual u32 getMaterialCount() const { return 1; }
-};
-
 class RainNode : public GPUParticle
 {
 protected:
