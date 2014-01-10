@@ -1,12 +1,13 @@
 #version 130
-varying vec4 offset[2];
+in vec4 offset[2];
+in vec2 uv;
 
 uniform sampler2D blendMap;
 uniform sampler2D colorMap;
 
 void main() {
 	// Fetch the blending weights for current pixel:
-	vec4 topLeft = texture2D(blendMap, gl_TexCoord[0].xy);
+	vec4 topLeft = texture2D(blendMap, uv);
 	float bottom = texture2D(blendMap, offset[1].zw).g;
 	float right = texture2D(blendMap, offset[1].xy).a;
 	vec4 a = vec4(topLeft.r, bottom, topLeft.b, right);
@@ -24,7 +25,7 @@ void main() {
 	vec4 color = vec4(0.0);
 
 	// Add the contributions of the possible 4 lines that can cross this pixel:
-	vec4 C = texture2D(colorMap, gl_TexCoord[0].xy);
+	vec4 C = texture2D(colorMap, uv);
 	vec4 Cleft = texture2D(colorMap, offset[0].xy);
 	vec4 Ctop = texture2D(colorMap, offset[0].zw);
 	vec4 Cright = texture2D(colorMap, offset[1].xy);

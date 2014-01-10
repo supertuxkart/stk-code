@@ -16,6 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #version 130
+uniform mat4 ModelViewProjectionMatrix;
+uniform mat4 TransposeInverseModelView;
 uniform vec3 lightdir;
 
 noperspective out vec3 normal;
@@ -25,7 +27,7 @@ noperspective out vec3 lightVec;
 
 void main()
 {
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    gl_Position = ModelViewProjectionMatrix * gl_Vertex;
     vertex_color = gl_Color;
 
     //vec3 normal3 = normalize(gl_Normal);
@@ -33,11 +35,11 @@ void main()
     //normal = normal4.xyz;
 
     eyeVec = normalize(-gl_Position).xyz; // we are in Eye Coordinates, so EyePos is (0,0,0)
-    normal = normalize(gl_NormalMatrix*gl_Normal);
+    normal = normalize((TransposeInverseModelView * vec4(gl_Normal, 1.)).xyz);
 
     // Building the matrix Eye Space -> Tangent Space
     // gl_MultiTexCoord1.xyz
-	vec3 t = normalize (gl_NormalMatrix * vec3(0.0, 0.0, 1.0)); // tangent
+	vec3 t = normalize ((TransposeInverseModelView * vec4(0.0, 0.0, 1.0, 1.)).xyz); // tangent
 	vec3 b = cross (normal, t);
 
 	// transform light and half angle vectors by tangent basis

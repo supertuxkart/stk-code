@@ -182,6 +182,11 @@ void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     vector3df sun_pos = m_sunpos;
     srv->setVertexShaderConstant("sun_pos", &sun_pos.X, 3);
     
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (!firstdone)
     {
         s32 tex = 0;
@@ -357,6 +362,11 @@ void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
     srv->setVertexShaderConstant("col", m_color, 3);
 }
 
@@ -498,6 +508,12 @@ void BloomProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void MLAAColor1Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (!firstdone)
     {
         const float pixels[2] = {
@@ -540,6 +556,12 @@ void MLAABlend2Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (!firstdone)
     {
         const float pixels[2] = {

@@ -1,5 +1,6 @@
 #version 130
-varying vec4 offset[2];
+in vec4 offset[2];
+in vec2 uv;
 
 uniform sampler2D colorMapG;
 const float threshold = 0.1;
@@ -10,7 +11,7 @@ void main() {
 	/**
 	 * Luma calculation requires gamma-corrected colors:
 	 */
-	float L = dot(texture2D(colorMapG, gl_TexCoord[0].xy).rgb, weights);
+	float L = dot(texture2D(colorMapG, uv).rgb, weights);
 	float Lleft = dot(texture2D(colorMapG, offset[0].xy).rgb, weights);
 	float Ltop = dot(texture2D(colorMapG, offset[0].zw).rgb, weights);
 	float Lright = dot(texture2D(colorMapG, offset[1].xy).rgb, weights);

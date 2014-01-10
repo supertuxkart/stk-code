@@ -19,18 +19,21 @@
 // Jean-manuel clemencon (C) Copyright supertuxkart
 // Creates a cone lightbeam effect by smoothing edges
 #version 130
+uniform mat4 ModelViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 TransposeInverseModelView;
 out vec2 uv;
 noperspective out vec3 eyeVec;
 noperspective out vec3 normal;
 
 void main()
 {
-	vec4 viewp = gl_ModelViewMatrix * gl_Vertex;
+	vec4 viewp = ModelViewMatrix * gl_Vertex;
 
 	eyeVec = normalize(-viewp).xyz;
-	normal = gl_NormalMatrix * gl_Normal;
+	normal = (TransposeInverseModelView * vec4(gl_Normal, 1.).xyz;
 
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_Position = ProjectionMatrix * viewp;
 
 	uv = gl_MultiTexCoord0.st;
 }

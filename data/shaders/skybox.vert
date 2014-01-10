@@ -18,6 +18,7 @@
 
 // Creates a bubble (wave) effect by distorting the texture depending on time
 #version 130
+uniform mat4 ModelViewProjectionMatrix;
 uniform float time;
 
 out vec2 uv;
@@ -30,8 +31,8 @@ out vec3 vertex;
 
 void main()
 {
-    uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
-    gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+    uv = gl_MultiTexCoord0.st;
+    gl_Position = ModelViewProjectionMatrix * gl_Vertex;
 
 
     float delta_x = cos(time*3.0) * sin( 4.0 * gl_TexCoord[0].st.s * 6.28318531 );
