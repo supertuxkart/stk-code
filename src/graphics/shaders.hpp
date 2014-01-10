@@ -34,7 +34,6 @@ using namespace irr;
     ACT(ES_GRASS_REF) \
     ACT(ES_BUBBLES) \
     ACT(ES_RAIN) \
-    ACT(ES_SNOW) \
     ACT(ES_MOTIONBLUR) \
     ACT(ES_GAUSSIAN3H) \
     ACT(ES_GAUSSIAN3V) \

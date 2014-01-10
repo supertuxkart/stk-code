@@ -41,7 +41,6 @@ Shaders::Shaders()
     m_callbacks[ES_COLOR_LEVELS] = new ColorLevelsProvider();
     m_callbacks[ES_BUBBLES] = new BubbleEffectProvider();
     m_callbacks[ES_RAIN] = new RainEffectProvider();
-    m_callbacks[ES_SNOW] = new SnowEffectProvider();
     m_callbacks[ES_MOTIONBLUR] = new MotionBlurProvider();
     m_callbacks[ES_GAUSSIAN3V] = m_callbacks[ES_GAUSSIAN3H] = new GaussianBlurProvider();
     m_callbacks[ES_MIPVIZ] = new MipVizProvider();
@@ -119,9 +118,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_RAIN] = glslmat(dir + "rain.vert", dir + "rain.frag",
                                     m_callbacks[ES_RAIN], EMT_TRANSPARENT_ALPHA_CHANNEL);
-
-    m_shaders[ES_SNOW] = glslmat(dir + "snow.vert", dir + "snow.frag",
-                                    m_callbacks[ES_SNOW], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
     m_shaders[ES_MOTIONBLUR] = glsl(std::string(""), dir + "motion_blur.frag",
                                     m_callbacks[ES_MOTIONBLUR]);
