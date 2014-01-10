@@ -32,6 +32,7 @@
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
+#include "graphics/stkmesh.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/water.hpp"
@@ -902,7 +903,16 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
 scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           scene::ISceneNode *parent)
 {
-    return m_scene_manager->addMeshSceneNode(mesh, parent);
+    if (!isGLSL())
+        return m_scene_manager->addMeshSceneNode(mesh, parent);
+
+    if (!parent)
+      parent = m_scene_manager->getRootSceneNode();
+
+    scene::IMeshSceneNode* node = new STKMesh(mesh, parent, m_scene_manager, -1);
+    node->drop();
+
+    return node;
 }   // addMesh
 
 // ----------------------------------------------------------------------------

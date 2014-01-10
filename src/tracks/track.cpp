@@ -818,8 +818,8 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
-    scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
+    //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
