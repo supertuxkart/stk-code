@@ -1,4 +1,4 @@
-#version 130
+#version 140
 uniform int dt;
 uniform mat4 sourcematrix;
 uniform int level;
