@@ -12,8 +12,8 @@ out vec2 uv1;
 void main() {
 
 	nor = (TransposeInverseModelView * vec4(gl_Normal, 1.)).xyz;
-	uv0 = (TextureMatrix0 * gl_MultiTexCoord0).st;
-	uv1 = (TextureMatrix1 * gl_MultiTexCoord1).st;
+	uv0 = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
+	uv1 = (gl_TextureMatrix[1] * gl_MultiTexCoord1).st;
 	gl_Position = ModelViewProjectionMatrix * gl_Vertex;
 	color = gl_Color;
 }
