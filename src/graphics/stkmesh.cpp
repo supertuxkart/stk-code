@@ -17,7 +17,7 @@ namespace ObjectShader
 }
 
 static
-void allocateMeshBuffer(scene::IMeshBuffer* mb, GLuint &vbo, GLuint idx)
+void allocateMeshBuffer(scene::IMeshBuffer* mb, GLuint &vbo, GLuint &idx)
 {
 	initGL();
 	GLuint bufferid, indexbufferid;
@@ -130,24 +130,33 @@ STKMesh::~STKMesh()
 
 void STKMesh::draw(unsigned i)
 {
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_TRUE);
+	glDisable(GL_CULL_FACE);
 	GLuint vbo = vertex_buffer[i], idx = index_buffer[i];
 	GLenum ptype = Primitivetype[i];
 	size_t count = Indexcount[i];
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
 
-   core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	glUseProgram(ObjectShader::Program);
+	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 	GLuint attrib_pos = glGetUniformLocation(ObjectShader::Program, "ModelViewProjectionMatrix");
 	glUniformMatrix4fv(attrib_pos, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-	glUseProgram(ObjectShader::Program);
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Stride[i], 0);
-	glDisableVertexAttribArray(0);
 	glDrawElements(ptype, count, GL_UNSIGNED_BYTE, 0);
+	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	video::SMaterial material;
+	material.MaterialType = irr_driver->getShader(ES_RAIN);
+//	fakemat.setTexture(0, tex);
+//	fakemat.BlendOperation = video::EBO_NONE;
+	irr_driver->getVideoDriver()->setMaterial(material);
+	static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
 }
 
 void STKMesh::render()
@@ -185,7 +194,6 @@ void STKMesh::render()
 			if (transparent == isTransparentPass)
 			{
 				driver->setMaterial(material);
-//				static_cast<irr::video::COpenGLDriver*>(driver)->setRenderStates3DMode();
 				driver->drawMeshBuffer(mb);
 			}
 		}
