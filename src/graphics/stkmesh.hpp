@@ -14,6 +14,7 @@ protected:
 	std::vector<GLuint> vertex_buffer, index_buffer;
 	std::vector<GLenum> Primitivetype;
 	std::vector<size_t> Indexcount;
+	std::vector<size_t> Stride;
 
 	void draw(unsigned i);
 public:

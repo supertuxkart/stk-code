@@ -3,9 +3,23 @@
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
 
+namespace ObjectShader
+{
+	GLuint Program;
+	GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
+	GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object.vert").c_str(), file_manager->getAsset("shaders/object.frag").c_str());
+	}
+}
+
 static
 void allocateMeshBuffer(scene::IMeshBuffer* mb, GLuint &vbo, GLuint idx)
 {
+	initGL();
 	GLuint bufferid, indexbufferid;
 	glGenBuffers(1, &bufferid);
 	glGenBuffers(1, &indexbufferid);
@@ -91,7 +105,21 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 		case scene::EPT_QUADS:
 			assert(0 && "Unsupported primitive type");
 		}
+		switch (mb->getVertexType())
+		{
+		case video::EVT_STANDARD:
+			Stride.push_back(sizeof(video::S3DVertex));
+			break;
+		case video::EVT_2TCOORDS:
+			Stride.push_back(sizeof(video::S3DVertex2TCoords));
+			break;
+		case video::EVT_TANGENTS:
+			Stride.push_back(sizeof(video::S3DVertexTangents));
+			break;
+		}
 	}
+	if (!ObjectShader::Program)
+		ObjectShader::init();
 }
 
 STKMesh::~STKMesh()
@@ -108,11 +136,18 @@ void STKMesh::draw(unsigned i)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
 
-/*	glNormalPointer(GL_FLOAT, sizeof(S3DVertex2TCoords), buffer_offset(12));
-	glColorPointer(colorSize, GL_UNSIGNED_BYTE, sizeof(S3DVertex2TCoords), buffer_offset(24));
-	glTexCoordPointer(2, GL_FLOAT, sizeof(S3DVertex2TCoords), buffer_offset(28));
-	glVertexPointer(3, GL_FLOAT, sizeof(S3DVertex2TCoords), buffer_offset(0));*/
+   core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	GLuint attrib_pos = glGetUniformLocation(ObjectShader::Program, "ModelViewProjectionMatrix");
+	glUniformMatrix4fv(attrib_pos, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+	glUseProgram(ObjectShader::Program);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Stride[i], 0);
+	glDisableVertexAttribArray(0);
 	glDrawElements(ptype, count, GL_UNSIGNED_BYTE, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 void STKMesh::render()
@@ -130,6 +165,11 @@ void STKMesh::render()
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
 	Box = Mesh->getBoundingBox();
 
+	for (unsigned i = 0; i < index_buffer.size(); i++)
+	{
+//		draw(i);
+	}
+
 	for (u32 i=0; i<Mesh->getMeshBufferCount(); ++i)
 	{
 		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
@@ -145,6 +185,7 @@ void STKMesh::render()
 			if (transparent == isTransparentPass)
 			{
 				driver->setMaterial(material);
+//				static_cast<irr::video::COpenGLDriver*>(driver)->setRenderStates3DMode();
 				driver->drawMeshBuffer(mb);
 			}
 		}
