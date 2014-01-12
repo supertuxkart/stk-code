@@ -6,8 +6,8 @@
 namespace ObjectShader
 {
 	GLuint Program;
-	GLuint attrib_position, attrib_texcoord;
-	GLuint uniform_MVP, uniform_texture;
+	GLuint attrib_position, attrib_texcoord, attrib_normal;
+	GLuint uniform_MVP, uniform_TIMV, uniform_texture;
 
 	void init()
 	{
@@ -15,7 +15,9 @@ namespace ObjectShader
 		Program = LoadProgram(file_manager->getAsset("shaders/object.vert").c_str(), file_manager->getAsset("shaders/object.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_normal = glGetAttribLocation(Program, "Normal");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
 		uniform_texture = glGetUniformLocation(Program, "texture");
 	}
 }
@@ -152,7 +154,7 @@ void STKMesh::draw(unsigned i)
 	  return;
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
-	glDisable(GL_CULL_FACE);
+	glDisable(GL_BLEND);
 	GLuint vbo = vertex_buffer[i], idx = index_buffer[i];
 	GLenum ptype = Primitivetype[i];
 	size_t count = Indexcount[i];
@@ -163,18 +165,29 @@ void STKMesh::draw(unsigned i)
 	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	TransposeInverseModelView.makeInverse();
+	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, textures[i]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glUniform1f(ObjectShader::uniform_texture, 0);
+
 	glUniformMatrix4fv(ObjectShader::uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+	glUniformMatrix4fv(ObjectShader::uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
 	glEnableVertexAttribArray(ObjectShader::attrib_position);
 	glEnableVertexAttribArray(ObjectShader::attrib_texcoord);
+	glEnableVertexAttribArray(ObjectShader::attrib_normal);
 	glVertexAttribPointer(ObjectShader::attrib_position, 3, GL_FLOAT, GL_FALSE, Stride[i], 0);
 	glVertexAttribPointer(ObjectShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, Stride[i], (GLvoid*) 28);
+	glVertexAttribPointer(ObjectShader::attrib_normal, 3, GL_FLOAT, GL_FALSE, Stride[i], (GLvoid*) 12);
 	glDrawElements(ptype, count, Indextype[i], 0);
 	glDisableVertexAttribArray(ObjectShader::attrib_position);
 	glDisableVertexAttribArray(ObjectShader::attrib_texcoord);
+	glDisableVertexAttribArray(ObjectShader::attrib_normal);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -201,9 +214,13 @@ void STKMesh::render()
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
 	Box = Mesh->getBoundingBox();
 
-	for (unsigned i = 0; i < index_buffer.size(); i++)
+	if (!isTransparentPass)
 	{
-//		draw(i);
+		for (unsigned i = 0; i < index_buffer.size(); i++)
+		{
+			//draw(i);
+		}
+		//return;
 	}
 
 	for (u32 i=0; i<Mesh->getMeshBufferCount(); ++i)
