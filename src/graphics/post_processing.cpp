@@ -31,6 +31,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
+#include "graphics/glwrap.hpp"
 
 #include <SViewFrustum.h>
 
@@ -222,6 +223,72 @@ void PostProcessing::renderSolid(const u32 cam)
     }
 }
 
+GLuint quad_vbo = 0;
+
+static void initQuadVBO()
+{
+	initGL();
+	const float quad_vertex[] = {
+		-1., -1., 0., 0., // UpperLeft
+		-1., 1., 0., 1., // LowerLeft
+		1., -1., 1., 0., // UpperRight
+		1., 1., 1., 1., // LowerRight
+	};
+	glGenBuffers(1, &quad_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+namespace BloomShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_texture, uniform_low;
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloom.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_texture = glGetUniformLocation(Program, "tex");
+		uniform_low = glGetUniformLocation(Program, "low");
+
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
+
+static
+void renderBloom(ITexture *in)
+{
+	if (!BloomShader::Program)
+		BloomShader::init();
+
+	const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
+	glUseProgram(BloomShader::Program);
+	glBindVertexArray(BloomShader::vao);
+	glUniform1f(BloomShader::uniform_low, threshold);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+	glUniform1i(BloomShader::uniform_texture, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -268,15 +335,8 @@ void PostProcessing::render()
 
             if (globalbloom)
             {
-                const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
-                ((BloomProvider *) irr_driver->getCallback(ES_BLOOM))->setThreshold(threshold);
-
-                // Catch bright areas, and progressively minify
-                m_material.MaterialType = irr_driver->getShader(ES_BLOOM);
-                m_material.setTexture(0, in);
-                drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
-
-                drawQuad(cam, m_material);
+				drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
+				renderBloom(in);
             }
 
             // Do we have any forced bloom nodes? If so, draw them now
