@@ -61,10 +61,10 @@ namespace Online
     void XMLRequest::afterOperation()
     {
         m_xml_data = file_manager->createXMLTreeFromString(getData());
-        if(getResult() != CURLE_OK)
+        if(hadDownloadError())
             Log::error("XMLRequest::afterOperation", 
                        "curl_easy_perform() failed: %s",
-                        curl_easy_strerror(getResult()));
+                       getDownloadErrorMessage());
         m_success = false;
         std::string rec_success;
         if(m_xml_data->get("success", &rec_success))

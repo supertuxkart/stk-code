@@ -1018,10 +1018,10 @@ void initRest()
     // This only initialises the non-network part of the addons manager. The
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
-    news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
 
     INetworkHttp::create();
+    NewsManager::get();   // this will create the news manager
 
     // Note that the network thread must be started after the assignment
     // to network_http (since the thread might use network_http, otherwise
@@ -1099,7 +1099,7 @@ static void cleanSuperTuxKart()
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     INetworkHttp::destroy();
-    if(news_manager)            delete news_manager;
+    NewsManager::deallocate();
     if(addons_manager)          delete addons_manager;
     NetworkManager::kill();
 
@@ -1252,7 +1252,7 @@ int main(int argc, char *argv[] )
             std::string xml_file = file_manager->getAddonsFile("addons.xml");
             if (file_manager->fileExists(xml_file)) {
                 const XMLNode *xml = new XMLNode (xml_file);
-                addons_manager->initOnline(xml);
+                addons_manager->initAddons(xml);
             }
         }
 
@@ -1354,7 +1354,7 @@ int main(int argc, char *argv[] )
 
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
-                                           news_manager->getImportantMessage();
+                                     NewsManager::get()->getImportantMessage();
         if(important_message!="")
         {
             new MessageDialog(important_message,

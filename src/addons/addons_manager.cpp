@@ -20,24 +20,27 @@
 
 #include "addons/addons_manager.hpp"
 
+#include "addons/inetwork_http.hpp"
+#include "addons./news_manager.hpp"
+#include "addons/zip.hpp"
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "online/http_request.hpp"
+#include "online/request_manager.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
+
+
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <sstream>
 #include <string.h>
 #include <vector>
-
-#include "addons/inetwork_http.hpp"
-#include "addons/request.hpp"
-#include "addons/zip.hpp"
-#include "io/file_manager.hpp"
-#include "io/xml_node.hpp"
-#include "karts/kart_properties.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
 
 AddonsManager* addons_manager = 0;
 
@@ -69,6 +72,59 @@ AddonsManager::~AddonsManager()
 }   // ~AddonsManager
 
 // ----------------------------------------------------------------------------
+void AddonsManager::init(const XMLNode *xml,
+                         bool force_refresh)
+{
+    std::string    addon_list_url("");
+    StkTime::TimeType mtime(0);
+    const XMLNode *include = xml->getNode("include");
+    std::string filename=file_manager->getAddonsFile("addons.xml");
+    if(!include)
+    {
+        file_manager->removeFile(filename);
+        NewsManager::get()->addNewsMessage(_("Can't access stkaddons server..."));
+        // Use a curl error code here:
+        //return CURLE_COULDNT_CONNECT;
+        return;
+    }
+
+    include->get("file",  &addon_list_url);
+
+    int64_t tmp;
+    include->get("mtime", &tmp);
+    mtime = tmp;
+
+    bool download = mtime > UserConfigParams::m_addons_last_updated ||
+                    force_refresh                                   ||
+                    !file_manager->fileExists(filename);
+    
+    if (download)
+    {
+        Log::info("NetworkHttp", "Downloading updated addons.xml");
+        Online::HTTPRequest *download_request = new Online::HTTPRequest("addons.xml");
+        download_request->setURL(addon_list_url);            
+        download_request->executeNow();
+        if(download_request->hadDownloadError())
+        {
+            Log::error("addons", "Error on download addons.xml: %s\n",
+                       download_request->getDownloadErrorMessage());
+            delete download_request;
+            return;
+        }
+        delete download_request;
+        UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
+    }
+    else
+        Log::info("NetworkHttp", "Using cached addons.xml");
+        
+    const XMLNode *xml_addons = new XMLNode(filename);
+    addons_manager->initAddons(xml_addons);   // will free xml_addons
+    if(UserConfigParams::logAddons())
+        Log::info("addons", "Addons manager list downloaded");
+ 
+
+}
+// ----------------------------------------------------------------------------
 /** This initialises the online portion of the addons manager. It uses the
  *  downloaded list of available addons. This is called by network_http before
  *  it goes into command-receiving mode, so we can't use any asynchronous calls
@@ -76,7 +132,7 @@ AddonsManager::~AddonsManager()
  *  main GUI is not blocked anyway). This function will update the state
  *  variable
  */
-void AddonsManager::initOnline(const XMLNode *xml)
+void AddonsManager::initAddons(const XMLNode *xml)
 {
     m_addons_list.lock();
     // Clear the list in case that a reinit is being done.
@@ -204,7 +260,7 @@ void AddonsManager::initOnline(const XMLNode *xml)
 
     if (UserConfigParams::m_internet_status == INetworkHttp::IPERM_ALLOWED)
         downloadIcons();
-}   // initOnline
+}   // initAddons
 
 // ----------------------------------------------------------------------------
 /** Reinitialises the addon manager, which happens when the user selects
@@ -297,12 +353,25 @@ void AddonsManager::downloadIcons()
                             addon.getId().c_str());
                 continue;
             }
-            std::string save        = "icons/"+icon;
-            Request *r = INetworkHttp::get()->downloadFileAsynchron(url, save,
-                                                            /*priority*/1,
-                                                           /*manage_mem*/true);
-            if (r != NULL)
-                r->setAddonIconNotification(&addon);
+
+            // A simple class that will notify the addon via a callback
+            class IconRequest : public Online::HTTPRequest
+            {
+                Addon *m_addon;  // stores this addon object
+                void afterOperation()
+                {
+                    m_addon->setIconReady();
+                }   // callback
+            public:
+                IconRequest(const std::string &filename, 
+                            const std::string &url,
+                            Addon *addon     ) : HTTPRequest(filename, true, 1)
+                {
+                    m_addon = addon;  setURL(url);
+                }   // IconRequest
+            };
+            IconRequest *r = new IconRequest("icons/"+icon, url, &addon);
+            r->queue();
         }
         else
             m_addons_list.getData()[i].setIconReady();

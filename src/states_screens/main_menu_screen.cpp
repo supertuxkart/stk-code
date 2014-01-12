@@ -112,7 +112,7 @@ void MainMenuScreen::init()
 
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    const core::stringw &news_text = news_manager->getNextNewsMessage();
+    const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
 
@@ -165,7 +165,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     w->update(delta);
     if(w->scrolledOff())
     {
-        const core::stringw &news_text = news_manager->getNextNewsMessage();
+        const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
         w->setText(news_text, true);
     }
 }   // onUpdate

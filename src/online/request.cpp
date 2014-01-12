@@ -47,6 +47,14 @@ namespace Online
     }   // Request
 
     // ------------------------------------------------------------------------
+    /** Inserts this request into the RequestManager's queue for executing.
+     */
+    void Request::queue()
+    {
+        RequestManager::get()->addRequest(this);
+    }   // queue
+
+    // ------------------------------------------------------------------------
     /** Executes the request. This calles prepareOperation, operation, and
      *  afterOperation.
      */

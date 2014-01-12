@@ -66,9 +66,6 @@ private:
 
     static void  *mainLoop(void *obj);
     CURLcode      init(bool forceRefresh);
-    CURLcode      loadAddonsList(const XMLNode *xml,
-                                 const std::string &filename,
-                                 bool forceRefresh);
     CURLcode      downloadFileInternal(Request *request);
     static int    progressDownload(void *clientp, double dltotal, double dlnow,
                                    double ultotal, double ulnow);
@@ -85,6 +82,9 @@ public:
                                         int   priority = 1,
                                         bool  manage_memory=true);
     void          cancelAllDownloads();
+    CURLcode      loadAddonsList(const XMLNode *xml,
+                                 const std::string &filename,
+                                 bool forceRefresh);
 };   // NetworkHttp
 
 #endif

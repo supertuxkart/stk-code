@@ -39,8 +39,6 @@ namespace Online
     class HTTPRequest : public Request
     {
     private:
-        typedef std::map<std::string, std::string>  Parameters;
-
         /** The progress indicator. 0 untill it is started and the first
          *  packet is downloaded. Guaranteed to be <1 while the download
          *  is in progress, it will be set to either -1 (error) or 1
@@ -51,7 +49,11 @@ namespace Online
         std::string m_url;
 
         /** The POST parameters that will be send with the request. */
-        Parameters *m_parameters;
+        std::string m_parameters;
+
+        /** Contains a filename if the data should be saved into a file
+         *  instead of being kept in in memory. Otherwise this is "". */
+        std::string m_filename;
 
         /** Pointer to the curl data structure for this request. */
         CURL *m_curl_session;
@@ -73,18 +75,35 @@ namespace Online
 
         static size_t writeCallback(void *contents, size_t size,
                                     size_t nmemb,   void *userp);
-
+        void init();
 
     public :
                            HTTPRequest(bool manage_memory = false, 
                                        int priority = 1);
-        virtual           ~HTTPRequest();
+                           HTTPRequest(const std::string &filename,
+                                       bool manage_memory = false, 
+                                       int priority = 1);
+                           HTTPRequest(const char * const filename,
+                                       bool manage_memory = false, 
+                                       int priority = 1);
+        virtual           ~HTTPRequest() {};
         virtual bool       isAllowedToAdd() OVERRIDE;
         void               setServerURL(const std::string& url);
+        void               setAddonsURL(const std::string& path);
         // ------------------------------------------------------------------------
-        /** Returns the curl error status of the request.
+        /** Returns true if there was an error downloading the file.
          */
-        CURLcode getResult() const { return m_curl_code; }
+        bool hadDownloadError() const { return m_curl_code!=CURLE_OK; }
+        // ------------------------------------------------------------------------
+        /** Returns the curl error message if an error has occurred.
+         *  \pre m_curl_code!=CURLE_OK
+         */
+        const char* getDownloadErrorMessage() const
+        { 
+            assert(hadDownloadError());
+            return curl_easy_strerror(m_curl_code);
+        }   // getDownloadErrorMessage
+
         // ------------------------------------------------------------------------
         /** Returns the downloaded string.
          *  \pre request has to be done
@@ -101,8 +120,8 @@ namespace Online
          */
         void addParameter(const std::string & name, const std::string &value)
         {
-            assert(isPreparing());
-            (*m_parameters)[name] = value;
+            // Call the template, so that the strings are escaped properly
+            addParameter(name, value.c_str());
         };   // addParameter
         // --------------------------------------------------------------------
         /** Sets a parameter to 'value' (stringw).
@@ -110,16 +129,25 @@ namespace Online
         void addParameter(const std::string & name, 
                           const irr::core::stringw &value)
         {
-            assert(isPreparing());
-            (*m_parameters)[name] = irr::core::stringc(value.c_str()).c_str();
+            core::stringc s = core::stringc(value.c_str());
+            // Call the template to escape strings properly
+            addParameter(name, s.c_str());
         }   // addParameter
+
         // --------------------------------------------------------------------
         /** Sets a parameter to 'value' (arbitrary types).
          */
         template <typename T>
-        void addParameter(const std::string & name, const T& value){
+        void addParameter(const std::string & name, const T& value)
+        {
             assert(isPreparing());
-            (*m_parameters)[name] = StringUtils::toString(value);
+            std::string s = StringUtils::toString(value);
+            char *s1 = curl_easy_escape(m_curl_session, name.c_str(), 
+                                        name.size() );
+            char *s2 = curl_easy_escape(m_curl_session, s.c_str(), s.size());
+            m_parameters.append(std::string(s1)+"="+s2+"&");
+            curl_free(s1);
+            curl_free(s2);
         }   // addParameter
         // --------------------------------------------------------------------
         /** Returns the current progress. */

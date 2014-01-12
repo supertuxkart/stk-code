@@ -124,6 +124,7 @@ namespace Online
         virtual ~Request() {}
         void     execute();
         void     executeNow();
+        void     queue();
         // --------------------------------------------------------------------
         /** Executed when a request has finished. */
         virtual void callback() {}

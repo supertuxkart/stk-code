@@ -39,8 +39,6 @@ private:
     Synchronised<std::vector<Addon> >  m_addons_list;
     /** Full filename of the addons_installed.xml file. */
     std::string                        m_file_installed;
-    std::string                        m_type;
-    int                                m_download_state;
 
     /** List of loaded icons. */
     std::vector<std::string> m_icon_list;
@@ -60,7 +58,8 @@ private:
 public:
                  AddonsManager();
                 ~AddonsManager();
-    void         initOnline(const XMLNode *xml);
+    void         init(const XMLNode *xml, bool force_refresh);
+    void         initAddons(const XMLNode *xml);
     void         checkInstalledAddons();
     const Addon* getAddon(const std::string &id) const;
     int          getAddonIndex(const std::string &id) const;

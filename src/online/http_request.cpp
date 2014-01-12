@@ -30,32 +30,66 @@
 #include <assert.h>
 
 
-namespace Online{
-
+namespace Online
+{
     /** Creates a HTTP(S) request that will have a raw string as result. (Can 
      *  of course be used if the result doesn't matter.)
-     *  \param manage_memory whether or not the HTTPManager should take care of
+     *  \param manage_memory whether or not the RequestManager should take care of
      *         deleting the object after all callbacks have been done.
-     *  \param priority by what priority should the HTTPManager take care of 
+     *  \param priority by what priority should the RequestManager take care of 
      *         this request.
      */
     HTTPRequest::HTTPRequest(bool manage_memory, int priority)
                : Request(manage_memory, priority, 0)
     {
-        m_url           = "";
-        m_string_buffer = "";
-        m_parameters    = new Parameters();
-        m_progress.setAtomic(0);
+        init();
     }   // HTTPRequest
 
     // ------------------------------------------------------------------------
-    HTTPRequest::~HTTPRequest()
+    /** This constructor configures this request to save the data in a flie.
+     *  \param filename Name of the file to save the data to.
+     *  \param manage_memory whether or not the RequestManager should take care of
+     *         deleting the object after all callbacks have been done.
+     *  \param priority by what priority should the RequestManager take care of 
+     *         this request.
+     */
+    HTTPRequest::HTTPRequest(const std::string &filename, bool manage_memory, 
+                                       int priority)
+               : Request(manage_memory, priority, 0)
     {
-        delete m_parameters;
-    }   // ~HTTPRequest
+        assert(filename.size()>0);
+        init();
+        m_filename = file_manager->getAddonsFile(filename);
+    }   // HTTPRequest(filename ...)
 
     // ------------------------------------------------------------------------
-    /** A handy shortcut that appends the given path to the URL of the server.
+    /** Char * needs a separate constructor, otherwise it will be considered
+     *  to be the no-filename constructor (char* -> bool).
+     */
+    HTTPRequest::HTTPRequest(const char* const filename, bool manage_memory, 
+                                       int priority)
+               : Request(manage_memory, priority, 0)
+    {
+        init();
+        m_filename = file_manager->getAddonsFile(filename);
+    }   // HTTPRequest(filename ...)
+
+    // ------------------------------------------------------------------------
+    /** Initialises all member variables.
+     */
+    void HTTPRequest::init()
+    {
+        m_url           = "";
+        m_string_buffer = "";
+        m_filename      = "";
+        m_parameters    = "";
+        m_curl_code     = CURLE_OK;
+        m_progress.setAtomic(0);
+    }   // init
+
+    // ------------------------------------------------------------------------
+    /** A handy shortcut that appends the given path to the URL of the 
+     *  mutiplayer server.
      *  \param path The path to add to the server.
      */
     void HTTPRequest::setServerURL(const std::string& path)
@@ -63,6 +97,16 @@ namespace Online{
         setURL((std::string)UserConfigParams::m_server_multiplayer+path);
     }   // setServerURL
 
+    // ------------------------------------------------------------------------
+    /** A handy shortcut that appends the given path to the URL of the addons
+     *  server.
+     *  \param path The path to add to the server.
+     */
+     void HTTPRequest::setAddonsURL(const std::string& path)
+     {
+        setURL((std::string)UserConfigParams::m_server_addons
+                 + "/" + path);
+     }   // set AddonsURL
     // ------------------------------------------------------------------------
     /** Checks the request if it has enough (correct) information to be
      *  executed (and thus allowed to add to the queue).
@@ -84,10 +128,9 @@ namespace Online{
                        "LibCurl session not initialized.");
             return;
         }
+
         curl_easy_setopt(m_curl_session, CURLOPT_URL, m_url.c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_FOLLOWLOCATION, 1);
-        curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION, 
-                                         &HTTPRequest::writeCallback);
         curl_easy_setopt(m_curl_session, CURLOPT_NOPROGRESS, 0);
         curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSDATA, this);
         curl_easy_setopt(m_curl_session, CURLOPT_PROGRESSFUNCTION,
@@ -95,15 +138,17 @@ namespace Online{
         curl_easy_setopt(m_curl_session, CURLOPT_CONNECTTIMEOUT, 20);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
-        //https
-        struct curl_slist *chunk = NULL;
-        chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
-        curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
-        curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, 
-                    (file_manager->getAsset("web.tuxfamily.org.pem")).c_str());
-        curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
-        //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
-        curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, &m_string_buffer);
+        if(m_filename.size()==0)
+        {
+            //https
+            struct curl_slist *chunk = NULL;
+            chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
+            curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
+            curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, 
+                file_manager->getAsset("web.tuxfamily.org.pem").c_str());
+            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
+            //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
+        }
     }   // prepareOperation
 
     // ------------------------------------------------------------------------
@@ -113,28 +158,38 @@ namespace Online{
     {
         if(!m_curl_session)
             return;
-        Parameters::iterator iter;
-        std::string postString("");
-        for (iter = m_parameters->begin(); iter != m_parameters->end(); ++iter)
+
+        FILE *fout = NULL;
+        if(m_filename.size()>0)
         {
-           if(iter != m_parameters->begin())
-               postString.append("&");
-           char* escaped = curl_easy_escape(m_curl_session , 
-                                            iter->first.c_str(), 
-                                            iter->first.size());
-           postString.append(escaped);
-           curl_free(escaped);
-           postString.append("=");
-           escaped = curl_easy_escape(m_curl_session,
-                                      iter->second.c_str(),
-                                      iter->second.size());
-           postString.append(escaped);
-           curl_free(escaped);
+            fout = fopen((m_filename+".part").c_str(), "wb");
+
+            if(!fout)
+            {
+                Log::error("HTTPRequest",
+                           "Can't open '%s' for writing, ignored.",
+                           (m_filename+".part").c_str());
+                return;
+            }
+            curl_easy_setopt(m_curl_session,  CURLOPT_WRITEDATA,     fout  );
+            curl_easy_setopt(m_curl_session,  CURLOPT_WRITEFUNCTION, fwrite);
         }
-        Log::info("HTTPRequest::operation", "Sending : %s",
-                  postString.c_str());
+        else
+        {
+            curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, 
+                             &m_string_buffer);
+            curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION, 
+                             &HTTPRequest::writeCallback);
+        }
+
+        // All parameters added have a '&' added 
+        if(m_parameters.size()>0)
+            m_parameters.pop_back();
+
+        Log::info("HTTPRequest", "Sending %s to %s",
+                  m_parameters.c_str(), m_url.c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS,
-                         postString.c_str());
+                         m_parameters.c_str());
         std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
             #ifdef WIN32
                     uagent += (std::string)" (Windows)";
@@ -151,6 +206,28 @@ namespace Online{
 
         m_curl_code = curl_easy_perform(m_curl_session);
         Request::operation();
+
+        if(fout)
+        {
+            fclose(fout);
+            if(m_curl_code==CURLE_OK)
+            {
+                if(UserConfigParams::logAddons())
+                    Log::info("HTTPRequest", "Download successful.");
+                // The behaviour of rename is unspecified if the target
+                // file should already exist - so remove it.
+                file_manager->removeFile(m_filename);
+                int ret = rename((m_filename+".part").c_str(), 
+                                 m_filename.c_str()           );
+                // In case of an error, set the status to indicate this
+                if(ret!=0)
+                {
+                    if(UserConfigParams::logAddons())
+                        Log::error("addons", "Could not rename downloaded file!");
+                    m_curl_code = CURLE_WRITE_ERROR;
+                }
+            }   // m_curl_code ==CURLE_OK
+        }   // if fout
     }   // operation
 
     // ------------------------------------------------------------------------
@@ -227,6 +304,7 @@ namespace Online{
         request->setProgress(f);
         return 0;
     }   // progressDownload
+
 
 
 } // namespace Online

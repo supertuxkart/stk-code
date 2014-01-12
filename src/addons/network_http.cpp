@@ -256,102 +256,19 @@ NetworkHttp::~NetworkHttp()
  */
 CURLcode NetworkHttp::init(bool forceRefresh)
 {
-    news_manager->clearErrorMessage();
-    core::stringw error_message("");
-    // The news message must be updated if either it has never been updated,
-    // or if the time of the last update was more than news_frequency ago.
-    bool download = UserConfigParams::m_news_last_updated==0  ||
-                    UserConfigParams::m_news_last_updated
-                        +UserConfigParams::m_news_frequency
-                    < StkTime::getTimeSinceEpoch() || forceRefresh;
-
-    if(!download)
-    {
-        // If there is no old news message file, force a new download
-        std::string xml_file = file_manager->getAddonsFile("news.xml");
-        if(!file_manager->fileExists(xml_file))
-            download=true;
-    }
-
-    // Initialise the online portion of the addons manager.
-    if(download && UserConfigParams::logAddons())
-        Log::info("addons", "Downloading list.");
-
-    Request r(Request::HC_DOWNLOAD_FILE, 9999, false,
-              "news.xml", "news.xml");
-    CURLcode status = download ? downloadFileInternal(&r)
-                               : CURLE_OK;
-    if(download &&
-        status==CURLE_COULDNT_RESOLVE_HOST)
-    {
-        // Assume that the server address is wrong. And retry
-        // with the default server address again (just in case
-        // that a redirect went wrong, or a wrong/incorrect
-        // address somehow made its way into the config file.
-        UserConfigParams::m_server_addons.revertToDefaults();
-        status = downloadFileInternal(&r);
-    }
-
-    if(status==CURLE_OK)
-    {
-        std::string xml_file = file_manager->getAddonsFile("news.xml");
-        if(download)
-            UserConfigParams::m_news_last_updated = StkTime::getTimeSinceEpoch();
-        const XMLNode *xml = new XMLNode(xml_file);
-
-        // A proper news file has at least a version number, mtime, and
-        // frequency defined. If this is not the case, assume that
-        // it's an invalid download. Try downloading again after
-        // resetting the news server back to the default.
-        int version=-1;
-        if( !xml->get("version", &version) || version!=1 ||
-             !xml->get("mtime", &version)  ||
-             !xml->get("frequency", &version)                )
-        {
-            UserConfigParams::m_server_addons.revertToDefaults();
-            status = downloadFileInternal(&r);
-            if(status==CURLE_OK)
-                UserConfigParams::m_news_last_updated =
-                    StkTime::getTimeSinceEpoch();
-            delete xml;
-            xml = new XMLNode(xml_file);
-        }
-        news_manager->init();
+#ifdef xx
         status = loadAddonsList(xml, xml_file, forceRefresh);
-        delete xml;
-        if(status==CURLE_OK)
-        {
-            return status;
-        }
-        else
-        {
-            // This message must be translated dynamically in the main menu.
-            // If it would be translated here, it wouldn't be translated
-            // if the language is changed in the menu!
-            error_message=
-                N_("Can't download addons list, check terminal for details.");
-        }
-        // Now fall through to error handling.
-    }
-    else
-    {
-        // This message must be translated dynamically in the main menu.
-        // If it would be translated here, it wouldn't be translated
-        // if the language is changed in the menu!
-        error_message=
-            N_("Can't download news file, check terminal for details.");
-    }
 
-    // Abort requested by stk -> display no error message and return
+        // Abort requested by stk -> display no error message and return
     if(status==CURLE_ABORTED_BY_CALLBACK)
         return status;
 
-    addons_manager->setErrorState();
-    news_manager->setErrorMessage(error_message);
 
     if(UserConfigParams::logAddons())
         Log::error("addons", "Error raised in NetworkHttp::init : %s", core::stringc(error_message).c_str());
     return status;
+#endif
+    return CURLE_OK;
 }   // init
 
 // ---------------------------------------------------------------------------
@@ -422,7 +339,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
     if(addon_list_url.size()==0)
     {
         file_manager->removeFile(filename);
-        news_manager->addNewsMessage(_("Can't access stkaddons server..."));
+        NewsManager::get()->addNewsMessage(_("Can't access stkaddons server..."));
         // Use a curl error code here:
         return CURLE_COULDNT_CONNECT;
     }
@@ -451,7 +368,7 @@ CURLcode NetworkHttp::loadAddonsList(const XMLNode *xml,
         if(download)
             UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
         const XMLNode *xml = new XMLNode(xml_file);
-        addons_manager->initOnline(xml);
+//        addons_manager->initOnline(xml);
         if(UserConfigParams::logAddons())
             Log::info("addons", "Addons manager list downloaded");
         return status;
