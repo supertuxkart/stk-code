@@ -184,7 +184,9 @@ namespace Online
 
         // All parameters added have a '&' added 
         if(m_parameters.size()>0)
-            m_parameters.pop_back();
+        {
+            m_parameters.erase(m_parameters.size()-1);
+        }
 
         Log::info("HTTPRequest", "Sending %s to %s",
                   m_parameters.c_str(), m_url.c_str());
