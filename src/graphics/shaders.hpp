@@ -41,7 +41,6 @@ using namespace irr;
     ACT(ES_FLIP) \
     ACT(ES_FLIP_ADDITIVE) \
     ACT(ES_COLOR_LEVELS) \
-    ACT(ES_BLOOM) \
     ACT(ES_GAUSSIAN6H) \
     ACT(ES_GAUSSIAN6V) \
     ACT(ES_COLORIZE) \
@@ -68,7 +67,6 @@ using namespace irr;
     ACT(ES_SHADOW_WARPH) \
     ACT(ES_SHADOW_WARPV) \
     ACT(ES_BLOOM_POWER) \
-    ACT(ES_BLOOM_BLEND) \
     ACT(ES_MULTIPLY_ADD) \
     ACT(ES_PENUMBRAH) \
     ACT(ES_PENUMBRAV) \

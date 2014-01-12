@@ -512,13 +512,6 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void BloomProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("low", &m_threshold, 1);
-}
-
-//-------------------------------------
-
 void MLAAColor1Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);

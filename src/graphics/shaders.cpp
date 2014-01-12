@@ -50,7 +50,6 @@ Shaders::Shaders()
     m_callbacks[ES_LIGHTBLEND] = new LightBlendProvider();
     m_callbacks[ES_POINTLIGHT] = new PointLightProvider();
     m_callbacks[ES_SUNLIGHT] = new SunLightProvider();
-    m_callbacks[ES_BLOOM] = new BloomProvider();
     m_callbacks[ES_MLAA_COLOR1] = new MLAAColor1Provider();
     m_callbacks[ES_MLAA_BLEND2] = new MLAABlend2Provider();
     m_callbacks[ES_MLAA_NEIGH3] = new MLAANeigh3Provider();
@@ -143,9 +142,6 @@ void Shaders::loadShaders()
     m_shaders[ES_COLOR_LEVELS] = glslmat(std::string(""), dir + "color_levels.frag",
                                     m_callbacks[ES_COLOR_LEVELS], EMT_SOLID);
 
-    m_shaders[ES_BLOOM] = glslmat(std::string(""), dir + "bloom.frag",
-                                    m_callbacks[ES_BLOOM], EMT_SOLID);
-
     m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
     m_shaders[ES_COLORIZE_REF] = glslmat(std::string(""), dir + "colorize_ref.frag",
@@ -205,8 +201,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_BLOOM_POWER] = glsl(std::string(""), dir + "bloompower.frag",
                                     m_callbacks[ES_BLOOM_POWER]);
-    m_shaders[ES_BLOOM_BLEND] = glslmat(std::string(""), dir + "bloomblend.frag",
-                                    0, EMT_TRANSPARENT_ADD_COLOR);
 
     m_shaders[ES_MULTIPLY_ADD] = glslmat(std::string(""), dir + "multiply.frag",
                                     m_callbacks[ES_MULTIPLY_ADD], EMT_ONETEXTURE_BLEND);

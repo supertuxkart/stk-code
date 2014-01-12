@@ -481,21 +481,6 @@ private:
 
 //
 
-class BloomProvider: public CallBase
-{
-public:
-    BloomProvider() { m_threshold = 0.75f; }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setThreshold(const float f) { m_threshold = f; }
-
-private:
-    float m_threshold;
-};
-
-//
-
 class MLAAColor1Provider: public CallBase
 {
 public:
