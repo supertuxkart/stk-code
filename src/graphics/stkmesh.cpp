@@ -23,14 +23,16 @@ namespace ObjectShader
 }
 
 static
-void allocateMeshBuffer(scene::IMeshBuffer* mb, GLuint &vbo, GLuint &idx)
+GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 {
 	initGL();
-	GLuint bufferid, indexbufferid;
-	glGenBuffers(1, &bufferid);
-	glGenBuffers(1, &indexbufferid);
+	GLMesh result;
+	if (!mb)
+		return result;
+	glGenBuffers(1, &(result.vertex_buffer));
+	glGenBuffers(1, &(result.index_buffer));
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferid);
+	glBindBuffer(GL_ARRAY_BUFFER, result.vertex_buffer);
 	const void* vertices=mb->getVertices();
 	const u32 vertexCount=mb->getVertexCount();
 	const irr::video::E_VERTEX_TYPE vType=mb->getVertexType();
@@ -42,7 +44,7 @@ void allocateMeshBuffer(scene::IMeshBuffer* mb, GLuint &vbo, GLuint &idx)
 	vbuf = buffer.const_pointer();
 	glBufferData(GL_ARRAY_BUFFER, vertexCount * vertexSize, vbuf, GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexbufferid);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.index_buffer);
 	const void* indices=mb->getIndices();
 	u32 indexCount= mb->getIndexCount();
 	GLenum indexSize;
@@ -67,8 +69,59 @@ void allocateMeshBuffer(scene::IMeshBuffer* mb, GLuint &vbo, GLuint &idx)
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	vbo = bufferid;
-	idx = indexbufferid;
+
+	result.IndexCount = mb->getIndexCount();
+	switch (mb->getPrimitiveType())
+	{
+	case scene::EPT_POINTS:
+		result.PrimitiveType = GL_POINTS;
+		break;
+	case scene::EPT_TRIANGLE_STRIP:
+		result.PrimitiveType = GL_TRIANGLE_STRIP;
+		break;
+	case scene::EPT_TRIANGLE_FAN:
+		result.PrimitiveType = GL_TRIANGLE_FAN;
+		break;
+	case scene::EPT_LINES:
+		result.PrimitiveType = GL_LINES;
+	case scene::EPT_TRIANGLES:
+		result.PrimitiveType = GL_TRIANGLES;
+		break;
+	case scene::EPT_POINT_SPRITES:
+	case scene::EPT_LINE_LOOP:
+	case scene::EPT_POLYGON:
+	case scene::EPT_LINE_STRIP:
+	case scene::EPT_QUAD_STRIP:
+	case scene::EPT_QUADS:
+		assert(0 && "Unsupported primitive type");
+	}
+	switch (mb->getVertexType())
+	{
+	case video::EVT_STANDARD:
+		result.Stride = sizeof(video::S3DVertex);
+		break;
+	case video::EVT_2TCOORDS:
+		result.Stride = sizeof(video::S3DVertex2TCoords);
+		break;
+	case video::EVT_TANGENTS:
+		result.Stride = sizeof(video::S3DVertexTangents);
+		break;
+	}
+	switch (mb->getIndexType())
+	{
+	case video::EIT_16BIT:
+		result.IndexType = GL_UNSIGNED_SHORT;
+		break;
+	case video::EIT_32BIT:
+		result.IndexType = GL_UNSIGNED_INT;
+		break;
+	}
+	ITexture *tex = mb->getMaterial().getTexture(0);
+	if (tex)
+		result.textures = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+	else
+		result.textures = 0;
+	return result;
 }
 
 STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
@@ -80,63 +133,8 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 	for (u32 i=0; i<Mesh->getMeshBufferCount(); ++i)
 	{
 		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-		if (!mb)
-			continue;
-		GLuint vbo, idx;
-		allocateMeshBuffer(mb, vbo, idx);
-		vertex_buffer.push_back(vbo);
-		index_buffer.push_back(idx);
-		Indexcount.push_back(mb->getIndexCount());
-		switch (mb->getPrimitiveType())
-		{
-		case scene::EPT_POINTS:
-			Primitivetype.push_back(GL_POINTS);
-			break;
-		case scene::EPT_TRIANGLE_STRIP:
-			Primitivetype.push_back(GL_TRIANGLE_STRIP);
-			break;
-		case scene::EPT_TRIANGLE_FAN:
-			Primitivetype.push_back(GL_TRIANGLE_FAN);
-			break;
-		case scene::EPT_LINES:
-			Primitivetype.push_back(GL_LINES);
-		case scene::EPT_TRIANGLES:
-			Primitivetype.push_back(GL_TRIANGLES);
-			break;
-		case scene::EPT_POINT_SPRITES:
-		case scene::EPT_LINE_LOOP:
-		case scene::EPT_POLYGON:
-		case scene::EPT_LINE_STRIP:
-		case scene::EPT_QUAD_STRIP:
-		case scene::EPT_QUADS:
-			assert(0 && "Unsupported primitive type");
-		}
-		switch (mb->getVertexType())
-		{
-		case video::EVT_STANDARD:
-			Stride.push_back(sizeof(video::S3DVertex));
-			break;
-		case video::EVT_2TCOORDS:
-			Stride.push_back(sizeof(video::S3DVertex2TCoords));
-			break;
-		case video::EVT_TANGENTS:
-			Stride.push_back(sizeof(video::S3DVertexTangents));
-			break;
-		}
-		switch (mb->getIndexType())
-		{
-		case video::EIT_16BIT:
-			Indextype.push_back(GL_UNSIGNED_SHORT);
-			break;
-		case video::EIT_32BIT:
-			Indextype.push_back(GL_UNSIGNED_INT);
-			break;
-		}
-		ITexture *tex = mb->getMaterial().getTexture(0);
-		if (tex)
-			textures.push_back(static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
-		else
-			textures.push_back(0);
+		GLmeshes.push_back(allocateMeshBuffer(mb));
+
 	}
 	if (!ObjectShader::Program)
 		ObjectShader::init();
@@ -144,20 +142,24 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 
 STKMesh::~STKMesh()
 {
-	glDeleteBuffers(vertex_buffer.size(), vertex_buffer.data());
-	glDeleteBuffers(index_buffer.size(), index_buffer.data());
+//	glDeleteBuffers(vertex_buffer.size(), vertex_buffer.data());
+//	glDeleteBuffers(index_buffer.size(), index_buffer.data());
 }
 
-void STKMesh::draw(unsigned i)
+static
+void draw(const GLMesh &mesh)
 {
-	if (!textures[i])
-	  return;
+	if (!mesh.textures)
+		return;
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_ALPHA_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
-	GLuint vbo = vertex_buffer[i], idx = index_buffer[i];
-	GLenum ptype = Primitivetype[i];
-	size_t count = Indexcount[i];
+	GLuint vbo = mesh.vertex_buffer, idx = mesh.index_buffer;
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+	size_t stride = mesh.Stride;
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
 
@@ -171,7 +173,7 @@ void STKMesh::draw(unsigned i)
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, textures[i]);
+	glBindTexture(GL_TEXTURE_2D, mesh.textures);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glUniform1f(ObjectShader::uniform_texture, 0);
@@ -181,10 +183,10 @@ void STKMesh::draw(unsigned i)
 	glEnableVertexAttribArray(ObjectShader::attrib_position);
 	glEnableVertexAttribArray(ObjectShader::attrib_texcoord);
 	glEnableVertexAttribArray(ObjectShader::attrib_normal);
-	glVertexAttribPointer(ObjectShader::attrib_position, 3, GL_FLOAT, GL_FALSE, Stride[i], 0);
-	glVertexAttribPointer(ObjectShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, Stride[i], (GLvoid*) 28);
-	glVertexAttribPointer(ObjectShader::attrib_normal, 3, GL_FLOAT, GL_FALSE, Stride[i], (GLvoid*) 12);
-	glDrawElements(ptype, count, Indextype[i], 0);
+	glVertexAttribPointer(ObjectShader::attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
+	glVertexAttribPointer(ObjectShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
+	glVertexAttribPointer(ObjectShader::attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
+	glDrawElements(ptype, count, itype, 0);
 	glDisableVertexAttribArray(ObjectShader::attrib_position);
 	glDisableVertexAttribArray(ObjectShader::attrib_texcoord);
 	glDisableVertexAttribArray(ObjectShader::attrib_normal);
@@ -214,15 +216,6 @@ void STKMesh::render()
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
 	Box = Mesh->getBoundingBox();
 
-	if (!isTransparentPass)
-	{
-		for (unsigned i = 0; i < index_buffer.size(); i++)
-		{
-			//draw(i);
-		}
-		//return;
-	}
-
 	for (u32 i=0; i<Mesh->getMeshBufferCount(); ++i)
 	{
 		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
@@ -235,7 +228,9 @@ void STKMesh::render()
 
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-			if (transparent == isTransparentPass)
+			/*if (isTransparentPass && transparent)
+				draw(GLmeshes[i]);
+			else*/ if (transparent == isTransparentPass)
 			{
 				driver->setMaterial(material);
 				driver->drawMeshBuffer(mb);

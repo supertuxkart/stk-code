@@ -8,15 +8,20 @@
 #include "glwrap.hpp"
 #include <vector>
 
+struct GLMesh {
+	GLuint vertex_buffer;
+	GLuint index_buffer;
+	GLuint textures;
+	GLenum PrimitiveType;
+	GLenum IndexType;
+	size_t IndexCount;
+	size_t Stride;
+};
+
 class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
-	std::vector<GLuint> vertex_buffer, index_buffer, textures;
-	std::vector<GLenum> Primitivetype, Indextype;
-	std::vector<size_t> Indexcount;
-	std::vector<size_t> Stride;
-
-	void draw(unsigned i);
+	std::vector<GLMesh> GLmeshes;
 public:
 	STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
 		const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
