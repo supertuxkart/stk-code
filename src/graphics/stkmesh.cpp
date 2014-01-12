@@ -201,6 +201,13 @@ void draw(const GLMesh &mesh)
 	static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
 }
 
+static bool isObject(video::E_MATERIAL_TYPE type)
+{
+	if (type == irr_driver->getShader(ES_OBJECTPASS_REF) || type == irr_driver->getShader(ES_OBJECTPASS))
+		return true;
+	return false;
+}
+
 void STKMesh::render()
 {
 	irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
@@ -228,7 +235,7 @@ void STKMesh::render()
 
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-			/*if (isTransparentPass && transparent)
+/*			if (isObject(material.MaterialType) && !isTransparentPass && !transparent)
 				draw(GLmeshes[i]);
 			else*/ if (transparent == isTransparentPass)
 			{
