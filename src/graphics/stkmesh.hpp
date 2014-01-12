@@ -11,8 +11,8 @@
 class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
-	std::vector<GLuint> vertex_buffer, index_buffer;
-	std::vector<GLenum> Primitivetype;
+	std::vector<GLuint> vertex_buffer, index_buffer, textures;
+	std::vector<GLenum> Primitivetype, Indextype;
 	std::vector<size_t> Indexcount;
 	std::vector<size_t> Stride;
 

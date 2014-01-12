@@ -6,13 +6,17 @@
 namespace ObjectShader
 {
 	GLuint Program;
-	GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-	GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_MVP, uniform_texture;
 
 	void init()
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/object.vert").c_str(), file_manager->getAsset("shaders/object.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_texture = glGetUniformLocation(Program, "texture");
 	}
 }
 
@@ -117,6 +121,20 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 			Stride.push_back(sizeof(video::S3DVertexTangents));
 			break;
 		}
+		switch (mb->getIndexType())
+		{
+		case video::EIT_16BIT:
+			Indextype.push_back(GL_UNSIGNED_SHORT);
+			break;
+		case video::EIT_32BIT:
+			Indextype.push_back(GL_UNSIGNED_INT);
+			break;
+		}
+		ITexture *tex = mb->getMaterial().getTexture(0);
+		if (tex)
+			textures.push_back(static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
+		else
+			textures.push_back(0);
 	}
 	if (!ObjectShader::Program)
 		ObjectShader::init();
@@ -130,6 +148,8 @@ STKMesh::~STKMesh()
 
 void STKMesh::draw(unsigned i)
 {
+	if (!textures[i])
+	  return;
 	glEnable(GL_DEPTH_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_CULL_FACE);
@@ -143,12 +163,19 @@ void STKMesh::draw(unsigned i)
 	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-	GLuint attrib_pos = glGetUniformLocation(ObjectShader::Program, "ModelViewProjectionMatrix");
-	glUniformMatrix4fv(attrib_pos, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, Stride[i], 0);
-	glDrawElements(ptype, count, GL_UNSIGNED_BYTE, 0);
-	glDisableVertexAttribArray(0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, textures[i]);
+	glUniform1f(ObjectShader::uniform_texture, 0);
+	glUniformMatrix4fv(ObjectShader::uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+	glEnableVertexAttribArray(ObjectShader::attrib_position);
+	glEnableVertexAttribArray(ObjectShader::attrib_texcoord);
+	glVertexAttribPointer(ObjectShader::attrib_position, 3, GL_FLOAT, GL_FALSE, Stride[i], 0);
+	glVertexAttribPointer(ObjectShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, Stride[i], (GLvoid*) 28);
+	glDrawElements(ptype, count, Indextype[i], 0);
+	glDisableVertexAttribArray(ObjectShader::attrib_position);
+	glDisableVertexAttribArray(ObjectShader::attrib_texcoord);
+
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	video::SMaterial material;
