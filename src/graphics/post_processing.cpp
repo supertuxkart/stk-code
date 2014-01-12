@@ -269,6 +269,34 @@ namespace BloomShader
 	}
 }
 
+namespace BloomBlendShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_texture, uniform_low;
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloomblend.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_texture = glGetUniformLocation(Program, "tex");
+
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -287,6 +315,33 @@ void renderBloom(ITexture *in)
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+static
+void renderBloomBlend(ITexture *in)
+{
+	if (!BloomBlendShader::Program)
+		BloomBlendShader::init();
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(BloomBlendShader::Program);
+	glBindVertexArray(BloomBlendShader::vao);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+	glUniform1i(BloomBlendShader::uniform_texture, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 }
 
 // ----------------------------------------------------------------------------
@@ -477,14 +532,8 @@ void PostProcessing::render()
                 }
 
                 // Additively blend on top of tmp1
-                m_material.BlendOperation = EBO_ADD;
-                m_material.MaterialType = irr_driver->getShader(ES_BLOOM_BLEND);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_EIGHTH1));
-                drv->setRenderTarget(out, false, false);
-
-                drawQuad(cam, m_material);
-
-                m_material.BlendOperation = EBO_NONE;
+				drv->setRenderTarget(out, false, false);
+				renderBloomBlend(irr_driver->getRTT(RTT_EIGHTH1));
             } // end if bloom
 
             in = irr_driver->getRTT(RTT_TMP1);
