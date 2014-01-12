@@ -3,7 +3,7 @@
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
 
-namespace ObjectShader
+namespace ObjectRefShader
 {
 	GLuint Program;
 	GLuint attrib_position, attrib_texcoord, attrib_normal;
@@ -121,6 +121,17 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 		result.textures = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
 	else
 		result.textures = 0;
+	glGenVertexArrays(1, &(result.vao));
+	glBindVertexArray(result.vao);
+	glBindBuffer(GL_ARRAY_BUFFER, result.vertex_buffer);
+	glEnableVertexAttribArray(ObjectRefShader::attrib_position);
+	glEnableVertexAttribArray(ObjectRefShader::attrib_texcoord);
+	glEnableVertexAttribArray(ObjectRefShader::attrib_normal);
+	glVertexAttribPointer(ObjectRefShader::attrib_position, 3, GL_FLOAT, GL_FALSE, result.Stride, 0);
+	glVertexAttribPointer(ObjectRefShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, result.Stride, (GLvoid*) 28);
+	glVertexAttribPointer(ObjectRefShader::attrib_normal, 3, GL_FLOAT, GL_FALSE, result.Stride, (GLvoid*) 12);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.index_buffer);
+	glBindVertexArray(0);
 	return result;
 }
 
@@ -136,8 +147,8 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 		GLmeshes.push_back(allocateMeshBuffer(mb));
 
 	}
-	if (!ObjectShader::Program)
-		ObjectShader::init();
+	if (!ObjectRefShader::Program)
+		ObjectRefShader::init();
 }
 
 STKMesh::~STKMesh()
@@ -155,15 +166,11 @@ void draw(const GLMesh &mesh)
 	glEnable(GL_ALPHA_TEST);
 	glDepthMask(GL_TRUE);
 	glDisable(GL_BLEND);
-	GLuint vbo = mesh.vertex_buffer, idx = mesh.index_buffer;
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
-	size_t stride = mesh.Stride;
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
 
-	glUseProgram(ObjectShader::Program);
+	glUseProgram(ObjectRefShader::Program);
 	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
@@ -176,27 +183,19 @@ void draw(const GLMesh &mesh)
 	glBindTexture(GL_TEXTURE_2D, mesh.textures);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glUniform1f(ObjectShader::uniform_texture, 0);
+	glUniform1f(ObjectRefShader::uniform_texture, 0);
 
-	glUniformMatrix4fv(ObjectShader::uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-	glUniformMatrix4fv(ObjectShader::uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
-	glEnableVertexAttribArray(ObjectShader::attrib_position);
-	glEnableVertexAttribArray(ObjectShader::attrib_texcoord);
-	glEnableVertexAttribArray(ObjectShader::attrib_normal);
-	glVertexAttribPointer(ObjectShader::attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
-	glVertexAttribPointer(ObjectShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
-	glVertexAttribPointer(ObjectShader::attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
+	glUniformMatrix4fv(ObjectRefShader::uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+	glUniformMatrix4fv(ObjectRefShader::uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+	glBindVertexArray(mesh.vao);
 	glDrawElements(ptype, count, itype, 0);
-	glDisableVertexAttribArray(ObjectShader::attrib_position);
-	glDisableVertexAttribArray(ObjectShader::attrib_texcoord);
-	glDisableVertexAttribArray(ObjectShader::attrib_normal);
+	glBindVertexArray(0);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	video::SMaterial material;
 	material.MaterialType = irr_driver->getShader(ES_RAIN);
-//	fakemat.setTexture(0, tex);
-//	fakemat.BlendOperation = video::EBO_NONE;
+	material.BlendOperation = video::EBO_NONE;
+	material.ZWriteEnable = true;
+	material.Lighting = false;
 	irr_driver->getVideoDriver()->setMaterial(material);
 	static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
 }
