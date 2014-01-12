@@ -21,7 +21,7 @@
 #include "addons/addons_manager.hpp"
 
 #include "addons/inetwork_http.hpp"
-#include "addons./news_manager.hpp"
+#include "addons/news_manager.hpp"
 #include "addons/zip.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"

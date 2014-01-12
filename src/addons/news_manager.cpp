@@ -64,7 +64,7 @@ void NewsManager::init(bool force_refresh)
                                 &NewsManager::downloadNews, this);
     if(error)
     {
-        Log::warn("news", "Could not create thread, error=%d", errno);
+        Log::warn("news", "Could not create thread, error=%d", error);
         // In this case just execute the downloading code with this thread
         downloadNews(this);
     }
