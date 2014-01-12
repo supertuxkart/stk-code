@@ -242,9 +242,7 @@ void ParticleSystemProxy::setFlip() {
 	for (unsigned i = 0; i < count; i++)
 	{
 		core::vector3df rotationdir(0., 1., 0.);
-		/*rotationdir.rotateXYBy(os::Randomizer::frand() * 180.);
-		rotationdir.rotateYZBy(os::Randomizer::frand() * 180.);
-		rotationdir.rotateXZBy(os::Randomizer::frand() * 180.);*/
+
 		quaternions[4 * i] = rotationdir.X;
 		quaternions[4 * i + 1] = rotationdir.Y;
 		quaternions[4 * i + 2] = rotationdir.Z;
@@ -602,17 +600,6 @@ void ParticleSystemProxy::drawFlip()
 	glUniformMatrix4fv(FlipParticleRender::uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
 	glUniformMatrix4fv(FlipParticleRender::uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
 
-/*	glUniform1i(FlipParticleRender::uniform_has_heightmap, has_height_map);
-	if (has_height_map)
-	{
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-		glUniform1i(FlipParticleRender::uniform_heightmap, 2);
-		glUniform1f(FlipParticleRender::uniform_track_x, track_x);
-		glUniform1f(FlipParticleRender::uniform_track_z, track_z);
-		glUniform1f(FlipParticleRender::uniform_track_x_len, track_x_len);
-		glUniform1f(FlipParticleRender::uniform_track_z_len, track_z_len);
-	}*/
 	glEnableVertexAttribArray(FlipParticleRender::attrib_rotationvec);
 	glEnableVertexAttribArray(FlipParticleRender::attrib_anglespeed);
 	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
@@ -681,18 +668,6 @@ void ParticleSystemProxy::drawNotFlip()
 	glUniform2f(SimpleParticleRender::uniform_screen, screen[0], screen[1]);
 	glUniformMatrix4fv(SimpleParticleRender::uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
 	glUniformMatrix4fv(SimpleParticleRender::uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-
-/*	glUniform1i(SimpleParticleRender::uniform_has_heightmap, has_height_map);
-	if (has_height_map)
-	{
-		glActiveTexture(GL_TEXTURE2);
-		glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-		glUniform1i(SimpleParticleRender::uniform_heightmap, 2);
-		glUniform1f(SimpleParticleRender::uniform_track_x, track_x);
-		glUniform1f(SimpleParticleRender::uniform_track_z, track_z);
-		glUniform1f(SimpleParticleRender::uniform_track_x_len, track_x_len);
-		glUniform1f(SimpleParticleRender::uniform_track_z_len, track_z_len);
-	}*/
 
 	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
 	glVertexAttribPointer(SimpleParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
