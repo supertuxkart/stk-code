@@ -82,6 +82,7 @@ public:
                       const core::vector3df& scale) {}
 
     virtual const core::vector3df& getPosition() const { return m_init_xyz; }
+    virtual const core::vector3df& getAbsolutePosition() const { return m_init_xyz; }
     virtual const core::vector3df& getRotation() const { return m_init_hpr; }
     virtual const core::vector3df& getScale() const { return m_init_scale; }
 
@@ -115,6 +116,7 @@ public:
     }
 
     virtual const core::vector3df& getPosition() const OVERRIDE;
+    virtual const core::vector3df& getAbsolutePosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,

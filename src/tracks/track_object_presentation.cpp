@@ -70,6 +70,14 @@ const core::vector3df& TrackObjectPresentationSceneNode::getPosition() const
     return m_node->getPosition();
 }
 
+const core::vector3df& TrackObjectPresentationSceneNode::getAbsolutePosition() const
+{
+    if (m_node == NULL) return m_init_xyz;
+    m_node->updateAbsolutePosition();
+    return m_node->getAbsolutePosition();
+}
+
+ 
 const core::vector3df& TrackObjectPresentationSceneNode::getRotation() const
 {
     if (m_node == NULL) return m_init_hpr;

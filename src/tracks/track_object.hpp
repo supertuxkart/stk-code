@@ -133,6 +133,7 @@ public:
     const ThreeDAnimation* getAnimator() const { return m_animator; }
 
     const core::vector3df& getPosition() const;
+    const core::vector3df& getAbsolutePosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
 

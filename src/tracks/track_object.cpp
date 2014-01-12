@@ -282,6 +282,16 @@ const core::vector3df& TrackObject::getPosition() const
 
 // ----------------------------------------------------------------------------
 
+const core::vector3df& TrackObject::getAbsolutePosition() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getAbsolutePosition();
+    else
+        return m_init_xyz;
+}
+
+// ----------------------------------------------------------------------------
+
 const core::vector3df& TrackObject::getRotation() const
 {
     if (m_presentation != NULL)
