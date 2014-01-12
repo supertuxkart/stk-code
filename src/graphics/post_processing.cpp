@@ -297,6 +297,36 @@ namespace BloomBlendShader
 	}
 }
 
+namespace PPDisplaceShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_tex, uniform_dtex, uniform_viz;
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ppdisplace.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_dtex = glGetUniformLocation(Program, "dtex");
+		uniform_viz = glGetUniformLocation(Program, "viz");
+
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -335,6 +365,37 @@ void renderBloomBlend(ITexture *in)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
 	glUniform1i(BloomBlendShader::uniform_texture, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+}
+
+static
+void renderPPDisplace(ITexture *in)
+{
+	if (!PPDisplaceShader::Program)
+		PPDisplaceShader::init();
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(PPDisplaceShader::Program);
+	glBindVertexArray(PPDisplaceShader::vao);
+	glUniform1i(PPDisplaceShader::uniform_viz, irr_driver->getDistortViz());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+	glUniform1i(PPDisplaceShader::uniform_tex, 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_DISPLACE))->getOpenGLTextureName());
+	glUniform1i(PPDisplaceShader::uniform_dtex, 1);
+	
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -661,7 +722,9 @@ void PostProcessing::render()
 
         if (irr_driver->getDisplacingNodes().size()) // Displacement
         {
-            m_material.MaterialType = irr_driver->getShader(ES_PPDISPLACE);
+			drv->setRenderTarget(out, true, false);
+			renderPPDisplace(in);
+/*            m_material.MaterialType = irr_driver->getShader(ES_PPDISPLACE);
             m_material.setFlag(EMF_BILINEAR_FILTER, false);
             m_material.setTexture(0, in);
             m_material.setTexture(1, irr_driver->getRTT(RTT_DISPLACE));
@@ -670,7 +733,7 @@ void PostProcessing::render()
             drawQuad(cam, m_material);
 
             m_material.setTexture(1, 0);
-            m_material.setFlag(EMF_BILINEAR_FILTER, true);
+            m_material.setFlag(EMF_BILINEAR_FILTER, true);*/
 
             ITexture *tmp = in;
             in = out;
@@ -747,7 +810,7 @@ void PostProcessing::render()
         } else if (irr_driver->getShadowViz())
         {
             m_material.MaterialType = irr_driver->getShader(ES_FLIP);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_SHADOW));
+            m_material.setTexture(0, irr_driver->getRTT(RTT_DISPLACE));
         } else
         {
             m_material.MaterialType = irr_driver->getShader(ES_COLOR_LEVELS);

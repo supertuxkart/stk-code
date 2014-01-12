@@ -4,9 +4,11 @@ uniform sampler2D dtex;
 
 uniform int viz;
 
+in vec2 uv;
+
 void main()
 {
-	vec2 tc = gl_TexCoord[0].xy;
+	vec2 tc = uv;
 
 	vec4 shiftval = texture2D(dtex, tc) / vec4(50.0);
 	vec2 shift;
