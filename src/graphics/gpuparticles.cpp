@@ -391,8 +391,8 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
 		particles[i].PositionX = pos.X;
 		particles[i].PositionY = pos.Y;
 		particles[i].PositionZ = pos.Z;
-		// Initial lifetime is < 0
-		particles[i].Lifetime = -1.;
+		// Initial lifetime is > 1
+		particles[i].Lifetime = 2.;
 
 		memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
 		generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
