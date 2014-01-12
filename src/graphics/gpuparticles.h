@@ -34,7 +34,7 @@ protected:
 	static GLuint quad_vertex_buffer;
 
 	GLuint texture, normal_and_depth;
-	unsigned duration, count, LastEmitTime;
+	unsigned count;
 
 	void simulateHeightmap();
 	void simulateNoHeightmap();

@@ -4,6 +4,7 @@
 #include "config/user_config.hpp"
 #include <ICameraSceneNode.h>
 #include <IParticleSystemSceneNode.h>
+#include "guiengine/engine.hpp"
 
 GLuint getTextureGLuint(irr::video::ITexture *tex) {
 	return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
@@ -432,7 +433,6 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	// Pass a fake material type to force irrlicht to update its internal states on rendering
 	setMaterialType(irr_driver->getShader(ES_RAIN));
 	setAutomaticCulling(0);
-	LastEmitTime = 0;
 
 	count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
 	switch (emitter->getType())
@@ -465,15 +465,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 void ParticleSystemProxy::simulateHeightmap()
 {
-	unsigned time = os::Timer::getTime();
-	if (LastEmitTime == 0)
-	{
-		LastEmitTime = time;
-		return;
-	}
-
-	u32 timediff = time - LastEmitTime;
-	LastEmitTime = time;
+	int timediff = GUIEngine::getLatestDt() * 1000.;
 	int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
 	core::matrix4 matrix = getAbsoluteTransformation();
 	glUseProgram(HeightmapSimulationShader::Program);
@@ -527,16 +519,7 @@ void ParticleSystemProxy::simulateHeightmap()
 
 void ParticleSystemProxy::simulateNoHeightmap()
 {
-
-	unsigned time = os::Timer::getTime();
-	if (LastEmitTime == 0)
-	{
-		LastEmitTime = time;
-		return;
-	}
-
-	u32 timediff = time - LastEmitTime;
-	LastEmitTime = time;
+	int timediff = GUIEngine::getLatestDt() * 1000.;
 	int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
 	core::matrix4 matrix = getAbsoluteTransformation();
 	glUseProgram(SimpleSimulationShader::Program);
