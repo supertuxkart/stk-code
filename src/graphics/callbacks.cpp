@@ -815,25 +815,6 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void PPDisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    int viz = irr_driver->getDistortViz();
-    srv->setPixelShaderConstant("viz", &viz, 1);
-
-    if (!firstdone)
-    {
-        int tex = 0;
-        srv->setPixelShaderConstant("tex", &tex, 1);
-
-        tex = 1;
-        srv->setPixelShaderConstant("dtex", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
 void FogProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const Track * const track = World::getWorld()->getTrack();

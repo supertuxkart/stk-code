@@ -693,14 +693,6 @@ private:
 
 //
 
-class PPDisplaceProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
 class FogProvider: public CallBase
 {
 public:

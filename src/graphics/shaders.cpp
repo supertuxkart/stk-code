@@ -63,7 +63,6 @@ Shaders::Shaders()
     m_callbacks[ES_SHADOWGEN] = new ShadowGenProvider();
     m_callbacks[ES_CAUSTICS] = new CausticsProvider();
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
-    m_callbacks[ES_PPDISPLACE] = new PPDisplaceProvider();
     m_callbacks[ES_FOG] = new FogProvider();
 
     for(s32 i=0 ; i < ES_COUNT ; i++)
@@ -217,8 +216,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_DISPLACE] = glsl(dir + "displace.vert", dir + "displace.frag",
                                   m_callbacks[ES_DISPLACE]);
-    m_shaders[ES_PPDISPLACE] = glsl(std::string(""), dir + "ppdisplace.frag",
-                                  m_callbacks[ES_PPDISPLACE]);
 
     m_shaders[ES_PASSFAR] = glsl(dir + "farplane.vert", dir + "colorize.frag",
                                   m_callbacks[ES_COLORIZE]);
