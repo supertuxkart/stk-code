@@ -247,28 +247,6 @@ void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void RainEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float screenw = (float)UserConfigParams::m_width;
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 90.0f;
-    const vector3df campos = irr_driver->getSceneManager()->getActiveCamera()->getPosition();
-	float screen[2] = { (float)UserConfigParams::m_width,
-		(float)UserConfigParams::m_height };
-
-    srv->setVertexShaderConstant("screenw", &screenw, 1);
-    srv->setVertexShaderConstant("time", &time, 1);
-    srv->setVertexShaderConstant("viewm", irr_driver->getViewMatrix().pointer(), 16);
-    srv->setVertexShaderConstant("campos", &campos.X, 3);
-	srv->setPixelShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
-	srv->setPixelShaderConstant("screen", screen, 2);
-	s32 tex = 0;
-	srv->setPixelShaderConstant("tex", &tex, 1);
-	tex = 1;
-	srv->setPixelShaderConstant("normals_and_depth", &tex, 1);
-}
-
-//-------------------------------------
-
 void MotionBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     // We need the maximum texture coordinates:

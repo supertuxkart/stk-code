@@ -39,7 +39,6 @@ Shaders::Shaders()
     m_callbacks[ES_WATER] = new WaterShaderProvider();
     m_callbacks[ES_GRASS] = new GrassShaderProvider();
     m_callbacks[ES_BUBBLES] = new BubbleEffectProvider();
-    m_callbacks[ES_RAIN] = new RainEffectProvider();
     m_callbacks[ES_MOTIONBLUR] = new MotionBlurProvider();
     m_callbacks[ES_GAUSSIAN3V] = m_callbacks[ES_GAUSSIAN3H] = new GaussianBlurProvider();
     m_callbacks[ES_MIPVIZ] = new MipVizProvider();

@@ -228,14 +228,6 @@ private:
 
 //
 
-class RainEffectProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
 class MotionBlurProvider: public CallBase
 {
 public:
