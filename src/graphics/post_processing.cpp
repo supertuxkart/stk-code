@@ -393,6 +393,39 @@ namespace PointLightShader
 	}
 }
 
+namespace LightBlendShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_diffuse, uniform_specular, uniform_ambient_occlusion, uniform_specular_map, uniform_ambient;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/lightblend.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_diffuse = glGetUniformLocation(Program, "diffuse");
+		uniform_specular = glGetUniformLocation(Program, "specular");
+		uniform_ambient_occlusion = glGetUniformLocation(Program, "ambient_occlusion");
+		uniform_specular_map = glGetUniformLocation(Program, "specular_map");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -524,6 +557,45 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
 	glUniform1i(PointLightShader::uniform_ntex, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+}
+
+void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, ITexture *ao, ITexture *specmap, bool debug)
+{
+	const SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+	if (!LightBlendShader::Program)
+		LightBlendShader::init();
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	if (debug)
+		glBlendFunc(GL_ONE, GL_ZERO);
+	else
+		glBlendFunc(GL_DST_COLOR, GL_ZERO);
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(LightBlendShader::Program);
+	glBindVertexArray(LightBlendShader::vao);
+
+	glUniform3f(LightBlendShader::uniform_ambient, s.r, s.g, s.b);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(diffuse)->getOpenGLTextureName());
+	glUniform1i(LightBlendShader::uniform_diffuse, 0);
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specular)->getOpenGLTextureName());
+	glUniform1i(LightBlendShader::uniform_specular, 1);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(ao)->getOpenGLTextureName());
+	glUniform1i(LightBlendShader::uniform_ambient_occlusion, 2);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specmap)->getOpenGLTextureName());
+	glUniform1i(LightBlendShader::uniform_specular_map, 3);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

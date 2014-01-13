@@ -808,30 +808,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         m_post_processing->drawQuad(cam, m_material);
     }
 
-    // Blend lights to the image
-    video::SMaterial lightmat;
-    lightmat.Lighting = false;
-    lightmat.ZWriteEnable = false;
-    lightmat.ZBuffer = video::ECFN_ALWAYS;
-    lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
-    lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
-    lightmat.setTexture(1, m_rtts->getRTT(RTT_TMP2));
-    lightmat.setTexture(2, m_rtts->getRTT(RTT_SSAO));
-    lightmat.setTexture(3, m_rtts->getRTT(RTT_SPECULARMAP));
-
-    lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
-	if (!m_lightviz)
-        lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
-	else
-		lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_ONE, video::EBF_ZERO);
-    lightmat.BlendOperation = video::EBO_ADD;
-
-    lightmat.TextureLayer[0].TextureWrapU =
-    lightmat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
     if (!m_mipviz)
-        m_post_processing->drawQuad(cam, lightmat);
+		m_post_processing->renderLightbBlend(m_rtts->getRTT(RTT_TMP1), m_rtts->getRTT(RTT_TMP2), m_rtts->getRTT(RTT_SSAO), m_rtts->getRTT(RTT_SPECULARMAP), m_lightviz);
 }
 
 // ----------------------------------------------------------------------------
