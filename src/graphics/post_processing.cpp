@@ -357,6 +357,42 @@ namespace ColorLevelShader
 	}
 }
 
+namespace PointLightShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_ntex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_screen, uniform_invproj, uniform_viewm;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_ntex = glGetUniformLocation(Program, "ntex");
+		uniform_center = glGetUniformLocation(Program, "center[0]");
+		uniform_col = glGetUniformLocation(Program, "col[0]");
+		uniform_energy = glGetUniformLocation(Program, "energy[0]");
+		uniform_spec = glGetUniformLocation(Program, "spec");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_invproj = glGetUniformLocation(Program, "invproj");
+		uniform_viewm = glGetUniformLocation(Program, "viewm");
+
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -455,6 +491,37 @@ void renderColorLevel(ITexture *in)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
 	glUniform1i(ColorLevelShader::uniform_tex, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+}
+
+void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
+{
+	float width = (float)UserConfigParams::m_width;
+	float height = (float)UserConfigParams::m_height;
+	if (!PointLightShader::Program)
+		PointLightShader::init();
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(PointLightShader::Program);
+	glBindVertexArray(PointLightShader::vao);
+
+	glUniform4fv(PointLightShader::uniform_center, 16, positions.data());
+	glUniform4fv(PointLightShader::uniform_col, 16, colors.data());
+	glUniform1fv(PointLightShader::uniform_energy, 16, energy.data());
+	glUniform1f(PointLightShader::uniform_spec, 200);
+	glUniform2f(PointLightShader::uniform_screen, width, height);
+	glUniformMatrix4fv(PointLightShader::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
+	glUniformMatrix4fv(PointLightShader::uniform_viewm, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+	glUniform1i(PointLightShader::uniform_ntex, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

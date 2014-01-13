@@ -75,6 +75,9 @@ public:
     /** Render the post-processed scene, solids only, color to color, no stencil */
     void         renderSolid(const u32 cam);
 
+	/** Generate diffuse and specular map */
+	void         renderPointlight(video::ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
+
     /** Render the post-processed scene */
     void         render();
 

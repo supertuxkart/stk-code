@@ -766,7 +766,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		accumulatedLightColor.push_back(0.);
 		accumulatedLightEnergy.push_back(0.);
 	}
-    LightNode::renderLightSet(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
+	m_post_processing->renderPointlight(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH) , accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     SMaterial m_material;
     GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
