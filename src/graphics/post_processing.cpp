@@ -327,6 +327,36 @@ namespace PPDisplaceShader
 	}
 }
 
+namespace ColorLevelShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_tex, uniform_inlevel, uniform_outlevel;
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
+		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
+
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -403,6 +433,34 @@ void renderPPDisplace(ITexture *in)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+}
+
+static
+void renderColorLevel(ITexture *in)
+{
+	core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
+	core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
+
+
+	if (!ColorLevelShader::Program)
+		ColorLevelShader::init();
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(ColorLevelShader::Program);
+	glBindVertexArray(ColorLevelShader::vao);
+	glUniform3f(ColorLevelShader::uniform_inlevel, m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
+	glUniform2f(ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+	glUniform1i(ColorLevelShader::uniform_tex, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
 }
 
 // ----------------------------------------------------------------------------
@@ -788,28 +846,26 @@ void PostProcessing::render()
         }
 
         // Final blit
-
+		drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
         if (irr_driver->getNormals())
         {
             m_material.MaterialType = irr_driver->getShader(ES_FLIP);
             m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+			drawQuad(cam, m_material);
         } else if (irr_driver->getSSAOViz())
         {
             m_material.MaterialType = irr_driver->getShader(ES_FLIP);
             m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
+			drawQuad(cam, m_material);
         } else if (irr_driver->getShadowViz())
         {
             m_material.MaterialType = irr_driver->getShader(ES_FLIP);
             m_material.setTexture(0, irr_driver->getRTT(RTT_DISPLACE));
+			drawQuad(cam, m_material);
         } else
         {
-            m_material.MaterialType = irr_driver->getShader(ES_COLOR_LEVELS);
-            m_material.setTexture(0, in);
+			renderColorLevel(in);
         }
-
-        drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
-
-        drawQuad(cam, m_material);
     }
 }   // render
 
