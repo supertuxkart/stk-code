@@ -674,10 +674,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                                         video::SColor(0, 0, 0, 0));
 
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-    FogProvider * const fogcb = (FogProvider *) irr_driver->
-                                        getCallback(ES_FOG);
-    fogcb->updateIPVMatrix();
-
 
     const u32 lightcount = m_lights.size();
     const core::vector3df &campos =

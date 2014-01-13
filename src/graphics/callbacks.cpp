@@ -718,31 +718,3 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
     srv->setVertexShaderConstant("screen", m_screen, 2);
 }
-
-//-------------------------------------
-
-void FogProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const Track * const track = World::getWorld()->getTrack();
-
-    // This function is only called once per frame - thus no need for setters.
-    const float fogmax = track->getFogMax();
-    const float startH = track->getFogStartHeight();
-    const float endH = track->getFogEndHeight();
-    const float start = track->getFogStart();
-    const float end = track->getFogEnd();
-    const SColor tmpcol = track->getFogColor();
-
-    const float col[3] = { tmpcol.getRed() / 255.0f,
-                           tmpcol.getGreen() / 255.0f,
-                           tmpcol.getBlue() / 255.0f };
-
-    srv->setPixelShaderConstant("fogmax", &fogmax, 1);
-    srv->setPixelShaderConstant("startH", &startH, 1);
-    srv->setPixelShaderConstant("endH", &endH, 1);
-    srv->setPixelShaderConstant("start", &start, 1);
-    srv->setPixelShaderConstant("end", &end, 1);
-    srv->setPixelShaderConstant("col", col, 3);
-    srv->setVertexShaderConstant("ipvmat", m_invprojview.pointer(), 16);
-    srv->setVertexShaderConstant("campos", m_campos, 3);
-}

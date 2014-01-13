@@ -67,7 +67,6 @@ using namespace irr;
     ACT(ES_CAUSTICS) \
     ACT(ES_DISPLACE) \
     ACT(ES_PASSFAR) \
-    ACT(ES_FOG)
 
 #define ENUM(a) a,
 #define STR(a) #a,

@@ -59,7 +59,6 @@ Shaders::Shaders()
     m_callbacks[ES_SHADOWGEN] = new ShadowGenProvider();
     m_callbacks[ES_CAUSTICS] = new CausticsProvider();
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
-    m_callbacks[ES_FOG] = new FogProvider();
 
     for(s32 i=0 ; i < ES_COUNT ; i++)
         m_shaders[i] = -1;
@@ -196,9 +195,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_PASSFAR] = glsl(dir + "farplane.vert", dir + "colorize.frag",
                                   m_callbacks[ES_COLORIZE]);
-
-	m_shaders[ES_FOG] = glslmat(dir + "pass.vert", dir + "fog.frag",
-                                    m_callbacks[ES_FOG], EMT_ONETEXTURE_BLEND);
 
     // Check that all successfully loaded
     for (s32 i = 0; i < ES_COUNT; i++) {

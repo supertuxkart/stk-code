@@ -608,32 +608,4 @@ private:
     float m_dir[2], m_dir2[2];
 };
 
-//
-
-class FogProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void updateIPVMatrix()
-    {
-        // Update the campos and IPV matrix, only once per frame since it's costly
-        const core::vector3df &campos =
-                     irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
-        m_campos[0] = campos.X;
-        m_campos[1] = campos.Y;
-        m_campos[2] = campos.Z;
-
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        m_invprojview = drv->getTransform(video::ETS_PROJECTION);
-        m_invprojview *= drv->getTransform(video::ETS_VIEW);
-        m_invprojview.makeInverse();
-    }
-
-private:
-    core::matrix4 m_invprojview;
-    float m_campos[3];
-};
-
 #endif
