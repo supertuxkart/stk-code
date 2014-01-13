@@ -455,6 +455,35 @@ namespace Gaussian6HBlurShader
 	}
 }
 
+namespace Gaussian3HBlurShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_tex, uniform_pixel;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3h.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_pixel = glGetUniformLocation(Program, "pixel");
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 namespace Gaussian6VBlurShader
 {
 	GLuint Program = 0;
@@ -467,6 +496,35 @@ namespace Gaussian6VBlurShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6v.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_pixel = glGetUniformLocation(Program, "pixel");
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
+namespace Gaussian3VBlurShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_tex, uniform_pixel;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3v.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
@@ -689,6 +747,47 @@ void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, IT
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+}
+
+
+void PostProcessing::renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height)
+{
+	glDisable(GL_BLEND);
+	glDisable(GL_DEPTH_TEST);
+	{
+		if (!Gaussian3VBlurShader::Program)
+			Gaussian3VBlurShader::init();
+		irr_driver->getVideoDriver()->setRenderTarget(temprtt, false, false);
+		glUseProgram(Gaussian3VBlurShader::Program);
+		glBindVertexArray(Gaussian3VBlurShader::vao);
+
+		glUniform2f(Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+		glUniform1i(Gaussian3VBlurShader::uniform_tex, 0);
+
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+	{
+		if (!Gaussian3HBlurShader::Program)
+			Gaussian3HBlurShader::init();
+		irr_driver->getVideoDriver()->setRenderTarget(in, false, false);
+		glUseProgram(Gaussian3HBlurShader::Program);
+		glBindVertexArray(Gaussian3HBlurShader::vao);
+
+		glUniform2f(Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
+
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(temprtt)->getOpenGLTextureName());
+		glUniform1i(Gaussian3HBlurShader::uniform_tex, 0);
+
+		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	}
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height)
@@ -955,21 +1054,7 @@ void PostProcessing::render()
             drawQuad(cam, m_material);
 
             // Blur
-            {
-                gacb->setResolution(UserConfigParams::m_width / 4,
-                                    UserConfigParams::m_height / 4);
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), true, false);
-
-                drawQuad(cam, m_material);
-
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), false, false);
-
-                drawQuad(cam, m_material);
-            }
+			renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER1), irr_driver->getRTT(RTT_QUARTER2), 4. / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
 
             // Calculate the sun's position in texcoords
             const core::vector3df pos = sun->getPosition();

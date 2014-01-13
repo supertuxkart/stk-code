@@ -755,8 +755,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 	m_post_processing->renderPointlight(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH) , accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     SMaterial m_material;
-    GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
-                                                               getCallback(ES_GAUSSIAN3H);
 
     m_material.ZWriteEnable = false;
     m_material.MaterialType = irr_driver->getShader(ES_SSAO);
@@ -768,19 +766,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     m_post_processing->drawQuad(cam, m_material);
 
     // Blur it to reduce noise.
-    if(UserConfigParams::m_ssao == 1) {
-        gacb->setResolution(UserConfigParams::m_width / 4,
-                            UserConfigParams::m_height / 4);
-        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_QUARTER4), true, false);
-        m_post_processing->drawQuad(cam, m_material);
-
-        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER4));
-        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
-        m_post_processing->drawQuad(cam, m_material);
-    }  else if (UserConfigParams::m_ssao == 2)
+    if(UserConfigParams::m_ssao == 1)
+		m_post_processing->renderGaussian3Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_QUARTER4), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
+    else if (UserConfigParams::m_ssao == 2)
 		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
@@ -837,19 +825,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     minimat.TextureLayer[0].TextureWrapU =
     minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 
-    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                UserConfigParams::m_width,
-                UserConfigParams::m_height);
-
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3H);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_DISPLACE));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP2), true, false);
-    m_post_processing->drawQuad(cam, minimat);
-
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3V);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_TMP2));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), true, false);
-    m_post_processing->drawQuad(cam, minimat);
+	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     glDisable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
