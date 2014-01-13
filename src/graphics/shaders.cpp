@@ -125,11 +125,6 @@ void Shaders::loadShaders()
     m_shaders[ES_MIPVIZ] = glslmat(std::string(""), dir + "mipviz.frag",
                                     m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_FLIP] = glslmat(std::string(""), dir + "flip.frag",
-                                    0, EMT_SOLID);
-    m_shaders[ES_FLIP_ADDITIVE] = glslmat(std::string(""), dir + "flip.frag",
-                                    0, EMT_TRANSPARENT_ADD_COLOR);
-
     m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
     m_shaders[ES_COLORIZE_REF] = glslmat(std::string(""), dir + "colorize_ref.frag",

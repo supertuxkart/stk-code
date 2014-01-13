@@ -38,8 +38,6 @@ using namespace irr;
     ACT(ES_GAUSSIAN3H) \
     ACT(ES_GAUSSIAN3V) \
     ACT(ES_MIPVIZ) \
-    ACT(ES_FLIP) \
-    ACT(ES_FLIP_ADDITIVE) \
     ACT(ES_COLORIZE) \
     ACT(ES_COLORIZE_REF) \
     ACT(ES_PASS) \
