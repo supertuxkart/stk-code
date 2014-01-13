@@ -372,10 +372,29 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "online")
     {
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
+        {
+            new MessageDialog(_("You can not play online without internet access. "
+                                "If you want to play online, go to options, select "
+                                " tab 'User Interface', and edit "
+                                "\"Allow STK to connect to the Internet\"."));
+            return;
+        }
         StateManager::get()->pushScreen(OnlineScreen::getInstance());
     }
     else if (selection == "addons")
     {
+        // Don't go to addons if there is no internet, unless some addons are
+        // already installed (so that you can delete addons without being online).
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED && 
+            !addons_manager->anyAddonsInstalled())
+        {
+            new MessageDialog(_("You can not download addons without internet access. "
+                                "If you want to download addons, go to options, select "
+                                " tab 'User Interface', and edit "
+                                "\"Allow STK to connect to the Internet\"."));
+            return;
+        }
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
 }   // eventCallback

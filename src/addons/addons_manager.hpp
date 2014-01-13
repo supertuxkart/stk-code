@@ -66,6 +66,7 @@ public:
     bool         install(const Addon &addon);
     bool         uninstall(const Addon &addon);
     void         reInit();
+    bool         anyAddonsInstalled() const;
     // ------------------------------------------------------------------------
     /** Returns true if the list of online addons has been downloaded. This is
      *  used to grey out the 'addons' entry till a network connections could be

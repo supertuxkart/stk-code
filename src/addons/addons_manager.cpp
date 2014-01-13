@@ -98,14 +98,18 @@ void AddonsManager::init(const XMLNode *xml,
     }
 
     include->get("file",  &addon_list_url);
+    int frequency = 0;
+    include->get("frequency", &frequency);
 
     int64_t tmp;
     include->get("mtime", &tmp);
     mtime = tmp;
 
-    bool download = mtime > UserConfigParams::m_addons_last_updated ||
-                    force_refresh                                   ||
-                    !file_manager->fileExists(filename);
+    bool download = 
+        ( mtime > UserConfigParams::m_addons_last_updated +frequency ||
+          force_refresh                                              ||
+          !file_manager->fileExists(filename)                          )
+       && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
     
     if (download)
     {
@@ -445,6 +449,14 @@ int AddonsManager::getAddonIndex(const std::string &id) const
     }
     return -1;
 }   // getAddonIndex
+// ----------------------------------------------------------------------------
+bool AddonsManager::anyAddonsInstalled() const
+{
+    for(unsigned int i=0; i<m_addons_list.getData().size(); i++)
+        if(m_addons_list.getData()[i].isInstalled())
+            return true;
+    return false;
+}   // anyAddonsInstalled
 
 // ----------------------------------------------------------------------------
 /** Installs or updates (i.e. = install on top of an existing installation) an

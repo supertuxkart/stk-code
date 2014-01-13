@@ -57,6 +57,9 @@ namespace Online
                                        int priority)
                : Request(manage_memory, priority, 0)
     {
+        // A http request should not even be created when internet is disabled
+        assert(UserConfigParams::m_internet_status == 
+               RequestManager::IPERM_ALLOWED);
         assert(filename.size()>0);
         init();
         m_filename = file_manager->getAddonsFile(filename);
@@ -70,6 +73,9 @@ namespace Online
                                        int priority)
                : Request(manage_memory, priority, 0)
     {
+        // A http request should not even be created when internet is disabled
+        assert(UserConfigParams::m_internet_status == 
+               RequestManager::IPERM_ALLOWED);
         init();
         m_filename = file_manager->getAddonsFile(filename);
     }   // HTTPRequest(filename ...)
@@ -188,8 +194,11 @@ namespace Online
             m_parameters.erase(m_parameters.size()-1);
         }
 
-        Log::info("HTTPRequest", "Sending %s to %s",
-                  m_parameters.c_str(), m_url.c_str());
+        if(m_parameters.size()==0)
+            Log::info("HTTPRequest", "Downloading %s", m_url.c_str());
+        else
+            Log::info("HTTPRequest", "Sending %s to %s",
+                       m_parameters.c_str(), m_url.c_str());
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS,
                          m_parameters.c_str());
         std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );

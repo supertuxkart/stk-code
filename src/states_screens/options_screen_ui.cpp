@@ -17,6 +17,7 @@
 
 #include "states_screens/options_screen_ui.hpp"
 
+#include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -228,11 +229,16 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     }
     else if (name=="enable-internet")
     {
-        CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
-        assert( news != NULL );
+        CheckBoxWidget* internet = getWidget<CheckBoxWidget>("enable-internet");
+        assert( internet != NULL );
         UserConfigParams::m_internet_status =
-            news->getState() ? RequestManager::IPERM_ALLOWED
-                             : RequestManager::IPERM_NOT_ALLOWED;
+            internet->getState() ? RequestManager::IPERM_ALLOWED
+                                 : RequestManager::IPERM_NOT_ALLOWED;
+        // If internet gets enabled, re-initialise the addon manager (which 
+        // happens in a separate thread) so that news.xml etc can be
+        // downloaded if necessary.
+        if(internet->getState())
+            NewsManager::get()->init(false);
     }
     else if (name == "language")
     {

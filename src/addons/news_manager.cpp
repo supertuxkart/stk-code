@@ -20,6 +20,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "online/http_request.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "utils/string_utils.hpp"
@@ -27,6 +28,8 @@
 #include "utils/translation.hpp"
 
 #include <iostream>
+
+using namespace Online;
 
 NewsManager *NewsManager::m_news_manager=NULL;
 
@@ -96,16 +99,17 @@ void* NewsManager::downloadNews(void *obj)
     // or if the time of the last update was more than news_frequency ago,
     // or because a 'refresh' was explicitly requested by the user, or no
     // news.xml file exists.
-    bool download = UserConfigParams::m_news_last_updated==0  ||
-                    UserConfigParams::m_news_last_updated
-                        +UserConfigParams::m_news_frequency
-                    < StkTime::getTimeSinceEpoch()            || 
-                    me->m_force_refresh                           ||
-                    !news_exists;
+    bool download = ( UserConfigParams::m_news_last_updated==0  ||
+                      UserConfigParams::m_news_last_updated
+                          +UserConfigParams::m_news_frequency
+                        < StkTime::getTimeSinceEpoch()          || 
+                      me->m_force_refresh                       ||
+                      !news_exists                                    )
+         && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED;
 
     const XMLNode *xml = NULL;
 
-    if(!download)
+    if(!download && news_exists)
     {
         // If (so far) we don't need to download, there should be an existing
         // file. Try to read this, and do some basic checks
@@ -131,7 +135,7 @@ void* NewsManager::downloadNews(void *obj)
     {
         core::stringw error_message("");
 
-        Online::HTTPRequest *download_req = new Online::HTTPRequest("news.xml");
+        HTTPRequest *download_req = new HTTPRequest("news.xml");
         download_req->setAddonsURL("news.xml");
         // Initialise the online portion of the addons manager.
         if(UserConfigParams::logAddons())
@@ -147,7 +151,7 @@ void* NewsManager::downloadNews(void *obj)
             delete download_req;
             // We need a new object, since the state of the old
             // download request is now done.
-            download_req = new Online::HTTPRequest("news.xml");
+            download_req = new HTTPRequest("news.xml");
             UserConfigParams::m_server_addons.revertToDefaults();
             // make sure the new server address is actually used
             download_req->setAddonsURL("news.xml");
@@ -190,14 +194,6 @@ void* NewsManager::downloadNews(void *obj)
     pthread_exit(NULL);
     return 0;  // prevent warning
 }   // downloadNews
-
-// ---------------------------------------------------------------------------
-/** Initialises the online part of the network manager. It downloads the
- *  news.xml file from the server (if the frequency of downloads makes this
- *  necessary), and (again if necessary) the addons.xml file.
- *  \return 0 if an error happened and no online connection will be available,
- *          1 otherwise.
- */
 
 // ---------------------------------------------------------------------------
 /** Checks if a redirect is received, causing a new server to be used for
