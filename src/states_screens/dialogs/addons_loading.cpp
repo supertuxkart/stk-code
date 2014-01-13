@@ -21,8 +21,6 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
-#include "addons/inetwork_http.hpp"
-#include "addons/request.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -39,6 +37,7 @@
 #include "utils/translation.hpp"
 
 using namespace GUIEngine;
+using namespace Online;
 using namespace irr::gui;
 
 // ----------------------------------------------------------------------------
@@ -95,7 +94,7 @@ void AddonsLoading::beforeAddingWidgets()
          * and  not in error state
          */
         if (m_addon.needsUpdate() && !addons_manager->wasError()
-            && UserConfigParams::m_internet_status==INetworkHttp::IPERM_ALLOWED)
+            && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED)
             getWidget<IconButtonWidget> ("install")->setLabel( _("Update") );
         else
             r->removeChildNamed("install");
@@ -279,7 +278,7 @@ void AddonsLoading::onUpdate(float delta)
             new MessageDialog( _("Sorry, downloading the add-on failed"));
             return;
         }
-        else if(progress>=1.0f)
+        else if(m_download_request->isDone())
         {
             m_back_button->setLabel(_("Back"));
             // No sense to update state text, since it all
@@ -308,9 +307,11 @@ void AddonsLoading::startDownload()
     std::string file   = m_addon.getZipFileName();
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = INetworkHttp::get()->downloadFileAsynchron(file, save,
-                                                       /*priority*/5,
-                                                       /*manage memory*/false);
+    m_download_request = new Online::HTTPRequest(save, /*manage mem*/false, 
+                                                 /*priority*/5);
+    m_download_request->setURL(m_addon.getZipFileName());
+    m_download_request->queue();
+
 }   // startDownload
 
 // ----------------------------------------------------------------------------
@@ -327,7 +328,8 @@ void AddonsLoading::stopDownload()
         // network_http will potentially update the request. So in
         // order to avoid a memory leak, we let network_http free
         // the request.
-        m_download_request->setManageMemory(true);
+        //m_download_request->setManageMemory(true);
+        assert(false);
         m_download_request->cancel();
     };
 }   // startDownload

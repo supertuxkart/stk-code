@@ -35,6 +35,7 @@ NewsManager::NewsManager() : m_news(std::vector<NewsMessage>())
 {
     m_current_news_message = -1;
     m_error_message.setAtomic("");
+    m_force_refresh = false;
     init(false);
 }   // NewsManage
 
@@ -44,8 +45,11 @@ NewsManager::~NewsManager()
 }   // ~NewsManager
 
 // ---------------------------------------------------------------------------
-/** This function initialises the data for the news manager. If necessary,
- *  it will use a separate thread to download the news.xml file.
+/** This function initialises the data for the news manager. It starts a
+ *  separate thread to execute downloadNews() - which (if necessary) the
+ *  news.xml file and updating the list of news messages. It also initialises
+ *  the addons manager (which can trigger another download of news.xml).
+ *  \param force_refresh Re-download news.xml, even if 
  */
 void NewsManager::init(bool force_refresh)
 {
@@ -58,6 +62,8 @@ void NewsManager::init(bool force_refresh)
     // Should be the default, but just in case:
     pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
     //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
+
+    m_force_refresh = force_refresh;
 
     pthread_t thread_id;
     int error = pthread_create(&thread_id, &attr,
@@ -80,7 +86,6 @@ void NewsManager::init(bool force_refresh)
  */
 void* NewsManager::downloadNews(void *obj)
 {
-    bool force_refresh = false;
     NewsManager *me = (NewsManager*)obj;
     me->clearErrorMessage();
 
@@ -95,7 +100,7 @@ void* NewsManager::downloadNews(void *obj)
                     UserConfigParams::m_news_last_updated
                         +UserConfigParams::m_news_frequency
                     < StkTime::getTimeSinceEpoch()            || 
-                    force_refresh                             ||
+                    me->m_force_refresh                           ||
                     !news_exists;
 
     const XMLNode *xml = NULL;
@@ -178,7 +183,7 @@ void* NewsManager::downloadNews(void *obj)
         xml = new XMLNode(xml_file);
         me->checkRedirect(xml);
         me->updateNews(xml, xml_file);
-        addons_manager->init(xml, force_refresh);
+        addons_manager->init(xml, me->m_force_refresh);
         delete xml;
     }
 

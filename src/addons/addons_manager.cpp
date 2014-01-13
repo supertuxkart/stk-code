@@ -20,7 +20,6 @@
 
 #include "addons/addons_manager.hpp"
 
-#include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
 #include "addons/zip.hpp"
 #include "io/file_manager.hpp"
@@ -42,12 +41,15 @@
 #include <string.h>
 #include <vector>
 
+using namespace Online;
+
 AddonsManager* addons_manager = 0;
 
 // ----------------------------------------------------------------------------
 /** Initialises the non-online component of the addons manager (i.e. handling
  *  the list of already installed addons). The online component is initialised
- *  later from a separate thread in network_http (once network_http is setup).
+ *  later from a separate thread started from the news manager (see
+ *  NewsManager::init()  ).
  */
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_state(STATE_INIT)
@@ -72,6 +74,14 @@ AddonsManager::~AddonsManager()
 }   // ~AddonsManager
 
 // ----------------------------------------------------------------------------
+/** This init function is called from a separate thread (started in
+ *  news_manager, since the news.xml file contains the address of the
+ *  addons.xml URL).
+ *  \param xml The news.xml file, which inclues the data about the addons.xml
+ *         file (in the 'include' node).
+ *  \param force_refresh Download addons.xml, even if the usual waiting period
+ *         between downloads hasn't passed yet.
+ */
 void AddonsManager::init(const XMLNode *xml,
                          bool force_refresh)
 {
@@ -82,9 +92,8 @@ void AddonsManager::init(const XMLNode *xml,
     if(!include)
     {
         file_manager->removeFile(filename);
+        setErrorState();
         NewsManager::get()->addNewsMessage(_("Can't access stkaddons server..."));
-        // Use a curl error code here:
-        //return CURLE_COULDNT_CONNECT;
         return;
     }
 
@@ -121,16 +130,15 @@ void AddonsManager::init(const XMLNode *xml,
     addons_manager->initAddons(xml_addons);   // will free xml_addons
     if(UserConfigParams::logAddons())
         Log::info("addons", "Addons manager list downloaded");
- 
+}   // init
 
-}
 // ----------------------------------------------------------------------------
 /** This initialises the online portion of the addons manager. It uses the
- *  downloaded list of available addons. This is called by network_http before
- *  it goes into command-receiving mode, so we can't use any asynchronous calls
- *  here (though this is being called from a separate thread , so the
- *  main GUI is not blocked anyway). This function will update the state
- *  variable
+ *  downloaded list of available addons. It is called from init(), which is
+ *  called from a separate thread, so blocking download requests can be used
+ *  without blocking the GUI. This function will update the state variable.
+ *  \param xml The xml tree of addons.xml with information about all available
+ *         addons.
  */
 void AddonsManager::initAddons(const XMLNode *xml)
 {
@@ -144,8 +152,9 @@ void AddonsManager::initAddons(const XMLNode *xml)
     {
         const XMLNode *node = xml->getNode(i);
         const std::string &name = node->getName();
-        // Ignore news/redirect, which is handled by network_http
-        if(name=="include" || name=="message") continue;
+        // Ignore news/redirect, which is handled by the NewsManager
+        if(name=="include" || name=="message")
+            continue;
         if(node->getName()=="track" || node->getName()=="kart" ||
             node->getName()=="arena"                                 )
         {
@@ -258,7 +267,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
 
     m_state.setAtomic(STATE_READY);
 
-    if (UserConfigParams::m_internet_status == INetworkHttp::IPERM_ALLOWED)
+    if (UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED)
         downloadIcons();
 }   // initAddons
 

@@ -17,7 +17,6 @@
 
 #include "states_screens/options_screen_ui.hpp"
 
-#include "addons/inetwork_http.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
@@ -30,6 +29,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widget.hpp"
 #include "io/file_manager.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
@@ -45,6 +45,7 @@
 #include <sstream>
 
 using namespace GUIEngine;
+using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( OptionsScreenUI );
 
@@ -126,7 +127,7 @@ void OptionsScreenUI::init()
     CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
     assert( news != NULL );
     news->setState( UserConfigParams::m_internet_status
-                                            ==INetworkHttp::IPERM_ALLOWED );
+                                     ==RequestManager::IPERM_ALLOWED );
 
     // --- select the right skin in the spinner
     bool currSkinFound = false;
@@ -229,19 +230,9 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
     {
         CheckBoxWidget* news = getWidget<CheckBoxWidget>("enable-internet");
         assert( news != NULL );
-        if(INetworkHttp::get())
-        {
-            INetworkHttp::get()->stopNetworkThread();
-            INetworkHttp::destroy();
-        }
         UserConfigParams::m_internet_status =
-            news->getState() ? INetworkHttp::IPERM_ALLOWED
-                             : INetworkHttp::IPERM_NOT_ALLOWED;
-        INetworkHttp::create();
-        // Note that the network thread must be started after the assignment
-        // to network_http (since the thread might use network_http, otherwise
-        // a race condition can be introduced resulting in a crash).
-        INetworkHttp::get()->startNetworkThread();
+            news->getState() ? RequestManager::IPERM_ALLOWED
+                             : RequestManager::IPERM_NOT_ALLOWED;
     }
     else if (name == "language")
     {

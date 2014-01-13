@@ -20,13 +20,14 @@
 #include <iostream>
 
 #include "addons/addons_manager.hpp"
-#include "addons/inetwork_http.hpp"
+#include "addons/news_manager.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "io/file_manager.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/dialogs/addons_loading.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -35,6 +36,7 @@
 
 DEFINE_SCREEN_SINGLETON( AddonsScreen );
 
+using namespace Online;
 // ----------------------------------------------------------------------------
 
 AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
@@ -155,7 +157,7 @@ void AddonsScreen::init()
     w_list->setIcons(m_icon_bank, (int)(m_icon_height));
 
     m_type = "kart";
-    if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
+    if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
         getWidget<GUIEngine::IconButtonWidget>("reload")->setDeactivated();
     else
         getWidget<GUIEngine::IconButtonWidget>("reload")->setActivated();
@@ -231,8 +233,9 @@ void AddonsScreen::loadList()
         if(!UserConfigParams::m_artist_debug_mode &&
             !addon.testStatus(Addon::AS_APPROVED)    )
             continue;
-        if (!addon.isInstalled() && (addons_manager->wasError()
-                || UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED ))
+        if (!addon.isInstalled() && (addons_manager->wasError() ||
+                                     UserConfigParams::m_internet_status !=
+                                     RequestManager::IPERM_ALLOWED ))
             continue;
 
         // Filter by rating.
@@ -424,10 +427,10 @@ void AddonsScreen::eventCallback(GUIEngine::Widget* widget,
         if (!m_reloading)
         {
             m_reloading = true;
-            INetworkHttp::get()->insertReInit();
+            NewsManager::get()->init(true);
 
             GUIEngine::ListWidget* w_list =
-            getWidget<GUIEngine::ListWidget>("list_addons");
+                       getWidget<GUIEngine::ListWidget>("list_addons");
             w_list->clear();
 
             w_list->addItem("spacer", L"");
@@ -498,7 +501,7 @@ void AddonsScreen::onUpdate(float dt, irr::video::IVideoDriver*)
 {
     if (m_reloading)
     {
-        if(UserConfigParams::m_internet_status!=INetworkHttp::IPERM_ALLOWED)
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
         {
             // not allowed to access the net. how did you get to this menu in
             // the first place??

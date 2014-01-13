@@ -21,7 +21,6 @@
 
 #include <string>
 
-#include "addons/inetwork_http.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -37,6 +36,7 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
@@ -60,6 +60,7 @@
 #include "utils/string_utils.hpp"
 
 using namespace GUIEngine;
+using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
@@ -146,7 +147,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
             addons_icon->setBadge(BAD_BADGE);
         }
         else if (addons_manager->isLoading() && UserConfigParams::m_internet_status
-                == INetworkHttp::IPERM_ALLOWED)
+            == Online::RequestManager::IPERM_ALLOWED)
         {
             // Addons manager is still initialising/downloading.
             addons_icon->setDeactivated();
@@ -391,7 +392,7 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 {
     if (item == "addons")
     {
-        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
+        if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
         {
             new MessageDialog( _("The add-ons module is currently disabled in "
                                  "the Options screen") );

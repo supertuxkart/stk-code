@@ -91,6 +91,9 @@ private:
      *  any news message (usually indicating connection problems). */
     Synchronised<core::stringw>    m_error_message;
 
+    /** True when all .xml files should be re-downloaded. */
+    bool m_force_refresh;
+
     void          checkRedirect(const XMLNode *xml);
     void          updateNews(const XMLNode *xml,
                              const std::string &filename);
@@ -106,7 +109,7 @@ public:
         if(!m_news_manager)
             m_news_manager = new NewsManager();
         return m_news_manager;
-    }   // 
+    }   // get
     // ------------------------------------------------------------------------
     static void deallocate()
     {

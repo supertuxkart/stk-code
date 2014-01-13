@@ -142,7 +142,6 @@
 #include "main_loop.hpp"
 #include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
-#include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -1020,14 +1019,9 @@ void initRest()
     // separate thread running in network http.
     addons_manager          = new AddonsManager();
 
-    INetworkHttp::create();
+    Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
 
-    // Note that the network thread must be started after the assignment
-    // to network_http (since the thread might use network_http, otherwise
-    // a race condition can be introduced resulting in a crash).
-    INetworkHttp::get()->startNetworkThread();
-    Online::RequestManager::get()->startNetworkThread();
     AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
@@ -1081,8 +1075,6 @@ static void cleanSuperTuxKart()
 
     irr_driver->updateConfigIfRelevant();
 
-    if(INetworkHttp::get())
-        INetworkHttp::get()->stopNetworkThread();
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
 
@@ -1098,7 +1090,6 @@ static void cleanSuperTuxKart()
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
-    INetworkHttp::destroy();
     NewsManager::deallocate();
     if(addons_manager)          delete addons_manager;
     NetworkManager::kill();
@@ -1248,7 +1239,9 @@ int main(int argc, char *argv[] )
 
         // Load addons.xml to get info about addons even when not
         // allowed to access the internet
-        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED) {
+        if (UserConfigParams::m_internet_status != 
+            Online::RequestManager::IPERM_ALLOWED)
+        {
             std::string xml_file = file_manager->getAddonsFile("addons.xml");
             if (file_manager->fileExists(xml_file)) {
                 const XMLNode *xml = new XMLNode (xml_file);
@@ -1278,7 +1271,7 @@ int main(int argc, char *argv[] )
             }
 #endif
             if(UserConfigParams::m_internet_status ==
-                INetworkHttp::IPERM_NOT_ASKED)
+                Online::RequestManager::IPERM_NOT_ASKED)
             {
                 class ConfirmServer :
                       public MessageDialog::IConfirmDialogListener
@@ -1286,27 +1279,16 @@ int main(int argc, char *argv[] )
                 public:
                     virtual void onConfirm()
                     {
-                        INetworkHttp::destroy();
                         UserConfigParams::m_internet_status =
-                            INetworkHttp::IPERM_ALLOWED;
+                                 Online::RequestManager::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                        INetworkHttp::create();
-                        // Note that the network thread must be started after
-                        // the assignment to network_http (since the thread
-                        // might use network_http, otherwise a race condition
-                        // can be introduced resulting in a crash).
-                        INetworkHttp::get()->startNetworkThread();
-
                     }   // onConfirm
                     // --------------------------------------------------------
                     virtual void onCancel()
                     {
-                        INetworkHttp::destroy();
                         UserConfigParams::m_internet_status =
-                            INetworkHttp::IPERM_NOT_ALLOWED;
+                            Online::RequestManager::IPERM_NOT_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                        INetworkHttp::create();
-                        INetworkHttp::get()->startNetworkThread();
                     }   // onCancel
                 };   // ConfirmServer
 

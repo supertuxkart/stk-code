@@ -21,6 +21,8 @@
 
 #include "io/file_manager.hpp"
 #include "utils/cpp2011.h"
+#include "utils/leak_check.hpp"
+#include "utils/no_copy.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 
@@ -58,9 +60,11 @@ namespace Online
      *        
      * \ingroup online
      */
-    class Request
+    class Request : public NoCopy
     {
     private:
+        LEAK_CHECK()
+
         /** Type of the request. Has 0 as default value. */
         const int              m_type;
         /** True if the memory for this Request should be managed by

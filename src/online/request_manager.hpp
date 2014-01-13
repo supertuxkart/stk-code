@@ -48,7 +48,17 @@ namespace Online
       */
     class RequestManager
     {
-        protected:
+    public:
+        /** If stk has permission to access the internet (for news
+        *  server etc).
+        *  IPERM_NOT_ASKED: The user needs to be asked if he wants to
+        *                   grant permission
+        *  IPERM_ALLOWED:   STK is allowed to access server.
+        *  IPERM_NOT_ALLOWED: STK must not access external servers. */
+        enum InternetPermission {IPERM_NOT_ASKED  =0,
+                                 IPERM_ALLOWED    =1,
+                                 IPERM_NOT_ALLOWED=2 };
+    protected:
 
             float                     m_time_since_poll;
 

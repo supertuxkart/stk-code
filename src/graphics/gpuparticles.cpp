@@ -517,7 +517,7 @@ void ParticleSystemProxy::simulateHeightmap()
 
 void ParticleSystemProxy::simulateNoHeightmap()
 {
-	int timediff = GUIEngine::getLatestDt() * 1000.;
+	int timediff = int(GUIEngine::getLatestDt() * 1000.f);
 	int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
 	core::matrix4 matrix = getAbsoluteTransformation();
 	glUseProgram(SimpleSimulationShader::Program);
