@@ -484,6 +484,34 @@ namespace Gaussian6VBlurShader
 	}
 }
 
+namespace PassThroughShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_texture;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_texture = glGetUniformLocation(Program, "texture");
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -703,6 +731,28 @@ void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *t
 	glEnable(GL_DEPTH_TEST);
 }
 
+static
+void renderPassThrough(ITexture *tex)
+{
+	if (!PassThroughShader::Program)
+		PassThroughShader::init();
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(PassThroughShader::Program);
+	glBindVertexArray(PassThroughShader::vao);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
+	glUniform1i(PassThroughShader::uniform_texture, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -853,25 +903,17 @@ void PostProcessing::render()
                 } // end forced bloom
 
                 // To half
-                m_material.MaterialType = EMT_SOLID;
-                m_material.setTexture(0, irr_driver->getRTT(RTT_TMP3));
                 drv->setRenderTarget(irr_driver->getRTT(RTT_HALF1), true, false);
+				renderPassThrough(irr_driver->getRTT(RTT_TMP3));
 
-                drawQuad(cam, m_material);
 
                 // To quarter
-                m_material.MaterialType = EMT_SOLID;
-                m_material.setTexture(0, irr_driver->getRTT(RTT_HALF1));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), true, false);
-
-                drawQuad(cam, m_material);
-
+				drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), true, false);
+				renderPassThrough(irr_driver->getRTT(RTT_HALF1));
+                
                 // To eighth
-                m_material.MaterialType = EMT_SOLID;
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_EIGHTH1), true, false);
-
-                drawQuad(cam, m_material);
+				drv->setRenderTarget(irr_driver->getRTT(RTT_EIGHTH1), true, false);
+				renderPassThrough(irr_driver->getRTT(RTT_QUARTER1));
 
                 // Blur it for distribution.
 				renderGaussian6Blur(irr_driver->getRTT(RTT_EIGHTH1), irr_driver->getRTT(RTT_EIGHTH2), 8.f / UserConfigParams::m_width, 8.f / UserConfigParams::m_height);
@@ -1075,26 +1117,16 @@ void PostProcessing::render()
         }
 
         // Final blit
+		// TODO : Use glBlitFramebuffer
 		drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
         if (irr_driver->getNormals())
-        {
-            m_material.MaterialType = irr_driver->getShader(ES_FLIP);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-			drawQuad(cam, m_material);
-        } else if (irr_driver->getSSAOViz())
-        {
-            m_material.MaterialType = irr_driver->getShader(ES_FLIP);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-			drawQuad(cam, m_material);
-        } else if (irr_driver->getShadowViz())
-        {
-            m_material.MaterialType = irr_driver->getShader(ES_FLIP);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_DISPLACE));
-			drawQuad(cam, m_material);
-        } else
-        {
+			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+        else if (irr_driver->getSSAOViz())
+			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
+        else if (irr_driver->getShadowViz())
+			renderPassThrough(irr_driver->getRTT(RTT_SHADOW));
+        else
 			renderColorLevel(in);
-        }
     }
 }   // render
 

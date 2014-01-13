@@ -6,7 +6,7 @@ uniform vec2 texsize;
 
 in vec2 position;
 in vec2 texcoord;
-out vec2 tc;
+out vec2 uv;
 
 void main()
 {
