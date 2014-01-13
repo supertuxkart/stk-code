@@ -139,23 +139,6 @@ private:
 
 //
 
-class ColorLevelsProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-
-    ColorLevelsProvider()
-    {
-    }
-
-private:
-    core::vector3df m_inlevel;
-    core::vector2df m_outlevel;
-};
-
-//
-
 class SkyboxProvider: public CallBase
 {
 public:

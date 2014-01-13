@@ -38,7 +38,6 @@ Shaders::Shaders()
     m_callbacks[ES_SPLATTING] = new SplattingProvider();
     m_callbacks[ES_WATER] = new WaterShaderProvider();
     m_callbacks[ES_GRASS] = new GrassShaderProvider();
-    m_callbacks[ES_COLOR_LEVELS] = new ColorLevelsProvider();
     m_callbacks[ES_BUBBLES] = new BubbleEffectProvider();
     m_callbacks[ES_RAIN] = new RainEffectProvider();
     m_callbacks[ES_MOTIONBLUR] = new MotionBlurProvider();
@@ -137,9 +136,6 @@ void Shaders::loadShaders()
                                     0, EMT_SOLID);
     m_shaders[ES_FLIP_ADDITIVE] = glslmat(std::string(""), dir + "flip.frag",
                                     0, EMT_TRANSPARENT_ADD_COLOR);
-                                    
-    m_shaders[ES_COLOR_LEVELS] = glslmat(std::string(""), dir + "color_levels.frag",
-                                    m_callbacks[ES_COLOR_LEVELS], EMT_SOLID);
 
     m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);

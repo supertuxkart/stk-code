@@ -154,26 +154,6 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 }
 
 //-------------------------------------
-
-void ColorLevelsProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
-{
-
-    m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
-    m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
-
-    srv->setVertexShaderConstant("inlevel", &m_inlevel.X, 3);
-    srv->setVertexShaderConstant("outlevel", &m_outlevel.X, 2);
-
-    if (!firstdone)
-    {
-        s32 tex = 0;
-        srv->setVertexShaderConstant("tex", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
 void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
