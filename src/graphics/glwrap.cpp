@@ -504,6 +504,8 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	{
 		ColoredQuadShader = LoadProgram(file_manager->getAsset("shaders/coloredquad.vert").c_str(), file_manager->getAsset("shaders/coloredquad.frag").c_str());
 		ColoredQuadUniformColor = glGetUniformLocation(ColoredQuadShader, "color");
+		ColoredQuadUniformCenter = glGetUniformLocation(ColoredQuadShader, "center");
+		ColoredQuadUniformSize = glGetUniformLocation(ColoredQuadShader, "size");
 	}
 	glUseProgram(ColoredQuadShader);
 	glUniform2f(ColoredQuadUniformCenter, center_pos_x, center_pos_y);

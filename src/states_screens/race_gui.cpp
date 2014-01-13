@@ -26,6 +26,7 @@ using namespace irr;
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -145,8 +146,7 @@ void RaceGUI::renderGlobal(float dt)
         !GUIEngine::ModalDialog::isADialogActive())
     {
         static video::SColor black = video::SColor(255,0,0,0);
-        irr_driver->getVideoDriver()
-            ->draw2DRectangle(black,
+        GL32_draw2DRectangle(black,
                               core::rect<s32>(UserConfigParams::m_width/2,
                                               UserConfigParams::m_height/2,
                                               UserConfigParams::m_width,
@@ -240,7 +240,7 @@ void RaceGUI::drawScores()
             (j+1)*m_marker_rendered_size,m_marker_rendered_size);
         core::recti position(offsetX, offsetY,
             offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
-        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
+        draw2DImage(m_marker, position, source,
             NULL, NULL, true);
         core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
         int string_height =
@@ -263,7 +263,7 @@ void RaceGUI::drawScores()
                                      offsetY + (int)(m_marker_player_size/1.25f));
         core::rect<s32> sourceRect(core::position2d<s32>(0,0),
                                                    team_icon->getOriginalSize());
-        irr_driver->getVideoDriver()->draw2DImage(team_icon,indicatorPos,sourceRect,
+        draw2DImage(team_icon,indicatorPos,sourceRect,
             NULL,NULL,true);
         numLeader++;
         offsetX += position.LowerRightCorner.X;
@@ -344,7 +344,7 @@ void RaceGUI::drawGlobalMiniMap()
                              m_map_left + m_map_width, lower_y);
         core::rect<s32> source(core::position2di(0, 0),
                                mini_map->getOriginalSize());
-        irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source,
+        draw2DImage(mini_map, dest, source,
                                                   NULL, NULL, true);
     }
 
@@ -367,7 +367,7 @@ void RaceGUI::drawGlobalMiniMap()
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size),
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
-        irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
+        draw2DImage(m_marker, position, source,
                                                   NULL, NULL, true);
     }   // for i<getNumKarts
 }   // drawGlobalMiniMap
@@ -401,7 +401,7 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
 
     // Background
-    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty,
+    draw2DImage(m_gauge_empty,
                                 core::rect<s32>((int)offset.X,
                                                 (int) offset.Y-gauge_height,
                                                 (int) offset.X + gauge_width,
@@ -615,7 +615,7 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     video::ITexture *meter_texture = m_speed_meter_icon->getTexture();
     const core::rect<s32> meter_texture_coords(core::position2d<s32>(0,0),
                                                meter_texture->getOriginalSize());
-    video->draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL,
+    draw2DImage(meter_texture, meter_pos, meter_texture_coords, NULL,
                        NULL, true);
 
     const float speed =  kart->getSpeed();

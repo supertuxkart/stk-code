@@ -619,7 +619,7 @@ void IrrDriver::applyResolutionSettings()
     // show black before resolution switch so we don't see OpenGL's buffer
     // garbage during switch
     m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
-    m_video_driver->draw2DRectangle( video::SColor(255, 0, 0, 0),
+    GL32_draw2DRectangle( video::SColor(255, 0, 0, 0),
                             core::rect<s32>(0, 0,
                                             UserConfigParams::m_prev_width,
                                             UserConfigParams::m_prev_height) );
@@ -1409,11 +1409,11 @@ void IrrDriver::displayFPS()
 
     if(UserConfigParams::m_artist_debug_mode)
     {
-        irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,50),NULL);
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,50),NULL);
     }
     else
     {
-        irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
     }
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
