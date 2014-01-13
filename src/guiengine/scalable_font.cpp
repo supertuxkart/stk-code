@@ -674,7 +674,7 @@ void ScalableFont::draw(const core::stringw& text,
         }
         else
         {
-            driver->draw2DImage(texture,
+            draw2DImage(texture,
                                 dest,
                                 source,
                                 clip,
