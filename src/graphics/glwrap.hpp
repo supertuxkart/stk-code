@@ -73,7 +73,9 @@ extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 extern PFNGLTEXBUFFERPROC glTexBuffer;
+extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
 #endif
+
 
 // core::rect<s32> needs these includes
 #include <rect.h>

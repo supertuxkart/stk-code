@@ -50,6 +50,7 @@ PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 PFNGLTEXBUFFERPROC glTexBuffer;
+PFNGLBUFFERSUBDATAPROC glBufferSubData;
 #endif
 
 static GLuint quad_buffer;
@@ -174,6 +175,7 @@ void initGL()
 	glTexBuffer = (PFNGLTEXBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glTexBuffer");
 	glUniform1fv = (PFNGLUNIFORM1FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform1fv");
 	glUniform4fv = (PFNGLUNIFORM4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform4fv");
+	glBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
 #endif
 #ifdef ENABLE_ARB_DEBUG_OUTPUT
 	glDebugMessageCallbackARB(debugCallback, NULL);
