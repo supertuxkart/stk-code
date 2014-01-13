@@ -12,6 +12,7 @@
 //#include "os.h"
 #include "Keycodes.h"
 
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "utils/translation.hpp"
 #include "utils/time.hpp"
@@ -937,7 +938,7 @@ void CGUIEditBox::draw()
             core::rect< s32 > caret_rect = CurrentTextRect;
             caret_rect.UpperLeftCorner.X += charcursorpos - 1;
             caret_rect.LowerRightCorner.X = caret_rect.UpperLeftCorner.X + 2;
-            irr_driver->getVideoDriver()->draw2DRectangle( video::SColor(255,0,0,0), caret_rect );
+            GL32_draw2DRectangle( video::SColor(255,0,0,0), caret_rect );
 
             /*
             font->draw(L"_", CurrentTextRect,

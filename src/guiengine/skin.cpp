@@ -795,7 +795,7 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
                                  SkinConfig::m_render_params["progress::fill"],
                                  w->m_deactivated);
 #if 0
-          GUIEngine::getDriver()->draw2DImage(
+          draw2DImage(
               SkinConfig::m_render_params["progress::fill"].getImage(),
               sized_rect, core::recti(0,0,progress->m_w, progress->m_h),
               0 /* no clipping */, colors, true);

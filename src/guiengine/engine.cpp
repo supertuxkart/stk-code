@@ -1237,7 +1237,7 @@ namespace GUIEngine
                                 core::dimension2d<s32>(screen_size.Width,
                                                        text_height) );
 
-                    Private::g_driver->draw2DRectangle(SColor(255,252,248,230),
+                    GL32_draw2DRectangle(SColor(255,252,248,230),
                                                        msgRect);
                     Private::g_font->draw((*it).m_message.c_str(),
                                           msgRect,
