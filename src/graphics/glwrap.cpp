@@ -174,7 +174,7 @@ void initGL()
 	glUniform1fv = (PFNGLUNIFORM1FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform1fv");
 	glUniform4fv = (PFNGLUNIFORM4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform4fv");
 #endif
-#if ENABLE_ARB_DEBUG_OUTPUT
+#ifdef ENABLE_ARB_DEBUG_OUTPUT
 	glDebugMessageCallbackARB(debugCallback, NULL);
 #endif
 	const float quad_vertex[] = {

@@ -321,14 +321,18 @@ void STKMesh::render()
 			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
 			bool transparent = (rnd && rnd->isTransparent());
 
+#ifdef OGL32CTX
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-/*			if (isObject(material.MaterialType) && !isTransparentPass && !transparent)
+			if (isObject(material.MaterialType) && !isTransparentPass && !transparent)
 			{
 				initvaostate(GLmeshes[i], material.MaterialType);
 				draw(GLmeshes[i], material.MaterialType);
 			}
-			else*/ if (transparent == isTransparentPass)
+			else if (transparent == isTransparentPass)
+#else
+			if (transparent == isTransparentPass)
+#endif
 			{
 				driver->setMaterial(material);
 				driver->drawMeshBuffer(mb);
