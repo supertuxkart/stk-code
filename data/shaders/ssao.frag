@@ -15,10 +15,6 @@ const float invSamples = strengh / SAMPLES;
 
 void main(void)
 {
-	// A set of Random(tm) vec2's. 8 1s, 6 0.7s, 2 0.4
-	// Again not using const because of broken Intel Windows drivers
-
-
 	vec4 cur = texture2D(normals_and_depth, uv);
 	float curdepth = texture2D(normals_and_depth, uv).a;
 	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
@@ -40,8 +36,6 @@ void main(void)
 		vec4 samplePos = FragPos + radius * vec4(sampleDir, 0.0);
 		vec4 sampleProj = projm * samplePos;
 		sampleProj /= sampleProj.w;
-		// Projection of sampleDir over nom
-		float cosTheta = samplePoints[i].z;
 
 		bool isInsideTexture = (sampleProj.x > -1.) && (sampleProj.x < 1.) && (sampleProj.y > -1.) && (sampleProj.y < 1.);
 		// get the depth of the occluder fragment
@@ -51,11 +45,11 @@ void main(void)
 		occluderPos /= occluderPos.w;
 
 		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
-		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) * cosTheta : 0.;
+		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) / smoothstep(0., 1., curdepth) : 0.;
 	}
 
 	// output the result
 	float ao = 1.0 - bl * invSamples;
 
-	gl_FragColor = vec4(vec3(ao), curdepth + 0.05); // offset so that the alpha test doesn't kill us
+	gl_FragColor = vec4(ao);
 }
