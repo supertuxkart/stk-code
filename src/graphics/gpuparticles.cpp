@@ -246,7 +246,7 @@ void ParticleSystemProxy::setFlip() {
 		quaternions[4 * i] = rotationdir.X;
 		quaternions[4 * i + 1] = rotationdir.Y;
 		quaternions[4 * i + 2] = rotationdir.Z;
-		quaternions[4 * i + 3] = 3.14 * 3. * (2. * os::Randomizer::frand() - 1.); // 3 half rotation during lifetime at max
+		quaternions[4 * i + 3] = 3.14f * 3.f * (2.f * os::Randomizer::frand() - 1.f); // 3 half rotation during lifetime at max
 	}
 	glGenBuffers(1, &quaternionsbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
@@ -463,7 +463,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 void ParticleSystemProxy::simulateHeightmap()
 {
-	int timediff = GUIEngine::getLatestDt() * 1000.;
+	int timediff = int(GUIEngine::getLatestDt() * 1000.f);
 	int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
 	core::matrix4 matrix = getAbsoluteTransformation();
 	glUseProgram(HeightmapSimulationShader::Program);
