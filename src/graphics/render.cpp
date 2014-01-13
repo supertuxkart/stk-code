@@ -673,8 +673,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     m_video_driver->setRenderTarget(rtts, true, false,
                                         video::SColor(0, 0, 0, 0));
 
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-
     const u32 lightcount = m_lights.size();
     const core::vector3df &campos =
         irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
