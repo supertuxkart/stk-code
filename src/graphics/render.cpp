@@ -749,16 +749,10 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 	}
 	m_post_processing->renderPointlight(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH) , accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
-    SMaterial m_material;
-
-    m_material.ZWriteEnable = false;
-    m_material.MaterialType = irr_driver->getShader(ES_SSAO);
-    m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-
     m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
                          SColor(255, 255, 255, 255));
 
-    m_post_processing->drawQuad(cam, m_material);
+    m_post_processing->renderSSAO(irr_driver->getInvProjMatrix(), irr_driver->getProjMatrix());
 
     // Blur it to reduce noise.
     if(UserConfigParams::m_ssao == 1)

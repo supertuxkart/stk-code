@@ -546,6 +546,59 @@ namespace PassThroughShader
 	}
 }
 
+namespace SSAOShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_normals_and_depth, uniform_invprojm,	uniform_projm, uniform_samplePoints;
+	float SSAOSamples[64];
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_normals_and_depth = glGetUniformLocation(Program, "normals_and_depth");
+		uniform_invprojm = glGetUniformLocation(Program, "invprojm");
+		uniform_projm = glGetUniformLocation(Program, "projm");
+		uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+
+		for (unsigned i = 0; i < 16; i++) {
+			// Generate x/y component between -1 and 1
+			// Use double to avoid denorm and get a true uniform distribution
+			double x = rand();
+			x /= RAND_MAX;
+			x = 2 * x - 1;
+			double y = rand();
+			y /= RAND_MAX;
+			y = 2 * y - 1;
+
+			// compute z so that norm (x,y,z) is one
+			double z = sqrt(x * x + y * y);
+			// Norm factor
+			double w = rand();
+			w /= RAND_MAX;
+			SSAOSamples[4 * i] = (float)x;
+			SSAOSamples[4 * i + 1] = (float)y;
+			SSAOSamples[4 * i + 2] = (float)z;
+			SSAOSamples[4 * i + 3] = (float)w;
+		}
+	}
+}
+
 namespace FogShader
 {
 	GLuint Program = 0;
@@ -863,8 +916,31 @@ void PostProcessing::renderPassThrough(ITexture *tex)
 	glDisable(GL_BLEND);
 }
 
-// ----------------------------------------------------------------------------
-/** Render the post-processed scene, solids only, color to color, no stencil */
+
+void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm)
+{
+	if (!SSAOShader::Program)
+		SSAOShader::init();
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+
+	glUseProgram(SSAOShader::Program);
+	glBindVertexArray(SSAOShader::vao);
+	glUniformMatrix4fv(SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
+	glUniformMatrix4fv(SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
+	glUniform4fv(SSAOShader::uniform_samplePoints, 16, SSAOShader::SSAOSamples);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
+	glUniform1i(SSAOShader::uniform_normals_and_depth, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+}
+
 void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat)
 {
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);

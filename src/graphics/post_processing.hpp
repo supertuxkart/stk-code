@@ -79,6 +79,7 @@ public:
 	void renderLightbBlend(video::ITexture *diffuse, video::ITexture *specular, video::ITexture *ao, video::ITexture *specmap, bool debug);
 
 	void renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat);
+	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
 
 	/** Blur the in texture */
 	void renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
