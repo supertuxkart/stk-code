@@ -290,9 +290,11 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
 	const video::SColor* const colors, bool useAlphaChannelOfTexture)
 {
-#ifndef OGL32CTX
-	irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
-#else
+	if (!irr_driver->isGLSL())
+	{
+		irr_driver->getVideoDriver()->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
+		return;
+	}
 
 	core::dimension2d<u32> frame_size =
 		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
@@ -371,7 +373,6 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	glDisableVertexAttribArray(TexturedQuadAttribPosition);
 	glDisableVertexAttribArray(TexturedQuadAttribTexCoord);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif
 }
 
 static GLuint ColoredQuadShader;
@@ -383,9 +384,12 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	const core::rect<s32>* clip)
 {
 
-#ifndef OGL32CTX
-	irr_driver->getVideoDriver()->draw2DRectangle(color, position, clip);
-#else
+	if (!irr_driver->isGLSL())
+	{
+		irr_driver->getVideoDriver()->draw2DRectangle(color, position, clip);
+		return;
+	}
+
 	core::dimension2d<u32> frame_size =
 		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
 	const int screen_w = frame_size.Width;
@@ -430,5 +434,4 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-#endif
 }
