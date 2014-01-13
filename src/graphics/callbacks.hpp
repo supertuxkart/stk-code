@@ -422,39 +422,6 @@ public:
 
 //
 
-class SSAOProvider: public CallBase
-{
-private:
-    float array[64];
-public:
-    SSAOProvider() : CallBase() {
-      for (unsigned i = 0; i < 16; i++) {
-        // Generate x/y component between -1 and 1
-        // Use double to avoid denorm and get a true uniform distribution
-        double x = rand();
-        x /= RAND_MAX;
-        x = 2 * x - 1;
-        double y = rand();
-        y /= RAND_MAX;
-        y = 2 * y - 1;
-
-        // compute z so that norm (x,y,z) is one
-        double z = sqrt(x * x + y * y);
-        // Norm factor
-        double w = rand();
-        w /= RAND_MAX;
-        array[4 * i] = (float)x;
-        array[4 * i + 1] = (float)y;
-        array[4 * i + 2] = (float)z;
-        array[4 * i + 3] = (float)w;
-      }
-    }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
 class GodRayProvider: public CallBase
 {
 public:

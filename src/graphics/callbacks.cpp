@@ -496,26 +496,6 @@ void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void SSAOProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setPixelShaderConstant("invprojm", irr_driver->getInvProjMatrix().pointer(), 16);
-    srv->setPixelShaderConstant("projm", irr_driver->getProjMatrix().pointer(), 16);
-    srv->setPixelShaderConstant("samplePoints[0]", array, 64);
-
-    if (!firstdone)
-    {
-        int tex = 0;
-        srv->setPixelShaderConstant("normals_and_depth", &tex, 1);
-
-        tex = 1;
-        srv->setPixelShaderConstant("depth", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
 void GodRayProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     srv->setPixelShaderConstant("sunpos", m_sunpos, 2);

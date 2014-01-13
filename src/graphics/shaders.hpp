@@ -51,7 +51,6 @@ using namespace irr;
     ACT(ES_MLAA_COLOR1) \
     ACT(ES_MLAA_BLEND2) \
     ACT(ES_MLAA_NEIGH3) \
-    ACT(ES_SSAO) \
     ACT(ES_GODFADE) \
     ACT(ES_GODRAY) \
     ACT(ES_SHADOWPASS) \
