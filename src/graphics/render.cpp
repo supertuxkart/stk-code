@@ -502,13 +502,13 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
                 m_rtts->getRTT(RTT_WARPV)->getSize().Height,
                 m_rtts->getRTT(RTT_WARPV)->getSize().Height);
 
-    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
+/*    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
     sq.setTexture(m_rtts->getRTT(RTT_WARPH));
     sq.render(m_rtts->getRTT(curh));
 
     sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6V));
     sq.setTexture(m_rtts->getRTT(RTT_WARPV));
-    sq.render(m_rtts->getRTT(curv));
+    sq.render(m_rtts->getRTT(curv));*/
 
     // Convert importance maps to warp maps
     //
@@ -649,19 +649,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     m_post_processing->drawQuad(cam, minimat);
 
     // Blur it
-    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                UserConfigParams::m_width / 4,
-                UserConfigParams::m_height / 4);
-
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6H);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER1));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER2), false, false);
-    m_post_processing->drawQuad(cam, minimat);
-
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6V);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER2));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-    m_post_processing->drawQuad(cam, minimat);
+	m_post_processing->renderGaussian6Blur(m_rtts->getRTT(RTT_QUARTER1), m_rtts->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
 
     // The glows will be rendered in the transparent phase
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);

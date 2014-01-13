@@ -122,11 +122,6 @@ void Shaders::loadShaders()
 	m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "gaussian3v.frag",
                                     m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-	m_shaders[ES_GAUSSIAN6H] = glslmat(dir + "pass.vert", dir + "gaussian6h.frag",
-                                    m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-	m_shaders[ES_GAUSSIAN6V] = glslmat(dir + "pass.vert", dir + "gaussian6v.frag",
-                                    m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
-
     m_shaders[ES_MIPVIZ] = glslmat(std::string(""), dir + "mipviz.frag",
                                     m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
