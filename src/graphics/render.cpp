@@ -794,19 +794,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER4));
         m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
         m_post_processing->drawQuad(cam, m_material);
-    }  else if (UserConfigParams::m_ssao == 2) {
-        gacb->setResolution(UserConfigParams::m_width,
-                            UserConfigParams::m_height);
-        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN6V);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_SSAO));
-        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_TMP4), true, false);
-        m_post_processing->drawQuad(cam, m_material);
-
-        m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN6H);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_TMP4));
-        m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), false, false);
-        m_post_processing->drawQuad(cam, m_material);
-    }
+    }  else if (UserConfigParams::m_ssao == 2)
+		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
     if (!m_mipviz)
