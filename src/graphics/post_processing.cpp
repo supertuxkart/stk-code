@@ -784,12 +784,9 @@ void PostProcessing::render()
 
         if (1) // bloom
         {
-            // Blit the base to tmp1
-            m_material.MaterialType = EMT_SOLID;
-            m_material.setTexture(0, in);
-            drv->setRenderTarget(out, true, false);
-
-            drawQuad(cam, m_material);
+			// Blit the base to tmp1
+			drv->setRenderTarget(out, true, false);
+			renderPassThrough(in);
 
             const bool globalbloom = World::getWorld()->getTrack()->getBloom();
 

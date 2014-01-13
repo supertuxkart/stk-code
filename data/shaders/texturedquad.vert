@@ -10,6 +10,6 @@ out vec2 uv;
 
 void main()
 {
-	tc = texcoord * texsize + texcenter;
+	uv = texcoord * texsize + texcenter;
 	gl_Position = vec4(position * size + center, 0., 1.);
 }
