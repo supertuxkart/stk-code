@@ -45,7 +45,7 @@ void main(void)
     new_particle_position = particle_position + particle_velocity.xyz * float(dt);
     new_particle_velocity = particle_velocity;
     new_lifetime = updated_lifetime;
-    new_size = mix(size_initial, size_initial * size_increase_factor, updated_lifetime);
+    new_size = (size == 0) ? 0. : mix(size_initial, size_initial * size_increase_factor, updated_lifetime);
   }
   gl_Position = vec4(0.);
 }
