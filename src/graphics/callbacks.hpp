@@ -356,14 +356,6 @@ public:
 
 //
 
-class LightBlendProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
 class SunLightProvider: public CallBase
 {
 public:

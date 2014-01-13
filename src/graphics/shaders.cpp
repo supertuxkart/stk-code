@@ -46,7 +46,6 @@ Shaders::Shaders()
     m_callbacks[ES_COLORIZE] = new ColorizeProvider();
     m_callbacks[ES_GLOW] = new GlowProvider();
     m_callbacks[ES_OBJECTPASS] = new ObjectPassProvider();
-    m_callbacks[ES_LIGHTBLEND] = new LightBlendProvider();
     m_callbacks[ES_SUNLIGHT] = new SunLightProvider();
     m_callbacks[ES_MLAA_COLOR1] = new MLAAColor1Provider();
     m_callbacks[ES_MLAA_BLEND2] = new MLAABlend2Provider();
@@ -155,9 +154,6 @@ void Shaders::loadShaders()
                                     m_callbacks[ES_OBJECTPASS], EMT_SOLID);
     m_shaders[ES_OBJECTPASS_RIMLIT] = glslmat(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag",
                                     m_callbacks[ES_OBJECTPASS], EMT_SOLID);
-
-	m_shaders[ES_LIGHTBLEND] = glslmat(dir + "pass.vert", dir + "lightblend.frag",
-                                    m_callbacks[ES_LIGHTBLEND], EMT_ONETEXTURE_BLEND);
 
     m_shaders[ES_SUNLIGHT] = glslmat(std::string(""), dir + "sunlight.frag",
                                     m_callbacks[ES_SUNLIGHT], EMT_SOLID);

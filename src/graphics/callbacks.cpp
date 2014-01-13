@@ -384,25 +384,6 @@ void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-
-    float ambient[3] = { s.r, s.g, s.b };
-    srv->setVertexShaderConstant("ambient", ambient, 3);
-
-    int tex = 0;
-    srv->setVertexShaderConstant("diffuse", &tex, 1);
-    tex = 1;
-    srv->setVertexShaderConstant("specular", &tex, 1);
-    tex = 2;
-    srv->setVertexShaderConstant("ambient_occlusion", &tex, 1);
-    tex = 3;
-    srv->setVertexShaderConstant("specular_map", &tex, 1);
-}
-
-//-------------------------------------
-
 void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const int hasclouds = World::getWorld()->getTrack()->hasClouds() &&
