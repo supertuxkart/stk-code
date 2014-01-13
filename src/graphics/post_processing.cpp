@@ -731,8 +731,7 @@ void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *t
 	glEnable(GL_DEPTH_TEST);
 }
 
-static
-void renderPassThrough(ITexture *tex)
+void PostProcessing::renderPassThrough(ITexture *tex)
 {
 	if (!PassThroughShader::Program)
 		PassThroughShader::init();

@@ -84,6 +84,9 @@ public:
 	/** Blur the in texture */
 	void renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
 
+	/** Render tex. Used for blit/texture resize */
+	void renderPassThrough(video::ITexture *tex);
+
     /** Render the post-processed scene */
     void         render();
 

@@ -639,14 +639,12 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 
     // To half
-    minimat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_HALF1), false, false);
-    m_post_processing->drawQuad(cam, minimat);
+	m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_TMP1));
 
     // To quarter
-    minimat.setTexture(0, m_rtts->getRTT(RTT_HALF1));
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-    m_post_processing->drawQuad(cam, minimat);
+	m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_HALF1));
 
     // Blur it
 	m_post_processing->renderGaussian6Blur(m_rtts->getRTT(RTT_QUARTER1), m_rtts->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
