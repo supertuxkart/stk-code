@@ -505,7 +505,9 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	float height = (float)UserConfigParams::m_height;
 	if (!PointLightShader::Program)
 		PointLightShader::init();
-	glDisable(GL_BLEND);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_ONE, GL_ONE);
 	glDisable(GL_DEPTH_TEST);
 
 	glUseProgram(PointLightShader::Program);
@@ -528,6 +530,7 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
 }
 
 // ----------------------------------------------------------------------------
