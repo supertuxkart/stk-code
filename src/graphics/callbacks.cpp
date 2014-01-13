@@ -269,15 +269,6 @@ void RainEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void SnowEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-
-    srv->setVertexShaderConstant("time", &time, 1);
-}
-
-//-------------------------------------
-
 void MotionBlurProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     // We need the maximum texture coordinates:
@@ -408,30 +399,6 @@ void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("ambient_occlusion", &tex, 1);
     tex = 3;
     srv->setVertexShaderConstant("specular_map", &tex, 1);
-}
-
-//-------------------------------------
-
-void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("screen", m_screen, 2);
-    srv->setVertexShaderConstant("spec", &m_specular, 1);
-    srv->setVertexShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
-    srv->setVertexShaderConstant("energy[0]", m_energy.data(), m_energy.size());
-    srv->setVertexShaderConstant("col[0]", m_color.data(), m_color.size());
-    srv->setVertexShaderConstant("center[0]", m_pos.data(), m_pos.size());
-    srv->setVertexShaderConstant("viewm", irr_driver->getViewMatrix().pointer(), 16);
-
-    if (!firstdone)
-    {
-        int tex = 0;
-        srv->setVertexShaderConstant("ntex", &tex, 1);
-
-        tex = 1;
-        srv->setVertexShaderConstant("dtex", &tex, 1);
-
-        firstdone = true;
-    }
 }
 
 //-------------------------------------

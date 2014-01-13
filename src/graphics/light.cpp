@@ -57,45 +57,6 @@ void LightNode::render()
     return;
 }
 
-void LightNode::renderLightSet(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
-{
-    assert (colors.size() == positions.size() && positions.size() == (energy.size() * 4));
-    ScreenQuad *sq = new ScreenQuad(irr_driver->getVideoDriver());
-    SMaterial &mat = sq->getMaterial();
-
-    mat.Lighting = false;
-    mat.MaterialType = irr_driver->getShader(ES_POINTLIGHT);
-
-    mat.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-
-    for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
-    {
-        mat.TextureLayer[i].TextureWrapU =
-        mat.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
-    }
-
-    mat.setFlag(EMF_BILINEAR_FILTER, false);
-    mat.setFlag(EMF_ZWRITE_ENABLE, false);
-
-    mat.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
-    mat.BlendOperation = EBO_ADD;
-
-    PointLightProvider * const cb = (PointLightProvider *) irr_driver->getCallback(ES_POINTLIGHT);
-    cb->setColor(colors);
-    cb->setPosition(positions);
-    cb->setEnergy(energy);
-    // Irrlicht's ScreenQuad reset the matrixes, we need to keep them
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-    matrix4 tmpworld = drv->getTransform(ETS_WORLD);
-    matrix4 tmpview = drv->getTransform(ETS_VIEW);
-    matrix4 tmpproj = drv->getTransform(ETS_PROJECTION);
-    sq->render(false);
-    drv->setTransform(ETS_WORLD, tmpworld);
-    drv->setTransform(ETS_VIEW, tmpview);
-    drv->setTransform(ETS_PROJECTION, tmpproj);
-    return;
-}
-
 void LightNode::OnRegisterSceneNode()
 { // This node is only drawn manually.
 

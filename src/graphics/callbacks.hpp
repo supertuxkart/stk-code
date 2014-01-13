@@ -236,14 +236,6 @@ public:
 
 //
 
-class SnowEffectProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
 class MotionBlurProvider: public CallBase
 {
 public:
@@ -368,48 +360,6 @@ class LightBlendProvider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-class PointLightProvider: public CallBase
-{
-public:
-    PointLightProvider()
-    {
-        m_screen[0] = (float)UserConfigParams::m_width;
-        m_screen[1] = (float)UserConfigParams::m_height;
-
-        m_specular = 200;
-    }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setColor(const std::vector<float> &col)
-    {
-      m_color = col;
-    }
-
-    void setPosition(const std::vector<float> &pos)
-    {
-      m_pos = pos;
-      return;
-    }
-
-    void setSpecular(float s)
-    {
-        m_specular = s;
-    }
-
-    void setEnergy(const std::vector<float> &e) {
-      m_energy = e;
-    }
-
-private:
-    std::vector<float> m_color;
-    std::vector<float> m_pos;
-    std::vector<float> m_energy;
-    float m_screen[2];
-    float m_specular;
 };
 
 //

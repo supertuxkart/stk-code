@@ -44,7 +44,6 @@ public:
     virtual ~LightNode();
 
     virtual void render() OVERRIDE;
-    static void renderLightSet(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
 
     virtual const core::aabbox3d<f32>& getBoundingBox() const OVERRIDE
     {
