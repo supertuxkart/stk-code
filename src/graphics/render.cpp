@@ -255,8 +255,9 @@ void IrrDriver::renderGLSL(float dt)
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         }
 
-        // Render the post-processed scene for solids
-        m_post_processing->renderSolid(cam);
+        // Render fog on top of solid
+		if (World::getWorld()->getTrack()->isFogEnabled())
+			m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
 
         // We need to re-render camera due to the per-cam-node hack.
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT |

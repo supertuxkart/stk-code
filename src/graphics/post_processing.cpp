@@ -199,30 +199,6 @@ void PostProcessing::update(float dt)
     }
 }   // update
 
-// ----------------------------------------------------------------------------
-/** Render the post-processed scene, solids only, color to color, no stencil */
-void PostProcessing::renderSolid(const u32 cam)
-{
-    if (!irr_driver->isGLSL()) return;
-
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-    if (World::getWorld()->getTrack()->isFogEnabled())
-    {
-        m_material.MaterialType = irr_driver->getShader(ES_FOG);
-        m_material.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-
-        // Overlay
-        m_material.BlendOperation = EBO_ADD;
-        m_material.MaterialTypeParam = pack_textureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA);
-
-        drv->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-        drawQuad(cam, m_material);
-
-        m_material.BlendOperation = EBO_NONE;
-        m_material.MaterialTypeParam = 0;
-    }
-}
-
 GLuint quad_vbo = 0;
 
 static void initQuadVBO()
@@ -570,6 +546,42 @@ namespace PassThroughShader
 	}
 }
 
+namespace FogShader
+{
+	GLuint Program = 0;
+	GLuint attrib_position, attrib_texcoord;
+	GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_campos, uniform_ipvmat;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/fog.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_fogmax = glGetUniformLocation(Program, "fogmax");
+		uniform_startH = glGetUniformLocation(Program, "startH");
+		uniform_endH = glGetUniformLocation(Program, "endH");
+		uniform_start = glGetUniformLocation(Program, "start");
+		uniform_end = glGetUniformLocation(Program, "end");
+		uniform_col = glGetUniformLocation(Program, "col");
+		uniform_campos = glGetUniformLocation(Program, "campos");
+		uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
+		if (!quad_vbo)
+			initQuadVBO();
+		glGenVertexArrays(1, &vao);
+		glBindVertexArray(vao);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+		glEnableVertexAttribArray(attrib_position);
+		glEnableVertexAttribArray(attrib_texcoord);
+		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+		glBindVertexArray(0);
+	}
+}
+
 
 static
 void renderBloom(ITexture *in)
@@ -842,6 +854,55 @@ void PostProcessing::renderPassThrough(ITexture *tex)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
 	glUniform1i(PassThroughShader::uniform_texture, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+}
+
+// ----------------------------------------------------------------------------
+/** Render the post-processed scene, solids only, color to color, no stencil */
+void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat)
+{
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+	const Track * const track = World::getWorld()->getTrack();
+
+	// This function is only called once per frame - thus no need for setters.
+	const float fogmax = track->getFogMax();
+	const float startH = track->getFogStartHeight();
+	const float endH = track->getFogEndHeight();
+	const float start = track->getFogStart();
+	const float end = track->getFogEnd();
+	const SColor tmpcol = track->getFogColor();
+
+	const float col[3] = { tmpcol.getRed() / 255.0f,
+		tmpcol.getGreen() / 255.0f,
+		tmpcol.getBlue() / 255.0f };
+
+	if (!FogShader::Program)
+		FogShader::init();
+	glDisable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	glUseProgram(FogShader::Program);
+	glBindVertexArray(FogShader::vao);
+
+	glUniform1f(FogShader::uniform_fogmax, fogmax);
+	glUniform1f(FogShader::uniform_startH, startH);
+	glUniform1f(FogShader::uniform_endH, endH);
+	glUniform1f(FogShader::uniform_start, start);
+	glUniform1f(FogShader::uniform_end, end);
+	glUniform3f(FogShader::uniform_col, col[0], col[1], col[2]);
+	glUniform3f(FogShader::uniform_campos, campos.X, campos.Y, campos.Z);
+	glUniformMatrix4fv(FogShader::uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
+	glUniform1i(FogShader::uniform_tex, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
