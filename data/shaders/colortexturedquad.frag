@@ -6,5 +6,6 @@ in vec4 col;
 
 void main()
 {
-	gl_FragColor = texture2D(texture, uv) * col;
+	vec4 res = texture2D(texture, uv);
+	gl_FragColor = vec4(res.xyz * col.xyz, res.a);
 }
