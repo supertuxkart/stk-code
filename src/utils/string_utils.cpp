@@ -114,7 +114,8 @@ namespace StringUtils
     }   // getExtension
 
     //-------------------------------------------------------------------------
-    /** Checks if the input string is not empty. ( = has characters different from a space)
+    /** Checks if the input string is not empty. ( = has characters different
+     *  from a space).
      */
     bool notEmpty(const irr::core::stringw& input)
     {
@@ -523,7 +524,13 @@ namespace StringUtils
     }   // timeToString
 
     // ------------------------------------------------------------------------
-
+    /** Replaces values in a string.
+     * \param other string in which to replace stuff
+     * \param from  pattern to remove from the string
+     * \param to    pattern to insert instead
+     * \return      a string with all occurrences of \c from replaced by
+     *              occurrences of \c to
+     */
     std::string replace(const std::string& other, const std::string& from,
                         const std::string& to)
     {
@@ -725,10 +732,6 @@ namespace StringUtils
         return version;
     }   // versionToInt
 
-    const char* boolstr(bool b)
-    {
-        return (b ? "true" : "false");
-    }
 } // namespace StringUtils
 
 

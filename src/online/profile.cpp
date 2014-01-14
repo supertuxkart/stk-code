@@ -142,7 +142,7 @@ namespace Online{
         assert(CurrentUser::get()->isRegisteredUser() && !m_is_current_user);
         AchievementsRequest * request = new AchievementsRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action",std::string("get-achievements"));
+        request->addParameter("action","get-achievements");
         request->addParameter("token", CurrentUser::get()->getToken());
         request->addParameter("userid", CurrentUser::get()->getID());
         request->addParameter("visitingid", m_id);
@@ -198,7 +198,7 @@ namespace Online{
         assert(CurrentUser::get()->isRegisteredUser());
         FriendsListRequest * request = new FriendsListRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action",std::string("get-friends-list"));
+        request->addParameter("action","get-friends-list");
         request->addParameter("token", CurrentUser::get()->getToken());
         request->addParameter("userid", CurrentUser::get()->getID());
         request->addParameter("visitingid", m_id);

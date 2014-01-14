@@ -949,7 +949,7 @@ int handleCmdLine()
     if (try_login)
     {
         irr::core::stringw s;
-        Online::CurrentUser::SignInRequest* request =
+        Online::XMLRequest* request =
                 Online::CurrentUser::get()->requestSignIn(login, password, false, false);
         request->executeNow();
 

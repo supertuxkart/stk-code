@@ -112,7 +112,7 @@ void AchievementsSlot::createFreshSlot()
 void AchievementsSlot::save(std::ofstream & out)
 {
     out << "    <slot user_id=\"" << m_id.c_str()
-        << "\" online=\""           << StringUtils::boolstr(m_online)
+        << "\" online=\""           << StringUtils::toString(m_online)
         << "\"> \n";
     std::map<uint32_t, Achievement*>::const_iterator i;
     for(i = m_achievements.begin(); i != m_achievements.end();  i++)

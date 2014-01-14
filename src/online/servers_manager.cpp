@@ -76,7 +76,7 @@ namespace Online{
         {
             request = new RefreshRequest();
             request->setServerURL("client-user.php");
-            request->addParameter("action",std::string("get_server_list"));
+            request->addParameter("action","get_server_list");
             if (request_now)
                 RequestManager::get()->addRequest(request);
         }

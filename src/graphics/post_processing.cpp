@@ -1187,7 +1187,10 @@ void PostProcessing::render()
             drawQuad(cam, m_material);
 
             // Blur
-			renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER1), irr_driver->getRTT(RTT_QUARTER2), 4. / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
+			renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER1),
+                                irr_driver->getRTT(RTT_QUARTER2),
+                                4.f / UserConfigParams::m_width,
+                                4.f / UserConfigParams::m_height);
 
             // Calculate the sun's position in texcoords
             const core::vector3df pos = sun->getPosition();

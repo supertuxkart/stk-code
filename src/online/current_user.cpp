@@ -39,69 +39,74 @@
 #include <assert.h>
 #include <algorithm>
 
+using namespace irr;
 using namespace Online;
 
 namespace Online
 {
     static CurrentUser* current_user_singleton(NULL);
 
+    /** Singleton create function. */
     CurrentUser* CurrentUser::get()
     {
         if (current_user_singleton == NULL)
             current_user_singleton = new CurrentUser();
         return current_user_singleton;
-    }
+    }   // get
 
+    // ------------------------------------------------------------------------
     void CurrentUser::deallocate()
     {
         delete current_user_singleton;
         current_user_singleton = NULL;
     }   // deallocate
 
-    // ============================================================================
+    // ========================================================================
     CurrentUser::CurrentUser()
     {
-        m_state = US_SIGNED_OUT;
-        m_token = "";
+        m_state        = US_SIGNED_OUT;
+        m_token        = "";
         m_save_session = false;
-        m_profile = NULL;
-    }
+        m_profile      = NULL;
+    }   // CurrentUser
 
-    // ============================================================================
-    const XMLRequest * CurrentUser::requestRecovery(    const irr::core::stringw &username,
-                                                        const irr::core::stringw &email)
+    // ------------------------------------------------------------------------
+    const XMLRequest * CurrentUser::requestRecovery(const core::stringw &username,
+                                                    const core::stringw &email)
     {
         assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("recovery"));
+        request->addParameter("action", "recovery");
         request->addParameter("username", username);
         request->addParameter("email", email);
-        RequestManager::get()->addRequest(request);
+        request->queue();
         return request;
-    }
+    }   // requestRecovery
 
-    // ============================================================================
-    const XMLRequest * CurrentUser::requestSignUp(  const irr::core::stringw &username,
-                                                    const irr::core::stringw &password,
-                                                    const irr::core::stringw &password_confirm,
-                                                    const irr::core::stringw &email,
-                                                    bool terms)
+    // ------------------------------------------------------------------------
+    const XMLRequest * CurrentUser::requestSignUp(const core::stringw &username,
+                                                  const core::stringw &password,
+                                                  const core::stringw &password_confirm,
+                                                  const core::stringw &email,
+                                                  bool terms)
     {
         assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("register"));
+        request->addParameter("action", "register");
         request->addParameter("username", username);
         request->addParameter("password", password);
         request->addParameter("password_confirm", password_confirm);
         request->addParameter("email", email);
-        request->addParameter("terms", std::string("on"));
-        RequestManager::get()->addRequest(request);
+        request->addParameter("terms", "on");
+        request->queue();
         return request;
-    }
+    }   // requestSignUp
 
-    // ============================================================================
+    // ------------------------------------------------------------------------
+    /** Request a login using the saved credentials of the user.
+     */
     void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
@@ -109,50 +114,89 @@ namespace Online
         {
             request = new SignInRequest(true);
             request->setServerURL("client-user.php");
-            request->addParameter("action",std::string("saved-session"));
+            request->addParameter("action","saved-session");
             request->addParameter("userid", UserConfigParams::m_saved_user);
-            request->addParameter("token", UserConfigParams::m_saved_token.c_str());
-            RequestManager::get()->addRequest(request);
+            request->addParameter("token", 
+                                  UserConfigParams::m_saved_token.c_str());
+            request->queue();
             m_state = US_SIGNING_IN;
         }
-    }
+    }   // requestSavedSession
 
-    CurrentUser::SignInRequest * CurrentUser::requestSignIn(    const irr::core::stringw &username,
-                                                                const irr::core::stringw &password,
-                                                                bool save_session, bool request_now)
+    // ------------------------------------------------------------------------
+    /** Create a signin request.
+     *  \param username Name of user.
+     *  \param password Password.
+     *  \param save_session If true, the login credential will be saved to
+     *         allow a password-less login.
+     *  \param request_now Immediately submit this request to the
+     *         RequestManager.
+     */
+    CurrentUser::SignInRequest*
+        CurrentUser::requestSignIn(const core::stringw &username,
+                                   const core::stringw &password,
+                                   bool save_session, bool request_now)
     {
         assert(m_state == US_SIGNED_OUT);
         m_save_session = save_session;
         SignInRequest * request = new SignInRequest(request_now);
         request->setServerURL("client-user.php");
-        request->addParameter("action",std::string("connect"));
+        request->addParameter("action","connect");
         request->addParameter("username",username);
         request->addParameter("password",password);
-        request->addParameter("save-session", StringUtils::boolstr(save_session));
+        request->addParameter("save-session", save_session);
         if (request_now)
         {
-            RequestManager::get()->addRequest(request);
+            request->queue();
             m_state = US_SIGNING_IN;
         }
         return request;
-    }
+    }   // requestSignIn
 
+    // ------------------------------------------------------------------------
+    /** Called when the signin request is finished.
+     */
+    void CurrentUser::SignInRequest::callback()
+    {
+        CurrentUser::get()->signIn(isSuccess(), getXMLData());
+        if(GUIEngine::ModalDialog::isADialogActive())
+        {
+            LoginDialog * dialog = 
+                dynamic_cast<LoginDialog*>(GUIEngine::ModalDialog::getCurrent());
+            if(dialog)
+            {
+                if(isSuccess())
+                    dialog->success();
+                else
+                    dialog->error(getInfo());
+            }   // if dialog
+        }   // isDialogActive
+    }   // SignInRequest::callback
+
+    // ------------------------------------------------------------------------
+    /** Checks the server respond after a login attempt. If the login
+     *  was successful, it marks the user as logged in, and (if requested)
+     *  saves data to be able to login next time.
+     *  \param success If the answer from the server indicated a 
+     *         successful login attemp.
+     *  \param input Xml tree with the complete server response.
+     */
     void CurrentUser::signIn(bool success, const XMLNode * input)
     {
         if (success)
         {
             int token_fetched       = input->get("token", &m_token);
-            irr::core::stringw username("");
+            core::stringw username("");
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
             m_profile = new Profile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_state = US_SIGNED_IN;
-            if(getSaveSession())
+            if(saveSession())
             {
-                UserConfigParams::m_saved_user = getID();
-                UserConfigParams::m_saved_token = getToken();
+                UserConfigParams::m_saved_user    = getID();
+                UserConfigParams::m_saved_token   = getToken();
                 UserConfigParams::m_saved_session = true;
             }
             ProfileManager::get()->addPersistent(m_profile);
@@ -160,77 +204,45 @@ namespace Online
             std::string achieved_string("");
             if(input->get("achieved", &achieved_string) == 1)
             {
-                std::vector<uint32_t> achieved_ids = StringUtils::splitToUInt(achieved_string, ' ');
+                std::vector<uint32_t> achieved_ids = 
+                    StringUtils::splitToUInt(achieved_string, ' ');
                 AchievementsManager::get()->getActive()->sync(achieved_ids);
             }
             m_profile->fetchFriends();
-        }
+        }   // if success
         else
         {
             m_state = US_SIGNED_OUT;
         }
-    }
+    }   // signIn
 
-    void CurrentUser::SignInRequest::callback()
+    // ------------------------------------------------------------------------
+    void CurrentUser::requestSignOut()
     {
-        CurrentUser::get()->signIn(isSuccess(), getXMLData());
-        if(GUIEngine::ModalDialog::isADialogActive())
-        {
-            LoginDialog * dialog  = dynamic_cast<LoginDialog*>(GUIEngine::ModalDialog::getCurrent());
-            if(dialog != NULL)
-            {
-                if(isSuccess())
-                    dialog->success();
-                else
-                    dialog->error(getInfo());
-            }
-        }
-    }
-
-    // ============================================================================
-
-    const CurrentUser::ServerCreationRequest * CurrentUser::requestServerCreation(  const irr::core::stringw &name,
-                                                                                    int max_players)
-    {
-        assert(m_state == US_SIGNED_IN);
-        ServerCreationRequest * request = new ServerCreationRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action",           std::string("create_server"));
-        request->addParameter("token",            getToken());
-        request->addParameter("userid",           getID());
-        request->addParameter("name",             name);
-        request->addParameter("max_players",      max_players);
-        RequestManager::get()->addRequest(request);
-        return request;
-    }
-
-    void CurrentUser::ServerCreationRequest::callback()
-    {
-        if(isSuccess())
-        {
-            Server * server = new Server(*getXMLData()->getNode("server"));
-            ServersManager::get()->addServer(server);
-            m_created_server_id = server->getServerId();
-        }
-    }
-
-    // ============================================================================
-    void CurrentUser::requestSignOut(){
         assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         SignOutRequest * request = new SignOutRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action",std::string("disconnect"));
+        request->addParameter("action","disconnect");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
-        RequestManager::get()->addRequest(request);
+        request->queue();
         m_state = US_SIGNING_OUT;
-    }
+    }   // requestSignOut
 
+    // --------------------------------------------------------------------
+    void CurrentUser::SignOutRequest::callback()
+    {
+        CurrentUser::get()->signOut(isSuccess(), getXMLData());
+    }   // SignOutRequest::callback
+
+    // ------------------------------------------------------------------------
     void CurrentUser::signOut(bool success, const XMLNode * input)
     {
         if(!success)
         {
-            Log::warn("CurrentUser::signOut", "%s", "There were some connection issues while signing out. Report a bug if this caused issues.");
+            Log::warn("CurrentUser::signOut", "%s",
+                      "There were some connection issues while signing out. "
+                      "Report a bug if this caused issues.");
         }
         m_token = "";
         ProfileManager::get()->clearPersistent();
@@ -240,30 +252,54 @@ namespace Online
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
         AchievementsManager::get()->updateCurrentPlayer();
-    }
+    }   // signOut
 
-    void CurrentUser::SignOutRequest::callback()
+    // ------------------------------------------------------------------------
+    const CurrentUser::ServerCreationRequest*
+                  CurrentUser::requestServerCreation(const core::stringw &name,
+                                                     int max_players)
     {
-        CurrentUser::get()->signOut(isSuccess(), getXMLData());
-    }
+        assert(m_state == US_SIGNED_IN);
+        ServerCreationRequest * request = new ServerCreationRequest();
+        request->setServerURL("client-user.php");
+        request->addParameter("action",           "create_server");
+        request->addParameter("token",            getToken());
+        request->addParameter("userid",           getID());
+        request->addParameter("name",             name);
+        request->addParameter("max_players",      max_players);
+        request->queue();
+        return request;
+    }   // requestServerCreation
 
-    // ============================================================================
+    // ------------------------------------------------------------------------
+    void CurrentUser::ServerCreationRequest::callback()
+    {
+        if(isSuccess())
+        {
+            Server * server = new Server(*getXMLData()->getNode("server"));
+            ServersManager::get()->addServer(server);
+            m_created_server_id = server->getServerId();
+        }
+    }   // ServerCreationRequest::callback
 
-    CurrentUser::ServerJoinRequest *  CurrentUser::requestServerJoin(uint32_t server_id,
-                                                                    bool request_now)
+    // ------------------------------------------------------------------------
+    CurrentUser::ServerJoinRequest* 
+                             CurrentUser::requestServerJoin(uint32_t server_id,
+                                                            bool request_now)
     {
         assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
         ServerJoinRequest * request = new ServerJoinRequest();
         request->setServerURL("address-management.php");
-        request->addParameter("action",std::string("request-connection"));
+        request->addParameter("action","request-connection");
         request->addParameter("token", getToken());
         request->addParameter("id", getID());
         request->addParameter("server_id", server_id);
         if (request_now)
-            RequestManager::get()->addRequest(request);
+            request->queue();
         return request;
-    }
+    }   // requestServerJoin
 
+    // ------------------------------------------------------------------------
     void CurrentUser::ServerJoinRequest::callback()
     {
         if(isSuccess())
@@ -273,63 +309,48 @@ namespace Online
             ServersManager::get()->setJoinedServer(server_id);
         }
         //FIXME needs changes for actual valid joining
-    }
+    }   // ServerJoinRequest::callback
 
-    // ============================================================================
-
-    const XMLRequest * CurrentUser::requestGetAddonVote( const std::string & addon_id) const
+    // ------------------------------------------------------------------------
+    const XMLRequest* 
+           CurrentUser::requestGetAddonVote(const std::string & addon_id) const
     {
         assert(m_state == US_SIGNED_IN);
         XMLRequest * request = new XMLRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("get-addon-vote"));
+        request->addParameter("action", "get-addon-vote");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("addonid", addon_id.substr(6));
-        RequestManager::get()->addRequest(request);
+        request->queue();
         return request;
-    }
+    }   // requestGetAddonVote
 
-    // ============================================================================
-    /**
-     * A request to the server, to fetch matching results for the supplied search term.
-     * \param search_string the string to search for.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to perform a vote on an addon.
+     *  \param addon_id the id of the addon to vote for.
+     *  \param rating the voted rating.
      */
-    const XMLRequest * CurrentUser::requestUserSearch( const irr::core::stringw & search_string) const
+    const CurrentUser::SetAddonVoteRequest*
+                 CurrentUser::requestSetAddonVote(const std::string & addon_id,
+                                                  float rating) const
     {
         assert(m_state == US_SIGNED_IN);
-        XMLRequest * request = new XMLRequest();
+        CurrentUser::SetAddonVoteRequest * request =
+                                        new CurrentUser::SetAddonVoteRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("user-search"));
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("search-string", search_string);
-        RequestManager::get()->addRequest(request);
-        return request;
-    }
-
-    // ============================================================================
-    /**
-     * A request to the server, to perform a vote on an addon.
-     * \param addon_id the id of the addon to vote for.
-     * \param rating the voted rating.
-     */
-    const CurrentUser::SetAddonVoteRequest * CurrentUser::requestSetAddonVote( const std::string & addon_id, float rating) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::SetAddonVoteRequest * request = new CurrentUser::SetAddonVoteRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("set-addon-vote"));
+        request->addParameter("action", "set-addon-vote");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("addonid", addon_id.substr(6));
         request->addParameter("rating", rating);
-        RequestManager::get()->addRequest(request);
+        request->queue();
         return request;
-    }
+    }   // requestSetAddonVote
 
-    /**
-     * Callback for the request to vote for an addon. Updates the local average rating.
+    // ------------------------------------------------------------------------
+    /** Callback for the request to vote for an addon. Updates the local
+     *  average rating.
      */
     void CurrentUser::SetAddonVoteRequest::callback()
     {
@@ -339,110 +360,144 @@ namespace Online
             getXMLData()->get("addon-id", &addon_id);
             float average;
             getXMLData()->get("new-average", &average);
-            addons_manager->getAddon(Addon::createAddonId(addon_id))->setRating(average);
+            addons_manager->getAddon(Addon::createAddonId(addon_id))
+                          ->setRating(average);
         }
-    }
+    }   // SetAddonVoteRequest::callback
 
-    // ============================================================================
-    /**
-     * A request to the server, to invite a user to be friends.
-     * \param friend_id The id of the user which has to be friended.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to fetch matching results for the supplied
+     *  search term.
+     *  \param search_string the string to search for.
+     */
+    const XMLRequest*
+        CurrentUser::requestUserSearch(const core::stringw &search_string) const
+    {
+        assert(m_state == US_SIGNED_IN);
+        XMLRequest * request = new XMLRequest();
+        request->setServerURL("client-user.php");
+        request->addParameter("action", "user-search");
+        request->addParameter("token", getToken());
+        request->addParameter("userid", getID());
+        request->addParameter("search-string", search_string);
+        request->queue();
+        return request;
+    }   // requestUserSearch
+
+    // ------------------------------------------------------------------------
+    /** A request to the server, to invite a user to be friends.
+     *  \param friend_id The id of the user which has to be friended.
      */
     void CurrentUser::requestFriendRequest(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
         CurrentUser::FriendRequest * request = new CurrentUser::FriendRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("friend-request"));
+        request->addParameter("action", "friend-request");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        RequestManager::get()->addRequest(request);
-    }
+        request->queue();
+    }   // requestFriendRequest
 
-    /**
-     * Callback for the request to send a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+    // ------------------------------------------------------------------------
+    /** Callback for the request to send a friend invitation. Shows a
+     *  confirmation message and takes care of updating all the cached
+     *  information.
      */
     void CurrentUser::FriendRequest::callback()
     {
         uint32_t id(0);
         getXMLData()->get("friendid", &id);
-        irr::core::stringw info_text("");
+        core::stringw info_text("");
         if(isSuccess())
         {
             CurrentUser::get()->getProfile()->addFriend(id);
-            ProfileManager::get()->getProfileByID(id)->setRelationInfo(new Profile::RelationInfo(_("Today"), false, true, false));
+            Profile::RelationInfo *info = 
+                new Profile::RelationInfo(_("Today"), false, true, false);
+            ProfileManager::get()->getProfileByID(id)->setRelationInfo(info);
             OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request send!");
         }
         else
             info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!isSuccess(), true), true);
-    }
+        UserInfoDialog *dialog = new UserInfoDialog(id, info_text,
+                                                    !isSuccess(), true);
+        GUIEngine::DialogQueue::get()->pushDialog(dialog, true);
+    }   // FriendRequest::callback
 
-    // ============================================================================
-    /**
-     * A request to the server, to accept a friend request.
-     * \param friend_id The id of the user of which the request has to be accepted.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to accept a friend request.
+     *  \param friend_id The id of the user of which the request has to be
+     *         accepted.
      */
     void CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
-        CurrentUser::AcceptFriendRequest * request = new CurrentUser::AcceptFriendRequest();
+        CurrentUser::AcceptFriendRequest * request =
+                                        new CurrentUser::AcceptFriendRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("accept-friend-request"));
+        request->addParameter("action", "accept-friend-request");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        RequestManager::get()->addRequest(request);
-    }
+        request->queue();
+    }   // requestAcceptFriend
 
-    /**
-     * Callback for the request to accept a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+    // ------------------------------------------------------------------------
+    /** Callback for the request to accept a friend invitation. Shows a
+     *  confirmation message and takes care of updating all the cached
+     *  information.
      */
     void CurrentUser::AcceptFriendRequest::callback()
     {
         uint32_t id(0);
         getXMLData()->get("friendid", &id);
-        irr::core::stringw info_text("");
+        core::stringw info_text("");
         if(isSuccess())
         {
             Profile * profile = ProfileManager::get()->getProfileByID(id);
             profile->setFriend();
-            profile->setRelationInfo(new Profile::RelationInfo(_("Today"), false, false, true));
+            Profile::RelationInfo *info = 
+                     new Profile::RelationInfo(_("Today"), false, false, true);
+            profile->setRelationInfo(info);
             OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request accepted!");
         }
         else
             info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!isSuccess(), true), true);
-    }
+        GUIEngine::DialogQueue::get()->pushDialog( 
+                   new UserInfoDialog(id, info_text,!isSuccess(), true), true);
+    }   // AcceptFriendRequest::callback
 
-    // ============================================================================
-    /**
-     * A request to the server, to decline a friend request.
-     * \param friend_id The id of the user of which the request has to be declined.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to decline a friend request.
+     *  \param friend_id The id of the user of which the request has to be
+     *         declined.
      */
     void CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
-        CurrentUser::DeclineFriendRequest * request = new CurrentUser::DeclineFriendRequest();
+        CurrentUser::DeclineFriendRequest * request =
+                                       new CurrentUser::DeclineFriendRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("decline-friend-request"));
+        request->addParameter("action", "decline-friend-request");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        RequestManager::get()->addRequest(request);
-    }
+        request->queue();
+    }   // requestDeclineFriend
 
-    /**
-     * Callback for the request to decline a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+    // ------------------------------------------------------------------------
+    /** Callback for the request to decline a friend invitation. Shows a
+     *  confirmation message and takes care of updating all the cached
+     *  information.
      */
     void CurrentUser::DeclineFriendRequest::callback()
     {
         uint32_t id(0);
         getXMLData()->get("friendid", &id);
-        irr::core::stringw info_text("");
+        core::stringw info_text("");
         if(isSuccess())
         {
             CurrentUser::get()->getProfile()->removeFriend(id);
@@ -453,35 +508,38 @@ namespace Online
         }
         else
             info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!isSuccess(), true), true);
+        GUIEngine::DialogQueue::get()->pushDialog(
+                   new UserInfoDialog(id, info_text,!isSuccess(), true), true);
+    }   // DeclineFriendRequest::callback
 
-    }
-
-    // ============================================================================
-    /**
-     * A request to the server, to cancel a pending friend request.
-     * \param friend_id The id of the user of which the request has to be canceled.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to cancel a pending friend request.
+     *  \param friend_id The id of the user of which the request has to be
+     *  canceled.
      */
     void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
-        CurrentUser::CancelFriendRequest * request = new CurrentUser::CancelFriendRequest();
+        CurrentUser::CancelFriendRequest * request =
+                                        new CurrentUser::CancelFriendRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("cancel-friend-request"));
+        request->addParameter("action", "cancel-friend-request");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        RequestManager::get()->addRequest(request);
-    }
+        request->queue();
+    }   // requestCancelFriend
 
-    /**
-     * Callback for the request to cancel a friend invitation. Shows a confirmation message and takes care of updating all the cached information.
+    // ------------------------------------------------------------------------
+    /** Callback for the request to cancel a friend invitation. Shows a
+     *  confirmation message and takes care of updating all the cached
+     *  information.
      */
     void CurrentUser::CancelFriendRequest::callback()
     {
         uint32_t id(0);
         getXMLData()->get("friendid", &id);
-        irr::core::stringw info_text("");
+        core::stringw info_text("");
         if(isSuccess())
         {
             CurrentUser::get()->getProfile()->removeFriend(id);
@@ -492,35 +550,37 @@ namespace Online
         }
         else
             info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!isSuccess(), true), true);
+        UserInfoDialog *dia = new UserInfoDialog(id, info_text,!isSuccess(),
+                                                 true);
+        GUIEngine::DialogQueue::get()->pushDialog(dia, true);
+    }   // CancelFriendRequest::callback
 
-    }
-
-    // ============================================================================
-    /**
-     * A request to the server, to remove a friend relation.
-     * \param friend_id The id of the friend to be removed.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to remove a friend relation.
+     *  \param friend_id The id of the friend to be removed.
      */
     void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
-        CurrentUser::RemoveFriendRequest * request = new CurrentUser::RemoveFriendRequest();
+        CurrentUser::RemoveFriendRequest * request = 
+                                        new CurrentUser::RemoveFriendRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("remove-friend"));
+        request->addParameter("action", "remove-friend");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
         request->addParameter("friendid", friend_id);
-        RequestManager::get()->addRequest(request);
-    }
+        request->queue();
+    }   // requestRemoveFriend
 
-    /**
-     * Callback for the request to remove a friend. Shows a confirmation message and takes care of updating all the cached information.
+    // ------------------------------------------------------------------------
+    /** Callback for the request to remove a friend. Shows a confirmation
+     *  message and takes care of updating all the cached information.
      */
     void CurrentUser::RemoveFriendRequest::callback()
     {
         uint32_t id(0);
         getXMLData()->get("friendid", &id);
-        irr::core::stringw info_text("");
+        core::stringw info_text("");
         if(isSuccess())
         {
             CurrentUser::get()->getProfile()->removeFriend(id);
@@ -531,40 +591,45 @@ namespace Online
         }
         else
             info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog( new UserInfoDialog(id, info_text,!isSuccess(), true), true);
+        UserInfoDialog *info = new UserInfoDialog(id, info_text,!isSuccess(), 
+                                                  true);
+        GUIEngine::DialogQueue::get()->pushDialog(info, true);
 
-    }
+    }   // RemoveFriendRequest::callback
 
-    // ============================================================================
-    /**
-     * A request to the server, to change the password of the signed in user.
-     * \param current_password The active password of the currently signed in user.
-     * \param new_password     The password the user wants to change to.
-     * \param new_password_ver Confirmation of that password. Has to be the exact same.
+    // ------------------------------------------------------------------------
+    /** A request to the server, to change the password of the signed in user.
+     *  \param current_password The active password of the currently signed in
+     *         user.
+     *  \param new_password     The password the user wants to change to.
+     *  \param new_password_ver Confirmation of that password. Has to be the
+     *         exact same.
      */
-    void CurrentUser::requestPasswordChange(const irr::core::stringw &current_password,
-                                            const irr::core::stringw &new_password,
-                                            const irr::core::stringw &new_password_ver) const
+    void CurrentUser::requestPasswordChange(const core::stringw &current_password,
+                                            const core::stringw &new_password,
+                                     const core::stringw &new_password_ver) const
     {
         assert(m_state == US_SIGNED_IN);
         ChangePasswordRequest * request = new ChangePasswordRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("change_password"));
+        request->addParameter("action", "change_password");
         request->addParameter("userid", getID());
         request->addParameter("current", current_password);
         request->addParameter("new1", new_password);
         request->addParameter("new2", new_password_ver);
-        RequestManager::get()->addRequest(request);
-    }
-
-    /**
-     * Callback for the change password request. If the matching dialog is still open, show a confirmation message.
+        request->queue();
+    }   // requestPasswordChange
+    // ------------------------------------------------------------------------
+    /** Callback for the change password request. If the matching dialog is 
+     *  still open, show a confirmation message.
      */
     void CurrentUser::ChangePasswordRequest::callback()
     {
         if(GUIEngine::ModalDialog::isADialogActive())
         {
-            ChangePasswordDialog * dialog  = dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog::getCurrent());
+            ChangePasswordDialog * dialog  = 
+                dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog
+                                                             ::getCurrent());
             if(dialog != NULL)
             {
                 if(isSuccess())
@@ -573,24 +638,26 @@ namespace Online
                     dialog->error(getInfo());
             }
         }
-    }
-    // ============================================================================
-    /**
-     * Sends a request to the server to see if any new information is available. (online friends, notifications, etc.).
+    }   // ChangePasswordRequest::callback
+
+    // ------------------------------------------------------------------------
+    /** Sends a request to the server to see if any new information is
+     *  available. (online friends, notifications, etc.).
      */
     void CurrentUser::requestPoll() const
     {
         assert(m_state == US_SIGNED_IN);
         CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
         request->setServerURL("client-user.php");
-        request->addParameter("action", std::string("poll"));
+        request->addParameter("action", "poll");
         request->addParameter("token", getToken());
         request->addParameter("userid", getID());
-        RequestManager::get()->addRequest(request);
-    }
+        request->queue();
+    }   // requestPoll()
 
-    /**
-     * Callback for the poll request. Parses the information and spawns notifications accordingly.
+    // ------------------------------------------------------------------------
+    /** Callback for the poll request. Parses the information and spawns
+     *  notifications accordingly.
      */
     void CurrentUser::PollRequest::callback()
     {
@@ -603,22 +670,27 @@ namespace Online
                 std::string online_friends_string("");
                 if(getXMLData()->get("online", &online_friends_string) == 1)
                 {
-                    std::vector<uint32_t> online_friends = StringUtils::splitToUInt(online_friends_string, ' ');
+                    std::vector<uint32_t> online_friends = 
+                          StringUtils::splitToUInt(online_friends_string, ' ');
                     bool went_offline = false;
-                    std::vector<uint32_t> friends = CurrentUser::get()->getProfile()->getFriends();
-                    std::vector<irr::core::stringw> to_notify;
+                    std::vector<uint32_t> friends = 
+                                CurrentUser::get()->getProfile()->getFriends();
+                    std::vector<core::stringw> to_notify;
                     for(unsigned int i = 0; i < friends.size(); ++i)
                     {
                          bool now_online = false;
                          std::vector<uint32_t>::iterator iter =
-                             std::find(online_friends.begin(),online_friends.end(), friends[i]);
+                             std::find(online_friends.begin(),
+                                       online_friends.end(), friends[i]);
                          if (iter != online_friends.end())
                          {
                              now_online = true;
                              online_friends.erase(iter);
                          }
-                         Profile * profile = ProfileManager::get()->getProfileByID(friends[i]);
-                         Profile::RelationInfo * relation_info = profile->getRelationInfo();
+                         Profile * profile =
+                             ProfileManager::get()->getProfileByID(friends[i]);
+                         Profile::RelationInfo * relation_info = 
+                                                    profile->getRelationInfo();
                          if( relation_info->isOnline() )
                          {
                              if (!now_online)
@@ -633,7 +705,9 @@ namespace Online
                              {
                                  //User came online
                                  relation_info->setOnline(true);
-                                 profile->setFriend(); //Do this because a user might have accepted a pending friend request.
+                                 // Do this because a user might have accepted
+                                 // a pending friend request.
+                                 profile->setFriend(); 
                                  to_notify.push_back(profile->getUserName());
                              }
                          }
@@ -642,24 +716,30 @@ namespace Online
 
                     if(to_notify.size() > 0)
                     {
-                        irr::core::stringw message("");
+                        core::stringw message("");
                         if(to_notify.size() == 1)
                         {
-                            message = to_notify[0] + irr::core::stringw(_(" is now online."));
+                            message = _("%s is now online.", to_notify[0]);
                         }
                         else if(to_notify.size() == 2)
                         {
-                            message = to_notify[0] + irr::core::stringw(_(" and ")) + to_notify[1] + irr::core::stringw(_(" are now online."));
+                            message = _("%s and %s are now online.",
+                                        to_notify[0], to_notify[1]    );
                         }
                         else if(to_notify.size() == 3)
                         {
-                            message = to_notify[0] + irr::core::stringw(_(", ")) + to_notify[1] + irr::core::stringw(_(" and ")) + to_notify[2] + irr::core::stringw(_(" are now online."));
+                            message = _("%s, %s and %s are now online.",
+                                     to_notify[0], to_notify[1], to_notify[2]);
                         }
                         else if(to_notify.size() > 3)
                         {
-                            message = StringUtils::toWString(to_notify.size()) + irr::core::stringw(_(" friends are now online."));
+                            message = _("%d friends are now online.", 
+                                        to_notify.size());
                         }
-                        GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
+                        NotificationDialog *dia = 
+                            new NotificationDialog(NotificationDialog::T_Friends,
+                                                   message);
+                        GUIEngine::DialogQueue::get()->pushDialog(dia, false);
                         OnlineProfileFriends::getInstance()->refreshFriendsList();
                     }
                     else if(went_offline)
@@ -679,7 +759,8 @@ namespace Online
                 const XMLNode * node = getXMLData()->getNode(i);
                 if(node->getName() == "new_friend_request")
                 {
-                    Profile::RelationInfo * ri = new Profile::RelationInfo("New", false, true, true);
+                    Profile::RelationInfo * ri = 
+                        new Profile::RelationInfo("New", false, true, true);
                     Profile * p = new Profile(node);
                     p->setRelationInfo(ri);
                     ProfileManager::get()->addPersistent(p);
@@ -688,44 +769,50 @@ namespace Online
             }
             if(friend_request_count > 0)
             {
-                irr::core::stringw message("");
+                core::stringw message("");
                 if(friend_request_count > 1)
                 {
-                    message = irr::core::stringw(_("You have ")) + StringUtils::toWString(friend_request_count) + irr::core::stringw(_(" new friend requests!."));
+                    message = _("You have %d new friend requests!",
+                                friend_request_count);
                 }
                 else
                 {
                     message = _("You have a new friend request!");
                 }
-                GUIEngine::DialogQueue::get()->pushDialog( new NotificationDialog(NotificationDialog::T_Friends, message), false);
+                NotificationDialog *dia =
+                    new NotificationDialog(NotificationDialog::T_Friends, 
+                                           message);
+                GUIEngine::DialogQueue::get()->pushDialog(dia, false);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
             }
         }
         // FIXME show connection error??
         // Perhaps show something after 2 misses.
 
-    }
-    // ============================================================================
-    /**
-     * Sends a message to the server that the client has been closed, if a user is signed in.
+    }   // PollRequest::callback
+
+    // ------------------------------------------------------------------------
+    /** Sends a message to the server that the client has been closed, if a
+     *  user is signed in.
      */
     void CurrentUser::onSTKQuit() const
     {
         if(isRegisteredUser())
         {
-            HTTPRequest * request = new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
+            HTTPRequest * request =
+                      new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
             request->setServerURL("client-user.php");
-            request->addParameter("action", std::string("client-quit"));
+            request->addParameter("action", "client-quit");
             request->addParameter("token", getToken());
             request->addParameter("userid", getID());
-            RequestManager::get()->addRequest(request);
+            request->queue();
         }
     }
 
-    // ============================================================================
-    /**
-     * Sends a confirmation to the server that an achievement has been completed, if a user is signed in.
-     * \param achievement_id the id of the achievement that got completed
+    // ------------------------------------------------------------------------
+    /** Sends a confirmation to the server that an achievement has been
+     *  completed, if a user is signed in.
+     *  \param achievement_id the id of the achievement that got completed.
      */
     void CurrentUser::onAchieving(uint32_t achievement_id) const
     {
@@ -733,17 +820,17 @@ namespace Online
         {
             HTTPRequest * request = new HTTPRequest(true);
             request->setServerURL("client-user.php");
-            request->addParameter("action", std::string("achieving"));
+            request->addParameter("action", "achieving");
             request->addParameter("token", getToken());
             request->addParameter("userid", getID());
             request->addParameter("achievementid", achievement_id);
-            RequestManager::get()->addRequest(request);
+            request->queue();
         }
-    }
+    }   // onAchieving
 
-    // ============================================================================
+    // ------------------------------------------------------------------------
     /** \return the username if signed in. */
-    irr::core::stringw CurrentUser::getUserName() const
+    core::stringw CurrentUser::getUserName() const
     {
         if((m_state == US_SIGNED_IN ) || (m_state == US_GUEST))
         {
@@ -751,9 +838,9 @@ namespace Online
             return m_profile->getUserName();
         }
         return _("Currently not signed in");
-    }
+    }   // getUserName
 
-    // ============================================================================
+    // ------------------------------------------------------------------------
     /** \return the online id. */
     uint32_t CurrentUser::getID() const
     {
@@ -763,5 +850,6 @@ namespace Online
             return m_profile->getID();
         }
         return 0;
-    }
+    }   // getID
+
 } // namespace Online
