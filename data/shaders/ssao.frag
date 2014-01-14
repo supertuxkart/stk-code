@@ -13,6 +13,12 @@ const float radius = .4f;
 
 const float invSamples = strengh / SAMPLES;
 
+// Found here : http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
+float rand(vec2 co)
+{
+   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+}
+
 void main(void)
 {
 	vec4 cur = texture2D(normals_and_depth, uv);
@@ -24,8 +30,13 @@ void main(void)
 	vec3 norm = normalize(cur.xyz * vec3(2.0) - vec3(1.0));
 	// Workaround for nvidia and skyboxes
 	float len = dot(vec3(1.0), abs(cur.xyz));
-	if (len < 0.2 || curdepth > 0.999) discard;
-	vec3 tangent = normalize(cross(norm, norm.yzx));
+	if (len < 0.2 || curdepth > 0.99) discard;
+	// Make a tangent as random as possible
+	vec3 randvect;
+	randvect.x = rand(uv);
+	randvect.y = rand(vec2(randvect.x, FragPos.z));
+	randvect.z = rand(randvect.xy);
+	vec3 tangent = normalize(cross(norm, randvect));
 	vec3 bitangent = cross(norm, tangent);
 
 	float bl = 0.0;
@@ -45,7 +56,7 @@ void main(void)
 		occluderPos /= occluderPos.w;
 
 		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
-		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) / smoothstep(0., 1., curdepth) : 0.;
+		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) : 0.;
 	}
 
 	// output the result
