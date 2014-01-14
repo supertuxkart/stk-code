@@ -300,6 +300,8 @@ static GLuint TexturedQuadUniformSize;
 static GLuint TexturedQuadUniformTexcenter;
 static GLuint TexturedQuadUniformTexsize;
 
+static GLuint TQvao;
+
 static GLuint ColorTexturedQuadShader;
 static GLuint ColorTexturedQuadAttribPosition;
 static GLuint ColorTexturedQuadAttribTexCoord;
@@ -309,6 +311,8 @@ static GLuint ColorTexturedQuadUniformCenter;
 static GLuint ColorTexturedQuadUniformSize;
 static GLuint ColorTexturedQuadUniformTexcenter;
 static GLuint ColorTexturedQuadUniformTexsize;
+
+static GLuint CTQvao;
 
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
@@ -331,8 +335,22 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
 	  ColorTexturedQuadUniformSize = glGetUniformLocation(ColorTexturedQuadShader, "size");
 	  ColorTexturedQuadUniformTexcenter = glGetUniformLocation(ColorTexturedQuadShader, "texcenter");
 	  ColorTexturedQuadUniformTexsize = glGetUniformLocation(ColorTexturedQuadShader, "texsize");
+	  glGenVertexArrays(1, &CTQvao);
+	  glBindVertexArray(CTQvao);
+	  glEnableVertexAttribArray(ColorTexturedQuadAttribPosition);
+	  glEnableVertexAttribArray(ColorTexturedQuadAttribTexCoord);
+	  glEnableVertexAttribArray(ColorTexturedQuadAttribColor);
+	  glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+	  glVertexAttribPointer(ColorTexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	  glVertexAttribPointer(ColorTexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+	  glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
+	  glVertexAttribPointer(ColorTexturedQuadAttribColor, 4, GL_UNSIGNED_INT, GL_FALSE, 4 * sizeof(float), 0);
+	  glBindVertexArray(0);
   }
+  glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(int), colors);
   glUseProgram(ColorTexturedQuadShader);
+  glBindVertexArray(CTQvao);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
   glUniform1i(ColorTexturedQuadUniformTexture, 0);
@@ -340,19 +358,8 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
   glUniform2f(ColorTexturedQuadUniformSize, width, height);
   glUniform2f(ColorTexturedQuadUniformTexcenter, tex_center_pos_x, tex_center_pos_y);
   glUniform2f(ColorTexturedQuadUniformTexsize, tex_width, tex_height);
-  glEnableVertexAttribArray(ColorTexturedQuadAttribPosition);
-  glEnableVertexAttribArray(ColorTexturedQuadAttribTexCoord);
-  glEnableVertexAttribArray(ColorTexturedQuadAttribColor);
-  glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-  glVertexAttribPointer(ColorTexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-  glVertexAttribPointer(ColorTexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-  glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(int), colors);
-  glVertexAttribPointer(ColorTexturedQuadAttribColor, 4, GL_UNSIGNED_INT, GL_FALSE, 4 * sizeof(float), 0);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glDisableVertexAttribArray(ColorTexturedQuadAttribPosition);
-  glDisableVertexAttribArray(ColorTexturedQuadAttribTexCoord);
-  glDisableVertexAttribArray(ColorTexturedQuadAttribColor);
+  glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
@@ -370,8 +377,17 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
 	  TexturedQuadUniformSize = glGetUniformLocation(TexturedQuadShader, "size");
 	  TexturedQuadUniformTexcenter = glGetUniformLocation(TexturedQuadShader, "texcenter");
 	  TexturedQuadUniformTexsize = glGetUniformLocation(TexturedQuadShader, "texsize");
+	  glGenVertexArrays(1, &TQvao);
+	  glBindVertexArray(TQvao);
+	  glEnableVertexAttribArray(TexturedQuadAttribPosition);
+	  glEnableVertexAttribArray(TexturedQuadAttribTexCoord);
+	  glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+	  glVertexAttribPointer(TexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	  glVertexAttribPointer(TexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+     glBindVertexArray(0);
   }
   glUseProgram(TexturedQuadShader);
+  glBindVertexArray(TQvao);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
   glUniform1i(TexturedQuadUniformTexture, 0);
@@ -379,16 +395,9 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
   glUniform2f(TexturedQuadUniformSize, width, height);
   glUniform2f(TexturedQuadUniformTexcenter, tex_center_pos_x, tex_center_pos_y);
   glUniform2f(TexturedQuadUniformTexsize, tex_width, tex_height);
-  glEnableVertexAttribArray(TexturedQuadAttribPosition);
-  glEnableVertexAttribArray(TexturedQuadAttribTexCoord);
-  glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-  glVertexAttribPointer(TexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-  glVertexAttribPointer(TexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-  glDisableVertexAttribArray(TexturedQuadAttribPosition);
-  glDisableVertexAttribArray(TexturedQuadAttribTexCoord);
+  glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
-  
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
@@ -442,13 +451,10 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	if (useAlphaChannelOfTexture)
 	{
 		glEnable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.f);
 	}
 	else
 	{
 		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
 	}
 	if (colors)
 	  drawTexColoredQuad(texture, colors, width, height, center_pos_x, center_pos_y,
@@ -462,6 +468,7 @@ static GLuint ColoredQuadShader;
 static GLuint ColoredQuadUniformCenter;
 static GLuint ColoredQuadUniformSize;
 static GLuint ColoredQuadUniformColor;
+static GLuint CQvao;
 
 void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	const core::rect<s32>* clip)
@@ -493,13 +500,10 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	if (color.getAlpha() < 255)
 	{
 		glEnable(GL_BLEND);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.f);
 	}
 	else
 	{
 		glDisable(GL_BLEND);
-		glDisable(GL_ALPHA_TEST);
 	}
 
 	if (!ColoredQuadShader)
@@ -508,15 +512,19 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 		ColoredQuadUniformColor = glGetUniformLocation(ColoredQuadShader, "color");
 		ColoredQuadUniformCenter = glGetUniformLocation(ColoredQuadShader, "center");
 		ColoredQuadUniformSize = glGetUniformLocation(ColoredQuadShader, "size");
+		glGenVertexArrays(1, &CQvao);
+		glBindVertexArray(CQvao);
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+		glBindVertexArray(0);
 	}
 	glUseProgram(ColoredQuadShader);
+	glBindVertexArray(CQvao);
 	glUniform2f(ColoredQuadUniformCenter, center_pos_x, center_pos_y);
 	glUniform2f(ColoredQuadUniformSize, width, height);
 	glUniform4i(ColoredQuadUniformColor, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-	glEnableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glDisableVertexAttribArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
