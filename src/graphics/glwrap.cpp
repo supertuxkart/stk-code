@@ -51,6 +51,7 @@ PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
 PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 PFNGLTEXBUFFERPROC glTexBuffer;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
+PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
 #endif
 
 static GLuint quad_buffer;
@@ -176,6 +177,7 @@ void initGL()
 	glUniform1fv = (PFNGLUNIFORM1FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform1fv");
 	glUniform4fv = (PFNGLUNIFORM4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform4fv");
 	glBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
+	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
 #endif
 #ifdef ENABLE_ARB_DEBUG_OUTPUT
 	glDebugMessageCallbackARB(debugCallback, NULL);
@@ -190,15 +192,15 @@ void initGL()
 	glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
 	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
 
-	const int quad_color[] = {
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0, 0,
-		0, 0, 0, 0,
+	const unsigned quad_color[] = {
+		0, 0, 0, 255,
+		255, 0, 0, 255,
+		0, 255, 0, 255,
+		0, 0, 255, 255,
 	};
 	glGenBuffers(1, &ColoredVertex);
 	glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
-	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(int), quad_color, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(unsigned), quad_color, GL_DYNAMIC_DRAW);
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
@@ -318,12 +320,13 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
     float tex_width, float tex_height)
 {
-  int colors[] = {
+  unsigned colors[] = {
   col[0].getRed(), col[0].getGreen(), col[0].getBlue(), col[0].getAlpha(),
   col[1].getRed(), col[1].getGreen(), col[1].getBlue(), col[1].getAlpha(),
   col[2].getRed(), col[2].getGreen(), col[2].getBlue(), col[2].getAlpha(),
   col[3].getRed(), col[3].getGreen(), col[3].getBlue(), col[3].getAlpha(),
   };
+
   if (!ColorTexturedQuadShader) {
      ColorTexturedQuadShader = LoadProgram(file_manager->getAsset("shaders/colortexturedquad.vert").c_str(), file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
 
@@ -344,11 +347,11 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
 	  glVertexAttribPointer(ColorTexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 	  glVertexAttribPointer(ColorTexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
 	  glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
-	  glVertexAttribPointer(ColorTexturedQuadAttribColor, 4, GL_UNSIGNED_INT, GL_FALSE, 4 * sizeof(float), 0);
+	  glVertexAttribIPointer(ColorTexturedQuadAttribColor, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
 	  glBindVertexArray(0);
   }
   glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
-  glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(int), colors);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
   glUseProgram(ColorTexturedQuadShader);
   glBindVertexArray(CTQvao);
   glActiveTexture(GL_TEXTURE0);

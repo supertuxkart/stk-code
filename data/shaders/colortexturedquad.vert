@@ -6,7 +6,7 @@ uniform vec2 texsize;
 
 in vec2 position;
 in vec2 texcoord;
-in ivec4 color;
+in uvec4 color;
 out vec2 uv;
 out vec4 col;
 
