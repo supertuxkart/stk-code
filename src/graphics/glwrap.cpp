@@ -454,6 +454,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	if (useAlphaChannelOfTexture)
 	{
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else
 	{
@@ -503,6 +504,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	if (color.getAlpha() < 255)
 	{
 		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	}
 	else
 	{
