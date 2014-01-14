@@ -5,12 +5,13 @@ uniform vec4 center[16];
 uniform vec4 col[16];
 uniform float energy[16];
 uniform float spec;
-uniform vec2 screen;
 uniform mat4 invproj;
 uniform mat4 viewm;
 
+in vec2 uv;
+
 void main() {
-	vec2 texc = gl_FragCoord.xy / screen;
+	vec2 texc = uv;
 	float z = texture2D(ntex, texc).a;
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;

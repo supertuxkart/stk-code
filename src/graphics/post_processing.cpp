@@ -337,7 +337,7 @@ namespace PointLightShader
 {
 	GLuint Program = 0;
 	GLuint attrib_position, attrib_texcoord;
-	GLuint uniform_ntex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_screen, uniform_invproj, uniform_viewm;
+	GLuint uniform_ntex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_invproj, uniform_viewm;
 
 	GLuint vao = 0;
 
@@ -352,7 +352,6 @@ namespace PointLightShader
 		uniform_col = glGetUniformLocation(Program, "col[0]");
 		uniform_energy = glGetUniformLocation(Program, "energy[0]");
 		uniform_spec = glGetUniformLocation(Program, "spec");
-		uniform_screen = glGetUniformLocation(Program, "screen");
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_viewm = glGetUniformLocation(Program, "viewm");
 
@@ -743,8 +742,6 @@ void renderColorLevel(ITexture *in)
 
 void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
 {
-	float width = (float)UserConfigParams::m_width;
-	float height = (float)UserConfigParams::m_height;
 	if (!PointLightShader::Program)
 		PointLightShader::init();
 	glEnable(GL_BLEND);
@@ -759,7 +756,6 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glUniform4fv(PointLightShader::uniform_col, 16, colors.data());
 	glUniform1fv(PointLightShader::uniform_energy, 16, energy.data());
 	glUniform1f(PointLightShader::uniform_spec, 200);
-	glUniform2f(PointLightShader::uniform_screen, width, height);
 	glUniformMatrix4fv(PointLightShader::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 	glUniformMatrix4fv(PointLightShader::uniform_viewm, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
 
