@@ -75,7 +75,8 @@ namespace StringUtils
     // ------------------------------------------------------------------------
     /** Specialisiation for bools to return 'true' or 'false'/
      */
-    static std::string toString(bool b)
+    template<bool>
+    std::string toString(bool &b)
     {
         return (b ? "true" : "false");
     }    // toString(bool)
