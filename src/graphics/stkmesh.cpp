@@ -253,6 +253,8 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		glBindTexture(GL_TEXTURE_2D, mesh.textures);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glUniform1f(ObjectRefShader::uniform_texture, 0);
 	}
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
@@ -263,12 +265,15 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		glBindTexture(GL_TEXTURE_2D, mesh.textures);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glUniform1f(ObjectShader::uniform_texture, 0);
 	}
 
 	glBindVertexArray(mesh.vao);
 	glDrawElements(ptype, count, itype, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	video::SMaterial material;
 	material.MaterialType = irr_driver->getShader(ES_RAIN);
