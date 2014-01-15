@@ -6,6 +6,14 @@ cmake_build/
 dependencies/
 
 .config/
+supertuxkart-64
+
+data/karts
+data/library
+data/music
+data/sfx
+data/textures
+data/tracks
 
 *.o
 *.d
