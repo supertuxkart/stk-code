@@ -216,10 +216,27 @@ static void initQuadVBO()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+static GLuint createVAO(GLuint Program)
+{
+  if (!quad_vbo)
+     initQuadVBO();
+  GLuint vao;
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
+  GLuint attrib_position = glGetAttribLocation(Program, "Position");
+  GLuint attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+  glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+  glEnableVertexAttribArray(attrib_position);
+  glEnableVertexAttribArray(attrib_texcoord);
+  glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+  glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+  glBindVertexArray(0);
+  return vao;
+}
+
 namespace BloomShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_texture, uniform_low;
 	GLuint vao = 0;
 
@@ -227,28 +244,15 @@ namespace BloomShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloom.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_texture = glGetUniformLocation(Program, "tex");
 		uniform_low = glGetUniformLocation(Program, "low");
-
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace BloomBlendShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_texture, uniform_low;
 	GLuint vao = 0;
 
@@ -256,27 +260,14 @@ namespace BloomBlendShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloomblend.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_texture = glGetUniformLocation(Program, "tex");
-
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace PPDisplaceShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_dtex, uniform_viz;
 	GLuint vao = 0;
 
@@ -284,29 +275,16 @@ namespace PPDisplaceShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ppdisplace.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_viz = glGetUniformLocation(Program, "viz");
-
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace ColorLevelShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_inlevel, uniform_outlevel;
 	GLuint vao = 0;
 
@@ -314,29 +292,16 @@ namespace ColorLevelShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
-
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace PointLightShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_ntex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_invproj, uniform_viewm;
 
 	GLuint vao = 0;
@@ -345,8 +310,6 @@ namespace PointLightShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_ntex = glGetUniformLocation(Program, "ntex");
 		uniform_center = glGetUniformLocation(Program, "center[0]");
 		uniform_col = glGetUniformLocation(Program, "col[0]");
@@ -354,24 +317,13 @@ namespace PointLightShader
 		uniform_spec = glGetUniformLocation(Program, "spec");
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_viewm = glGetUniformLocation(Program, "viewm");
-
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace LightBlendShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_diffuse, uniform_specular, uniform_ambient_occlusion, uniform_specular_map, uniform_ambient;
 
 	GLuint vao = 0;
@@ -380,31 +332,18 @@ namespace LightBlendShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/lightblend.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_diffuse = glGetUniformLocation(Program, "diffuse");
 		uniform_specular = glGetUniformLocation(Program, "specular");
 		uniform_ambient_occlusion = glGetUniformLocation(Program, "ambient_occlusion");
 		uniform_specular_map = glGetUniformLocation(Program, "specular_map");
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
-
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace Gaussian6HBlurShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_pixel;
 
 	GLuint vao = 0;
@@ -413,27 +352,15 @@ namespace Gaussian6HBlurShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6h.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace Gaussian3HBlurShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_pixel;
 
 	GLuint vao = 0;
@@ -442,27 +369,15 @@ namespace Gaussian3HBlurShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3h.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace Gaussian6VBlurShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_pixel;
 
 	GLuint vao = 0;
@@ -471,27 +386,15 @@ namespace Gaussian6VBlurShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6v.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace Gaussian3VBlurShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_pixel;
 
 	GLuint vao = 0;
@@ -500,27 +403,15 @@ namespace Gaussian3VBlurShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3v.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace PassThroughShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_texture;
 
 	GLuint vao = 0;
@@ -529,26 +420,14 @@ namespace PassThroughShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_texture = glGetUniformLocation(Program, "texture");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
 namespace SSAOShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_normals_and_depth, uniform_invprojm,	uniform_projm, uniform_samplePoints;
 	float SSAOSamples[64];
 
@@ -558,22 +437,11 @@ namespace SSAOShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_normals_and_depth = glGetUniformLocation(Program, "normals_and_depth");
 		uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		uniform_projm = glGetUniformLocation(Program, "projm");
 		uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 
 		for (unsigned i = 0; i < 16; i++) {
 			// Generate x/y component between -1 and 1
@@ -601,7 +469,6 @@ namespace SSAOShader
 namespace FogShader
 {
 	GLuint Program = 0;
-	GLuint attrib_position, attrib_texcoord;
 	GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_campos, uniform_ipvmat;
 
 	GLuint vao = 0;
@@ -610,8 +477,6 @@ namespace FogShader
 	{
 		initGL();
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/fog.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_fogmax = glGetUniformLocation(Program, "fogmax");
 		uniform_startH = glGetUniformLocation(Program, "startH");
@@ -621,16 +486,7 @@ namespace FogShader
 		uniform_col = glGetUniformLocation(Program, "col");
 		uniform_campos = glGetUniformLocation(Program, "campos");
 		uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
-		if (!quad_vbo)
-			initQuadVBO();
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
-		glBindVertexArray(0);
+		vao = createVAO(Program);
 	}
 }
 
