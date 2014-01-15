@@ -255,7 +255,7 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glUniform1f(ObjectRefShader::uniform_texture, 0);
+		glUniform1i(ObjectRefShader::uniform_texture, 0);
 	}
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
 	{
@@ -267,7 +267,7 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glUniform1f(ObjectShader::uniform_texture, 0);
+		glUniform1i(ObjectShader::uniform_texture, 0);
 	}
 
 	glBindVertexArray(mesh.vao);
