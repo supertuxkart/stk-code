@@ -3,6 +3,24 @@
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
 
+static
+GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_normal, size_t stride)
+{
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glEnableVertexAttribArray(attrib_position);
+	glEnableVertexAttribArray(attrib_texcoord);
+	glEnableVertexAttribArray(attrib_normal);
+	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
+	glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
+	glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
+	glBindVertexArray(0);
+	return vao;
+}
+
 namespace ObjectRefShader
 {
 	GLuint Program;
@@ -19,23 +37,6 @@ namespace ObjectRefShader
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
 		uniform_texture = glGetUniformLocation(Program, "texture");
-	}
-
-	GLuint createVAO(GLuint vbo, GLuint idx, size_t stride)
-	{
-		GLuint vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glEnableVertexAttribArray(attrib_normal);
-		glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
-		glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
-		glBindVertexArray(0);
-		return vao;
 	}
 
 	void setProgramAndUniforms()
@@ -72,23 +73,6 @@ namespace ObjectShader
 		uniform_texture = glGetUniformLocation(Program, "texture");
 	}
 
-	GLuint createVAO(GLuint vbo, GLuint idx, size_t stride)
-	{
-		GLuint vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glEnableVertexAttribArray(attrib_position);
-		glEnableVertexAttribArray(attrib_texcoord);
-		glEnableVertexAttribArray(attrib_normal);
-		glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
-		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
-		glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
-		glBindVertexArray(0);
-		return vao;
-	}
-
 	void setProgramAndUniforms()
 	{
 		glUseProgram(Program);
@@ -109,38 +93,36 @@ static
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 {
 	initGL();
-	GLMesh result;
+	GLMesh result = {};
 	if (!mb)
 		return result;
 	glGenBuffers(1, &(result.vertex_buffer));
 	glGenBuffers(1, &(result.index_buffer));
 
 	glBindBuffer(GL_ARRAY_BUFFER, result.vertex_buffer);
-	const void* vertices=mb->getVertices();
-	const u32 vertexCount=mb->getVertexCount();
-	const irr::video::E_VERTEX_TYPE vType=mb->getVertexType();
-	const u32 vertexSize = getVertexPitchFromType(vType);
+	const void* vertices = mb->getVertices();
+	const u32 vertexCount = mb->getVertexCount();
+	const irr::video::E_VERTEX_TYPE vType = mb->getVertexType();
+	result.Stride = getVertexPitchFromType(vType);
 	const c8* vbuf = static_cast<const c8*>(vertices);
-	core::array<c8> buffer;
-	buffer.set_used(vertexSize * vertexCount);
-	memcpy(buffer.pointer(), vertices, vertexSize * vertexCount);
-	vbuf = buffer.const_pointer();
-	glBufferData(GL_ARRAY_BUFFER, vertexCount * vertexSize, vbuf, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertexCount * result.Stride, vbuf, GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.index_buffer);
-	const void* indices=mb->getIndices();
-	u32 indexCount= mb->getIndexCount();
+	const void* indices = mb->getIndices();
+	u32 indexCount = mb->getIndexCount();
 	GLenum indexSize;
 	switch (mb->getIndexType())
 	{
 		case irr::video::EIT_16BIT:
 		{
-			indexSize=sizeof(u16);
+			indexSize = sizeof(u16);
+			result.IndexType = GL_UNSIGNED_SHORT;
 			break;
 		}
 		case irr::video::EIT_32BIT:
 		{
-			indexSize=sizeof(u32);
+			indexSize = sizeof(u32);
+			result.IndexType = GL_UNSIGNED_INT;
 			break;
 		}
 		default:
@@ -177,27 +159,6 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	case scene::EPT_QUAD_STRIP:
 	case scene::EPT_QUADS:
 		assert(0 && "Unsupported primitive type");
-	}
-	switch (mb->getVertexType())
-	{
-	case video::EVT_STANDARD:
-		result.Stride = sizeof(video::S3DVertex);
-		break;
-	case video::EVT_2TCOORDS:
-		result.Stride = sizeof(video::S3DVertex2TCoords);
-		break;
-	case video::EVT_TANGENTS:
-		result.Stride = sizeof(video::S3DVertexTangents);
-		break;
-	}
-	switch (mb->getIndexType())
-	{
-	case video::EIT_16BIT:
-		result.IndexType = GL_UNSIGNED_SHORT;
-		break;
-	case video::EIT_32BIT:
-		result.IndexType = GL_UNSIGNED_INT;
-		break;
 	}
 	ITexture *tex = mb->getMaterial().getTexture(0);
 	if (tex)
@@ -296,9 +257,13 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	if (mesh.vao)
 		return;
 	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-		mesh.vao = ObjectRefShader::createVAO(mesh.vertex_buffer, mesh.index_buffer, mesh.Stride);
+		mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			ObjectRefShader::attrib_position, ObjectRefShader::attrib_texcoord, ObjectRefShader::attrib_normal,
+			mesh.Stride);
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
-		mesh.vao = ObjectShader::createVAO(mesh.vertex_buffer, mesh.index_buffer, mesh.Stride);
+		mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			ObjectShader::attrib_position, ObjectShader::attrib_texcoord, ObjectShader::attrib_normal,
+			mesh.Stride);
 }
 
 void STKMesh::render()
