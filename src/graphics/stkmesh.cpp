@@ -21,40 +21,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	return vao;
 }
 
-namespace ObjectRefShader
-{
-	GLuint Program;
-	GLuint attrib_position, attrib_texcoord, attrib_normal;
-	GLuint uniform_MVP, uniform_TIMV, uniform_texture;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/object.vert").c_str(), file_manager->getAsset("shaders/objectref.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-		attrib_normal = glGetAttribLocation(Program, "Normal");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
-		uniform_texture = glGetUniformLocation(Program, "texture");
-	}
-
-	void setProgramAndUniforms()
-	{
-		glUseProgram(Program);
-		core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-		ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-		ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-		core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-		TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-		TransposeInverseModelView.makeInverse();
-		TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
-	}
-}
-
 namespace ObjectShader
 {
 	GLuint Program;
@@ -73,19 +39,11 @@ namespace ObjectShader
 		uniform_texture = glGetUniformLocation(Program, "texture");
 	}
 
-	void setProgramAndUniforms()
+	void setProgramAndUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_texture)
 	{
-		glUseProgram(Program);
-		core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-		ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-		ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-		core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-		TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-		TransposeInverseModelView.makeInverse();
-		TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+		glUniform1i(uniform_texture, TU_texture);
 	}
 }
 
@@ -181,9 +139,8 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 		GLmeshes.push_back(allocateMeshBuffer(mb));
 
 	}
-	if (ObjectRefShader::Program)
+	if (ObjectShader::Program)
 		return;
-	ObjectRefShader::init();
 	ObjectShader::init();
 }
 
@@ -206,30 +163,23 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
-	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-	{
-		ObjectRefShader::setProgramAndUniforms();
+	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	TransposeInverseModelView.makeInverse();
+	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, mesh.textures);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glUniform1i(ObjectRefShader::uniform_texture, 0);
-	}
-	if (type == irr_driver->getShader(ES_OBJECTPASS))
-	{
-		ObjectShader::setProgramAndUniforms();
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh.textures);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, mesh.textures);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glUniform1i(ObjectShader::uniform_texture, 0);
-	}
+	glUseProgram(ObjectShader::Program);
+	ObjectShader::setProgramAndUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
 
 	glBindVertexArray(mesh.vao);
 	glDrawElements(ptype, count, itype, 0);
@@ -247,7 +197,7 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 
 static bool isObject(video::E_MATERIAL_TYPE type)
 {
-	if (type == irr_driver->getShader(ES_OBJECTPASS_REF) || type == irr_driver->getShader(ES_OBJECTPASS))
+	if (type == irr_driver->getShader(ES_OBJECTPASS))
 		return true;
 	return false;
 }
@@ -256,14 +206,10 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	if (mesh.vao)
 		return;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-		mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectRefShader::attrib_position, ObjectRefShader::attrib_texcoord, ObjectRefShader::attrib_normal,
-			mesh.Stride);
-	if (type == irr_driver->getShader(ES_OBJECTPASS))
-		mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectShader::attrib_position, ObjectShader::attrib_texcoord, ObjectShader::attrib_normal,
-			mesh.Stride);
+
+	mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+		ObjectShader::attrib_position, ObjectShader::attrib_texcoord, ObjectShader::attrib_normal,
+		mesh.Stride);
 }
 
 void STKMesh::render()
@@ -291,7 +237,6 @@ void STKMesh::render()
 			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
 			bool transparent = (rnd && rnd->isTransparent());
 
-#ifdef OGL32CTX
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
 			if (isObject(material.MaterialType) && !isTransparentPass && !transparent)
@@ -300,9 +245,6 @@ void STKMesh::render()
 				draw(GLmeshes[i], material.MaterialType);
 			}
 			else if (transparent == isTransparentPass)
-#else
-			if (transparent == isTransparentPass)
-#endif
 			{
 				driver->setMaterial(material);
 				driver->drawMeshBuffer(mb);
