@@ -752,7 +752,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
                          SColor(255, 255, 255, 255));
 
-    m_post_processing->renderSSAO(irr_driver->getInvProjMatrix(), irr_driver->getProjMatrix());
+    if(UserConfigParams::m_ssao)
+        m_post_processing->renderSSAO(irr_driver->getInvProjMatrix(), irr_driver->getProjMatrix());
 
     // Blur it to reduce noise.
     if(UserConfigParams::m_ssao == 1)
