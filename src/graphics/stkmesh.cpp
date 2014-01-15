@@ -155,6 +155,7 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	if (!mesh.textures)
 		return;
+	glStencilFunc(GL_ALWAYS, 0, ~0);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_ALPHA_TEST);
 	glDepthMask(GL_TRUE);
@@ -185,6 +186,7 @@ void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	glDrawElements(ptype, count, itype, 0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glStencilFunc(GL_ALWAYS, 1, ~0);
 
 	video::SMaterial material;
 	material.MaterialType = irr_driver->getShader(ES_RAIN);

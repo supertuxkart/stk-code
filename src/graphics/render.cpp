@@ -193,14 +193,21 @@ void IrrDriver::renderGLSL(float dt)
         m_video_driver->setRenderTarget(m_mrt, false, false);
 
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glStencilFunc(GL_ALWAYS, 1, ~0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glEnable(GL_STENCIL_TEST);
         m_scene_manager->drawAll(m_renderpass);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glDisable(GL_STENCIL_TEST);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
 
-        ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
-                                                 irr_driver->getCallback(ES_SHADOW_IMPORTANCE);
-        sicb->updateIPVMatrix();
+        // Todo : reenable glow and shadows
+        //ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
+        //                                         irr_driver->getCallback(ES_SHADOW_IMPORTANCE);
+        //sicb->updateIPVMatrix();
 
         // Used to cull glowing items & lights
         const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
@@ -208,14 +215,14 @@ void IrrDriver::renderGLSL(float dt)
         // Render anything glowing.
         if (!m_mipviz && !m_wireframe)
         {
-            renderGlow(overridemat, glows, cambox, cam);
+            //renderGlow(overridemat, glows, cambox, cam);
         } // end glow
 
         // Shadows
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows &&
             World::getWorld()->getTrack()->hasShadows())
         {
-            renderShadows(sicb, camnode, overridemat, camera);
+            //renderShadows(sicb, camnode, overridemat, camera);
         }
 
         // Lights
