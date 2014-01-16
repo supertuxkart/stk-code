@@ -193,6 +193,7 @@ void IrrDriver::renderGLSL(float dt)
         m_video_driver->setRenderTarget(m_mrt, false, false);
 
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+        irr_driver->setPhase(0);
         glClear(GL_STENCIL_BUFFER_BIT);
         glStencilFunc(GL_ALWAYS, 1, ~0);
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
@@ -227,6 +228,13 @@ void IrrDriver::renderGLSL(float dt)
 
         // Lights
         renderLights(cambox, camnode, overridemat, cam, dt);
+        irr_driver->setPhase(1);
+        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+        glStencilFunc(GL_EQUAL, 0, ~0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glEnable(GL_STENCIL_TEST);
+        m_scene_manager->drawAll(m_renderpass);
+        glDisable(GL_STENCIL_TEST);
 
         if (!bgnodes)
         {

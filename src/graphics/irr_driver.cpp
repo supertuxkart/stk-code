@@ -140,6 +140,21 @@ void IrrDriver::reset()
     if (m_glsl) m_post_processing->reset();
 }   // reset
 
+void IrrDriver::setPhase(unsigned p)
+{
+  phase = p;
+}
+
+unsigned IrrDriver::getPhase() const
+{
+  return phase;
+}
+
+core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
+{
+  return m_mrt;
+}
+
 // ----------------------------------------------------------------------------
 
 #if defined(__linux__) && !defined(ANDROID)

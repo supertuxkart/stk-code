@@ -174,6 +174,8 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
+    unsigned phase;
+
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
@@ -206,6 +208,9 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void setPhase(unsigned);
+    unsigned getPhase() const;
+    core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
