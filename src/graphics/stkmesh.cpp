@@ -53,7 +53,7 @@ namespace ObjectPass2Shader
 {
 	GLuint Program;
 	GLuint attrib_position, attrib_texcoord;
-	GLuint uniform_MVP, uniform_TIMV, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_screen, uniform_ambient;
+	GLuint uniform_MVP, uniform_TIMV, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
 
 	void init()
 	{
@@ -65,16 +65,18 @@ namespace ObjectPass2Shader
 		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
 		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
 		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
 		uniform_screen = glGetUniformLocation(Program, "screen");
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
 	}
 
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap)
+	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
 		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
 		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
 		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
@@ -245,9 +247,11 @@ void drawSecondPass(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
   glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName());
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName());
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName());
 
   glUseProgram(ObjectPass2Shader::Program);
-  ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2);
+  ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
