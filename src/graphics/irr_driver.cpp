@@ -413,8 +413,12 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-    m_glsl          = m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-                      m_video_driver->queryFeature(video::EVDF_TEXTURE_NPOT) &&
+    m_glsl          = 
+#if defined(__APPLE__)
+#else
+		m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
+        m_video_driver->queryFeature(video::EVDF_TEXTURE_NPOT) &&
+#endif
                       UserConfigParams::m_pixel_shaders;
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
