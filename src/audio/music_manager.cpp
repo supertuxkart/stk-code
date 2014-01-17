@@ -182,6 +182,7 @@ void MusicManager::startMusic(MusicInformation* mi, bool startRightNow)
 
     mi->volumeMusic(m_masterGain);
     if (startRightNow) mi->startMusic();
+    else mi->setMusicWaiting();
 }   // startMusic
 
 //-----------------------------------------------------------------------------

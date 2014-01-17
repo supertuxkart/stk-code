@@ -48,6 +48,10 @@ private:
     std::vector<std::string> m_all_tracks;
     //int                      m_numLoops;
 
+    /** If music is loaded but hasn't been started yet (MusicManager::startMusic()
+     *  was told not to start right away). */
+    bool                    m_music_waiting;
+
     /** If faster music is enabled at all (either separate file or using
      *  the pitch shift approach). */
     bool                     m_enable_fast;
@@ -87,6 +91,7 @@ public:
     //int              getNumLoops      () const {return m_numLoops;        }
     float              getFasterTime    () const {return m_faster_time;     }
     float              getMaxPitch      () const {return m_max_pitch;       }
+    void               setMusicWaiting  () {m_music_waiting = true;}
     void               addMusicToTracks ();
     void               update           (float dt);
     void               startMusic       ();
