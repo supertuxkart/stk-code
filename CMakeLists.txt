@@ -51,8 +51,16 @@ else(NOT BULLET_FOUND)
 endif(NOT BULLET_FOUND)
 
 # Build the ENet UDP network library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+find_package(ENet)
+if(NOT ENET_FOUND)
+    message("Using bundled enet libs")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+    set(ENet_LIBRARIES "enet")
+else(NOT ENET_FOUND)
+    message("Using system enet libs")
+    include_directories(${ENet_INCLUDE_DIRS})
+endif(NOT ENET_FOUND)
 
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
@@ -238,7 +246,7 @@ endif()
 # Common library dependencies
 target_link_libraries(supertuxkart
     ${BULLET_LIBRARIES}
-    enet
+    ${ENet_LIBRARIES}
     stkirrlicht
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
