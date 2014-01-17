@@ -1,6 +1,5 @@
 #version 130
-uniform sampler2D texture; //The texture
-uniform sampler2D normalMap; //The bump-map
+uniform sampler2D normalMap;
 
 noperspective in vec3 tangent;
 noperspective in vec3 bitangent;
@@ -18,8 +17,5 @@ void main()
 	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;
 	FragmentNormal = normalize(FragmentNormal);
 	
-
-	gl_FragData[0] = texture2D (texture, uv);
-	gl_FragData[1] = vec4(0.5 * FragmentNormal + 0.5, gl_FragCoord.z);
-	gl_FragData[2] = vec4(0.);
+	gl_FragColor = vec4(0.5 * FragmentNormal + 0.5, gl_FragCoord.z);
 }

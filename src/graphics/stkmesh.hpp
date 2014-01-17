@@ -14,7 +14,7 @@ struct GLMesh {
 	GLuint vao_glow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
-	GLuint textures;
+	GLuint textures[2];
 	GLenum PrimitiveType;
 	GLenum IndexType;
 	size_t IndexCount;
@@ -25,7 +25,7 @@ class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
 	std::vector<GLMesh> GLmeshes;
-	void draw(const GLMesh &mesh);
+	void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 public:
 	STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
 		const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
