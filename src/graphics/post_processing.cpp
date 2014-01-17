@@ -927,15 +927,8 @@ void PostProcessing::render()
 				renderBloom(in);
             }
 
-            // Do we have any forced bloom nodes? If so, draw them now
-            const std::vector<IrrDriver::BloomData> &blooms = irr_driver->getForcedBloom();
-            const u32 bloomsize = blooms.size();
 
-            if (!globalbloom && bloomsize)
-                drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
-
-
-            if (globalbloom || bloomsize)
+            if (globalbloom)
             {
                 // Clear the alpha to a suitable value, stencil
                 glClearColor(0, 0, 0, 0.1f);
@@ -945,86 +938,6 @@ void PostProcessing::render()
 
                 glClearColor(0, 0, 0, 0);
                 glColorMask(1, 1, 1, 1);
-
-                // The forced-bloom objects are drawn again, to know which pixels to pick.
-                // While it's more drawcalls, there's a cost to using four MRTs over three,
-                // and there shouldn't be many such objects in a track.
-                // The stencil is already in use for the glow. The alpha channel is best
-                // reserved for other use (specular, etc).
-                //
-                // They are drawn with depth and color writes off, giving 4x-8x drawing speed.
-                if (bloomsize)
-                {
-                    const core::aabbox3df &cambox = camnode->
-                                                    getViewFrustum()->
-                                                    getBoundingBox();
-
-                    irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);
-                    SOverrideMaterial &overridemat = drv->getOverrideMaterial();
-                    overridemat.EnablePasses = ESNRP_SOLID;
-                    overridemat.EnableFlags = EMF_MATERIAL_TYPE | EMF_ZWRITE_ENABLE | EMF_COLOR_MASK;
-                    overridemat.Enabled = true;
-
-                    overridemat.Material.MaterialType = irr_driver->getShader(ES_BLOOM_POWER);
-                    overridemat.Material.ZWriteEnable = false;
-                    overridemat.Material.ColorMask = ECP_ALPHA;
-
-                    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-                    glStencilFunc(GL_ALWAYS, 1, ~0);
-                    glEnable(GL_STENCIL_TEST);
-
-                    camnode->render();
-
-                    for (u32 i = 0; i < bloomsize; i++)
-                    {
-                        scene::ISceneNode * const cur = blooms[i].node;
-
-                        // Quick box-based culling
-                        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-                        if (!nodebox.intersectsWithBox(cambox))
-                            continue;
-
-                        bloomcb->setPower(blooms[i].power);
-
-                        cur->render();
-                    }
-
-                    // Second pass for transparents. No-op for solids.
-                    irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_TRANSPARENT);
-                    for (u32 i = 0; i < bloomsize; i++)
-                    {
-                        scene::ISceneNode * const cur = blooms[i].node;
-
-                        // Quick box-based culling
-                        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-                        if (!nodebox.intersectsWithBox(cambox))
-                            continue;
-
-                        bloomcb->setPower(blooms[i].power);
-
-                        cur->render();
-                    }
-
-                    overridemat.Enabled = 0;
-                    overridemat.EnablePasses = 0;
-
-                    // Ok, we have the stencil; now use it to blit from color to bloom tex
-                    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-                    glStencilFunc(GL_EQUAL, 1, ~0);
-                    m_material.MaterialType = EMT_SOLID;
-                    m_material.setTexture(0, irr_driver->getRTT(RTT_COLOR));
-
-                    // Just in case.
-                    glColorMask(1, 1, 1, 0);
-                    drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), false, false);
-
-                    m_material.ColorMask = ECP_RGB;
-                    drawQuad(cam, m_material);
-                    m_material.ColorMask = ECP_ALL;
-
-                    glColorMask(1, 1, 1, 1);
-                    glDisable(GL_STENCIL_TEST);
-                } // end forced bloom
 
                 // To half
                 drv->setRenderTarget(irr_driver->getRTT(RTT_HALF1), true, false);
