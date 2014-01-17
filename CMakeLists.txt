@@ -36,9 +36,19 @@ set(STK_INSTALL_BINARY_DIR "bin" CACHE
 set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
+INCLUDE (FindPkgConfig)
+
 # Build the Bullet physics library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
+pkg_search_module(BULLET bullet)
+if(NOT BULLET_FOUND)
+    message("Using bundled bullet libs")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
+    set(BULLET_LIBRARIES "bulletdynamics;bulletcollision;bulletmath")
+else(NOT BULLET_FOUND)
+    message("Using system bullet libs")
+    include_directories(${BULLET_INCLUDE_DIRS})
+endif(NOT BULLET_FOUND)
 
 # Build the ENet UDP network library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
@@ -227,9 +237,7 @@ endif()
 
 # Common library dependencies
 target_link_libraries(supertuxkart
-    bulletdynamics
-    bulletcollision
-    bulletmath
+    ${BULLET_LIBRARIES}
     enet
     stkirrlicht
     ${CURL_LIBRARIES}
