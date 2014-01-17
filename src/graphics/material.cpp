@@ -764,7 +764,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         {
 
 			if (mb->getVertexType() != video::EVT_TANGENTS)
-				Log::fatal("material", "Requiring normal map without tangent enabled mesh");
+				Log::error("material", "Requiring normal map without tangent enabled mesh");
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             if (m_is_heightmap)
             {
