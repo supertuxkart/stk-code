@@ -632,6 +632,8 @@ void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, IT
 	const SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 	if (!LightBlendShader::Program)
 		LightBlendShader::init();
+	glStencilFunc(GL_EQUAL, 1, ~0);
+	glEnable(GL_STENCIL_TEST);
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	if (debug)
@@ -664,6 +666,7 @@ void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, IT
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+	glDisable(GL_STENCIL_TEST);
 }
 
 

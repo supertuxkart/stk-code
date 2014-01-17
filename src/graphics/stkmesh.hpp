@@ -9,7 +9,8 @@
 #include <vector>
 
 struct GLMesh {
-	GLuint vao;
+	GLuint vao_first_pass;
+	GLuint vao_second_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
 	GLuint textures;

@@ -61,6 +61,7 @@ GlowNode::~GlowNode()
 
 void GlowNode::render()
 {
+    return;
     IVideoDriver * const drv = irr_driver->getVideoDriver();
     drv->setTransform(ETS_WORLD, AbsoluteTransformation);
     drv->setMaterial(mat);

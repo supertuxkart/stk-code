@@ -1037,16 +1037,11 @@ void FileManager::checkAndCreateDirForAddons(const std::string &dir)
 }   // checkAndCreateDirForAddons
 
 // ----------------------------------------------------------------------------
-/** Removes the specified file.
- *  \return True if successful, or false if the file is not a regular file or
- *           can not be removed.
+/** Removes the specified file, returns true if successful, or false
+ *  if the file is not a regular file or can not be removed.
  */
 bool FileManager::removeFile(const std::string &name) const
 {
-    // If the file does not exists, everything is fine
-    if(!fileExists(name))
-       return true;
-
     struct stat mystat;
     if(stat(name.c_str(), &mystat) < 0) return false;
     if( S_ISREG(mystat.st_mode))

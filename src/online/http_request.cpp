@@ -227,14 +227,20 @@ namespace Online
                     Log::info("HTTPRequest", "Download successful.");
                 // The behaviour of rename is unspecified if the target
                 // file should already exist - so remove it.
-                file_manager->removeFile(m_filename);
+                bool ok = file_manager->removeFile(m_filename);
+                if(!ok)
+                {
+                    Log::error("addons",
+                               "Could not removed existing addons.xml file.");
+                    m_curl_code = CURLE_WRITE_ERROR;
+                }
                 int ret = rename((m_filename+".part").c_str(), 
                                  m_filename.c_str()           );
                 // In case of an error, set the status to indicate this
                 if(ret!=0)
                 {
-                    if(UserConfigParams::logAddons())
-                        Log::error("addons", "Could not rename downloaded file!");
+                    Log::error("addons",
+                               "Could not rename downloaded addons.xml file!");
                     m_curl_code = CURLE_WRITE_ERROR;
                 }
             }   // m_curl_code ==CURLE_OK
