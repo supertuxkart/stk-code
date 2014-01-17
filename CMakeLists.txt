@@ -48,6 +48,11 @@ if(NOT BULLET_FOUND)
 else(NOT BULLET_FOUND)
     message("Using system bullet libs")
     include_directories(${BULLET_INCLUDE_DIRS})
+    if(BULLET_VERSION GREATER 2.80)
+        message("We must apply patch for new bullet")
+        execute_process(COMMAND patch -p1 -d ${PROJECT_SOURCE_DIR} -i
+                                      ${PROJECT_SOURCE_DIR}/patches/0001-btKartRaycast.cpp-fix-usage-with-new-bullet.patch)
+    endif(BULLET_VERSION GREATER 2.80)
 endif(NOT BULLET_FOUND)
 
 # Build the ENet UDP network library
