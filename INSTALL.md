@@ -21,25 +21,29 @@ First, make sure that you have the following packages installed:
 
 Ubuntu command:
 
-`sudo apt-get install autoconf automake build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev`
+```
+sudo apt-get install autoconf automake build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev \
+libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
+```
   
 Unpack the files from the tarball like this:
 
-`tar xzf supertuxkart-*.tar.gz
-cd supertuxkart-*`
+```
+tar xzf supertuxkart-*.tar.gz
+cd supertuxkart-*
+```
 
 where `*` is the version of SuperTuxkart you downloaded - eg `0.8.0`. Then:
 
 
 Compile SuperTuxKart:
 
-`mkdir cmake_build`
-
-`cd cmake_build`
-
-`cmake ..`
-
-`make VERBOSE=1 -j2`
+```
+mkdir cmake_build
+cd cmake_build
+cmake ..
+make VERBOSE=1 -j2
+```
 
 To create a debug version of STK, use:
 
