@@ -171,16 +171,16 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
-            msg = _("You completed the easy challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]);
+            msg = _("You completed the easy challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         case RaceManager::DIFFICULTY_MEDIUM:
-            msg = _("You completed the intermediate challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]);
+            msg = _("You completed the intermediate challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         case RaceManager::DIFFICULTY_HARD:
-            msg = _("You completed the difficult challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+            msg = _("You completed the difficult challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         default:
             assert(false);

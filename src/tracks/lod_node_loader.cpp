@@ -92,7 +92,7 @@ LODNode* LodNodeLoader::instanciate(const XMLNode* node, scene::ISceneNode* pare
                 continue;
             }
 
-            //if (group[m].m_tangent && a_mesh->getMeshBuffer(0)->getVertexType() != video::EVT_TANGENTS)
+            if (group[m].m_tangent && a_mesh->getMeshBuffer(0)->getVertexType() != video::EVT_TANGENTS)
             {
                 scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
                 scene::IMesh* m2 = manip->createMeshWithTangents(a_mesh);
