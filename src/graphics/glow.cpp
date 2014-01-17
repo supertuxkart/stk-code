@@ -61,18 +61,6 @@ GlowNode::~GlowNode()
 
 void GlowNode::render()
 {
-    return;
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setTransform(ETS_WORLD, AbsoluteTransformation);
-    drv->setMaterial(mat);
-
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    glStencilFunc(GL_EQUAL, 0, ~0);
-    glEnable(GL_STENCIL_TEST);
-
-    drv->drawMeshBuffer(sphere->getMeshBuffer(0));
-
-    glDisable(GL_STENCIL_TEST);
 }
 
 void GlowNode::OnRegisterSceneNode()

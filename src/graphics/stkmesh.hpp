@@ -11,6 +11,7 @@
 struct GLMesh {
 	GLuint vao_first_pass;
 	GLuint vao_second_pass;
+	GLuint vao_glow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
 	GLuint textures;
@@ -24,6 +25,7 @@ class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
 	std::vector<GLMesh> GLmeshes;
+	void STKMesh::draw(const GLMesh &mesh);
 public:
 	STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
 		const irr::core::vector3df& position = irr::core::vector3df(0,0,0),

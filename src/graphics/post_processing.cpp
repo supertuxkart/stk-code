@@ -425,6 +425,22 @@ namespace PassThroughShader
 	}
 }
 
+namespace GlowShader
+{
+	GLuint Program = 0;
+	GLuint uniform_tex;
+
+	GLuint vao = 0;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/glow.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		vao = createVAO(Program);
+	}
+}
+
 namespace SSAOShader
 {
 	GLuint Program = 0;
@@ -762,6 +778,27 @@ void PostProcessing::renderPassThrough(ITexture *tex)
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
 	glUniform1i(PassThroughShader::uniform_texture, 0);
+
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_BLEND);
+}
+
+void PostProcessing::renderGlow(ITexture *tex)
+{
+	if (!GlowShader::Program)
+		GlowShader::init();
+	glDisable(GL_DEPTH_TEST);
+
+	glUseProgram(GlowShader::Program);
+	glBindVertexArray(GlowShader::vao);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
+	glUniform1i(GlowShader::uniform_tex, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
