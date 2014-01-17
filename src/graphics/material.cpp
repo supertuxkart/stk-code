@@ -762,6 +762,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (irr_driver->isGLSL())
         {
+
+			if (mb->getVertexType() != video::EVT_TANGENTS)
+				Log::fatal("material", "Requiring normal map without tangent enabled mesh");
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             if (m_is_heightmap)
             {
