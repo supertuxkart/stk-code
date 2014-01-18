@@ -322,7 +322,7 @@ void PlayerController::update(float dt)
 
     if (World::getWorld()->isStartPhase())
     {
-        if (m_controls->m_accel || m_controls->m_brake ||
+        /*if (m_controls->m_accel || m_controls->m_brake ||
             m_controls->m_fire  || m_controls->m_nitro)
         {
             // Only give penalty time in SET_PHASE.
@@ -342,12 +342,28 @@ void PlayerController::update(float dt)
                 m_bzzt_sound->play();
 
                 m_penalty_time = stk_config->m_penalty_time;
-            }   // if penalty_time = 0
+            }   // if penalty_time = 0 
 
             m_controls->m_brake = false;
             m_controls->m_accel = 0.0f;
-        }   // if key pressed
+        }   // if key pressed*/
 
+        if(World::getWorld()->getPhase() != WorldStatus::GO_PHASE)
+        {
+            // Only rev while tapping m_accel, once the player lets go we start cooling down.
+            // TODO: Floating point arithmetic is a big no-no, used else-where too.
+            // Temporarily use penalty time for rev accumulator to save some space in class object.
+            if(m_prev_accel) m_penalty_time += float(m_prev_accel / 1000);
+            else m_penalty_time -= dt;
+
+            // Burn out, happens when accel was tapped to many times. TODO: Play burnout sound, else engine sound.
+            if(m_penalty_time >= 100.0f) m_penalty_time = 0.0f;
+        }
+        else m_penalty_time = 0.0f; // This is where we use the final rev value for boost and such.
+
+        m_controls->m_brake = false;
+        m_controls->m_accel = 0.0f;
+        m_prev_accel = 0;
         return;
     }   // if isStartPhase
 
