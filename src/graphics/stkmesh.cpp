@@ -166,8 +166,7 @@ STKMesh::~STKMesh()
 	}
 }
 
-static
-void drawFirstPass(const GLMesh &mesh)
+void STKMesh::drawFirstPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 
@@ -180,10 +179,10 @@ void drawFirstPass(const GLMesh &mesh)
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+  ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-  core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+  TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
   TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
   TransposeInverseModelView.makeInverse();
   TransposeInverseModelView = TransposeInverseModelView.getTransposed();
@@ -199,8 +198,7 @@ void drawFirstPass(const GLMesh &mesh)
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
-static
-void drawNormalPass(const GLMesh &mesh)
+void STKMesh::drawNormalPass(const GLMesh &mesh)
 {
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 
@@ -213,10 +211,10 @@ void drawNormalPass(const GLMesh &mesh)
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
-	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+	ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-	core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 	TransposeInverseModelView.makeInverse();
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
@@ -240,8 +238,7 @@ void drawNormalPass(const GLMesh &mesh)
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
-static
-void drawSphereMap(const GLMesh &mesh)
+void STKMesh::drawSphereMap(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
@@ -252,14 +249,6 @@ void drawSphereMap(const GLMesh &mesh)
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
-
-  core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-  core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-  TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-  TransposeInverseModelView.makeInverse();
-  TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
@@ -278,8 +267,7 @@ void drawSphereMap(const GLMesh &mesh)
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
-static
-void drawSplatting(const GLMesh &mesh)
+void STKMesh::drawSplatting(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
@@ -290,10 +278,6 @@ void drawSplatting(const GLMesh &mesh)
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
-
-  core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
   // Texlayout
   glActiveTexture(GL_TEXTURE0);
@@ -356,8 +340,7 @@ void drawSplatting(const GLMesh &mesh)
 }
 
 
-static
-void drawSecondPass(const GLMesh &mesh)
+void STKMesh::drawSecondPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
@@ -368,10 +351,6 @@ void drawSecondPass(const GLMesh &mesh)
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
-
-  core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
@@ -397,8 +376,7 @@ void drawSecondPass(const GLMesh &mesh)
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
-static
-void drawGlow(const GLMesh &mesh, float r, float g, float b)
+void STKMesh::drawGlow(const GLMesh &mesh, float r, float g, float b)
 {
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_ALPHA_TEST);
@@ -407,10 +385,6 @@ void drawGlow(const GLMesh &mesh, float r, float g, float b)
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
-
-	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
 	glUseProgram(MeshShader::ColorizeShader::Program);
 	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
