@@ -587,7 +587,7 @@ void drawGlow(const GLMesh &mesh, float r, float g, float b)
 	glUseProgram(ColorizeShader::Program);
 	ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
 
-	glBindVertexArray(mesh.vao_second_pass);
+	glBindVertexArray(mesh.vao_glow_pass);
 	glDrawElements(ptype, count, itype, 0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
