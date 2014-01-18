@@ -74,14 +74,11 @@ namespace StringUtils
     }   // toString template
 
     // ------------------------------------------------------------------------
-    /** Specialisiation for bools to return 'true' or 'false'/
-     */
+    /** Specialisiation for bools to return 'true' or 'false'*/
     inline std::string toString(bool &b)
     {
-        Log::info("string_utils","toString(bool) called");
         return (b ? "true" : "false");
     }    // toString(bool)
-
 
     // ------------------------------------------------------------------------
     template <class T>
