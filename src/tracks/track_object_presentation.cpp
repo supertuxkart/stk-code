@@ -41,6 +41,7 @@
 #include <IBillboardSceneNode.h>
 #include <IParticleSystemSceneNode.h>
 #include <ILightSceneNode.h>
+#include <IMeshManipulator.h>
 
 // ----------------------------------------------------------------------------
 
@@ -177,6 +178,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         m_is_in_skybox = true;
     }
 
+    bool tangent = false;
+    xml_node.get("tangents", &tangent);
+    
     //std::string full_path =
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
@@ -191,6 +195,13 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     else
     {
         m_mesh = irr_driver->getMesh(model_name);
+
+        if (tangent)
+        {
+            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+            // TODO: perhaps the original mesh leaks here?
+            m_mesh = manip->createMeshWithTangents(m_mesh);
+       }
     }
 
     if (!m_mesh)
