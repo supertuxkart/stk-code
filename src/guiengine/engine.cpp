@@ -837,7 +837,7 @@ namespace GUIEngine
             {
                 widget->update(dt);
             }
-            DialogQueue::get()->update();
+            if (state == GUIEngine::MENU) DialogQueue::get()->update();
         }
 
         // Hack : on the first frame, irrlicht processes all events that have been queued
