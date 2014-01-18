@@ -97,7 +97,7 @@ void Shaders::loadShaders()
     m_shaders[ES_WATER_SURFACE] = glsl(dir + "water.vert", dir + "pass.frag",
                                   m_callbacks[ES_WATER]);
 
-    m_shaders[ES_SPHERE_MAP] = glslmat(dir + "objectpass_rimlit.vert", dir + "objectpass_spheremap.frag",
+    m_shaders[ES_SPHERE_MAP] = glslmat(dir + "objectpass.vert", dir + "objectpass_spheremap.frag",
                                        m_callbacks[ES_OBJECTPASS], EMT_SOLID);
 
     m_shaders[ES_GRASS] = glslmat(dir + "grass.vert", dir + "grass.frag",
