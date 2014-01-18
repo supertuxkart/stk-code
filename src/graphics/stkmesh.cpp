@@ -3,9 +3,10 @@
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
 #include "config/user_config.hpp"
+#include "graphics/callbacks.hpp"
 
 static
-GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_normal, size_t stride)
+GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, size_t stride)
 {
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -16,11 +17,28 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 		glEnableVertexAttribArray(attrib_texcoord);
 	if ((GLint)attrib_normal != -1)
 		glEnableVertexAttribArray(attrib_normal);
+	if ((GLint)attrib_tangent != -1)
+		glEnableVertexAttribArray(attrib_tangent);
+	if ((GLint)attrib_bitangent != -1)
+		glEnableVertexAttribArray(attrib_bitangent);
 	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
 	if ((GLint)attrib_texcoord != -1)
 		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
 	if ((GLint)attrib_normal != -1)
 		glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
+	if ((GLint)attrib_tangent != -1)
+	{
+		assert(stride >= 48);
+		glVertexAttribPointer(attrib_tangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)36);
+	}
+		
+	if ((GLint)attrib_bitangent != -1)
+	{
+		printf("stride of is %d\n", stride);
+		assert(stride >= 60);
+		glVertexAttribPointer(attrib_bitangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)48);
+	}
+		
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
 	glBindVertexArray(0);
 	return vao;
@@ -80,6 +98,55 @@ namespace ObjectPass2Shader
 		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+}
+
+namespace NormalMapShader
+{
+	GLuint Program;
+	GLuint attrib_position, attrib_texcoord, attrib_tangent, attrib_bitangent;
+	GLuint uniform_MVP, uniform_TIMV, uniform_normalMap;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/normalmap.vert").c_str(), file_manager->getAsset("shaders/normalmap.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_tangent = glGetAttribLocation(Program, "Tangent");
+		attrib_bitangent = glGetAttribLocation(Program, "Bitangent");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+		uniform_normalMap = glGetUniformLocation(Program, "normalMap");
+	}
+
+	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+		glUniform1i(uniform_normalMap, TU_normalMap);
+	}
+}
+
+namespace ColorizeShader
+{
+	GLuint Program;
+	GLuint attrib_position;
+	GLuint uniform_MVP, uniform_col;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/colorize.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_col = glGetUniformLocation(Program, "col");
+	}
+
+	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform3f(uniform_col, r, g, b);
 	}
 }
 
@@ -156,9 +223,14 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	}
 	ITexture *tex = mb->getMaterial().getTexture(0);
 	if (tex)
-		result.textures = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+		result.textures[0] = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
 	else
-		result.textures = 0;
+		result.textures[0] = 0;
+	tex = mb->getMaterial().getTexture(1);
+	if (tex)
+		result.textures[1] = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+	else
+		result.textures[1] = 0;
 	return result;
 }
 
@@ -178,6 +250,8 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 		return;
 	ObjectPass1Shader::init();
 	ObjectPass2Shader::init();
+	NormalMapShader::init();
+	ColorizeShader::init();
 }
 
 STKMesh::~STKMesh()
@@ -187,7 +261,7 @@ STKMesh::~STKMesh()
 }
 
 static
-void drawFirstPass(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
+void drawFirstPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 
@@ -220,7 +294,48 @@ void drawFirstPass(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 }
 
 static
-void drawSecondPass(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
+void drawNormalPass(const GLMesh &mesh)
+{
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+
+	glStencilFunc(GL_ALWAYS, 0, ~0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_TRUE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	TransposeInverseModelView.makeInverse();
+	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+	assert(mesh.textures[1]);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh.textures[1]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glUseProgram(NormalMapShader::Program);
+	NormalMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+
+	glBindVertexArray(mesh.vao_first_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glStencilFunc(GL_ALWAYS, 1, ~0);
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
+}
+
+static
+void drawSecondPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
@@ -237,7 +352,7 @@ void drawSecondPass(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
   ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, mesh.textures);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -261,14 +376,52 @@ void drawSecondPass(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 }
 
 static
-void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
+void drawGlow(const GLMesh &mesh, float r, float g, float b)
 {
-	if (!mesh.textures)
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+
+	glUseProgram(ColorizeShader::Program);
+	ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
+
+	glBindVertexArray(mesh.vao_second_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
+{
+	if (!mesh.textures[0])
 		return;
-	if (irr_driver->getPhase() == 0)
-		drawFirstPass(mesh, type);
-	else
-		drawSecondPass(mesh, type);
+	switch (irr_driver->getPhase())
+	{
+	case 0:
+		if (type == irr_driver->getShader(ES_OBJECTPASS))
+			drawFirstPass(mesh);
+		else if (type == irr_driver->getShader(ES_NORMAL_MAP))
+			drawNormalPass(mesh);
+		break;
+	case 1:
+		drawSecondPass(mesh);
+		break;
+	case 2:
+	{
+		ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
+		drawGlow(mesh, cb->getRed(), cb->getGreen(), cb->getBlue());
+		break;
+	}
+	}
+		
 
 	video::SMaterial material;
 	material.MaterialType = irr_driver->getShader(ES_RAIN);
@@ -283,6 +436,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 {
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
 		return true;
+	if (type == irr_driver->getShader(ES_NORMAL_MAP))
+		return true;
 	return false;
 }
 
@@ -290,13 +445,20 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	if (mesh.vao_first_pass)
 		return;
-
-	mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-		ObjectPass1Shader::attrib_position, -1, ObjectPass1Shader::attrib_normal,
-		mesh.Stride);
+	if (type == irr_driver->getShader(ES_OBJECTPASS))
+	{
+		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			ObjectPass1Shader::attrib_position, -1, ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+	}
+	else if (type == irr_driver->getShader(ES_NORMAL_MAP))
+	{
+		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			NormalMapShader::attrib_position, NormalMapShader::attrib_texcoord, -1, NormalMapShader::attrib_tangent, NormalMapShader::attrib_bitangent, mesh.Stride);
+	}
 	mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-		ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1,
-		mesh.Stride);
+		ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1, -1, -1,	mesh.Stride);
+
+	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, ColorizeShader::attrib_position, -1, -1, -1, -1, mesh.Stride);
 }
 
 void STKMesh::render()
@@ -319,7 +481,7 @@ void STKMesh::render()
 		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
 		if (mb)
 		{
-			const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
+			const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];				
 
 			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
 			bool transparent = (rnd && rnd->isTransparent());

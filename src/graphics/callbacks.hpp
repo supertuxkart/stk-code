@@ -317,6 +317,21 @@ public:
         m_color[2] = b;
     }
 
+	float getRed() const
+	{
+		return m_color[0];
+	}
+
+	float getGreen() const
+	{
+		return m_color[1];
+	}
+
+	float getBlue() const
+	{
+		return m_color[2];
+	}
+
 private:
     float m_color[3];
 };

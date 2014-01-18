@@ -30,7 +30,7 @@ void main(void)
 	vec3 norm = normalize(cur.xyz * vec3(2.0) - vec3(1.0));
 	// Workaround for nvidia and skyboxes
 	float len = dot(vec3(1.0), abs(cur.xyz));
-	if (len < 0.2 || curdepth > 0.99) discard;
+	if (len < 0.2 || curdepth > 0.999) discard;
 	// Make a tangent as random as possible
 	vec3 randvect;
 	randvect.x = rand(uv);

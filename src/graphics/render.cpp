@@ -213,12 +213,6 @@ void IrrDriver::renderGLSL(float dt)
         // Used to cull glowing items & lights
         const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
 
-        // Render anything glowing.
-        if (!m_mipviz && !m_wireframe)
-        {
-            //renderGlow(overridemat, glows, cambox, cam);
-        } // end glow
-
         // Shadows
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows &&
             World::getWorld()->getTrack()->hasShadows())
@@ -235,6 +229,13 @@ void IrrDriver::renderGLSL(float dt)
         glEnable(GL_STENCIL_TEST);
         m_scene_manager->drawAll(m_renderpass);
         glDisable(GL_STENCIL_TEST);
+
+		// Render anything glowing.
+		if (!m_mipviz && !m_wireframe)
+		{
+			irr_driver->setPhase(2);
+			renderGlow(overridemat, glows, cambox, cam);
+		} // end glow
 
         if (!bgnodes)
         {
@@ -665,10 +666,13 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     // Blur it
 	m_post_processing->renderGaussian6Blur(m_rtts->getRTT(RTT_QUARTER1), m_rtts->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
 
-    // The glows will be rendered in the transparent phase
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA);
+	glStencilFunc(GL_EQUAL, 0, ~0);
+	glEnable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	m_post_processing->renderGlow(m_rtts->getRTT(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
 }
 
