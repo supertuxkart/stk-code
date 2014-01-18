@@ -19,20 +19,23 @@
 #include "graphics/mesh_tools.hpp"
 #include <IMesh.h>
 #include <IMeshBuffer.h>
+#include "utils/log.hpp"
 
 void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
 
     Vec3 extend;
     *min = Vec3( 999999.9f);
     *max = Vec3(-999999.9f);
-    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++) {
+    for(unsigned int i=0; i<mesh->getMeshBufferCount(); i++)
+    {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
 
         if (mb->getVertexType() == video::EVT_STANDARD)
         {
             u16 *mbIndices = mb->getIndices();
             video::S3DVertex* mbVertices=(irr::video::S3DVertex*)mb->getVertices();
-            for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
+            for (unsigned int j=0; j<mb->getIndexCount(); j+=1)
+            {
                 int indx=mbIndices[j];
                 Vec3 c(mbVertices[indx].Pos.X,
                        mbVertices[indx].Pos.Y,
@@ -45,7 +48,22 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
         {
             u16 *mbIndices = mb->getIndices();
             video::S3DVertex2TCoords* mbVertices=(irr::video::S3DVertex2TCoords*)mb->getVertices();
-            for(unsigned int j=0; j<mb->getIndexCount(); j+=1) {
+            for (unsigned int j=0; j<mb->getIndexCount(); j+=1)
+            {
+                int indx=mbIndices[j];
+                Vec3 c(mbVertices[indx].Pos.X,
+                       mbVertices[indx].Pos.Y,
+                       mbVertices[indx].Pos.Z  );
+                min->min(c);
+                max->max(c);
+            }   // for j
+        }
+        else if (mb->getVertexType() == video::EVT_TANGENTS)
+        {
+            u16 *mbIndices = mb->getIndices();
+            video::S3DVertexTangents* mbVertices=(irr::video::S3DVertexTangents*)mb->getVertices();
+            for (unsigned int j=0; j<mb->getIndexCount(); j+=1)
+            {
                 int indx=mbIndices[j];
                 Vec3 c(mbVertices[indx].Pos.X,
                        mbVertices[indx].Pos.Y,
@@ -56,8 +74,8 @@ void MeshTools::minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max) {
         }
         else
         {
-            fprintf(stderr, "Tools::minMax3D: Ignoring type '%d'!\n",
-                    mb->getVertexType());
+            Log::warn("Tools", "minMax3D: Ignoring type '%d'!\n",
+                      mb->getVertexType());
         }
     }  // for i<getMeshBufferCount
 }   // minMax3D
