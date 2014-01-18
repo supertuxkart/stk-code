@@ -28,14 +28,15 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 		glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
 	if ((GLint)attrib_tangent != -1)
 	{
-		assert(stride >= 48);
+		if (stride < 48)
+			Log::error("material", "Tangents not present in VBO");
 		glVertexAttribPointer(attrib_tangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)36);
 	}
 		
 	if ((GLint)attrib_bitangent != -1)
 	{
-		printf("stride of is %d\n", stride);
-		assert(stride >= 60);
+		if (stride < 60)
+			Log::error("material", "Bitangents not present in VBO");
 		glVertexAttribPointer(attrib_bitangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)48);
 	}
 		
