@@ -129,6 +129,31 @@ namespace NormalMapShader
 	}
 }
 
+namespace SphereMapShader
+{
+	GLuint Program;
+	GLuint attrib_position, attrib_normal;
+	GLuint uniform_MVP, uniform_TIMV, uniform_tex;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_normal = glGetAttribLocation(Program, "Normal");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+	}
+
+	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+		glUniform1i(uniform_tex, TU_tex);
+	}
+}
+
 namespace ColorizeShader
 {
 	GLuint Program;
@@ -253,6 +278,7 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 	ObjectPass2Shader::init();
 	NormalMapShader::init();
 	ColorizeShader::init();
+	SphereMapShader::init();
 }
 
 STKMesh::~STKMesh()
@@ -268,7 +294,7 @@ void drawFirstPass(const GLMesh &mesh)
 
   glStencilFunc(GL_ALWAYS, 0, ~0);
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_ALPHA_TEST);
+  glDisable(GL_ALPHA_TEST);
   glDepthMask(GL_TRUE);
   glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
@@ -336,12 +362,50 @@ void drawNormalPass(const GLMesh &mesh)
 }
 
 static
+void drawSphereMap(const GLMesh &mesh)
+{
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_ALPHA_TEST);
+  glDepthMask(GL_FALSE);
+  glDisable(GL_BLEND);
+  GLenum ptype = mesh.PrimitiveType;
+  GLenum itype = mesh.IndexType;
+  size_t count = mesh.IndexCount;
+
+  core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+  core::matrix4 TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+  TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+  TransposeInverseModelView.makeInverse();
+  TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  glUseProgram(SphereMapShader::Program);
+  SphereMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+
+  glBindVertexArray(mesh.vao_second_pass);
+  glDrawElements(ptype, count, itype, 0);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+}
+
+static
 void drawSecondPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
   glEnable(GL_DEPTH_TEST);
-  glEnable(GL_ALPHA_TEST);
+  glDisable(GL_ALPHA_TEST);
   glDepthMask(GL_FALSE);
   glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
@@ -380,7 +444,7 @@ static
 void drawGlow(const GLMesh &mesh, float r, float g, float b)
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_ALPHA_TEST);
+	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_BLEND);
 	GLenum ptype = mesh.PrimitiveType;
@@ -407,13 +471,16 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	switch (irr_driver->getPhase())
 	{
 	case 0:
-		if (type == irr_driver->getShader(ES_OBJECTPASS))
-			drawFirstPass(mesh);
-		else if (type == irr_driver->getShader(ES_NORMAL_MAP))
+		if (type == irr_driver->getShader(ES_NORMAL_MAP))
 			drawNormalPass(mesh);
+		else
+			drawFirstPass(mesh);
 		break;
 	case 1:
-		drawSecondPass(mesh);
+		if (type == irr_driver->getShader(ES_SPHERE_MAP))
+			drawSphereMap(mesh);
+		else
+			drawSecondPass(mesh);
 		break;
 	case 2:
 	{
@@ -439,6 +506,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 		return true;
+	if (type == irr_driver->getShader(ES_SPHERE_MAP))
+		return true;
 	return false;
 }
 
@@ -446,19 +515,27 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	if (mesh.vao_first_pass)
 		return;
-	if (type == irr_driver->getShader(ES_OBJECTPASS))
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectPass1Shader::attrib_position, -1, ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
-	}
-	else if (type == irr_driver->getShader(ES_NORMAL_MAP))
+	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 			NormalMapShader::attrib_position, NormalMapShader::attrib_texcoord, -1, NormalMapShader::attrib_tangent, NormalMapShader::attrib_bitangent, mesh.Stride);
 	}
-	mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-		ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1, -1, -1,	mesh.Stride);
+	else
+	{
+		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			ObjectPass1Shader::attrib_position, -1, ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+	}
 
+	if (type == irr_driver->getShader(ES_SPHERE_MAP))
+	{
+		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			SphereMapShader::attrib_position, -1, SphereMapShader::attrib_normal, -1, -1,	mesh.Stride);
+	}
+	else
+	{
+		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1, -1, -1,	mesh.Stride);
+	}
 	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, ColorizeShader::attrib_position, -1, -1, -1, -1, mesh.Stride);
 }
 
