@@ -6,7 +6,7 @@
 #include "graphics/callbacks.hpp"
 
 static
-GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, size_t stride)
+GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, size_t stride)
 {
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -15,6 +15,8 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	glEnableVertexAttribArray(attrib_position);
 	if ((GLint)attrib_texcoord != -1)
 		glEnableVertexAttribArray(attrib_texcoord);
+	if ((GLint)attrib_second_texcoord != -1)
+		glEnableVertexAttribArray(attrib_second_texcoord);
 	if ((GLint)attrib_normal != -1)
 		glEnableVertexAttribArray(attrib_normal);
 	if ((GLint)attrib_tangent != -1)
@@ -24,6 +26,12 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
 	if ((GLint)attrib_texcoord != -1)
 		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
+	if ((GLint)attrib_second_texcoord != 1)
+	{
+		if (stride < 44)
+			Log::error("material", "Second texcoords not present in VBO");
+		glVertexAttribPointer(attrib_second_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 36);
+	}
 	if ((GLint)attrib_normal != -1)
 		glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
 	if ((GLint)attrib_tangent != -1)
@@ -154,6 +162,49 @@ namespace SphereMapShader
 	}
 }
 
+namespace SplattingShader
+{
+	GLuint Program;
+	GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
+	GLuint uniform_MVP, uniform_tex_layout, uniform_tex_detail0, uniform_tex_detail1, uniform_tex_detail2, uniform_tex_detail3,  uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+
+	void init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/splatting.vert").c_str(), file_manager->getAsset("shaders/splatting.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_tex_layout = glGetUniformLocation(Program, "tex_layout");
+		uniform_tex_detail0 = glGetUniformLocation(Program, "tex_detail0");
+		uniform_tex_detail1 = glGetUniformLocation(Program, "tex_detail1");
+		uniform_tex_detail2 = glGetUniformLocation(Program, "tex_detail2");
+		uniform_tex_detail3 = glGetUniformLocation(Program, "tex_detail3");
+		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex_layout, unsigned TU_tex_detail0, unsigned TU_tex_detail1, unsigned TU_tex_detail2, unsigned TU_tex_detail3, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_tex_layout, TU_tex_layout);
+		glUniform1i(uniform_tex_detail0, TU_tex_detail0);
+		glUniform1i(uniform_tex_detail1, TU_tex_detail1);
+		glUniform1i(uniform_tex_detail2, TU_tex_detail2);
+		glUniform1i(uniform_tex_detail3, TU_tex_detail3);
+		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
+		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+}
+
 namespace ColorizeShader
 {
 	GLuint Program;
@@ -247,16 +298,15 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	case scene::EPT_QUADS:
 		assert(0 && "Unsupported primitive type");
 	}
-	ITexture *tex = mb->getMaterial().getTexture(0);
-	if (tex)
-		result.textures[0] = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
-	else
-		result.textures[0] = 0;
-	tex = mb->getMaterial().getTexture(1);
-	if (tex)
-		result.textures[1] = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
-	else
-		result.textures[1] = 0;
+	ITexture *tex;
+	for (unsigned i = 0; i < 6; i++)
+	{
+		tex = mb->getMaterial().getTexture(i);
+		if (tex)
+			result.textures[i] = static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+		else
+			result.textures[i] = 0;
+	}
 	return result;
 }
 
@@ -279,6 +329,7 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 	NormalMapShader::init();
 	ColorizeShader::init();
 	SphereMapShader::init();
+	SplattingShader::init();
 }
 
 STKMesh::~STKMesh()
@@ -400,6 +451,84 @@ void drawSphereMap(const GLMesh &mesh)
 }
 
 static
+void drawSplatting(const GLMesh &mesh)
+{
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_ALPHA_TEST);
+  glDepthMask(GL_FALSE);
+  glDisable(GL_BLEND);
+  GLenum ptype = mesh.PrimitiveType;
+  GLenum itype = mesh.IndexType;
+  size_t count = mesh.IndexCount;
+
+  core::matrix4 ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+
+  // Texlayout
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[1]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  //Tex detail0
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[2]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  //Tex detail1
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[3]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  //Tex detail2
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[4]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  //Tex detail3
+  glActiveTexture(GL_TEXTURE4);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[5]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  // Diffuse
+  glActiveTexture(GL_TEXTURE5);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName());
+  // Specular
+  glActiveTexture(GL_TEXTURE6);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName());
+  // SSAO
+  glActiveTexture(GL_TEXTURE7);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName());
+
+  glUseProgram(SplattingShader::Program);
+  SplattingShader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3, 4, 5, 6, 7);
+
+  glBindVertexArray(mesh.vao_second_pass);
+  glDrawElements(ptype, count, itype, 0);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+}
+
+
+static
 void drawSecondPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
@@ -479,6 +608,8 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case 1:
 		if (type == irr_driver->getShader(ES_SPHERE_MAP))
 			drawSphereMap(mesh);
+		else if (type == irr_driver->getShader(ES_SPLATTING))
+			drawSplatting(mesh);
 		else
 			drawSecondPass(mesh);
 		break;
@@ -508,6 +639,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == irr_driver->getShader(ES_SPHERE_MAP))
 		return true;
+	if (type == irr_driver->getShader(ES_SPLATTING))
+		return true;
 	return false;
 }
 
@@ -518,25 +651,30 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			NormalMapShader::attrib_position, NormalMapShader::attrib_texcoord, -1, NormalMapShader::attrib_tangent, NormalMapShader::attrib_bitangent, mesh.Stride);
+			NormalMapShader::attrib_position, NormalMapShader::attrib_texcoord, -1, -1, NormalMapShader::attrib_tangent, NormalMapShader::attrib_bitangent, mesh.Stride);
 	}
 	else
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectPass1Shader::attrib_position, -1, ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+			ObjectPass1Shader::attrib_position, -1, -1, ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
 	}
 
 	if (type == irr_driver->getShader(ES_SPHERE_MAP))
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			SphereMapShader::attrib_position, -1, SphereMapShader::attrib_normal, -1, -1,	mesh.Stride);
+			SphereMapShader::attrib_position, -1, -1, SphereMapShader::attrib_normal, -1, -1,	mesh.Stride);
+	}
+	else if (type == irr_driver->getShader(ES_SPLATTING))
+	{
+		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			SplattingShader::attrib_position, SplattingShader::attrib_texcoord, SplattingShader::attrib_second_texcoord, -1, -1, -1,	mesh.Stride);
 	}
 	else
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1, -1, -1,	mesh.Stride);
+			ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, mesh.Stride);
 	}
-	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, ColorizeShader::attrib_position, -1, -1, -1, -1, mesh.Stride);
+	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, ColorizeShader::attrib_position, -1, -1, -1, -1, -1, mesh.Stride);
 }
 
 void STKMesh::render()

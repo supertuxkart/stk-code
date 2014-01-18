@@ -14,7 +14,7 @@ struct GLMesh {
 	GLuint vao_glow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
-	GLuint textures[2];
+	GLuint textures[6];
 	GLenum PrimitiveType;
 	GLenum IndexType;
 	size_t IndexCount;
