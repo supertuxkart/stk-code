@@ -334,8 +334,18 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 
 STKMesh::~STKMesh()
 {
-//	glDeleteBuffers(vertex_buffer.size(), vertex_buffer.data());
-//	glDeleteBuffers(index_buffer.size(), index_buffer.data());
+	for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
+	{
+		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+		if (!mb)
+			continue;
+		GLMesh mesh = GLmeshes[i];
+		glDeleteVertexArrays(1, &(mesh.vao_first_pass));
+		glDeleteVertexArrays(1, &(mesh.vao_second_pass));
+		glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
+		glDeleteBuffers(1, &(mesh.vertex_buffer));
+		glDeleteBuffers(1, &(mesh.index_buffer));
+	}
 }
 
 static
