@@ -20,7 +20,159 @@
 #include <IShaderConstantSetCallBack.h>
 #include <IMeshSceneNode.h>
 #include <vector>
+#include "graphics/glwrap.hpp"
 using namespace irr;
+
+namespace MeshShader
+{
+
+}
+
+namespace FullScreenShader
+{
+
+class BloomShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_texture, uniform_low;
+	static GLuint vao;
+
+	static void init();
+};
+
+class BloomBlendShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_texture, uniform_low;
+	static GLuint vao;
+
+	static void init();
+};
+
+class PPDisplaceShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_dtex, uniform_viz;
+	static GLuint vao;
+
+	static void init();
+};
+
+class ColorLevelShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_inlevel, uniform_outlevel;
+	static GLuint vao;
+
+	static void init();
+};
+
+class PointLightShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_ntex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_invproj, uniform_viewm;
+	static GLuint vao;
+
+	static void init();
+};
+
+class LightBlendShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_diffuse, uniform_specular, uniform_ambient_occlusion, uniform_specular_map, uniform_ambient;
+	static GLuint vao;
+
+	static void init();
+};
+
+class Gaussian6HBlurShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_pixel;
+	static GLuint vao;
+
+	static void init();
+};
+
+class Gaussian3HBlurShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_pixel;
+	static GLuint vao;
+
+	static void init();
+};
+
+class Gaussian6VBlurShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_pixel;
+	static GLuint vao;
+
+	static void init();
+};
+
+class Gaussian3VBlurShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_pixel;
+	static GLuint vao;
+
+	static void init();
+};
+
+class PassThroughShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_texture;
+	static GLuint vao;
+
+	static void init();
+};
+
+class GlowShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex;
+	static GLuint vao;
+
+	static void init();
+};
+
+class SSAOShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_normals_and_depth, uniform_invprojm, uniform_projm, uniform_samplePoints;
+	static GLuint vao;
+	static float SSAOSamples[64];
+	
+	static void init();
+};
+
+class FogShader
+{
+public:
+	static GLuint Program;
+	static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_campos, uniform_ipvmat;
+	static GLuint vao;
+
+	static void init();
+};
+
+}
 
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \

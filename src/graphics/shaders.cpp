@@ -65,6 +65,23 @@ Shaders::Shaders()
     loadShaders();
 }
 
+GLuint quad_vbo = 0;
+
+static void initQuadVBO()
+{
+	initGL();
+	const float quad_vertex[] = {
+		-1., -1., 0., 0., // UpperLeft
+		-1., 1., 0., 1., // LowerLeft
+		1., -1., 1., 0., // UpperRight
+		1., 1., 1., 1., // LowerRight
+	};
+	glGenBuffers(1, &quad_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -214,6 +231,23 @@ void Shaders::loadShaders()
         if(m_shaders[i] == -1)
             m_shaders[i] = saved_shaders[i];
     }
+
+	initGL();
+	initQuadVBO();
+	FullScreenShader::BloomBlendShader::init();
+	FullScreenShader::BloomShader::init();
+	FullScreenShader::ColorLevelShader::init();
+	FullScreenShader::FogShader::init();
+	FullScreenShader::Gaussian3HBlurShader::init();
+	FullScreenShader::Gaussian3VBlurShader::init();
+	FullScreenShader::Gaussian6HBlurShader::init();
+	FullScreenShader::Gaussian6VBlurShader::init();
+	FullScreenShader::GlowShader::init();
+	FullScreenShader::LightBlendShader::init();
+	FullScreenShader::PassThroughShader::init();
+	FullScreenShader::PointLightShader::init();
+	FullScreenShader::PPDisplaceShader::init();
+	FullScreenShader::SSAOShader::init();
 }
 
 Shaders::~Shaders()
@@ -240,4 +274,246 @@ void Shaders::check(const int num) const
         Log::fatal("shaders", "Shader %s failed to load. Update your drivers, if the issue "
                               "persists, report a bug to us.", shader_names[num] + 3);
     }
+}
+
+static GLuint createVAO(GLuint Program)
+{
+	GLuint vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	GLuint attrib_position = glGetAttribLocation(Program, "Position");
+	GLuint attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
+	glEnableVertexAttribArray(attrib_position);
+	glEnableVertexAttribArray(attrib_texcoord);
+	glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*)(2 * sizeof(float)));
+	glBindVertexArray(0);
+	return vao;
+}
+
+namespace FullScreenShader
+{
+	GLuint BloomShader::Program;
+	GLuint BloomShader::uniform_texture;
+	GLuint BloomShader::uniform_low;
+	GLuint BloomShader::vao;
+	void BloomShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloom.frag").c_str());
+		uniform_texture = glGetUniformLocation(Program, "tex");
+		uniform_low = glGetUniformLocation(Program, "low");
+		vao = createVAO(Program);
+	}
+
+	GLuint BloomBlendShader::Program;
+	GLuint BloomBlendShader::uniform_texture;
+	GLuint BloomBlendShader::uniform_low;
+	GLuint BloomBlendShader::vao;
+	void BloomBlendShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloomblend.frag").c_str());
+		uniform_texture = glGetUniformLocation(Program, "tex");
+		vao = createVAO(Program);
+	}
+
+	GLuint PPDisplaceShader::Program;
+	GLuint PPDisplaceShader::uniform_tex;
+	GLuint PPDisplaceShader::uniform_dtex;
+	GLuint PPDisplaceShader::uniform_viz;
+	GLuint PPDisplaceShader::vao;
+	void PPDisplaceShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ppdisplace.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_dtex = glGetUniformLocation(Program, "dtex");
+		uniform_viz = glGetUniformLocation(Program, "viz");
+		vao = createVAO(Program);
+	}
+
+	GLuint ColorLevelShader::Program;
+	GLuint ColorLevelShader::uniform_tex;
+	GLuint ColorLevelShader::uniform_inlevel;
+	GLuint ColorLevelShader::uniform_outlevel;
+	GLuint ColorLevelShader::vao;
+	void ColorLevelShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
+		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
+		vao = createVAO(Program);
+	}
+
+	GLuint PointLightShader::Program;
+	GLuint PointLightShader::uniform_ntex;
+	GLuint PointLightShader::uniform_center;
+	GLuint PointLightShader::uniform_col;
+	GLuint PointLightShader::uniform_energy;
+	GLuint PointLightShader::uniform_spec;
+	GLuint PointLightShader::uniform_invproj;
+	GLuint PointLightShader::uniform_viewm;
+	GLuint PointLightShader::vao;
+	void PointLightShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
+		uniform_ntex = glGetUniformLocation(Program, "ntex");
+		uniform_center = glGetUniformLocation(Program, "center[0]");
+		uniform_col = glGetUniformLocation(Program, "col[0]");
+		uniform_energy = glGetUniformLocation(Program, "energy[0]");
+		uniform_spec = glGetUniformLocation(Program, "spec");
+		uniform_invproj = glGetUniformLocation(Program, "invproj");
+		uniform_viewm = glGetUniformLocation(Program, "viewm");
+		vao = createVAO(Program);
+	}
+
+	GLuint LightBlendShader::Program;
+	GLuint LightBlendShader::uniform_diffuse;
+	GLuint LightBlendShader::uniform_specular;
+	GLuint LightBlendShader::uniform_ambient_occlusion;
+	GLuint LightBlendShader::uniform_specular_map;
+	GLuint LightBlendShader::uniform_ambient;
+	GLuint LightBlendShader::vao;
+	void LightBlendShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/lightblend.frag").c_str());
+		uniform_diffuse = glGetUniformLocation(Program, "diffuse");
+		uniform_specular = glGetUniformLocation(Program, "specular");
+		uniform_ambient_occlusion = glGetUniformLocation(Program, "ambient_occlusion");
+		uniform_specular_map = glGetUniformLocation(Program, "specular_map");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+		vao = createVAO(Program);
+	}
+
+	GLuint Gaussian6HBlurShader::Program;
+	GLuint Gaussian6HBlurShader::uniform_tex;
+	GLuint Gaussian6HBlurShader::uniform_pixel;
+	GLuint Gaussian6HBlurShader::vao;
+	void Gaussian6HBlurShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6h.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_pixel = glGetUniformLocation(Program, "pixel");
+		vao = createVAO(Program);
+	}
+
+	GLuint Gaussian3HBlurShader::Program;
+	GLuint Gaussian3HBlurShader::uniform_tex;
+	GLuint Gaussian3HBlurShader::uniform_pixel;
+	GLuint Gaussian3HBlurShader::vao;
+	void Gaussian3HBlurShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3h.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_pixel = glGetUniformLocation(Program, "pixel");
+		vao = createVAO(Program);
+	}
+
+	GLuint Gaussian6VBlurShader::Program;
+	GLuint Gaussian6VBlurShader::uniform_tex;
+	GLuint Gaussian6VBlurShader::uniform_pixel;
+	GLuint Gaussian6VBlurShader::vao;
+	void Gaussian6VBlurShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6v.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_pixel = glGetUniformLocation(Program, "pixel");
+		vao = createVAO(Program);
+	}
+
+	GLuint Gaussian3VBlurShader::Program;
+	GLuint Gaussian3VBlurShader::uniform_tex;
+	GLuint Gaussian3VBlurShader::uniform_pixel;
+	GLuint Gaussian3VBlurShader::vao;
+	void Gaussian3VBlurShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3v.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_pixel = glGetUniformLocation(Program, "pixel");
+		vao = createVAO(Program);
+	}
+
+	GLuint PassThroughShader::Program;
+	GLuint PassThroughShader::uniform_texture;
+	GLuint PassThroughShader::vao;
+	void PassThroughShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
+		uniform_texture = glGetUniformLocation(Program, "texture");
+		vao = createVAO(Program);
+	}
+
+	GLuint GlowShader::Program;
+	GLuint GlowShader::uniform_tex;
+	GLuint GlowShader::vao;
+	void GlowShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/glow.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		vao = createVAO(Program);
+	}
+
+	GLuint SSAOShader::Program;
+	GLuint SSAOShader::uniform_normals_and_depth;
+	GLuint SSAOShader::uniform_invprojm;
+	GLuint SSAOShader::uniform_projm;
+	GLuint SSAOShader::uniform_samplePoints;
+	GLuint SSAOShader::vao;
+	float SSAOShader::SSAOSamples[64];
+	void SSAOShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
+		uniform_normals_and_depth = glGetUniformLocation(Program, "normals_and_depth");
+		uniform_invprojm = glGetUniformLocation(Program, "invprojm");
+		uniform_projm = glGetUniformLocation(Program, "projm");
+		uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");
+		vao = createVAO(Program);
+
+		for (unsigned i = 0; i < 16; i++) {
+			// Generate x/y component between -1 and 1
+			// Use double to avoid denorm and get a true uniform distribution
+			double x = rand();
+			x /= RAND_MAX;
+			x = 2 * x - 1;
+			double y = rand();
+			y /= RAND_MAX;
+			y = 2 * y - 1;
+
+			// compute z so that norm (x,y,z) is one
+			double z = sqrt(x * x + y * y);
+			// Norm factor
+			double w = rand();
+			w /= RAND_MAX;
+			SSAOSamples[4 * i] = (float)x;
+			SSAOSamples[4 * i + 1] = (float)y;
+			SSAOSamples[4 * i + 2] = (float)z;
+			SSAOSamples[4 * i + 3] = (float)w;
+		}
+	}
+
+	GLuint FogShader::Program;
+	GLuint FogShader::uniform_tex;
+	GLuint FogShader::uniform_fogmax;
+	GLuint FogShader::uniform_startH;
+	GLuint FogShader::uniform_endH;
+	GLuint FogShader::uniform_start;
+	GLuint FogShader::uniform_end;
+	GLuint FogShader::uniform_col;
+	GLuint FogShader::uniform_campos;
+	GLuint FogShader::uniform_ipvmat;
+	GLuint FogShader::vao;
+	void FogShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/fog.frag").c_str());
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_fogmax = glGetUniformLocation(Program, "fogmax");
+		uniform_startH = glGetUniformLocation(Program, "startH");
+		uniform_endH = glGetUniformLocation(Program, "endH");
+		uniform_start = glGetUniformLocation(Program, "start");
+		uniform_end = glGetUniformLocation(Program, "end");
+		uniform_col = glGetUniformLocation(Program, "col");
+		uniform_campos = glGetUniformLocation(Program, "campos");
+		uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
+		vao = createVAO(Program);
+	}
 }
