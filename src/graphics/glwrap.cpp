@@ -59,7 +59,8 @@ static GLuint quad_buffer;
 static GLuint ColoredVertex;
 static bool is_gl_init = false;
 
-#ifdef DEBUG
+//#define ARB_DEBUG_OUTPUT
+#ifdef ARB_DEBUG_OUTPUT
 static
 void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
   const GLchar* msg, const void *userparam)
@@ -181,7 +182,7 @@ void initGL()
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
 #endif
-#ifdef DEBUG
+#ifdef ARB_DEBUG_OUTPUT
 	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 	const float quad_vertex[] = {
