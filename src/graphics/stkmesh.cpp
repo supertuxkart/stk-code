@@ -26,7 +26,7 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
 	if ((GLint)attrib_texcoord != -1)
 		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
-	if ((GLint)attrib_second_texcoord != 1)
+	if ((GLint)attrib_second_texcoord != -1)
 	{
 		if (stride < 44)
 			Log::error("material", "Second texcoords not present in VBO");

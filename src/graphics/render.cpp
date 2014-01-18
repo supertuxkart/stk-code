@@ -600,10 +600,10 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glowcb->setResolution(UserConfigParams::m_width,
                             UserConfigParams::m_height);
 
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
+/*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
     overridemat.EnablePasses = scene::ESNRP_SOLID;
-    overridemat.Enabled = true;
+    overridemat.Enabled = true;*/
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilFunc(GL_ALWAYS, 1, ~0);
@@ -624,7 +624,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     }
 
     // Second round for transparents; it's a no-op for solids
-    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
+/*    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
     overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE_REF);
     for (u32 i = 0; i < glowcount; i++)
     {
@@ -640,7 +640,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
         cur->render();
     }
     overridemat.Enabled = false;
-    overridemat.EnablePasses = 0;
+    overridemat.EnablePasses = 0;*/
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glDisable(GL_STENCIL_TEST);
@@ -668,7 +668,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glStencilFunc(GL_EQUAL, 0, ~0);
 	glEnable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
