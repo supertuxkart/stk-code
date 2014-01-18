@@ -21,7 +21,7 @@
 #include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
-
+#include "graphics/glwrap.hpp"
 #include <assert.h>
 #include <IGPUProgrammingServices.h>
 

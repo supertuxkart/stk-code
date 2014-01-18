@@ -20,7 +20,8 @@
 #include <IShaderConstantSetCallBack.h>
 #include <IMeshSceneNode.h>
 #include <vector>
-#include "graphics/glwrap.hpp"
+
+typedef unsigned int	GLuint;
 using namespace irr;
 
 namespace MeshShader
