@@ -248,6 +248,12 @@ void Shaders::loadShaders()
 	FullScreenShader::PointLightShader::init();
 	FullScreenShader::PPDisplaceShader::init();
 	FullScreenShader::SSAOShader::init();
+	MeshShader::ColorizeShader::init();
+	MeshShader::NormalMapShader::init();
+	MeshShader::ObjectPass1Shader::init();
+	MeshShader::ObjectPass2Shader::init();
+	MeshShader::SphereMapShader::init();
+	MeshShader::SplattingShader::init();
 }
 
 Shaders::~Shaders()
@@ -274,6 +280,196 @@ void Shaders::check(const int num) const
         Log::fatal("shaders", "Shader %s failed to load. Update your drivers, if the issue "
                               "persists, report a bug to us.", shader_names[num] + 3);
     }
+}
+
+namespace MeshShader
+{
+	GLuint ObjectPass1Shader::Program;
+	GLuint ObjectPass1Shader::attrib_position;
+	GLuint ObjectPass1Shader::attrib_normal;
+	GLuint ObjectPass1Shader::uniform_MVP;
+	GLuint ObjectPass1Shader::uniform_TIMV;
+
+	void ObjectPass1Shader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/object_pass1.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_normal = glGetAttribLocation(Program, "Normal");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+	}
+
+	void ObjectPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+	}
+
+	GLuint ObjectPass2Shader::Program;
+	GLuint ObjectPass2Shader::attrib_position;
+	GLuint ObjectPass2Shader::attrib_texcoord;
+	GLuint ObjectPass2Shader::uniform_MVP;
+	GLuint ObjectPass2Shader::uniform_TIMV;
+	GLuint ObjectPass2Shader::uniform_Albedo;
+	GLuint ObjectPass2Shader::uniform_DiffuseMap;
+	GLuint ObjectPass2Shader::uniform_SpecularMap;
+	GLuint ObjectPass2Shader::uniform_SSAO;
+	GLuint ObjectPass2Shader::uniform_screen;
+	GLuint ObjectPass2Shader::uniform_ambient;
+
+	void ObjectPass2Shader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_pass2.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_Albedo, TU_Albedo);
+		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
+		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint NormalMapShader::Program;
+	GLuint NormalMapShader::attrib_position;
+	GLuint NormalMapShader::attrib_texcoord;
+	GLuint NormalMapShader::attrib_tangent;
+	GLuint NormalMapShader::attrib_bitangent;
+	GLuint NormalMapShader::uniform_MVP;
+	GLuint NormalMapShader::uniform_TIMV;
+	GLuint NormalMapShader::uniform_normalMap;
+
+	void NormalMapShader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/normalmap.vert").c_str(), file_manager->getAsset("shaders/normalmap.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_tangent = glGetAttribLocation(Program, "Tangent");
+		attrib_bitangent = glGetAttribLocation(Program, "Bitangent");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+		uniform_normalMap = glGetUniformLocation(Program, "normalMap");
+	}
+
+	void NormalMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+		glUniform1i(uniform_normalMap, TU_normalMap);
+	}
+
+	GLuint SphereMapShader::Program;
+	GLuint SphereMapShader::attrib_position;
+	GLuint SphereMapShader::attrib_normal;
+	GLuint SphereMapShader::uniform_MVP;
+	GLuint SphereMapShader::uniform_TIMV;
+	GLuint SphereMapShader::uniform_tex;
+
+	void SphereMapShader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_normal = glGetAttribLocation(Program, "Normal");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+	}
+
+	void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+		glUniform1i(uniform_tex, TU_tex);
+	}
+
+	GLuint SplattingShader::Program;
+	GLuint SplattingShader::attrib_position;
+	GLuint SplattingShader::attrib_texcoord;
+	GLuint SplattingShader::attrib_second_texcoord;
+	GLuint SplattingShader::uniform_MVP;
+	GLuint SplattingShader::uniform_tex_layout;
+	GLuint SplattingShader::uniform_tex_detail0;
+	GLuint SplattingShader::uniform_tex_detail1;
+	GLuint SplattingShader::uniform_tex_detail2;
+	GLuint SplattingShader::uniform_tex_detail3;
+	GLuint SplattingShader::uniform_DiffuseMap;
+	GLuint SplattingShader::uniform_SpecularMap;
+	GLuint SplattingShader::uniform_SSAO;
+	GLuint SplattingShader::uniform_screen;
+	GLuint SplattingShader::uniform_ambient;
+
+	void SplattingShader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/splatting.vert").c_str(), file_manager->getAsset("shaders/splatting.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_tex_layout = glGetUniformLocation(Program, "tex_layout");
+		uniform_tex_detail0 = glGetUniformLocation(Program, "tex_detail0");
+		uniform_tex_detail1 = glGetUniformLocation(Program, "tex_detail1");
+		uniform_tex_detail2 = glGetUniformLocation(Program, "tex_detail2");
+		uniform_tex_detail3 = glGetUniformLocation(Program, "tex_detail3");
+		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void SplattingShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex_layout, unsigned TU_tex_detail0, unsigned TU_tex_detail1, unsigned TU_tex_detail2, unsigned TU_tex_detail3, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_tex_layout, TU_tex_layout);
+		glUniform1i(uniform_tex_detail0, TU_tex_detail0);
+		glUniform1i(uniform_tex_detail1, TU_tex_detail1);
+		glUniform1i(uniform_tex_detail2, TU_tex_detail2);
+		glUniform1i(uniform_tex_detail3, TU_tex_detail3);
+		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
+		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint ColorizeShader::Program;
+	GLuint ColorizeShader::attrib_position;
+	GLuint ColorizeShader::uniform_MVP;
+	GLuint ColorizeShader::uniform_col;
+
+	void ColorizeShader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/colorize.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_col = glGetUniformLocation(Program, "col");
+	}
+
+	void ColorizeShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform3f(uniform_col, r, g, b);
+	}
 }
 
 static GLuint createVAO(GLuint Program)

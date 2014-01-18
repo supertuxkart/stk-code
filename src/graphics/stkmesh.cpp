@@ -53,180 +53,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	return vao;
 }
 
-namespace ObjectPass1Shader
-{
-	GLuint Program;
-	GLuint attrib_position, attrib_normal;
-	GLuint uniform_MVP, uniform_TIMV;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/object_pass1.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_normal = glGetAttribLocation(Program, "Normal");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");;
-	}
-
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
-	}
-}
-
-namespace ObjectPass2Shader
-{
-	GLuint Program;
-	GLuint attrib_position, attrib_texcoord;
-	GLuint uniform_MVP, uniform_TIMV, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_pass2.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
-		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
-		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
-		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
-		uniform_screen = glGetUniformLocation(Program, "screen");
-		uniform_ambient = glGetUniformLocation(Program, "ambient");
-	}
-
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform1i(uniform_Albedo, TU_Albedo);
-		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
-		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
-		glUniform1i(uniform_SSAO, TU_SSAO);
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-}
-
-namespace NormalMapShader
-{
-	GLuint Program;
-	GLuint attrib_position, attrib_texcoord, attrib_tangent, attrib_bitangent;
-	GLuint uniform_MVP, uniform_TIMV, uniform_normalMap;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/normalmap.vert").c_str(), file_manager->getAsset("shaders/normalmap.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-		attrib_tangent = glGetAttribLocation(Program, "Tangent");
-		attrib_bitangent = glGetAttribLocation(Program, "Bitangent");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
-		uniform_normalMap = glGetUniformLocation(Program, "normalMap");
-	}
-
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
-		glUniform1i(uniform_normalMap, TU_normalMap);
-	}
-}
-
-namespace SphereMapShader
-{
-	GLuint Program;
-	GLuint attrib_position, attrib_normal;
-	GLuint uniform_MVP, uniform_TIMV, uniform_tex;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_normal = glGetAttribLocation(Program, "Normal");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
-		uniform_tex = glGetUniformLocation(Program, "tex");
-	}
-
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
-		glUniform1i(uniform_tex, TU_tex);
-	}
-}
-
-namespace SplattingShader
-{
-	GLuint Program;
-	GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
-	GLuint uniform_MVP, uniform_tex_layout, uniform_tex_detail0, uniform_tex_detail1, uniform_tex_detail2, uniform_tex_detail3,  uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/splatting.vert").c_str(), file_manager->getAsset("shaders/splatting.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_tex_layout = glGetUniformLocation(Program, "tex_layout");
-		uniform_tex_detail0 = glGetUniformLocation(Program, "tex_detail0");
-		uniform_tex_detail1 = glGetUniformLocation(Program, "tex_detail1");
-		uniform_tex_detail2 = glGetUniformLocation(Program, "tex_detail2");
-		uniform_tex_detail3 = glGetUniformLocation(Program, "tex_detail3");
-		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
-		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
-		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
-		uniform_screen = glGetUniformLocation(Program, "screen");
-		uniform_ambient = glGetUniformLocation(Program, "ambient");
-	}
-
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex_layout, unsigned TU_tex_detail0, unsigned TU_tex_detail1, unsigned TU_tex_detail2, unsigned TU_tex_detail3, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform1i(uniform_tex_layout, TU_tex_layout);
-		glUniform1i(uniform_tex_detail0, TU_tex_detail0);
-		glUniform1i(uniform_tex_detail1, TU_tex_detail1);
-		glUniform1i(uniform_tex_detail2, TU_tex_detail2);
-		glUniform1i(uniform_tex_detail3, TU_tex_detail3);
-		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
-		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
-		glUniform1i(uniform_SSAO, TU_SSAO);
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-}
-
-namespace ColorizeShader
-{
-	GLuint Program;
-	GLuint attrib_position;
-	GLuint uniform_MVP, uniform_col;
-
-	void init()
-	{
-		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/colorize.frag").c_str());
-		attrib_position = glGetAttribLocation(Program, "Position");
-		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-		uniform_col = glGetUniformLocation(Program, "col");
-	}
-
-	void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform3f(uniform_col, r, g, b);
-	}
-}
-
 static
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 {
@@ -322,14 +148,6 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 		GLmeshes.push_back(allocateMeshBuffer(mb));
 
 	}
-	if (ObjectPass1Shader::Program && ObjectPass2Shader::Program)
-		return;
-	ObjectPass1Shader::init();
-	ObjectPass2Shader::init();
-	NormalMapShader::init();
-	ColorizeShader::init();
-	SphereMapShader::init();
-	SplattingShader::init();
 }
 
 STKMesh::~STKMesh()
@@ -370,8 +188,8 @@ void drawFirstPass(const GLMesh &mesh)
   TransposeInverseModelView.makeInverse();
   TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
-  glUseProgram(ObjectPass1Shader::Program);
-  ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView);
+  glUseProgram(MeshShader::ObjectPass1Shader::Program);
+  MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
@@ -411,8 +229,8 @@ void drawNormalPass(const GLMesh &mesh)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	glUseProgram(NormalMapShader::Program);
-	NormalMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+	glUseProgram(MeshShader::NormalMapShader::Program);
+	MeshShader::NormalMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
@@ -450,8 +268,8 @@ void drawSphereMap(const GLMesh &mesh)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-  glUseProgram(SphereMapShader::Program);
-  SphereMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+  glUseProgram(MeshShader::SphereMapShader::Program);
+  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
@@ -527,8 +345,8 @@ void drawSplatting(const GLMesh &mesh)
   glActiveTexture(GL_TEXTURE7);
   glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName());
 
-  glUseProgram(SplattingShader::Program);
-  SplattingShader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3, 4, 5, 6, 7);
+  glUseProgram(MeshShader::SplattingShader::Program);
+  MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3, 4, 5, 6, 7);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
@@ -569,8 +387,8 @@ void drawSecondPass(const GLMesh &mesh)
   glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName());
 
-  glUseProgram(ObjectPass2Shader::Program);
-  ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
+  glUseProgram(MeshShader::ObjectPass2Shader::Program);
+  MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
@@ -594,8 +412,8 @@ void drawGlow(const GLMesh &mesh, float r, float g, float b)
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
-	glUseProgram(ColorizeShader::Program);
-	ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
+	glUseProgram(MeshShader::ColorizeShader::Program);
+	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
 
 	glBindVertexArray(mesh.vao_glow_pass);
 	glDrawElements(ptype, count, itype, 0);
@@ -661,30 +479,30 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			NormalMapShader::attrib_position, NormalMapShader::attrib_texcoord, -1, -1, NormalMapShader::attrib_tangent, NormalMapShader::attrib_bitangent, mesh.Stride);
+			MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, mesh.Stride);
 	}
 	else
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectPass1Shader::attrib_position, -1, -1, ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+			MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
 	}
 
 	if (type == irr_driver->getShader(ES_SPHERE_MAP))
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			SphereMapShader::attrib_position, -1, -1, SphereMapShader::attrib_normal, -1, -1,	mesh.Stride);
+			MeshShader::SphereMapShader::attrib_position, -1, -1, MeshShader::SphereMapShader::attrib_normal, -1, -1, mesh.Stride);
 	}
 	else if (type == irr_driver->getShader(ES_SPLATTING))
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			SplattingShader::attrib_position, SplattingShader::attrib_texcoord, SplattingShader::attrib_second_texcoord, -1, -1, -1,	mesh.Stride);
+			MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, mesh.Stride);
 	}
 	else
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			ObjectPass2Shader::attrib_position, ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, mesh.Stride);
+			MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, mesh.Stride);
 	}
-	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, ColorizeShader::attrib_position, -1, -1, -1, -1, -1, mesh.Stride);
+	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, mesh.Stride);
 }
 
 void STKMesh::render()

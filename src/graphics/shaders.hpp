@@ -25,6 +25,71 @@ using namespace irr;
 
 namespace MeshShader
 {
+class ObjectPass1Shader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_normal;
+	static GLuint uniform_MVP, uniform_TIMV;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+};
+
+class ObjectPass2Shader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_MVP, uniform_TIMV, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
+class NormalMapShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_tangent, attrib_bitangent;
+	static GLuint uniform_MVP, uniform_TIMV, uniform_normalMap;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap);
+};
+
+class SphereMapShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_normal;
+	static GLuint uniform_MVP, uniform_TIMV, uniform_tex;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex);
+};
+
+class SplattingShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
+	static GLuint uniform_MVP, uniform_tex_layout, uniform_tex_detail0, uniform_tex_detail1, uniform_tex_detail2, uniform_tex_detail3, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex_layout, unsigned TU_tex_detail0, unsigned TU_tex_detail1, unsigned TU_tex_detail2, unsigned TU_tex_detail3, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
+class ColorizeShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position;
+	static GLuint uniform_MVP, uniform_col;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
+};
 
 }
 
