@@ -52,15 +52,14 @@ PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 PFNGLTEXBUFFERPROC glTexBuffer;
 PFNGLBUFFERSUBDATAPROC glBufferSubData;
 PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
+PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
 
 static GLuint quad_buffer;
 static GLuint ColoredVertex;
 static bool is_gl_init = false;
 
-// Please leave this code, it's for debugging purpose
-//#define ENABLE_ARB_DEBUG_OUTPUT
-#ifdef ENABLE_ARB_DEBUG_OUTPUT
+#ifdef DEBUG
 static
 void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
   const GLchar* msg, const void *userparam)
@@ -178,9 +177,12 @@ void initGL()
 	glUniform4fv = (PFNGLUNIFORM4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniform4fv");
 	glBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
 	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
+#ifdef DEBUG
+	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
-#ifdef ENABLE_ARB_DEBUG_OUTPUT
-	glDebugMessageCallbackARB(debugCallback, NULL);
+#endif
+#ifdef DEBUG
+	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 	const float quad_vertex[] = {
 		-1., -1., -1., 1., // UpperLeft

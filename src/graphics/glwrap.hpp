@@ -75,6 +75,9 @@ extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 extern PFNGLTEXBUFFERPROC glTexBuffer;
 extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
 extern PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
+#ifdef DEBUG
+extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
+#endif
 #endif
 
 
