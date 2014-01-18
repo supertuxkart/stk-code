@@ -587,13 +587,6 @@ void CollapseProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void BloomPowerProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("power", &m_power, 1);
-}
-
-//-------------------------------------
-
 void MultiplyProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     if (!firstdone)

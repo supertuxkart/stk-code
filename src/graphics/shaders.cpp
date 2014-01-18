@@ -53,7 +53,6 @@ Shaders::Shaders()
     m_callbacks[ES_SHADOWPASS] = new ShadowPassProvider();
     m_callbacks[ES_SHADOW_IMPORTANCE] = new ShadowImportanceProvider();
     m_callbacks[ES_COLLAPSE] = new CollapseProvider();
-    m_callbacks[ES_BLOOM_POWER] = new BloomPowerProvider();
     m_callbacks[ES_MULTIPLY_ADD] = new MultiplyProvider();
     m_callbacks[ES_SHADOWGEN] = new ShadowGenProvider();
     m_callbacks[ES_CAUSTICS] = new CausticsProvider();
@@ -144,11 +143,6 @@ void Shaders::loadShaders()
     m_shaders[ES_COLORIZE_REF] = glslmat(std::string(""), dir + "colorize_ref.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
 
-    m_shaders[ES_PASS] = glslmat(std::string(""), dir + "pass.frag",
-                                    0, EMT_SOLID);
-    m_shaders[ES_PASS_ADDITIVE] = glslmat(std::string(""), dir + "pass.frag",
-                                    0, EMT_TRANSPARENT_ADD_COLOR);
-
     m_shaders[ES_GLOW] = glslmat(std::string(""), dir + "glow.frag",
                                     m_callbacks[ES_GLOW], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
@@ -187,9 +181,6 @@ void Shaders::loadShaders()
                                     m_callbacks[ES_COLLAPSE]);
     m_shaders[ES_SHADOW_WARPV] = glsl(std::string(""), dir + "shadowwarpv.frag",
                                     m_callbacks[ES_COLLAPSE]);
-
-    m_shaders[ES_BLOOM_POWER] = glsl(std::string(""), dir + "bloompower.frag",
-                                    m_callbacks[ES_BLOOM_POWER]);
 
     m_shaders[ES_MULTIPLY_ADD] = glslmat(std::string(""), dir + "multiply.frag",
                                     m_callbacks[ES_MULTIPLY_ADD], EMT_ONETEXTURE_BLEND);

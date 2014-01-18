@@ -582,10 +582,6 @@ void PostProcessing::render()
 
             const bool globalbloom = World::getWorld()->getTrack()->getBloom();
 
-            BloomPowerProvider * const bloomcb = (BloomPowerProvider *)
-                                                 irr_driver->
-                                                 getCallback(ES_BLOOM_POWER);
-
             if (globalbloom)
             {
 				drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
