@@ -11,7 +11,7 @@ out vec4 FragColor;
 const float strengh = 4.;
 const float radius = .4f;
 
-#define SAMPLES 16
+#define SAMPLES 8
 
 const float invSamples = strengh / SAMPLES;
 
