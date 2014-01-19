@@ -490,8 +490,8 @@ void PostProcessing::renderGlow(ITexture *tex)
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::GlowShader::uniform_tex, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
