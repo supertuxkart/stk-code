@@ -31,6 +31,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
+#include "utils/profiler.hpp"
 
 #include <SViewFrustum.h>
 
@@ -574,6 +575,7 @@ void PostProcessing::render()
 
 	// As the original color shouldn't be touched, the first effect can't be disabled.
 
+        PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         if (1) // bloom
         {
 			// Blit the base to tmp1
@@ -627,7 +629,9 @@ void PostProcessing::render()
             in = irr_driver->getRTT(RTT_TMP1);
             out = irr_driver->getRTT(RTT_TMP2);
         }
+        PROFILER_POP_CPU_MARKER();
 
+        PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         if (World::getWorld()->getTrack()->hasGodRays() && m_sunpixels > 30) // god rays
         {
             // Grab the sky
@@ -710,9 +714,11 @@ void PostProcessing::render()
 
             drawQuad(cam, m_material);
         }
+        PROFILER_POP_CPU_MARKER();
 
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
+            PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
             // Calculate the kart's Y position on screen
             const core::vector3df pos =
                 Camera::getCamera(cam)->getKart()->getNode()->getPosition();
@@ -734,20 +740,24 @@ void PostProcessing::render()
             ITexture *tmp = in;
             in = out;
             out = tmp;
+            PROFILER_POP_CPU_MARKER();
         }
 
         if (irr_driver->getDisplacingNodes().size()) // Displacement
         {
+            PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
 			drv->setRenderTarget(out, true, false);
 			renderPPDisplace(in);
 
             ITexture *tmp = in;
             in = out;
             out = tmp;
+            PROFILER_POP_CPU_MARKER();
         }
 
         if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
         {
+            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
             drv->setRenderTarget(out, false, false);
 
             glEnable(GL_STENCIL_TEST);
@@ -801,6 +811,7 @@ void PostProcessing::render()
 
             // Done.
             glDisable(GL_STENCIL_TEST);
+            PROFILER_POP_CPU_MARKER();
         }
 
         // Final blit

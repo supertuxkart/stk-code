@@ -220,6 +220,9 @@ void IrrDriver::renderGLSL(float dt)
             //renderShadows(sicb, camnode, overridemat, camera);
         }
 
+
+        PROFILER_PUSH_CPU_MARKER("- Light", 0xFF, 0x00, 0x00);
+
         // Lights
         renderLights(cambox, camnode, overridemat, cam, dt);
         irr_driver->setPhase(1);
@@ -230,6 +233,10 @@ void IrrDriver::renderGLSL(float dt)
         m_scene_manager->drawAll(m_renderpass);
         glDisable(GL_STENCIL_TEST);
 
+        PROFILER_POP_CPU_MARKER();
+
+        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0x00, 0x00);
+
 		// Render anything glowing.
 		if (!m_mipviz && !m_wireframe)
 		{
@@ -237,13 +244,20 @@ void IrrDriver::renderGLSL(float dt)
 			renderGlow(overridemat, glows, cambox, cam);
 		} // end glow
 
+        PROFILER_POP_CPU_MARKER();
+
         if (!bgnodes)
         {
+            PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0x00);
+
             // If there are no BG nodes, it's more efficient to do the skybox here.
             m_renderpass = scene::ESNRP_SKY_BOX;
             m_scene_manager->drawAll(m_renderpass);
+
+            PROFILER_POP_CPU_MARKER();
         }
 
+        PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0xFF, 0x00, 0x00);
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
@@ -270,22 +284,31 @@ void IrrDriver::renderGLSL(float dt)
             // Make sure the color mask is reset
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         }
+        PROFILER_POP_CPU_MARKER();
 
         // Render fog on top of solid
 		if (World::getWorld()->getTrack()->isFogEnabled())
+        {
+            PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
 			m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
+            PROFILER_POP_CPU_MARKER();
+        }
 
         // We need to re-render camera due to the per-cam-node hack.
+        PROFILER_PUSH_CPU_MARKER("- SceneManager::drawAll", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT |
                                  scene::ESNRP_TRANSPARENT_EFFECT;
         m_scene_manager->drawAll(m_renderpass);
+        PROFILER_POP_CPU_MARKER();
 
+        PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
         // Handle displacing nodes, if any
         const u32 displacingcount = m_displacing.size();
         if (displacingcount)
         {
             renderDisplacement(overridemat, cam);
         }
+        PROFILER_POP_CPU_MARKER();
 
         // Drawing for this cam done, cleanup
         const u32 glowrepcount = transparent_glow_nodes.size();
@@ -305,8 +328,10 @@ void IrrDriver::renderGLSL(float dt)
             World::getWorld()->getPhysics()->draw();
     }   // for i<world->getNumKarts()
 
+    PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0x00, 0x00);
     // Render the post-processed scene
     m_post_processing->render();
+    PROFILER_POP_CPU_MARKER();
 
     // Set the viewport back to the full screen for race gui
     m_video_driver->setViewPort(core::recti(0, 0,
