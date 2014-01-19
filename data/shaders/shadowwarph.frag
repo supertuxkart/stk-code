@@ -22,7 +22,7 @@ void main()
 
 	for (int i = 0; i < size; i++)
 	{
-		float col = texture2D(tex, tc).x;
+		float col = texture(tex, tc).x;
 
 		lower += col * step(tc.x, origtc.x);
 		total += col;

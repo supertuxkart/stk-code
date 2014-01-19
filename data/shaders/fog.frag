@@ -14,7 +14,7 @@ in vec2 uv;
 
 void main()
 {
-	float z = texture2D(tex, uv).a;
+	float z = texture(tex, uv).a;
 
 	vec3 tmp = vec3(gl_TexCoord[0].xy, z);
 	tmp = tmp * 2.0 - 1.0;

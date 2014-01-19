@@ -4,7 +4,7 @@ uniform sampler2D tex;
 
 void main()
 {
-	float alpha = texture2D(tex, gl_TexCoord[0].xy).a;
+	float alpha = texture(tex, gl_TexCoord[0].xy).a;
 	if (alpha < 0.5)
 		discard;
 

@@ -13,7 +13,7 @@ void main() {
 	vec4 color;
 
 	if (hastex != 0) {
-		vec4 col = texture2D(tex, gl_TexCoord[0].xy);
+		vec4 col = texture(tex, gl_TexCoord[0].xy);
 
 		if (col.a < 0.1)
 			discard;

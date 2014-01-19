@@ -12,11 +12,11 @@ void main()
 	float X = uv.x;
 	float Y = uv.y;
 
-	sum += texture2D(tex, vec2(X - 3.0 * pixel.x, Y)) * 0.03125;
-	sum += texture2D(tex, vec2(X - 1.3333 * pixel.x, Y)) * 0.328125;
-	sum += texture2D(tex, vec2(X, Y)) * 0.273438;
-	sum += texture2D(tex, vec2(X + 1.3333 * pixel.x, Y)) * 0.328125;
-	sum += texture2D(tex, vec2(X + 3.0 * pixel.x, Y)) * 0.03125;
+	sum += texture(tex, vec2(X - 3.0 * pixel.x, Y)) * 0.03125;
+	sum += texture(tex, vec2(X - 1.3333 * pixel.x, Y)) * 0.328125;
+	sum += texture(tex, vec2(X, Y)) * 0.273438;
+	sum += texture(tex, vec2(X + 1.3333 * pixel.x, Y)) * 0.328125;
+	sum += texture(tex, vec2(X + 3.0 * pixel.x, Y)) * 0.03125;
 
 	gl_FragColor = sum;
 }

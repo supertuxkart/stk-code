@@ -10,7 +10,7 @@ in vec2 uv1;
 void main() {
 
 	//if (hastex != 0) {
-		vec4 col = texture2D(tex, uv0);
+		vec4 col = texture(tex, uv0);
 
 		if (col.a < 0.5)
 			discard;

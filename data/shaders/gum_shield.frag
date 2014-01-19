@@ -30,7 +30,7 @@ noperspective in vec3 normal;
 void main()
 {
 	float inter = dot(normal, eyeVec);
-	float m = texture2D(tex, vec2(0.5, uv.y)).r;
+	float m = texture(tex, vec2(0.5, uv.y)).r;
 	inter = 1.0 - inter;
 	float alpha = inter + 1.0;// * m;
 

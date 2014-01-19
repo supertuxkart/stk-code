@@ -4,7 +4,7 @@ uniform sampler2D tex;
 
 void main()
 {
-	vec4 col = texture2D(tex, gl_TexCoord[0].xy);
+	vec4 col = texture(tex, gl_TexCoord[0].xy);
 	if (col.a < 0.5)
 		discard;
 

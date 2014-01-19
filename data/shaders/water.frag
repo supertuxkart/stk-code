@@ -16,8 +16,8 @@ in vec2 uv;
 void main()
 {
 	// lookup normal from normal map, move from [0,1] to  [-1, 1] range, normalize
-	vec3 normal  = 2.0 * texture2D (BumpTex1, uv + delta1).rgb - 1.0;
-	vec3 normal2 = 2.0 * texture2D (BumpTex2, uv + delta2).rgb - 1.0;
+	vec3 normal  = 2.0 * texture (BumpTex1, uv + delta1).rgb - 1.0;
+	vec3 normal2 = 2.0 * texture (BumpTex2, uv + delta2).rgb - 1.0;
 
 	// scale normals
 	normal.y = 4.0*normal.y;
@@ -30,7 +30,7 @@ void main()
 	vec4 diffuseMaterial;
 	vec4 diffuseLight;
 
-	diffuseMaterial = texture2D (DecalTex, uv + vec2(delta1.x, 0.0));
+	diffuseMaterial = texture (DecalTex, uv + vec2(delta1.x, 0.0));
 	diffuseLight  = vec4(1.0, 1.0, 1.0, 1.0);
 
 	vec3 col = diffuseMaterial.xyz * (0.3 + lamberFactor*0.7);

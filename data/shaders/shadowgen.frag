@@ -6,9 +6,9 @@ uniform sampler2D eighth;
 void main()
 {
 	vec3 val[3];
-	val[0] = texture2D(halft, gl_TexCoord[0].xy).xyz;
-	val[1] = texture2D(quarter, gl_TexCoord[0].xy).xyz;
-	val[2] = texture2D(eighth, gl_TexCoord[0].xy).xyz;
+	val[0] = texture(halft, gl_TexCoord[0].xy).xyz;
+	val[1] = texture(quarter, gl_TexCoord[0].xy).xyz;
+	val[2] = texture(eighth, gl_TexCoord[0].xy).xyz;
 
 	// Find the first level with a penumbra value
 	int i;

@@ -77,7 +77,7 @@ vec2 Area(vec2 distance, float e1, float e2) {
 void main() {
 	vec4 areas = vec4(0.0);
 
-	vec2 e = texture2D(edgesMap, gl_TexCoord[0].xy).rg;
+	vec2 e = texture(edgesMap, gl_TexCoord[0].xy).rg;
 
 	if (e.g != 0.0) { // Edge at north
 

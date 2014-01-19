@@ -15,7 +15,7 @@ void main() {
 	vec3 normal_y = normalize(vec3(0.0, nor.y, nor.z));
 	float sin_theta_y = length(cross( forward, normal_y )) * nor.y / abs(nor.y);
 
-	vec4 detail0 = texture2D(tex, 0.5 * vec2(sin_theta_x, sin_theta_y) + 0.5);
+	vec4 detail0 = texture(tex, 0.5 * vec2(sin_theta_x, sin_theta_y) + 0.5);
 
 	gl_FragColor = vec4(detail0.xyz, 1.);
 }

@@ -11,7 +11,7 @@ void main()
 	//texc.y = 1.0 - texc.y;
 
 
-	vec4 col = texture2D(tex, texc);
+	vec4 col = texture(tex, texc);
 
 	//col = col / (1 - col);
 

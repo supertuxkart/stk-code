@@ -12,7 +12,7 @@ uniform vec2 wind;
 void main() {
 
 	vec2 texc = gl_FragCoord.xy / screen;
-	float z = texture2D(ntex, texc).a;
+	float z = texture(ntex, texc).a;
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0;
 	xpos = invproj * xpos;
 	xpos.xyz /= xpos.w;
@@ -25,7 +25,7 @@ void main() {
 		return;
 	}
 
-	vec3 norm = texture2D(ntex, texc).xyz;
+	vec3 norm = texture(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;
 
 	// Normalized on the cpu
@@ -41,7 +41,7 @@ void main() {
 	if (hasclouds == 1)
 	{
 		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;
-		float cloud = texture2D(cloudtex, cloudcoord).x;
+		float cloud = texture(cloudtex, cloudcoord).x;
 		//float cloud = step(0.5, cloudcoord.x) * step(0.5, cloudcoord.y);
 
 		outcol *= cloud;

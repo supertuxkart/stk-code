@@ -8,9 +8,9 @@ void main()
 {
 	vec2 tc = gl_TexCoord[0].xy;
 
-	vec3 col = texture2D(tex, tc).xyz;
-	float caustic = texture2D(caustictex, tc + dir).x;
-	float caustic2 = texture2D(caustictex, (tc.yx + dir2 * vec2(-0.6, 0.3)) * vec2(0.6)).x;
+	vec3 col = texture(tex, tc).xyz;
+	float caustic = texture(caustictex, tc + dir).x;
+	float caustic2 = texture(caustictex, (tc.yx + dir2 * vec2(-0.6, 0.3)) * vec2(0.6)).x;
 
 	col += caustic * caustic2 * 10.0;
 

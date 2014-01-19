@@ -21,8 +21,8 @@ float rand(vec2 co)
 
 void main(void)
 {
-	vec4 cur = texture2D(normals_and_depth, uv);
-	float curdepth = texture2D(normals_and_depth, uv).a;
+	vec4 cur = texture(normals_and_depth, uv);
+	float curdepth = texture(normals_and_depth, uv).a;
 	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
 	FragPos /= FragPos.w;
 
@@ -50,7 +50,7 @@ void main(void)
 
 		bool isInsideTexture = (sampleProj.x > -1.) && (sampleProj.x < 1.) && (sampleProj.y > -1.) && (sampleProj.y < 1.);
 		// get the depth of the occluder fragment
-		float occluderFragmentDepth = texture2D(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
+		float occluderFragmentDepth = texture(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
 		// Position of the occluder fragment in worldSpace
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;

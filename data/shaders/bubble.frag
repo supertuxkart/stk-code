@@ -21,6 +21,6 @@ in vec2 uv;
 
 void main()
 {
-	gl_FragColor = texture2D(tex, uv);
+	gl_FragColor = texture(tex, uv);
 	gl_FragColor.a *= transparency;
 }

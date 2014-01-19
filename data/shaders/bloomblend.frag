@@ -5,7 +5,7 @@ in vec2 uv;
 
 void main()
 {
-	vec4 col = texture2D(tex, uv);
+	vec4 col = texture(tex, uv);
 
 	col.xyz *= 10.0 * col.a;
 

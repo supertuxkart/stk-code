@@ -12,7 +12,7 @@ in vec2 uv;
 
 void main() {
 	vec2 texc = uv;
-	float z = texture2D(ntex, texc).a;
+	float z = texture(ntex, texc).a;
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;
@@ -29,7 +29,7 @@ void main() {
 		float att = energy[i] * 200. / (4. * 3.14 * d * d);
 		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
 
-		vec3 norm = texture2D(ntex, texc).xyz;
+		vec3 norm = texture(ntex, texc).xyz;
 		norm = (norm - 0.5) * 2.0;
 
 		// Light Direction

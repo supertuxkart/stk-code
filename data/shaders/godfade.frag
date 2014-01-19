@@ -4,7 +4,7 @@ uniform vec3 col;
 
 void main()
 {
-	vec4 res = texture2D(tex, gl_TexCoord[0].xy);
+	vec4 res = texture(tex, gl_TexCoord[0].xy);
 
 	// Keep the sun fully bright, but fade the sky
 	float mul = distance(res.xyz, col);

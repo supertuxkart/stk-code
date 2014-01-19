@@ -14,11 +14,11 @@ void main() {
 	vec4 col;
 
 	if (haslightmap != 0) {
-		light = texture2D(lighttex, uv1);
+		light = texture(lighttex, uv1);
 	}
 
 	if (hastex != 0)
-		col = texture2D(tex, uv0) * light;
+		col = texture(tex, uv0) * light;
 	else
 		col = color;
 

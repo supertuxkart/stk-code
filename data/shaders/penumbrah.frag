@@ -13,37 +13,37 @@ void main()
 	float width = 0.0;
 	float zsum = 0.00001;
 
-	tmp = texture2D(tex, vec2(X - 5.13333 * pixel.x, Y));
+	tmp = texture(tex, vec2(X - 5.13333 * pixel.x, Y));
 	sum += tmp.x * 0.00640869;
 	zsum += tmp.z;
 	width += tmp.y;
 
-	tmp = texture2D(tex, vec2(X - 3.26667 * pixel.x, Y));
+	tmp = texture(tex, vec2(X - 3.26667 * pixel.x, Y));
 	sum += tmp.x * 0.083313;
 	zsum += tmp.z;
 	width += tmp.y;
 
-	tmp = texture2D(tex, vec2(X - 1.4 * pixel.x, Y));
+	tmp = texture(tex, vec2(X - 1.4 * pixel.x, Y));
 	sum += tmp.x * 0.305481;
 	zsum += tmp.z;
 	width += tmp.y;
 
-	tmp = texture2D(tex, vec2(X, Y));
+	tmp = texture(tex, vec2(X, Y));
 	sum += tmp.x * 0.209473;
 	zsum += tmp.z;
 	width += tmp.y;
 
-	tmp = texture2D(tex, vec2(X + 1.4 * pixel.x, Y));
+	tmp = texture(tex, vec2(X + 1.4 * pixel.x, Y));
 	sum += tmp.x * 0.305481;
 	zsum += tmp.z;
 	width += tmp.y;
 
-	tmp = texture2D(tex, vec2(X + 3.26667 * pixel.x, Y));
+	tmp = texture(tex, vec2(X + 3.26667 * pixel.x, Y));
 	sum += tmp.x * 0.083313;
 	zsum += tmp.z;
 	width += tmp.y;
 
-	tmp = texture2D(tex, vec2(X + 5.13333 * pixel.x, Y));
+	tmp = texture(tex, vec2(X + 5.13333 * pixel.x, Y));
 	sum += tmp.x * 0.00640869;
 	zsum += tmp.z;
 	width += tmp.y;

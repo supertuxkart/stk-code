@@ -49,7 +49,7 @@ void main()
 	vec2 texcoords = gl_TexCoord[0].st;
 
 	// Sample the color buffer
-	vec3 color = texture2D(color_buffer, texcoords).rgb;
+	vec3 color = texture(color_buffer, texcoords).rgb;
 
 	// Compute the blur direction.
 	// IMPORTANT: we don't normalize it so that it avoids a glitch around 'center',
@@ -74,7 +74,7 @@ void main()
 	vec2 blur_texcoords = texcoords + inc_vec;
 	for(int i=1 ; i < NB_SAMPLES ; i++)
 	{
-		color += texture2D(color_buffer, blur_texcoords).rgb;
+		color += texture(color_buffer, blur_texcoords).rgb;
 		blur_texcoords += inc_vec;
 	}
 	color /= vec3(NB_SAMPLES);

@@ -15,12 +15,12 @@ void main()
 
 	vec2 dist = tosun * 1.0/(float(SAMPLES) * 1.12);
 
-	vec3 col = texture2D(tex, texc).xyz;
+	vec3 col = texture(tex, texc).xyz;
 	float decay = 1.0;
 
 	for (int i = 0; i < SAMPLES; i++) {
 		texc += dist;
-		vec3 here = texture2D(tex, texc).xyz;
+		vec3 here = texture(tex, texc).xyz;
 		here *= decay;
 		col += here;
 		decay *= decaystep;

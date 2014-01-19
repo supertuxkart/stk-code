@@ -17,7 +17,7 @@ vec4 encdepth(float v) {
 void main() {
 
 	if (hastex != 0) {
-		float alpha = texture2D(tex, uv).a;
+		float alpha = texture(tex, uv).a;
 
 		if (alpha < 0.5)
 			discard;
@@ -31,7 +31,7 @@ void main() {
 		if (wireframe > 0)
 			gl_FragColor = vec4(1.0);
 		else
-			gl_FragColor = texture2D(tex, uv);
+			gl_FragColor = texture(tex, uv);
 	}
 }
 

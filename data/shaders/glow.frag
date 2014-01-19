@@ -7,7 +7,7 @@ void main()
 {
 	vec2 coords = uv;
 
-	vec4 col = texture2D(tex, coords);
+	vec4 col = texture(tex, coords);
 	float alpha = col.a;
 
 	if (alpha < 0.04 || length(col.xyz) < 0.2) discard;

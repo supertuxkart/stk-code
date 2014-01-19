@@ -44,7 +44,7 @@ void main() {
 	float mixer = fract(mip);
 
 	vec4 mixcol = mix(levels[lowmip], levels[highmip], mixer);
-	vec4 tcol = texture2D(tex, gl_TexCoord[0].xy);
+	vec4 tcol = texture(tex, gl_TexCoord[0].xy);
 
 	vec3 col = mix(tcol.xyz, mixcol.xyz, mixcol.a);
 
