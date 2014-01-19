@@ -4,9 +4,10 @@
 #include <IMaterialRenderer.h>
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
+#include "utils/helpers.hpp"
 
 static
-GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, size_t stride)
+GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
 {
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
@@ -23,6 +24,8 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 		glEnableVertexAttribArray(attrib_tangent);
 	if ((GLint)attrib_bitangent != -1)
 		glEnableVertexAttribArray(attrib_bitangent);
+	if ((GLint)attrib_color != -1)
+		glEnableVertexAttribArray(attrib_color);
 	glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
 	if ((GLint)attrib_texcoord != -1)
 		glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
@@ -47,6 +50,8 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 			Log::error("material", "Bitangents not present in VBO");
 		glVertexAttribPointer(attrib_bitangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)48);
 	}
+	if ((GLint)attrib_color != -1)
+		glVertexAttribPointer(attrib_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (GLvoid*)24);
 		
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
 	glBindVertexArray(0);
@@ -235,6 +240,61 @@ void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glStencilFunc(GL_ALWAYS, 1, ~0);
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
+}
+
+static
+core::vector3df getWind()
+{
+	const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
+	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+	GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
+	float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
+
+	float strength = (pos.X + pos.Y + pos.Z) * 1.2f + time * m_speed;
+	strength = noise2d(strength / 10.0f) * m_amplitude * 5;
+	// * 5 is to work with the existing amplitude values.
+
+	// Pre-multiply on the cpu
+	return irr_driver->getWind() * strength;
+}
+
+void STKMesh::drawGrassPass1(const GLMesh &mesh)
+{
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+
+	glStencilFunc(GL_ALWAYS, 0, ~0);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_TRUE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	TransposeInverseModelView.makeInverse();
+	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glUseProgram(MeshShader::GrassPass1Shader::Program);
+	MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, getWind(), 0);
+
+	glBindVertexArray(mesh.vao_first_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glStencilFunc(GL_ALWAYS, 1, ~0);
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
 void STKMesh::drawNormalPass(const GLMesh &mesh)
@@ -426,6 +486,48 @@ void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
+void STKMesh::drawGrassPass2(const GLMesh &mesh)
+{
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glActiveTexture(GL_TEXTURE2);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glActiveTexture(GL_TEXTURE3);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+	glUseProgram(MeshShader::GrassPass2Shader::Program);
+	MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, getWind(), 0, 1, 2, 3);
+
+	glBindVertexArray(mesh.vao_second_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+}
+
 void STKMesh::drawSecondPass(const GLMesh &mesh)
 {
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
@@ -498,6 +600,8 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawNormalPass(mesh);
 		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 			drawObjectRefPass1(mesh);
+		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+			drawGrassPass1(mesh);
 		else
 			drawFirstPass(mesh);
 		break;
@@ -508,6 +612,8 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawSplatting(mesh);
 		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 			drawObjectRefPass2(mesh);
+		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+			drawGrassPass2(mesh);
 		else
 			drawSecondPass(mesh);
 		break;
@@ -541,6 +647,10 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == irr_driver->getShader(ES_SPLATTING))
 		return true;
+	if (type == irr_driver->getShader(ES_GRASS))
+		return true;
+	if (type == irr_driver->getShader(ES_GRASS_REF))
+		return true;
 	return false;
 }
 
@@ -551,41 +661,50 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, mesh.Stride);
+			MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, -1, mesh.Stride);
 	}
 	else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+			MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+	}
+	else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+	{
+		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			MeshShader::GrassPass1Shader::attrib_position, MeshShader::GrassPass1Shader::attrib_texcoord, -1, MeshShader::GrassPass1Shader::attrib_normal, -1, -1, MeshShader::GrassPass1Shader::attrib_color, mesh.Stride);
 	}
 	else
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+			MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
 	}
 
 	if (type == irr_driver->getShader(ES_SPHERE_MAP))
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::SphereMapShader::attrib_position, -1, -1, MeshShader::SphereMapShader::attrib_normal, -1, -1, mesh.Stride);
+			MeshShader::SphereMapShader::attrib_position, -1, -1, MeshShader::SphereMapShader::attrib_normal, -1, -1, -1, mesh.Stride);
 	}
 	else if (type == irr_driver->getShader(ES_SPLATTING))
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, mesh.Stride);
+			MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
 	}
 	else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, mesh.Stride);
-
+			MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+	}
+	else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+	{
+		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			MeshShader::GrassPass2Shader::attrib_position, MeshShader::GrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassPass2Shader::attrib_color, mesh.Stride);
 	}
 	else
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, mesh.Stride);
+			MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 	}
-	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, mesh.Stride);
+	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
 }
 
 void STKMesh::render()

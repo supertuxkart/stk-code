@@ -32,12 +32,14 @@ protected:
 	void drawFirstPass(const GLMesh &mesh);
 	void drawNormalPass(const GLMesh &mesh);
 	void drawObjectRefPass1(const GLMesh &mesh);
+	void drawGrassPass1(const GLMesh &mesh);
 
 	// Pass 2 shader (ie shaders that outputs final color)
 	void drawSphereMap(const GLMesh &mesh);
 	void drawSplatting(const GLMesh &mesh);
 	void drawSecondPass(const GLMesh &mesh);
 	void drawObjectRefPass2(const GLMesh &mesh);
+	void STKMesh::drawGrassPass2(const GLMesh &mesh);
 
 	// Pass 3 shader (glow)
 	void drawGlow(const GLMesh &mesh, float r, float g, float b);

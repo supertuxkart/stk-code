@@ -117,6 +117,16 @@ public:
         m_amplitude = amp;
     }
 
+	float getSpeed() const
+	{
+		return m_speed;
+	}
+
+	float getAmplitude() const
+	{
+		return m_amplitude;
+	}
+
 private:
     float m_amplitude, m_speed;
 };
