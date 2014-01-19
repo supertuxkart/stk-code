@@ -471,12 +471,12 @@ void ParticleSystemProxy::simulateHeightmap()
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_position);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_lifetime);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_velocity);
-	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_size);
+//	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_size);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glVertexAttribPointer(HeightmapSimulationShader::attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
 	glVertexAttribPointer(HeightmapSimulationShader::attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
 	glVertexAttribPointer(HeightmapSimulationShader::attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
-	glVertexAttribPointer(HeightmapSimulationShader::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
+	//glVertexAttribPointer(HeightmapSimulationShader::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_initial_position);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_initial_lifetime);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_initial_velocity);
@@ -506,7 +506,7 @@ void ParticleSystemProxy::simulateHeightmap()
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_position);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_lifetime);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_velocity);
-	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_size);
+//	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_size);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_initial_position);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_initial_lifetime);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_initial_velocity);
