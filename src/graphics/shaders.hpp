@@ -243,7 +243,7 @@ class SSAOShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_normals_and_depth, uniform_invprojm, uniform_projm, uniform_samplePoints;
+	static GLuint uniform_normals_and_depth, uniform_noise_texture, uniform_invprojm, uniform_projm, uniform_samplePoints;
 	static GLuint vao;
 	static float SSAOSamples[64];
 	

@@ -502,6 +502,7 @@ void PostProcessing::renderGlow(ITexture *tex)
 	glDisable(GL_BLEND);
 }
 
+ITexture *noise_tex = 0;
 
 void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm)
 {
@@ -521,6 +522,16 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, 0);
+
+	if (!noise_tex)
+		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/tarmac.jpg").c_str());
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName());
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

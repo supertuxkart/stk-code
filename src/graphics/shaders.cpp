@@ -710,6 +710,7 @@ namespace FullScreenShader
 
 	GLuint SSAOShader::Program;
 	GLuint SSAOShader::uniform_normals_and_depth;
+	GLuint SSAOShader::uniform_noise_texture;
 	GLuint SSAOShader::uniform_invprojm;
 	GLuint SSAOShader::uniform_projm;
 	GLuint SSAOShader::uniform_samplePoints;
@@ -719,6 +720,7 @@ namespace FullScreenShader
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
 		uniform_normals_and_depth = glGetUniformLocation(Program, "normals_and_depth");
+		uniform_noise_texture = glGetUniformLocation(Program, "noise_texture");
 		uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		uniform_projm = glGetUniformLocation(Program, "projm");
 		uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");

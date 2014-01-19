@@ -1,5 +1,6 @@
 #version 130
 uniform sampler2D normals_and_depth;
+uniform sampler2D noise_texture;
 uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
@@ -13,10 +14,9 @@ const float radius = .4f;
 
 const float invSamples = strengh / SAMPLES;
 
-// Found here : http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
 float rand(vec2 co)
 {
-   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+   return texture(noise_texture, co).x;
 }
 
 void main(void)
