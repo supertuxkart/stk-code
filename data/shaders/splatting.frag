@@ -12,14 +12,15 @@ uniform vec3 ambient;
 
 in vec2 uv;
 in vec2 uv_bis;
+out vec4 FragColor;
 
 void main() {
 	// Splatting part
-	vec4 splatting = texture2D(tex_layout, uv_bis);
-	vec4 detail0 = texture2D(tex_detail0, uv);
-	vec4 detail1 = texture2D(tex_detail1, uv);
-	vec4 detail2 = texture2D(tex_detail2, uv);
-	vec4 detail3 = texture2D(tex_detail3, uv);
+	vec4 splatting = texture(tex_layout, uv_bis);
+	vec4 detail0 = texture(tex_detail0, uv);
+	vec4 detail1 = texture(tex_detail1, uv);
+	vec4 detail2 = texture(tex_detail2, uv);
+	vec4 detail3 = texture(tex_detail3, uv);
 	vec4 detail4 = vec4(0.0);
 
 	vec4 splatted = splatting.r * detail0 +
@@ -28,12 +29,10 @@ void main() {
 			(1.0 - splatting.r - splatting.g - splatting.b) * detail3;
 
    vec2 tc = gl_FragCoord.xy / screen;
-   vec3 DiffuseComponent = texture2D(DiffuseMap, tc).xyz;
-   vec3 SpecularComponent = texture2D(SpecularMap, tc).xyz;
-  float ao = texture2D(SSAO, tc).x;
+   vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
+   vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
+  float ao = texture(SSAO, tc).x;
    vec3 LightFactor = ao * ambient + DiffuseComponent + SpecularComponent;
 	
-	gl_FragColor = vec4(splatted.xyz * LightFactor, 1.);
-
-//	gl_FragData[2] = vec4(1. - splatted.a);
+	FragColor = vec4(splatted.xyz * LightFactor, 1.);
 }

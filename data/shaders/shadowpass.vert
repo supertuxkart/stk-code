@@ -15,8 +15,8 @@ void main()
 
 	vec2 tc = pos.xy * vec2(0.5) + vec2(0.5);
 
-	float movex = decdepth(texture2D(warpx, tc));
-	float movey = decdepth(texture2D(warpy, tc));
+	float movex = decdepth(texture(warpx, tc));
+	float movey = decdepth(texture(warpy, tc));
 
 	float dx = movex * 2.0 - 1.0;
 	float dy = movey * 2.0 - 1.0;

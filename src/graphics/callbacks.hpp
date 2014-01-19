@@ -50,22 +50,6 @@ protected:
 
 //
 
-class NormalMapProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    NormalMapProvider(bool withLightmap)
-    {
-        m_with_lightmap = withLightmap;
-    }
-
-private:
-    bool m_with_lightmap;
-};
-
-//
-
 class WaterShaderProvider: public CallBase
 {
 public:
@@ -133,6 +117,16 @@ public:
         m_amplitude = amp;
     }
 
+	float getSpeed() const
+	{
+		return m_speed;
+	}
+
+	float getAmplitude() const
+	{
+		return m_amplitude;
+	}
+
 private:
     float m_amplitude, m_speed;
 };
@@ -152,14 +146,6 @@ public:
 
 private:
     core::vector3df m_sunpos;
-};
-
-//
-
-class SplattingProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 };
 
 //

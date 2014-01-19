@@ -11,10 +11,11 @@ uniform vec3 campos;
 uniform mat4 ipvmat;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
-	float z = texture2D(tex, uv).a;
+	float z = texture(tex, uv).a;
 
 	vec3 tmp = vec3(gl_TexCoord[0].xy, z);
 	tmp = tmp * 2.0 - 1.0;
@@ -29,5 +30,5 @@ void main()
 
 	fog = min(fog, fogmax);
 
-	gl_FragColor = vec4(col, fog);
+	FragColor = vec4(col, fog);
 }

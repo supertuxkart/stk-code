@@ -9,10 +9,14 @@ uniform mat4 invproj;
 uniform int hasclouds;
 uniform vec2 wind;
 
+out vec4 Diff;
+out vec4 Spec;
+out vec4 SpecularMap;
+
 void main() {
 
 	vec2 texc = gl_FragCoord.xy / screen;
-	float z = texture2D(ntex, texc).a;
+	float z = texture(ntex, texc).a;
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0;
 	xpos = invproj * xpos;
 	xpos.xyz /= xpos.w;
@@ -20,12 +24,12 @@ void main() {
 	if (z < 0.03)
 	{
 		// Skyboxes are fully lit
-		gl_FragData[0] = vec4(1.0);
-		gl_FragData[1] = vec4(1.0);
+		Diff = vec4(1.0);
+		Spec = vec4(1.0);
 		return;
 	}
 
-	vec3 norm = texture2D(ntex, texc).xyz;
+	vec3 norm = texture(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;
 
 	// Normalized on the cpu
@@ -41,13 +45,13 @@ void main() {
 	if (hasclouds == 1)
 	{
 		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;
-		float cloud = texture2D(cloudtex, cloudcoord).x;
+		float cloud = texture(cloudtex, cloudcoord).x;
 		//float cloud = step(0.5, cloudcoord.x) * step(0.5, cloudcoord.y);
 
 		outcol *= cloud;
 	}
 
-	gl_FragData[0] = vec4(NdotL * col, 1.);
-	gl_FragData[1] = vec4(Specular * col, 1.);
-	gl_FragData[2] = vec4(1.0);
+	Diff = vec4(NdotL * col, 1.);
+	Spec = vec4(Specular * col, 1.);
+	SpecularMap = vec4(1.0);
 }

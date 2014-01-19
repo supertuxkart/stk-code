@@ -1,28 +1,29 @@
 #version 130
 uniform sampler2D normals_and_depth;
+uniform sampler2D noise_texture;
 uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
 in vec2 uv;
+out vec4 FragColor;
 
 const float strengh = 4.;
 const float radius = .4f;
 
-#define SAMPLES 16
+#define SAMPLES 8
 
 const float invSamples = strengh / SAMPLES;
 
-// Found here : http://byteblacksmith.com/improvements-to-the-canonical-one-liner-glsl-rand-for-opengl-es-2-0/
 float rand(vec2 co)
 {
-   return fract(sin(dot(co.xy,vec2(12.9898,78.233))) * 43758.5453);
+   return texture(noise_texture, co).x;
 }
 
 void main(void)
 {
-	vec4 cur = texture2D(normals_and_depth, uv);
-	float curdepth = texture2D(normals_and_depth, uv).a;
+	vec4 cur = texture(normals_and_depth, uv);
+	float curdepth = texture(normals_and_depth, uv).a;
 	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
 	FragPos /= FragPos.w;
 
@@ -50,7 +51,7 @@ void main(void)
 
 		bool isInsideTexture = (sampleProj.x > -1.) && (sampleProj.x < 1.) && (sampleProj.y > -1.) && (sampleProj.y < 1.);
 		// get the depth of the occluder fragment
-		float occluderFragmentDepth = texture2D(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
+		float occluderFragmentDepth = texture(normals_and_depth, (sampleProj.xy * 0.5) + 0.5).a;
 		// Position of the occluder fragment in worldSpace
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;
@@ -62,5 +63,5 @@ void main(void)
 	// output the result
 	float ao = 1.0 - bl * invSamples;
 
-	gl_FragColor = vec4(ao);
+	FragColor = vec4(ao);
 }

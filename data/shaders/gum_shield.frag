@@ -26,13 +26,14 @@ uniform float transparency;
 in vec2 uv;
 noperspective in vec3 eyeVec;
 noperspective in vec3 normal;
+out vec4 FragColor;
 
 void main()
 {
 	float inter = dot(normal, eyeVec);
-	float m = texture2D(tex, vec2(0.5, uv.y)).r;
+	float m = texture(tex, vec2(0.5, uv.y)).r;
 	inter = 1.0 - inter;
 	float alpha = inter + 1.0;// * m;
 
-	gl_FragColor = vec4(0.8, 0.16, 0.48, alpha);
+	FragColor = vec4(0.8, 0.16, 0.48, alpha);
 }

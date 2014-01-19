@@ -90,7 +90,7 @@ namespace SimpleParticleRender
 {
 	GLuint Program;
 	GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
-	GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+	GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_normal_and_depths, uniform_screen, uniform_invproj;
 
 	void init()
 	{
@@ -105,7 +105,7 @@ namespace SimpleParticleRender
 
 		uniform_matrix = glGetUniformLocation(Program, "ProjectionMatrix");
 		uniform_viewmatrix = glGetUniformLocation(Program, "ViewMatrix");
-		uniform_texture = glGetUniformLocation(Program, "texture");
+		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_screen = glGetUniformLocation(Program, "screen");
 		uniform_normal_and_depths = glGetUniformLocation(Program, "normals_and_depth");
@@ -116,7 +116,7 @@ namespace FlipParticleRender
 {
 	GLuint Program;
 	GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz, attrib_rotationvec, attrib_anglespeed;
-	GLuint uniform_matrix, uniform_viewmatrix, uniform_texture, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+	GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_normal_and_depths, uniform_screen, uniform_invproj;
 
 	void init()
 	{
@@ -132,7 +132,7 @@ namespace FlipParticleRender
 
 		uniform_matrix = glGetUniformLocation(Program, "ProjectionMatrix");
 		uniform_viewmatrix = glGetUniformLocation(Program, "ViewMatrix");
-		uniform_texture = glGetUniformLocation(Program, "texture");
+		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_screen = glGetUniformLocation(Program, "screen");
 		uniform_normal_and_depths = glGetUniformLocation(Program, "normals_and_depth");
@@ -471,12 +471,12 @@ void ParticleSystemProxy::simulateHeightmap()
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_position);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_lifetime);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_velocity);
-	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_size);
+//	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_size);
 	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
 	glVertexAttribPointer(HeightmapSimulationShader::attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
 	glVertexAttribPointer(HeightmapSimulationShader::attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
 	glVertexAttribPointer(HeightmapSimulationShader::attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
-	glVertexAttribPointer(HeightmapSimulationShader::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
+	//glVertexAttribPointer(HeightmapSimulationShader::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_initial_position);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_initial_lifetime);
 	glEnableVertexAttribArray(HeightmapSimulationShader::attrib_initial_velocity);
@@ -506,7 +506,7 @@ void ParticleSystemProxy::simulateHeightmap()
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_position);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_lifetime);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_velocity);
-	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_size);
+//	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_size);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_initial_position);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_initial_lifetime);
 	glDisableVertexAttribArray(HeightmapSimulationShader::attrib_initial_velocity);
@@ -592,7 +592,7 @@ void ParticleSystemProxy::drawFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	bindUniformToTextureUnit(FlipParticleRender::uniform_texture, texture, 0);
+	bindUniformToTextureUnit(FlipParticleRender::uniform_tex, texture, 0);
 	bindUniformToTextureUnit(FlipParticleRender::uniform_normal_and_depths, normal_and_depth, 1);
 
 	glUniformMatrix4fv(FlipParticleRender::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
@@ -661,7 +661,7 @@ void ParticleSystemProxy::drawNotFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	bindUniformToTextureUnit(SimpleParticleRender::uniform_texture, texture, 0);
+	bindUniformToTextureUnit(SimpleParticleRender::uniform_tex, texture, 0);
 	bindUniformToTextureUnit(SimpleParticleRender::uniform_normal_and_depths, normal_and_depth, 1);
 
 	glUniformMatrix4fv(SimpleParticleRender::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());

@@ -5,6 +5,8 @@ uniform vec2 pixel;
 uniform vec2 multi;
 uniform int size;
 
+out vec4 FragColor;
+
 void main()
 {
 	float res = 0.0;
@@ -14,13 +16,13 @@ void main()
 
 	for (int i = 0; i < size; i++)
 	{
-		float col = texture2D(tex, tc).x;
+		float col = texture(tex, tc).x;
 		res = max(col, res);
 
 		tc += pixel;
 	}
 
-	float old = texture2D(oldtex, gl_TexCoord[0].xy).x;
+	float old = texture(oldtex, gl_TexCoord[0].xy).x;
 
-	gl_FragColor = vec4(mix(old, res, 0.7));
+	FragColor = vec4(mix(old, res, 0.7));
 }

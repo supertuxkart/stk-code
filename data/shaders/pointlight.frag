@@ -9,10 +9,12 @@ uniform mat4 invproj;
 uniform mat4 viewm;
 
 in vec2 uv;
+out vec4 Diffuse;
+out vec4 Specular;
 
 void main() {
 	vec2 texc = uv;
-	float z = texture2D(ntex, texc).a;
+	float z = texture(ntex, texc).a;
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;
@@ -29,7 +31,7 @@ void main() {
 		float att = energy[i] * 200. / (4. * 3.14 * d * d);
 		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
 
-		vec3 norm = texture2D(ntex, texc).xyz;
+		vec3 norm = texture(ntex, texc).xyz;
 		norm = (norm - 0.5) * 2.0;
 
 		// Light Direction
@@ -44,6 +46,6 @@ void main() {
 		specular += Specular * light_col * spec_att;
 	}
 
-	gl_FragData[0] = vec4(diffuse, 1.);
-	gl_FragData[1] = vec4(specular , 1.);
+	Diffuse = vec4(diffuse, 1.);
+	Specular = vec4(specular , 1.);
 }
