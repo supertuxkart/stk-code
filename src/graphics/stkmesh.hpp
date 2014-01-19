@@ -26,6 +26,7 @@ class STKMesh : public irr::scene::CMeshSceneNode
 protected:
 	std::vector<GLMesh> GLmeshes;
 	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+	core::vector3df windDir;
 	void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 
 	// Pass 1 shader (ie shaders that outputs normals and depth)
