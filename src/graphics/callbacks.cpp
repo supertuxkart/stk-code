@@ -29,37 +29,6 @@ using namespace core;
 
 //-------------------------------------
 
-void NormalMapProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 texture = 0;
-        srv->setPixelShaderConstant("texture", &texture, 1);
-
-        s32 normaltex = 1;
-        srv->setPixelShaderConstant("normalMap", &normaltex, 1);
-
-        // We could calculate light direction as coming from the sun (then we'd need to
-        // transform it into camera space). But I find that pretending light
-        // comes from the camera gives good results
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
 void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -173,42 +142,6 @@ void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
         srv->setPixelShaderConstant("tex", &tex, 1);
         s32 glow_tex = 1;
         srv->setPixelShaderConstant("glow_tex", &glow_tex, 1);
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 tex_layout = 1;
-        srv->setPixelShaderConstant("tex_layout", &tex_layout, 1);
-
-        s32 tex_detail0 = 2;
-        srv->setPixelShaderConstant("tex_detail0", &tex_detail0, 1);
-
-        s32 tex_detail1 = 3;
-        srv->setPixelShaderConstant("tex_detail1", &tex_detail1, 1);
-
-        s32 tex_detail2 = 4;
-        srv->setPixelShaderConstant("tex_detail2", &tex_detail2, 1);
-
-        s32 tex_detail3 = 5;
-        srv->setPixelShaderConstant("tex_detail3", &tex_detail3, 1);
-
         firstdone = true;
     }
 }
