@@ -242,7 +242,9 @@ void Shaders::loadShaders()
 	MeshShader::ColorizeShader::init();
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
+	MeshShader::ObjectRefPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+	MeshShader::ObjectRefPass2Shader::init();
 	MeshShader::SphereMapShader::init();
 	MeshShader::SplattingShader::init();
 }
@@ -297,6 +299,31 @@ namespace MeshShader
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
 	}
 
+	GLuint ObjectRefPass1Shader::Program;
+	GLuint ObjectRefPass1Shader::attrib_position;
+	GLuint ObjectRefPass1Shader::attrib_normal;
+	GLuint ObjectRefPass1Shader::uniform_MVP;
+	GLuint ObjectRefPass1Shader::uniform_TIMV;
+	GLuint ObjectRefPass1Shader::uniform_tex;
+
+	void ObjectRefPass1Shader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/objectref_pass1.vert").c_str(), file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_normal = glGetAttribLocation(Program, "Normal");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+	}
+
+	void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+		glUniform1i(uniform_tex, TU_tex);
+	}
+
 	GLuint ObjectPass2Shader::Program;
 	GLuint ObjectPass2Shader::attrib_position;
 	GLuint ObjectPass2Shader::attrib_texcoord;
@@ -325,6 +352,45 @@ namespace MeshShader
 	}
 
 	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_Albedo, TU_Albedo);
+		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
+		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint ObjectRefPass2Shader::Program;
+	GLuint ObjectRefPass2Shader::attrib_position;
+	GLuint ObjectRefPass2Shader::attrib_texcoord;
+	GLuint ObjectRefPass2Shader::uniform_MVP;
+	GLuint ObjectRefPass2Shader::uniform_TIMV;
+	GLuint ObjectRefPass2Shader::uniform_Albedo;
+	GLuint ObjectRefPass2Shader::uniform_DiffuseMap;
+	GLuint ObjectRefPass2Shader::uniform_SpecularMap;
+	GLuint ObjectRefPass2Shader::uniform_SSAO;
+	GLuint ObjectRefPass2Shader::uniform_screen;
+	GLuint ObjectRefPass2Shader::uniform_ambient;
+
+	void ObjectRefPass2Shader::init()
+	{
+		initGL();
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void ObjectRefPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
