@@ -171,15 +171,8 @@ STKMesh::~STKMesh()
 	}
 }
 
-void STKMesh::drawFirstPass(const GLMesh &mesh)
+void STKMesh::drawObjectPass1(const GLMesh &mesh)
 {
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-
-  glStencilFunc(GL_ALWAYS, 0, ~0);
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_TRUE);
-  glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -197,21 +190,10 @@ void STKMesh::drawFirstPass(const GLMesh &mesh)
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glStencilFunc(GL_ALWAYS, 1, ~0);
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
 void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
 {
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-
-  glStencilFunc(GL_ALWAYS, 0, ~0);
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_TRUE);
-  glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -236,10 +218,6 @@ void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glStencilFunc(GL_ALWAYS, 1, ~0);
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
 static
@@ -260,13 +238,6 @@ core::vector3df getWind()
 
 void STKMesh::drawGrassPass1(const GLMesh &mesh)
 {
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-
-	glStencilFunc(GL_ALWAYS, 0, ~0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
@@ -291,21 +262,10 @@ void STKMesh::drawGrassPass1(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glStencilFunc(GL_ALWAYS, 1, ~0);
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
 void STKMesh::drawNormalPass(const GLMesh &mesh)
 {
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-
-	glStencilFunc(GL_ALWAYS, 0, ~0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_TRUE);
-	glDisable(GL_BLEND);
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
@@ -331,20 +291,10 @@ void STKMesh::drawNormalPass(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glStencilFunc(GL_ALWAYS, 1, ~0);
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
 void STKMesh::drawSphereMap(const GLMesh &mesh)
 {
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_FALSE);
-  glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -361,19 +311,10 @@ void STKMesh::drawSphereMap(const GLMesh &mesh)
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
 void STKMesh::drawSplatting(const GLMesh &mesh)
 {
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_FALSE);
-  glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -439,19 +380,10 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
 void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
 {
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_FALSE);
-  glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -481,19 +413,10 @@ void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
 void STKMesh::drawGrassPass2(const GLMesh &mesh)
 {
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
@@ -523,19 +446,10 @@ void STKMesh::drawGrassPass2(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
-void STKMesh::drawSecondPass(const GLMesh &mesh)
+void STKMesh::drawObjectPass2(const GLMesh &mesh)
 {
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-  glEnable(GL_DEPTH_TEST);
-  glDisable(GL_ALPHA_TEST);
-  glDepthMask(GL_FALSE);
-  glDisable(GL_BLEND);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -565,9 +479,6 @@ void STKMesh::drawSecondPass(const GLMesh &mesh)
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
 void STKMesh::drawGlow(const GLMesh &mesh, float r, float g, float b)
@@ -596,6 +507,15 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	switch (irr_driver->getPhase())
 	{
 	case 0:
+	{
+		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+
+		glStencilFunc(GL_ALWAYS, 0, ~0);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
+
 		if (type == irr_driver->getShader(ES_NORMAL_MAP))
 			drawNormalPass(mesh);
 		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
@@ -603,20 +523,38 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
 			drawGrassPass1(mesh);
 		else
-			drawFirstPass(mesh);
+			drawObjectPass1(mesh);
+
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glStencilFunc(GL_ALWAYS, 1, ~0);
+		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 		break;
+	}
 	case 1:
-		if (type == irr_driver->getShader(ES_SPHERE_MAP))
-			drawSphereMap(mesh);
-		else if (type == irr_driver->getShader(ES_SPLATTING))
-			drawSplatting(mesh);
-		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-			drawObjectRefPass2(mesh);
-		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-			drawGrassPass2(mesh);
-		else
-			drawSecondPass(mesh);
-		break;
+	{
+		  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+
+		  glEnable(GL_DEPTH_TEST);
+		  glDisable(GL_ALPHA_TEST);
+		  glDepthMask(GL_FALSE);
+		  glDisable(GL_BLEND);
+
+		  if (type == irr_driver->getShader(ES_SPHERE_MAP))
+			  drawSphereMap(mesh);
+		  else if (type == irr_driver->getShader(ES_SPLATTING))
+			  drawSplatting(mesh);
+		  else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+			  drawObjectRefPass2(mesh);
+		  else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+			  drawGrassPass2(mesh);
+		  else
+			  drawObjectPass2(mesh);
+
+		  glBindVertexArray(0);
+		  glBindBuffer(GL_ARRAY_BUFFER, 0);
+		  break;
+	}
 	case 2:
 	{
 		ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
