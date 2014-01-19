@@ -198,6 +198,45 @@ void STKMesh::drawFirstPass(const GLMesh &mesh)
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 }
 
+void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
+{
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+
+  glStencilFunc(GL_ALWAYS, 0, ~0);
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_ALPHA_TEST);
+  glDepthMask(GL_TRUE);
+  glDisable(GL_BLEND);
+  GLenum ptype = mesh.PrimitiveType;
+  GLenum itype = mesh.IndexType;
+  size_t count = mesh.IndexCount;
+
+  ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
+  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+  ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+  TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+  TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+  TransposeInverseModelView.makeInverse();
+  TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
+  MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+
+  glBindVertexArray(mesh.vao_first_pass);
+  glDrawElements(ptype, count, itype, 0);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glStencilFunc(GL_ALWAYS, 1, ~0);
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
+}
+
 void STKMesh::drawNormalPass(const GLMesh &mesh)
 {
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
@@ -339,6 +378,41 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
   irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 }
 
+void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
+{
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+
+  glEnable(GL_DEPTH_TEST);
+  glDisable(GL_ALPHA_TEST);
+  glDepthMask(GL_FALSE);
+  glDisable(GL_BLEND);
+  GLenum ptype = mesh.PrimitiveType;
+  GLenum itype = mesh.IndexType;
+  size_t count = mesh.IndexCount;
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, mesh.textures[0]);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName());
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName());
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName());
+
+  glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
+  MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
+
+  glBindVertexArray(mesh.vao_second_pass);
+  glDrawElements(ptype, count, itype, 0);
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+}
 
 void STKMesh::drawSecondPass(const GLMesh &mesh)
 {
@@ -404,6 +478,8 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case 0:
 		if (type == irr_driver->getShader(ES_NORMAL_MAP))
 			drawNormalPass(mesh);
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+			drawObjectRefPass1(mesh);
 		else
 			drawFirstPass(mesh);
 		break;
@@ -412,6 +488,8 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawSphereMap(mesh);
 		else if (type == irr_driver->getShader(ES_SPLATTING))
 			drawSplatting(mesh);
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+			drawObjectRefPass2(mesh);
 		else
 			drawSecondPass(mesh);
 		break;
@@ -437,6 +515,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 {
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
 		return true;
+	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+		return true;
 	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 		return true;
 	if (type == irr_driver->getShader(ES_SPHERE_MAP))
@@ -455,6 +535,11 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 			MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, mesh.Stride);
 	}
+	else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+	{
+		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, mesh.Stride);
+	}
 	else
 	{
 		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -470,6 +555,12 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	{
 		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 			MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, mesh.Stride);
+	}
+	else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+	{
+		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, mesh.Stride);
+
 	}
 	else
 	{

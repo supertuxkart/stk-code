@@ -302,6 +302,7 @@ namespace MeshShader
 	GLuint ObjectRefPass1Shader::Program;
 	GLuint ObjectRefPass1Shader::attrib_position;
 	GLuint ObjectRefPass1Shader::attrib_normal;
+	GLuint ObjectRefPass1Shader::attrib_texcoord;
 	GLuint ObjectRefPass1Shader::uniform_MVP;
 	GLuint ObjectRefPass1Shader::uniform_TIMV;
 	GLuint ObjectRefPass1Shader::uniform_tex;
@@ -312,6 +313,7 @@ namespace MeshShader
 		Program = LoadProgram(file_manager->getAsset("shaders/objectref_pass1.vert").c_str(), file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_normal = glGetAttribLocation(Program, "Normal");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
 		uniform_tex = glGetUniformLocation(Program, "tex");

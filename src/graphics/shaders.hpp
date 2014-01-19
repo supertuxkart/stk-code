@@ -41,7 +41,7 @@ class ObjectRefPass1Shader
 {
 public:
 	static GLuint Program;
-	static GLuint attrib_position, attrib_normal;
+	static GLuint attrib_position, attrib_normal, attrib_texcoord;
 	static GLuint uniform_MVP, uniform_TIMV, uniform_tex;
 
 	static void init();
