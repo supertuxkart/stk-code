@@ -6,6 +6,7 @@ uniform sampler2D SSAO;
 uniform vec2 screen;
 uniform vec3 ambient;
 in vec2 uv;
+out vec4 FragColor;
 
 void main(void)
 {
@@ -16,5 +17,5 @@ void main(void)
     vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
     float ao = texture(SSAO, tc).x;
     vec3 LightFactor = ao * ambient + DiffuseComponent + SpecularComponent;
-    gl_FragColor = vec4(color.xyz * LightFactor, 1.);
+    FragColor = vec4(color.xyz * LightFactor, 1.);
 }

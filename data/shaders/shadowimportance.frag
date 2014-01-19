@@ -6,6 +6,7 @@ uniform int low;
 
 in vec3 wpos;
 in vec2 texc;
+out vec4 FragColor;
 
 float luminanceImp()
 {
@@ -66,6 +67,6 @@ void main()
 	importance = ceil(importance) * low;
 	importance /= steps;
 
-	gl_FragColor = vec4(importance);
+	FragColor = vec4(importance);
 	gl_FragDepth = 1.0 - importance;
 }

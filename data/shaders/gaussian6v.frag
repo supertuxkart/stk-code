@@ -5,6 +5,7 @@ uniform vec2 pixel;
 // Gaussian separated blur with radius 6.
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -20,5 +21,5 @@ void main()
 	sum += texture(tex, vec2(X, Y + 3.26667 * pixel.y)) * 0.083313;
 	sum += texture(tex, vec2(X, Y + 5.13333 * pixel.y)) * 0.00640869;
 
-	gl_FragColor = sum;
+	FragColor = sum;
 }

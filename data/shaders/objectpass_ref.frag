@@ -6,6 +6,9 @@ uniform float objectid;
 noperspective in vec3 nor;
 in vec2 uv0;
 in vec2 uv1;
+out vec4 Albedo;
+out vec4 NormalDepth;
+out vec4 Specular;
 
 void main() {
 
@@ -15,12 +18,12 @@ void main() {
 		if (col.a < 0.5)
 			discard;
 
-		gl_FragData[0] = vec4(col.xyz, 1.);
+		Albedo = vec4(col.xyz, 1.);
 	//} else {
-	//	gl_FragData[0] = gl_Color;
+	//	Albedo = gl_Color;
 	//}
 
-	gl_FragData[1] = vec4(0.5 * normalize(nor) + 0.5, gl_FragCoord.z);
-	gl_FragData[2] = vec4(1. - col.a);
+	NormalDepth = vec4(0.5 * normalize(nor) + 0.5, gl_FragCoord.z);
+	Specular = vec4(1. - col.a);
 }
 

@@ -2,6 +2,8 @@
 uniform sampler2D tex;
 uniform vec2 pixel;
 
+out vec4 FragColor;
+
 // Separated penumbra, vertical
 
 void main()
@@ -49,5 +51,5 @@ void main()
 	width += tmp.y;
 
 	float hasz = step(0.7, zsum);
-	gl_FragColor = vec4(sum, (width / zsum) * hasz, hasz, 1.0);
+	FragColor = vec4(sum, (width / zsum) * hasz, hasz, 1.0);
 }

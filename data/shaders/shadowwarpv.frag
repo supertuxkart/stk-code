@@ -3,6 +3,8 @@ uniform sampler2D tex;
 uniform int size;
 uniform vec2 pixel;
 
+out vec4 FragColor;
+
 vec4 encdepth(float v) {
 	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
 	enc = fract(enc);
@@ -51,5 +53,5 @@ void main()
 	res = res * 0.5 + 0.5;
 	res = clamp(res, 0.01, 0.99);
 
-	gl_FragColor = encdepth(res);
+	FragColor = encdepth(res);
 }

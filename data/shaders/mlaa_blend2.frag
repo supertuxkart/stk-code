@@ -9,6 +9,8 @@ uniform sampler2D areaMap;
 
 uniform vec2 PIXEL_SIZE;
 
+out vec4 FragColor;
+
 /**
  * This one just returns the first level of a mip map chain, which allow us to
  * avoid the nasty ddx/ddy warnings, even improving the performance a little
@@ -109,5 +111,5 @@ void main() {
 		areas.ba = Area(abs(d), e1, e2);
 	}
 
-	gl_FragColor = areas;
+	FragColor = areas;
 }

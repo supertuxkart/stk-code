@@ -6,6 +6,9 @@ uniform float objectid;
 noperspective in vec3 nor;
 noperspective in vec3 eyenor;
 noperspective in vec3 viewpos;
+out vec4 Albedo;
+out vec4 NormalDepth;
+out vec4 Specular;
 
 void main() {
 	float rim = 1.0 - dot(eyenor, viewpos);
@@ -25,8 +28,8 @@ void main() {
 		color = gl_Color + vec4(vec3(rim), 0.0);
 	}
 
-	gl_FragData[0] = vec4(color.xyz, 1.);
-	gl_FragData[1] = vec4(0.5 * normalize(nor) + 0.5, gl_FragCoord.z);
-	gl_FragData[2] = vec4(1. - color.a);
+	Albedo = vec4(color.xyz, 1.);
+	NormalDepth = vec4(0.5 * normalize(nor) + 0.5, gl_FragCoord.z);
+	Specular = vec4(1. - color.a);
 }
 

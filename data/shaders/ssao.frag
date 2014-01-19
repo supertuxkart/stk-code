@@ -6,6 +6,7 @@ uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
 in vec2 uv;
+out vec4 FragColor;
 
 const float strengh = 4.;
 const float radius = .4f;
@@ -62,5 +63,5 @@ void main(void)
 	// output the result
 	float ao = 1.0 - bl * invSamples;
 
-	gl_FragColor = vec4(ao);
+	FragColor = vec4(ao);
 }

@@ -2,6 +2,7 @@
 uniform sampler2D tex;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -9,5 +10,5 @@ void main()
 
 	col.xyz *= 10.0 * col.a;
 
-	gl_FragColor = vec4(col.xyz, 1.);
+	FragColor = vec4(col.xyz, 1.);
 }

@@ -12,6 +12,7 @@ noperspective in vec3 lightVec;
 noperspective in vec3 halfVec;
 noperspective in vec3 eyeVec;
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -53,5 +54,5 @@ void main()
 	float summed = dot(vec3(1.0), col) / 3.0;
 	float alpha = 0.9 + 0.1 * smoothstep(0.0, 1.0, summed);
 
-	gl_FragColor = vec4(col, alpha);
+	FragColor = vec4(col, alpha);
 }

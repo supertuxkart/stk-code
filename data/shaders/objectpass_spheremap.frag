@@ -2,6 +2,7 @@
 uniform sampler2D tex;
 
 noperspective in vec3 nor;
+out vec4 FragColor;
 
 void main() {
 	// Calculate the spherical UV
@@ -17,5 +18,5 @@ void main() {
 
 	vec4 detail0 = texture(tex, 0.5 * vec2(sin_theta_x, sin_theta_y) + 0.5);
 
-	gl_FragColor = vec4(detail0.xyz, 1.);
+	FragColor = vec4(detail0.xyz, 1.);
 }

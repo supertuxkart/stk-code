@@ -3,6 +3,7 @@ uniform sampler2D tex;
 uniform float low;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -12,5 +13,5 @@ void main()
 
 	col *= smoothstep(low, 0.9, luma);
 
-	gl_FragColor = vec4(col, 1.0);
+	FragColor = vec4(col, 1.0);
 }

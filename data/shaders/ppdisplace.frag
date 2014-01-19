@@ -5,6 +5,7 @@ uniform sampler2D dtex;
 uniform int viz;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -21,9 +22,9 @@ void main()
 
 	if (viz < 1)
 	{
-		gl_FragColor = newcol;
+		FragColor = newcol;
 	} else
 	{
-		gl_FragColor = shiftval * vec4(50.0);
+		FragColor = shiftval * vec4(50.0);
 	}
 }

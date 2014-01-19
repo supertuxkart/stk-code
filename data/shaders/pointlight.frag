@@ -9,6 +9,8 @@ uniform mat4 invproj;
 uniform mat4 viewm;
 
 in vec2 uv;
+out vec4 Diffuse;
+out vec4 Specular;
 
 void main() {
 	vec2 texc = uv;
@@ -44,6 +46,6 @@ void main() {
 		specular += Specular * light_col * spec_att;
 	}
 
-	gl_FragData[0] = vec4(diffuse, 1.);
-	gl_FragData[1] = vec4(specular , 1.);
+	Diffuse = vec4(diffuse, 1.);
+	Specular = vec4(specular , 1.);
 }

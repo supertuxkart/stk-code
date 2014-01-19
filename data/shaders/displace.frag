@@ -8,6 +8,8 @@ in vec2 uv;
 in vec2 edger_uv;
 in float camdist;
 
+out vec4 FragColor;
+
 void main()
 {
 	vec2 tc = uv;
@@ -39,5 +41,5 @@ void main()
 	col.b = step(offset.y, 0.0) * -offset.y;
 	col.a = step(0.0, offset.y) * offset.y;
 
-	gl_FragColor = col;
+	FragColor = col;
 }

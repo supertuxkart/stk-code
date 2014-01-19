@@ -6,6 +6,8 @@ uniform vec2 sunpos;
 
 const float decaystep = 0.88;
 
+out vec4 FragColor;
+
 void main()
 {
 	vec2 texc = gl_TexCoord[0].xy;
@@ -26,5 +28,5 @@ void main()
 		decay *= decaystep;
 	}
 
-	gl_FragColor = vec4(col, 1.0) * 0.8;
+	FragColor = vec4(col, 1.0) * 0.8;
 }

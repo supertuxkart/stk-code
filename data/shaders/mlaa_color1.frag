@@ -5,6 +5,8 @@ in vec2 uv;
 uniform sampler2D colorMapG;
 const float threshold = 0.1;
 
+out vec4 FragColor;
+
 void main() {
 	vec3 weights = vec3(0.2126,0.7152, 0.0722); // ITU-R BT. 709
 
@@ -23,5 +25,5 @@ void main() {
 	if (dot(edges, vec4(1.0)) == 0.0)
 		discard;
 
-	gl_FragColor = edges;
+	FragColor = edges;
 }

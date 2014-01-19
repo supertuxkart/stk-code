@@ -12,6 +12,7 @@ uniform vec3 ambient;
 
 in vec2 uv;
 in vec2 uv_bis;
+out vec4 FragColor;
 
 void main() {
 	// Splatting part
@@ -33,7 +34,5 @@ void main() {
   float ao = texture(SSAO, tc).x;
    vec3 LightFactor = ao * ambient + DiffuseComponent + SpecularComponent;
 	
-	gl_FragColor = vec4(splatted.xyz * LightFactor, 1.);
-
-//	gl_FragData[2] = vec4(1. - splatted.a);
+	FragColor = vec4(splatted.xyz * LightFactor, 1.);
 }

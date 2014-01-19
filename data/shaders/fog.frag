@@ -11,6 +11,7 @@ uniform vec3 campos;
 uniform mat4 ipvmat;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -29,5 +30,5 @@ void main()
 
 	fog = min(fog, fogmax);
 
-	gl_FragColor = vec4(col, fog);
+	FragColor = vec4(col, fog);
 }

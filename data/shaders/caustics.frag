@@ -4,6 +4,8 @@ uniform sampler2D caustictex;
 uniform vec2 dir;
 uniform vec2 dir2;
 
+out vec4 FragColor;
+
 void main()
 {
 	vec2 tc = gl_TexCoord[0].xy;
@@ -14,5 +16,5 @@ void main()
 
 	col += caustic * caustic2 * 10.0;
 
-	gl_FragColor = vec4(col, 1.0);
+	FragColor = vec4(col, 1.0);
 }

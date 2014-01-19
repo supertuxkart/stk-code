@@ -5,6 +5,8 @@ uniform vec2 pixel;
 uniform vec2 multi;
 uniform int size;
 
+out vec4 FragColor;
+
 void main()
 {
 	float res = 0.0;
@@ -22,5 +24,5 @@ void main()
 
 	float old = texture(oldtex, gl_TexCoord[0].xy).x;
 
-	gl_FragColor = vec4(mix(old, res, 0.7));
+	FragColor = vec4(mix(old, res, 0.7));
 }

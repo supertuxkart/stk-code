@@ -4,6 +4,8 @@ uniform sampler2D normals_and_depth;
 uniform mat4 invproj;
 uniform vec2 screen;
 
+out vec4 FragColor;
+
 void main()
 {
 	vec2 xy = gl_FragCoord.xy / screen;
@@ -15,6 +17,6 @@ void main()
 	EnvPos /= EnvPos.w;
 	float len = dot(vec3(1.0), abs(texture(normals_and_depth, xy).xyz));
 	float alpha = (len < 0.2) ? 1. : clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
-	gl_FragColor = texture(tex, gl_PointCoord.xy);
-	gl_FragColor.a *= alpha;
+	FragColor = texture(tex, gl_PointCoord.xy);
+	FragColor.a *= alpha;
 }

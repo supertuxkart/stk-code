@@ -4,6 +4,7 @@ uniform vec3 inlevel;
 uniform vec2 outlevel;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -25,5 +26,5 @@ void main()
 	col.rgb = (pow(((col.rgb * 255.0) - inBlack) / (inWhite - inBlack),
                 vec3(1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
   
-	gl_FragColor = vec4(col.rgb, 1.0);
+	FragColor = vec4(col.rgb, 1.0);
 }

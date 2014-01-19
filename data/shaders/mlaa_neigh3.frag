@@ -1,6 +1,7 @@
 #version 130
 in vec4 offset[2];
 in vec2 uv;
+out vec4 FragColor;
 
 uniform sampler2D blendMap;
 uniform sampler2D colorMap;
@@ -36,5 +37,5 @@ void main() {
 	color = mix(C, Cright, a.a) * w.a + color;
 
 	// Normalize the resulting color and we are finished!
-	gl_FragColor = color / sum;
+	FragColor = color / sum;
 }

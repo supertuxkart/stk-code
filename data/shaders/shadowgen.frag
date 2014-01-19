@@ -2,6 +2,7 @@
 uniform sampler2D halft; // half is a reserved word
 uniform sampler2D quarter;
 uniform sampler2D eighth;
+out vec4 FragColor;
 
 void main()
 {
@@ -41,5 +42,5 @@ void main()
 		outval = 1.0 - mix(val[down].x, val[up].x, interp);
 	}
 
-	gl_FragColor = vec4(vec3(outval), 1.0);
+	FragColor = vec4(vec3(outval), 1.0);
 }

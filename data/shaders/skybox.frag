@@ -25,6 +25,7 @@ in vec2 uv;
 in vec2 uv_cl;
 in vec3 vertex;
 in vec2 uv_fast;
+out vec4 FragColor;
 
 void main()
 {
@@ -62,8 +63,8 @@ void main()
 	col = cld_mask + col*(1. - cld_mask);
 	col = cld_fast + col*(1. - cld_fast);
 	
-  gl_FragColor = vec4( vec3(col * paint * paint2), 1.0);
+  FragColor = vec4( vec3(col * paint * paint2), 1.0);
   
 
-  //gl_FragColor = vec4(vec3(ou), 1.0);
+  //FragColor = vec4(vec3(ou), 1.0);
 }

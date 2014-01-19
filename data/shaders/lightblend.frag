@@ -6,6 +6,7 @@ uniform sampler2D specular_map;
 uniform vec3 ambient;
 
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
@@ -16,5 +17,5 @@ void main()
 	float specmap = texture(specular_map, texc).x;
 	float ao = texture(ambient_occlusion, texc).x;
 
-	gl_FragColor = vec4(diffuse + spec * specmap + ao * ambient, 1.0);
+	FragColor = vec4(diffuse + spec * specmap + ao * ambient, 1.0);
 }

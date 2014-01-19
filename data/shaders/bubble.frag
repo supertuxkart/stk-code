@@ -18,9 +18,10 @@
 uniform sampler2D tex;
 uniform float transparency;
 in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
-	gl_FragColor = texture(tex, uv);
-	gl_FragColor.a *= transparency;
+	FragColor = texture(tex, uv);
+	FragColor.a *= transparency;
 }

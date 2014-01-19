@@ -15,6 +15,9 @@ uniform int hasclouds;
 uniform vec2 wind;
 uniform float shadowoffset;
 
+out vec4 FragColor;
+out vec4 OtherOutput;
+
 float decdepth(vec4 rgba) {
 	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
 }
@@ -28,8 +31,8 @@ void main() {
 	if (z < 0.03)
 	{
 		// Skyboxes are fully lit
-		gl_FragData[0] = vec4(1.0);
-		gl_FragData[1] = vec4(0.0);
+		FragColor = vec4(1.0);
+		OtherOutput = vec4(0.0);
 		return;
 	}
 
@@ -115,6 +118,6 @@ void main() {
 /*	outcol.r = (shadowcoord.z - shadowmapz) * 50.0;
 	outcol.g = moved;*/
 
-	gl_FragData[0] = vec4(outcol, 0.05);
-	gl_FragData[1] = vec4(shadowed, penumbra, shadowed, shadowed);
+	FragColor = vec4(outcol, 0.05);
+	OtherOutput = vec4(shadowed, penumbra, shadowed, shadowed);
 }

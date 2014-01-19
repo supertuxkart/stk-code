@@ -9,6 +9,10 @@ uniform mat4 invproj;
 uniform int hasclouds;
 uniform vec2 wind;
 
+out vec4 Diff;
+out vec4 Spec;
+out vec4 SpecularMap;
+
 void main() {
 
 	vec2 texc = gl_FragCoord.xy / screen;
@@ -20,8 +24,8 @@ void main() {
 	if (z < 0.03)
 	{
 		// Skyboxes are fully lit
-		gl_FragData[0] = vec4(1.0);
-		gl_FragData[1] = vec4(1.0);
+		Diff = vec4(1.0);
+		Spec = vec4(1.0);
 		return;
 	}
 
@@ -47,7 +51,7 @@ void main() {
 		outcol *= cloud;
 	}
 
-	gl_FragData[0] = vec4(NdotL * col, 1.);
-	gl_FragData[1] = vec4(Specular * col, 1.);
-	gl_FragData[2] = vec4(1.0);
+	Diff = vec4(NdotL * col, 1.);
+	Spec = vec4(Specular * col, 1.);
+	SpecularMap = vec4(1.0);
 }

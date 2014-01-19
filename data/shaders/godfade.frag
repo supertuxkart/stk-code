@@ -1,6 +1,7 @@
 #version 130
 uniform sampler2D tex;
 uniform vec3 col;
+out vec4 FragColor;
 
 void main()
 {
@@ -13,5 +14,5 @@ void main()
 
 	res = res * vec4(mul);
 
-	gl_FragColor = res;
+	FragColor = res;
 }

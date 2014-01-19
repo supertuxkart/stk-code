@@ -41,6 +41,8 @@ uniform float mask_radius;
 // Maximum height of texture used
 uniform float max_tex_height;
 
+out vec4 FragColor;
+
 // Number of samples used for blurring
 #define NB_SAMPLES 8
 
@@ -78,8 +80,8 @@ void main()
 		blur_texcoords += inc_vec;
 	}
 	color /= vec3(NB_SAMPLES);
-	gl_FragColor = vec4(color, 1.0);
+	FragColor = vec4(color, 1.0);
 
 	// Keep this commented line for debugging:
-	//gl_FragColor = vec4(blur_factor, blur_factor, blur_factor, 0.0);
+	//FragColor = vec4(blur_factor, blur_factor, blur_factor, 0.0);
 }
