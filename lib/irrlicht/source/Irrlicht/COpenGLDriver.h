@@ -142,6 +142,8 @@ namespace video
 		//! queries the features of the driver, returns true if feature is available
 		virtual bool queryFeature(E_VIDEO_DRIVER_FEATURE feature) const
 		{
+		  if (feature == EVDF_FRAMEBUFFER_OBJECT)
+			 return true;
 			return FeatureEnabled[feature] && COpenGLExtensionHandler::queryFeature(feature);
 		}
 
