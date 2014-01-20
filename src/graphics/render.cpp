@@ -301,17 +301,10 @@ void IrrDriver::renderGLSL(float dt)
         }
 
         // We need to re-render camera due to the per-cam-node hack.
-        PROFILER_PUSH_CPU_MARKER("- Transparent Pass 1", 0xFF, 0x00, 0x00);
-		irr_driver->setPhase(0);
+        PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
         m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
-
-		PROFILER_PUSH_CPU_MARKER("- Transparent Pass 2", 0xFF, 0x00, 0x00);
-		irr_driver->setPhase(1);
-		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
-		m_scene_manager->drawAll(m_renderpass);
-        PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0x00, 0x00);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;

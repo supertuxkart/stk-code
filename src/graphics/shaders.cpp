@@ -246,6 +246,8 @@ void Shaders::loadShaders()
 	MeshShader::SplattingShader::init();
 	MeshShader::GrassPass1Shader::init();
 	MeshShader::GrassPass2Shader::init();
+	MeshShader::BubbleShader::init();
+	MeshShader::TransparentShader::init();
 }
 
 Shaders::~Shaders()
@@ -572,6 +574,53 @@ namespace MeshShader
 		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint BubbleShader::Program;
+	GLuint BubbleShader::attrib_position;
+	GLuint BubbleShader::attrib_texcoord;
+	GLuint BubbleShader::uniform_MVP;
+	GLuint BubbleShader::uniform_tex;
+	GLuint BubbleShader::uniform_time;
+	GLuint BubbleShader::uniform_transparency;
+
+	void BubbleShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/bubble.vert").c_str(), file_manager->getAsset("shaders/bubble.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_time = glGetUniformLocation(Program, "time");
+		uniform_transparency = glGetUniformLocation(Program, "transparency");
+	}
+	void BubbleShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_tex, TU_tex);
+		glUniform1f(uniform_time, time);
+		glUniform1f(uniform_transparency, transparency);
+	}
+
+	GLuint TransparentShader::Program;
+	GLuint TransparentShader::attrib_position;
+	GLuint TransparentShader::attrib_texcoord;
+	GLuint TransparentShader::uniform_MVP;
+	GLuint TransparentShader::uniform_tex;
+
+	void TransparentShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparent.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+	}
+
+	void TransparentShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_tex, TU_tex);
 	}
 
 	GLuint ColorizeShader::Program;

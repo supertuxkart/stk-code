@@ -16,5 +16,5 @@ void main(void)
     vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
 	float ao = texture(SSAO, tc).x;
     vec3 LightFactor = ao * ambient + DiffuseComponent + SpecularComponent * (1. - color.a);
-    FragColor = vec4(color.xyz * LightFactor, color.a);
+    FragColor = vec4(color.xyz * LightFactor, 1.);
 }
