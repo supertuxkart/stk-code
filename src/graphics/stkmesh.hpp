@@ -27,7 +27,8 @@ protected:
 	std::vector<GLMesh> GLmeshes;
 	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
 	core::vector3df windDir;
-	void draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
+	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
+	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 
 	// Pass 1 shader (ie shaders that outputs normals and depth)
 	void drawObjectPass1(const GLMesh &mesh);
@@ -41,6 +42,10 @@ protected:
 	void drawObjectPass2(const GLMesh &mesh);
 	void drawObjectRefPass2(const GLMesh &mesh);
 	void drawGrassPass2(const GLMesh &mesh);
+
+	// Forward pass (for transparents meshes)
+	void drawTransparentObject(const GLMesh &mesh);
+	void drawBubble(const GLMesh &mesh);
 
 	// Pass 3 shader (glow)
 	void drawGlow(const GLMesh &mesh, float r, float g, float b);

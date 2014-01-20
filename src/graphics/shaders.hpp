@@ -125,6 +125,29 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex_layout, unsigned TU_tex_detail0, unsigned TU_tex_detail1, unsigned TU_tex_detail2, unsigned TU_tex_detail3, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
 };
 
+class BubbleShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_MVP, uniform_tex, uniform_time, uniform_transparency;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency);
+};
+
+class TransparentShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_MVP, uniform_tex;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
+};
+
+
 class ColorizeShader
 {
 public:
