@@ -20,7 +20,8 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine { class Widget; class LabelWidget; }
+namespace GUIEngine { class Widget; class LabelWidget;
+                      class RibbonWidget;              }
 namespace Online    { class XMLRequest;                }
 /**
   * \brief Screen to register an online account.
