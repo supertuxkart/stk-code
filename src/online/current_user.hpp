@@ -180,8 +180,7 @@ namespace Online
             const XMLRequest *              requestSignUp(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             const irr::core::stringw &password_ver,
-                                                            const irr::core::stringw &email,
-                                                            bool terms);
+                                                            const irr::core::stringw &email);
 
             const XMLRequest *              requestRecovery(const irr::core::stringw &username,
                                                             const irr::core::stringw &email);

@@ -28,8 +28,9 @@
 #include "utils/translation.hpp"
 #include "addons/addon.hpp"
 #include "guiengine/dialog_queue.hpp"
+#include "guiengine/screen.hpp"
+#include "states_screens/login_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "states_screens/online_profile_friends.hpp"
@@ -88,8 +89,7 @@ namespace Online
     const XMLRequest * CurrentUser::requestSignUp(const core::stringw &username,
                                                   const core::stringw &password,
                                                   const core::stringw &password_confirm,
-                                                  const core::stringw &email,
-                                                  bool terms)
+                                                  const core::stringw &email)
     {
         assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
         XMLRequest * request = new XMLRequest();
@@ -139,7 +139,7 @@ namespace Online
     {
         assert(m_state == US_SIGNED_OUT);
         m_save_session = save_session;
-        SignInRequest * request = new SignInRequest(request_now);
+        SignInRequest * request = new SignInRequest(false);
         request->setServerURL("client-user.php");
         request->addParameter("action","connect");
         request->addParameter("username",username);
@@ -159,18 +159,15 @@ namespace Online
     void CurrentUser::SignInRequest::callback()
     {
         CurrentUser::get()->signIn(isSuccess(), getXMLData());
-        if(GUIEngine::ModalDialog::isADialogActive())
+        GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
+        LoginScreen *login = dynamic_cast<LoginScreen*>(screen);
+        if(login)
         {
-            LoginDialog * dialog = 
-                dynamic_cast<LoginDialog*>(GUIEngine::ModalDialog::getCurrent());
-            if(dialog)
-            {
-                if(isSuccess())
-                    dialog->success();
-                else
-                    dialog->error(getInfo());
-            }   // if dialog
-        }   // isDialogActive
+            if(isSuccess())
+                login->loginSuccessful();
+            else
+                login->loginError(getInfo());
+        }   // if dialog
     }   // SignInRequest::callback
 
     // ------------------------------------------------------------------------
@@ -841,7 +838,8 @@ namespace Online
     }   // getUserName
 
     // ------------------------------------------------------------------------
-    /** \return the online id. */
+    /** \return the online id, or 0 if the user is not signed in.
+     */ 
     uint32_t CurrentUser::getID() const
     {
         if((m_state == US_SIGNED_IN ))

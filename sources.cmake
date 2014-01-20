@@ -243,11 +243,13 @@ src/states_screens/easter_egg_screen.cpp
 src/states_screens/feature_unlocked.cpp
 src/states_screens/grand_prix_lose.cpp
 src/states_screens/grand_prix_win.cpp
+src/states_screens/guest_login_screen.cpp
 src/states_screens/help_screen_1.cpp
 src/states_screens/help_screen_2.cpp
 src/states_screens/help_screen_3.cpp
 src/states_screens/help_screen_4.cpp
 src/states_screens/kart_selection.cpp
+src/states_screens/login_screen.cpp
 src/states_screens/main_menu_screen.cpp
 src/states_screens/network_kart_selection.cpp
 src/states_screens/networking_lobby.cpp
@@ -270,6 +272,7 @@ src/states_screens/race_gui_base.cpp
 src/states_screens/race_gui_overworld.cpp
 src/states_screens/race_result_gui.cpp
 src/states_screens/race_setup_screen.cpp
+src/states_screens/register_screen.cpp
 src/states_screens/server_selection.cpp
 src/states_screens/soccer_setup_screen.cpp
 src/states_screens/state_manager.cpp
@@ -572,11 +575,13 @@ src/states_screens/easter_egg_screen.hpp
 src/states_screens/feature_unlocked.hpp
 src/states_screens/grand_prix_lose.hpp
 src/states_screens/grand_prix_win.hpp
+src/states_screens/guest_login_screen.hpp
 src/states_screens/help_screen_1.hpp
 src/states_screens/help_screen_2.hpp
 src/states_screens/help_screen_3.hpp
 src/states_screens/help_screen_4.hpp
 src/states_screens/kart_selection.hpp
+src/states_screens/login_screen.hpp
 src/states_screens/main_menu_screen.hpp
 src/states_screens/network_kart_selection.hpp
 src/states_screens/networking_lobby.hpp
@@ -599,6 +604,7 @@ src/states_screens/race_gui_base.hpp
 src/states_screens/race_gui_overworld.hpp
 src/states_screens/race_result_gui.hpp
 src/states_screens/race_setup_screen.hpp
+src/states_screens/register_screen.hpp
 src/states_screens/server_selection.hpp
 src/states_screens/soccer_setup_screen.hpp
 src/states_screens/state_manager.hpp

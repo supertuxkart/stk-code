@@ -37,12 +37,12 @@
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
 #include "online/request_manager.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
+#include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
-#include "states_screens/network_kart_selection.hpp" // FIXME : remove when not testing
+#include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -111,6 +111,11 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
+    IconButtonWidget* online = getWidget<IconButtonWidget>("online");
+    if(CurrentUser::get()->getID())
+        online->setLabel(_("Online"));
+    else
+        online->setLabel(_("Login"));
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
@@ -380,7 +385,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Allow STK to connect to the Internet\"."));
             return;
         }
-        StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        if(CurrentUser::get()->getID())
+            StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        else
+            StateManager::get()->pushScreen(LoginScreen::getInstance());
     }
     else if (selection == "addons")
     {
