@@ -15,9 +15,9 @@ const float radius = .4f;
 
 const float invSamples = strengh / SAMPLES;
 
-float rand(vec2 co)
+vec3 rand(vec2 co)
 {
-   return texture(noise_texture, co).x;
+   return texture(noise_texture, co).xyz;
 }
 
 void main(void)
@@ -33,10 +33,7 @@ void main(void)
 	float len = dot(vec3(1.0), abs(cur.xyz));
 	if (len < 0.2 || curdepth > 0.999) discard;
 	// Make a tangent as random as possible
-	vec3 randvect;
-	randvect.x = rand(uv);
-	randvect.y = rand(vec2(randvect.x, FragPos.z));
-	randvect.z = rand(randvect.xy);
+	vec3 randvect = rand(uv);
 	vec3 tangent = normalize(cross(norm, randvect));
 	vec3 bitangent = cross(norm, tangent);
 
