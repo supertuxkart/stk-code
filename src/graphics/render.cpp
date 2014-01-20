@@ -192,6 +192,7 @@ void IrrDriver::renderGLSL(float dt)
         // Fire up the MRT
         m_video_driver->setRenderTarget(m_mrt, false, false);
 
+		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         irr_driver->setPhase(0);
         glClear(GL_STENCIL_BUFFER_BIT);
@@ -204,6 +205,8 @@ void IrrDriver::renderGLSL(float dt)
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
+
+		PROFILER_POP_CPU_MARKER();
 
         // Todo : reenable glow and shadows
         //ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
@@ -225,6 +228,9 @@ void IrrDriver::renderGLSL(float dt)
 
         // Lights
         renderLights(cambox, camnode, overridemat, cam, dt);
+		PROFILER_POP_CPU_MARKER();
+
+		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0xFF, 0x00, 0x00);
         irr_driver->setPhase(1);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         glStencilFunc(GL_EQUAL, 0, ~0);
@@ -295,11 +301,15 @@ void IrrDriver::renderGLSL(float dt)
         }
 
         // We need to re-render camera due to the per-cam-node hack.
-        PROFILER_PUSH_CPU_MARKER("- SceneManager::drawAll", 0xFF, 0x00, 0x00);
-        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT |
-                                 scene::ESNRP_TRANSPARENT_EFFECT;
+        PROFILER_PUSH_CPU_MARKER("- TransparentPass", 0xFF, 0x00, 0x00);
+		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
         m_scene_manager->drawAll(m_renderpass);
         PROFILER_POP_CPU_MARKER();
+
+		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0x00, 0x00);
+		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+		m_scene_manager->drawAll(m_renderpass);
+		PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
         // Handle displacing nodes, if any
