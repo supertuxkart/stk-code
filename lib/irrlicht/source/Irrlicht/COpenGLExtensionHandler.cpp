@@ -94,7 +94,7 @@ COpenGLExtensionHandler::COpenGLExtensionHandler() :
 #endif // _IRR_OPENGL_USE_EXTPOINTER_
 {
 	for (u32 i=0; i<IRR_OpenGL_Feature_Count; ++i)
-		FeatureAvailable[i]=false;
+		FeatureAvailable[i]=true;
 	DimAliasedLine[0]=1.f;
 	DimAliasedLine[1]=1.f;
 	DimAliasedPoint[0]=1.f;
