@@ -415,8 +415,9 @@ void STKMesh::drawGlow(const GLMesh &mesh, float r, float g, float b)
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
+void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type, bool isTransparent)
 {
+	
 	if (!mesh.textures[0])
 		return;
 	switch (irr_driver->getPhase())
@@ -448,27 +449,39 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	}
 	case 1:
 	{
-		  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
+		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
-		  glEnable(GL_DEPTH_TEST);
-		  glDisable(GL_ALPHA_TEST);
-		  glDepthMask(GL_FALSE);
-		  glDisable(GL_BLEND);
+		if (isTransparent)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_ALPHA_TEST);
+			glDepthMask(GL_FALSE);
+			glEnable(GL_BLEND);
+			glBlendEquation(GL_FUNC_ADD);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		}
+		else
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDisable(GL_ALPHA_TEST);
+			glDepthMask(GL_FALSE);
+			glDisable(GL_BLEND);
+		}
 
-		  if (type == irr_driver->getShader(ES_SPHERE_MAP))
-			  drawSphereMap(mesh);
-		  else if (type == irr_driver->getShader(ES_SPLATTING))
-			  drawSplatting(mesh);
-		  else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-			  drawObjectRefPass2(mesh);
-		  else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-			  drawGrassPass2(mesh);
-		  else
-			  drawObjectPass2(mesh);
+		if (type == irr_driver->getShader(ES_SPHERE_MAP))
+			drawSphereMap(mesh);
+		else if (type == irr_driver->getShader(ES_SPLATTING))
+			drawSplatting(mesh);
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+			drawObjectRefPass2(mesh);
+		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+			drawGrassPass2(mesh);
+		else
+			drawObjectPass2(mesh);
 
-		  glBindVertexArray(0);
-		  glBindBuffer(GL_ARRAY_BUFFER, 0);
-		  break;
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		break;
 	}
 	case 2:
 	{
@@ -477,7 +490,6 @@ void STKMesh::draw(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		break;
 	}
 	}
-		
 
 	video::SMaterial material;
 	material.MaterialType = irr_driver->getShader(ES_RAIN);
@@ -503,6 +515,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_GRASS))
 		return true;
 	if (type == irr_driver->getShader(ES_GRASS_REF))
+		return true;
+	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		return true;
 	return false;
 }
@@ -587,10 +601,10 @@ void STKMesh::render()
 
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-			if (isObject(material.MaterialType) && !isTransparentPass && !transparent)
+			if (isObject(material.MaterialType) && isTransparentPass == transparent)
 			{
 				initvaostate(GLmeshes[i], material.MaterialType);
-				draw(GLmeshes[i], material.MaterialType);
+				draw(GLmeshes[i], material.MaterialType, transparent);
 			}
 			else if (transparent == isTransparentPass)
 			{
