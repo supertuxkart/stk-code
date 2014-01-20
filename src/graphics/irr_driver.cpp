@@ -437,6 +437,10 @@ void IrrDriver::initDevice()
 
         // Order matters, create RTTs as soon as possible, as they are the largest blocks.
         m_rtts = new RTT();
+    }
+    // m_glsl might be reset in rtt if an error occurs.
+    if(m_glsl)
+    {
         m_shaders = new Shaders();
         m_shadow_importance = new ShadowImportance();
 

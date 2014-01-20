@@ -390,6 +390,10 @@ public:
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
+    /** Called when the driver pretends to support it, but fails at some
+     *  operations. */
+    void disableGLSL() { m_glsl = false; }
+    // ------------------------------------------------------------------------
     void resetDebugModes()
     {
         m_wireframe = false;

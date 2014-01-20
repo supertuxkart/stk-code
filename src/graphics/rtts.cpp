@@ -62,6 +62,7 @@ RTT::RTT()
             Log::error("rtts", "This requires pixel shaders to be disabled.");
             UserConfigParams::m_pixel_shaders = false;
         }
+        irr_driver->disableGLSL();
     }
     rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
