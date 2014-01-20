@@ -158,6 +158,8 @@ FileManager::FileManager()
         root_dir = "data/" ;
     else if(m_file_system->existFile("../data"))
         root_dir = "../data/" ;
+    else if(m_file_system->existFile("../../data"))
+        root_dir = "../../data/" ;
     else if(m_file_system->existFile(exe_path+"data"))
         root_dir = (exe_path+"data/").c_str();
     else if(m_file_system->existFile(exe_path+"/../data"))
