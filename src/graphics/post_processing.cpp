@@ -333,6 +333,24 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glDisable(GL_BLEND);
 }
 
+void PostProcessing::renderSunlight()
+{
+  SunLightProvider * const cb = (SunLightProvider *) irr_driver->getCallback(ES_SUNLIGHT);
+
+  glEnable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glBlendEquation(GL_FUNC_ADD);
+
+  glUseProgram(FullScreenShader::SunLightShader::Program);
+  glBindVertexArray(FullScreenShader::SunLightShader::vao);
+  GLuint ntex_id = static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName();
+  setTexture(0, ntex_id, GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glBindVertexArray(0);
+}
+
 void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, ITexture *ao, ITexture *specmap, bool debug)
 {
 	const SColorf s = irr_driver->getSceneManager()->getAmbientLight();

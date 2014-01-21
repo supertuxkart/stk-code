@@ -87,12 +87,7 @@ void SunNode::render()
 
     vector3df pos = getPosition();
     cb->setPosition(pos.X, pos.Y, pos.Z);
-
-    if (!UserConfigParams::m_shadows || !World::getWorld()->getTrack()->hasShadows())
-    {
-        sq->render(false);
-        return;
-    }
+    return;
 
     array<IRenderTarget> mrt;
     mrt.reallocate(2);

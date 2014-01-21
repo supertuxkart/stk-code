@@ -74,7 +74,7 @@ public:
 
 	/** Generate diffuse and specular map */
 	void         renderPointlight(video::ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
-
+	void         renderSunlight();
 	/** Blend all light related map */
 	void renderLightbBlend(video::ITexture *diffuse, video::ITexture *specular, video::ITexture *ao, video::ITexture *specmap, bool debug);
 

@@ -740,6 +740,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         if (!m_lights[i]->isPointLight())
         {
           m_lights[i]->render();
+          m_post_processing->renderSunlight();
           continue;
         }
         const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);

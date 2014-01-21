@@ -236,6 +236,7 @@ void Shaders::loadShaders()
 	FullScreenShader::PointLightShader::init();
 	FullScreenShader::PPDisplaceShader::init();
 	FullScreenShader::SSAOShader::init();
+	FullScreenShader::SunLightShader::init();
 	MeshShader::ColorizeShader::init();
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
@@ -947,6 +948,31 @@ namespace FullScreenShader
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_viewm = glGetUniformLocation(Program, "viewm");
 		vao = createVAO(Program);
+	}
+
+	GLuint SunLightShader::Program;
+	GLuint SunLightShader::uniform_ntex;
+	GLuint SunLightShader::uniform_direction;
+	GLuint SunLightShader::uniform_col;
+	GLuint SunLightShader::uniform_invproj;
+	GLuint SunLightShader::vao;
+
+	void SunLightShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/sunlight.frag").c_str());
+		uniform_ntex = glGetUniformLocation(Program, "ntex");
+		uniform_direction = glGetUniformLocation(Program, "direction");
+		uniform_col = glGetUniformLocation(Program, "col");
+		uniform_invproj = glGetUniformLocation(Program, "invproj");
+		vao = createVAO(Program);
+	}
+
+	void SunLightShader::setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex)
+	{
+		glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+		glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
+		glUniform3f(uniform_col, r, g, b);
+		glUniform1i(uniform_ntex, TU_ntex);
 	}
 
 	GLuint LightBlendShader::Program;
