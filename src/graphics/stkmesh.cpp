@@ -584,11 +584,6 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::GrassPass1Shader::attrib_position, MeshShader::GrassPass1Shader::attrib_texcoord, -1, MeshShader::GrassPass1Shader::attrib_normal, -1, -1, MeshShader::GrassPass1Shader::attrib_color, mesh.Stride);
 		}
-		else if (type == irr_driver->getShader(ES_BUBBLES))
-		{
-			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-				MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-		}
 		else
 		{
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -632,7 +627,12 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case 3: // Transparent
 		if (mesh.vao_first_pass)
 			return;
-		if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
+		if (type == irr_driver->getShader(ES_BUBBLES))
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		{
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);

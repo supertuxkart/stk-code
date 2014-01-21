@@ -292,13 +292,6 @@ void IrrDriver::renderGLSL(float dt)
         }
         PROFILER_POP_CPU_MARKER();
 
-        // Render fog on top of solid
-		if (World::getWorld()->getTrack()->isFogEnabled())
-        {
-            PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
-            PROFILER_POP_CPU_MARKER();
-        }
 
         // We need to re-render camera due to the per-cam-node hack.
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
@@ -311,6 +304,13 @@ void IrrDriver::renderGLSL(float dt)
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
 		m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
+
+		if (World::getWorld()->getTrack()->isFogEnabled())
+		{
+			PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+			m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
+			PROFILER_POP_CPU_MARKER();
+		}
 
         PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
         // Handle displacing nodes, if any
