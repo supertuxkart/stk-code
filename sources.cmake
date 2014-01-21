@@ -225,7 +225,6 @@ src/states_screens/dialogs/confirm_resolution_dialog.cpp
 src/states_screens/dialogs/custom_video_settings.cpp
 src/states_screens/dialogs/enter_player_name_dialog.cpp
 src/states_screens/dialogs/gp_info_dialog.cpp
-src/states_screens/dialogs/login_dialog.cpp
 src/states_screens/dialogs/message_dialog.cpp
 src/states_screens/dialogs/notification_dialog.cpp
 src/states_screens/dialogs/player_info_dialog.cpp
@@ -557,7 +556,6 @@ src/states_screens/dialogs/confirm_resolution_dialog.hpp
 src/states_screens/dialogs/custom_video_settings.hpp
 src/states_screens/dialogs/enter_player_name_dialog.hpp
 src/states_screens/dialogs/gp_info_dialog.hpp
-src/states_screens/dialogs/login_dialog.hpp
 src/states_screens/dialogs/message_dialog.hpp
 src/states_screens/dialogs/notification_dialog.hpp
 src/states_screens/dialogs/player_info_dialog.hpp
