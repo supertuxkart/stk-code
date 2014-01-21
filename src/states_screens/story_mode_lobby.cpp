@@ -92,7 +92,9 @@ void StoryModeLobbyScreen::tearDown()
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void StoryModeLobbyScreen::eventCallback(Widget* widget,
+                                         const std::string& name,
+                                         const int player_id)
 {
     if (name == "back")
     {
@@ -122,8 +124,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
 
         if (!slot_found)
         {
-            fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
-                    core::stringc(list->getSelectionLabel().c_str()).c_str());
+            Log::error("StoryModeLobby",
+                       "Cannot find player corresponding to slot '%s'.",
+                     core::stringc(list->getSelectionLabel().c_str()).c_str());
         }
         else
         {
@@ -164,12 +167,13 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
 
     if (!slot_found)
     {
-        fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
-                core::stringc(newName.c_str()).c_str());
+        Log::error("StoryModeLobbyScreen",
+                   "Cannot find player corresponding to slot '%s'.",
+                   core::stringc(newName.c_str()).c_str());
     }
 
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-}
+}   // onNewPlayerWithName
 
 // -----------------------------------------------------------------------------
 

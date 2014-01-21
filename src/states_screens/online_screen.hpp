@@ -50,7 +50,6 @@ private:
     GUIEngine::LabelWidget * m_online_status_widget;
 
     GUIEngine::RibbonWidget * m_bottom_menu_widget;
-    GUIEngine::IconButtonWidget * m_sign_in_widget;
     GUIEngine::IconButtonWidget * m_register_widget;
     GUIEngine::IconButtonWidget * m_profile_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
@@ -81,9 +80,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onDisabledItemClicked(const std::string& item) OVERRIDE;
 
     /** \brief Implements the callback when a dialog gets closed. */
     virtual void onDialogClose() OVERRIDE;

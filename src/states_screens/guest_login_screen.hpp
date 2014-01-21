@@ -34,6 +34,7 @@ class GuestLoginScreen : public GUIEngine::Screen,
 
 public:
 
+    virtual void init() OVERRIDE;
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE {};
 

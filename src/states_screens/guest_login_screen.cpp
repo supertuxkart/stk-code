@@ -33,19 +33,26 @@ GuestLoginScreen::GuestLoginScreen() : Screen("online/guest_login.stkgui")
 }   // GuestLoginScreen
 
 // -----------------------------------------------------------------------------
+/** Make sure this tab is actually selected.
+ */
+void GuestLoginScreen::init()
+{
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("login_tabs");
+    if (tabs) tabs->select( "tab_guest_login", PLAYER_ID_GAME_MASTER );
+}   // init
+
+// -----------------------------------------------------------------------------
 
 void GuestLoginScreen::eventCallback(Widget* widget, const std::string& name, 
                                     const int playerID)
 {
-    if (name == "category")
+    if (name == "login_tabs")
     {
         const std::string selection = 
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-        Log::warn("login", "selection %s", selection.c_str());
-        if (selection == "login")
+        if (selection == "tab_login")
             StateManager::get()->replaceTopMostScreen(LoginScreen::getInstance());
-        else if (selection == "register")
+        else if (selection == "tab_register")
             StateManager::get()->replaceTopMostScreen(RegisterScreen::getInstance());
     }
     else if (name=="options")

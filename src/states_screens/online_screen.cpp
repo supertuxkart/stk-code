@@ -31,8 +31,6 @@
 #include "main_loop.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
-#include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/create_server_screen.hpp"
@@ -89,10 +87,6 @@ void OnlineScreen::loadedFromFile()
 
     m_bottom_menu_widget = getWidget<RibbonWidget>("menu_bottomrow");
     assert(m_bottom_menu_widget != NULL);
-    m_sign_in_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("sign_in");
-    assert(m_sign_in_widget != NULL);
-    m_register_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("register");
-    assert(m_register_widget != NULL);
     m_profile_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("profile");
     assert(m_profile_widget != NULL);
     m_sign_out_widget = (IconButtonWidget *) m_bottom_menu_widget->findWidgetNamed("sign_out");
@@ -117,29 +111,18 @@ void OnlineScreen::beforeAddingWidget()
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);
     hasStateChanged();
-    if (m_recorded_state == CurrentUser::US_SIGNED_IN)
-    {
-        m_register_widget->setVisible(false);
-        m_sign_in_widget->setVisible(false);
-    }
-    else if (m_recorded_state == CurrentUser::US_SIGNED_OUT || m_recorded_state == CurrentUser::US_SIGNING_IN || m_recorded_state == CurrentUser::US_SIGNING_OUT)
+    if (m_recorded_state == CurrentUser::US_SIGNED_OUT || m_recorded_state == CurrentUser::US_SIGNING_IN || m_recorded_state == CurrentUser::US_SIGNING_OUT)
     {
         m_quick_play_widget->setDeactivated();
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
         m_sign_out_widget->setVisible(false);
         m_profile_widget->setVisible(false);
-        if(m_recorded_state == CurrentUser::US_SIGNING_IN || m_recorded_state == CurrentUser::US_SIGNING_OUT)
-        {
-            m_register_widget->setDeactivated();
-            m_sign_in_widget->setDeactivated();
-        }
     }
     else if (m_recorded_state == CurrentUser::US_GUEST)
     {
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
-        m_sign_in_widget->setVisible(false);
         m_profile_widget->setVisible(false);
     }
 
@@ -189,11 +172,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (ribbon == NULL) return;
     std::string selection = ribbon->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-    if (selection == m_sign_in_widget->m_properties[PROP_ID])
-    {
-        new LoginDialog(LoginDialog::Normal);
-    }
-    else if (selection == m_sign_out_widget->m_properties[PROP_ID])
+    if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
         CurrentUser::get()->requestSignOut();
     }
@@ -201,10 +180,6 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     {
         ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
-    }
-    else if (selection == m_register_widget->m_properties[PROP_ID])
-    {
-        new RegistrationDialog();
     }
     else if (selection == m_find_server_widget->m_properties[PROP_ID])
     {
@@ -259,23 +234,6 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
 void OnlineScreen::tearDown()
 {
 }
-
-// ----------------------------------------------------------------------------
-void OnlineScreen::onDisabledItemClicked(const std::string& item)
-{
-    if (item == "find_server")
-    {
-        new LoginDialog(LoginDialog::Registration_Required);
-    }
-    else if (item =="create_server")
-    {
-        new LoginDialog(LoginDialog::Registration_Required);
-    }
-    else if (item == "quick_play")
-    {
-        new LoginDialog(LoginDialog::Signing_In_Required);
-    }
-}   // onDisabledItemClicked
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::setInitialFocus()

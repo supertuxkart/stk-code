@@ -32,10 +32,6 @@
             <spacer width="10" height="10" />                         
             
             <buttonbar id="menu_bottomrow" x="0" y="0" width="12%" height="100%" align="center">
-                <icon-button id="sign_in" width="64" height="64" icon="gui/main_about.png" extend_label="50"
-                             I18N="Online menu button" text="Sign In" label_location="hover"/>
-                <icon-button id="register" width="64" height="64" icon="gui/tutorial.png"  extend_label="75"
-                             I18N="Online menu button" text="Register" label_location="hover"/>
                 <icon-button id="profile" width="64" height="64" icon="gui/green_check.png"  extend_label="50"
                              I18N="Online menu button" text="Profile" label_location="hover"/>
                 <icon-button id="sign_out" width="64" height="64" icon="gui/main_quit.png"  extend_label="70"

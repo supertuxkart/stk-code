@@ -24,8 +24,6 @@
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
 #include "online/current_user.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
-
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -33,15 +31,6 @@
  */
 class VoteDialog : public GUIEngine::ModalDialog
 {
-public :
-    class LoginListener : public LoginDialog::Listener
-    {
-        const std::string m_addon_id;
-    public :
-        LoginListener(const std::string & addon_id) : m_addon_id(addon_id) {}
-        virtual void onClose() const { new VoteDialog(m_addon_id); }
-    };
-
 private:
     const std::string m_addon_id;
     bool m_self_destroy;

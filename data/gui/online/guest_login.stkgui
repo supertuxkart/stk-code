@@ -6,12 +6,12 @@
     <header align="center" width="80%" text="Login" text_align="center"/>
     <spacer height="15" width="10"/>
 
-    <tabs id="category" height="10%" max_height="110" x="2%" width="98%" align="center">
-        <icon-button id="login" width="128" height="128" icon="gui/track_random.png"
+    <tabs id="login_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+        <icon-button id="tab_login" width="128" height="128" icon="gui/track_random.png"
                 I18N="Tab in login menu" text="Sign In"/>
-        <icon-button id="guest_login" width="128" height="128" icon="gui/mode_ftl.png"
+        <icon-button id="tab_guest_login" width="128" height="128" icon="gui/mode_ftl.png"
                 I18N="Tab in login menu" text="Sign In As Guest"/>
-        <icon-button id="register" width="128" height="128" icon="gui/mode_ftl.png"
+        <icon-button id="tab_register" width="128" height="128" icon="gui/mode_ftl.png"
                 I18N="Tab in login menu" text="Register"/>
     </tabs>
 

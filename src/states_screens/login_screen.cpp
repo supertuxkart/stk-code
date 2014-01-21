@@ -45,6 +45,10 @@ LoginScreen::LoginScreen() : Screen("online/login.stkgui")
 // -----------------------------------------------------------------------------
 void LoginScreen::init()
 {
+    // Make sure this tab is actually focused.
+    RibbonWidget* tabs = this->getWidget<RibbonWidget>("login_tabs");
+    if (tabs) tabs->select( "tab_login", PLAYER_ID_GAME_MASTER );
+
     TextBoxWidget *password_widget = getWidget<TextBoxWidget>("password");
     password_widget->setPasswordBox(true,L'*');
     
@@ -55,6 +59,9 @@ void LoginScreen::init()
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget != NULL);
     m_success = false;
+
+    // As default don't select 'remember'
+    getWidget<CheckBoxWidget>("remember")->setState(false);
 }   // loadedFromFile
 
 // -----------------------------------------------------------------------------
@@ -141,15 +148,15 @@ void LoginScreen::onUpdate(float dt, irr::video::IVideoDriver*)
 void LoginScreen::eventCallback(Widget* widget, const std::string& name, 
                                 const int playerID)
 {
-    if (name == "category")
+    if (name == "login_tabs")
     {
         StateManager *sm = StateManager::get();
         const std::string selection = 
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "guest_login")
+        if (selection == "tab_guest_login")
             sm->replaceTopMostScreen(GuestLoginScreen::getInstance()); 
-        else if (selection == "register")
+        else if (selection == "tab_register")
             sm->replaceTopMostScreen(RegisterScreen::getInstance());
     }
     else if (name=="options")

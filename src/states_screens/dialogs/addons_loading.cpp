@@ -30,7 +30,6 @@
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/dialogs/vote_dialog.hpp"
-#include "states_screens/dialogs/login_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -253,9 +252,7 @@ void AddonsLoading::voteClicked()
     ModalDialog::dismiss();
     if (Online::CurrentUser::get()->isRegisteredUser())
         new VoteDialog(m_addon.getId());
-    else
-        new LoginDialog(LoginDialog::Registration_Required, new VoteDialog::LoginListener(m_addon.getId()));
-}
+}   // voteClicked
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
