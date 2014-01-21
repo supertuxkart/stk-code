@@ -103,10 +103,6 @@ else()
     include_directories(${OGGVORBIS_INCLUDE_DIRS})
 endif()
 
-# CURL
-find_package(CURL REQUIRED)
-include_directories(${CURL_INCLUDE_DIRS})
-
 # Fribidi
 if(USE_FRIBIDI)
     find_package(Fribidi)
@@ -238,6 +234,15 @@ target_link_libraries(supertuxkart
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
 
+# CURL
+if(WIN32)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurldll.a)
+else()
+    find_package(CURL REQUIRED)
+    include_directories(${CURL_INCLUDE_DIRS})
+endif()
+
+
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
     # unix-style installs of Vorbis/Ogg/OpenAL/etc. they will be picked up over our frameworks. This is blocking when I make releases :
@@ -274,6 +279,10 @@ endif()
 
 if(MSVC)
   target_link_libraries(supertuxkart iphlpapi.lib)
+  add_custom_command(TARGET supertuxkart POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/dependencies/dll"
+        $<TARGET_FILE_DIR:supertuxkart>) 
 endif()
 
 # Optional tools
