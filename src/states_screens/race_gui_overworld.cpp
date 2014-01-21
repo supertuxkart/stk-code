@@ -26,6 +26,7 @@ using namespace irr;
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -143,8 +144,7 @@ void RaceGUIOverworld::renderGlobal(float dt)
         !GUIEngine::ModalDialog::isADialogActive())
     {
         static video::SColor black = video::SColor(255,0,0,0);
-        irr_driver->getVideoDriver()
-        ->draw2DRectangle(black,
+        GL32_draw2DRectangle(black,
                           core::rect<s32>(UserConfigParams::m_width/2,
                                           UserConfigParams::m_height/2,
                                           UserConfigParams::m_width,
@@ -233,7 +233,7 @@ void RaceGUIOverworld::drawTrophyPoints()
 
     if (!m_close_to_a_challenge)
     {
-        irr_driver->getVideoDriver()->draw2DImage(m_trophy1, dest, source, NULL,
+        draw2DImage(m_trophy1, dest, source, NULL,
                                                   NULL, true /* alpha */);
     }
 
@@ -248,7 +248,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest += core::position2di(size*2, 0);
     if (!m_close_to_a_challenge)
     {
-        irr_driver->getVideoDriver()->draw2DImage(m_trophy2, dest, source, NULL,
+        draw2DImage(m_trophy2, dest, source, NULL,
                                                   NULL, true /* alpha */);
     }
 
@@ -263,7 +263,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest += core::position2di(size*2, 0);
     if (!m_close_to_a_challenge)
     {
-        irr_driver->getVideoDriver()->draw2DImage(m_trophy3, dest, source, NULL,
+        draw2DImage(m_trophy3, dest, source, NULL,
                                                   NULL, true /* alpha */);
     }
     dest += core::position2di((int)(size*1.5f), 0);
@@ -277,7 +277,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     dest = core::rect<s32>(pos.UpperLeftCorner.X - size - 5, pos.UpperLeftCorner.Y,
                            pos.UpperLeftCorner.X - 5, pos.UpperLeftCorner.Y + size);
 
-    irr_driver->getVideoDriver()->draw2DImage(m_open_challenge, dest, source, NULL,
+    draw2DImage(m_open_challenge, dest, source, NULL,
                                               NULL, true /* alpha */);
 
     pos.LowerRightCorner.Y = dest.LowerRightCorner.Y;
@@ -330,7 +330,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         core::rect<s32> dest(m_map_left,               upper_y,
                              m_map_left + m_map_width, lower_y);
         core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
-        irr_driver->getVideoDriver()->draw2DImage(mini_map, dest, source, 0, 0, true);
+        draw2DImage(mini_map, dest, source, 0, 0, true);
     }
 
     Vec3 kart_xyz;
@@ -376,11 +376,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
                                            m_icons_frame->getTexture()->getOriginalSize());
 
-                irr_driver->getVideoDriver()->draw2DImage(m_icons_frame->getTexture(), position,
+                draw2DImage(m_icons_frame->getTexture(), position,
                                                           rect, NULL, colors, true);
             }   // if isPlayerController
 
-            irr_driver->getVideoDriver()->draw2DImage(m_marker, position, source,
+            draw2DImage(m_marker, position, source,
                                                       NULL, NULL, true);
         }   // for i<getNumKarts
     }   // for only_draw_player_kart
@@ -420,7 +420,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                    lower_y   -(int)(draw_at.getY()-marker_size/2));
             m_current_challenge = &(challenges[n]);
         }
-        irr_driver->getVideoDriver()->draw2DImage(m_icons[state],
+        draw2DImage(m_icons[state],
                                                   dest, source, NULL, NULL, true);
     }
 
@@ -546,7 +546,7 @@ void RaceGUIOverworld::drawEnergyMeter(int x, int y, const AbstractKart *kart,
     x    -= w;
 
     // Background
-    irr_driver->getVideoDriver()->draw2DImage(m_gauge_empty, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+    draw2DImage(m_gauge_empty, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
                                               core::rect<s32>(0, 0, 64, 256) /* source rect */,
                                               NULL /* clip rect */, NULL /* colors */,
                                               true /* alpha */);
@@ -565,7 +565,7 @@ void RaceGUIOverworld::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         if (state >= 1.0f) y1 = y;
 
         core::rect<s32> clip(x, y1, x + w, y + h);
-        irr_driver->getVideoDriver()->draw2DImage(m_gauge_goal, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+        draw2DImage(m_gauge_goal, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
                                                   core::rect<s32>(0, 0, 64, 256) /* source rect */,
                                                   &clip, NULL /* colors */, true /* alpha */);
     }
@@ -581,7 +581,7 @@ void RaceGUIOverworld::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         if (state >= 1.0f) y1 = y;
 
         core::rect<s32> clip(x, y1, x + w, y + h);
-        irr_driver->getVideoDriver()->draw2DImage(m_gauge_full, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
+        draw2DImage(m_gauge_full, core::rect<s32>(x, y, x+w, y+h) /* dest rect */,
                                                   core::rect<s32>(0, 0, 64, 256) /* source rect */,
                                                   &clip, NULL /* colors */, true /* alpha */);
     }
