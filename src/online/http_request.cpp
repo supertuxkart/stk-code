@@ -153,7 +153,7 @@ namespace Online
             curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
             curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, 
                 file_manager->getAsset("web.tuxfamily.org.pem").c_str());
-            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 0L);
+            curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
         }
     }   // prepareOperation
