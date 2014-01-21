@@ -803,6 +803,16 @@ namespace ParticleShader
 		uniform_normal_and_depths = glGetUniformLocation(Program, "normals_and_depth");
 	}
 
+	void SimpleParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth)
+	{
+		glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+		glUniform2f(uniform_screen, width, height);
+		glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
+		glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+		glUniform1i(uniform_tex, TU_tex);
+		glUniform1i(uniform_normal_and_depths, TU_normal_and_depth);
+	}
+
 	GLuint FlipParticleRender::Program;
 	GLuint FlipParticleRender::attrib_pos;
 	GLuint FlipParticleRender::attrib_lf;
@@ -835,6 +845,16 @@ namespace ParticleShader
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_screen = glGetUniformLocation(Program, "screen");
 		uniform_normal_and_depths = glGetUniformLocation(Program, "normals_and_depth");
+	}
+
+	void FlipParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth)
+	{
+		glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+		glUniform2f(uniform_screen, width, height);
+		glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
+		glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+		glUniform1i(uniform_tex, TU_tex);
+		glUniform1i(uniform_normal_and_depths, TU_normal_and_depth);
 	}
 }
 

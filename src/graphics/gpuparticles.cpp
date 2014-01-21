@@ -522,13 +522,10 @@ void ParticleSystemProxy::drawFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	bindUniformToTextureUnit(ParticleShader::FlipParticleRender::uniform_tex, texture, 0);
-	bindUniformToTextureUnit(ParticleShader::FlipParticleRender::uniform_normal_and_depths, normal_and_depth, 1);
+	setTexture(0, texture, GL_LINEAR, GL_LINEAR);
+	setTexture(1, normal_and_depth, GL_NEAREST, GL_NEAREST);
 
-	glUniformMatrix4fv(ParticleShader::FlipParticleRender::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-	glUniform2f(ParticleShader::FlipParticleRender::uniform_screen, screen[0], screen[1]);
-	glUniformMatrix4fv(ParticleShader::FlipParticleRender::uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-	glUniformMatrix4fv(ParticleShader::FlipParticleRender::uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+	ParticleShader::FlipParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
 
 	glBindVertexArray(current_rendering_flip_vao);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
@@ -557,13 +554,10 @@ void ParticleSystemProxy::drawNotFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	bindUniformToTextureUnit(ParticleShader::SimpleParticleRender::uniform_tex, texture, 0);
-	bindUniformToTextureUnit(ParticleShader::SimpleParticleRender::uniform_normal_and_depths, normal_and_depth, 1);
+	setTexture(0, texture, GL_LINEAR, GL_LINEAR);
+	setTexture(1, normal_and_depth, GL_NEAREST, GL_NEAREST);
 
-	glUniformMatrix4fv(ParticleShader::SimpleParticleRender::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-	glUniform2f(ParticleShader::SimpleParticleRender::uniform_screen, screen[0], screen[1]);
-	glUniformMatrix4fv(ParticleShader::SimpleParticleRender::uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-	glUniformMatrix4fv(ParticleShader::SimpleParticleRender::uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+	ParticleShader::SimpleParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
 
 	glBindVertexArray(current_rendering_vao);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);

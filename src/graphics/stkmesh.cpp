@@ -204,17 +204,6 @@ void STKMesh::drawObjectPass1(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-static void
-setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter)
-{
-	glActiveTexture(GL_TEXTURE0 + TextureUnit);
-	glBindTexture(GL_TEXTURE_2D, TextureId);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MagFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-}
-
 void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
 {
   GLenum ptype = mesh.PrimitiveType;

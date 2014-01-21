@@ -22,7 +22,7 @@ void initGL();
 GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path);
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
 void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUnit);
-
+void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter);
 
 // already includes glext.h, which defines useful GL constants.
 // COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
