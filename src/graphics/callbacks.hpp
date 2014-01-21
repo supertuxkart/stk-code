@@ -555,6 +555,28 @@ public:
         m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0;
     }
 
+	void update();
+
+	float getDirX() const
+	{
+		return m_dir[0];
+	}
+
+	float getDirY() const
+	{
+		return m_dir[1];
+	}
+
+	float getDir2X() const
+	{
+		return m_dir2[0];
+	}
+
+	float getDir2Y() const
+	{
+		return m_dir2[1];
+	}
+
 private:
     float m_screen[2];
     float m_dir[2], m_dir2[2];

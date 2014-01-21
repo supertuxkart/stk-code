@@ -159,6 +159,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
 };
 
+class DisplaceShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
+	static GLuint uniform_MVP, uniform_MV, uniform_tex, uniform_dir, uniform_dir2;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex);
+};
+
 }
 
 namespace FullScreenShader

@@ -248,6 +248,7 @@ void Shaders::loadShaders()
 	MeshShader::GrassPass2Shader::init();
 	MeshShader::BubbleShader::init();
 	MeshShader::TransparentShader::init();
+	MeshShader::DisplaceShader::init();
 }
 
 Shaders::~Shaders()
@@ -640,6 +641,38 @@ namespace MeshShader
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform3f(uniform_col, r, g, b);
+	}
+
+	GLuint DisplaceShader::Program;
+	GLuint DisplaceShader::attrib_position;
+	GLuint DisplaceShader::attrib_texcoord;
+	GLuint DisplaceShader::attrib_second_texcoord;
+	GLuint DisplaceShader::uniform_MVP;
+	GLuint DisplaceShader::uniform_MV;
+	GLuint DisplaceShader::uniform_tex;
+	GLuint DisplaceShader::uniform_dir;
+	GLuint DisplaceShader::uniform_dir2;
+
+	void DisplaceShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/displace.vert").c_str(), file_manager->getAsset("shaders/displace.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_dir = glGetUniformLocation(Program, "dir");
+		uniform_dir2 = glGetUniformLocation(Program, "dir2");
+	}
+
+	void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
+		glUniform2f(uniform_dir, dirX, dirY);
+		glUniform2f(uniform_dir2, dir2X, dir2Y);
+		glUniform1i(uniform_tex, TU_tex);
 	}
 }
 

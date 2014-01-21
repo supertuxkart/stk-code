@@ -1,16 +1,17 @@
 #version 130
+uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
 
+in vec3 Position;
+in vec2 Texcoord;
+in vec2 SecondTexcoord;
 out vec2 uv;
-out vec2 edger_uv;
+out vec2 uv_bis;
 out float camdist;
 
 void main() {
-	vec4 position = ModelViewMatrix * gl_Vertex;
-	gl_Position = ProjectionMatrix * position;
-	uv = gl_MultiTexCoord0.xy;
-	edger_uv = gl_MultiTexCoord1.xy;
-
-	camdist = length(position.xyz);
+	gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+	uv = Texcoord;
+	uv_bis = SecondTexcoord;
+	camdist = length(ModelViewMatrix *  vec4(Position, 1.));
 }
