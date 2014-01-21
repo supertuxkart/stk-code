@@ -105,7 +105,7 @@ void OnlineProfileFriends::eventCallback(Widget* widget, const std::string& name
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-void OnlineProfileFriends::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void OnlineProfileFriends::onUpdate(float delta)
 {
     if(m_waiting_for_friends)
     {

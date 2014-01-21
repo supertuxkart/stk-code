@@ -497,7 +497,7 @@ void AddonsScreen::setLastSelected()
 
 // ----------------------------------------------------------------------------
 
-void AddonsScreen::onUpdate(float dt, irr::video::IVideoDriver*)
+void AddonsScreen::onUpdate(float dt)
 {
     if (m_reloading)
     {

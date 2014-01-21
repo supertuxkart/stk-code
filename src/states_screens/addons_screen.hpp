@@ -107,7 +107,7 @@ public:
     virtual void tearDown() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
     void    setLastSelected();
 

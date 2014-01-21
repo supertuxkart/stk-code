@@ -140,7 +140,7 @@ void OnlineScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void OnlineScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void OnlineScreen::onUpdate(float delta)
 {
     if (hasStateChanged())
     {

@@ -540,7 +540,7 @@ GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action,
 /** Called once a frame, this now triggers the rendering of the actual
  *  race result gui.
  */
-void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
+void RaceResultGUI::onUpdate(float dt)
 {
     renderGlobal(dt);
 

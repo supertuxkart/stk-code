@@ -126,7 +126,7 @@ void RegisterScreen::acceptTerms()
 
 // -----------------------------------------------------------------------------
 
-void RegisterScreen::onUpdate(float dt, irr::video::IVideoDriver*)
+void RegisterScreen::onUpdate(float dt)
 {
     if(m_signup_request)
     {

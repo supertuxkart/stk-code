@@ -52,7 +52,7 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE {};
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
     void acceptTerms();
     /** \brief implement callback from parent class GUIEngine::Screen */

@@ -92,7 +92,7 @@ void NetworkingLobby::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void NetworkingLobby::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void NetworkingLobby::onUpdate(float delta)
 {
 }   // onUpdate
 

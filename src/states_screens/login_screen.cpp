@@ -126,7 +126,7 @@ void LoginScreen::loginError(const irr::core::stringw & error_message)
 /** Called in each frame. If a successful login is detected, the online screen
  *  will be displayed.
  */
-void LoginScreen::onUpdate(float dt, irr::video::IVideoDriver*)
+void LoginScreen::onUpdate(float dt)
 {
 
     if(!m_options_widget->isActivated())

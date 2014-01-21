@@ -297,7 +297,7 @@ void OptionsScreenInput::filterInput(Input::InputType type,
 
 // -----------------------------------------------------------------------------
 
-void OptionsScreenInput::onUpdate(float dt, irr::video::IVideoDriver* drv)
+void OptionsScreenInput::onUpdate(float dt)
 {
     std::map<std::string, float>::iterator it;
     for (it = m_highlights.begin(); it != m_highlights.end();)
@@ -318,4 +318,4 @@ void OptionsScreenInput::onUpdate(float dt, irr::video::IVideoDriver* drv)
         }
     }
     //m_highlights[internal_name]
-}
+}   // onUpdate

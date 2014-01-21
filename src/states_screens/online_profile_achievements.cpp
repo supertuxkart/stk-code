@@ -112,7 +112,7 @@ void OnlineProfileAchievements::eventCallback(Widget* widget, const std::string&
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-void OnlineProfileAchievements::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void OnlineProfileAchievements::onUpdate(float delta)
 {
     if(m_waiting_for_achievements)
     {

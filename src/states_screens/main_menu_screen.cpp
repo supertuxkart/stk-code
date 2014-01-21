@@ -140,7 +140,7 @@ void MainMenuScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void MainMenuScreen::onUpdate(float delta)
 {
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)

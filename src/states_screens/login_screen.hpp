@@ -48,7 +48,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE {};
     virtual void init() OVERRIDE;
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
 
     /** \brief implement callback from parent class GUIEngine::Screen */

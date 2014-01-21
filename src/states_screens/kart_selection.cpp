@@ -1324,7 +1324,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 
 // ----------------------------------------------------------------------------
 
-void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
+void KartSelectionScreen::onUpdate(float delta)
 {
     // Dispatch the onUpdate event to each kart, so they can perform their
     // animation if any

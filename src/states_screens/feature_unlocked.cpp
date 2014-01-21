@@ -430,8 +430,7 @@ const float ANIM_TO = 3.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
-void FeatureUnlockedCutScene::onUpdate(float dt,
-                                       irr::video::IVideoDriver* driver)
+void FeatureUnlockedCutScene::onUpdate(float dt)
 {
     m_global_time += dt;
 
@@ -667,7 +666,7 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         while (m_global_time < GIFT_EXIT_TO)
         {
             // simulate all the steps of the animation until we reach the end
-            onUpdate(0.4f, irr_driver->getVideoDriver());
+            onUpdate(0.4f);
         }
     }
     else

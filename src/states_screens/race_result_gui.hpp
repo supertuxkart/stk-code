@@ -224,7 +224,7 @@ public:
     /** No kart specific view needs to be rendered in the result gui. */
     virtual void renderPlayerView(const AbstractKart *kart) {}
 
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
     /** No more messages need to be displayed, but the function might still be
      *  called (e.g. 'new lap' message if the end controller is used for more

@@ -1195,7 +1195,7 @@ namespace GUIEngine
             if (ModalDialog::isADialogActive())
                 ModalDialog::getCurrent()->onUpdate(dt);
             else
-                getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+                getCurrentScreen()->onUpdate(elapsed_time);
         }
         else
         {
