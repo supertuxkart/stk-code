@@ -28,6 +28,8 @@ class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
 	video::SMaterial fakemat;
 	GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;
+	GLuint current_rendering_vao, non_current_rendering_vao;
+	GLuint current_rendering_flip_vao, non_current_rendering_flip_vao;
 	bool m_alpha_additive, has_height_map, flip;
 	float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
 
@@ -35,6 +37,8 @@ protected:
 
 	GLuint texture, normal_and_depth;
 	unsigned count;
+	static void SimpleParticleVAOBind(GLuint PositionBuffer);
+	static void FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer);
 
 	void simulateHeightmap();
 	void simulateNoHeightmap();

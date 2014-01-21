@@ -65,7 +65,6 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	const core::vector3df& position,
 	const core::vector3df& rotation,
 	const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
-	initGL();
 	fakemat.Lighting = false;
 	fakemat.ZWriteEnable = false;
 	fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
@@ -76,6 +75,8 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	glGenBuffers(1, &initial_values_buffer);
 	glGenBuffers(2, tfb_buffers);
 	glGenBuffers(1, &quaternionsbuffer);
+	glGenVertexArrays(1, &current_rendering_vao);
+	glGenVertexArrays(1, &non_current_rendering_vao);
 	size_increase_factor = 0.;
 	if (quad_vertex_buffer)
 		return;
@@ -123,6 +124,15 @@ void ParticleSystemProxy::setFlip() {
 	glGenBuffers(1, &quaternionsbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
 	glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STATIC_DRAW);
+
+	glGenVertexArrays(1, &current_rendering_flip_vao);
+	glBindVertexArray(current_rendering_flip_vao);
+	FlipParticleVAOBind(tfb_buffers[0], quaternionsbuffer);
+	glGenVertexArrays(1, &non_current_rendering_flip_vao);
+	glBindVertexArray(non_current_rendering_flip_vao);
+	FlipParticleVAOBind(tfb_buffers[1], quaternionsbuffer);
+	glBindVertexArray(0);
+
 	delete[] quaternions;
 }
 
@@ -293,6 +303,56 @@ static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
 	}
 }
 
+void ParticleSystemProxy::FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer)
+{
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_pos);
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_lf);
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_quadcorner);
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_texcoord);
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_sz);
+
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_rotationvec);
+	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_anglespeed);
+	glBindBuffer(GL_ARRAY_BUFFER, QuaternionBuffer);
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_rotationvec, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_anglespeed, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+	glBindBuffer(GL_ARRAY_BUFFER, PositionBuffer);
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
+	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_sz, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
+
+	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_lf, 1);
+	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_pos, 1);
+	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_sz, 1);
+	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_rotationvec, 1);
+	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_anglespeed, 1);
+}
+
+void ParticleSystemProxy::SimpleParticleVAOBind(GLuint PositionBuffer)
+{
+	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_pos);
+	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_lf);
+	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_quadcorner);
+	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_texcoord);
+	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_sz);
+
+	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
+	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+	glBindBuffer(GL_ARRAY_BUFFER, PositionBuffer);
+	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
+	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
+	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_sz, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
+
+	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_lf, 1);
+	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_pos, 1);
+	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_sz, 1);
+}
+
 void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 {
 	CParticleSystemSceneNode::setEmitter(emitter);
@@ -321,6 +381,14 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	}
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glBindVertexArray(current_rendering_vao);
+	SimpleParticleVAOBind(tfb_buffers[0]);
+
+	glBindVertexArray(non_current_rendering_vao);
+	SimpleParticleVAOBind(tfb_buffers[1]);
+
+	glBindVertexArray(0);
 
 	texture = getTextureGLuint(getMaterial(0).getTexture(0));
 	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
@@ -378,6 +446,7 @@ void ParticleSystemProxy::simulateHeightmap()
 	glDisableVertexAttribArray(ParticleShader::HeightmapSimulationShader::attrib_initial_size);
 	glDisable(GL_RASTERIZER_DISCARD);
 	std::swap(tfb_buffers[0], tfb_buffers[1]);
+	std::swap(current_rendering_flip_vao, non_current_rendering_flip_vao);
 }
 
 void ParticleSystemProxy::simulateNoHeightmap()
@@ -425,6 +494,7 @@ void ParticleSystemProxy::simulateNoHeightmap()
 	glDisableVertexAttribArray(ParticleShader::SimpleSimulationShader::attrib_initial_size);
 	glDisable(GL_RASTERIZER_DISCARD);
 	std::swap(tfb_buffers[0], tfb_buffers[1]);
+	std::swap(current_rendering_vao, non_current_rendering_vao);
 }
 
 void ParticleSystemProxy::simulate()
@@ -446,11 +516,6 @@ void ParticleSystemProxy::drawFlip()
 	else
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(ParticleShader::FlipParticleRender::Program);
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_pos);
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_lf);
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_quadcorner);
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_texcoord);
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_sz);
 
 	float screen[2] = {
 		(float)UserConfigParams::m_width,
@@ -465,39 +530,10 @@ void ParticleSystemProxy::drawFlip()
 	glUniformMatrix4fv(ParticleShader::FlipParticleRender::uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
 	glUniformMatrix4fv(ParticleShader::FlipParticleRender::uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
 
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_rotationvec);
-	glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_anglespeed);
-	glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_rotationvec, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_anglespeed, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
-
-	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
-	glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_sz, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
-
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_lf, 1);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_pos, 1);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_sz, 1);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_rotationvec, 1);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_anglespeed, 1);
-
+	glBindVertexArray(current_rendering_flip_vao);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_lf, 0);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_pos, 0);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_sz, 0);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_rotationvec, 0);
-	glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_anglespeed, 0);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_pos);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_lf);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_quadcorner);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_texcoord);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_sz);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_rotationvec);
-	glDisableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_anglespeed);
+
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glDisable(GL_BLEND);
@@ -515,11 +551,6 @@ void ParticleSystemProxy::drawNotFlip()
 	else
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUseProgram(ParticleShader::SimpleParticleRender::Program);
-	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_pos);
-	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_lf);
-	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_quadcorner);
-	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_texcoord);
-	glEnableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_sz);
 
 	float screen[2] = {
 		(float)UserConfigParams::m_width,
@@ -534,27 +565,10 @@ void ParticleSystemProxy::drawNotFlip()
 	glUniformMatrix4fv(ParticleShader::SimpleParticleRender::uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
 	glUniformMatrix4fv(ParticleShader::SimpleParticleRender::uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
 
-	glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
-	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-	glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
-	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
-	glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_sz, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
-
-	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_lf, 1);
-	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_pos, 1);
-	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_sz, 1);
-
+	glBindVertexArray(current_rendering_vao);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
-	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_lf, 0);
-	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_pos, 0);
-	glVertexAttribDivisor(ParticleShader::SimpleParticleRender::attrib_sz, 0);
-	glDisableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_pos);
-	glDisableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_lf);
-	glDisableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_quadcorner);
-	glDisableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_texcoord);
-	glDisableVertexAttribArray(ParticleShader::SimpleParticleRender::attrib_sz);
+
+	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glDisable(GL_BLEND);
