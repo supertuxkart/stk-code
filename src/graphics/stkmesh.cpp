@@ -396,25 +396,6 @@ void STKMesh::drawObjectPass2(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawGlow(const GLMesh &mesh, float r, float g, float b)
-{
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
-	GLenum ptype = mesh.PrimitiveType;
-	GLenum itype = mesh.IndexType;
-	size_t count = mesh.IndexCount;
-
-	glUseProgram(MeshShader::ColorizeShader::Program);
-	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
-
-	glBindVertexArray(mesh.vao_glow_pass);
-	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void STKMesh::drawTransparentObject(const GLMesh &mesh)
 {
 	GLenum ptype = mesh.PrimitiveType;
@@ -448,6 +429,27 @@ void STKMesh::drawBubble(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
+}
+
+void STKMesh::drawGlow(const GLMesh &mesh)
+{
+	ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	computeMVP(ModelViewProjectionMatrix);
+	glUseProgram(MeshShader::ColorizeShader::Program);
+	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
+
+	glBindVertexArray(mesh.vao_glow_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
@@ -517,11 +519,9 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawObjectPass2(mesh);
 		break;
 	}
-	case 2:
+	default:
 	{
-		ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
-		drawGlow(mesh, cb->getRed(), cb->getGreen(), cb->getBlue());
-		break;
+		assert(0 && "wrong pass");
 	}
 	}
 }
@@ -637,9 +637,23 @@ void STKMesh::render()
 			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
 			bool transparent = (rnd && rnd->isTransparent());
 
+			if (isTransparentPass != transparent)
+				continue;
+			if (!isObject(material.MaterialType))
+			{
+				driver->setMaterial(material);
+				driver->drawMeshBuffer(mb);
+				continue;
+			}
+
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-			if (isObject(material.MaterialType) && isTransparentPass == transparent)
+			if (irr_driver->getPhase() == 2)
+			{
+				initvaostate(GLmeshes[i], material.MaterialType);
+				drawGlow(GLmeshes[i]);
+			}
+			else
 			{
 				initvaostate(GLmeshes[i], material.MaterialType);
 				if (transparent)
@@ -655,11 +669,6 @@ void STKMesh::render()
 				material.Lighting = false;
 				irr_driver->getVideoDriver()->setMaterial(material);
 				static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
-			}
-			else if (transparent == isTransparentPass)
-			{
-				driver->setMaterial(material);
-				driver->drawMeshBuffer(mb);
 			}
 		}
 	}
