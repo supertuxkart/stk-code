@@ -191,6 +191,7 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/story_mode_lobby.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
@@ -484,6 +485,8 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_log_errors_to_console=true;
     if(CommandLine::has("--no-console"))
         UserConfigParams::m_log_errors_to_console=false;
+    if(CommandLine::has("--online"))
+        MainMenuScreen::m_enable_online=true;
     if(CommandLine::has("--log=nocolor"))
     {
         Log::disableColor();

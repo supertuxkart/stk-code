@@ -64,6 +64,8 @@ using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
 
+bool MainMenuScreen::m_enable_online = false;
+
 // ----------------------------------------------------------------------------
 
 MainMenuScreen::MainMenuScreen() : Screen("main.stkgui")
@@ -111,11 +113,10 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
-    IconButtonWidget* online = getWidget<IconButtonWidget>("online");
-    if(CurrentUser::get()->getID())
-        online->setLabel(_("Online"));
-    else
-        online->setLabel(_("Login"));
+    m_online = getWidget<IconButtonWidget>("online");
+
+    if(!m_enable_online)
+        m_online->setDeactivated();
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
@@ -141,7 +142,10 @@ void MainMenuScreen::init()
 
 // ----------------------------------------------------------------------------
 void MainMenuScreen::onUpdate(float delta)
+
 {
+    m_online->setLabel(CurrentUser::get()->getID() ? _("Online")
+                                                   : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
