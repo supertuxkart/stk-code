@@ -368,6 +368,21 @@ public:
         m_color[1] = g;
         m_color[2] = b;
     }
+    
+    float getRed() const
+    {
+      return m_color[0];
+    }
+
+    float getGreen() const
+    {
+      return m_color[1];
+    }
+    
+    float getBlue() const
+    {
+      return m_color[2];
+    }
 
     void setPosition(float x, float y, float z)
     {
@@ -382,6 +397,11 @@ public:
         m_pos[0] = pos.X;
         m_pos[1] = pos.Y;
         m_pos[2] = pos.Z;
+    }
+    
+    core::vector3df getPosition() const
+    {
+      return core::vector3df(m_pos[0], m_pos[1], m_pos[2]);
     }
 
     void setShadowMatrix(const core::matrix4 &mat)
