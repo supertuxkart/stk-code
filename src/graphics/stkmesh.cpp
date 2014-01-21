@@ -204,17 +204,6 @@ void STKMesh::drawObjectPass1(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-static void
-setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter)
-{
-	glActiveTexture(GL_TEXTURE0 + TextureUnit);
-	glBindTexture(GL_TEXTURE_2D, TextureId);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MagFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-}
-
 void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
 {
   GLenum ptype = mesh.PrimitiveType;
@@ -396,25 +385,6 @@ void STKMesh::drawObjectPass2(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawGlow(const GLMesh &mesh, float r, float g, float b)
-{
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
-	GLenum ptype = mesh.PrimitiveType;
-	GLenum itype = mesh.IndexType;
-	size_t count = mesh.IndexCount;
-
-	glUseProgram(MeshShader::ColorizeShader::Program);
-	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, r, g, b);
-
-	glBindVertexArray(mesh.vao_glow_pass);
-	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-}
-
 void STKMesh::drawTransparentObject(const GLMesh &mesh)
 {
 	GLenum ptype = mesh.PrimitiveType;
@@ -448,6 +418,51 @@ void STKMesh::drawBubble(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
+}
+
+void STKMesh::drawGlow(const GLMesh &mesh)
+{
+	ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	computeMVP(ModelViewProjectionMatrix);
+	glUseProgram(MeshShader::ColorizeShader::Program);
+	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
+
+	glBindVertexArray(mesh.vao_glow_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void STKMesh::drawDisplace(const GLMesh &mesh)
+{
+	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	computeMVP(ModelViewProjectionMatrix);
+	core::matrix4 ModelViewMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getTexture(FileManager::TEXTURE, "displace.png"))->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+	glUseProgram(MeshShader::DisplaceShader::Program);
+	MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix, cb->getDirX(), cb->getDirY(), cb->getDir2X(), cb->getDir2Y(), 0);
+
+	glBindVertexArray(mesh.vao_displace_pass);
+	glDrawElements(ptype, count, itype, 0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
@@ -517,11 +532,9 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawObjectPass2(mesh);
 		break;
 	}
-	case 2:
+	default:
 	{
-		ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
-		drawGlow(mesh, cb->getRed(), cb->getGreen(), cb->getBlue());
-		break;
+		assert(0 && "wrong pass");
 	}
 	}
 }
@@ -551,65 +564,86 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 
 static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
-	if (mesh.vao_first_pass)
+	switch (irr_driver->getPhase())
+	{
+	case 0: // Solid Pass 1
+		if (mesh.vao_first_pass)
+			return;
+		if (type == irr_driver->getShader(ES_NORMAL_MAP))
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, -1, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::GrassPass1Shader::attrib_position, MeshShader::GrassPass1Shader::attrib_texcoord, -1, MeshShader::GrassPass1Shader::attrib_normal, -1, -1, MeshShader::GrassPass1Shader::attrib_color, mesh.Stride);
+		}
+		else
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+		}
 		return;
-	if (type == irr_driver->getShader(ES_NORMAL_MAP))
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, -1, mesh.Stride);
+	case 1: // Solid pass 2
+		if (mesh.vao_second_pass)
+			return;
+		if (type == irr_driver->getShader(ES_SPHERE_MAP))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::SphereMapShader::attrib_position, -1, -1, MeshShader::SphereMapShader::attrib_normal, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_SPLATTING))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::GrassPass2Shader::attrib_position, MeshShader::GrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassPass2Shader::attrib_color, mesh.Stride);
+		}
+		else
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+		}
+		return;
+	case 2: // Glow
+		if (mesh.vao_glow_pass)
+			return;
+		mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+		return;
+	case 3: // Transparent
+		if (mesh.vao_first_pass)
+			return;
+		if (type == irr_driver->getShader(ES_BUBBLES))
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
+		{
+			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+		}
+		return;
+	case 4:
+		if (mesh.vao_displace_pass)
+			return;
+		mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
+		return;
 	}
-	else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
-	}
-	else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::GrassPass1Shader::attrib_position, MeshShader::GrassPass1Shader::attrib_texcoord, -1, MeshShader::GrassPass1Shader::attrib_normal, -1, -1, MeshShader::GrassPass1Shader::attrib_color, mesh.Stride);
-	}
-	else if (type == irr_driver->getShader(ES_BUBBLES))
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-	}
-	else if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-	}
-	else
-	{
-		mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
-	}
-
-	if (type == irr_driver->getShader(ES_SPHERE_MAP))
-	{
-		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::SphereMapShader::attrib_position, -1, -1, MeshShader::SphereMapShader::attrib_normal, -1, -1, -1, mesh.Stride);
-	}
-	else if (type == irr_driver->getShader(ES_SPLATTING))
-	{
-		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
-	}
-	else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-	{
-		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-	}
-	else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-	{
-		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::GrassPass2Shader::attrib_position, MeshShader::GrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassPass2Shader::attrib_color, mesh.Stride);
-	}
-	else
-	{
-		mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-			MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-	}
-	mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
 }
 
 void STKMesh::render()
@@ -637,9 +671,29 @@ void STKMesh::render()
 			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
 			bool transparent = (rnd && rnd->isTransparent());
 
+			if (isTransparentPass != transparent)
+				continue;
+			if (irr_driver->getPhase() == 4)
+			{
+				initvaostate(GLmeshes[i], material.MaterialType);
+				drawDisplace(GLmeshes[i]);
+				continue;
+			}
+			if (!isObject(material.MaterialType))
+			{
+				driver->setMaterial(material);
+				driver->drawMeshBuffer(mb);
+				continue;
+			}
+
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-			if (isObject(material.MaterialType) && isTransparentPass == transparent)
+			if (irr_driver->getPhase() == 2)
+			{
+				initvaostate(GLmeshes[i], material.MaterialType);
+				drawGlow(GLmeshes[i]);
+			}
+			else
 			{
 				initvaostate(GLmeshes[i], material.MaterialType);
 				if (transparent)
@@ -655,11 +709,6 @@ void STKMesh::render()
 				material.Lighting = false;
 				irr_driver->getVideoDriver()->setMaterial(material);
 				static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
-			}
-			else if (transparent == isTransparentPass)
-			{
-				driver->setMaterial(material);
-				driver->drawMeshBuffer(mb);
 			}
 		}
 	}

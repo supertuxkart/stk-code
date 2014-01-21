@@ -12,6 +12,7 @@ struct GLMesh {
 	GLuint vao_first_pass;
 	GLuint vao_second_pass;
 	GLuint vao_glow_pass;
+	GLuint vao_displace_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
 	GLuint textures[6];
@@ -47,8 +48,9 @@ protected:
 	void drawTransparentObject(const GLMesh &mesh);
 	void drawBubble(const GLMesh &mesh);
 
-	// Pass 3 shader (glow)
-	void drawGlow(const GLMesh &mesh, float r, float g, float b);
+	// Misc passes shaders (glow, displace...)
+	void drawGlow(const GLMesh &mesh);
+	void drawDisplace(const GLMesh &mesh);
 public:
 	STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
 		const irr::core::vector3df& position = irr::core::vector3df(0,0,0),

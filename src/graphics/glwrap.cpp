@@ -296,6 +296,16 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
 	glUniform1i(location, textureUnit);
 }
 
+void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter)
+{
+	glActiveTexture(GL_TEXTURE0 + TextureUnit);
+	glBindTexture(GL_TEXTURE_2D, TextureId);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, MagFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+}
+
 static GLuint TexturedQuadShader;
 static GLuint TexturedQuadAttribPosition;
 static GLuint TexturedQuadAttribTexCoord;

@@ -601,26 +601,29 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("ProjectionMatrix", ProjectionMatrix.pointer(), 16);
     srv->setVertexShaderConstant("ModelViewMatrix", ModelViewMatrix.pointer(), 16);
 
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
-
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
-
-    vector3df wind = irr_driver->getWind() * strength * speed;
-    m_dir[0] += wind.X;
-    m_dir[1] += wind.Z;
-
-    strength = time * 0.56f + sinf(time);
-    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
-
-    wind = irr_driver->getWind() * strength * speed;
-    wind.rotateXZBy(cosf(time));
-    m_dir2[0] += wind.X;
-    m_dir2[1] += wind.Z;
-
     srv->setVertexShaderConstant("dir", m_dir, 2);
     srv->setVertexShaderConstant("dir2", m_dir2, 2);
 
     srv->setVertexShaderConstant("screen", m_screen, 2);
+}
+
+void DisplaceProvider::update()
+{
+	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+	const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
+
+	float strength = time;
+	strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
+
+	vector3df wind = irr_driver->getWind() * strength * speed;
+	m_dir[0] += wind.X;
+	m_dir[1] += wind.Z;
+
+	strength = time * 0.56f + sinf(time);
+	strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
+
+	wind = irr_driver->getWind() * strength * speed;
+	wind.rotateXZBy(cosf(time));
+	m_dir2[0] += wind.X;
+	m_dir2[1] += wind.Z;
 }

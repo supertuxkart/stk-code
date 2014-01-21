@@ -159,6 +159,66 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
 };
 
+class DisplaceShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
+	static GLuint uniform_MVP, uniform_MV, uniform_tex, uniform_dir, uniform_dir2;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex);
+};
+
+}
+
+namespace ParticleShader
+{
+
+class SimpleSimulationShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
+	static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
+
+	static void init();
+};
+
+
+
+class HeightmapSimulationShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
+	static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
+	static GLuint uniform_track_x, uniform_track_z, uniform_track_x_len, uniform_track_z_len, uniform_heightmap;
+
+	static void init();
+};
+
+class SimpleParticleRender
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth);
+};
+
+class FlipParticleRender
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz, attrib_rotationvec, attrib_anglespeed;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth);
+};
 }
 
 namespace FullScreenShader
