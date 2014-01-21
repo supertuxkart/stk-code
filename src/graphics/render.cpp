@@ -828,10 +828,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 {
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), false, false);
     glClearColor(0, 0, 0, 0);
-    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glStencilFunc(GL_ALWAYS, 1, ~0);
-    glEnable(GL_STENCIL_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     overridemat.Enabled = 1;
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE0;
@@ -845,9 +842,14 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     overridemat.Material.TextureLayer[0].TextureWrapU =
     overridemat.Material.TextureLayer[0].TextureWrapV = video::ETC_REPEAT;
 
+	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+	cb->update();
+
     const int displacingcount = m_displacing.size();
+	irr_driver->setPhase(4);
     for (int i = 0; i < displacingcount; i++)
     {
+
         m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
         m_displacing[i]->render();
 
@@ -858,9 +860,6 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     overridemat.Enabled = 0;
 
     // Blur it
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    glStencilFunc(GL_EQUAL, 1, ~0);
-
     video::SMaterial minimat;
     minimat.Lighting = false;
     minimat.ZWriteEnable = false;
@@ -872,6 +871,5 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 
 	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
-    glDisable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
 }
