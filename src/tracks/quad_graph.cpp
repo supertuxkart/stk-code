@@ -983,7 +983,7 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
                /*track_color*/    &fill_color,
                /*lap line color*/  &red                       );
 
-    m_node = irr_driver->addMesh(m_mesh);   // add Debug Mesh
+    m_node = irr_driver->getSceneManager()->addMeshSceneNode(m_mesh);   // add Debug Mesh
 #ifdef DEBUG
     m_node->setName("minimap-mesh");
 #endif

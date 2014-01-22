@@ -479,6 +479,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	else
 	  drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
 	      tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
+	glUseProgram(0);
 }
 
 static GLuint ColoredQuadShader;
@@ -545,4 +546,5 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glUseProgram(0);
 }
