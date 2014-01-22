@@ -369,6 +369,8 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
   glBindVertexArray(CTQvao);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glUniform1i(ColorTexturedQuadUniformTex, 0);
   glUniform2f(ColorTexturedQuadUniformCenter, center_pos_x, center_pos_y);
   glUniform2f(ColorTexturedQuadUniformSize, width, height);
@@ -406,6 +408,8 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
   glBindVertexArray(TQvao);
   glActiveTexture(GL_TEXTURE0);
   glBindTexture(GL_TEXTURE_2D, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glUniform1i(TexturedQuadUniformTex, 0);
   glUniform2f(TexturedQuadUniformCenter, center_pos_x, center_pos_y);
   glUniform2f(TexturedQuadUniformSize, width, height);
