@@ -320,6 +320,11 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
 
   // SSAO
   setTexture(7, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  if (!UserConfigParams::m_ssao)
+  {
+    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
 
   glUseProgram(MeshShader::SplattingShader::Program);
   MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -339,6 +344,11 @@ void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
   setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(3, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  if (!UserConfigParams::m_ssao)
+  {
+    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
 
   glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
   MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
@@ -358,6 +368,12 @@ void STKMesh::drawGrassPass2(const GLMesh &mesh)
 	setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
 	setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
 	setTexture(3, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	if (!UserConfigParams::m_ssao)
+	{
+	  GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
+	  glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+	
 
 	glUseProgram(MeshShader::GrassPass2Shader::Program);
 	MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir, 0, 1, 2, 3);
@@ -375,6 +391,12 @@ void STKMesh::drawUntexturedObject(const GLMesh &mesh)
   setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  if (!UserConfigParams::m_ssao)
+  {
+    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
+  
 
   glUseProgram(MeshShader::UntexturedObjectShader::Program);
   MeshShader::UntexturedObjectShader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2);
@@ -395,6 +417,11 @@ void STKMesh::drawObjectPass2(const GLMesh &mesh)
   setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(3, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  if (!UserConfigParams::m_ssao)
+  {
+    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
 
   glUseProgram(MeshShader::ObjectPass2Shader::Program);
   MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
