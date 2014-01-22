@@ -109,7 +109,7 @@ void BattleAI::update(float dt)
    // updateCurrentNode();
     handleAcceleration(dt);
     handleSteering(dt);
-    handleBraking();
+   // handleBraking();
     handleGetUnstuck(dt);
     AIBaseController::update(dt);
 }   //BattleAI
@@ -296,7 +296,7 @@ void BattleAI::handleBraking()
                        "speed %f too tight curve: radius %f ",
                        m_kart->getSpeed(),
                        m_kart->getIdent().c_str(),
-                       m_current_curve_radius);
+                       current_curve_radius);
 #endif
         }
         return;

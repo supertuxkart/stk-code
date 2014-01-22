@@ -83,7 +83,7 @@ public:
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseController() {};
     virtual void reset();
-
+    static void enableDebug() {m_ai_debug = true; }
     virtual bool  disableSlipstreamBonus() const;
     
     virtual void    crashed(const Material *m);

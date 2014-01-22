@@ -78,7 +78,6 @@ public:
                               StateManager::ActivePlayer *player=NULL);
     virtual ~AIBaseLapController() {};
     virtual void reset();
-    static void enableDebug() {m_ai_debug = true; }
     virtual void crashed(const AbstractKart *k) {};
     virtual void handleZipper(bool play_sound) {};
     virtual void finishedRace(float time) {};
