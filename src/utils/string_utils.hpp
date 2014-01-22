@@ -61,9 +61,6 @@ namespace StringUtils
 
     std::string encodeToHtmlEntities(const irr::core::stringw &output);
 
-    /** Compute a simple hash of a string */
-    unsigned int simpleHash(const char* input);
-
     // ------------------------------------------------------------------------
     template <class T>
     std::string toString (const T& any)
