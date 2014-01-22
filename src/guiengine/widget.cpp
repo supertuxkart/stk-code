@@ -86,7 +86,7 @@ Widget::Widget(WidgetType type, bool reserve_id)
     m_tab_down_root = -1;
     m_tab_up_root = -1;
 
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         m_player_focus[n] = false;
         m_selected[n] = false;
@@ -108,7 +108,7 @@ Widget::~Widget()
     assert(m_magic_number == 0xCAFEC001);
 
     // If any player focused this widget, unset that focus
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         if (m_player_focus[n])
         {
@@ -136,7 +136,7 @@ void Widget::elementRemoved()
     m_element = NULL;
 
     // If any player focused this widget, unset that focus
-    for (int n=0; n<MAX_PLAYER_COUNT; n++)
+    for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
     {
         if (m_player_focus[n])
         {

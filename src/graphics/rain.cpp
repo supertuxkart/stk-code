@@ -18,7 +18,9 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
+#include "graphics/gpuparticles.h"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
@@ -30,103 +32,13 @@
 #include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
+
 #include <ISceneManager.h>
 #include <SMeshBuffer.h>
 
 using namespace video;
 using namespace scene;
 using namespace core;
-
-// The actual rain node
-class RainNode: public scene::ISceneNode
-{
-public:
-    RainNode(scene::ISceneManager* mgr, ITexture *tex)
-            : scene::ISceneNode(0, mgr, -1)
-    {
-        mat.Lighting = false;
-        mat.ZWriteEnable = false;
-        mat.MaterialType = irr_driver->getShader(ES_RAIN);
-        mat.Thickness = 200;
-        mat.BlendOperation = EBO_ADD;
-
-        mat.setTexture(0, tex);
-        mat.TextureLayer[0].TextureWrapU =
-        mat.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-
-        count = 2500;
-        area = 3500;
-
-        // Fill in the mesh buffer
-        buf.Vertices.clear();
-        buf.Indices.clear();
-
-        buf.Vertices.set_used(count);
-        buf.Indices.set_used(count);
-
-        buf.Primitive = EPT_POINT_SPRITES;
-        buf.setHardwareMappingHint(EHM_STATIC);
-
-        u32 i;
-        float x, y, z;
-        for (i = 0; i < count; i++)
-    {
-            x = ((rand() % area) - area/2) / 100.0f;
-            y = ((rand() % 2400)) / 100.0f;
-            z = ((rand() % area) - area/2) / 100.0f;
-
-            buf.Indices[i] = i;
-            buf.Vertices[i] = S3DVertex(x, y, z, 0, 0, 0, SColor(255, 255, 0, 0), 0, 0);
-        }
-
-        box.addInternalPoint(vector3df((float)(-area/2)));
-        box.addInternalPoint(vector3df((float)( area/2)));
-    }
-
-    ~RainNode()
-    {
-    }
-
-    virtual void render()
-        {
-        glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-
-        IVideoDriver * const drv = irr_driver->getVideoDriver();
-        drv->setTransform(ETS_WORLD, AbsoluteTransformation);
-        drv->setMaterial(mat);
-
-        drv->drawMeshBuffer(&buf);
-
-        glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    }
-
-    virtual const core::aabbox3d<f32>& getBoundingBox() const
-    {
-        return box;
-    }
-
-    virtual void OnRegisterSceneNode()
-            {
-        if (IsVisible &&
-           (irr_driver->getRenderPass() & ESNRP_TRANSPARENT) == ESNRP_TRANSPARENT)
-        {
-            SceneManager->registerNodeForRendering(this, ESNRP_TRANSPARENT);
-            }
-
-        ISceneNode::OnRegisterSceneNode();
-        }
-
-    virtual u32 getMaterialCount() const { return 1; }
-    virtual video::SMaterial& getMaterial(u32 i) { return mat; }
-
-private:
-    video::SMaterial mat;
-    core::aabbox3d<f32> box;
-    u32 count;
-    s32 area;
-
-    scene::SMeshBuffer buf;
-};
 
 // The rain manager
 

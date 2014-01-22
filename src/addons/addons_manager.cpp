@@ -20,6 +20,20 @@
 
 #include "addons/addons_manager.hpp"
 
+#include "addons/news_manager.hpp"
+#include "addons/zip.hpp"
+#include "io/file_manager.hpp"
+#include "io/xml_node.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "online/http_request.hpp"
+#include "online/request_manager.hpp"
+#include "states_screens/kart_selection.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_manager.hpp"
+#include "utils/string_utils.hpp"
+
+
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -27,24 +41,15 @@
 #include <string.h>
 #include <vector>
 
-#include "addons/inetwork_http.hpp"
-#include "addons/request.hpp"
-#include "addons/zip.hpp"
-#include "io/file_manager.hpp"
-#include "io/xml_node.hpp"
-#include "karts/kart_properties.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "states_screens/kart_selection.hpp"
-#include "tracks/track.hpp"
-#include "tracks/track_manager.hpp"
-#include "utils/string_utils.hpp"
+using namespace Online;
 
 AddonsManager* addons_manager = 0;
 
 // ----------------------------------------------------------------------------
 /** Initialises the non-online component of the addons manager (i.e. handling
  *  the list of already installed addons). The online component is initialised
- *  later from a separate thread in network_http (once network_http is setup).
+ *  later from a separate thread started from the news manager (see
+ *  NewsManager::init()  ).
  */
 AddonsManager::AddonsManager() : m_addons_list(std::vector<Addon>() ),
                                  m_state(STATE_INIT)
@@ -69,14 +74,77 @@ AddonsManager::~AddonsManager()
 }   // ~AddonsManager
 
 // ----------------------------------------------------------------------------
-/** This initialises the online portion of the addons manager. It uses the
- *  downloaded list of available addons. This is called by network_http before
- *  it goes into command-receiving mode, so we can't use any asynchronous calls
- *  here (though this is being called from a separate thread , so the
- *  main GUI is not blocked anyway). This function will update the state
- *  variable
+/** This init function is called from a separate thread (started in
+ *  news_manager, since the news.xml file contains the address of the
+ *  addons.xml URL).
+ *  \param xml The news.xml file, which inclues the data about the addons.xml
+ *         file (in the 'include' node).
+ *  \param force_refresh Download addons.xml, even if the usual waiting period
+ *         between downloads hasn't passed yet.
  */
-void AddonsManager::initOnline(const XMLNode *xml)
+void AddonsManager::init(const XMLNode *xml,
+                         bool force_refresh)
+{
+    std::string    addon_list_url("");
+    StkTime::TimeType mtime(0);
+    const XMLNode *include = xml->getNode("include");
+    std::string filename=file_manager->getAddonsFile("addons.xml");
+    if(!include)
+    {
+        file_manager->removeFile(filename);
+        setErrorState();
+        NewsManager::get()->addNewsMessage(_("Can't access stkaddons server..."));
+        return;
+    }
+
+    include->get("file",  &addon_list_url);
+    int frequency = 0;
+    include->get("frequency", &frequency);
+
+    int64_t tmp;
+    include->get("mtime", &tmp);
+    mtime = tmp;
+
+    bool download = 
+        ( mtime > UserConfigParams::m_addons_last_updated +frequency ||
+          force_refresh                                              ||
+          !file_manager->fileExists(filename)                          )
+       && UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED;
+    
+    if (download)
+    {
+        Log::info("NetworkHttp", "Downloading updated addons.xml");
+        Online::HTTPRequest *download_request = new Online::HTTPRequest("addons.xml");
+        download_request->setURL(addon_list_url);            
+        download_request->executeNow();
+        if(download_request->hadDownloadError())
+        {
+            Log::error("addons", "Error on download addons.xml: %s\n",
+                       download_request->getDownloadErrorMessage());
+            delete download_request;
+            return;
+        }
+        delete download_request;
+        UserConfigParams::m_addons_last_updated=StkTime::getTimeSinceEpoch();
+    }
+    else
+        Log::info("NetworkHttp", "Using cached addons.xml");
+        
+    const XMLNode *xml_addons = new XMLNode(filename);
+    addons_manager->initAddons(xml_addons);   // will free xml_addons
+    if(UserConfigParams::logAddons())
+        Log::info("addons", "Addons manager list downloaded");
+}   // init
+
+// ----------------------------------------------------------------------------
+/** This initialises the online portion of the addons manager. It uses the
+ *  downloaded list of available addons. It is called from init(), which is
+ *  called from a separate thread, so blocking download requests can be used
+ *  without blocking the GUI. This function will update the state variable.
+ *  \param xml The xml tree of addons.xml with information about all available
+ *         addons.
+ */
+void AddonsManager::initAddons(const XMLNode *xml)
 {
     m_addons_list.lock();
     // Clear the list in case that a reinit is being done.
@@ -88,8 +156,9 @@ void AddonsManager::initOnline(const XMLNode *xml)
     {
         const XMLNode *node = xml->getNode(i);
         const std::string &name = node->getName();
-        // Ignore news/redirect, which is handled by network_http
-        if(name=="include" || name=="message") continue;
+        // Ignore news/redirect, which is handled by the NewsManager
+        if(name=="include" || name=="message")
+            continue;
         if(node->getName()=="track" || node->getName()=="kart" ||
             node->getName()=="arena"                                 )
         {
@@ -202,9 +271,9 @@ void AddonsManager::initOnline(const XMLNode *xml)
 
     m_state.setAtomic(STATE_READY);
 
-    if (UserConfigParams::m_internet_status == INetworkHttp::IPERM_ALLOWED)
+    if (UserConfigParams::m_internet_status == RequestManager::IPERM_ALLOWED)
         downloadIcons();
-}   // initOnline
+}   // initAddons
 
 // ----------------------------------------------------------------------------
 /** Reinitialises the addon manager, which happens when the user selects
@@ -297,12 +366,25 @@ void AddonsManager::downloadIcons()
                             addon.getId().c_str());
                 continue;
             }
-            std::string save        = "icons/"+icon;
-            Request *r = INetworkHttp::get()->downloadFileAsynchron(url, save,
-                                                            /*priority*/1,
-                                                           /*manage_mem*/true);
-            if (r != NULL)
-                r->setAddonIconNotification(&addon);
+
+            // A simple class that will notify the addon via a callback
+            class IconRequest : public Online::HTTPRequest
+            {
+                Addon *m_addon;  // stores this addon object
+                void afterOperation()
+                {
+                    m_addon->setIconReady();
+                }   // callback
+            public:
+                IconRequest(const std::string &filename, 
+                            const std::string &url,
+                            Addon *addon     ) : HTTPRequest(filename, true, 1)
+                {
+                    m_addon = addon;  setURL(url);
+                }   // IconRequest
+            };
+            IconRequest *r = new IconRequest("icons/"+icon, url, &addon);
+            r->queue();
         }
         else
             m_addons_list.getData()[i].setIconReady();
@@ -367,6 +449,14 @@ int AddonsManager::getAddonIndex(const std::string &id) const
     }
     return -1;
 }   // getAddonIndex
+// ----------------------------------------------------------------------------
+bool AddonsManager::anyAddonsInstalled() const
+{
+    for(unsigned int i=0; i<m_addons_list.getData().size(); i++)
+        if(m_addons_list.getData()[i].isInstalled())
+            return true;
+    return false;
+}   // anyAddonsInstalled
 
 // ----------------------------------------------------------------------------
 /** Installs or updates (i.e. = install on top of an existing installation) an
@@ -463,13 +553,24 @@ bool AddonsManager::uninstall(const Addon &addon)
     if (file_manager->fileExists(addon.getDataDir()))
     {
         error = !file_manager->removeDirectory(addon.getDataDir());
+
+        // Even if an error happened when removing the data files
+        // still remove the addon, since it is unknown if e.g. only
+        // some files were successfully removed. Since we can not
+        // know if the addon is still functional, better remove it.
+        // On the other hand, in case of a problem the user will have
+        // the option in the GUI to try again. In this case 
+        // removeTrack/Kart would not find the addon and assert. So 
+        // check first if the track is still known.
         if(addon.getType()=="kart")
         {
-            kart_properties_manager->removeKart(addon.getId());
+            if(kart_properties_manager->getKart(addon.getId()))
+               kart_properties_manager->removeKart(addon.getId());
         }
         else if(addon.getType()=="track" || addon.getType()=="arena")
         {
-            track_manager->removeTrack(addon.getId());
+            if(track_manager->getTrack(addon.getId()))
+               track_manager->removeTrack(addon.getId());
         }
     }
     saveInstalled();

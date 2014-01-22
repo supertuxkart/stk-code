@@ -1,46 +1,35 @@
 #version 130
 uniform sampler2D tex;
-uniform float far;
 uniform int hastex;
 uniform float objectid;
 
 noperspective in vec3 nor;
 noperspective in vec3 eyenor;
 noperspective in vec3 viewpos;
-
-const float near = 1.0;
-
-vec4 encdepth(float v) {
-	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
-	enc = fract(enc);
-	enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
-	return enc;
-}
+out vec4 Albedo;
+out vec4 NormalDepth;
+out vec4 Specular;
 
 void main() {
-
-	float linear_z = (2.0 * near) / (far + near - gl_FragCoord.z * (far - near));
-
-	// Tune for better inside range without losing outdoors
-	linear_z *= 2.0;
-
 	float rim = 1.0 - dot(eyenor, viewpos);
 	rim = smoothstep(0.5, 1.5, rim) * 0.35;
+	vec4 color;
 
 	if (hastex != 0) {
-		vec4 col = texture2D(tex, gl_TexCoord[0].xy);
+		vec4 col = texture(tex, gl_TexCoord[0].xy);
 
-		if (col.a < 0.5)
+		if (col.a < 0.1)
 			discard;
 
 		col.xyz += rim;
 
-		gl_FragData[0] = col;
+		color = col;
 	} else {
-		gl_FragData[0] = gl_Color + vec4(vec3(rim), 0.0);
+		color = gl_Color + vec4(vec3(rim), 0.0);
 	}
 
-	gl_FragData[1] = vec4(0.5 * normalize(nor) + 0.5, linear_z);
-	gl_FragData[2] = vec4(encdepth(gl_FragCoord.z).xyz, objectid);
+	Albedo = vec4(color.xyz, 1.);
+	NormalDepth = vec4(0.5 * normalize(nor) + 0.5, gl_FragCoord.z);
+	Specular = vec4(1. - color.a);
 }
 

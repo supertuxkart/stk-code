@@ -60,7 +60,7 @@ void CheckGoal::update(float dt)
 
     PtrVector<TrackObject>&   objects = tom->getObjects();
     unsigned int ball_index = 0;
-    for(int i=0; i<objects.size(); i++)
+    for(unsigned int i=0; i<objects.size(); i++)
     {
         TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())
@@ -116,7 +116,7 @@ void CheckGoal::reset(const Track &track)
     m_previous_position.clear();
 
     const PtrVector<TrackObject>&   objects = tom->getObjects();
-    for(int i=0; i<objects.size(); i++)
+    for(unsigned int i=0; i<objects.size(); i++)
     {
         const TrackObject* obj = objects.get(i);
         if(!obj->isSoccerBall())

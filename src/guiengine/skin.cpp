@@ -32,6 +32,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
+#include "graphics/glwrap.hpp"
 
 using namespace GUIEngine;
 using namespace irr;
@@ -366,7 +367,7 @@ void Skin::drawBgImage()
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
-    GUIEngine::getDriver()->draw2DImage(bg_image, dest, source_area,
+    draw2DImage(bg_image, dest, source_area,
                                         /* no clipping */0, /*color*/ 0,
                                         /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
@@ -612,34 +613,34 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
 
     if ((areas & BoxRenderParams::LEFT) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_left,
+        draw2DImage(source, dest_area_left,
                                             m_source_area_left, clipRect,
                                             colorptr, true /* alpha */);
     }
 
     if ((areas & BoxRenderParams::BODY) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_center,
+        draw2DImage(source, dest_area_center,
                                             m_source_area_center, clipRect,
                                             colorptr, true /* alpha */);
     }
 
     if ((areas & BoxRenderParams::RIGHT) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_right,
+        draw2DImage(source, dest_area_right,
                                             m_source_area_right, clipRect,
                                             colorptr, true /* alpha */);
     }
 
     if ((areas & BoxRenderParams::TOP) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top,
+        draw2DImage(source, dest_area_top,
                                             m_source_area_top, clipRect,
                                             colorptr, true /* alpha */);
     }
     if ((areas & BoxRenderParams::BOTTOM) != 0)
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom,
+        draw2DImage(source, dest_area_bottom,
                                             m_source_area_bottom, clipRect,
                                             colorptr, true /* alpha */);
     }
@@ -647,21 +648,21 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
     if ( ((areas & BoxRenderParams::LEFT) != 0) &&
          ((areas & BoxRenderParams::TOP ) != 0)     )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_left,
+        draw2DImage(source, dest_area_top_left,
                                             m_source_area_top_left, clipRect,
                                             colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::RIGHT) != 0) &&
          ((areas & BoxRenderParams::TOP  ) != 0)    )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_top_right,
+        draw2DImage(source, dest_area_top_right,
                                             m_source_area_top_right, clipRect,
                                             colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::LEFT  ) != 0) &&
          ((areas & BoxRenderParams::BOTTOM) != 0)    )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_left,
+        draw2DImage(source, dest_area_bottom_left,
                                             m_source_area_bottom_left,
                                             clipRect, colorptr,
                                             /*alpha*/true );
@@ -669,7 +670,7 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
     if ( ((areas & BoxRenderParams::RIGHT ) != 0) &&
          ((areas & BoxRenderParams::BOTTOM) != 0)    )
     {
-        GUIEngine::getDriver()->draw2DImage(source, dest_area_bottom_right,
+        draw2DImage(source, dest_area_bottom_right,
                                             m_source_area_bottom_right,
                                             clipRect, colorptr,
                                             /*alpha*/true );
@@ -794,7 +795,7 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
                                  SkinConfig::m_render_params["progress::fill"],
                                  w->m_deactivated);
 #if 0
-          GUIEngine::getDriver()->draw2DImage(
+          draw2DImage(
               SkinConfig::m_render_params["progress::fill"].getImage(),
               sized_rect, core::recti(0,0,progress->m_w, progress->m_h),
               0 /* no clipping */, colors, true);
@@ -858,7 +859,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         const core::recti source_area(texture_w * step, 0, 
                                       texture_w * (step + 1), texture_h);
 
-        GUIEngine::getDriver()->draw2DImage(texture,
+        draw2DImage(texture,
                                             star_rect, source_area,
                                             0 /* no clipping */,
                                            (w->m_deactivated || ID_DEBUG) ? colors : 0,
@@ -1021,14 +1022,14 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                                      SColor(100,255,255,255),
                                      SColor(100,255,255,255),
                                      SColor(100,255,255,255) };
-                GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2,
+                draw2DImage(tex_bubble, rect2,
                                                     source_area,
                                                     0 /* no clipping */,
                                                     colors, true /* alpha */);
             }
             else
             {
-                GUIEngine::getDriver()->draw2DImage(tex_bubble, rect2,
+                draw2DImage(tex_bubble, rect2,
                                                     source_area,
                                                     0 /* no clipping */, 0,
                                                     true /* alpha */);
@@ -1077,7 +1078,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                                         glow_center_x + 45 + grow,
                                         glow_center_y + 25 + grow/2);
 
-                GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2,
+                draw2DImage(tex_ficonhighlight, rect2,
                                                     source_area,
                                                     /*clipping*/ 0,
                                                     /*color*/ 0,
@@ -1305,7 +1306,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 
         const core::recti source_area(0, 0, texture_w, texture_h);
 
-        GUIEngine::getDriver()->draw2DImage(texture,
+        draw2DImage(texture,
                                             dest_area, source_area,
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
@@ -1400,7 +1401,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
                                 glow_center_x + 45 + grow,
                                 glow_center_y + 25 + grow/2);
 
-        GUIEngine::getDriver()->draw2DImage(tex_ficonhighlight, rect2,
+        draw2DImage(tex_ficonhighlight, rect2,
                                             source_area,
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
@@ -1443,7 +1444,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
                              SColor(100,255,255,255),
                              SColor(100,255,255,255) };
         core::recti r(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h);
-        GUIEngine::getDriver()->draw2DImage(icon_widget->m_texture, sized_rect,
+        draw2DImage(icon_widget->m_texture, sized_rect,
                                             r, 0 /* no clipping */, colors,
                                             true /* alpha */);
     }
@@ -1460,7 +1461,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
             t = icon_widget->m_highlight_texture;
         }
         core::recti r(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h);
-        GUIEngine::getDriver()->draw2DImage(t, sized_rect, r,0
+        draw2DImage(t, sized_rect, r,0
                                             /* no clipping */, 0,
                                             true /* alpha */);
     }
@@ -1510,13 +1511,13 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
                              SColor(100,255,255,255),
                              SColor(100,255,255,255),
                              SColor(100,255,255,255) };
-        GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
+        draw2DImage( texture, rect, source_area,
                                             0 /* no clipping */, colors,
                                             true /* alpha */);
     }
     else
     {
-        GUIEngine::getDriver()->draw2DImage( texture, rect, source_area,
+        draw2DImage( texture, rect, source_area,
                                              0 /* no clipping */, 0,
                                              true /* alpha */);
     }
@@ -1579,7 +1580,7 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
                              core::dimension2di(rect.getHeight(),
                                                 rect.getHeight()));
         core::recti srcRect(core::position2d<s32>(0,0), img->getSize());
-        irr_driver->getVideoDriver()->draw2DImage(img, destRect, srcRect,
+        draw2DImage(img, destRect, srcRect,
                                                   NULL, NULL, /* alpha */true);
     }
 
@@ -1643,7 +1644,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                 core::recti r1(0, (int)(widget.m_y - 40*y_size),
                                framesize.Width, framesize.Height);
                 core::recti r2(core::dimension2di(0,0), tex->getSize());
-                irr_driver->getVideoDriver()->draw2DImage(tex, r1, r2,
+                draw2DImage(tex, r1, r2,
                                                           0, 0, /*alpha*/true);
             }
             else if (widget.isTopBar())
@@ -1654,7 +1655,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                 core::recti r1(0,               0,
                                (int)widget.m_w, (int)widget.m_h);
                 core::recti r2(core::dimension2di(0,0), tex->getSize());
-                irr_driver->getVideoDriver()->draw2DImage(tex, r1, r2,
+                draw2DImage(tex, r1, r2,
                                                           0, 0, /*alpha*/false);
             }
             else
@@ -1678,7 +1679,7 @@ void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_background::neutral"];
 
-    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect2,
+    draw2DImage(p.getImage(), rect2,
                                         p.m_source_area_center,
                                         0 /* no clipping */, 0,
                                         true /* alpha */);
@@ -1691,7 +1692,7 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
     BoxRenderParams& p =
         SkinConfig::m_render_params["scrollbar_thumb::neutral"];
 
-    GUIEngine::getDriver()->draw2DImage(p.getImage(), rect,
+    draw2DImage(p.getImage(), rect,
                                         p.m_source_area_center,
                                         0 /* no clipping */, 0,
                                         true /* alpha */);
@@ -1708,7 +1709,7 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect,
 
     if (!bottomArrow)
     {
-        GUIEngine::getDriver()->draw2DImage(p.getImage(), rect,
+        draw2DImage(p.getImage(), rect,
                                             p.m_source_area_center,
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
@@ -1722,7 +1723,7 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect,
         const int y0 = source_area.UpperLeftCorner.Y;
         const int y1 = source_area.LowerRightCorner.Y;
 
-        GUIEngine::getDriver()->draw2DImage(p.getImage(), rect,
+        draw2DImage(p.getImage(), rect,
                                             core::recti(x0, y1, x1, y0),
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
@@ -1926,7 +1927,7 @@ void doDrawBadge(ITexture* texture, const core::recti& rect,
                                           : rect.LowerRightCorner.X,
                             rect.LowerRightCorner.Y                     );
 
-    GUIEngine::getDriver()->draw2DImage(texture, rect2, source_area,
+    draw2DImage(texture, rect2, source_area,
                                         0 /* no clipping */, 0,
                                         true /* alpha */);
 }  // doDrawBadge
@@ -2060,12 +2061,12 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
                 center.Y + (int)(((int)rect.LowerRightCorner.Y
                                 - (int)center.Y)*texture_size);
         }
-        GUIEngine::getDriver()->draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
+        GL32_draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
 
         core::recti innerArea = borderArea;
         innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
         innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
-        GUIEngine::getDriver()->draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
+		GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)
@@ -2129,7 +2130,7 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-    GUIEngine::getDriver()->draw2DRectangle( color,
+	GL32_draw2DRectangle(color,
                                             core::recti(position2d< s32 >(0,0),
                        GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }   // drawBGFadeColor
@@ -2177,7 +2178,7 @@ void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
     SColor color = SColor(150, 96, 74, 196);
-    GUIEngine::getDriver()->draw2DRectangle(color, rect);
+	GL32_draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------

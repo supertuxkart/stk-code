@@ -44,87 +44,21 @@ TrackObjectManager::~TrackObjectManager()
  * \note If you add add any objects with LOD, don't forget to call
  *       TrackObjectManager::assingLodNodes after everything is loaded
  *       to finalize their creation.
+ *
+ * FIXME: all of this is horrible, just make the exporter write LOD definitions
+ *        in a separate section that's read before everything and remove all this
+ *        crap
  */
-void TrackObjectManager::add(const XMLNode &xml_node)
+void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
 {
     try
     {
-        std::string groupname;
-        xml_node.get("lod_group", &groupname);
-        bool is_lod = !groupname.empty();
-
-        if (is_lod)
-        {
-            //printf("Adding lod obj to group <%s>\n", groupname.c_str());
-            m_lod_objects[groupname].push_back(&xml_node);
-        }
-        else
-        {
-            m_all_objects.push_back(new TrackObject(xml_node));
-        }
-
-        /*
-        std::string groupname;
-        xml_node.get("lod_group", &groupname);
-        bool is_lod = !groupname.empty();
-
-        std::string type;
-        xml_node.get("type", &type);
-
-        if (xml_node.getName() == "particle-emitter")
-        {
-            m_all_objects.push_back(new ThreeDAnimation(xml_node));
-        }
-        else if (type=="movable")
-        {
-            if (is_lod)
-            {
-                assert(false); // TODO
-                //_lod_objects[groupname].push_back(new TrackObject(xml_node));
-            }
-            else
-            {
-                m_all_objects.push_back(new TrackObject(xml_node));
-            }
-        }
-        else if(type=="animation")
-        {
-            if (is_lod)
-            {
-                m_lod_objects[groupname].push_back(new ThreeDAnimation(xml_node));
-            }
-            else
-            {
-                m_all_objects.push_back(new ThreeDAnimation(xml_node));
-            }
-        }
-        else if(type=="billboard")
-        {
-            m_all_objects.push_back(new BillboardAnimation(xml_node));
-        }
-        else if(type=="sfx-emitter")
-        {
-            m_all_objects.push_back(new ThreeDAnimation(xml_node));
-        }
-        else if(type=="cutscene_camera")
-        {
-            m_all_objects.push_back(new ThreeDAnimation(xml_node));
-        }
-        else if(type=="action-trigger")
-        {
-            m_all_objects.push_back(new TrackObject(xml_node));
-        }
-        else
-        {
-            fprintf(stderr, "Unknown track object: '%s' - ignored.\n",
-                    type.c_str());
-        }
-         */
+        m_all_objects.push_back(new TrackObject(xml_node, parent, lod_loader));
     }
     catch (std::exception& e)
     {
-        fprintf(stderr, "[TrackObjectManager] WARNING: Could not load track object. Reason : %s\n",
-                e.what());
+        Log::warn("TrackObjectManager", "Could not load track object. Reason : %s",
+                  e.what());
     }
 }   // add
 
@@ -270,13 +204,8 @@ void TrackObjectManager::removeObject(TrackObject* obj)
 }   // removeObject
 
 // ----------------------------------------------------------------------------
-/**
-  * \brief To be called after all objects are loaded and the LodNodeLoader is done
-  *        parsing everything.
-  * This method exists because LOD objects need to be created after others.
-  *
-  * \param lod_nodes the LOD nodes created by the LodNodeLoader.
-  */
+
+/*
 void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
 {
     for (unsigned int n=0; n<lod_nodes.size(); n++)
@@ -285,7 +214,7 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
         assert( queue.size() > 0 );
         const XMLNode* xml = queue[ queue.size() - 1 ];
 
-        TrackObject* obj = new TrackObject(*xml, lod_nodes[n]);
+        TrackObject* obj = new TrackObject(*xml, lod_nodes[n]->getParent(), lod_nodes[n]);
         queue.erase( queue.end() - 1 );
 
         m_all_objects.push_back(obj);
@@ -293,3 +222,4 @@ void TrackObjectManager::assingLodNodes(const std::vector<LODNode*>& lod_nodes)
 
     m_lod_objects.clear();
 }
+*/

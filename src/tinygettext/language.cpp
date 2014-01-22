@@ -213,7 +213,7 @@ static const LanguageSpec languages[] = {
   { "pl", "PL", 0, "Polish (Poland)"             },
   { "ps", 0,    0, "Pashto"                      },
   { "pt", 0,    0, "Portuguese"                  },
-  { "pt", "BR", 0, "Brazilian"                   },
+  { "pt", "BR", 0, "Portuguese (Brazil)"         },
   { "pt", "PT", 0, "Portuguese (Portugal)"       },
   { "qu", 0,    0, "Quechua"                     },
   { "rm", 0,    0, "Rhaeto-Romance"              },

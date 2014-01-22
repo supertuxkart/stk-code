@@ -103,10 +103,6 @@ else()
     include_directories(${OGGVORBIS_INCLUDE_DIRS})
 endif()
 
-# CURL
-find_package(CURL REQUIRED)
-include_directories(${CURL_INCLUDE_DIRS})
-
 # Fribidi
 if(USE_FRIBIDI)
     find_package(Fribidi)
@@ -149,16 +145,21 @@ if(WIN32)
 
     # And shut up about unsafe stuff
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+	# VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
+	# Since STK uses DEBUG, this is added for debug compilation only:
+    set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)
+else()
+    # All non VS generators used create only a single compile mode, so
+	# compile flags can be simplye be added
+    if(CMAKE_BUILD_TYPE MATCHES Debug)
+        add_definitions(-DDEBUG)
+    else()
+        add_definitions(-DNDEBUG)
+    endif()
 endif()
 
 # TODO: remove this switch
 add_definitions(-DHAVE_OGGVORBIS)
-
-if(CMAKE_BUILD_TYPE MATCHES Debug)
-    add_definitions(-DDEBUG)
-else()
-    add_definitions(-DNDEBUG)
-endif()
 
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
@@ -219,6 +220,13 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
+# CURL
+if(WIN32)
+    target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurldll.a)
+else()
+    find_package(CURL REQUIRED)
+    include_directories(${CURL_INCLUDE_DIRS})
+endif()
 
 # Common library dependencies
 target_link_libraries(supertuxkart
@@ -232,6 +240,7 @@ target_link_libraries(supertuxkart
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
+
 
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
@@ -269,6 +278,10 @@ endif()
 
 if(MSVC)
   target_link_libraries(supertuxkart iphlpapi.lib)
+  add_custom_command(TARGET supertuxkart POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${PROJECT_SOURCE_DIR}/dependencies/dll"
+        $<TARGET_FILE_DIR:supertuxkart>) 
 endif()
 
 # Optional tools

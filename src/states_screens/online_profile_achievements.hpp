@@ -57,7 +57,7 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
+    virtual void onUpdate(float delta) OVERRIDE;
 
     virtual void beforeAddingWidget() OVERRIDE;
 

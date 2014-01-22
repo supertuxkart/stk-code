@@ -1,50 +1,38 @@
 #version 130
-uniform float far;
-uniform float objectid;
-
 uniform sampler2D tex_layout;
 uniform sampler2D tex_detail0;
 uniform sampler2D tex_detail1;
 uniform sampler2D tex_detail2;
 uniform sampler2D tex_detail3;
-//uniform sampler2D tex_detail4;
+uniform sampler2D DiffuseMap;
+uniform sampler2D SpecularMap;
+uniform sampler2D SSAO;
+uniform vec2 screen;
+uniform vec3 ambient;
 
-noperspective in vec3 nor;
-
-const float near = 1.0;
-
-vec4 encdepth(float v) {
-	vec4 enc = vec4(1.0, 255.0, 65025.0, 16581375.0) * v;
-	enc = fract(enc);
-	enc -= enc.yzww * vec4(1.0/255.0, 1.0/255.0, 1.0/255.0, 0.0);
-	return enc;
-}
+in vec2 uv;
+in vec2 uv_bis;
+out vec4 FragColor;
 
 void main() {
-
-	float linear_z = (2.0 * near) / (far + near - gl_FragCoord.z * (far - near));
-
-	// Tune for better inside range without losing outdoors
-	linear_z *= 2.0;
-
 	// Splatting part
-	vec4 splatting = texture2D(tex_layout, gl_TexCoord[1].st);
-	vec4 detail0 = texture2D(tex_detail0, gl_TexCoord[0].st);
-	vec4 detail1 = texture2D(tex_detail1, gl_TexCoord[0].st);
-	vec4 detail2 = texture2D(tex_detail2, gl_TexCoord[0].st);
-	vec4 detail3 = texture2D(tex_detail3, gl_TexCoord[0].st);
-//	vec4 detail4 = texture2D(tex_detail4, gl_TexCoord[0].st);
+	vec4 splatting = texture(tex_layout, uv_bis);
+	vec4 detail0 = texture(tex_detail0, uv);
+	vec4 detail1 = texture(tex_detail1, uv);
+	vec4 detail2 = texture(tex_detail2, uv);
+	vec4 detail3 = texture(tex_detail3, uv);
 	vec4 detail4 = vec4(0.0);
 
-	vec4 splatted = (splatting.r * detail0 +
+	vec4 splatted = splatting.r * detail0 +
 			splatting.g * detail1 +
 			splatting.b * detail2 +
-			(1.0 - splatting.r - splatting.g - splatting.b) * detail3 +
-			(1.0 - splatting.a) * detail4)
-			* gl_Color;
+			(1.0 - splatting.r - splatting.g - splatting.b) * detail3;
 
-	gl_FragData[0] = splatted;
-
-	gl_FragData[1] = vec4(normalize(nor) * 0.5 + 0.5, linear_z);
-	gl_FragData[2] = vec4(encdepth(gl_FragCoord.z).xyz, objectid);
+   vec2 tc = gl_FragCoord.xy / screen;
+   vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
+   vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
+  float ao = texture(SSAO, tc).x;
+   vec3 LightFactor = ao * ambient + DiffuseComponent + SpecularComponent;
+	
+	FragColor = vec4(splatted.xyz * LightFactor, 1.);
 }

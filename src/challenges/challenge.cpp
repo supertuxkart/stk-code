@@ -93,8 +93,14 @@ void Challenge::setSolved(RaceManager::Difficulty d)
 void Challenge::save(std::ofstream& writer)
 {
     writer << "        <" << m_data->getId().c_str() << ">\n"
-           << "            <easy   solved=\"" << StringUtils::boolstr(isSolved(RaceManager::DIFFICULTY_EASY))   << "\"/>\n"
-           << "            <medium solved=\"" << StringUtils::boolstr(isSolved(RaceManager::DIFFICULTY_MEDIUM)) << "\"/>\n"
-           << "            <hard   solved=\"" << StringUtils::boolstr(isSolved(RaceManager::DIFFICULTY_HARD))   << "\"/>\n"
+           << "            <easy   solved=\"" 
+           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_EASY))
+           << "\"/>\n"
+           << "            <medium solved=\"" 
+           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_MEDIUM))
+           << "\"/>\n"
+           << "            <hard   solved=\"" 
+           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_HARD)) 
+           << "\"/>\n"
            << "        </" << m_data->getId().c_str() << ">\n";
 }   // save

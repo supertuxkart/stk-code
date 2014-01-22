@@ -54,6 +54,7 @@ public:
                           GE_WATER_SHADER,
                           GE_SPHERE_MAP,
                           GE_SPLATTING,
+                          GE_SKYBOX,
                           GE_NORMAL_MAP,
                           GE_CAUSTICS};
 
@@ -335,6 +336,9 @@ public:
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
     void isInitiallyHidden(scene::IMeshBuffer* who);
+	/** For particle system : specify if the particle should be additively blended
+	 */
+	bool isAlphaAdditive() const { return !m_alpha_blending;  }
 } ;
 
 

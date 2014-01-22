@@ -17,8 +17,8 @@ if(MSVC)
   add_definitions(/D_IRR_STATIC_LIB_)
   add_definitions(/D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
-  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions -fno-rtti -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
-  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions -fno-rtti -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
+  set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
+  set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
 endif()
 
 set(IRRLICHT_SOURCES

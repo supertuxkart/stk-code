@@ -57,7 +57,7 @@ void StoryModeLobbyScreen::init()
 
     if (UserConfigParams::m_default_player.toString().size() > 0)
     {
-        for (int n=0; n<players.size(); n++)
+        for (unsigned int n=0; n<players.size(); n++)
         {
             if (players[n].getName() == UserConfigParams::m_default_player.toString())
             {
@@ -68,7 +68,7 @@ void StoryModeLobbyScreen::init()
         }
     }
 
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         if (players[n].isGuestAccount()) continue;
 
@@ -92,7 +92,9 @@ void StoryModeLobbyScreen::tearDown()
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void StoryModeLobbyScreen::eventCallback(Widget* widget,
+                                         const std::string& name,
+                                         const int player_id)
 {
     if (name == "back")
     {
@@ -109,7 +111,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
         bool slot_found = false;
 
         PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-        for (int n=0; n<players.size(); n++)
+        for (unsigned int n=0; n<players.size(); n++)
         {
             if (list->getSelectionLabel() == players[n].getName())
             {
@@ -122,8 +124,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget, const std::string& name
 
         if (!slot_found)
         {
-            fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
-                    core::stringc(list->getSelectionLabel().c_str()).c_str());
+            Log::error("StoryModeLobby",
+                       "Cannot find player corresponding to slot '%s'.",
+                     core::stringc(list->getSelectionLabel().c_str()).c_str());
         }
         else
         {
@@ -151,7 +154,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
     bool slot_found = false;
 
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         if (players[n].getName() == newName)
         {
@@ -164,12 +167,13 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
 
     if (!slot_found)
     {
-        fprintf(stderr, "[StoryModeLobbyScreen] ERROR: cannot find player corresponding to slot '%s'\n",
-                core::stringc(newName.c_str()).c_str());
+        Log::error("StoryModeLobbyScreen",
+                   "Cannot find player corresponding to slot '%s'.",
+                   core::stringc(newName.c_str()).c_str());
     }
 
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-}
+}   // onNewPlayerWithName
 
 // -----------------------------------------------------------------------------
 

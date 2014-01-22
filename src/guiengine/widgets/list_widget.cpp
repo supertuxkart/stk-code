@@ -352,7 +352,7 @@ void ListWidget::elementRemoved()
 {
     Widget::elementRemoved();
 
-    for (int n=0; n<m_header_elements.size(); n++)
+    for (unsigned int n=0; n<m_header_elements.size(); n++)
     {
         m_header_elements[n].elementRemoved();
         m_children.remove( m_header_elements.get(n) );

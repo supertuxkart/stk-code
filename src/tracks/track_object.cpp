@@ -38,9 +38,9 @@
  *                 model, enable/disable status, timer information.
  * \param lod_node Lod node (defaults to NULL).
  */
-TrackObject::TrackObject(const XMLNode &xml_node, LODNode* lod_node)
+TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
 {
-    init(xml_node, lod_node);
+    init(xml_node, parent, lod_loader);
 }
 
 // ----------------------------------------------------------------------------
@@ -79,7 +79,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
 
 // ----------------------------------------------------------------------------
 
-void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
+void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -99,8 +99,14 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     xml_node.get("interaction", &m_interaction);
     xml_node.get("lod_group", &m_lod_group);
 
+    bool lod_instance = false;
+    xml_node.get("lod_instance", &lod_instance);
+
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
+    
+    m_garage = false;
+    m_distance = 0;
 
     std::string type;
     xml_node.get("type",    &type );
@@ -111,22 +117,35 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     if (xml_node.getName() == "particle-emitter")
     {
         m_type = "particle-emitter";
-        m_presentation = new TrackObjectPresentationParticles(xml_node);
+        m_presentation = new TrackObjectPresentationParticles(xml_node, parent);
+    }
+    else if (xml_node.getName() == "light")
+    {
+        m_type = "light";
+        m_presentation = new TrackObjectPresentationLight(xml_node, parent);
     }
     else if (type == "sfx-emitter")
     {
         // FIXME: at this time sound emitters are just disabled in multiplayer
         //        otherwise the sounds would be constantly heard
         if (race_manager->getNumLocalPlayers() < 2)
-            m_presentation = new TrackObjectPresentationSound(xml_node);
+            m_presentation = new TrackObjectPresentationSound(xml_node, parent);
     }
     else if (type == "action-trigger")
     {
+        std::string m_action;
+        xml_node.get("action", &m_action);
+        xml_node.get("distance", &m_distance);
+        if (m_action == "garage")
+        {
+            m_garage = true;
+        }
+
         m_presentation = new TrackObjectPresentationActionTrigger(xml_node);
     }
     else if (type == "billboard")
     {
-        m_presentation = new TrackObjectPresentationBillboard(xml_node);
+        m_presentation = new TrackObjectPresentationBillboard(xml_node, parent);
     }
     else if (type=="cutscene_camera")
     {
@@ -136,18 +155,20 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
     {
         scene::ISceneNode *glownode = NULL;
 
-        if (lod_node != NULL)
+        if (lod_instance)
         {
             m_type = "lod";
-            m_presentation = new TrackObjectPresentationLOD(xml_node, lod_node);
+            TrackObjectPresentationLOD* lod_node = new TrackObjectPresentationLOD(xml_node, parent, lod_loader);
+            m_presentation = lod_node;
 
-            glownode = lod_node->getAllNodes()[0];
+            glownode = ((LODNode*)lod_node->getNode())->getAllNodes()[0];
         }
         else
         {
             m_type = "mesh";
             m_presentation = new TrackObjectPresentationMesh(xml_node,
-                                                             m_enabled);
+                                                             m_enabled,
+                                                             parent);
             glownode = ((TrackObjectPresentationMesh *) m_presentation)->getNode();
         }
 
@@ -170,7 +191,7 @@ void TrackObject::init(const XMLNode &xml_node, LODNode* lod_node)
             b = glow.getBlue() / 255.0f;
 
             irr_driver->addGlowingNode(glownode, r, g, b);
-    }
+        }
 
         bool forcedbloom = false;
         if (xml_node.get("forcedbloom", &forcedbloom) && forcedbloom && glownode)
@@ -255,6 +276,16 @@ const core::vector3df& TrackObject::getPosition() const
 {
     if (m_presentation != NULL)
         return m_presentation->getPosition();
+    else
+        return m_init_xyz;
+}
+
+// ----------------------------------------------------------------------------
+
+const core::vector3df& TrackObject::getAbsolutePosition() const
+{
+    if (m_presentation != NULL)
+        return m_presentation->getAbsolutePosition();
     else
         return m_init_xyz;
 }

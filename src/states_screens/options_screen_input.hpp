@@ -74,7 +74,7 @@ public:
                              int value);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt, irr::video::IVideoDriver* drv);
+    virtual void onUpdate(float dt);
 };
 
 #endif

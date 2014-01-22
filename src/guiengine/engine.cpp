@@ -665,6 +665,7 @@ namespace GUIEngine
 #include <iostream>
 #include <assert.h>
 #include <irrlicht.h>
+#include "graphics/glwrap.hpp"
 
 using namespace irr::gui;
 using namespace irr::video;
@@ -751,7 +752,7 @@ namespace GUIEngine
     }   // showMessage
 
     // ------------------------------------------------------------------------
-    Widget* getFocusForPlayer(const int playerID)
+    Widget* getFocusForPlayer(const unsigned int playerID)
     {
         assert(playerID >= 0);
         assert(playerID < MAX_PLAYER_COUNT);
@@ -760,7 +761,7 @@ namespace GUIEngine
     }   // getFocusForPlayer
 
     // ------------------------------------------------------------------------
-    void focusNothingForPlayer(const int playerID)
+    void focusNothingForPlayer(const unsigned int playerID)
     {
         Widget* focus = getFocusForPlayer(playerID);
         if (focus != NULL) focus->unsetFocusForPlayer(playerID);
@@ -769,7 +770,7 @@ namespace GUIEngine
     }   // focusNothingForPlayer
 
     // ------------------------------------------------------------------------
-    bool isFocusedForPlayer(const Widget* w, const int playerID)
+    bool isFocusedForPlayer(const Widget* w, const unsigned int playerID)
     {
         assert(w != NULL);
         assert(playerID >= 0);
@@ -836,7 +837,7 @@ namespace GUIEngine
             {
                 widget->update(dt);
             }
-            DialogQueue::get()->update();
+            if (state == GUIEngine::MENU) DialogQueue::get()->update();
         }
 
         // Hack : on the first frame, irrlicht processes all events that have been queued
@@ -955,7 +956,7 @@ namespace GUIEngine
         //if (g_skin != NULL) delete g_skin;
         g_skin = NULL;
 
-        for (int i=0; i<g_loaded_screens.size(); i++)
+        for (unsigned int i=0; i<g_loaded_screens.size(); i++)
         {
             g_loaded_screens[i].unload();
         }
@@ -1005,7 +1006,7 @@ namespace GUIEngine
         g_driver = driver_a;
         g_state_manager = state_manager;
 
-        for (int n=0; n<MAX_PLAYER_COUNT; n++)
+        for (unsigned int n=0; n<MAX_PLAYER_COUNT; n++)
         {
             g_focus_for_player[n] = NULL;
         }
@@ -1194,7 +1195,7 @@ namespace GUIEngine
             if (ModalDialog::isADialogActive())
                 ModalDialog::getCurrent()->onUpdate(dt);
             else
-                getCurrentScreen()->onUpdate(elapsed_time, g_driver);
+                getCurrentScreen()->onUpdate(elapsed_time);
         }
         else
         {
@@ -1236,7 +1237,7 @@ namespace GUIEngine
                                 core::dimension2d<s32>(screen_size.Width,
                                                        text_height) );
 
-                    Private::g_driver->draw2DRectangle(SColor(255,252,248,230),
+                    GL32_draw2DRectangle(SColor(255,252,248,230),
                                                        msgRect);
                     Private::g_font->draw((*it).m_message.c_str(),
                                           msgRect,
@@ -1275,7 +1276,6 @@ namespace GUIEngine
     }   // render
 
     // -----------------------------------------------------------------------
-
     std::vector<irr::video::ITexture*> g_loading_icons;
 
     void renderLoading(bool clearIcons)
@@ -1309,7 +1309,7 @@ namespace GUIEngine
         const core::rect< s32 > source_area =
             core::rect< s32 >(0, 0, texture_w, texture_h);
 
-        GUIEngine::getDriver()->draw2DImage( loading, dest_area, source_area,
+        draw2DImage( loading, dest_area, source_area,
                                             0 /* no clipping */, 0,
                                             true /* alpha */);
 
@@ -1329,7 +1329,7 @@ namespace GUIEngine
         int y = screen_h - icon_size - ICON_MARGIN;
         for (int n=0; n<icon_count; n++)
         {
-            g_driver->draw2DImage(g_loading_icons[n],
+            draw2DImage(g_loading_icons[n],
                               core::rect<s32>(x, y, x+icon_size, y+icon_size),
                               core::rect<s32>(core::position2d<s32>(0, 0),
                                               g_loading_icons[n]->getSize()),

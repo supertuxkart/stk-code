@@ -75,10 +75,10 @@ namespace Online{
         if(StkTime::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
         {
             request = new RefreshRequest();
-            request->setURL((std::string)UserConfigParams::m_server_multiplayer + "client-user.php");
-            request->setParameter("action",std::string("get_server_list"));
+            request->setServerURL("client-user.php");
+            request->addParameter("action","get_server_list");
             if (request_now)
-                HTTPManager::get()->addRequest(request);
+                RequestManager::get()->addRequest(request);
         }
         return request;
     }
@@ -100,7 +100,7 @@ namespace Online{
 
     void ServersManager::RefreshRequest::callback()
     {
-        ServersManager::get()->refresh(m_success, m_result);
+        ServersManager::get()->refresh(isSuccess(), getXMLData());
     }
 
     // ============================================================================

@@ -25,6 +25,7 @@
 #include "graphics/material_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/command_line.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 
@@ -105,7 +106,7 @@ FileManager* file_manager = 0;
  *  exists) changed in reInit().
  *
  */
-FileManager::FileManager(char *argv[])
+FileManager::FileManager()
 {
     m_subdir_name.resize(ASSET_COUNT);
     m_subdir_name[CHALLENGE  ] = "challenges";
@@ -144,19 +145,21 @@ FileManager::FileManager(char *argv[])
     // This is esp. useful for Visual Studio, since it's not necessary
     // to define the working directory when debugging, it works automatically.
     std::string root_dir;
-    if(m_file_system->existFile(argv[0]))
-        exe_path = m_file_system->getFileDir(argv[0]);
+    if(m_file_system->existFile(CommandLine::getExecName().c_str()))
+        exe_path = m_file_system->getFileDir(CommandLine::getExecName().c_str());
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
         root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
 #ifdef __APPLE__
-    else if( macSetBundlePathIfRelevant( root_dir ) ) { /* nothing to do */ }
+    else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
     else if(m_file_system->existFile("data"))
         root_dir = "data/" ;
     else if(m_file_system->existFile("../data"))
         root_dir = "../data/" ;
+    else if(m_file_system->existFile("../../data"))
+        root_dir = "../../data/" ;
     else if(m_file_system->existFile(exe_path+"data"))
         root_dir = (exe_path+"data/").c_str();
     else if(m_file_system->existFile(exe_path+"/../data"))
@@ -177,8 +180,8 @@ FileManager::FileManager(char *argv[])
     }
 
     addRootDirs(root_dir);
-    if( fileExists(root_dir+"../../data_supertuxkart"))
-        addRootDirs(root_dir+"../../data_supertuxkart");
+    if( fileExists(root_dir+"../../stk-assets"))
+        addRootDirs(root_dir+"../../stk-assets");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
         
@@ -1036,11 +1039,16 @@ void FileManager::checkAndCreateDirForAddons(const std::string &dir)
 }   // checkAndCreateDirForAddons
 
 // ----------------------------------------------------------------------------
-/** Removes the specified file, returns true if successful, or false
- *  if the file is not a regular file or can not be removed.
+/** Removes the specified file.
+ *  \return True if successful, or false if the file is not a regular file or
+ *           can not be removed.
  */
 bool FileManager::removeFile(const std::string &name) const
 {
+    // If the file does not exists, everything is fine
+    if(!fileExists(name))
+       return true;
+
     struct stat mystat;
     if(stat(name.c_str(), &mystat) < 0) return false;
     if( S_ISREG(mystat.st_mode))
@@ -1065,8 +1073,7 @@ bool FileManager::removeDirectory(const std::string &name) const
         if(UserConfigParams::logMisc())
             Log::verbose("FileManager", "Deleting directory '%s'.",
                          (*i).c_str());
-        std::string full_path=name+"/"+*i;
-        if(isDirectory(full_path))
+        if(isDirectory(*i))
         {
             // This should not be necessary (since this function is only
             // used to remove addons), and it limits the damage in case
@@ -1075,7 +1082,7 @@ bool FileManager::removeDirectory(const std::string &name) const
         }
         else
         {
-            removeFile(full_path);
+            removeFile(*i);
         }
     }
 #if defined(WIN32)

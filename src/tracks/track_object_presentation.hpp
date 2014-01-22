@@ -40,6 +40,7 @@ class SFXBase;
 class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
+class LodNodeLoader;
 
 /**
  * \ingroup tracks
@@ -81,6 +82,7 @@ public:
                       const core::vector3df& scale) {}
 
     virtual const core::vector3df& getPosition() const { return m_init_xyz; }
+    virtual const core::vector3df& getAbsolutePosition() const { return m_init_xyz; }
     virtual const core::vector3df& getRotation() const { return m_init_hpr; }
     virtual const core::vector3df& getScale() const { return m_init_scale; }
 
@@ -114,6 +116,7 @@ public:
     }
 
     virtual const core::vector3df& getPosition() const OVERRIDE;
+    virtual const core::vector3df& getAbsolutePosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
     virtual const core::vector3df& getScale() const OVERRIDE;
     virtual void move(const core::vector3df& xyz, const core::vector3df& hpr,
@@ -147,7 +150,9 @@ class TrackObjectPresentationLOD : public TrackObjectPresentationSceneNode
 {
 public:
 
-    TrackObjectPresentationLOD(const XMLNode& xml_node, LODNode* lod_node);
+    TrackObjectPresentationLOD(const XMLNode& xml_node,
+                               scene::ISceneNode* parent,
+                               LodNodeLoader& lod_loader);
     virtual ~TrackObjectPresentationLOD();
 };
 
@@ -174,10 +179,10 @@ private:
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
 
-    void init(const XMLNode* xml_node, bool enabled);
+    void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
-    TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled);
+    TrackObjectPresentationMesh(const XMLNode& xml_node, bool enabled, scene::ISceneNode* parent);
 
     TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
@@ -207,7 +212,7 @@ private:
 
 public:
 
-    TrackObjectPresentationSound(const XMLNode& xml_node);
+    TrackObjectPresentationSound(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationSound();
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
     virtual void update(float dt) OVERRIDE;
@@ -235,7 +240,7 @@ class TrackObjectPresentationBillboard : public TrackObjectPresentationSceneNode
     float m_fade_out_start;
     float m_fade_out_end;
 public:
-    TrackObjectPresentationBillboard(const XMLNode& xml_node);
+    TrackObjectPresentationBillboard(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationBillboard();
     virtual void update(float dt) OVERRIDE;
 };
@@ -253,7 +258,7 @@ private:
     std::string m_trigger_condition;
 
 public:
-    TrackObjectPresentationParticles(const XMLNode& xml_node);
+    TrackObjectPresentationParticles(const XMLNode& xml_node, scene::ISceneNode* parent);
     virtual ~TrackObjectPresentationParticles();
 
     virtual void update(float dt) OVERRIDE;
@@ -262,6 +267,23 @@ public:
 
     void triggerParticles();
 };
+
+/**
+* \ingroup tracks
+* A track object representation that consists of a light emitter
+*/
+class TrackObjectPresentationLight : public TrackObjectPresentationSceneNode
+{
+private:
+    video::SColor m_color;
+    //float m_distance;
+    float m_energy;
+
+public:
+    TrackObjectPresentationLight(const XMLNode& xml_node, scene::ISceneNode* parent);
+    virtual ~TrackObjectPresentationLight();
+};
+
 
 /**
  * \ingroup tracks

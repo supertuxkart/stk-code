@@ -663,8 +663,7 @@ bool CIrrDeviceLinux::createWindow()
 	if (!CreationParams.WindowId)
 	{
 		// create new Window
-		// Remove window manager decoration in fullscreen
-		attributes.override_redirect = CreationParams.Fullscreen;
+		attributes.override_redirect = false;
 		window = XCreateWindow(display,
 				RootWindow(display, visual->screen),
 				0, 0, Width, Height, 0, visual->depth,
@@ -676,16 +675,34 @@ bool CIrrDeviceLinux::createWindow()
 		Atom wmDelete;
 		wmDelete = XInternAtom(display, wmDeleteWindow, True);
 		XSetWMProtocols(display, window, &wmDelete, 1);
+
 		if (CreationParams.Fullscreen)
 		{
-			XSetInputFocus(display, window, RevertToParent, CurrentTime);
-			int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
-				GrabModeAsync, CurrentTime);
-			IrrPrintXGrabError(grabKb, "XGrabKeyboard");
-			int grabPointer = XGrabPointer(display, window, True, ButtonPressMask,
-				GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
-			IrrPrintXGrabError(grabPointer, "XGrabPointer");
-			XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
+			// Workaround for Gnome which sometimes creates window smaller than display
+			XSizeHints *hints = XAllocSizeHints();
+			hints->flags=PMinSize;
+			hints->min_width=Width;
+			hints->min_height=Height;
+			XSetWMNormalHints(display, window, hints);
+			XFree(hints);
+
+			// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
+			// Get the needed atom from there freedesktop names
+			Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
+			Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
+			// Set the fullscreen property
+			XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char *>(& WMFullscreenAtom), 1);
+		   
+			// Notify the root window
+			XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
+			   
+			xev.type = ClientMessage;
+			xev.xclient.window = window;
+			xev.xclient.message_type = WMStateAtom;
+			xev.xclient.format = 32;
+			xev.xclient.data.l[0] = 1;
+			xev.xclient.data.l[1] = WMFullscreenAtom;
+			XSendEvent(display, DefaultRootWindow(display), false, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
 		}
 	}
 	else
@@ -724,8 +741,21 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
+			int context_attribs[] =
+				{
+					GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+					GLX_CONTEXT_MINOR_VERSION_ARB, 0,
+					// Uncomment to discard deprecated features
+					//GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+					GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+					None
+				};
+			
+			PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
+			glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
+								glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
 			// create glx context
-			Context = glXCreateNewContext(display, glxFBConfig, GLX_RGBA_TYPE, NULL, True);
+			Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, context_attribs);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))

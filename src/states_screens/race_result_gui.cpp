@@ -21,6 +21,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
@@ -539,7 +540,7 @@ GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action,
 /** Called once a frame, this now triggers the rendering of the actual
  *  race result gui.
  */
-void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
+void RaceResultGUI::onUpdate(float dt)
 {
     renderGlobal(dt);
 
@@ -813,7 +814,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                                 ri->m_kart_icon->getSize());
         core::recti dest_rect(current_x, y,
                                 current_x+m_width_icon, y+m_width_icon);
-        irr_driver->getVideoDriver()->draw2DImage(ri->m_kart_icon, dest_rect,
+        draw2DImage(ri->m_kart_icon, dest_rect,
                                                     source_rect, NULL, NULL,
                                                     true);
     }
@@ -921,12 +922,12 @@ void RaceResultGUI::displaySoccerResults()
     core::recti sourceRect(core::vector2di(0,0), redTeamIcon->getSize());
     core::recti destRect(currX, currY, currX+redTeamIcon->getSize().Width/2,
         currY+redTeamIcon->getSize().Height/2);
-    irr_driver->getVideoDriver()->draw2DImage(redTeamIcon, destRect,sourceRect,
+    draw2DImage(redTeamIcon, destRect,sourceRect,
         NULL,NULL, true);
     currX += UserConfigParams::m_width/2 - redTeamIcon->getSize().Width/2;
     destRect = core::recti(currX, currY, currX+redTeamIcon->getSize().Width/2,
         currY+redTeamIcon->getSize().Height/2);
-    irr_driver->getVideoDriver()->draw2DImage(blueTeamIcon,destRect,sourceRect,
+    draw2DImage(blueTeamIcon,destRect,sourceRect,
         NULL, NULL, true);
     
     resultText = StringUtils::toWString(teamScore[1]);
@@ -977,7 +978,7 @@ void RaceResultGUI::displaySoccerResults()
         sourceRect = core::recti(core::vector2di(0,0), scorerIcon->getSize());
         irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
         destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
-        irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
+        draw2DImage(scorerIcon, destRect, sourceRect,
             NULL, NULL, true);
     }
 
@@ -1009,7 +1010,7 @@ void RaceResultGUI::displaySoccerResults()
         irr::u32 offsetX = GUIEngine::getFont()->getDimension(resultText.c_str()).Width/2;
 
         destRect = core::recti(currX-offsetX-30, currY, currX-offsetX, currY+ 30);
-        irr_driver->getVideoDriver()->draw2DImage(scorerIcon, destRect, sourceRect,
+        draw2DImage(scorerIcon, destRect, sourceRect,
             NULL, NULL, true);
     }
 }
@@ -1180,7 +1181,7 @@ void RaceResultGUI::displayHighScores()
                     core::recti dest_rect(current_x, current_y,
                         current_x+m_width_icon, current_y+m_width_icon);
 
-                    irr_driver->getVideoDriver()->draw2DImage(
+                    draw2DImage(
                         kart_icon_texture, dest_rect,
                         source_rect, NULL, NULL,
                         true);

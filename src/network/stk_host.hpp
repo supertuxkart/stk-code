@@ -28,7 +28,7 @@
 
 // enet.h includes win32.h, which without lean_and_mean includes
 // winspool.h, which defines MAX_PRIORITY as a macro, which then
-// results in http_manager.hpp not being compilable.
+// results in request_manager.hpp not being compilable.
 #define WIN32_LEAN_AND_MEAN
 #include <enet/enet.h>
 

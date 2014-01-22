@@ -206,7 +206,7 @@ void LayoutManager::readCoords(Widget* self)
         int child_max_width = -1, child_max_height = -1;
         int total_width = 0, total_height = 0;
 
-        for (int child=0; child<self->m_children.size(); child++)
+        for (unsigned int child=0; child<self->m_children.size(); child++)
         {
             if (self->m_children[child].m_absolute_w > -1)
             {

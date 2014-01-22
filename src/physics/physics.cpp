@@ -159,8 +159,6 @@ void Physics::update(float dt)
         // --------------------
         if(p->getUserPointer(0)->is(UserPointer::UP_KART))
         {
-            AbstractKart *a=p->getUserPointer(0)->getPointerKart();
-            AbstractKart *b=p->getUserPointer(1)->getPointerKart();
             KartKartCollision(p->getUserPointer(0)->getPointerKart(),
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),

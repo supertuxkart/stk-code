@@ -50,22 +50,6 @@ protected:
 
 //
 
-class NormalMapProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    NormalMapProvider(bool withLightmap)
-    {
-        m_with_lightmap = withLightmap;
-    }
-
-private:
-    bool m_with_lightmap;
-};
-
-//
-
 class WaterShaderProvider: public CallBase
 {
 public:
@@ -86,6 +70,10 @@ public:
 
         m_water_shader_speed_1 =
         m_water_shader_speed_2 = 0.0f;
+        m_sunpos = core::vector3df(0., 0., 0.);
+        m_speed = 0.;
+        m_height = 0.;
+        m_length = 0.;
     }
 
     void setSunPosition(const core::vector3df &in)
@@ -133,33 +121,35 @@ public:
         m_amplitude = amp;
     }
 
+	float getSpeed() const
+	{
+		return m_speed;
+	}
+
+	float getAmplitude() const
+	{
+		return m_amplitude;
+	}
+
 private:
     float m_amplitude, m_speed;
 };
 
 //
 
-class ColorLevelsProvider: public CallBase
+class SkyboxProvider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-
-    ColorLevelsProvider()
+    
+    void setSunPosition(const core::vector3df &in)
     {
+        m_sunpos = in;
+        //m_sunpos.normalize();
     }
 
 private:
-    core::vector3df m_inlevel;
-    core::vector2df m_outlevel;
-};
-
-//
-
-class SplattingProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
+    core::vector3df m_sunpos;
 };
 
 //
@@ -224,22 +214,6 @@ public:
 
 private:
     std::set<const scene::IMeshBuffer *> m_bubbles;
-};
-
-//
-
-class RainEffectProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class SnowEffectProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 };
 
 //
@@ -333,6 +307,21 @@ public:
         m_color[2] = b;
     }
 
+	float getRed() const
+	{
+		return m_color[0];
+	}
+
+	float getGreen() const
+	{
+		return m_color[1];
+	}
+
+	float getBlue() const
+	{
+		return m_color[2];
+	}
+
 private:
     float m_color[3];
 };
@@ -364,81 +353,6 @@ public:
 
 //
 
-class LightBlendProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-class PointLightProvider: public CallBase
-{
-public:
-    PointLightProvider()
-    {
-        m_screen[0] = (float)UserConfigParams::m_width;
-        m_screen[1] = (float)UserConfigParams::m_height;
-
-        m_specular = 200;
-    }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setColor(float r, float g, float b)
-    {
-        m_color[0] = r;
-        m_color[1] = g;
-        m_color[2] = b;
-    }
-
-    void setPosition(float x, float y, float z)
-    {
-        const core::vector3df &campos =
-                   irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-        core::vector3df pos(x,y,z);
-        pos -= campos;
-
-        // get position in eye space coordinates
-        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
-        float *mat = m_view.pointer();
-
-        float scale = mat[3] * x + mat[7] * y + mat[11] * z + mat[15];
-        m_pos[0] = (mat[0] * x + mat[4] * y + mat[8] * z + mat[12]) / scale;
-        m_pos[1] = (mat[1] * x + mat[5] * y + mat[9] * z + mat[13]) / scale;
-        m_pos[2] = (mat[2] * x + mat[6] * y + mat[10] * z + mat[14]) / scale;
-    }
-
-    void setRadius(float r)
-    {
-        m_radius = r;
-    }
-
-    void setSpecular(float s)
-    {
-        m_specular = s;
-    }
-
-    void updateIPVMatrix()
-    {
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        m_invproj = drv->getTransform(video::ETS_PROJECTION);
-        m_invproj.makeInverse();
-    }
-
-private:
-    core::matrix4 m_invproj;
-
-    float m_color[3];
-    float m_pos[3];
-    float m_screen[2];
-    float m_radius;
-    float m_specular;
-};
-
-//
-
 class SunLightProvider: public CallBase
 {
 public:
@@ -458,6 +372,21 @@ public:
         m_color[1] = g;
         m_color[2] = b;
     }
+    
+    float getRed() const
+    {
+      return m_color[0];
+    }
+
+    float getGreen() const
+    {
+      return m_color[1];
+    }
+    
+    float getBlue() const
+    {
+      return m_color[2];
+    }
 
     void setPosition(float x, float y, float z)
     {
@@ -473,14 +402,10 @@ public:
         m_pos[1] = pos.Y;
         m_pos[2] = pos.Z;
     }
-
-    void updateIPVMatrix()
+    
+    core::vector3df getPosition() const
     {
-        // Update the IPV matrix, only once per frame since it's costly
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        m_invproj = drv->getTransform(video::ETS_PROJECTION);
-        m_invproj.makeInverse();
+      return core::vector3df(m_pos[0], m_pos[1], m_pos[2]);
     }
 
     void setShadowMatrix(const core::matrix4 &mat)
@@ -489,26 +414,11 @@ public:
     }
 
 private:
-    core::matrix4 m_invproj, m_shadowmat;
+    core::matrix4 m_shadowmat;
     float m_color[3];
     float m_pos[3];
     float m_screen[2];
     float m_wind[2];
-};
-
-//
-
-class BloomProvider: public CallBase
-{
-public:
-    BloomProvider() { m_threshold = 0.75f; }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setThreshold(const float f) { m_threshold = f; }
-
-private:
-    float m_threshold;
 };
 
 //
@@ -533,24 +443,6 @@ class MLAANeigh3Provider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class SSAOProvider: public CallBase
-{
-private:
-    core::matrix4 projm, invprojm;
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-    void updateIPVMatrix()
-    {
-        // Update the IPV matrix, only once per frame since it's costly
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        projm = drv->getTransform(video::ETS_PROJECTION);
-        projm.getInverse(invprojm);
-    }
 };
 
 //
@@ -645,22 +537,6 @@ private:
 
 //
 
-class BloomPowerProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setPower(float power)
-    {
-        m_power = power / 10.0f;
-    }
-
-private:
-    float m_power;
-};
-
-//
-
 class MultiplyProvider: public CallBase
 {
 public:
@@ -703,45 +579,31 @@ public:
         m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0;
     }
 
+	void update();
+
+	float getDirX() const
+	{
+		return m_dir[0];
+	}
+
+	float getDirY() const
+	{
+		return m_dir[1];
+	}
+
+	float getDir2X() const
+	{
+		return m_dir2[0];
+	}
+
+	float getDir2Y() const
+	{
+		return m_dir2[1];
+	}
+
 private:
     float m_screen[2];
     float m_dir[2], m_dir2[2];
-};
-
-//
-
-class PPDisplaceProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class FogProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void updateIPVMatrix()
-    {
-        // Update the campos and IPV matrix, only once per frame since it's costly
-        const core::vector3df &campos =
-                     irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
-        m_campos[0] = campos.X;
-        m_campos[1] = campos.Y;
-        m_campos[2] = campos.Z;
-
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-        m_invprojview = drv->getTransform(video::ETS_PROJECTION);
-        m_invprojview *= drv->getTransform(video::ETS_VIEW);
-        m_invprojview.makeInverse();
-    }
-
-private:
-    core::matrix4 m_invprojview;
-    float m_campos[3];
 };
 
 #endif

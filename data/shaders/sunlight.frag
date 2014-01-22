@@ -1,57 +1,55 @@
+#version 130
 uniform sampler2D ntex;
-uniform sampler2D dtex;
-uniform sampler2D cloudtex;
+//uniform sampler2D cloudtex;
 
-uniform vec3 center;
+uniform vec3 direction;
 uniform vec3 col;
-uniform vec2 screen;
 uniform mat4 invproj;
-uniform int hasclouds;
-uniform vec2 wind;
+//uniform int hasclouds;
+//uniform vec2 wind;
 
-float decdepth(vec4 rgba) {
-	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
-}
+in vec2 uv;
+out vec4 Diff;
+out vec4 Spec;
+out vec4 SpecularMap;
 
 void main() {
-
-	vec2 texc = gl_FragCoord.xy / screen;
-	float z = decdepth(vec4(texture2D(dtex, texc).xyz, 0.0));
+	float z = texture(ntex, uv).a;
+	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
+	xpos = invproj * xpos;
+	xpos.xyz /= xpos.w;
 
 	if (z < 0.03)
 	{
 		// Skyboxes are fully lit
-		gl_FragData[0] = vec4(1.0);
-		gl_FragData[1] = vec4(1.0);
+		Diff = vec4(1.0);
+		Spec = vec4(1.0);
 		return;
 	}
 
-	vec3 norm = texture2D(ntex, texc).xyz;
+	vec3 norm = texture(ntex, uv).xyz;
 	norm = (norm - 0.5) * 2.0;
 
 	// Normalized on the cpu
-	vec3 L = center;
+	vec3 L = direction;
 
 	float NdotL = max(0.0, dot(norm, L));
+	vec3 R = reflect(L, norm);
+	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
+	float Specular = pow(RdotE, 200);
 
 	vec3 outcol = NdotL * col;
 
-	if (hasclouds == 1)
+/*	if (hasclouds == 1)
 	{
-		vec3 tmp = vec3(texc, z);
-		tmp = tmp * 2.0 - 1.0;
-
-		vec4 xpos = vec4(tmp, 1.0);
-		xpos = invproj * xpos;
-		xpos.xyz /= xpos.w;
-
 		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;
-		float cloud = texture2D(cloudtex, cloudcoord).x;
+		float cloud = texture(cloudtex, cloudcoord).x;
 		//float cloud = step(0.5, cloudcoord.x) * step(0.5, cloudcoord.y);
 
 		outcol *= cloud;
-	}
+	}*/
 
-	gl_FragData[0] = vec4(outcol, 0.05);
-	gl_FragData[1] = vec4(1.0);
+	Diff = vec4(NdotL * col, 1.);
+	Spec = vec4(Specular * col, 1.);
+	SpecularMap = vec4(1.0);
 }

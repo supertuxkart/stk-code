@@ -21,6 +21,7 @@
 #include "states_screens/race_gui_base.hpp"
 
 #include "audio/music_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material.hpp"
@@ -218,7 +219,7 @@ void RaceGUIBase::createMarkerTexture()
                                   (i+1)*m_marker_rendered_size,
                                   m_marker_rendered_size);
             core::recti source_rect(core::vector2di(0,0), t->getSize());
-            irr_driver->getVideoDriver()->draw2DImage(t, dest_rect,
+            draw2DImage(t, dest_rect,
                                                       source_rect,
                                                       /*clipRect*/0,
                                                       /*color*/   0,
@@ -411,7 +412,7 @@ void RaceGUIBase::drawPowerupIcons(const AbstractKart* kart,
     {
         int x2 = (int)(x1+i*itemSpacing);
         core::rect<s32> pos(x2, y1, x2+nSize, y1+nSize);
-        irr_driver->getVideoDriver()->draw2DImage(t, pos, rect, NULL,
+        draw2DImage(t, pos, rect, NULL,
                                                   NULL, true);
     }   // for i
 }   // drawPowerupIcons
@@ -668,7 +669,7 @@ void RaceGUIBase::drawGlobalMusicDescription()
     const core::rect<s32> source(core::position2d<s32>(0,0),
                                  t->getOriginalSize());
 
-    irr_driver->getVideoDriver()->draw2DImage(t, dest, source,
+    draw2DImage(t, dest, source,
                                               NULL, NULL, true);
 }   // drawGlobalMusicDescription
 
@@ -935,7 +936,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             }
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                                        m_icons_frame->getTexture()->getOriginalSize());
-            irr_driver->getVideoDriver()->draw2DImage(
+            draw2DImage(
                                                       m_icons_frame->getTexture(), pos, rect,NULL, colors, true);
         }
 
@@ -944,7 +945,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
         {
             const core::rect<s32> rect(core::position2d<s32>(0,0),
                                        icon->getOriginalSize());
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos, rect,
+            draw2DImage(icon, pos, rect,
                                                       NULL, NULL, true);
         }
 
@@ -959,7 +960,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                                         icon->getOriginalSize());
             const core::rect<s32> pos1((int)(x-t_anim), y,
                                        (int)(x+w-t_anim), y+w);
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos1, rect1,
+            draw2DImage(icon, pos1, rect1,
                                                       NULL, NULL, true);
         }
 
@@ -970,7 +971,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                                            core::position2d<s32>(x+w,y+w*3/4));
             const core::rect<s32> sourceRect(core::position2d<s32>(0,0),
                                              icon->getOriginalSize());
-            irr_driver->getVideoDriver()->draw2DImage(icon, destRect,
+            draw2DImage(icon, destRect,
                                                       sourceRect, NULL, NULL,
                                                       true);
         }
@@ -988,7 +989,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
             const core::rect<s32> pos1((int)(x-t_anim), (int)(y-t_anim),
                                        (int)(x+w/2-t_anim),
                                        (int)(y+w/2-t_anim));
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos1, rect1,
+            draw2DImage(icon, pos1, rect1,
                                                       NULL, NULL, true);
 
             const core::rect<s32> rect2(icon_size_x/2,0,
@@ -997,18 +998,18 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                                        (int)(y-t_anim),
                                        (int)(x+w+t_anim),
                                        (int)(y+w/2-t_anim));
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos2, rect2,
+            draw2DImage(icon, pos2, rect2,
                                                       NULL, NULL, true);
 
             const core::rect<s32> rect3(0, icon_size_y/2, icon_size_x/2,icon_size_y);
             const core::rect<s32> pos3((int)(x-t_anim), (int)(y+w/2+t_anim),
                                        (int)(x+w/2-t_anim), (int)(y+w+t_anim));
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos3, rect3, NULL, NULL, true);
+            draw2DImage(icon, pos3, rect3, NULL, NULL, true);
 
             const core::rect<s32> rect4(icon_size_x/2,icon_size_y/2,icon_size_x,icon_size_y);
             const core::rect<s32> pos4((int)(x+w/2+t_anim), (int)(y+w/2+t_anim),
                                        (int)(x+w+t_anim), (int)(y+w+t_anim));
-            irr_driver->getVideoDriver()->draw2DImage(icon, pos4, rect4, NULL, NULL, true);
+            draw2DImage(icon, pos4, rect4, NULL, NULL, true);
         }
 
         //Plunger
@@ -1021,7 +1022,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
                                            icon_plunger->getOriginalSize());
                 const core::rect<s32> pos1(x+10, y-10, x+w+10, y+w-10);
-                irr_driver->getVideoDriver()->draw2DImage(icon_plunger, pos1,
+                draw2DImage(icon_plunger, pos1,
                                                           rect, NULL, NULL,
                                                           true);
             }
@@ -1037,7 +1038,7 @@ void RaceGUIBase::drawGlobalPlayerIcons(int bottom_margin)
                 const core::rect<s32> rect(core::position2d<s32>(0,0),
                                            icon_attachment->getOriginalSize());
                 const core::rect<s32> pos1(x-20, y-10, x+w-20, y+w-10);
-                irr_driver->getVideoDriver()->draw2DImage(icon_attachment,
+                draw2DImage(icon_attachment,
                                                           pos1, rect, NULL,
                                                           NULL, true);
             }
@@ -1135,7 +1136,7 @@ void RaceGUIBase::drawPlungerInFace(const Camera *camera, float dt)
     const core::rect<s32> source(core::position2d<s32>(0,0),
                                  t->getOriginalSize());
 
-    irr_driver->getVideoDriver()->draw2DImage(t, dest, source,
+    draw2DImage(t, dest, source,
                                               &viewport /* clip */,
                                               NULL /* color */,
                                               true /* alpha */     );

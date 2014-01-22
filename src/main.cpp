@@ -142,7 +142,6 @@
 #include "main_loop.hpp"
 #include "achievements/achievements_manager.hpp"
 #include "addons/addons_manager.hpp"
-#include "addons/inetwork_http.hpp"
 #include "addons/news_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
@@ -176,13 +175,13 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -192,10 +191,12 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/story_mode_lobby.hpp"
+#include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
+#include "utils/command_line.hpp"
 #include "utils/constants.hpp"
 #include "utils/crash_reporting.hpp"
 #include "utils/leak_check.hpp"
@@ -388,7 +389,7 @@ void handleXmasMode()
 // ----------------------------------------------------------------------------
 /** Prints help for command line options to stdout.
  */
-void cmdLineHelp(char* invocation)
+void cmdLineHelp()
 {
     Log::info("main",
     "Usage: %s [OPTIONS]\n\n"
@@ -399,49 +400,37 @@ void cmdLineHelp(char* invocation)
                               "menu.\n"
     "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
                               " and the music.\n"
-    "  -t,  --track NAME       Start at track NAME (see --list-tracks).\n"
-    "       --gp NAME          Start the specified Grand Prix.\n"
-    "       --stk-config FILE  use ./data/FILE instead of "
+    "  -t,  --track=NAME       Start at track NAME.\n"
+    "       --gp=NAME          Start the specified Grand Prix.\n"
+    "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
-    "  -l,  --list-tracks      Show available tracks.\n"
-    "  -k,  --numkarts NUM     Number of karts on the racetrack.\n"
-    "       --kart NAME        Use kart number NAME (see --list-karts).\n"
+    "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
+    "       --kart=NAME        Use kart number NAME.\n"
     "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
-    "       --list-karts       Show available karts.\n"
-    "       --laps N           Define number of laps to N.\n"
-    "       --mode N           N=1 novice, N=2 driver, N=3 racer.\n"
-    "       --type N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
+    "       --laps=N           Define number of laps to N.\n"
+    "       --mode=N           N=1 novice, N=2 driver, N=3 racer.\n"
+    "       --type=N           N=0 Normal, N=1 Time trial, N=2 FTL\n"
     "       --reverse          Play track in reverse (if allowed)\n"
     // TODO: add back "--players" switch
     // "       --players n      Define number of players to between 1 and 4.\n"
     "  -f,  --fullscreen       Select fullscreen display.\n"
     "  -w,  --windowed         Windowed display (default).\n"
-    "  -s,  --screensize WxH   Set the screen size (e.g. 320x200).\n"
+    "  -s,  --screensize=WxH   Set the screen size (e.g. 320x200).\n"
     "  -v,  --version          Show version of SuperTuxKart.\n"
-    "       --trackdir DIR     A directory from which additional tracks are "
+    "       --trackdir=DIR     A directory from which additional tracks are "
                               "loaded.\n"
-    "       --animations=n     Play karts' animations (All: 2, Humans only: 1,"
-                              " Nobody: 0).\n"
-    "       --gfx=n            Play other graphical effects like impact stars "
-                              "dance,\n"
-    "                            water animations or explosions (Enable: 1, "
-                              "Disable: 0).\n"
-    "       --weather=n        Show weather effects like rain or snow (0 or 1 "
-                              "as --gfx).\n"
-    "       --camera-style=n   Flexible (0) or hard like v0.6 (1) kart-camera "
-                              "link.\n"
     "       --profile-laps=n   Enable automatic driven profile mode for n "
                               "laps.\n"
     "       --profile-time=n   Enable automatic driven profile mode for n "
                               "seconds.\n"
     "       --no-graphics      Do not display the actual race.\n"
     "       --with-profile     Enables the profile mode.\n"
-    "       --demo-mode t      Enables demo mode after t seconds idle time in "
+    "       --demo-mode=t      Enables demo mode after t seconds idle time in "
                                "main menu.\n"
-    "       --demo-tracks t1,t2 List of tracks to be used in demo mode. No\n"
+    "       --demo-tracks=t1,t2 List of tracks to be used in demo mode. No\n"
     "                          spaces are allowed in the track names.\n"
-    "       --demo-laps n      Number of laps in a demo.\n"
-    "       --demo-karts n     Number of karts to use in a demo.\n"
+    "       --demo-laps=n      Number of laps in a demo.\n"
+    "       --demo-karts=n     Number of karts to use in a demo.\n"
     "       --ghost            Replay ghost data together with one player kart.\n"
     // "       --history          Replay history file 'history.dat'.\n"
     // "       --history=n        Replay history file 'history.dat' using:\n"
@@ -458,7 +447,8 @@ void cmdLineHelp(char* invocation)
     "  -h,  --help             Show this help.\n"
     "\n"
     "You can visit SuperTuxKart's homepage at "
-    "http://supertuxkart.sourceforge.net\n\n", invocation
+    "http://supertuxkart.sourceforge.net\n\n",
+    CommandLine::getExecName().c_str()
     );
 }   // cmdLineHelp
 
@@ -470,676 +460,486 @@ void cmdLineHelp(char* invocation)
  *  track_manager, since their search path might be extended by command
  *  line options).
  */
-int handleCmdLinePreliminary(int argc, char **argv)
+int handleCmdLinePreliminary()
 {
-    int n;
-    for(int i=1; i<argc; i++)
+    if( CommandLine::has("--help") || CommandLine::has("-help") ||
+        CommandLine::has("-h")                                      )
     {
-        if(argv[i][0] != '-') continue;
-        if (!strcmp(argv[i], "--help" ) ||
-            !strcmp(argv[i], "-help"  ) ||
-            !strcmp(argv[i], "-h"     )     )
-        {
-            cmdLineHelp(argv[0]);
-            exit(0);
-        }
-        else if(!strcmp(argv[i], "--gamepad-visualisation") ||
-                !strcmp(argv[i], "--gamepad-visualization")   )
-        {
-            UserConfigParams::m_gamepad_visualisation=true;
-        }
-        else if ( !strcmp(argv[i], "--debug=memory") )
-        {
-            UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
-        }
-        else if ( !strcmp(argv[i], "--debug=addons") )
-        {
-            UserConfigParams::m_verbosity |= UserConfigParams::LOG_ADDONS;
-        }
-        else if ( !strcmp(argv[i], "--debug=gui") )
-        {
-            UserConfigParams::m_verbosity |= UserConfigParams::LOG_GUI;
-        }
-        else if ( !strcmp(argv[i], "--debug=flyable") )
-        {
-            UserConfigParams::m_verbosity |= UserConfigParams::LOG_FLYABLE;
-        }
-        else if ( !strcmp(argv[i], "--debug=misc") )
-        {
-            UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
-        }
-        else if ( sscanf(argv[i], "--xmas=%d", &n) )
-        {
-            UserConfigParams::m_xmas_mode = n;
-        }
-        else if( !strcmp(argv[i], "--no-console"))
-        {
-            UserConfigParams::m_log_errors_to_console=false;
-        }
-        else if( !strcmp(argv[i], "--console"))
-        {
-            UserConfigParams::m_log_errors_to_console=true;
-        }
-        else if( !strcmp(argv[i], "--log=nocolor"))
-        {
-            Log::disableColor();
-            Log::verbose("main", "Colours disabled.\n");
-        }
-        else if(sscanf(argv[i], "--log=%d",&n)==1)
-        {
-            Log::setLogLevel(n);
-        }
-        else if ( !strcmp(argv[i], "--debug=all") )
-        {
-            UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
-        }
-        else if( (!strcmp(argv[i], "--stk-config")) && i+1<argc )
-        {
-            stk_config->load(file_manager->getAsset(argv[i+1]));
-            Log::info("main", "STK config will be read from %s.\n",argv[i+1] );
-            i++;
-        }
-        else if( !strcmp(argv[i], "--trackdir") && i+1<argc )
-        {
-            TrackManager::addTrackSearchDir(argv[i+1]);
-            i++;
-        }
-        else if( !strcmp(argv[i], "--kartdir") && i+1<argc )
-        {
-            KartPropertiesManager::addKartSearchDir(argv[i+1]);
-            i++;
-        }
-        else if( !strcmp(argv[i], "--no-graphics") || !strncmp(argv[i], "--list-", 7) ||
-                 !strcmp(argv[i], "-l" ))
-        {
-            ProfileWorld::disableGraphics();
-            UserConfigParams::m_log_errors_to_console=true;
-        }
-#if !defined(WIN32) && !defined(__CYGWIN)
-        else if ( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f"))
-        {
-            // Check that current res is not blacklisted
-            std::ostringstream o;
-            o << UserConfigParams::m_width << "x"
-              << UserConfigParams::m_height;
-            std::string res = o.str();
-            if (std::find(UserConfigParams::m_blacklist_res.begin(),
-                          UserConfigParams::m_blacklist_res.end(),res)
-                             == UserConfigParams::m_blacklist_res.end())
-                UserConfigParams::m_fullscreen = true;
-            else
-                Log::warn("main", "Resolution %s has been blacklisted, so it "
-                          "is not available!\n", res.c_str());
-        }
-        else if ( !strcmp(argv[i], "--windowed") || !strcmp(argv[i], "-w"))
-        {
-            UserConfigParams::m_fullscreen = false;
-        }
-#endif
-        else if ( (!strcmp(argv[i], "--screensize") || !strcmp(argv[i], "-s") )
-             && i+1<argc)
-        {
-            //Check if fullscreen and new res is blacklisted
-            int width, height;
-            if (sscanf(argv[i+1], "%dx%d", &width, &height) == 2)
-            {
-                std::ostringstream o;
-                o << width << "x" << height;
-                std::string res = o.str();
-                if (!UserConfigParams::m_fullscreen ||
-                    std::find(UserConfigParams::m_blacklist_res.begin(),
-                              UserConfigParams::m_blacklist_res.end(),res) ==
-                                  UserConfigParams::m_blacklist_res.end())
-                {
-                    UserConfigParams::m_prev_width =
-                        UserConfigParams::m_width = width;
-                    UserConfigParams::m_prev_height =
-                        UserConfigParams::m_height = height;
-                    Log::verbose("main", "You choose to use %dx%d.\n",
-                             (int)UserConfigParams::m_width,
-                             (int)UserConfigParams::m_height );
-                }
-                else
-                    Log::warn("main", "Resolution %s has been blacklisted, so "
-                                      "it is not available!\n", res.c_str());
-                i++;
-            }
-            else
-            {
-                Log::fatal("main", "Error: --screensize argument must be "
-                                   "given as WIDTHxHEIGHT");
-            }
-        }
-        else if (strcmp(argv[i], "--version") == 0 ||
-                 strcmp(argv[i], "-v"       ) == 0    )
-        {
-            Log::info("main", "==============================");
-            Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
-#ifdef SVNVERSION
-            Log::info("main", "SuperTuxKart, SVN revision number '%s'.",
-                      SVNVERSION ) ;
-#endif
-
-            // IRRLICHT_VERSION_SVN
-            Log::info("main", "Irrlicht version %i.%i.%i (%s)",
-                      IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                      IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
-
-            Log::info("main", "==============================");
-        }   // --verbose or -v
+        cmdLineHelp();
+        exit(0);
     }
+    if( CommandLine::has("--gamepad-visualisation") ||
+        CommandLine::has("--gamepad-visualization")    )
+        UserConfigParams::m_gamepad_visualisation=true;
+    if( CommandLine::has("--debug=memory"))
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
+    if( CommandLine::has("--debug=addons"))
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_ADDONS;
+    if( CommandLine::has("--debug=mgui"))
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_GUI;
+    if( CommandLine::has("--debug=flyable"))
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_FLYABLE;
+    if( CommandLine::has("--debug=mist"))
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
+    if(CommandLine::has("--console"))
+        UserConfigParams::m_log_errors_to_console=true;
+    if(CommandLine::has("--no-console"))
+        UserConfigParams::m_log_errors_to_console=false;
+    if(CommandLine::has("--online"))
+        MainMenuScreen::m_enable_online=true;
+    if(CommandLine::has("--log=nocolor"))
+    {
+        Log::disableColor();
+        Log::verbose("main", "Colours disabled.");
+    }
+    if(CommandLine::has("--debug=all") )
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
+
+    std::string s;
+    if( CommandLine::has( "--stk-config", &s))
+    {
+        stk_config->load(file_manager->getAsset(s));
+        Log::info("main", "STK config will be read from %s.",s.c_str());
+    }
+    if( CommandLine::has( "--trackdir", &s))
+        TrackManager::addTrackSearchDir(s);
+    if( CommandLine::has( "--kartdir", &s))
+        KartPropertiesManager::addKartSearchDir(s);
+
+    if( CommandLine::has( "--no-graphics") ||
+        CommandLine::has("-l"            )    )
+    {
+        ProfileWorld::disableGraphics();
+        UserConfigParams::m_log_errors_to_console=true;
+    }
+
+    if(CommandLine::has("--screensize", &s) || 
+       CommandLine::has("-s", &s)              )
+    {
+        //Check if fullscreen and new res is blacklisted
+        int width, height;
+        if (sscanf(s.c_str(), "%dx%d", &width, &height) == 2)
+        {
+            // Reassemble the string in case that the original width or
+            // height contained a leading 0 
+            std::ostringstream o;
+            o << width << "x" << height;
+            std::string res = o.str();
+            if (!UserConfigParams::m_fullscreen ||
+                std::find(UserConfigParams::m_blacklist_res.begin(),
+                UserConfigParams::m_blacklist_res.end(),res) ==
+                UserConfigParams::m_blacklist_res.end())
+            {
+                UserConfigParams::m_prev_width =
+                    UserConfigParams::m_width = width;
+                UserConfigParams::m_prev_height =
+                    UserConfigParams::m_height = height;
+                Log::verbose("main", "You choose to use %dx%d.",
+                    (int)UserConfigParams::m_width,
+                    (int)UserConfigParams::m_height );
+            }
+            else
+                Log::warn("main", "Resolution %s has been blacklisted, so "
+                "it is not available!", res.c_str());
+        }
+        else
+        {
+            Log::fatal("main", "Error: --screensize argument must be "
+                "given as WIDTHxHEIGHT");
+        }
+    }
+
+
+//#if !defined(WIN32) && !defined(__CYGWIN)
+    if(CommandLine::has("--fullscreen") || CommandLine::has("-f"))
+    {
+        // Check that current res is not blacklisted
+        std::ostringstream o;
+        o << UserConfigParams::m_width << "x" << UserConfigParams::m_height;
+        std::string res = o.str();
+        if (std::find(UserConfigParams::m_blacklist_res.begin(),
+                      UserConfigParams::m_blacklist_res.end(),res)
+                   == UserConfigParams::m_blacklist_res.end())
+            UserConfigParams::m_fullscreen = true;
+        else
+            Log::warn("main", "Resolution %s has been blacklisted, so it "
+            "is not available!", res.c_str());
+    }
+    if(CommandLine::has("--windowed") || CommandLine::has("-w"))
+        UserConfigParams::m_fullscreen = false;
+//#endif
+
+    if(CommandLine::has("--version") || CommandLine::has("-v"))
+    {
+        Log::info("main", "==============================");
+        Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
+#ifdef SVNVERSION
+        Log::info("main", "SuperTuxKart, SVN revision number '%s'.",
+                          SVNVERSION ) ;
+#endif
+        // IRRLICHT_VERSION_SVN
+        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
+                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
+                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
+        Log::info("main", "==============================");
+    }   // --verbose or -v
+
+    int n;
+    if(CommandLine::has("--xmas", &n))
+        UserConfigParams::m_xmas_mode = n;
+    if(CommandLine::has("--log", &n))
+        Log::setLogLevel(n);
+
     return 0;
 }   // handleCmdLinePreliminary
 
 // ============================================================================
 /** Handles command line options.
  *  \param argc Number of command line options
- *  \param argv Command line options.
  */
-int handleCmdLine(int argc, char **argv)
+int handleCmdLine()
 {
+    // Some generic variables used in scanning:
     int n;
-    char s[1024];
+    std::string s;
 
     bool try_login = false;
     irr::core::stringw login, password;
 
-    for(int i=1; i<argc; i++)
-    {
-
-        if(!strcmp(argv[i], "--gamepad-debug"))
-        {
-            UserConfigParams::m_gamepad_debug=true;
-        }
-        else if (!strcmp(argv[i], "--wiimote-debug"))
-        {
-            UserConfigParams::m_wiimote_debug = true;
-        }
-        else if (!strcmp(argv[i], "--tutorial-debug"))
-        {
+    if(CommandLine::has("--gamepad-debug"))
+        UserConfigParams::m_gamepad_debug=true;
+    if(CommandLine::has("--wiimote-debug"))
+        UserConfigParams::m_wiimote_debug = true;
+    if(CommandLine::has("--tutorial-debug"))
             UserConfigParams::m_tutorial_debug = true;
-        }
-        else if(sscanf(argv[i], "--track-debug=%d",&n)==1)
-        {
-            UserConfigParams::m_track_debug=n;
-        }
-        else if(!strcmp(argv[i], "--track-debug"))
-        {
-            UserConfigParams::m_track_debug=1;
-        }
-        else if(!strcmp(argv[i], "--material-debug"))
-        {
-            UserConfigParams::m_material_debug = true;
-        }
-        else if(!strcmp(argv[i], "--ftl-debug"))
-        {
-            UserConfigParams::m_ftl_debug = true;
-        }
-        else if(UserConfigParams::m_artist_debug_mode &&
-               !strcmp(argv[i], "--camera-wheel-debug"))
-        {
-            UserConfigParams::m_camera_debug=2;
-        }
-        else if(UserConfigParams::m_artist_debug_mode &&
-               !strcmp(argv[i], "--camera-debug"))
-        {
-            UserConfigParams::m_camera_debug=1;
-        }
-        else if(UserConfigParams::m_artist_debug_mode &&
-               !strcmp(argv[i], "--physics-debug"))
-        {
-            UserConfigParams::m_physics_debug=1;
-        }
-        else if(!strcmp(argv[i], "--kartsize-debug"))
-        {
-            for(unsigned int i=0;
-                i<kart_properties_manager->getNumberOfKarts(); i++)
-            {
-                const KartProperties *km =
-                    kart_properties_manager->getKartById(i);
-                 Log::info("main", "%s:\t%swidth: %f length: %f height: %f "
-                                   "mesh-buffer count %d",
-                        km->getIdent().c_str(),
-                        (km->getIdent().size()<7) ? "\t" : "",
-                        km->getMasterKartModel().getWidth(),
-                        km->getMasterKartModel().getLength(),
-                        km->getMasterKartModel().getHeight(),
-                        km->getMasterKartModel().getModel()
-                          ->getMeshBufferCount());
-            }
-        }
-        else if(UserConfigParams::m_artist_debug_mode &&
-                !strcmp(argv[i], "--check-debug"))
-        {
-            UserConfigParams::m_check_debug=true;
-        }
-        else if(!strcmp(argv[i], "--slipstream-debug"))
-        {
+    if(CommandLine::has( "--track-debug",&n))
+        UserConfigParams::m_track_debug=n;
+    if(CommandLine::has( "--track-debug"))
+        UserConfigParams::m_track_debug=1;
+    if(CommandLine::has("--material-debug"))
+        UserConfigParams::m_material_debug = true;
+    if(CommandLine::has("--ftl-debug"))
+        UserConfigParams::m_ftl_debug = true;
+    if(CommandLine::has("--slipstream-debug"))
             UserConfigParams::m_slipstream_debug=true;
-        }
-        else if(!strcmp(argv[i], "--rendering-debug"))
-        {
-            UserConfigParams::m_rendering_debug=true;
-        }
-        else if(!strcmp(argv[i], "--ai-debug"))
-        {
-            AIBaseLapController::enableDebug();
-        }
-        else if(sscanf(argv[i], "--port=%d",&n))
-        {
-            UserConfigParams::m_server_port = n;
-        }
-        else if( !strcmp(argv[i], "--server") )
-        {
-            NetworkManager::getInstance<ServerNetworkManager>();
-            Log::info("main", "Creating a server network manager.");
-        }
-        else if( sscanf(argv[i], "--max-players=%d", &n) )
-        {
-            UserConfigParams::m_server_max_players=n;
-        }
-        else if( sscanf(argv[i], "--login=%1023s", s) )
-        {
-            login = s;
-            try_login = true;
-        }
-        else if( sscanf(argv[i], "--password=%1023s", s) )
-        {
-            password = s;
-        }
-        else if ( sscanf(argv[i], "--gfx=%d", &n) )
-        {
-            if (n)
-            {
-                UserConfigParams::m_graphical_effects = true;
-            }
-            else
-            {
-                UserConfigParams::m_graphical_effects = false;
-            }
-        }
-        else if ( sscanf(argv[i], "--weather=%d", &n) )
-        {
-            if (n)
-            {
-                UserConfigParams::m_weather_effects = true;
-            }
-            else
-            {
-                UserConfigParams::m_weather_effects = false;
-            }
-        }
-        else if ( sscanf(argv[i], "--animations=%d", &n) )
-        {
-            UserConfigParams::m_show_steering_animations = n;
-        }
+    if(CommandLine::has("--rendering-debug"))
+        UserConfigParams::m_rendering_debug=true;
+    if(CommandLine::has("--ai-debug"))
+        AIBaseController::enableDebug();
 
-        else if ( sscanf(argv[i], "--camera-style=%d", &n) )
-        {
-            UserConfigParams::m_camera_style = n;
-        }
-        else if( (!strcmp(argv[i], "--kart") && i+1<argc ))
-        {
-            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                           .getUniqueID()                    );
+    if(UserConfigParams::m_artist_debug_mode)
+    {
+       if(CommandLine::has("--camera-wheel-debug"))
+           UserConfigParams::m_camera_debug=2;
+        if(CommandLine::has("--camera-debug"))
+            UserConfigParams::m_camera_debug=1;
+        if(CommandLine::has("--physics-debug"))
+            UserConfigParams::m_physics_debug=1;
+        if(CommandLine::has("--check-debug"))
+            UserConfigParams::m_check_debug=true;
+    }
 
-            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
-            {
-                const KartProperties *prop =
-                    kart_properties_manager->getKart(argv[i+1]);
-                if(prop)
-                {
-                    UserConfigParams::m_default_kart = argv[i+1];
+    // Networking command lines
+    if(CommandLine::has("--server") )
+    {
+        NetworkManager::getInstance<ServerNetworkManager>();
+        Log::info("main", "Creating a server network manager.");
+    }   // -server
 
-                    // if a player was added with -N, change its kart.
-                    // Otherwise, nothing to do, kart choice will be picked
-                    // up upon player creation.
-                    if (StateManager::get()->activePlayerCount() > 0)
-                    {
-                        race_manager->setLocalKartInfo(0, argv[i+1]);
-                    }
-                    Log::verbose("main", "You chose to use kart '%s'.",
-                                 argv[i+1] ) ;
-                    i++;
-                }
-                else
-                {
-                    Log::warn("main", "Kart '%s' not found, ignored.",
-                              argv[i+1]);
-                    i++;  // ignore the next parameter, otherwise STK will abort
-                }
-            }
-            else   // kart locked
-            {
-                Log::warn("main", "Kart '%s' has not been unlocked yet.",
-                          argv[i+1]);
-                Log::warn("main",
-                          "Use --list-karts to list available karts.");
-                return 0;
-            }   // if kart locked
-        }
-        else if( sscanf(argv[i], "--ai=%1023s", s)==1)
-        {
-            const std::vector<std::string> l=
-                StringUtils::split(std::string(s),',');
-            race_manager->setDefaultAIKartList(l);
-            // Add 1 for the player kart
-            race_manager->setNumKarts(l.size()+1);
-        }
-        else if( (!strcmp(argv[i], "--mode") && i+1<argc ))
-        {
-            int n = atoi(argv[i+1]);
-            if(n<0 || n>RaceManager::DIFFICULTY_LAST)
-                Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
-                          argv[i+1]);
-            else
-                race_manager->setDifficulty(RaceManager::Difficulty(n));
-            i++;
-        }
-        else if( (!strcmp(argv[i], "--type") && i+1<argc ))
-        {
-            switch (atoi(argv[i+1]))
-            {
-            case 0: race_manager
-                        ->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
-                    break;
-            case 1: race_manager
-                        ->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
-                    break;
-            case 2: race_manager
-                        ->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
-                    break;
-            default:
-                Log::warn("main", "Invalid race type '%d' - ignored.",
-                          atoi(argv[i+1]));
-            }
-            i++;
-        }
-        else if( !strcmp(argv[i], "--reverse"))
-        {
-            race_manager->setReverseTrack(true);
-        }
-        else if( (!strcmp(argv[i], "--track") || !strcmp(argv[i], "-t"))
-                 && i+1<argc                                              )
-        {
-            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                           .getUniqueID()                    );
-            if (!unlock_manager->getCurrentSlot()->isLocked(argv[i+1]))
-            {
-                race_manager->setTrack(argv[i+1]);
-                Log::verbose("main", "You choose to start in track '%s'.",
-                             argv[i+1] );
+    if(CommandLine::has("--max-players", &n))
+        UserConfigParams::m_server_max_players=n;
 
-                Track* t = track_manager->getTrack(argv[i+1]);
-                if (t == NULL)
-                {
-                    Log::warn("main", "Can't find track named '%s'.",
-                              argv[i+1]);
-                }
-                else if (t->isArena())
-                {
-                    //if it's arena, don't create ai karts
-                    const std::vector<std::string> l;
-                    race_manager->setDefaultAIKartList(l);
-                    // Add 1 for the player kart
-                    race_manager->setNumKarts(1);
-                    race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
-                }
-                else if(t->isSoccer())
-                {
-                    //if it's soccer, don't create ai karts
-                    const std::vector<std::string> l;
-                    race_manager->setDefaultAIKartList(l);
-                    // Add 1 for the player kart
-                    race_manager->setNumKarts(1);
-                    race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
-                }
-            }
-            else
-            {
-                Log::warn("main", "Track '%s' has not been unlocked yet.",
-                         argv[i+1]);
-                Log::warn("main", "Use --list-tracks to list available "
-                                  "tracks.");
-                return 0;
-            }
-            i++;
-        }
-        else if( (!strcmp(argv[i], "--gp")) && i+1<argc)
-        {
-            race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-            const GrandPrixData *gp =
-                grand_prix_manager->getGrandPrix(argv[i+1]);
+    if(CommandLine::has("--login", &s) )
+    {
+        login = s.c_str();
+        try_login = true;
+    }   // --login
 
-            if (gp == NULL)
-            {
-                Log::warn("main", "There is no GP named '%s'.", argv[i+1]);
-                return 0;
-            }
+    if(CommandLine::has("--password", &s))
+        password = s.c_str();
 
-            race_manager->setGrandPrix(*gp);
-            i++;
-        }
-        else if( (!strcmp(argv[i], "--numkarts") || !strcmp(argv[i], "-k")) &&
-                 i+1<argc )
+    // Race parameters
+    if(CommandLine::has("--kartsize-debug"))
+    {
+        for(unsigned int i=0;
+            i<kart_properties_manager->getNumberOfKarts(); i++)
         {
-            UserConfigParams::m_num_karts = atoi(argv[i+1]);
-            if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
-            {
-                Log::warn("main",
-                          "Number of karts reset to maximum number %d.",
-                                  stk_config->m_max_karts);
-                UserConfigParams::m_num_karts = stk_config->m_max_karts;
-            }
-            race_manager->setNumKarts( UserConfigParams::m_num_karts );
-            Log::verbose("main", "%d karts will be used.",
-                         (int)UserConfigParams::m_num_karts);
-            i++;
-        }
-        else if( !strcmp(argv[i], "--list-tracks") || !strcmp(argv[i], "-l") )
-        {
+            const KartProperties *km =
+                kart_properties_manager->getKartById(i);
+            Log::info("main", "%s:\t%swidth: %f length: %f height: %f "
+                      "mesh-buffer count %d",
+                      km->getIdent().c_str(),
+                      (km->getIdent().size()<7) ? "\t" : "",
+                      km->getMasterKartModel().getWidth(),
+                      km->getMasterKartModel().getLength(),
+                      km->getMasterKartModel().getHeight(),
+                      km->getMasterKartModel().getModel()
+                        ->getMeshBufferCount());
+        }    // for i
+    }   // --kartsize-debug
 
-            Log::info("main", "  Available tracks:" );
-            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                           .getUniqueID()                    );
-
-            for (size_t i = 0; i != track_manager->getNumberOfTracks(); i++)
-            {
-                const Track *track = track_manager->getTrack(i);
-                const char * locked = "";
-                if ( unlock_manager->getCurrentSlot()
-                                   ->isLocked(track->getIdent()) )
-                {
-                    locked = " (locked)";
-                }
-                Log::info("main", "%-18s: %ls %s",
-                              track->getIdent().c_str(),
-                              track->getName(), locked);
-                //}
-            }
-
-            Log::info("main", "Use --track N to choose track.");
-
-            exit(0);
-        }
-        else if( !strcmp(argv[i], "--list-karts") )
-        {
-            Log::info("main", "  Available karts:");
-            for (unsigned int i = 0;
-                 i < kart_properties_manager->getNumberOfKarts(); i++)
-            {
-                const KartProperties* KP =
-                    kart_properties_manager->getKartById(i);
-                unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                              .getUniqueID()                    );
-                const char * locked = "";
-                if (unlock_manager->getCurrentSlot()->isLocked(KP->getIdent()))
-                    locked = "(locked)";
-
-                Log::info("main", " %-10s: %ls %s", KP->getIdent().c_str(),
-                         KP->getName(), locked);
-            }
-
-            exit(0);
-        }
-        else if (    !strcmp(argv[i], "--no-start-screen")
-                     || !strcmp(argv[i], "-N")                )
-        {
-            UserConfigParams::m_no_start_screen = true;
-        }
-        else if (    !strcmp(argv[i], "--race-now")
-                     || !strcmp(argv[i], "-R")                )
-        {
-            UserConfigParams::m_no_start_screen = true;
-            UserConfigParams::m_race_now = true;
-        }
-        else if ( !strcmp(argv[i], "--laps") && i+1<argc )
-        {
-            int laps = atoi(argv[i+1]);
-            if (laps < 0)
-            {
-                Log::error("main", "Invalid number of laps: %s.\n", argv[i+1] );
-                return 0;
-            }
-            else
-            {
-                Log::verbose("main", "You choose to have %d laps.", laps);
-                race_manager->setNumLaps(laps);
-                i++;
-            }
-        }
-        else if( sscanf(argv[i], "--profile-laps=%d",  &n)==1)
-        {
-            if (n < 0)
-            {
-                Log::error("main", "Invalid number of profile-laps: %i.\n", n );
-                return 0;
-            }
-            else
-            {
-                Log::verbose("main", "Profiling %d laps.",n);
-                UserConfigParams::m_no_start_screen = true;
-                ProfileWorld::setProfileModeLaps(n);
-                race_manager->setNumLaps(n);
-            }
-        }
-        else if( sscanf(argv[i], "--profile-time=%d",  &n)==1)
-        {
-            Log::verbose("main", "Profiling: %d seconds.", n);
-            UserConfigParams::m_no_start_screen = true;
-            ProfileWorld::setProfileModeTime((float)n);
-            race_manager->setNumLaps(999999); // profile end depends on time
-        }
-        else if( !strcmp(argv[i], "--no-graphics") )
-        {
-        }
-        else if( !strcmp(argv[i], "--with-profile") )
-        {
-            // Set default profile mode of 1 lap if we haven't already set one
-            if (!ProfileWorld::isProfileMode()) {
-                UserConfigParams::m_no_start_screen = true;
-                ProfileWorld::setProfileModeLaps(1);
-                race_manager->setNumLaps(1);
-            }
-        }
-        else if( !strcmp(argv[i], "--ghost"))
-        {
-            ReplayPlay::create();
-        }
-        else if( sscanf(argv[i], "--history=%d",  &n)==1)
-        {
-            history->doReplayHistory( (History::HistoryReplayMode)n);
-            // Force the no-start screen flag, since this initialises
-            // the player structures correctly.
-            UserConfigParams::m_no_start_screen = true;
-
-        }
-        else if( !strcmp(argv[i], "--history") )
-        {
-            history->doReplayHistory(History::HISTORY_POSITION);
-            // Force the no-start screen flag, since this initialises
-            // the player structures correctly.
-            UserConfigParams::m_no_start_screen = true;
-
-        }
-        else if( !strcmp(argv[i], "--demo-mode") && i+1<argc)
-        {
-            unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+    if(CommandLine::has("--kart", &s))
+    {
+        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
                                        .getUniqueID()                    );
-            float t;
-            StringUtils::fromString(argv[i+1], t);
-            DemoWorld::enableDemoMode(t);
-            // The default number of laps is taken from ProfileWorld and
-            // is 0. So set a more useful default for demo mode.
-            DemoWorld::setNumLaps(2);
-            i++;
-        }
-        else if( !strcmp(argv[i], "--demo-laps") && i+1<argc)
+
+        if (!unlock_manager->getCurrentSlot()->isLocked(s))
         {
-            // Note that we use a separate setting for demo mode to avoid the
-            // problem that someone plays a game, and in further demos then
-            // the wrong (i.e. last selected) number of laps would be used
-            DemoWorld::setNumLaps(atoi(argv[i+1]));
-            i++;
+            const KartProperties *prop =
+                kart_properties_manager->getKart(s);
+            if(prop)
+            {
+                UserConfigParams::m_default_kart = s;
+
+                // if a player was added with -N, change its kart.
+                // Otherwise, nothing to do, kart choice will be picked
+                // up upon player creation.
+                if (StateManager::get()->activePlayerCount() > 0)
+                {
+                    race_manager->setLocalKartInfo(0, s);
+                }
+                Log::verbose("main", "You chose to use kart '%s'.",
+                             s.c_str() ) ;
+            }
+            else
+            {
+                Log::warn("main", "Kart '%s' not found, ignored.",
+                          s.c_str());
+            }
         }
-        else if( !strcmp(argv[i], "--demo-karts") && i+1<argc)
+        else   // kart locked
         {
-            // Note that we use a separate setting for demo mode to avoid the
-            // problem that someone plays a game, and in further demos then
-            // the wrong (i.e. last selected) number of karts would be used
-            DemoWorld::setNumKarts(atoi(argv[i+1]));
-            i++;
-        }
-        else if( !strcmp(argv[i], "--demo-tracks") && i+1<argc)
+            Log::warn("main", "Kart '%s' has not been unlocked yet.",
+                       s.c_str());
+            return 0;
+        }   // if kart locked
+    }   // if --kart
+
+    if(CommandLine::has("--ai", &s))
+    {
+        const std::vector<std::string> l=StringUtils::split(std::string(s),',');
+        race_manager->setDefaultAIKartList(l);
+        // Add 1 for the player kart
+        race_manager->setNumKarts(l.size()+1);
+    }   // --ai
+
+    if(CommandLine::has( "--mode", &s))
+    {
+        int n = atoi(s.c_str());
+        if(n<0 || n>RaceManager::DIFFICULTY_LAST)
+            Log::warn("main", "Invalid difficulty '%s' - ignored.\n",
+                      s.c_str());
+        else
+            race_manager->setDifficulty(RaceManager::Difficulty(n));
+    }   // --mode
+
+    if(CommandLine::has("--type", &n))
+    {
+        switch (n)
         {
-            DemoWorld::setTracks(StringUtils::split(std::string(argv[i+1]),
-                                                    ','));
-            i++;
+        case 0: race_manager->setMinorMode(RaceManager::MINOR_MODE_NORMAL_RACE);
+                break;
+        case 1: race_manager->setMinorMode(RaceManager::MINOR_MODE_TIME_TRIAL);
+                break;
+        case 2: race_manager->setMinorMode(RaceManager::MINOR_MODE_FOLLOW_LEADER);
+                break;
+        default:
+                Log::warn("main", "Invalid race type '%d' - ignored.", n);
         }
-#ifdef ENABLE_WIIUSE
-        else if( !strcmp(argv[i], "--wii"))
+    }   // --type
+
+    if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
+    {
+        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                      .getUniqueID()                    );
+        if (!unlock_manager->getCurrentSlot()->isLocked(s))
         {
-            WiimoteManager::enable();
+            race_manager->setTrack(s);
+            Log::verbose("main", "You choose to start in track '%s'.",
+                         s.c_str());
+
+            Track* t = track_manager->getTrack(s);
+            if (!t)
+            {
+                Log::warn("main", "Can't find track named '%s'.", s.c_str());
+            }
+            else if (t->isArena())
+            {
+                //if it's arena, don't create ai karts
+                const std::vector<std::string> l;
+                race_manager->setDefaultAIKartList(l);
+                // Add 1 for the player kart
+                race_manager->setNumKarts(1);
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_3_STRIKES);
+            }
+            else if(t->isSoccer())
+            {
+                //if it's soccer, don't create ai karts
+                const std::vector<std::string> l;
+                race_manager->setDefaultAIKartList(l);
+                // Add 1 for the player kart
+                race_manager->setNumKarts(1);
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_SOCCER);
+            }
         }
-#endif
-        // these commands are already processed in handleCmdLinePreliminary,
-        // but repeat this just so that we don't get error messages about
-        // unknown commands
-        else if( !strcmp(argv[i], "--stk-config")&& i+1<argc ) { i++; }
-        else if( !strcmp(argv[i], "--trackdir")  && i+1<argc ) { i++; }
-        else if( !strcmp(argv[i], "--kartdir")   && i+1<argc ) { i++; }
-        else if( !strcmp(argv[i], "--debug=memory" )                       ) {}
-        else if( !strcmp(argv[i], "--debug=addons" )                       ) {}
-        else if( !strcmp(argv[i], "--debug=gui"    )                       ) {}
-        else if( !strcmp(argv[i], "--debug=flyable")                       ) {}
-        else if( !strcmp(argv[i], "--debug=misc"   )                       ) {}
-        else if( !strcmp(argv[i], "--debug=all"    )                       ) {}
-        else if ( sscanf(argv[i], "--xmas=%d", &n) )                         {}
-        else if( !strcmp(argv[i], "--log=nocolor"  )                       ) {}
-        else if(  sscanf(argv[i], "--log=%d",&n    )==1                    ) {}
-        else if( !strcmp(argv[i], "--no-console"   )                       ) {}
-        else if( !strcmp(argv[i], "--console"      )                       ) {}
-        else if( !strcmp(argv[i], "--screensize") ||
-                 !strcmp(argv[i], "-s")            )                     {i++;}
-        else if( !strcmp(argv[i], "--fullscreen") || !strcmp(argv[i], "-f")) {}
-        else if( !strcmp(argv[i], "--windowed")   || !strcmp(argv[i], "-w")) {}
-        else if( !strcmp(argv[i], "--version")    || !strcmp(argv[i], "-v")) {}
-#ifdef __APPLE__
-        // on OS X, sometimes the Finder will pass a -psn* something parameter
-        // to the application
-        else if( strncmp(argv[i], "-psn", 3) == 0) {}
-#endif
         else
         {
-            // invalid param needs to go to console
-            UserConfigParams::m_log_errors_to_console = true;
-
-            Log::error("main", "Invalid parameter: %s.\n", argv[i] );
-            cmdLineHelp(argv[0]);
-            cleanSuperTuxKart();
+            Log::warn("main", "Track '%s' has not been unlocked yet.",
+                      s.c_str());
             return 0;
         }
-    }   // for i <argc
+    }   // --track
+
+
+    if(CommandLine::has("--gp", &s))
+    {
+        race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
+        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(s);
+
+        if (!gp)
+        {
+            Log::warn("main", "There is no GP named '%s'.", s.c_str());
+            return 0;
+        }
+        race_manager->setGrandPrix(*gp);
+    }   // --gp
+
+    if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
+    {
+        UserConfigParams::m_num_karts = n;
+        if(UserConfigParams::m_num_karts > stk_config->m_max_karts)
+        {
+            Log::warn("main", "Number of karts reset to maximum number %d.",
+                      stk_config->m_max_karts);
+            UserConfigParams::m_num_karts = stk_config->m_max_karts;
+        }
+        race_manager->setNumKarts( UserConfigParams::m_num_karts );
+        Log::verbose("main", "%d karts will be used.",
+                     (int)UserConfigParams::m_num_karts);
+    }   // --numkarts
+
+    if(CommandLine::has( "--no-start-screen") || 
+        CommandLine::has("-N")                   )
+        UserConfigParams::m_no_start_screen = true;
+    if(CommandLine::has("--race-now") || CommandLine::has("-R"))
+    {
+        UserConfigParams::m_no_start_screen = true;
+        UserConfigParams::m_race_now = true;
+    }   // --race-now
+
+    if(CommandLine::has("--laps", &s))
+    {
+        int laps = atoi(s.c_str());
+        if (laps < 0)
+        {
+            Log::error("main", "Invalid number of laps: %s.\n", s.c_str());
+            return 0;
+        }
+        else
+        {
+            Log::verbose("main", "You choose to have %d laps.", laps);
+            race_manager->setNumLaps(laps);
+        }
+    }   // --laps
+
+    if(CommandLine::has("--profile-laps=",  &n))
+    {
+        if (n < 0)
+        {
+            Log::error("main", "Invalid number of profile-laps: %i.", n );
+            return 0;
+        }
+        else
+        {
+            Log::verbose("main", "Profiling %d laps.",n);
+            UserConfigParams::m_no_start_screen = true;
+            ProfileWorld::setProfileModeLaps(n);
+            race_manager->setNumLaps(n);
+        }
+    }   // --profile-laps
+
+    if(CommandLine::has("--profile-time",  &n))
+    {
+        Log::verbose("main", "Profiling: %d seconds.", n);
+        UserConfigParams::m_no_start_screen = true;
+        ProfileWorld::setProfileModeTime((float)n);
+        race_manager->setNumLaps(999999); // profile end depends on time
+    }   // --profile-time
+
+    if(CommandLine::has("--with-profile") )
+    {
+        // Set default profile mode of 1 lap if we haven't already set one
+        if (!ProfileWorld::isProfileMode()) {
+            UserConfigParams::m_no_start_screen = true;
+            ProfileWorld::setProfileModeLaps(1);
+            race_manager->setNumLaps(1);
+        }
+    }   // --with-profile
+
+    if(CommandLine::has("--ghost"))
+        ReplayPlay::create();
+
+    if(CommandLine::has("--history",  &n))
+    {
+        history->doReplayHistory( (History::HistoryReplayMode)n);
+        // Force the no-start screen flag, since this initialises
+        // the player structures correctly.
+        UserConfigParams::m_no_start_screen = true;
+    }   // --history=%d
+
+    if(CommandLine::has("--history"))  // handy default for --history=1
+    {
+        history->doReplayHistory(History::HISTORY_POSITION);
+        // Force the no-start screen flag, since this initialises
+        // the player structures correctly.
+        UserConfigParams::m_no_start_screen = true;
+    }   // --history
+
+    // Demo mode
+    if(CommandLine::has("--demo-mode", &s))
+    {
+        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
+                                       .getUniqueID()                    );
+        float t;
+        StringUtils::fromString(s, t);
+        DemoWorld::enableDemoMode(t);
+        // The default number of laps is taken from ProfileWorld and
+        // is 0. So set a more useful default for demo mode.
+        DemoWorld::setNumLaps(2);
+    }   // --demo-mode
+
+    if(CommandLine::has("--demo-laps", &n))
+    {
+        // Note that we use a separate setting for demo mode to avoid the
+        // problem that someone plays a game, and in further demos then
+        // the wrong (i.e. last selected) number of laps would be used
+        DemoWorld::setNumLaps(n);
+    }   // --demo-laps
+
+    if(CommandLine::has("--demo-karts", &n))
+    {
+        // Note that we use a separate setting for demo mode to avoid the
+        // problem that someone plays a game, and in further demos then
+        // the wrong (i.e. last selected) number of karts would be used
+        DemoWorld::setNumKarts(n);
+    }   // --demo-karts
+
+    if(CommandLine::has("--demo-tracks", &s))
+        DemoWorld::setTracks(StringUtils::split(s,','));
+
+#ifdef ENABLE_WIIUSE
+    if(CommandLine::has("--wii"))
+        WiimoteManager::enable();
+#endif
+
+#ifdef __APPLE__
+    // on OS X, sometimes the Finder will pass a -psn* something parameter
+    // to the application --> ignore it
+    CommandLine::has("-psn");
+#endif
+
+    CommandLine::reportInvalidParameters();
+
     if(UserConfigParams::m_no_start_screen)
         unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
                                        .getUniqueID()                    );
@@ -1152,10 +952,9 @@ int handleCmdLine(int argc, char **argv)
     if (try_login)
     {
         irr::core::stringw s;
-        Online::CurrentUser::SignInRequest* request =
+        Online::XMLRequest* request =
                 Online::CurrentUser::get()->requestSignIn(login, password, false, false);
-
-        Online::HTTPManager::get()->synchronousRequest(request);
+        request->executeNow();
 
         if (request->isSuccess())
         {
@@ -1169,10 +968,10 @@ int handleCmdLine(int argc, char **argv)
 //=============================================================================
 /** Initialises the minimum number of managers to get access to user_config.
  */
-void initUserConfig(char *argv[])
+void initUserConfig()
 {
     irr_driver              = new IrrDriver();
-    file_manager            = new FileManager(argv);
+    file_manager            = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
     const bool config_ok    = user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
@@ -1221,16 +1020,11 @@ void initRest()
     // This only initialises the non-network part of the addons manager. The
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
-    news_manager            = new NewsManager();
     addons_manager          = new AddonsManager();
 
-    INetworkHttp::create();
+    Online::RequestManager::get()->startNetworkThread();
+    NewsManager::get();   // this will create the news manager
 
-    // Note that the network thread must be started after the assignment
-    // to network_http (since the thread might use network_http, otherwise
-    // a race condition can be introduced resulting in a crash).
-    INetworkHttp::get()->startNetworkThread();
-    Online::HTTPManager::get()->startNetworkThread();
     AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
@@ -1284,14 +1078,12 @@ static void cleanSuperTuxKart()
 
     irr_driver->updateConfigIfRelevant();
 
-    if(INetworkHttp::get())
-        INetworkHttp::get()->stopNetworkThread();
-    if(Online::HTTPManager::isRunning())
-        Online::HTTPManager::get()->stopNetworkThread();
+    if(Online::RequestManager::isRunning())
+        Online::RequestManager::get()->stopNetworkThread();
 
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
-    Online::HTTPManager::deallocate();
+    Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
     Online::ProfileManager::deallocate();
     AchievementsManager::deallocate();
@@ -1301,8 +1093,7 @@ static void cleanSuperTuxKart()
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
-    INetworkHttp::destroy();
-    if(news_manager)            delete news_manager;
+    NewsManager::deallocate();
     if(addons_manager)          delete addons_manager;
     NetworkManager::kill();
 
@@ -1349,32 +1140,33 @@ bool ShowDumpResults(const wchar_t* dump_path,
 #pragma comment(linker, "/SUBSYSTEM:console")
 #endif
 
+// ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
 #ifdef BREAKPAD
     google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
                                          NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
 #endif
+    CommandLine::init(argc, argv);
+
     CrashReporting::installHandlers();
 
     srand(( unsigned ) time( 0 ));
 
-    try {
-        // Check for "--root COLON:SEPARATED:LIST" parameter
-        for(int i=0; i<argc-1; i++)
+    try 
+    {
+        std::string s;
+        if(CommandLine::has("--root", &s))
         {
-            if(!strcmp(argv[i],"--root"))
-            {
-                FileManager::addRootDirs(argv[i+1]);
-            }
+            FileManager::addRootDirs(s);
         }
+
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
-        initUserConfig(argv); // argv passed so config file can be
-                              // found more reliably
+        initUserConfig(); 
 
-        handleCmdLinePreliminary(argc, argv);
+        handleCmdLinePreliminary();
 
         initRest();
 
@@ -1432,7 +1224,7 @@ int main(int argc, char *argv[] )
                                                           "banana.png")    );
 
         //handleCmdLine() needs InitTuxkart() so it can't be called first
-        if(!handleCmdLine(argc, argv)) exit(0);
+        if(!handleCmdLine()) exit(0);
 
         // load the network manager
         // If the server has been created (--server option), this will do nothing (just a warning):
@@ -1450,11 +1242,13 @@ int main(int argc, char *argv[] )
 
         // Load addons.xml to get info about addons even when not
         // allowed to access the internet
-        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED) {
+        if (UserConfigParams::m_internet_status != 
+            Online::RequestManager::IPERM_ALLOWED)
+        {
             std::string xml_file = file_manager->getAddonsFile("addons.xml");
             if (file_manager->fileExists(xml_file)) {
                 const XMLNode *xml = new XMLNode (xml_file);
-                addons_manager->initOnline(xml);
+                addons_manager->initAddons(xml);
             }
         }
 
@@ -1464,7 +1258,7 @@ int main(int argc, char *argv[] )
             // hack to have a running game slot :
             PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
             if (UserConfigParams::m_default_player.toString().size() > 0)
-                for (int n=0; n<players.size(); n++)
+                for (unsigned int n=0; n<players.size(); n++)
                     if (players[n].getName() == UserConfigParams::m_default_player.toString())
                         unlock_manager->setCurrentSlot(players[n].getUniqueID());
 
@@ -1480,7 +1274,7 @@ int main(int argc, char *argv[] )
             }
 #endif
             if(UserConfigParams::m_internet_status ==
-                INetworkHttp::IPERM_NOT_ASKED)
+                Online::RequestManager::IPERM_NOT_ASKED)
             {
                 class ConfirmServer :
                       public MessageDialog::IConfirmDialogListener
@@ -1488,27 +1282,16 @@ int main(int argc, char *argv[] )
                 public:
                     virtual void onConfirm()
                     {
-                        INetworkHttp::destroy();
                         UserConfigParams::m_internet_status =
-                            INetworkHttp::IPERM_ALLOWED;
+                                 Online::RequestManager::IPERM_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                        INetworkHttp::create();
-                        // Note that the network thread must be started after
-                        // the assignment to network_http (since the thread
-                        // might use network_http, otherwise a race condition
-                        // can be introduced resulting in a crash).
-                        INetworkHttp::get()->startNetworkThread();
-
                     }   // onConfirm
                     // --------------------------------------------------------
                     virtual void onCancel()
                     {
-                        INetworkHttp::destroy();
                         UserConfigParams::m_internet_status =
-                            INetworkHttp::IPERM_NOT_ALLOWED;
+                            Online::RequestManager::IPERM_NOT_ALLOWED;
                         GUIEngine::ModalDialog::dismiss();
-                        INetworkHttp::create();
-                        INetworkHttp::get()->startNetworkThread();
                     }   // onCancel
                 };   // ConfirmServer
 
@@ -1556,7 +1339,7 @@ int main(int argc, char *argv[] )
 
         // If an important news message exists it is shown in a popup dialog.
         const core::stringw important_message =
-                                           news_manager->getImportantMessage();
+                                     NewsManager::get()->getImportantMessage();
         if(important_message!="")
         {
             new MessageDialog(important_message,

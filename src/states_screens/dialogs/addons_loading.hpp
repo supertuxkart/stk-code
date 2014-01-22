@@ -25,7 +25,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "utils/synchronised.hpp"
 
-class Request;
+namespace Online { class HTTPRequest; }
 
 /**
   * \ingroup states_screens
@@ -53,7 +53,7 @@ private:
 
     /** A pointer to the download request, which gives access
      *  to the progress of a download. */
-    Request *m_download_request;
+    Online::HTTPRequest *m_download_request;
 
     bool m_vote_clicked;
 

@@ -131,7 +131,7 @@ namespace GUIEngine
         irr::core::stringw getSelectionText(const int playerID)
         {
             const int selection = m_selection[playerID];
-            if (selection < 0 || selection >= m_children.size()) return "";
+            if (selection < 0 || selection >= int(m_children.size())) return "";
             return m_children[selection].m_text;
         }
         // --------------------------------------------------------------------        
@@ -150,7 +150,7 @@ namespace GUIEngine
           * \pre Must be called after the ribbon was add()ed
           * \param id The index of the item to rename, in range [0 .. item count - 1]
           */
-        void setLabel(const int id, irr::core::stringw new_name);
+        void setLabel(const unsigned int id, irr::core::stringw new_name);
         
         /** Returns the ID of the item, or -1 if not found */
         int findItemNamed(const char* internalName);

@@ -35,6 +35,7 @@ namespace irr
     namespace scene { class IMesh; class ILightSceneNode; }
 }
 using namespace irr;
+class LodNodeLoader;
 
 #include "LinearMath/btTransform.h"
 
@@ -401,6 +402,9 @@ private:
                              std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
+    void loadObjects(const XMLNode* root, const std::string& path, LodNodeLoader& lod_loader,
+                     bool create_lod_definitions, scene::ISceneNode* parent,
+                     std::map<std::string, XMLNode*>& library_nodes);
 
 public:
 

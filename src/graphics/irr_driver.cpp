@@ -32,6 +32,7 @@
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
+#include "graphics/stkmesh.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/water.hpp"
@@ -138,6 +139,21 @@ void IrrDriver::reset()
 {
     if (m_glsl) m_post_processing->reset();
 }   // reset
+
+void IrrDriver::setPhase(unsigned p)
+{
+  phase = p;
+}
+
+unsigned IrrDriver::getPhase() const
+{
+  return phase;
+}
+
+core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
+{
+  return m_mrt;
+}
 
 // ----------------------------------------------------------------------------
 
@@ -397,9 +413,12 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-    m_glsl          = m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-                      m_video_driver->queryFeature(video::EVDF_TEXTURE_NPOT) &&
-                      UserConfigParams::m_pixel_shaders;
+
+	int GLMajorVersion;
+	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
+	printf("OPENGL VERSION IS %d\n", GLMajorVersion);
+	m_glsl = (GLMajorVersion >= 3) && UserConfigParams::m_pixel_shaders;
+                      
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);
@@ -418,14 +437,18 @@ void IrrDriver::initDevice()
 
         // Order matters, create RTTs as soon as possible, as they are the largest blocks.
         m_rtts = new RTT();
+    }
+    // m_glsl might be reset in rtt if an error occurs.
+    if(m_glsl)
+    {
         m_shaders = new Shaders();
         m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
         m_mrt.reallocate(3);
         m_mrt.push_back(m_rtts->getRTT(RTT_COLOR));
-        m_mrt.push_back(m_rtts->getRTT(RTT_NORMAL));
-        m_mrt.push_back(m_rtts->getRTT(RTT_DEPTH));
+        m_mrt.push_back(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH));
+        m_mrt.push_back(m_rtts->getRTT(RTT_SPECULARMAP));
 
         irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
@@ -618,7 +641,7 @@ void IrrDriver::applyResolutionSettings()
     // show black before resolution switch so we don't see OpenGL's buffer
     // garbage during switch
     m_video_driver->beginScene(true, true, video::SColor(255,100,101,140));
-    m_video_driver->draw2DRectangle( video::SColor(255, 0, 0, 0),
+    GL32_draw2DRectangle( video::SColor(255, 0, 0, 0),
                             core::rect<s32>(0, 0,
                                             UserConfigParams::m_prev_width,
                                             UserConfigParams::m_prev_height) );
@@ -902,7 +925,16 @@ scene::IParticleSystemSceneNode *IrrDriver::addParticleNode(bool default_emitter
 scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
                                           scene::ISceneNode *parent)
 {
-    return m_scene_manager->addMeshSceneNode(mesh, parent);
+    if (!isGLSL())
+        return m_scene_manager->addMeshSceneNode(mesh, parent);
+
+    if (!parent)
+      parent = m_scene_manager->getRootSceneNode();
+
+    scene::IMeshSceneNode* node = new STKMesh(mesh, parent, m_scene_manager, -1);
+    node->drop();
+
+    return node;
 }   // addMesh
 
 // ----------------------------------------------------------------------------
@@ -1397,8 +1429,14 @@ void IrrDriver::displayFPS()
 {
     gui::IGUIFont* font = GUIEngine::getFont();
 
-    irr_driver->getVideoDriver()->draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,800,50),NULL);
-
+    if(UserConfigParams::m_artist_debug_mode)
+    {
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,50),NULL);
+    }
+    else
+    {
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
+    }
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
     const int NO_TRUST_COUNT = 200;
@@ -1450,8 +1488,8 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris",
-                min, fps, max, low, kilotris, high);
+        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris - LightDst : ~%d",
+                min, fps, max, low, kilotris, high, m_last_light_bucket_distance);
     }
     else
     {
@@ -1906,8 +1944,8 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     }
 
     assert(m_rtt_main_node != NULL);
-    assert(mesh.size() == (int)mesh_location.size());
-    assert(mesh.size() == (int)model_frames.size());
+    assert(mesh.size() == mesh_location.size());
+    assert(mesh.size() == model_frames.size());
 
     const int mesh_amount = mesh.size();
     for (int n=1; n<mesh_amount; n++)
@@ -1966,7 +2004,10 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
 
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
-    m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
+    if (irr_driver->isGLSL())
+        m_camera->setUpVector( core::vector3df(0.0, -1.0, 0.0) );
+    else
+        m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
@@ -2036,6 +2077,8 @@ video::ITexture* IrrDriver::RTTProvider::renderToTexture(float angle,
     return m_render_target_texture;
 }
 
+// ----------------------------------------------------------------------------
+
 void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimlit)
 {
     if (!m_glsl)
@@ -2102,6 +2145,8 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     }
 }
 
+// ----------------------------------------------------------------------------
+
 void IrrDriver::applyObjectPassShader()
 {
     if (!m_glsl)
@@ -2110,27 +2155,30 @@ void IrrDriver::applyObjectPassShader()
     applyObjectPassShader(m_scene_manager->getRootSceneNode());
 }
 
-scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float radius,
-                     float r, float g, float b, bool sun)
+// ----------------------------------------------------------------------------
+
+scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
+    float r, float g, float b, bool sun, scene::ISceneNode* parent)
 {
     if (m_glsl)
     {
+        if (parent == NULL) parent = m_scene_manager->getRootSceneNode();
         LightNode *light = NULL;
 
         if (!sun)
-            light = new LightNode(m_scene_manager, radius, r, g, b);
+            light = new LightNode(m_scene_manager, parent, energy, r, g, b);
         else
-            light = new SunNode(m_scene_manager, r, g, b);
+            light = new SunNode(m_scene_manager, parent, r, g, b);
 
         light->grab();
-        light->setParent(NULL);
 
         light->setPosition(pos);
         light->updateAbsolutePosition();
 
         m_lights.push_back(light);
 
-        if (sun) {
+        if (sun)
+        {
             m_sun_interposer->setPosition(pos);
             m_sun_interposer->updateAbsolutePosition();
 
@@ -2141,14 +2189,19 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float radius,
             m_suncam->updateAbsolutePosition();
 
             ((WaterShaderProvider *) m_shaders->m_callbacks[ES_WATER])->setSunPosition(pos);
+            ((SkyboxProvider *) m_shaders->m_callbacks[ES_SKYBOX])->setSunPosition(pos);
         }
 
         return light;
-    } else
+    }
+    else
     {
-        return m_scene_manager->addLightSceneNode(NULL, pos, video::SColorf(r, g, b), radius);
+		return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(),
+                                                  pos, video::SColorf(1.0f, r, g, b));
     }
 }
+
+// ----------------------------------------------------------------------------
 
 void IrrDriver::clearLights()
 {

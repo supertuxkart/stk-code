@@ -196,7 +196,7 @@ public:
     int createActivePlayer(PlayerProfile *profile, InputDevice *device, Online::Profile* use);
     void removeActivePlayer(int id);
 
-    int activePlayerCount();
+    unsigned int activePlayerCount();
     void resetActivePlayers();
 
     /** \return whether to reduce FPS at the moment

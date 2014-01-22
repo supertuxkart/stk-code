@@ -95,7 +95,7 @@ void SingleAchievement::load(XMLNode * input)
 void SingleAchievement::save(std::ofstream & out)
 {
     out << "        <achievement id=\"" << m_id << "\" "
-        << "achieved=\"" << StringUtils::boolstr(m_achieved) << "\"";
+        << "achieved=\"" << StringUtils::toString(m_achieved) << "\"";
     if(!m_achieved)
     {
         out << " value=\"" << StringUtils::toString(m_progress) << "\"";
@@ -153,12 +153,16 @@ void MapAchievement::load(XMLNode * input)
 // ============================================================================
 void MapAchievement::save(std::ofstream & out)
 {
-    out << "        <achievement id=\"" << m_id << "\" achieved=\"" << StringUtils::boolstr(m_achieved) << "\">\n";
+    out << "        <achievement id=\"" << m_id << "\" achieved=\"" 
+        << StringUtils::toString(m_achieved) << "\">\n";
     if(!m_achieved)
     {
-        std::map<std::string, int>::iterator iter;
-        for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter ) {
-            out << "            <entry key=\"" << iter->first.c_str() << "\" value=\"" << StringUtils::toString(iter->second) << "\"/>\n";
+        std::map<std::string, int>::iterator i;
+        for ( i = m_progress_map.begin(); i != m_progress_map.end(); ++i )
+        {
+            out << "            <entry key=\"" << i->first.c_str()
+                << "\" value=\"" << StringUtils::toString(i->second) 
+                << "\"/>\n";
         }
     }
     out << "        </achievement>\n";
@@ -178,7 +182,8 @@ int MapAchievement::getValue(const std::string & key)
 void MapAchievement::reset()
 {
     std::map<std::string, int>::iterator iter;
-    for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter ) {
+    for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter )
+    {
         iter->second = 0;
     }
 }   // reset

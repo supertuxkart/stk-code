@@ -20,7 +20,7 @@
 
 #include "network/network_manager.hpp"
 #include "online/current_user.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "config/user_config.hpp"
 
 StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
@@ -47,20 +47,20 @@ void StopServer::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-        m_request->setParameter("id",Online::CurrentUser::get()->getID());
-        m_request->setParameter("token",Online::CurrentUser::get()->getToken());
-        m_request->setParameter("address",addr.ip);
-        m_request->setParameter("port",addr.port);
-        m_request->setParameter("action","stop-server");
+        m_request->setServerURL( "address-management.php");
+        m_request->addParameter("id",Online::CurrentUser::get()->getID());
+        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+        m_request->addParameter("address",addr.ip);
+        m_request->addParameter("port",addr.port);
+        m_request->addParameter("action","stop-server");
         Log::info("StopServer", "address %u, port %d", addr.ip, addr.port);
 
-        Online::HTTPManager::get()->addRequest(m_request);
+        Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
     }
     else if (m_state == REQUEST_PENDING && m_request->isDone())
     {
-        const XMLNode * result = m_request->getResult();
+        const XMLNode * result = m_request->getXMLData();
         std::string rec_success;
 
         if(result->get("success", &rec_success))

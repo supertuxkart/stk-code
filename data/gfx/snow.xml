@@ -5,19 +5,19 @@
 
     <spreading angle="3"           />
     
-    <velocity  x="0.0"
+    <velocity  x="-0.005"
                y="-0.01"
-               z="0.0"             />
+               z="-0.005"             />
     
     <material  file="snowflake.png" clampu="Y" clampv="Y" />
     
     <!-- Amount of particles emitted per second -->
-    <rate      min="400"
-               max="500"           />
+    <rate      min="1000"
+               max="1000"           />
     
     <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
-    <lifetime  min="9000"
-               max="9000"          />
+    <lifetime  min="10000"
+               max="10000"          />
     
     <!-- Size of the particles -->
     <size      min="0.40"

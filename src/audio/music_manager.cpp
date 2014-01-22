@@ -60,7 +60,7 @@ MusicManager::MusicManager()
     ALCdevice* device = alcOpenDevice ( NULL ); //The default sound device
     if( device == NULL )
     {
-        fprintf(stderr, "WARNING: Could not open the default sound device.\n");
+        Log::warn("MusicManager", "Could not open the default sound device.");
         m_initialized = false;
     }
     else
@@ -70,7 +70,7 @@ MusicManager::MusicManager()
 
         if( context == NULL )
         {
-            fprintf(stderr, "WARNING: Could not create a sound context.\n");
+            Log::warn("MusicManager", "Could not create a sound context.");
             m_initialized = false;
         }
         else
@@ -153,8 +153,8 @@ void MusicManager::addMusicToTracks()
     {
         if(!i->second)
         {
-            fprintf(stderr, "Can't find music file '%s' - ignored.\n",
-                    i->first.c_str());
+            Log::warn("MusicManager", "Can't find music file '%s' - ignored.",
+                      i->first.c_str());
             continue;
         }
         i->second->addMusicToTracks();
@@ -182,6 +182,7 @@ void MusicManager::startMusic(MusicInformation* mi, bool startRightNow)
 
     mi->volumeMusic(m_masterGain);
     if (startRightNow) mi->startMusic();
+    else mi->setMusicWaiting();
 }   // startMusic
 
 //-----------------------------------------------------------------------------

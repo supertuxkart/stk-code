@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2D cloudtex;
@@ -14,6 +15,9 @@ uniform int hasclouds;
 uniform vec2 wind;
 uniform float shadowoffset;
 
+out vec4 FragColor;
+out vec4 OtherOutput;
+
 float decdepth(vec4 rgba) {
 	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
 }
@@ -21,18 +25,18 @@ float decdepth(vec4 rgba) {
 void main() {
 
 	vec2 texc = gl_FragCoord.xy / screen;
-	vec4 depthread = texture2D(dtex, texc);
+	vec4 depthread = texture(dtex, texc);
 	float z = decdepth(vec4(depthread.xyz, 0.0));
 
 	if (z < 0.03)
 	{
 		// Skyboxes are fully lit
-		gl_FragData[0] = vec4(1.0);
-		gl_FragData[1] = vec4(0.0);
+		FragColor = vec4(1.0);
+		OtherOutput = vec4(0.0);
 		return;
 	}
 
-	vec3 norm = texture2D(ntex, texc).xyz;
+	vec3 norm = texture(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;
 
 	// Normalized on the cpu
@@ -54,7 +58,7 @@ void main() {
 	if (hasclouds == 1)
 	{
 		vec2 cloudcoord = (xpos.xz * 0.00833333) + wind;
-		float cloud = texture2D(cloudtex, cloudcoord).x;
+		float cloud = texture(cloudtex, cloudcoord).x;
 		//float cloud = step(0.5, cloudcoord.x) * step(0.5, cloudcoord.y);
 
 		outcol *= cloud;
@@ -64,13 +68,13 @@ void main() {
 	vec3 shadowcoord = (shadowmat * vec4(xpos.xyz, 1.0)).xyz;
 	shadowcoord = (shadowcoord * 0.5) + vec3(0.5);
 
-	float movex = decdepth(texture2D(warpx, shadowcoord.xy));
-	float movey = decdepth(texture2D(warpy, shadowcoord.xy));
+	float movex = decdepth(texture(warpx, shadowcoord.xy));
+	float movey = decdepth(texture(warpy, shadowcoord.xy));
 	float dx = movex * 2.0 - 1.0;
 	float dy = movey * 2.0 - 1.0;
 	shadowcoord.xy += vec2(dx, dy);
 
-	vec4 shadowread = texture2D(shadowtex, shadowcoord.xy);
+	vec4 shadowread = texture(shadowtex, shadowcoord.xy);
 	float shadowmapz = decdepth(vec4(shadowread.xyz, 0.0));
 
 	float moved = (abs(dx) + abs(dy)) * 0.5;
@@ -93,10 +97,10 @@ void main() {
 	bias = clamp(bias, 0.001, abi);
 
 	// This ID, and four IDs around this must match for a shadow pixel
-	float right = texture2D(shadowtex, shadowcoord.xy + vec2(shadowoffset, 0.0)).a;
-	float left = texture2D(shadowtex, shadowcoord.xy + vec2(-shadowoffset, 0.0)).a;
-	float up = texture2D(shadowtex, shadowcoord.xy + vec2(0.0, shadowoffset)).a;
-	float down = texture2D(shadowtex, shadowcoord.xy + vec2(0.0, -shadowoffset)).a;
+	float right = texture(shadowtex, shadowcoord.xy + vec2(shadowoffset, 0.0)).a;
+	float left = texture(shadowtex, shadowcoord.xy + vec2(-shadowoffset, 0.0)).a;
+	float up = texture(shadowtex, shadowcoord.xy + vec2(0.0, shadowoffset)).a;
+	float down = texture(shadowtex, shadowcoord.xy + vec2(0.0, -shadowoffset)).a;
 
 	float matching = ((right + left + up + down) * 0.25) - shadowread.a;
 	matching = abs(matching) * 400.0;
@@ -114,6 +118,6 @@ void main() {
 /*	outcol.r = (shadowcoord.z - shadowmapz) * 50.0;
 	outcol.g = moved;*/
 
-	gl_FragData[0] = vec4(outcol, 0.05);
-	gl_FragData[1] = vec4(shadowed, penumbra, shadowed, shadowed);
+	FragColor = vec4(outcol, 0.05);
+	OtherOutput = vec4(shadowed, penumbra, shadowed, shadowed);
 }

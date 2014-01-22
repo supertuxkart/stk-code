@@ -115,11 +115,11 @@ void VoteDialog::onUpdate(float dt)
             {
                 m_info_widget->setDefaultColor();
                 std::string voted("");
-                m_fetch_vote_request->getResult()->get("voted", &voted);
+                m_fetch_vote_request->getXMLData()->get("voted", &voted);
                 if(voted == "yes")
                 {
                     float rating;
-                    m_fetch_vote_request->getResult()->get("rating", &rating);
+                    m_fetch_vote_request->getXMLData()->get("rating", &rating);
                     m_rating_widget->setRating(rating);
                     m_info_widget->setText(_("You can adapt your previous rating by clicking the stars beneath."), false);
                 }

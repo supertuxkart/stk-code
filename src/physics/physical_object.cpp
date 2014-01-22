@@ -126,7 +126,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
 
     m_object = object;
 
-    m_init_xyz   = object->getPosition();
+    m_init_xyz   = object->getAbsolutePosition();
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 

@@ -17,6 +17,7 @@
 
 
 // motion_blur.vert
+#version 130
 
 void main()
 {

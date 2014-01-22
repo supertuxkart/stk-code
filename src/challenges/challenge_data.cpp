@@ -73,9 +73,9 @@ ChallengeData::ChallengeData(const std::string& filename)
     // is not supported anyway (id is needed for warning message)
     if(!unlock_manager->isSupportedVersion(*this))
     {
-        fprintf(stderr, "[ChallengeData] WARNING: challenge <%s> is older "
-                "or newer than this version of STK, will be ignored.\n",
-                filename.c_str());
+        Log::warn("ChallengeData", "Challenge <%s> is older "
+                  "or newer than this version of STK, will be ignored.\n",
+                  filename.c_str());
         return;
     }
 
@@ -191,9 +191,8 @@ ChallengeData::ChallengeData(const std::string& filename)
             }
             else
             {
-                fprintf(stderr,
-                        "[ChallengeData] WARNING: Unknown A superpower '%s'\n",
-                        superPower.c_str());
+                Log::warn("ChallengeData", "Unknown superpower '%s'",
+                          superPower.c_str());
             }
         }
 
@@ -241,10 +240,8 @@ ChallengeData::ChallengeData(const std::string& filename)
             setUnlocks(s, ChallengeData::UNLOCK_DIFFICULTY);
         else
         {
-            fprintf(stderr, "[ChallengeData] unknown unlock entry.\n");
-            fprintf(stderr,
-                    "Must be one of kart, track, gp, mode, difficulty.\n");
-            exit(-1);
+            Log::warn("ChallengeData", "Unknown unlock entry. Must be one of kart, track, gp, mode, difficulty.");
+            throw std::runtime_error("Unknown unlock entry");
         }
     }
 
@@ -266,7 +263,7 @@ void ChallengeData::error(const char *id) const
     msg << "Undefined or incorrect value for '" << id
         << "' in challenge file '" << m_filename << "'.";
 
-    printf("ChallengeData : %s\n", msg.str().c_str());
+    Log::error("ChallengeData", "%s", msg.str().c_str());
 
     throw std::runtime_error(msg.str());
 }   // error
@@ -339,9 +336,9 @@ void ChallengeData::setUnlocks(const std::string &id, RewardType reward)
                                 kart_properties_manager->getKart(id);
                             if (prop == NULL)
                             {
-                                fprintf(stderr, "Challenge refers to kart %s, "
-                                        "which is unknown. Ignoring reward.\n",
-                                        id.c_str());
+                                Log::warn("ChallengeData", "Challenge refers to kart %s, "
+                                          "which is unknown. Ignoring reward.",
+                                          id.c_str());
                                 break;
                             }
                             irr::core::stringw user_name = prop->getName();

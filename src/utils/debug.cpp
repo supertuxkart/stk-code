@@ -119,7 +119,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Physics debug", DEBUG_GRAPHICS_BULLET_1);
             sub->addItem(L"Physics debug (no kart)", DEBUG_GRAPHICS_BULLET_2);
 
-            int itemsMenuIndex = mnu->addItem(L"Items >",-1,true,true);
+            mnu->addItem(L"Items >",-1,true,true);
             sub = mnu->getSubMenu(1);
             sub->addItem(L"Basketball", DEBUG_POWERUP_RUBBERBALL );
             sub->addItem(L"Bowling", DEBUG_POWERUP_BOWLING );

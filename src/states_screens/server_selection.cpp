@@ -185,7 +185,7 @@ void ServerSelection::setLastSelected()
 
 // ----------------------------------------------------------------------------
 
-void ServerSelection::onUpdate(float dt, irr::video::IVideoDriver*)
+void ServerSelection::onUpdate(float dt)
 {
     if(m_refresh_request != NULL)
     {

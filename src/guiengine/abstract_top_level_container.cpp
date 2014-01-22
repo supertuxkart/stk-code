@@ -220,7 +220,7 @@ Widget* AbstractTopLevelContainer::getFirstWidget(
     if (m_first_widget != NULL) return m_first_widget;
     if (within_vector == NULL) within_vector = &m_widgets;
 
-    for (int i = 0; i < within_vector->size(); i++)
+    for (unsigned int i = 0; i < within_vector->size(); i++)
     {
         if (!within_vector->get(i)->m_focusable) continue;
 

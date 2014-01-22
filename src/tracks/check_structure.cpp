@@ -20,6 +20,7 @@
 
 #include <algorithm>
 
+#include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"
 #include "modes/world.hpp"

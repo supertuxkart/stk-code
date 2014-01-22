@@ -72,8 +72,23 @@ public:
     void         begin();
     void         update(float dt);
 
-    /** Render the post-processed scene, solids only, color to color, no stencil */
-    void         renderSolid(const u32 cam);
+	/** Generate diffuse and specular map */
+	void         renderPointlight(video::ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
+	void         renderSunlight();
+	/** Blend all light related map */
+	void renderLightbBlend(video::ITexture *diffuse, video::ITexture *specular, video::ITexture *ao, video::ITexture *specmap, bool debug);
+
+	void renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat);
+	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
+
+	/** Blur the in texture */
+	void renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
+	void renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
+
+	/** Render tex. Used for blit/texture resize */
+	void renderPassThrough(video::ITexture *tex);
+
+	void renderGlow(video::ITexture *tex);
 
     /** Render the post-processed scene */
     void         render();

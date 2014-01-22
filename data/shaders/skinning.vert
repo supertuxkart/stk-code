@@ -16,7 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 // skinning.vert
-
+#version 130
 #define MAX_JOINT_NUM 36
 #define MAX_LIGHT_NUM 8
 

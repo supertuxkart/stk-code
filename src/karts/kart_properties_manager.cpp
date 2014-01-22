@@ -239,7 +239,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
   */
 void KartPropertiesManager::setHatMeshName(const std::string &hat_name)
 {
-    for (int i=0; i<m_karts_properties.size(); i++)
+    for (unsigned int i=0; i<m_karts_properties.size(); i++)
     {
         m_karts_properties[i].setHatMeshName(hat_name);
     }
@@ -251,7 +251,7 @@ void KartPropertiesManager::setHatMeshName(const std::string &hat_name)
  */
 const int KartPropertiesManager::getKartId(const std::string &ident) const
 {
-    for (int i=0; i<m_karts_properties.size(); i++)
+    for (unsigned int i=0; i<m_karts_properties.size(); i++)
     {
         if (m_karts_properties[i].getIdent() == ident)
             return i;
@@ -290,7 +290,7 @@ const KartProperties* KartPropertiesManager::getKartById(int i) const
 std::vector<std::string> KartPropertiesManager::getAllAvailableKarts() const
 {
     std::vector<std::string> all;
-    for (int i=0; i<m_karts_properties.size(); i++)
+    for (unsigned int i=0; i<m_karts_properties.size(); i++)
     {
         if (m_kart_available[i])
             all.push_back(m_karts_properties[i].getIdent());
@@ -306,7 +306,7 @@ std::vector<std::string> KartPropertiesManager::getAllAvailableKarts() const
  */
 void KartPropertiesManager::setUnavailableKarts(std::vector<std::string> karts)
 {
-    for (int i=0; i<m_karts_properties.size(); i++)
+    for (unsigned int i=0; i<m_karts_properties.size(); i++)
     {
         if (!m_kart_available[i]) continue;
 
@@ -331,7 +331,7 @@ int KartPropertiesManager::getKartByGroup(const std::string& group,
                                           int n) const
 {
     int count=0;
-    for (int i=0; i<m_karts_properties.size(); i++)
+    for (unsigned int i=0; i<m_karts_properties.size(); i++)
     {
         std::vector<std::string> groups = m_karts_properties[i].getGroups();
         if (std::find(groups.begin(), groups.end(), group) == groups.end())
@@ -391,7 +391,7 @@ const std::vector<int> KartPropertiesManager::getKartsInGroup(
     if (g == ALL_KART_GROUPS_ID)
     {
         std::vector<int> out;
-        for (int n=0; n<m_karts_properties.size(); n++)
+        for (unsigned int n=0; n<m_karts_properties.size(); n++)
         {
             out.push_back(n);
         }

@@ -250,7 +250,7 @@ void SFXOpenAL::position(const Vec3 &position)
         return;
     if (!m_ok)
     {
-        fprintf(stderr, "WARNING, position called on non-ok SFX <%s>\n", m_soundBuffer->getFileName().c_str());
+        Log::warn("SFX", "Position called on non-ok SFX <%s>", m_soundBuffer->getFileName().c_str());
         return;
     }
     if (!m_positional)
@@ -260,7 +260,7 @@ void SFXOpenAL::position(const Vec3 &position)
         // (note that 0 players is also possible, in cutscenes)
         if (race_manager->getNumLocalPlayers() < 2)
         {
-            fprintf(stderr, "WARNING, position called on non-positional SFX\n");
+            Log::warn("SFX", "Position called on non-positional SFX");
         }
         return;
     }

@@ -21,7 +21,6 @@
 
 #include <string>
 
-#include "addons/inetwork_http.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -37,12 +36,13 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
-#include "states_screens/online_screen.hpp"
+#include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
+#include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
-#include "states_screens/network_kart_selection.hpp" // FIXME : remove when not testing
+#include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -60,8 +60,11 @@
 #include "utils/string_utils.hpp"
 
 using namespace GUIEngine;
+using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
+
+bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
 
@@ -110,9 +113,13 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
+    m_online = getWidget<IconButtonWidget>("online");
+
+    if(!m_enable_online)
+        m_online->setDeactivated();
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
-    const core::stringw &news_text = news_manager->getNextNewsMessage();
+    const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
     w->setText(news_text, true);
     w->update(0.01f);
 
@@ -134,8 +141,11 @@ void MainMenuScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void MainMenuScreen::onUpdate(float delta)
+
 {
+    m_online->setLabel(CurrentUser::get()->getID() ? _("Online")
+                                                   : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -146,7 +156,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
             addons_icon->setBadge(BAD_BADGE);
         }
         else if (addons_manager->isLoading() && UserConfigParams::m_internet_status
-                == INetworkHttp::IPERM_ALLOWED)
+            == Online::RequestManager::IPERM_ALLOWED)
         {
             // Addons manager is still initialising/downloading.
             addons_icon->setDeactivated();
@@ -165,7 +175,7 @@ void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
     w->update(delta);
     if(w->scrolledOff())
     {
-        const core::stringw &news_text = news_manager->getNextNewsMessage();
+        const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
         w->setText(news_text, true);
     }
 }   // onUpdate
@@ -371,10 +381,32 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "online")
     {
-        StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED)
+        {
+            new MessageDialog(_("You can not play online without internet access. "
+                                "If you want to play online, go to options, select "
+                                " tab 'User Interface', and edit "
+                                "\"Allow STK to connect to the Internet\"."));
+            return;
+        }
+        if(CurrentUser::get()->getID())
+            StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        else
+            StateManager::get()->pushScreen(LoginScreen::getInstance());
     }
     else if (selection == "addons")
     {
+        // Don't go to addons if there is no internet, unless some addons are
+        // already installed (so that you can delete addons without being online).
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED && 
+            !addons_manager->anyAddonsInstalled())
+        {
+            new MessageDialog(_("You can not download addons without internet access. "
+                                "If you want to download addons, go to options, select "
+                                " tab 'User Interface', and edit "
+                                "\"Allow STK to connect to the Internet\"."));
+            return;
+        }
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
     }
 }   // eventCallback
@@ -391,7 +423,7 @@ void MainMenuScreen::onDisabledItemClicked(const std::string& item)
 {
     if (item == "addons")
     {
-        if (UserConfigParams::m_internet_status != INetworkHttp::IPERM_ALLOWED)
+        if (UserConfigParams::m_internet_status != RequestManager::IPERM_ALLOWED)
         {
             new MessageDialog( _("The add-ons module is currently disabled in "
                                  "the Options screen") );

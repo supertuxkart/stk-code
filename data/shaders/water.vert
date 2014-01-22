@@ -1,15 +1,16 @@
 // Shader based on work by Fabien Sanglard
 // Released under the terms of CC-BY 3.0
-
+#version 130
 uniform float speed;
 uniform float height;
 uniform float waveLength;
 
 uniform vec3 lightdir;
 
-varying vec3 lightVec;
-varying vec3 halfVec;
-varying vec3 eyeVec;
+noperspective out vec3 lightVec;
+noperspective out vec3 halfVec;
+noperspective out vec3 eyeVec;
+out vec2 uv;
 
 void main()
 {
@@ -50,6 +51,5 @@ void main()
 	halfVec = v ;
 
 	gl_Position = gl_ModelViewProjectionMatrix * pos;
-	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-	gl_TexCoord[1] = gl_TextureMatrix[1] * gl_MultiTexCoord1;
+	uv = (gl_TextureMatrix[0] * gl_MultiTexCoord0).st;
 }

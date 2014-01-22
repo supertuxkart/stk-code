@@ -15,6 +15,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "graphics/callbacks.hpp"
+
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/wind.hpp"
 #include "guiengine/engine.hpp"
@@ -24,26 +26,6 @@
 
 using namespace video;
 using namespace core;
-
-//-------------------------------------
-
-void NormalMapProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    if (!firstdone)
-    {
-        s32 texture = 0;
-        srv->setPixelShaderConstant("texture", &texture, 1);
-
-        s32 normaltex = 1;
-        srv->setPixelShaderConstant("normalMap", &normaltex, 1);
-
-        // We could calculate light direction as coming from the sun (then we'd need to
-        // transform it into camera space). But I find that pretending light
-        // comes from the camera gives good results
-
-        firstdone = true;
-    }
-}
 
 //-------------------------------------
 
@@ -109,16 +91,6 @@ void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
 {
-    
-    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
-    srv->setVertexShaderConstant("far", &camfar, 1);
-
-    float objectid = 0;
-    const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
-    objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
-    srv->setVertexShaderConstant("objectid", &objectid, 1);
-
-    
     IVideoDriver * const drv = srv->getVideoDriver();
     const core::vector3df pos = drv->getTransform(ETS_WORLD).getTranslation();
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -129,8 +101,17 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 
     // Pre-multiply on the cpu
     vector3df wind = irr_driver->getWind() * strength;
+    core::matrix4 ModelViewProjectionMatrix = drv->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= drv->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= drv->getTransform(ETS_WORLD);
+    core::matrix4 TransposeInverseModelView = drv->getTransform(ETS_VIEW);
+    TransposeInverseModelView *= drv->getTransform(ETS_WORLD);
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 
     srv->setVertexShaderConstant("windDir", &wind.X, 3);
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
 
     if (!firstdone)
     {
@@ -142,54 +123,25 @@ void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int use
 }
 
 //-------------------------------------
-
-void ColorLevelsProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
+void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+    srv->setVertexShaderConstant("time", &time, 1);
 
-    m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
-    m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
-
-    srv->setVertexShaderConstant("inlevel", &m_inlevel.X, 3);
-    srv->setVertexShaderConstant("outlevel", &m_outlevel.X, 2);
+    vector3df sun_pos = m_sunpos;
+    srv->setVertexShaderConstant("sun_pos", &sun_pos.X, 3);
+    
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
 
     if (!firstdone)
     {
         s32 tex = 0;
-        srv->setVertexShaderConstant("tex", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
-    srv->setVertexShaderConstant("far", &camfar, 1);
-
-    float objectid = 0;
-    const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
-    objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
-    srv->setVertexShaderConstant("objectid", &objectid, 1);
-
-    if (!firstdone)
-    {
-        s32 tex_layout = 1;
-        srv->setPixelShaderConstant("tex_layout", &tex_layout, 1);
-
-        s32 tex_detail0 = 2;
-        srv->setPixelShaderConstant("tex_detail0", &tex_detail0, 1);
-
-        s32 tex_detail1 = 3;
-        srv->setPixelShaderConstant("tex_detail1", &tex_detail1, 1);
-
-        s32 tex_detail2 = 4;
-        srv->setPixelShaderConstant("tex_detail2", &tex_detail2, 1);
-
-        s32 tex_detail3 = 5;
-        srv->setPixelShaderConstant("tex_detail3", &tex_detail3, 1);
-
+        srv->setPixelShaderConstant("tex", &tex, 1);
+        s32 glow_tex = 1;
+        srv->setPixelShaderConstant("glow_tex", &glow_tex, 1);
         firstdone = true;
     }
 }
@@ -205,6 +157,12 @@ void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
     const float diff = (time - start) / 3.0f;
 
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (visible)
     {
         transparency = diff;
@@ -218,30 +176,6 @@ void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
     srv->setVertexShaderConstant("time", &time, 1);
     srv->setVertexShaderConstant("transparency", &transparency, 1);
-}
-
-//-------------------------------------
-
-void RainEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float screenw = (float)UserConfigParams::m_width;
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 90.0f;
-    const matrix4 viewm = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    const vector3df campos = irr_driver->getSceneManager()->getActiveCamera()->getPosition();
-
-    srv->setVertexShaderConstant("screenw", &screenw, 1);
-    srv->setVertexShaderConstant("time", &time, 1);
-    srv->setVertexShaderConstant("viewm", viewm.pointer(), 16);
-    srv->setVertexShaderConstant("campos", &campos.X, 3);
-}
-
-//-------------------------------------
-
-void SnowEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-
-    srv->setVertexShaderConstant("time", &time, 1);
 }
 
 //-------------------------------------
@@ -310,6 +244,11 @@ void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
     srv->setVertexShaderConstant("col", m_color, 3);
 }
 
@@ -324,22 +263,24 @@ void GlowProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    const float camfar = irr_driver->getSceneManager()->getActiveCamera()->getFarValue();
-    srv->setVertexShaderConstant("far", &camfar, 1);
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
+    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
+    srv->setVertexShaderConstant("TextureMatrix0", mat.getTextureMatrix(0).pointer(), 16);
+    srv->setVertexShaderConstant("TextureMatrix1", mat.getTextureMatrix(1).pointer(), 16);
 
     const int hastex = mat.TextureLayer[0].Texture != NULL;
     srv->setVertexShaderConstant("hastex", &hastex, 1);
 
     const int haslightmap = mat.TextureLayer[1].Texture != NULL;
     srv->setVertexShaderConstant("haslightmap", &haslightmap, 1);
-
-    float objectid = 0;
-    if (hastex)
-    {
-        const stringc name = mat.TextureLayer[0].Texture->getName().getPath();
-        objectid = shash8((const u8 *) name.c_str(), name.size()) / 255.0f;
-    }
-    srv->setVertexShaderConstant("objectid", &objectid, 1);
 
     //if (!firstdone)
     // Can't use the firstdone optimization, as this callback is used for multiple shaders
@@ -354,42 +295,6 @@ void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void LightBlendProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-
-    float ambient[3] = { s.r, s.g, s.b };
-    srv->setVertexShaderConstant("ambient", ambient, 3);
-
-    //int spectex = 1;
-    //srv->setVertexShaderConstant("spectex", &spectex, 1);
-}
-
-//-------------------------------------
-
-void PointLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("screen", m_screen, 2);
-    srv->setVertexShaderConstant("spec", &m_specular, 1);
-    srv->setVertexShaderConstant("col", m_color, 3);
-    srv->setVertexShaderConstant("center", m_pos, 3);
-    srv->setVertexShaderConstant("r", &m_radius, 1);
-    srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
-
-    if (!firstdone)
-    {
-        int tex = 0;
-        srv->setVertexShaderConstant("ntex", &tex, 1);
-
-        tex = 1;
-        srv->setVertexShaderConstant("dtex", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
 void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const int hasclouds = World::getWorld()->getTrack()->hasClouds() &&
@@ -398,7 +303,7 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("screen", m_screen, 2);
     srv->setVertexShaderConstant("col", m_color, 3);
     srv->setVertexShaderConstant("center", m_pos, 3);
-    srv->setVertexShaderConstant("invproj", m_invproj.pointer(), 16);
+    srv->setVertexShaderConstant("invproj", irr_driver->getInvProjMatrix().pointer(), 16);
     srv->setVertexShaderConstant("hasclouds", &hasclouds, 1);
 
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -446,15 +351,14 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void BloomProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("low", &m_threshold, 1);
-}
-
-//-------------------------------------
-
 void MLAAColor1Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (!firstdone)
     {
         const float pixels[2] = {
@@ -497,6 +401,12 @@ void MLAABlend2Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
+    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
+
+    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
+
     if (!firstdone)
     {
         const float pixels[2] = {
@@ -512,45 +422,6 @@ void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
         tex = 1;
         srv->setPixelShaderConstant("colorMap", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void SSAOProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    static const float array[64] = {
-        0.43589, -0.9, 0.667945, 0.,
-        -0.9, 0.43589, 0.667945, 0.,
-        -0.8, -0.6, 0.7, 0.,
-        0.6, 0.8, 0.7, 0.,
-        0.866025, -0.5, 0.6830125, 0.,
-        -0.5, 0.866025, 0.6830125, 0.,
-        -0.3, -0.953939, 0.6269695, 0.,
-        0.953939, 0.3, 0.6269695, 0.,
-        0.3, -0.781025, 0.5405125, 0.,
-        -0.781025, 0.3, 0.5405125, 0.,
-        -0.56, -0.621611, 0.5908055, 0.,
-        0.621611, 0.56, 0.5908055, 0.,
-        0.734847, -0.4, 0.5674235, 0.,
-        -0.4, 0.734847, 0.5674235, 0.,
-        -0.2, -0.6, 0.4, 0.,
-        0.6, 0.2, 0.4, 0.,
-    };
-
-    srv->setPixelShaderConstant("invprojm", invprojm.pointer(), 16);
-    srv->setPixelShaderConstant("projm", projm.pointer(), 16);
-    srv->setPixelShaderConstant("samplePoints[0]", array, 64);
-
-    if (!firstdone)
-    {
-        int tex = 0;
-        srv->setPixelShaderConstant("normals_and_depth", &tex, 1);
-
-        tex = 1;
-        srv->setPixelShaderConstant("depth", &tex, 1);
 
         firstdone = true;
     }
@@ -649,13 +520,6 @@ void CollapseProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void BloomPowerProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("power", &m_power, 1);
-}
-
-//-------------------------------------
-
 void MultiplyProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     if (!firstdone)
@@ -730,23 +594,12 @@ void CausticsProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
+    core::matrix4 ProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
+    core::matrix4 ModelViewMatrix = srv->getVideoDriver()->getTransform(ETS_VIEW);
+    ModelViewMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
 
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
-
-    vector3df wind = irr_driver->getWind() * strength * speed;
-    m_dir[0] += wind.X;
-    m_dir[1] += wind.Z;
-
-    strength = time * 0.56f + sinf(time);
-    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
-
-    wind = irr_driver->getWind() * strength * speed;
-    wind.rotateXZBy(cosf(time));
-    m_dir2[0] += wind.X;
-    m_dir2[1] += wind.Z;
+    srv->setVertexShaderConstant("ProjectionMatrix", ProjectionMatrix.pointer(), 16);
+    srv->setVertexShaderConstant("ModelViewMatrix", ModelViewMatrix.pointer(), 16);
 
     srv->setVertexShaderConstant("dir", m_dir, 2);
     srv->setVertexShaderConstant("dir2", m_dir2, 2);
@@ -754,49 +607,23 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("screen", m_screen, 2);
 }
 
-//-------------------------------------
-
-void PPDisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
+void DisplaceProvider::update()
 {
-    int viz = irr_driver->getDistortViz();
-    srv->setPixelShaderConstant("viz", &viz, 1);
+	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+	const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
 
-    if (!firstdone)
-    {
-        int tex = 0;
-        srv->setPixelShaderConstant("tex", &tex, 1);
+	float strength = time;
+	strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
 
-        tex = 1;
-        srv->setPixelShaderConstant("dtex", &tex, 1);
+	vector3df wind = irr_driver->getWind() * strength * speed;
+	m_dir[0] += wind.X;
+	m_dir[1] += wind.Z;
 
-        firstdone = true;
-    }
-}
+	strength = time * 0.56f + sinf(time);
+	strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
 
-//-------------------------------------
-
-void FogProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    const Track * const track = World::getWorld()->getTrack();
-
-    // This function is only called once per frame - thus no need for setters.
-    const float fogmax = track->getFogMax();
-    const float startH = track->getFogStartHeight();
-    const float endH = track->getFogEndHeight();
-    const float start = track->getFogStart();
-    const float end = track->getFogEnd();
-    const SColor tmpcol = track->getFogColor();
-
-    const float col[3] = { tmpcol.getRed() / 255.0f,
-                           tmpcol.getGreen() / 255.0f,
-                           tmpcol.getBlue() / 255.0f };
-
-    srv->setPixelShaderConstant("fogmax", &fogmax, 1);
-    srv->setPixelShaderConstant("startH", &startH, 1);
-    srv->setPixelShaderConstant("endH", &endH, 1);
-    srv->setPixelShaderConstant("start", &start, 1);
-    srv->setPixelShaderConstant("end", &end, 1);
-    srv->setPixelShaderConstant("col", col, 3);
-    srv->setVertexShaderConstant("ipvmat", m_invprojview.pointer(), 16);
-    srv->setVertexShaderConstant("campos", m_campos, 3);
+	wind = irr_driver->getWind() * strength * speed;
+	wind.rotateXZBy(cosf(time));
+	m_dir2[0] += wind.X;
+	m_dir2[1] += wind.Z;
 }

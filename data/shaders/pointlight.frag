@@ -1,41 +1,51 @@
+#version 130
 uniform sampler2D ntex;
-uniform sampler2D dtex;
 
-uniform vec3 center;
-uniform vec3 col;
-uniform float r;
+uniform vec4 center[16];
+uniform vec4 col[16];
+uniform float energy[16];
 uniform float spec;
-uniform vec2 screen;
 uniform mat4 invproj;
+uniform mat4 viewm;
 
-float decdepth(vec4 rgba) {
-	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
-}
+in vec2 uv;
+out vec4 Diffuse;
+out vec4 Specular;
 
 void main() {
-	vec2 texc = gl_FragCoord.xy / screen;
-	float z = decdepth(vec4(texture2D(dtex, texc).xyz, 0.0));
+	vec2 texc = uv;
+	float z = texture(ntex, texc).a;
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;
 	xpos /= xpos.w;
 
-	float d = distance(center, xpos.xyz);
-	if (d > r) discard;
-	float att = 1.0 - smoothstep(0.0, r, d);
+	vec3 diffuse = vec3(0.), specular = vec3(0.);
 
-	vec3 norm = texture2D(ntex, texc).xyz;
-	norm = (norm - 0.5) * 2.0;
+	for (int i = 0; i < 16; ++i) {
+		vec4 pseudocenter = viewm * vec4(center[i].xyz, 1.0);
+		pseudocenter /= pseudocenter.w;
+		vec3 light_pos = pseudocenter.xyz;
+		vec3 light_col = col[i].xyz;
+		float d = distance(light_pos, xpos.xyz);
+		float att = energy[i] * 200. / (4. * 3.14 * d * d);
+		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
 
-	// Light Direction
-	vec3 L = normalize(xpos.xyz - center);
-	vec3 eyedir = normalize(xpos.xyz);
-	vec3 H = normalize(-L + eyedir);
+		vec3 norm = texture(ntex, texc).xyz;
+		norm = (norm - 0.5) * 2.0;
 
-	float NdotL = max(0.0, dot(norm, -L)) * att;
-	float NdotH = max(0.0, dot(norm, H));
-	NdotH = pow(NdotH, spec);
-	NdotH += 0.05; // offset so that the alpha test doesn't kill us
+		// Light Direction
+		vec3 L = normalize(xpos.xyz - light_pos);
 
-	gl_FragColor = NdotL * vec4(NdotL * col, NdotH);
+		float NdotL = max(0.0, dot(norm, -L));
+		diffuse += NdotL * light_col * att;
+		// Reflected light dir
+		vec3 R = reflect(-L, norm);
+		float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
+		float Specular = pow(RdotE, spec);
+		specular += Specular * light_col * spec_att;
+	}
+
+	Diffuse = vec4(diffuse, 1.);
+	Specular = vec4(specular , 1.);
 }

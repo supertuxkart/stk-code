@@ -19,9 +19,10 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/profile.hpp"
+#include "online/xml_request.hpp"
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
 
@@ -30,7 +31,8 @@
 #include <string>
 #include <assert.h>
 
-namespace Online{
+namespace Online
+{
 
     // ============================================================================
 
@@ -50,82 +52,100 @@ namespace Online{
                 US_SIGNING_OUT
             };
 
+            // ----------------------------------------------------------------
             class SignInRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignInRequest(bool manage_memory = false) : XMLRequest(manage_memory) {}
-            };
+                SignInRequest(bool manage_memory = false) 
+                    : XMLRequest(manage_memory, /*priority*/10) {}
+            };   // SignInRequest
 
+            // ----------------------------------------------------------------
             class SignOutRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignOutRequest() : XMLRequest(true) {}
-            };
+                SignOutRequest() : XMLRequest(true,/*priority*/10) {}
+            };   // SignOutRequest
 
+            // ----------------------------------------------------------------
             class ServerCreationRequest : public XMLRequest {
                 virtual void callback ();
                 uint32_t m_created_server_id;
             public:
                 ServerCreationRequest() : XMLRequest() {}
-                const uint32_t getCreatedServerID() const { assert(isDone()); return m_created_server_id;}
-            };
+                const uint32_t getCreatedServerID() const 
+                {
+                    assert(isDone());
+                    return m_created_server_id;
+                }   // getCreatedServerID
+            };   // ServerCreationRequest
+
+            // ----------------------------------------------------------------
 
             class ServerJoinRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 ServerJoinRequest() : XMLRequest() {}
-            };
+            };   // ServerJoinRequest
 
+            // ----------------------------------------------------------------
             class SetAddonVoteRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 SetAddonVoteRequest() : XMLRequest() {}
-            };
+            };   // SetAddonVoteRequest
 
+            // ----------------------------------------------------------------
             class FriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 FriendRequest() : XMLRequest(true) {}
-            };
+            };   // FriendRequest
 
+            // ----------------------------------------------------------------
             class AcceptFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 AcceptFriendRequest() : XMLRequest(true) {}
-            };
+            };   // AcceptFriendRequest
 
+            // ----------------------------------------------------------------
             class DeclineFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 DeclineFriendRequest() : XMLRequest(true) {}
-            };
+            };   // DeclineFriendRequest
 
+            // ----------------------------------------------------------------
             class RemoveFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 RemoveFriendRequest() : XMLRequest(true) {}
-            };
+            };   // RemoveFriendRequest
 
+            // ----------------------------------------------------------------
             class CancelFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 CancelFriendRequest() : XMLRequest(true) {}
-            };
+            };   // CancelFriendRequest
 
+            // ----------------------------------------------------------------
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 PollRequest() : XMLRequest(true) {}
-            };
+            };   // PollRequest
 
+            // ----------------------------------------------------------------
             class ChangePasswordRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
                 ChangePasswordRequest() : XMLRequest(true) {}
-            };
+            };   // ChangePasswordRequest
 
 
         private:
@@ -134,7 +154,7 @@ namespace Online{
             UserState                   m_state;
             Profile *                   m_profile;
 
-            bool                        getSaveSession()        const   { return m_save_session;      }
+            bool saveSession()  const   { return m_save_session;      }
 
             CurrentUser();
 
@@ -160,8 +180,7 @@ namespace Online{
             const XMLRequest *              requestSignUp(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             const irr::core::stringw &password_ver,
-                                                            const irr::core::stringw &email,
-                                                            bool terms);
+                                                            const irr::core::stringw &email);
 
             const XMLRequest *              requestRecovery(const irr::core::stringw &username,
                                                             const irr::core::stringw &email);

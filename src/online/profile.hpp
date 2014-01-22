@@ -19,8 +19,8 @@
 #ifndef HEADER_ONLINE_PROFILE_HPP
 #define HEADER_ONLINE_PROFILE_HPP
 
-#include "http_manager.hpp"
-#include "online/request.hpp"
+#include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
 

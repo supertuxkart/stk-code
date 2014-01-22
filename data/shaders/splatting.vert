@@ -16,15 +16,18 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #version 130
-uniform vec3 lightdir;
+uniform mat4 ModelViewProjectionMatrix;
+uniform mat4 TransposeInverseModelView;
 
-noperspective out vec3 normal;
+in vec3 Position;
+in vec2 Texcoord;
+in vec2 SecondTexcoord;
+out vec2 uv;
+out vec2 uv_bis;
 
 void main()
 {
-    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-    gl_TexCoord[1] = gl_TextureMatrix[1] * gl_MultiTexCoord1;
-    gl_Position = ftransform();
-
-    normal = gl_NormalMatrix * gl_Normal;
+    uv = Texcoord;
+    uv_bis = SecondTexcoord;
+    gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
 }

@@ -99,6 +99,9 @@ private:
     /** The main MRT setup. */
     core::array<video::IRenderTarget> m_mrt;
 
+    /** Matrixes used in several places stored here to avoid recomputation. */
+    core::matrix4 m_ViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
+
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
      *  change to new resolution and trigger confirmation dialog.
@@ -149,6 +152,7 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
+    unsigned             m_last_light_bucket_distance;
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     scene::IMeshSceneNode *m_sun_interposer;
@@ -169,6 +173,8 @@ private:
     std::vector<scene::ISceneNode *> m_displacing;
 
     std::vector<scene::ISceneNode *> m_background;
+
+    unsigned phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -193,7 +199,7 @@ private:
     void renderLights(const core::aabbox3df& cambox,
                       scene::ICameraSceneNode * const camnode,
                       video::SOverrideMaterial &overridemat,
-                      int cam);
+                      int cam, float dt);
     void renderDisplacement(video::SOverrideMaterial &overridemat,
                             int cam);
     void doScreenShot();
@@ -202,6 +208,9 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void setPhase(unsigned);
+    unsigned getPhase() const;
+    core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
     scene::IAnimatedMesh *getAnimatedMesh(const std::string &name);
@@ -270,6 +279,7 @@ public:
 
     void                  showPointer();
     void                  hidePointer();
+    void                  setLastLightBucketDistance(unsigned d) { m_last_light_bucket_distance = d; }
     bool                  isPointerShown() const { return m_pointer_shown; }
     core::position2di     getMouseLocation();
 
@@ -380,6 +390,10 @@ public:
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
+    /** Called when the driver pretends to support it, but fails at some
+     *  operations. */
+    void disableGLSL() { m_glsl = false; }
+    // ------------------------------------------------------------------------
     void resetDebugModes()
     {
         m_wireframe = false;
@@ -454,13 +468,21 @@ public:
     void applyObjectPassShader();
     void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
     // ------------------------------------------------------------------------
-    scene::ISceneNode *addLight(const core::vector3df &pos, float radius = 1.0f, float r = 1.0f,
-                  float g = 1.0f, float b = 1.0f, bool sun = false);
+    scene::ISceneNode *addLight(const core::vector3df &pos, float energy = 1., float r = 1.0f,
+                  float g = 1.0f, float b = 1.0f, bool sun = false, scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
     scene::IMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
-
+    // ------------------------------------------------------------------------
+    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; }
+    const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
+    void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
+    const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
+    const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }
+    void genProjViewMatrix() { m_ProjViewMatrix = m_ProjMatrix * m_ViewMatrix; m_InvProjViewMatrix = m_ProjViewMatrix; m_InvProjViewMatrix.makeInverse(); }
+    const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
+    const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }

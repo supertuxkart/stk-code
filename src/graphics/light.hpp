@@ -21,6 +21,7 @@
 
 #include <ISceneNode.h>
 #include <utils/cpp2011.h>
+#include <vector>
 
 using namespace irr;
 
@@ -29,11 +30,17 @@ namespace irr
     namespace scene { class IMesh; }
 }
 
+//#define __LIGHT_NODE_VISUALISATION__
+
 // The actual node
 class LightNode: public scene::ISceneNode
 {
+#ifdef __LIGHT_NODE_VISUALISATION__
+    bool m_viz_added;
+#endif
+
 public:
-    LightNode(scene::ISceneManager* mgr, float radius, float r, float g, float b);
+    LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float energy, float r, float g, float b);
     virtual ~LightNode();
 
     virtual void render() OVERRIDE;
@@ -46,19 +53,27 @@ public:
     virtual void OnRegisterSceneNode() OVERRIDE;
 
     virtual u32 getMaterialCount() const OVERRIDE { return 1; }
-    virtual video::SMaterial& getMaterial(u32 i) OVERRIDE { return mat; }
+    virtual bool isPointLight() { return true; }
 
-    float getRadius() const { return m_radius; }
-    void getColor(float out[3]) const { memcpy(out, m_color, 3 * sizeof(float)); }
+    //float getRadius() const { return m_radius; }
+    float getEnergy() const { return m_energy; }
+    float getEffectiveEnergy() const { return m_energy_multiplier * m_energy; }
+    core::vector3df getColor() const { return core::vector3df(m_color[0], m_color[1], m_color[2]); }
+
+    float getEnergyMultiplier() const { return m_energy_multiplier; }
+    void setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }
 
 protected:
-    static video::SMaterial mat;
     static core::aabbox3df box;
 
-    static scene::IMesh *sphere;
+    class ScreenQuad *sq;
 
-    float m_radius;
+    //float m_radius;
     float m_color[3];
+    float m_energy;
+
+    /// The energy multiplier is in range [0, 1] and is used to fade in lights when they come in range
+    float m_energy_multiplier;
 };
 
 #endif

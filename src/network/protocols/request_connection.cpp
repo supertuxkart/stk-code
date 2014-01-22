@@ -19,7 +19,7 @@
 #include "network/protocols/request_connection.hpp"
 
 #include "network/protocol_manager.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/current_user.hpp"
 #include "config/user_config.hpp"
 
@@ -44,13 +44,13 @@ void RequestConnection::asynchronousUpdate()
         case NONE:
         {
             m_request = new Online::CurrentUser::ServerJoinRequest();
-            m_request->setURL((std::string)UserConfigParams::m_server_multiplayer + "address-management.php");
-            m_request->setParameter("id",Online::CurrentUser::get()->getID());
-            m_request->setParameter("token",Online::CurrentUser::get()->getToken());
-            m_request->setParameter("server_id",m_server_id);
-            m_request->setParameter("action","request-connection");
+            m_request->setServerURL("address-management.php");
+            m_request->addParameter("id",Online::CurrentUser::get()->getID());
+            m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+            m_request->addParameter("server_id",m_server_id);
+            m_request->addParameter("action","request-connection");
 
-            Online::HTTPManager::get()->addRequest(m_request);
+            Online::RequestManager::get()->addRequest(m_request);
             m_state = REQUEST_PENDING;
             break;
         }
@@ -58,7 +58,7 @@ void RequestConnection::asynchronousUpdate()
         {
             if (!m_request->isDone())
                 return;
-            const XMLNode * result = m_request->getResult();
+            const XMLNode * result = m_request->getXMLData();
             std::string rec_success;
 
             if(result->get("success", &rec_success))

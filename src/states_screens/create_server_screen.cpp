@@ -90,7 +90,7 @@ void CreateServerScreen::init()
     m_info_widget->setText("", false);
 }
 // ----------------------------------------------------------------------------
-void CreateServerScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void CreateServerScreen::onUpdate(float delta)
 {
     if(m_server_creation_request != NULL)
     {

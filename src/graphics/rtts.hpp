@@ -31,9 +31,9 @@ enum TypeRTT
     RTT_TMP2,
     RTT_TMP3,
     RTT_TMP4,
-    RTT_DEPTH,
-    RTT_NORMAL,
+    RTT_NORMAL_AND_DEPTH,
     RTT_COLOR,
+    RTT_SPECULARMAP,
 
     RTT_HALF1,
     RTT_HALF2,
@@ -41,6 +41,7 @@ enum TypeRTT
     RTT_QUARTER1,
     RTT_QUARTER2,
     RTT_QUARTER3,
+    RTT_QUARTER4,
 
     RTT_EIGHTH1,
     RTT_EIGHTH2,
@@ -48,8 +49,7 @@ enum TypeRTT
     RTT_SIXTEENTH1,
     RTT_SIXTEENTH2,
 
-    RTT_SSAO1,
-    RTT_SSAO2,
+    RTT_SSAO,
 
     RTT_SHADOW,
     RTT_COLLAPSE,

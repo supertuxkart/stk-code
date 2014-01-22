@@ -1,10 +1,12 @@
+#version 130
 uniform sampler2D ntex;
 uniform sampler2D ctex;
 uniform vec3 campos;
 uniform int low;
 
-varying vec3 wpos;
-varying vec2 texc;
+in vec3 wpos;
+in vec2 texc;
+out vec4 FragColor;
 
 float luminanceImp()
 {
@@ -12,7 +14,7 @@ float luminanceImp()
 	if (low > 0) return 1.0;
 
 	const vec3 weights = vec3(0.2126, 0.7152, 0.0722); // ITU-R BT. 709
-	vec3 col = texture2D(ctex, texc).xyz;
+	vec3 col = texture(ctex, texc).xyz;
 
 	float luma = dot(weights, col);
 
@@ -50,7 +52,7 @@ float depthImp(float linearz)
 
 void main()
 {
-	vec4 ntmp = texture2D(ntex, texc);
+	vec4 ntmp = texture(ntex, texc);
 	vec3 normal = ntmp.xyz * 2.0 - 1.0;
 	float linearz = ntmp.a;
 
@@ -65,6 +67,6 @@ void main()
 	importance = ceil(importance) * low;
 	importance /= steps;
 
-	gl_FragColor = vec4(importance);
+	FragColor = vec4(importance);
 	gl_FragDepth = 1.0 - importance;
 }

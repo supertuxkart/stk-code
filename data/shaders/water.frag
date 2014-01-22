@@ -1,6 +1,6 @@
 // Shader based on work by Fabien Sanglard
 // Released under the terms of CC-BY 3.0
-
+#version 130
 uniform sampler2D BumpTex1; // Normal map 1
 uniform sampler2D BumpTex2; // Normal map 2
 uniform sampler2D DecalTex; //The texture
@@ -8,15 +8,17 @@ uniform sampler2D DecalTex; //The texture
 uniform vec2 delta1;
 uniform vec2 delta2;
 
-varying vec3 lightVec;
-varying vec3 halfVec;
-varying vec3 eyeVec;
+noperspective in vec3 lightVec;
+noperspective in vec3 halfVec;
+noperspective in vec3 eyeVec;
+in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
 	// lookup normal from normal map, move from [0,1] to  [-1, 1] range, normalize
-	vec3 normal  = 2.0 * texture2D (BumpTex1, gl_TexCoord[0].st + delta1).rgb - 1.0;
-	vec3 normal2 = 2.0 * texture2D (BumpTex2, gl_TexCoord[0].st + delta2).rgb - 1.0;
+	vec3 normal  = 2.0 * texture (BumpTex1, uv + delta1).rgb - 1.0;
+	vec3 normal2 = 2.0 * texture (BumpTex2, uv + delta2).rgb - 1.0;
 
 	// scale normals
 	normal.y = 4.0*normal.y;
@@ -29,7 +31,7 @@ void main()
 	vec4 diffuseMaterial;
 	vec4 diffuseLight;
 
-	diffuseMaterial = texture2D (DecalTex, gl_TexCoord[0].st + vec2(delta1.x, 0.0));
+	diffuseMaterial = texture (DecalTex, uv + vec2(delta1.x, 0.0));
 	diffuseLight  = vec4(1.0, 1.0, 1.0, 1.0);
 
 	vec3 col = diffuseMaterial.xyz * (0.3 + lamberFactor*0.7);
@@ -52,5 +54,5 @@ void main()
 	float summed = dot(vec3(1.0), col) / 3.0;
 	float alpha = 0.9 + 0.1 * smoothstep(0.0, 1.0, summed);
 
-	gl_FragColor = vec4(col, alpha);
+	FragColor = vec4(col, alpha);
 }

@@ -174,7 +174,7 @@ void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in s
 
 // ----------------------------------------------------------------------------
 
-void OnlineUserSearch::onUpdate(float dt, irr::video::IVideoDriver*)
+void OnlineUserSearch::onUpdate(float dt)
 {
     if(m_search_request != NULL)
     {
@@ -182,7 +182,7 @@ void OnlineUserSearch::onUpdate(float dt, irr::video::IVideoDriver*)
         {
             if(m_search_request->isSuccess())
             {
-                parseResult(m_search_request->getResult());
+                parseResult(m_search_request->getXMLData());
                 showList();
             }
             else

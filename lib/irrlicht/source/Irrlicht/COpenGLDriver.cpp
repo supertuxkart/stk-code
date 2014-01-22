@@ -338,7 +338,9 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 	else
 #endif
 		AntiAlias=0;
-
+#ifdef WGL_ARB_create_context
+	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+#endif
 	wglMakeCurrent(HDc, NULL);
 	wglDeleteContext(hrc);
 	ReleaseDC(temporary_wnd, HDc);
@@ -405,13 +407,14 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 
 	// create rendering context
 #ifdef WGL_ARB_create_context
-	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 	if (wglCreateContextAttribs_ARB)
 	{
 		int iAttribs[] =
 		{
 			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
 			WGL_CONTEXT_MINOR_VERSION_ARB, 1,
+			//WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
+			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
 			0
 		};
 		hrc=wglCreateContextAttribs_ARB(HDc, 0, iAttribs);

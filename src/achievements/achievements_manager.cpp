@@ -155,7 +155,7 @@ void AchievementsManager::createSlotsIfNeeded()
 
     // make sure all players have at least one game slot associated
     PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         if (getSlot(players[n].getUniqueID(), false) == NULL )
         {
@@ -188,7 +188,7 @@ void AchievementsManager::save()
     achievements_file << "<?xml version=\"1.0\"?>\n";
     achievements_file << "<achievements>\n";
 
-    for (int i = 0; i < m_slots.size(); i++)
+    for (unsigned int i = 0; i < m_slots.size(); i++)
     {
         m_slots[i].save(achievements_file);
     }
@@ -208,7 +208,7 @@ void AchievementsManager::onRaceEnd()
 // ============================================================================
 AchievementsSlot * AchievementsManager::getSlot(const std::string & id, bool online)
 {
-    for(int i = 0; i < m_slots.size(); i++)
+    for(unsigned int i = 0; i < m_slots.size(); i++)
     {
         if(m_slots[i].isOnline() == online && m_slots[i].getID() == id)
         {

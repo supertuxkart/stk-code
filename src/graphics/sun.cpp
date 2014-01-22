@@ -34,17 +34,15 @@ using namespace video;
 using namespace scene;
 using namespace core;
 
-SunNode::SunNode(scene::ISceneManager* mgr, float r, float g, float b):
-                     LightNode(mgr, 10000, r, g, b)
+SunNode::SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, float g, float b):
+                     LightNode(mgr, parent, 0., r, g, b)
 {
-
     sq = new ScreenQuad(irr_driver->getVideoDriver());
 
     SMaterial &m = sq->getMaterial();
 
     m.MaterialType = irr_driver->getShader(ES_SUNLIGHT);
-    m.setTexture(0, irr_driver->getRTT(RTT_NORMAL));
-    m.setTexture(1, irr_driver->getRTT(RTT_DEPTH));
+    m.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
     m.setTexture(2, irr_driver->getTexture(file_manager->getAsset(FileManager::TEXTURE,"cloudshadow.png")));
     m.setFlag(EMF_BILINEAR_FILTER, false);
     m.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
@@ -89,12 +87,7 @@ void SunNode::render()
 
     vector3df pos = getPosition();
     cb->setPosition(pos.X, pos.Y, pos.Z);
-
-    if (!UserConfigParams::m_shadows || !World::getWorld()->getTrack()->hasShadows())
-    {
-        sq->render(false);
-        return;
-    }
+    return;
 
     array<IRenderTarget> mrt;
     mrt.reallocate(2);

@@ -28,6 +28,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
+#include "graphics/gpuparticles.h"
 
 #include <SParticle.h>
 #include <IParticleAffector.h>
@@ -316,17 +317,28 @@ void ParticleEmitter::setCreationRateAbsolute(float f)
     m_min_rate = f;
     m_max_rate = f;
 
+#if 0
     // FIXME: to work around irrlicht bug, when an emitter is paused by setting the rate
     //        to 0 results in a massive emission when enabling it back. In irrlicht 1.8
     //        the node has a method called "clearParticles" that should be cleaner than this
+
     if (f <= 0.0f && m_node->getEmitter())
     {
-        m_node->setEmitter(NULL);
+		m_node->clearParticles();
     }
     else if (m_node->getEmitter() == NULL)
     {
         m_node->setEmitter(m_emitter);
     }
+#endif
+/*	if (f <= 0.0f)
+	{
+		m_node->setVisible(false);
+	}
+	else
+	{
+		m_node->setVisible(true);
+	}*/
 }   // setCreationRateAbsolute
 
 //-----------------------------------------------------------------------------
@@ -343,7 +355,7 @@ int ParticleEmitter::getCreationRate()
  */
 void ParticleEmitter::setPosition(const Vec3 &pos)
 {
-    m_node->setPosition(pos.toIrrVector());
+  m_node->setPosition(pos.toIrrVector());
 }   // setPosition
 
 //-----------------------------------------------------------------------------
@@ -369,7 +381,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node = irr_driver->addParticleNode();
+            m_node = ParticleSystemProxy::addParticleNode();
+            if (irr_driver->isGLSL())
+                static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(type->getMaterial()->isAlphaAdditive());
         }
 
         if (m_parent != NULL)
@@ -436,7 +450,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             case EMITTER_POINT:
             {
                 m_emitter = m_node->createPointEmitter(velocity,
-                                                       type->getMinRate(),  type->getMaxRate(),
+													   type->getMinRate(),  type->getMaxRate(),
                                                        type->getMinColor(), type->getMaxColor(),
                                                        lifeTimeMin, lifeTimeMax,
                                                        m_particle_type->getAngleSpread() /* angle */
@@ -542,6 +556,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                 m_node->createScaleParticleAffector(factor);
             m_node->addAffector(scale_affector);
             scale_affector->drop();
+            if (irr_driver->isGLSL())
+                static_cast<ParticleSystemProxy *>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
         }
 
         const float windspeed = type->getWindSpeed();
@@ -555,8 +571,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         const bool flips = type->getFlips();
         if (flips)
         {
-            m_node->getMaterial(0).MaterialType = irr_driver->getShader(ES_SNOW);
-            m_node->getMaterial(0).BlendOperation = video::EBO_ADD;
+			if (irr_driver->isGLSL())
+				static_cast<ParticleSystemProxy *>(m_node)->setFlip();
+            //m_node->getMaterial(0).BlendOperation = video::EBO_ADD;
         }
     }
 }   // setParticleType
@@ -568,6 +585,17 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
     HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
     m_node->addAffector(hmca);
     hmca->drop();
+    if (irr_driver->isGLSL()) {
+        const Vec3* aabb_min;
+        const Vec3* aabb_max;
+        t->getAABB(&aabb_min, &aabb_max);
+        float track_x = aabb_min->getX();
+        float track_z = aabb_min->getZ();
+        const float track_x_len = aabb_max->getX() - aabb_min->getX();
+        const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
+        static_cast<ParticleSystemProxy *>(m_node)->setHeightmap(t->buildHeightMap(),
+            track_x, track_z, track_x_len, track_z_len);
+    }
 }
 
 //-----------------------------------------------------------------------------

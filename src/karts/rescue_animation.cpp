@@ -18,6 +18,8 @@
 
 #include "karts/rescue_animation.hpp"
 
+#include "graphics/callbacks.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/referee.hpp"
 #include "items/attachment.hpp"
 #include "karts/abstract_kart.hpp"

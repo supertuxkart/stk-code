@@ -1,9 +1,17 @@
-varying float camdist;
+#version 130
+uniform mat4 ModelViewProjectionMatrix;
+uniform mat4 ModelViewMatrix;
+
+in vec3 Position;
+in vec2 Texcoord;
+in vec2 SecondTexcoord;
+out vec2 uv;
+out vec2 uv_bis;
+out float camdist;
 
 void main() {
-	gl_Position = ftransform();
-	gl_TexCoord[0] = gl_MultiTexCoord0;
-	gl_TexCoord[1] = gl_MultiTexCoord1;
-
-	camdist = length((gl_ModelViewMatrix * gl_Vertex).xyz);
+	gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+	uv = Texcoord;
+	uv_bis = SecondTexcoord;
+	camdist = length(ModelViewMatrix *  vec4(Position, 1.));
 }

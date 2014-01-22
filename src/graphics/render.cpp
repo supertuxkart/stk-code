@@ -47,6 +47,8 @@
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 
+#include <algorithm>
+
 void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
@@ -139,8 +141,9 @@ void IrrDriver::renderGLSL(float dt)
                                world->getClearColor());
 
     // Clear normal and depth to zero
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL), true, false, video::SColor(0,0,0,0));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DEPTH), true, false, video::SColor(0,0,0,0));
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH), true, false, video::SColor(0,0,0,0));
+    // Clear specular map to zero
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SPECULARMAP), true, false, video::SColor(0,0,0,0));
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     RaceGUIBase *rg = world->getRaceGUI();
@@ -189,39 +192,78 @@ void IrrDriver::renderGLSL(float dt)
         // Fire up the MRT
         m_video_driver->setRenderTarget(m_mrt, false, false);
 
+		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+        irr_driver->setPhase(0);
+        glClear(GL_STENCIL_BUFFER_BIT);
+        glStencilFunc(GL_ALWAYS, 1, ~0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glEnable(GL_STENCIL_TEST);
         m_scene_manager->drawAll(m_renderpass);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glDisable(GL_STENCIL_TEST);
+        irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
+        irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+        irr_driver->genProjViewMatrix();
 
-        ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
-                                                 irr_driver->getCallback(ES_SHADOW_IMPORTANCE);
-        sicb->updateIPVMatrix();
+		PROFILER_POP_CPU_MARKER();
+
+        // Todo : reenable glow and shadows
+        //ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
+        //                                         irr_driver->getCallback(ES_SHADOW_IMPORTANCE);
+        //sicb->updateIPVMatrix();
 
         // Used to cull glowing items & lights
         const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
-
-        // Render anything glowing.
-        if (!m_mipviz && !m_wireframe)
-        {
-            renderGlow(overridemat, glows, cambox, cam);
-        } // end glow
 
         // Shadows
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows &&
             World::getWorld()->getTrack()->hasShadows())
         {
-            renderShadows(sicb, camnode, overridemat, camera);
+            //renderShadows(sicb, camnode, overridemat, camera);
         }
 
+
+        PROFILER_PUSH_CPU_MARKER("- Light", 0xFF, 0x00, 0x00);
+
         // Lights
-        renderLights(cambox, camnode, overridemat, cam);
+        renderLights(cambox, camnode, overridemat, cam, dt);
+		PROFILER_POP_CPU_MARKER();
+
+		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0xFF, 0x00, 0x00);
+        irr_driver->setPhase(1);
+        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+        glStencilFunc(GL_EQUAL, 0, ~0);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glEnable(GL_STENCIL_TEST);
+        m_scene_manager->drawAll(m_renderpass);
+        glDisable(GL_STENCIL_TEST);
+
+        PROFILER_POP_CPU_MARKER();
+
+        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0x00, 0x00);
+
+		// Render anything glowing.
+		if (!m_mipviz && !m_wireframe)
+		{
+			irr_driver->setPhase(2);
+			renderGlow(overridemat, glows, cambox, cam);
+		} // end glow
+
+        PROFILER_POP_CPU_MARKER();
 
         if (!bgnodes)
         {
+            PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0x00);
+
             // If there are no BG nodes, it's more efficient to do the skybox here.
             m_renderpass = scene::ESNRP_SKY_BOX;
             m_scene_manager->drawAll(m_renderpass);
+
+            PROFILER_POP_CPU_MARKER();
         }
 
+        PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0xFF, 0x00, 0x00);
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
@@ -248,21 +290,36 @@ void IrrDriver::renderGLSL(float dt)
             // Make sure the color mask is reset
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         }
+        PROFILER_POP_CPU_MARKER();
 
-        // Render the post-processed scene for solids
-        m_post_processing->renderSolid(cam);
 
         // We need to re-render camera due to the per-cam-node hack.
-        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT |
-                                 scene::ESNRP_TRANSPARENT_EFFECT;
+        PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
+		irr_driver->setPhase(3);
+		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
         m_scene_manager->drawAll(m_renderpass);
+		PROFILER_POP_CPU_MARKER();
 
+		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0x00, 0x00);
+		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+		m_scene_manager->drawAll(m_renderpass);
+		PROFILER_POP_CPU_MARKER();
+
+		if (World::getWorld()->getTrack()->isFogEnabled())
+		{
+			PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+			m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
+			PROFILER_POP_CPU_MARKER();
+		}
+
+        PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
         // Handle displacing nodes, if any
         const u32 displacingcount = m_displacing.size();
         if (displacingcount)
         {
             renderDisplacement(overridemat, cam);
         }
+        PROFILER_POP_CPU_MARKER();
 
         // Drawing for this cam done, cleanup
         const u32 glowrepcount = transparent_glow_nodes.size();
@@ -282,8 +339,10 @@ void IrrDriver::renderGLSL(float dt)
             World::getWorld()->getPhysics()->draw();
     }   // for i<world->getNumKarts()
 
+    PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0x00, 0x00);
     // Render the post-processed scene
     m_post_processing->render();
+    PROFILER_POP_CPU_MARKER();
 
     // Set the viewport back to the full screen for race gui
     m_video_driver->setViewPort(core::recti(0, 0,
@@ -496,13 +555,13 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
                 m_rtts->getRTT(RTT_WARPV)->getSize().Height,
                 m_rtts->getRTT(RTT_WARPV)->getSize().Height);
 
-    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
+/*    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
     sq.setTexture(m_rtts->getRTT(RTT_WARPH));
     sq.render(m_rtts->getRTT(curh));
 
     sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6V));
     sq.setTexture(m_rtts->getRTT(RTT_WARPV));
-    sq.render(m_rtts->getRTT(curv));
+    sq.render(m_rtts->getRTT(curv));*/
 
     // Convert importance maps to warp maps
     //
@@ -577,10 +636,10 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glowcb->setResolution(UserConfigParams::m_width,
                             UserConfigParams::m_height);
 
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
+/*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
     overridemat.EnablePasses = scene::ESNRP_SOLID;
-    overridemat.Enabled = true;
+    overridemat.Enabled = true;*/
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilFunc(GL_ALWAYS, 1, ~0);
@@ -601,7 +660,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     }
 
     // Second round for transparents; it's a no-op for solids
-    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
+/*    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
     overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE_REF);
     for (u32 i = 0; i < glowcount; i++)
     {
@@ -617,7 +676,7 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
         cur->render();
     }
     overridemat.Enabled = false;
-    overridemat.EnablePasses = 0;
+    overridemat.EnablePasses = 0;*/
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glDisable(GL_STENCIL_TEST);
@@ -633,160 +692,134 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 
     // To half
-    minimat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_HALF1), false, false);
-    m_post_processing->drawQuad(cam, minimat);
+	m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_TMP1));
 
     // To quarter
-    minimat.setTexture(0, m_rtts->getRTT(RTT_HALF1));
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-    m_post_processing->drawQuad(cam, minimat);
+	m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_HALF1));
 
     // Blur it
-    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                UserConfigParams::m_width / 4,
-                UserConfigParams::m_height / 4);
+	m_post_processing->renderGaussian6Blur(m_rtts->getRTT(RTT_QUARTER1), m_rtts->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
 
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6H);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER1));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER2), false, false);
-    m_post_processing->drawQuad(cam, minimat);
-
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN6V);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_QUARTER2));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-    m_post_processing->drawQuad(cam, minimat);
-
-    // The glows will be rendered in the transparent phase
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glStencilFunc(GL_EQUAL, 0, ~0);
+	glEnable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+	m_post_processing->renderGlow(m_rtts->getRTT(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
 }
 
 // ----------------------------------------------------------------------------
-
+#define MAXLIGHT 16 // to be adjusted in pointlight.frag too
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              scene::ICameraSceneNode * const camnode,
                              video::SOverrideMaterial &overridemat,
-                             int cam)
+                             int cam, float dt)
 {
-    if (!m_lightviz)
-    {
-        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP1), true, false,
-                                        video::SColor(1, 0, 0, 0));
-    } else
-    {
-        m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-    }
+    core::array<video::IRenderTarget> rtts;
+    // Diffuse
+    rtts.push_back(m_rtts->getRTT(RTT_TMP1));
+    // Specular
+    rtts.push_back(m_rtts->getRTT(RTT_TMP2));
 
-    const vector3df camcenter = cambox.getCenter();
-    const float camradius = cambox.getExtent().getLength() / 2;
-    const vector3df campos = camnode->getPosition();
-    const float camnear = camnode->getNearValue();
-
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-    PointLightProvider * const pcb = (PointLightProvider *) irr_driver->
-                                        getCallback(ES_POINTLIGHT);
-    pcb->updateIPVMatrix();
-    SunLightProvider * const scb = (SunLightProvider *) irr_driver->
-                                        getCallback(ES_SUNLIGHT);
-    scb->updateIPVMatrix();
-    FogProvider * const fogcb = (FogProvider *) irr_driver->
-                                        getCallback(ES_FOG);
-    fogcb->updateIPVMatrix();
-    SSAOProvider * const ssaocb = (SSAOProvider *) irr_driver->
-                                        getCallback(ES_SSAO);
-    ssaocb->updateIPVMatrix();
-
+    m_video_driver->setRenderTarget(rtts, true, false,
+                                        video::SColor(0, 0, 0, 0));
 
     const u32 lightcount = m_lights.size();
+    const core::vector3df &campos =
+        irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
+    std::vector<float> accumulatedLightPos;
+    std::vector<float> accumulatedLightColor;
+    std::vector<float> accumulatedLightEnergy;
+    std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
     {
-        // Sphere culling
-        const float distance_sq = (m_lights[i]->getPosition() - camcenter).getLengthSQ();
-        float radius_sum = camradius + m_lights[i]->getRadius();
-        radius_sum *= radius_sum;
-        if (radius_sum < distance_sq)
-            continue;
-
-        bool inside = false;
-
-        const float camdistance_sq = (m_lights[i]->getPosition() - campos).getLengthSQ();
-        float adjusted_radius = m_lights[i]->getRadius() + camnear;
-        adjusted_radius *= adjusted_radius;
-
-        // Camera inside the light's radius? Needs adjustment for the near plane.
-        if (camdistance_sq < adjusted_radius)
+        if (!m_lights[i]->isPointLight())
         {
-            inside = true;
-
-            video::SMaterial &m = m_lights[i]->getMaterial(0);
-            m.FrontfaceCulling = true;
-            m.BackfaceCulling = false;
-            m.ZBuffer = video::ECFN_GREATER;
+          m_lights[i]->render();
+          m_post_processing->renderSunlight();
+          continue;
         }
+        const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
+        unsigned idx = (unsigned)(lightpos.getLength() / 10);
+        if (idx > 14)
+          continue;
+        BucketedLN[idx].push_back(m_lights[i]);
+    }
 
-        if (m_lightviz)
+    unsigned lightnum = 0;
+
+    for (unsigned i = 0; i < 15; i++)
+    {
+        for (unsigned j = 0; j < BucketedLN[i].size(); j++)
         {
-            overridemat.Enabled = true;
-            overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_WIREFRAME |
-                                        video::EMF_FRONT_FACE_CULLING |
-                                        video::EMF_BACK_FACE_CULLING |
-                                        video::EMF_ZBUFFER;
-            overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
-            overridemat.Material.Wireframe = true;
-            overridemat.Material.BackfaceCulling = false;
-            overridemat.Material.FrontfaceCulling = false;
-            overridemat.Material.ZBuffer = video::ECFN_LESSEQUAL;
+            if (++lightnum > MAXLIGHT)
+            {
+                LightNode* light_node = BucketedLN[i].at(j);
+                light_node->setEnergyMultiplier(0.0f);
+            }
+            else
+            {
+                LightNode* light_node = BucketedLN[i].at(j);
 
+                float em = light_node->getEnergyMultiplier();
+                if (em < 1.0f)
+                {
+                    light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
+                }
 
-            ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
-            float col[3];
-            m_lights[i]->getColor(col);
-            cb->setColor(col[0], col[1], col[2]);
+                const core::vector3df &pos = light_node->getAbsolutePosition();
+                accumulatedLightPos.push_back(pos.X);
+                accumulatedLightPos.push_back(pos.Y);
+                accumulatedLightPos.push_back(pos.Z);
+                accumulatedLightPos.push_back(0.);
+                const core::vector3df &col = light_node->getColor();
+
+                accumulatedLightColor.push_back(col.X);
+                accumulatedLightColor.push_back(col.Y);
+                accumulatedLightColor.push_back(col.Z);
+                accumulatedLightColor.push_back(0.);
+                accumulatedLightEnergy.push_back(light_node->getEffectiveEnergy());
+            }
         }
-
-        // Action
-        m_lights[i]->render();
-
-        // Reset the inside change
-        if (inside)
+        if (lightnum > MAXLIGHT)
         {
-            video::SMaterial &m = m_lights[i]->getMaterial(0);
-            m.FrontfaceCulling = false;
-            m.BackfaceCulling = true;
-            m.ZBuffer = video::ECFN_LESSEQUAL;
+          irr_driver->setLastLightBucketDistance(i * 10);
+          break;
         }
+    }
+	// Fill lights
+	for (; lightnum < MAXLIGHT; lightnum++) {
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightPos.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightColor.push_back(0.);
+		accumulatedLightEnergy.push_back(0.);
+	}
+	m_post_processing->renderPointlight(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH) , accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
+    // Handle SSAO
+    m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
+                         SColor(255, 255, 255, 255));
 
-        if (m_lightviz)
-        {
-            overridemat.Enabled = false;
-        }
+    if(UserConfigParams::m_ssao)
+        m_post_processing->renderSSAO(irr_driver->getInvProjMatrix(), irr_driver->getProjMatrix());
 
-    } // for i in lights
-
-    // Blend lights to the image
-    video::SMaterial lightmat;
-    lightmat.Lighting = false;
-    lightmat.ZWriteEnable = false;
-    lightmat.ZBuffer = video::ECFN_ALWAYS;
-    lightmat.setFlag(video::EMF_BILINEAR_FILTER, false);
-    lightmat.setTexture(0, m_rtts->getRTT(RTT_TMP1));
-
-    // Specular mapping
-    //lightmat.setTexture(1, m_rtts->getRTT(RTT_COLOR));
-
-    lightmat.MaterialType = m_shaders->getShader(ES_LIGHTBLEND);
-    lightmat.MaterialTypeParam = video::pack_textureBlendFunc(video::EBF_DST_COLOR, video::EBF_ZERO);
-    lightmat.BlendOperation = video::EBO_ADD;
-
-    lightmat.TextureLayer[0].TextureWrapU =
-    lightmat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
+    // Blur it to reduce noise.
+    if(UserConfigParams::m_ssao == 1)
+		m_post_processing->renderGaussian3Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_QUARTER4), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
+    else if (UserConfigParams::m_ssao == 2)
+		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
     if (!m_mipviz)
-        m_post_processing->drawQuad(cam, lightmat);
+		m_post_processing->renderLightbBlend(m_rtts->getRTT(RTT_TMP1), m_rtts->getRTT(RTT_TMP2), m_rtts->getRTT(RTT_SSAO), m_rtts->getRTT(RTT_SPECULARMAP), m_lightviz);
 }
 
 // ----------------------------------------------------------------------------
@@ -796,10 +829,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 {
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), false, false);
     glClearColor(0, 0, 0, 0);
-    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glStencilFunc(GL_ALWAYS, 1, ~0);
-    glEnable(GL_STENCIL_TEST);
+    glClear(GL_COLOR_BUFFER_BIT);
 
     overridemat.Enabled = 1;
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE0;
@@ -813,9 +843,14 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     overridemat.Material.TextureLayer[0].TextureWrapU =
     overridemat.Material.TextureLayer[0].TextureWrapV = video::ETC_REPEAT;
 
+	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+	cb->update();
+
     const int displacingcount = m_displacing.size();
+	irr_driver->setPhase(4);
     for (int i = 0; i < displacingcount; i++)
     {
+
         m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
         m_displacing[i]->render();
 
@@ -826,9 +861,6 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     overridemat.Enabled = 0;
 
     // Blur it
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-    glStencilFunc(GL_EQUAL, 1, ~0);
-
     video::SMaterial minimat;
     minimat.Lighting = false;
     minimat.ZWriteEnable = false;
@@ -838,20 +870,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     minimat.TextureLayer[0].TextureWrapU =
     minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
 
-    ((GaussianBlurProvider *) m_shaders->m_callbacks[ES_GAUSSIAN3H])->setResolution(
-                UserConfigParams::m_width,
-                UserConfigParams::m_height);
+	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3H);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_DISPLACE));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_TMP2), true, false);
-    m_post_processing->drawQuad(cam, minimat);
-
-    minimat.MaterialType = m_shaders->getShader(ES_GAUSSIAN3V);
-    minimat.setTexture(0, m_rtts->getRTT(RTT_TMP2));
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), true, false);
-    m_post_processing->drawQuad(cam, minimat);
-
-    glDisable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
 }

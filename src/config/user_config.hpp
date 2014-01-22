@@ -46,7 +46,6 @@
 using irr::core::stringc;
 using irr::core::stringw;
 
-#include "graphics/camera.hpp"
 #include "io/xml_writer.hpp"
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
@@ -365,6 +364,9 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam          m_num_laps
             PARAM_DEFAULT(  IntUserConfigParam(4, "numlaps",
             &m_race_setup_group, "Default number of laps.") );
+    PARAM_PREFIX IntUserConfigParam          m_soccer_time_limit
+            PARAM_DEFAULT(  IntUserConfigParam(3, "soccer-time-limit",
+            &m_race_setup_group, "Limit in soccer time mode.") );
     PARAM_PREFIX IntUserConfigParam          m_difficulty
             PARAM_DEFAULT(  IntUserConfigParam(0, "difficulty",
                             &m_race_setup_group,
@@ -522,9 +524,6 @@ namespace UserConfigParams
     // not saved to file
 
     // ---- Networking
-    PARAM_PREFIX IntUserConfigParam         m_server_port
-            PARAM_DEFAULT(  IntUserConfigParam(7321, "server_port",
-                                       "Information about the port to listen on.") );
 
     PARAM_PREFIX IntUserConfigParam         m_server_max_players
             PARAM_DEFAULT(  IntUserConfigParam(16, "server_max_players",
@@ -660,10 +659,6 @@ namespace UserConfigParams
             PARAM_DEFAULT(  IntUserConfigParam(0, "reverse_look_threshold",
             "If the kart is driving backwards faster than this value,\n"
             "switch automatically to reverse camera (set to 0 to disable).") );
-    PARAM_PREFIX IntUserConfigParam         m_camera_style
-            PARAM_DEFAULT( IntUserConfigParam(Camera::CS_MODERN,
-                            "camera_style", "Camera Style") );
-
 
     PARAM_PREFIX StringUserConfigParam      m_item_style
             PARAM_DEFAULT(  StringUserConfigParam("items", "item_style",

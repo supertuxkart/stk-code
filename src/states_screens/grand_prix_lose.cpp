@@ -199,7 +199,7 @@ void GrandPrixLose::tearDown()
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
+void GrandPrixLose::onUpdate(float dt)
 {
     m_global_time += dt;
 

@@ -142,7 +142,7 @@ public:
                                 int difficulty, int total_karts,
                                 int player_karts)
     {
-        for (int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
+        for (unsigned int n=0; n<UserConfigParams::m_saved_grand_prix_list.size(); n++)
         {
             SavedGrandPrix* gp = &UserConfigParams::m_saved_grand_prix_list[n];
             if ((gp->getGPID()       == gpid) &&

@@ -21,7 +21,8 @@
 
 #include "utils/types.hpp"
 #include "achievements/achievement.hpp"
-#include "online/http_manager.hpp"
+#include "online/request_manager.hpp"
+#include "online/xml_request.hpp"
 
 #include <irrString.h>
 #include <string>

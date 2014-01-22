@@ -87,7 +87,7 @@ typedef struct EventProcessingInfo
 {
     Event* event;
     double arrival_time;
-    std::vector<int> protocols_ids;
+    std::vector<unsigned int> protocols_ids;
 } EventProcessingInfo;
 
 /*!

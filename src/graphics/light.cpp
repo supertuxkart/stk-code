@@ -25,49 +25,27 @@
 #include "graphics/material.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/screenquad.hpp"
 
 using namespace video;
 using namespace scene;
 using namespace core;
 
-IMesh * LightNode::sphere = NULL;
-SMaterial LightNode::mat;
 aabbox3df LightNode::box;
 
 
-LightNode::LightNode(scene::ISceneManager* mgr, float radius, float r, float g, float b):
-                     ISceneNode(mgr->getRootSceneNode(), mgr, -1)
+LightNode::LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float e, float r, float g, float b):
+                     ISceneNode(parent == NULL ? mgr->getRootSceneNode() : parent, mgr, -1)
 {
-    if (!sphere)
-    {
-        mat.Lighting = false;
-        mat.MaterialType = irr_driver->getShader(ES_POINTLIGHT);
-
-        mat.setTexture(0, irr_driver->getRTT(RTT_NORMAL));
-        mat.setTexture(1, irr_driver->getRTT(RTT_DEPTH));
-
-        for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; ++i)
-        {
-            mat.TextureLayer[i].TextureWrapU =
-            mat.TextureLayer[i].TextureWrapV = ETC_CLAMP_TO_EDGE;
-        }
-
-        mat.setFlag(EMF_BILINEAR_FILTER, false);
-        mat.setFlag(EMF_ZWRITE_ENABLE, false);
-
-        mat.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
-        mat.BlendOperation = EBO_ADD;
-
-        sphere = mgr->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        box = sphere->getBoundingBox();
-    }
-
-    setScale(vector3df(radius));
-    m_radius = radius;
-
+    m_energy = e;
+    m_energy_multiplier = 1.0f;
     m_color[0] = r;
     m_color[1] = g;
     m_color[2] = b;
+
+#ifdef __LIGHT_NODE_VISUALISATION__
+    m_viz_added = false;
+#endif
 }
 
 LightNode::~LightNode()
@@ -76,18 +54,18 @@ LightNode::~LightNode()
 
 void LightNode::render()
 {
-    PointLightProvider * const cb = (PointLightProvider *) irr_driver->getCallback(ES_POINTLIGHT);
-    cb->setColor(m_color[0], m_color[1], m_color[2]);
-    cb->setPosition(getPosition().X, getPosition().Y, getPosition().Z);
-    cb->setRadius(m_radius);
-
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setTransform(ETS_WORLD, AbsoluteTransformation);
-    drv->setMaterial(mat);
-
-    drv->drawMeshBuffer(sphere->getMeshBuffer(0));
+    return;
 }
 
 void LightNode::OnRegisterSceneNode()
 { // This node is only drawn manually.
+
+#ifdef __LIGHT_NODE_VISUALISATION__
+    if (!m_viz_added)
+    {
+        scene::IMeshSceneNode* viz = irr_driver->addSphere(0.5f, video::SColor(255, m_color[0]*255, m_color[1]*255, m_color[2]*255));
+        viz->setPosition(this->getAbsolutePosition());
+        m_viz_added = true;
+    }
+#endif
 }

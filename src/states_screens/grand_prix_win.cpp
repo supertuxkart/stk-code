@@ -269,7 +269,7 @@ void GrandPrixWin::tearDown()
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
+void GrandPrixWin::onUpdate(float dt)
 {
     m_global_time += dt;
 

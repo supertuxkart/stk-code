@@ -433,7 +433,7 @@ void PlayerKartWidget::add()
     if (m_associatedPlayer) // if player is local
     {
         bool mineInList = false;
-        for (int p=0; p<StateManager::get()->activePlayerCount(); p++)
+        for (unsigned int p=0; p<StateManager::get()->activePlayerCount(); p++)
         {
 #ifdef DEBUG
             assert(StateManager::get()->getActivePlayer(p)->ok());
@@ -1223,7 +1223,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     std::map<PlayerKartWidget*, std::string> selections;
 
     // Find the player ID associated to this player
-    for (int n=0; n<m_kart_widgets.size(); n++)
+    for (unsigned int n=0; n<m_kart_widgets.size(); n++)
     {
         if (m_kart_widgets[n].getAssociatedPlayer() == player)
         {
@@ -1324,7 +1324,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
 
 // ----------------------------------------------------------------------------
 
-void KartSelectionScreen::onUpdate(float delta, irr::video::IVideoDriver*)
+void KartSelectionScreen::onUpdate(float delta)
 {
     // Dispatch the onUpdate event to each kart, so they can perform their
     // animation if any
@@ -1687,7 +1687,7 @@ void KartSelectionScreen::allPlayersDone()
     {
         std::cout << "[KartSelectionScreen] " << players.size()
                   << " players :\n";
-        for (int n=0; n<players.size(); n++)
+        for (unsigned int n=0; n<players.size(); n++)
         {
             std::cout << "     Player " << n << " is "
                       << core::stringc(
@@ -1696,7 +1696,7 @@ void KartSelectionScreen::allPlayersDone()
         }
     }
 
-    for (int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<players.size(); n++)
     {
         StateManager::get()->getActivePlayer(n)->getProfile()
         ->incrementUseFrequency();
@@ -1966,7 +1966,7 @@ void KartSelectionScreen::renumberKarts()
     Widget* fullarea = getWidget("playerskarts");
     const int splitWidth = fullarea->m_w / m_kart_widgets.size();
 
-    for (int n=0; n < m_kart_widgets.size(); n++)
+    for (unsigned int n=0; n < m_kart_widgets.size(); n++)
     {
         m_kart_widgets[n].setPlayerID(n);
         m_kart_widgets[n].move( fullarea->m_x + splitWidth*n, fullarea->m_y,

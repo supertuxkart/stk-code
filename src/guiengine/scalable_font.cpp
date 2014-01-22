@@ -13,6 +13,7 @@
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
 #include "utils/translation.hpp"
+#include "graphics/glwrap.hpp"
 
 namespace irr
 {
@@ -650,7 +651,7 @@ void ScalableFont::draw(const core::stringw& text,
                 for (int y_delta=-2; y_delta<=2; y_delta++)
                 {
                     if (x_delta == 0 || y_delta == 0) continue;
-                    driver->draw2DImage(texture,
+                    draw2DImage(texture,
                                         dest + core::position2d<s32>(x_delta, y_delta),
                                         source,
                                         clip,
@@ -665,7 +666,7 @@ void ScalableFont::draw(const core::stringw& text,
             static video::SColor orange(color.getAlpha(), 255, 100, 0);
             static video::SColor yellow(color.getAlpha(), 255, 220, 15);
             video::SColor title_colors[] = {yellow, orange, orange, yellow};
-            driver->draw2DImage(texture,
+            draw2DImage(texture,
                                 dest,
                                 source,
                                 clip,
@@ -673,7 +674,7 @@ void ScalableFont::draw(const core::stringw& text,
         }
         else
         {
-            driver->draw2DImage(texture,
+            draw2DImage(texture,
                                 dest,
                                 source,
                                 clip,

@@ -17,6 +17,7 @@
 
 #include "profiler.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -231,7 +232,7 @@ void Profiler::draw()
             pos.UpperLeftCorner.Y  += m.layer;
             pos.LowerRightCorner.Y -= m.layer;
 
-            driver->draw2DRectangle(m.color, pos);
+            GL32_draw2DRectangle(m.color, pos);
 
             // If the mouse cursor is over the marker, get its information
             if(pos.isPointInside(mouse_pos))
@@ -314,5 +315,5 @@ void Profiler::drawBackground()
                                    (int)((MARGIN_Y + 3.0f*LINE_HEIGHT) * screen_size.Height));
 
     video::SColor   color(0xFF, 0xFF, 0xFF, 0xFF);
-    driver->draw2DRectangle(color, background_rect);
+    GL32_draw2DRectangle(color, background_rect);
 }

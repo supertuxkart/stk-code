@@ -260,7 +260,7 @@ namespace GUIEngine
         /**
          * \brief optional callback you can override to be notified at every frame.
          */
-        virtual void onUpdate(float dt, irr::video::IVideoDriver*) { };
+        virtual void onUpdate(float dt) { };
 
         /**
          * \return which music to play at this screen

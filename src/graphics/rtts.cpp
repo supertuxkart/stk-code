@@ -62,13 +62,14 @@ RTT::RTT()
             Log::error("rtts", "This requires pixel shaders to be disabled.");
             UserConfigParams::m_pixel_shaders = false;
         }
+        irr_driver->disableGLSL();
     }
     rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
     rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
-    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_A8R8G8B8, stencil);
-    rtts[RTT_DEPTH] = drv->addRenderTargetTexture(res, "rtt.depth", ECF_A8R8G8B8, stencil);
-    rtts[RTT_NORMAL] = drv->addRenderTargetTexture(res, "rtt.normal", ECF_A32B32G32R32F, stencil);
-    rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A8R8G8B8, stencil);
+    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_R8, stencil);
+    rtts[RTT_NORMAL_AND_DEPTH] = drv->addRenderTargetTexture(res, "rtt.normal_and_depth", ECF_A32B32G32R32F, stencil);
+    rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A16B16G16R16F, stencil);
+    rtts[RTT_SPECULARMAP] = drv->addRenderTargetTexture(res, "rtt.specularmap", ECF_R8, stencil);
 
     rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, stencil);
     rtts[RTT_HALF2] = drv->addRenderTargetTexture(half, "rtt.half2", ECF_A8R8G8B8, stencil);
@@ -76,6 +77,7 @@ RTT::RTT()
     rtts[RTT_QUARTER1] = drv->addRenderTargetTexture(quarter, "rtt.q1", ECF_A8R8G8B8, stencil);
     rtts[RTT_QUARTER2] = drv->addRenderTargetTexture(quarter, "rtt.q2", ECF_A8R8G8B8, stencil);
     rtts[RTT_QUARTER3] = drv->addRenderTargetTexture(quarter, "rtt.q3", ECF_A8R8G8B8, stencil);
+    rtts[RTT_QUARTER4] = drv->addRenderTargetTexture(quarter, "rtt.q4", ECF_R8, stencil);
 
     rtts[RTT_EIGHTH1] = drv->addRenderTargetTexture(eighth, "rtt.e1", ECF_A8R8G8B8, stencil);
     rtts[RTT_EIGHTH2] = drv->addRenderTargetTexture(eighth, "rtt.e2", ECF_A8R8G8B8, stencil);
@@ -83,8 +85,7 @@ RTT::RTT()
     rtts[RTT_SIXTEENTH1] = drv->addRenderTargetTexture(sixteenth, "rtt.s1", ECF_A8R8G8B8, stencil);
     rtts[RTT_SIXTEENTH2] = drv->addRenderTargetTexture(sixteenth, "rtt.s2", ECF_A8R8G8B8, stencil);
 
-    rtts[RTT_SSAO1] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SSAO2] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao2", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
 
     rtts[RTT_SHADOW] = drv->addRenderTargetTexture(shadowsize, "rtt.shadow", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
@@ -125,8 +126,7 @@ RTT::RTT()
     // Clear those that should be cleared
     drv->beginScene(false, false);
 
-    drv->setRenderTarget(rtts[RTT_SSAO1], true, false, SColor(255, 255, 255, 255));
-    drv->setRenderTarget(rtts[RTT_SSAO2], true, false, SColor(255, 255, 255, 255));
+    drv->setRenderTarget(rtts[RTT_SSAO], true, false, SColor(255, 255, 255, 255));
 
     drv->setRenderTarget(rtts[RTT_COLLAPSEV], true, false);
     drv->setRenderTarget(rtts[RTT_COLLAPSEH], true, false);

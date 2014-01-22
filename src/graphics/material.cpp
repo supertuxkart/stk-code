@@ -217,6 +217,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     {
         m_graphical_effect = GE_SPHERE_MAP;
     }
+    else if (s == "skybox")
+    {
+        m_graphical_effect = GE_SKYBOX;
+    }
     else if (s == "splatting")
     {
         m_graphical_effect = GE_SPLATTING;
@@ -644,7 +648,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         (m->getTexture(0) != NULL && 
          ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
     {
-        Log::warn("material", "Track uses deprecated texture '%s'\n", 
+        Log::warn("material", "Track uses deprecated texture '%s'", 
                   m_texname.c_str());
     }
 
@@ -758,6 +762,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (irr_driver->isGLSL())
         {
+
+			if (mb->getVertexType() != video::EVT_TANGENTS)
+				Log::error("material", "Requiring normal map without tangent enabled mesh");
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             if (m_is_heightmap)
             {
@@ -800,6 +807,15 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->MaterialTypeParam = m_parallax_height;
         m->SpecularColor.set(0,0,0,0);
         modes++;
+    }
+    
+    if(m_graphical_effect == GE_SKYBOX && irr_driver->isGLSL())
+    {
+        ITexture* tex = irr_driver->getTexture("cloud_mask.png");
+        m->setTexture(1, tex);
+
+        
+        m->MaterialType = irr_driver->getShader(ES_SKYBOX);
     }
     if (m_graphical_effect == GE_SPLATTING)
     {

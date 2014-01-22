@@ -9,6 +9,7 @@
 #include "IVideoDriver.h"
 #include "ITexture.h"
 #include <cassert>
+#include "graphics/glwrap.hpp"
 
 namespace irr
 {
@@ -217,7 +218,7 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
                       const video::SColor  *const colors=0,
                       bool useAlphaChannelOfTexture=false)=0
      */
-    Driver->draw2DImage(tex, dest, r /* source rect */, clip,
+    draw2DImage(tex, dest, r /* source rect */, clip,
                         NULL /* colors */, true);
 
 }   // draw2DSprite

@@ -96,7 +96,7 @@ private:
 #endif
 
 public:
-                      FileManager(char *argv[]);
+                      FileManager();
                      ~FileManager();
     void              reInit();
     void              dropFileSystem();

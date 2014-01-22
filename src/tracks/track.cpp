@@ -617,6 +617,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
                       "This track contains an empty LOD group.");
             return;
         }
+        node->updateAbsolutePosition();
     }
     node->updateAbsolutePosition();
 
@@ -797,7 +798,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_track_mesh      = new TriangleMesh();
     m_gfx_effect_mesh = new TriangleMesh();
 
-    const XMLNode *track_node= root.getNode("track");
+    const XMLNode *track_node = root.getNode("track");
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+model_name;
@@ -825,8 +826,8 @@ bool Track::loadMainTrack(const XMLNode &root)
 
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    //scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
-    scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
+    //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
@@ -862,9 +863,23 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
-    LodNodeLoader lodLoader;
+    LodNodeLoader lodLoader(this);
 
-    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
+    // Load LOD groups
+    const XMLNode *lod_xml_node = root.getNode("lod");
+    if (lod_xml_node != NULL)
+    {
+        for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
+        {
+            const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                lodLoader.addLODModelDefinition(lod_group_xml->getNode(j));
+            }
+        }
+    }
+
+    for (unsigned int i=0; i<track_node->getNumNodes(); i++)
     {
         const XMLNode *n=track_node->getNode(i);
         // Animated textures have already been handled
@@ -1024,7 +1039,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         std::string challenge;
         n->get("challenge", &challenge);
 
-        bool is_lod = lodLoader.check(n);
+        bool lod_instance = false;
+        n->get("lod_instance", &lod_instance);
 
         if (tangent)
         {
@@ -1069,9 +1085,18 @@ bool Track::loadMainTrack(const XMLNode &root)
             handleAnimatedTextures(scene_node, *n);
             m_all_nodes.push_back( scene_node );
         }
-        else if (is_lod)
+        else if (lod_instance)
         {
-            // nothing to do
+            LODNode* node = lodLoader.instanciate(n, NULL);
+            if (node != NULL)
+            {
+                node->setPosition(xyz);
+                node->setRotation(hpr);
+                node->setScale(scale);
+                node->updateAbsolutePosition();
+
+                m_all_nodes.push_back( node );
+            }
         }
         else
         {
@@ -1188,16 +1213,6 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
 
     }   // for i
-
-    // Create LOD nodes
-    std::vector<LODNode*> lod_nodes;
-    lodLoader.done(this, m_root, m_all_cached_meshes, lod_nodes);
-    for (unsigned int n=0; n<lod_nodes.size(); n++)
-    {
-        // FIXME: support for animated textures on LOD objects
-        // handleAnimatedTextures( lod_nodes[n], *node );
-        m_all_nodes.push_back( lod_nodes[n] );
-    }
 
     // This will (at this stage) only convert the main track model.
     for(unsigned int i=0; i<m_all_nodes.size(); i++)
@@ -1433,7 +1448,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // Add the track directory to the texture search path
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
-    // First read the temporary materials.dat file if it exists
+
+    // First read the temporary materials.xml file if it exists
     try
     {
         std::string materials_file = m_root+"materials.xml";
@@ -1448,22 +1464,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     catch (std::exception& e)
     {
-        // no temporary materials.dat file, ignore
+        // no temporary materials.xml file, ignore
         (void)e;
-    }
-
-    // Start building the scene graph
-    std::string path = m_root+m_all_modes[mode_id].m_scene;
-    XMLNode *root    = file_manager->createXMLTree(path);
-
-    // Make sure that we have a track (which is used for raycasts to
-    // place other objects).
-    if(!root || root->getName()!="scene")
-    {
-        std::ostringstream msg;
-        msg<< "No track model defined in '"<<path
-           <<"', aborting.";
-        throw std::runtime_error(msg.str());
     }
 
     // Load the graph only now: this function is called from world, after
@@ -1482,15 +1484,31 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     float upwards_distance   = 0.1f;
     int   karts_per_row      = 2;
 
-    const XMLNode *default_start=root->getNode("default-start");
-    if(default_start)
+
+    // Start building the scene graph
+    std::string path = m_root + m_all_modes[mode_id].m_scene;
+    XMLNode *root    = file_manager->createXMLTree(path);
+
+    // Make sure that we have a track (which is used for raycasts to
+    // place other objects).
+    if (!root || root->getName()!="scene")
+    {
+        std::ostringstream msg;
+        msg<< "No track model defined in '"<<path
+           <<"', aborting.";
+        throw std::runtime_error(msg.str());
+    }
+
+    const XMLNode *default_start = root->getNode("default-start");
+    if (default_start)
     {
         default_start->get("forwards-distance",  &forwards_distance );
         default_start->get("sidewards-distance", &sidewards_distance);
         default_start->get("upwards-distance",   &upwards_distance  );
         default_start->get("karts-per-row",      &karts_per_row     );
     }
-    if(!m_is_arena && !m_is_soccer && !m_is_cutscene)
+
+    if (!m_is_arena && !m_is_soccer && !m_is_cutscene)
     {
         m_start_transforms.resize(race_manager->getNumberOfKarts());
         QuadGraph::get()->setDefaultStartPositions(&m_start_transforms,
@@ -1500,10 +1518,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                                                    upwards_distance);
     }
 
-    unsigned int start_position_counter = 0;
-
     // we need to check for fog before loading the main track model
-    if(const XMLNode *node = root->getNode("sun"))
+    if (const XMLNode *node = root->getNode("sun"))
     {
         node->get("xyz",           &m_sun_position );
         node->get("ambient",       &m_default_ambient_color);
@@ -1521,173 +1537,34 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    LodNodeLoader lod_loader;
+    LodNodeLoader lod_loader(this);
 
-    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    // Load LOD groups
+    const XMLNode *lod_xml_node = root->getNode("lod");
+    if (lod_xml_node != NULL)
     {
-        const XMLNode *node = root->getNode(i);
-        const std::string name = node->getName();
-        // The track object was already converted before the loop, and the
-        // default start was already used, too - so ignore those.
-        if(name=="track" || name=="default-start") continue;
-        if(name=="object")
+        for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
         {
-            lod_loader.check(node);
-            m_track_object_manager->add(*node);
-        }
-        else if(name=="water")
-        {
-            createWater(*node);
-        }
-        else if(name=="banana"      || name=="item" ||
-                name=="small-nitro" || name=="big-nitro" ||
-                name=="easter-egg"                           )
-        {
-            // will be handled later
-        }
-        else if (name=="start")
-        {
-            unsigned int position = start_position_counter;
-            start_position_counter++;
-            node->get("position", &position);
-            Vec3 xyz(0,0,0);
-            node->getXYZ(&xyz);
-            float h=0;
-            node->get("h", &h);
-
-            if (position >= m_start_transforms.size())
+            const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                m_start_transforms.resize(position + 1);
-            }
-
-            m_start_transforms[position].setOrigin(xyz);
-            m_start_transforms[position].setRotation(
-                                           btQuaternion(btVector3(0,1,0),
-                                                        h*DEGREE_TO_RAD ) );
-        }
-        else if(name=="camera")
-        {
-            node->get("far", &m_camera_far);
-        }
-        else if(name=="checks")
-        {
-            CheckManager::get()->load(*node);
-        }
-        else if (name=="particle-emitter")
-        {
-            if (UserConfigParams::m_graphical_effects)
-            {
-                m_track_object_manager->add(*node);
+                lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
             }
         }
-        else if(name=="sky-dome" || name=="sky-box" || name=="sky-color")
-        {
-            handleSky(*node, path);
-        }
-        else if(name=="end-cameras")
-        {
-            Camera::readEndCamera(*node);
-        }
-        else if(name=="light")
-        {
-            core::vector3df pos;
-            node->get("xyz", &pos);
-
-            video::SColor color;
-            node->get("color", &color);
-            const video::SColorf colorf(color);
-
-            float distance = 25.0f;
-            node->get("distance", &distance);
-
-            if (irr_driver->isGLSL())
-            {
-                irr_driver->addLight(pos, distance, colorf.r, colorf.g, colorf.b);
-            } else
-            {
-            scene::ILightSceneNode* node = irr_driver->getSceneManager()->addLightSceneNode(NULL, pos, color, distance);
-            node->setLightType(video::ELT_POINT);
-            node->enableCastShadow(true);
-        }
-        }
-        else if(name=="weather")
-        {
-            std::string weather_particles;
-            std::string weather_type;
-            node->get("particles", &weather_particles);
-            node->get("type", &weather_type);
-
-            if (weather_particles.size() > 0)
-            {
-                m_sky_particles =
-                    ParticleKindManager::get()->getParticles(weather_particles);
-            }
-            else if (weather_type.size() > 0)
-            {
-                if (weather_type == "rain")
-                {
-                    m_weather_type = WEATHER_RAIN;
-                }
-                else
-                {
-                    Log::error("track", "Unknown weather type : '%s'",
-                               weather_type.c_str());
-                }
-            }
-            else
-            {
-                Log::error("track", "Bad weather node found - ignored.\n");
-                continue;
-            }
-        }
-        else if (name == "sun")
-        {
-            // handled above
-        }
-        else if (name == "subtitles")
-        {
-            std::vector<XMLNode*> subtitles;
-            node->getNodes("subtitle", subtitles);
-            for (unsigned int i = 0; i < subtitles.size(); i++)
-            {
-                int from = -1, to = -1;
-                std::string subtitle_text;
-                subtitles[i]->get("from", &from);
-                subtitles[i]->get("to", &to);
-                subtitles[i]->get("text", &subtitle_text);
-                if (from != -1 && to != -1 && subtitle_text.size() > 0)
-                {
-                    m_subtitles.push_back( Subtitle(from, to, _(subtitle_text.c_str())) );
-                }
-            }
-        }
-        else
-        {
-            Log::warn("track", "While loading track '%s', element '%s' was "
-                      "met but is unknown.",
-                      m_ident.c_str(), node->getName().c_str());
-        }
-
-    }   // for i<root->getNumNodes()
-
-    // -------- Create and assign LOD nodes --------
-    // recheck the static area, we will need LOD info
-    const XMLNode* track_node = root->getNode("track");
-    for(unsigned int i=0; i<track_node->getNumNodes(); i++)
-    {
-        const XMLNode* n = track_node->getNode(i);
-        bool is_instance = false;
-        n->get("lod_instance", &is_instance);
-
-        if (!is_instance) lod_loader.check(n);
     }
 
-    std::vector<LODNode*> lod_nodes;
-    std::vector<scene::IMesh*> devnull;
-    lod_loader.done(this, m_root, devnull, lod_nodes);
+    std::map<std::string, XMLNode*> library_nodes;
+    loadObjects(root, path, lod_loader, true, NULL, library_nodes);
 
-    m_track_object_manager->assingLodNodes(lod_nodes);
-    // ---------------------------------------------
+    // Cleanup library nodes
+    for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
+         it != library_nodes.end(); it++)
+    {
+        delete it->second;
+
+        file_manager->popTextureSearchPath();
+        file_manager->popModelSearchPath();
+    }
 
     // Init all track objects
     m_track_object_manager->init();
@@ -1708,14 +1585,11 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     // Enable for for all track nodes if fog is used
-    //if(m_use_fog)
-    //{
-        const unsigned int count = m_all_nodes.size();
-        for(unsigned int i=0; i<count; i++)
-        {
-            adjustForFog(m_all_nodes[i]);
-        }
-    //}
+    const unsigned int count = m_all_nodes.size();
+    for(unsigned int i=0; i<count; i++)
+    {
+        adjustForFog(m_all_nodes[i]);
+    }
     m_track_object_manager->enableFog(m_use_fog);
 
     // Sky dome and boxes support
@@ -1765,21 +1639,22 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     const video::SColorf tmpf(m_sun_diffuse_color);
-    m_sun = irr_driver->addLight(m_sun_position, 10000.0f, tmpf.r, tmpf.g, tmpf.b, true);
+    m_sun = irr_driver->addLight(m_sun_position, 0., tmpf.r, tmpf.g, tmpf.b, true);
 
     if (!irr_driver->isGLSL())
     {
         scene::ILightSceneNode *sun = (scene::ILightSceneNode *) m_sun;
+
         sun->setLightType(video::ELT_DIRECTIONAL);
 
-    // The angle of the light is rather important - let the sun
-    // point towards (0,0,0).
-        if(m_sun_position.getLengthSQ() < 0.03f)
-        // Backward compatibility: if no sun is specified, use the
-        // old hardcoded default angle
-        m_sun->setRotation( core::vector3df(180, 45, 45) );
-    else
-        m_sun->setRotation((-m_sun_position).getHorizontalAngle());
+        // The angle of the light is rather important - let the sun
+        // point towards (0,0,0).
+        if (m_sun_position.getLengthSQ() < 0.03f)
+            // Backward compatibility: if no sun is specified, use the
+            // old hardcoded default angle
+            m_sun->setRotation( core::vector3df(180, 45, 45) );
+        else
+            m_sun->setRotation((-m_sun_position).getHorizontalAngle());
 
         sun->getLightData().SpecularColor = m_sun_specular_color;
     }
@@ -1788,7 +1663,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     createPhysicsModel(main_track_count);
 
 
-    for(unsigned int i=0; i<root->getNumNodes(); i++)
+    for (unsigned int i=0; i<root->getNumNodes(); i++)
     {
         const XMLNode *node = root->getNode(i);
         const std::string &name = node->getName();
@@ -1805,7 +1680,9 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
+    {
         QuadGraph::get()->createDebugMesh();
+    }
 
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
@@ -1815,7 +1692,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Only print warning if not in battle mode, since battle tracks don't have
     // any quads or check lines.
-    if(CheckManager::get()->getCheckStructureCount()==0  &&
+    if (CheckManager::get()->getCheckStructureCount()==0  &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES && !m_is_cutscene)
     {
         Log::warn("track", "No check lines found in track '%s'.",
@@ -1824,11 +1701,13 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
                   "positions might be incorrect.");
     }
 
-    if(UserConfigParams::logMemory())
+    if (UserConfigParams::logMemory())
+    {
         Log::debug("track", "[memory] After loading  '%s': mesh cache %d "
                    "texture cache %d\n", getIdent().c_str(),
                 irr_driver->getSceneManager()->getMeshCache()->getMeshCount(),
                 irr_driver->getVideoDriver()->getTextureCount());
+    }
 
     World *world = World::getWorld();
     if (world->useChecklineRequirements())
@@ -1845,6 +1724,209 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     irr_driver->unsetTextureErrorMessage();
 }   // loadTrackModel
+
+//-----------------------------------------------------------------------------
+
+void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoader& lod_loader,
+                        bool create_lod_definitions, scene::ISceneNode* parent,
+                        std::map<std::string, XMLNode*>& library_nodes)
+{
+    unsigned int start_position_counter = 0;
+
+    unsigned int node_count = root->getNumNodes();
+    for (unsigned int i = 0; i < node_count; i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        const std::string name = node->getName();
+        // The track object was already converted before the loop, and the
+        // default start was already used, too - so ignore those.
+        if (name == "track" || name == "default-start") continue;
+        if (name == "object")
+        {
+            m_track_object_manager->add(*node, parent, lod_loader);
+        }
+        else if (name == "library")
+        {
+            std::string name;
+            node->get("name", &name);
+
+            core::vector3df xyz;
+            node->get("xyz", &xyz);
+
+            core::vector3df hpr;
+            node->get("hpr", &hpr);
+
+            core::vector3df scale;
+            node->get("scale", &scale);
+
+            XMLNode* libroot;
+            std::string lib_path = file_manager->getAsset("library/" + name);
+            bool create_lod_definitions = true;
+
+            if (library_nodes.find(name) == library_nodes.end())
+            {
+                std::string node_path = "library/" + name + "/node.xml";
+                std::string lib_node_path = file_manager->getAsset(node_path);
+                libroot = file_manager->createXMLTree(lib_node_path);
+                if (libroot == NULL)
+                {
+                    Log::error("Track", "Cannot find library '%s'", node_path.c_str());
+                    continue;
+                }
+
+                file_manager->pushTextureSearchPath(lib_path + "/");
+                file_manager->pushModelSearchPath  (lib_path);
+                material_manager->pushTempMaterial(lib_path + "/materials.xml");
+                library_nodes[name] = libroot;
+
+                // Load LOD groups
+                const XMLNode *lod_xml_node = libroot->getNode("lod");
+                if (lod_xml_node != NULL)
+                {
+                    for (unsigned int i = 0; i < lod_xml_node->getNumNodes(); i++)
+                    {
+                        const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
+                        for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+                        {
+                            lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
+                        }
+                    }
+                }
+            }
+            else
+            {
+                libroot = library_nodes[name];
+                create_lod_definitions = false; // LOD definitions are already created, don't create them again
+            }
+    
+            scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
+            parent->setPosition(xyz);
+            parent->setRotation(hpr);
+            parent->setScale(scale);
+            parent->updateAbsolutePosition();
+            loadObjects(libroot, lib_path, lod_loader, create_lod_definitions, parent, library_nodes);
+        }
+        else if (name == "water")
+        {
+            createWater(*node);
+        }
+        else if (name == "banana"      || name == "item" ||
+                 name == "small-nitro" || name == "big-nitro" ||
+                 name == "easter-egg"                           )
+        {
+            // will be handled later
+        }
+        else if (name == "start")
+        {
+            unsigned int position = start_position_counter;
+            start_position_counter++;
+            node->get("position", &position);
+            Vec3 xyz(0,0,0);
+            node->getXYZ(&xyz);
+            float h=0;
+            node->get("h", &h);
+
+            if (position >= m_start_transforms.size())
+            {
+                m_start_transforms.resize(position + 1);
+            }
+
+            m_start_transforms[position].setOrigin(xyz);
+            m_start_transforms[position].setRotation(
+                                           btQuaternion(btVector3(0,1,0),
+                                                        h*DEGREE_TO_RAD ) );
+        }
+        else if (name == "camera")
+        {
+            node->get("far", &m_camera_far);
+        }
+        else if (name == "checks")
+        {
+            CheckManager::get()->load(*node);
+        }
+        else if (name == "particle-emitter")
+        {
+            if (UserConfigParams::m_graphical_effects)
+            {
+                m_track_object_manager->add(*node, parent, lod_loader);
+            }
+        }
+        else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
+        {
+            handleSky(*node, path);
+        }
+        else if (name == "end-cameras")
+        {
+            Camera::readEndCamera(*node);
+        }
+        else if (name == "light")
+        {
+            m_track_object_manager->add(*node, parent, lod_loader);
+        }
+        else if (name == "weather")
+        {
+            std::string weather_particles;
+            std::string weather_type;
+            node->get("particles", &weather_particles);
+            node->get("type", &weather_type);
+
+            if (weather_particles.size() > 0)
+            {
+                m_sky_particles =
+                    ParticleKindManager::get()->getParticles(weather_particles);
+            }
+            else if (weather_type.size() > 0)
+            {
+                if (weather_type == "rain")
+                {
+                    m_weather_type = WEATHER_RAIN;
+                }
+                else
+                {
+                    Log::error("track", "Unknown weather type : '%s'",
+                               weather_type.c_str());
+                }
+            }
+            else
+            {
+                Log::error("track", "Bad weather node found - ignored.\n");
+                continue;
+            }
+        }
+        else if (name == "sun")
+        {
+            // handled above
+        }
+        else if (name == "lod")
+        {
+            // handled above
+        }
+        else if (name == "subtitles")
+        {
+            std::vector<XMLNode*> subtitles;
+            node->getNodes("subtitle", subtitles);
+            for (unsigned int i = 0; i < subtitles.size(); i++)
+            {
+                int from = -1, to = -1;
+                std::string subtitle_text;
+                subtitles[i]->get("from", &from);
+                subtitles[i]->get("to", &to);
+                subtitles[i]->get("text", &subtitle_text);
+                if (from != -1 && to != -1 && subtitle_text.size() > 0)
+                {
+                    m_subtitles.push_back( Subtitle(from, to, _(subtitle_text.c_str())) );
+                }
+            }
+        }
+        else
+        {
+            Log::warn("track", "While loading track '%s', element '%s' was "
+                      "met but is unknown.",
+                      m_ident.c_str(), node->getName().c_str());
+        }
+
+    }   // for i<root->getNumNodes()
+}
 
 //-----------------------------------------------------------------------------
 /** Changes all materials of the given mesh to use the current fog
@@ -2143,7 +2225,7 @@ bool Track::findGround(AbstractKart *kart)
     bool over_ground = m_track_mesh->castRay(kart->getXYZ(), to, &hit_point,
                                              &m, &normal);
     const Vec3 &xyz = kart->getXYZ();
-    if(!over_ground || !m)
+    if(!over_ground)
     {
         Log::warn("physics", "Kart at (%f %f %f) can not be dropped.",
                   xyz.getX(),xyz.getY(),xyz.getZ());
@@ -2152,11 +2234,11 @@ bool Track::findGround(AbstractKart *kart)
 
     // Check if the material the kart is about to be placed on would trigger
     // a reset. If so, this is not a valid position.
-    if(m->isDriveReset())
+    if(m && m->isDriveReset())
     {
         Log::warn("physics","Kart at (%f %f %f) over reset terrain '%s'",
                    xyz.getX(),xyz.getY(),xyz.getZ(),
-            m->getTexFname().c_str());
+                   m->getTexFname().c_str());
         return false;
     }
 

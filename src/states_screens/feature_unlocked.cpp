@@ -171,16 +171,16 @@ void FeatureUnlockedCutScene::addTrophy(RaceManager::Difficulty difficulty)
     switch (difficulty)
     {
         case RaceManager::DIFFICULTY_EASY:
-            msg = _("You completed the easy challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY]);
+            msg = _("You completed the easy challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_EASY], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         case RaceManager::DIFFICULTY_MEDIUM:
-            msg = _("You completed the intermediate challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM]);
+            msg = _("You completed the intermediate challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_MEDIUM], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         case RaceManager::DIFFICULTY_HARD:
-            msg = _("You completed the difficult challenge! This trophy is worth %i points",
-                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
+            msg = _("You completed the difficult challenge! Points earned on this level: %i/%i",
+                    CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD], CHALLENGE_POINTS[RaceManager::DIFFICULTY_HARD]);
             break;
         default:
             assert(false);
@@ -430,8 +430,7 @@ const float ANIM_TO = 3.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
-void FeatureUnlockedCutScene::onUpdate(float dt,
-                                       irr::video::IVideoDriver* driver)
+void FeatureUnlockedCutScene::onUpdate(float dt)
 {
     m_global_time += dt;
 
@@ -667,7 +666,7 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         while (m_global_time < GIFT_EXIT_TO)
         {
             // simulate all the steps of the animation until we reach the end
-            onUpdate(0.4f, irr_driver->getVideoDriver());
+            onUpdate(0.4f);
         }
     }
     else

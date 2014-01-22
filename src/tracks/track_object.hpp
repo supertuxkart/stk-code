@@ -31,7 +31,7 @@
 
 class XMLNode;
 class ThreeDAnimation;
-
+class LodNodeLoader;
 
 /**
  * \ingroup tracks
@@ -73,15 +73,19 @@ protected:
     std::string                    m_type;
 
     bool                           m_soccer_ball;
+    
+    bool                           m_garage;
+    
+    float                          m_distance;
 
     PhysicalObject*                m_rigid_body;
 
     ThreeDAnimation*               m_animator;
-
-    void init(const XMLNode &xml_node, LODNode* lodNode);
+    
+    void init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 
 public:
-                 TrackObject(const XMLNode &xml_node, LODNode* lodNode=NULL);
+                 TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 
                  TrackObject(const core::vector3df& xyz,
                              const core::vector3df& hpr,
@@ -106,7 +110,9 @@ public:
     const std::string& getType() const { return m_type; }
 
     bool isSoccerBall() const { return m_soccer_ball; }
-
+    bool isGarage() const { return m_garage; }
+    float getDistance() const { return m_distance; }
+    
     const PhysicalObject* getPhysics() const { return m_rigid_body; }
     PhysicalObject* getPhysics() { return m_rigid_body; }
 
@@ -127,6 +133,7 @@ public:
     const ThreeDAnimation* getAnimator() const { return m_animator; }
 
     const core::vector3df& getPosition() const;
+    const core::vector3df& getAbsolutePosition() const;
     const core::vector3df& getRotation() const;
     const core::vector3df& getScale() const;
 

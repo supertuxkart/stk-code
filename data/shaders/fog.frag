@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D tex;
 
 uniform float fogmax;
@@ -9,13 +10,12 @@ uniform vec3 col;
 uniform vec3 campos;
 uniform mat4 ipvmat;
 
-float decdepth(vec4 rgba) {
-	return dot(rgba, vec4(1.0, 1.0/255.0, 1.0/65025.0, 1.0/16581375.0));
-}
+in vec2 uv;
+out vec4 FragColor;
 
 void main()
 {
-	float z = decdepth(vec4(texture2D(tex, gl_TexCoord[0].xy).xyz, 0.0));
+	float z = texture(tex, uv).a;
 
 	vec3 tmp = vec3(gl_TexCoord[0].xy, z);
 	tmp = tmp * 2.0 - 1.0;
@@ -30,5 +30,5 @@ void main()
 
 	fog = min(fog, fogmax);
 
-	gl_FragColor = vec4(col, fog);
+	FragColor = vec4(col, fog);
 }

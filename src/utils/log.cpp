@@ -163,6 +163,10 @@ void Log::printMessage(int level, const char *component, const char *format,
     {
         va_copy(copy, args);
     }
+#if defined(_MSC_FULL_VER) && defined(_DEBUG)
+    VALIST copy2;
+    va_copy(copy2, args);
+#endif
 
     // If we don't have a console file, write to stdout and hope for the best
     if(!m_file_stdout || level >= LL_WARN ||
@@ -178,6 +182,21 @@ void Log::printMessage(int level, const char *component, const char *format,
 
         va_end(out);
     }
+
+#if defined(_MSC_FULL_VER) && defined(_DEBUG)
+    static char szBuff[2048];
+    vsnprintf(szBuff, sizeof(szBuff), format, copy2);
+
+    OutputDebugString("[");
+    OutputDebugString(names[level]);
+    OutputDebugString("] ");
+    OutputDebugString(component);
+    OutputDebugString(": ");
+    OutputDebugString(szBuff);
+    OutputDebugString("\r\n");
+#endif
+    
+
     if(m_file_stdout)
     {
         fprintf (m_file_stdout, "[%s] %s: ", names[level], component);
