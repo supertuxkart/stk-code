@@ -747,9 +747,7 @@ bool CIrrDeviceLinux::createWindow()
 					GLX_CONTEXT_MINOR_VERSION_ARB, 0,
 					// Uncomment to discard deprecated features
 					//GLX_CONTEXT_FLAGS_ARB        , GLX_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB,
-#if DEBUG
 					GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-#endif
 					None
 				};
 			
