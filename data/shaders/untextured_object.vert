@@ -7,6 +7,6 @@ out vec4 color;
 
 void main(void)
 {
-    color = Color;
+    color = Color.zyxw;
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
 }
