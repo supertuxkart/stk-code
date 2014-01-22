@@ -70,6 +70,10 @@ public:
 
         m_water_shader_speed_1 =
         m_water_shader_speed_2 = 0.0f;
+        m_sunpos = core::vector3df(0., 0., 0.);
+        m_speed = 0.;
+        m_height = 0.;
+        m_length = 0.;
     }
 
     void setSunPosition(const core::vector3df &in)
