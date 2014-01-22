@@ -37,6 +37,7 @@ GuestLoginScreen::GuestLoginScreen() : Screen("online/guest_login.stkgui")
  */
 void GuestLoginScreen::init()
 {
+    Screen::init();
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("login_tabs");
     if (tabs) tabs->select( "tab_guest_login", PLAYER_ID_GAME_MASTER );
 }   // init
