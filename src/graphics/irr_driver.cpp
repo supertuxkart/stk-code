@@ -2004,7 +2004,10 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
 
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
-    m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
+    if (irr_driver->isGLSL())
+        m_camera->setUpVector( core::vector3df(0.0, -1.0, 0.0) );
+    else
+        m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();
