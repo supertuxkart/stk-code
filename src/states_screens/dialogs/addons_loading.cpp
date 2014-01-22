@@ -243,6 +243,11 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
             return GUIEngine::EVENT_BLOCK;
         }
     }
+    else if (event_source == "rating")
+    {
+        voteClicked();
+        return GUIEngine::EVENT_BLOCK;
+    }
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
