@@ -366,6 +366,24 @@ void STKMesh::drawGrassPass2(const GLMesh &mesh)
 	glDrawElements(ptype, count, itype, 0);
 }
 
+void STKMesh::drawUntexturedObject(const GLMesh &mesh)
+{
+  GLenum ptype = mesh.PrimitiveType;
+  GLenum itype = mesh.IndexType;
+  size_t count = mesh.IndexCount;
+
+  setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+
+  glUseProgram(MeshShader::UntexturedObjectShader::Program);
+  MeshShader::UntexturedObjectShader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2);
+
+  glBindVertexArray(mesh.vao_second_pass);
+  glDrawElements(ptype, count, itype, 0);
+
+}
+
 void STKMesh::drawObjectPass2(const GLMesh &mesh)
 {
   GLenum ptype = mesh.PrimitiveType;
@@ -484,9 +502,6 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 
 void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
-	
-	if (!mesh.textures[0])
-		return;
 	switch (irr_driver->getPhase())
 	{
 	case 0:
@@ -528,6 +543,8 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawObjectRefPass2(mesh);
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
 			drawGrassPass2(mesh);
+		else if (!mesh.textures[0])
+			drawUntexturedObject(mesh);
 		else
 			drawObjectPass2(mesh);
 		break;
@@ -612,6 +629,11 @@ static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::GrassPass2Shader::attrib_position, MeshShader::GrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassPass2Shader::attrib_color, mesh.Stride);
+		}
+		else if (!mesh.textures[0])
+		{
+		  mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+			  MeshShader::UntexturedObjectShader::attrib_position, -1, -1, -1, -1, -1, MeshShader::UntexturedObjectShader::attrib_color, mesh.Stride);
 		}
 		else
 		{

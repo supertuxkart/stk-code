@@ -242,6 +242,7 @@ void Shaders::loadShaders()
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+	MeshShader::UntexturedObjectShader::init();
 	MeshShader::ObjectRefPass2Shader::init();
 	MeshShader::SphereMapShader::init();
 	MeshShader::SplattingShader::init();
@@ -367,6 +368,41 @@ namespace MeshShader
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
+
+	GLuint UntexturedObjectShader::Program;
+	GLuint UntexturedObjectShader::attrib_position;
+	GLuint UntexturedObjectShader::attrib_color;
+	GLuint UntexturedObjectShader::uniform_MVP;
+	GLuint UntexturedObjectShader::uniform_DiffuseMap;
+	GLuint UntexturedObjectShader::uniform_SpecularMap;
+	GLuint UntexturedObjectShader::uniform_SSAO;
+	GLuint UntexturedObjectShader::uniform_screen;
+	GLuint UntexturedObjectShader::uniform_ambient;
+
+	void UntexturedObjectShader::init()
+	{
+	  Program = LoadProgram(file_manager->getAsset("shaders/untextured_object.vert").c_str(), file_manager->getAsset("shaders/untextured_object.frag").c_str());
+	  attrib_position = glGetAttribLocation(Program, "Position");
+	  attrib_color = glGetAttribLocation(Program, "Color");
+	  uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+	  uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+	  uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+	  uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+	  uniform_screen = glGetUniformLocation(Program, "screen");
+	  uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void UntexturedObjectShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+	  glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+	  glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+	  glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+	  glUniform1i(uniform_SSAO, TU_SSAO);
+	  glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+	  const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+	  glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
 
 	GLuint ObjectRefPass2Shader::Program;
 	GLuint ObjectRefPass2Shader::attrib_position;
