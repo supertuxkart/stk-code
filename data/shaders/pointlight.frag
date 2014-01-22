@@ -15,10 +15,13 @@ out vec4 Specular;
 void main() {
 	vec2 texc = uv;
 	float z = texture(ntex, texc).a;
+	vec3 norm = texture(ntex, texc).xyz;
+	norm = (norm - 0.5) * 2.0;
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;
 	xpos /= xpos.w;
+	vec3 eyedir = normalize(xpos.xyz);
 
 	vec3 diffuse = vec3(0.), specular = vec3(0.);
 
@@ -31,9 +34,6 @@ void main() {
 		float att = energy[i] * 200. / (4. * 3.14 * d * d);
 		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
 
-		vec3 norm = texture(ntex, texc).xyz;
-		norm = (norm - 0.5) * 2.0;
-
 		// Light Direction
 		vec3 L = normalize(xpos.xyz - light_pos);
 
@@ -41,7 +41,7 @@ void main() {
 		diffuse += NdotL * light_col * att;
 		// Reflected light dir
 		vec3 R = reflect(-L, norm);
-		float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
+		float RdotE = max(0.0, dot(R, eyedir));
 		float Specular = pow(RdotE, spec);
 		specular += Specular * light_col * spec_att;
 	}

@@ -383,6 +383,11 @@ void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, IT
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(ao)->getOpenGLTextureName());
 	glUniform1i(FullScreenShader::LightBlendShader::uniform_ambient_occlusion, 2);
 	glActiveTexture(GL_TEXTURE3);
+	if (!UserConfigParams::m_ssao)
+	{
+	  GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
+	  glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specmap)->getOpenGLTextureName());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

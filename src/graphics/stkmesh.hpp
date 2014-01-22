@@ -43,6 +43,7 @@ protected:
 	void drawObjectPass2(const GLMesh &mesh);
 	void drawObjectRefPass2(const GLMesh &mesh);
 	void drawGrassPass2(const GLMesh &mesh);
+	void drawUntexturedObject(const GLMesh &mesh);
 
 	// Forward pass (for transparents meshes)
 	void drawTransparentObject(const GLMesh &mesh);
