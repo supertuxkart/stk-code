@@ -458,6 +458,10 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	float tex_height = sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y;
 	tex_height /= ss.Height * 2.;
 
+	if (texture->isRenderTarget()) {
+		tex_height = - tex_height;
+	}
+
 	const f32 invW = 1.f / static_cast<f32>(ss.Width);
 	const f32 invH = 1.f / static_cast<f32>(ss.Height);
 	const core::rect<f32> tcoords(
