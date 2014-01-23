@@ -22,6 +22,20 @@ struct GLMesh {
 	size_t Stride;
 };
 
+// Pass 1 shader (ie shaders that outputs normals and depth)
+void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
+
+// Pass 2 shader (ie shaders that outputs final color)
+void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
+
 class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
@@ -30,21 +44,7 @@ protected:
 	core::vector3df windDir;
 	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-
-	// Pass 1 shader (ie shaders that outputs normals and depth)
-	void drawObjectPass1(const GLMesh &mesh);
-	void drawNormalPass(const GLMesh &mesh);
-	void drawObjectRefPass1(const GLMesh &mesh);
-	void drawGrassPass1(const GLMesh &mesh);
-
-	// Pass 2 shader (ie shaders that outputs final color)
-	void drawSphereMap(const GLMesh &mesh);
-	void drawSplatting(const GLMesh &mesh);
-	void drawObjectPass2(const GLMesh &mesh);
-	void drawObjectRefPass2(const GLMesh &mesh);
-	void drawGrassPass2(const GLMesh &mesh);
-	void drawUntexturedObject(const GLMesh &mesh);
-
+	
 	// Forward pass (for transparents meshes)
 	void drawTransparentObject(const GLMesh &mesh);
 	void drawBubble(const GLMesh &mesh);

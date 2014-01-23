@@ -188,14 +188,11 @@ void computeTIMV(core::matrix4 &TransposeInverseModelView)
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 }
 
-void STKMesh::drawObjectPass1(const GLMesh &mesh)
+void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
-
-  computeMVP(ModelViewProjectionMatrix);
-  computeTIMV(TransposeInverseModelView);
 
   glUseProgram(MeshShader::ObjectPass1Shader::Program);
   MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView);
@@ -204,14 +201,12 @@ void STKMesh::drawObjectPass1(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawObjectRefPass1(const GLMesh &mesh)
+void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  computeMVP(ModelViewProjectionMatrix);
-  computeTIMV(TransposeInverseModelView);
 
   setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 
@@ -238,15 +233,11 @@ core::vector3df getWind()
 	return irr_driver->getWind() * strength;
 }
 
-void STKMesh::drawGrassPass1(const GLMesh &mesh)
+void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
-	windDir = getWind();
-
-	computeMVP(ModelViewProjectionMatrix);
-	computeTIMV(TransposeInverseModelView);
 
 	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 
@@ -257,14 +248,11 @@ void STKMesh::drawGrassPass1(const GLMesh &mesh)
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawNormalPass(const GLMesh &mesh)
+void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
-
-	computeMVP(ModelViewProjectionMatrix);
-	computeTIMV(TransposeInverseModelView);
 
 	assert(mesh.textures[1]);
 	setTexture(0, mesh.textures[1], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
@@ -276,7 +264,7 @@ void STKMesh::drawNormalPass(const GLMesh &mesh)
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawSphereMap(const GLMesh &mesh)
+void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -291,7 +279,7 @@ void STKMesh::drawSphereMap(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawSplatting(const GLMesh &mesh)
+void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -378,7 +366,7 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
+void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -411,7 +399,7 @@ void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawGrassPass2(const GLMesh &mesh)
+void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -436,7 +424,6 @@ void STKMesh::drawGrassPass2(const GLMesh &mesh)
 	  GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ONE};
 	  glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
 	}
-	
 
 	glUseProgram(MeshShader::GrassPass2Shader::Program);
 	MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir, 0, 1, 2, 3);
@@ -445,7 +432,7 @@ void STKMesh::drawGrassPass2(const GLMesh &mesh)
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawUntexturedObject(const GLMesh &mesh)
+void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -469,7 +456,7 @@ void STKMesh::drawUntexturedObject(const GLMesh &mesh)
 
 }
 
-void STKMesh::drawObjectPass2(const GLMesh &mesh)
+void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -606,6 +593,7 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	{
 	case 0:
 	{
+        windDir = getWind();
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 
 		glEnable(GL_DEPTH_TEST);
@@ -613,14 +601,17 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
 
+		computeMVP(ModelViewProjectionMatrix);
+		computeTIMV(TransposeInverseModelView);
+
 		if (type == irr_driver->getShader(ES_NORMAL_MAP))
-			drawNormalPass(mesh);
+			drawNormalPass(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-			drawObjectRefPass1(mesh);
+			drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-			drawGrassPass1(mesh);
+			drawGrassPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
 		else
-			drawObjectPass1(mesh);
+			drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 		break;
 	}
@@ -634,17 +625,17 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		glDisable(GL_BLEND);
 		
 		if (type == irr_driver->getShader(ES_SPHERE_MAP))
-			drawSphereMap(mesh);
+			drawSphereMap(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		else if (type == irr_driver->getShader(ES_SPLATTING))
-			drawSplatting(mesh);
+			drawSplatting(mesh, ModelViewProjectionMatrix);
 		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-			drawObjectRefPass2(mesh);
+			drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-			drawGrassPass2(mesh);
+			drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
 		else if (!mesh.textures[0])
-			drawUntexturedObject(mesh);
+			drawUntexturedObject(mesh, ModelViewProjectionMatrix);
 		else
-			drawObjectPass2(mesh);
+			drawObjectPass2(mesh, ModelViewProjectionMatrix);
 		break;
 	}
 	default:
