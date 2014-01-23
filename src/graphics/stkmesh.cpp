@@ -6,7 +6,7 @@
 #include "graphics/callbacks.hpp"
 #include "utils/helpers.hpp"
 
-static
+
 GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
 {
 	GLuint vao;
@@ -58,7 +58,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 	return vao;
 }
 
-static
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 {
 	initGL();
@@ -171,7 +170,6 @@ STKMesh::~STKMesh()
 	}
 }
 
-static
 void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
 {
 	ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
@@ -179,7 +177,6 @@ void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 }
 
-static
 void computeTIMV(core::matrix4 &TransposeInverseModelView)
 {
 	TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
@@ -668,7 +665,7 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 	return false;
 }
 
-static void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
+void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
 	{

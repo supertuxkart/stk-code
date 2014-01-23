@@ -22,6 +22,12 @@ struct GLMesh {
 	size_t Stride;
 };
 
+GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride);
+GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
+void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type);
+void computeMVP(core::matrix4 &ModelViewProjectionMatrix);
+void computeTIMV(core::matrix4 &TransposeInverseModelView);
+
 // Pass 1 shader (ie shaders that outputs normals and depth)
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);

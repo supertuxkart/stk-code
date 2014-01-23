@@ -4,9 +4,16 @@
 #include "../lib/irrlicht/source/Irrlicht/CAnimatedMeshSceneNode.h"
 #include <IAnimatedMesh.h>
 #include <irrTypes.h>
+#include "graphics/stkmesh.hpp"
+
 
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode
 {
+protected:
+	bool firstTime;
+	std::vector<GLMesh> GLmeshes;
+	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 public:
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
      irr::scene::ISceneManager* mgr, irr::s32 id,
