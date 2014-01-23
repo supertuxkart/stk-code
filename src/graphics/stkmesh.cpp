@@ -568,7 +568,6 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	{
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 
-		glStencilFunc(GL_ALWAYS, 0, ~0);
 		glEnable(GL_DEPTH_TEST);
 		glDisable(GL_ALPHA_TEST);
 		glDepthMask(GL_TRUE);
@@ -582,7 +581,6 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawGrassPass1(mesh);
 		else
 			drawObjectPass1(mesh);
-		glStencilFunc(GL_ALWAYS, 1, ~0);
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 		break;
 	}

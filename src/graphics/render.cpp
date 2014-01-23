@@ -195,13 +195,7 @@ void IrrDriver::renderGLSL(float dt)
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         irr_driver->setPhase(0);
-        glClear(GL_STENCIL_BUFFER_BIT);
-        glStencilFunc(GL_ALWAYS, 1, ~0);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-        glEnable(GL_STENCIL_TEST);
         m_scene_manager->drawAll(m_renderpass);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        glDisable(GL_STENCIL_TEST);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
@@ -233,11 +227,7 @@ void IrrDriver::renderGLSL(float dt)
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
         irr_driver->setPhase(1);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
-        glStencilFunc(GL_EQUAL, 0, ~0);
-        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-        glEnable(GL_STENCIL_TEST);
         m_scene_manager->drawAll(m_renderpass);
-        glDisable(GL_STENCIL_TEST);
 
         PROFILER_POP_CPU_MARKER();
 
@@ -818,8 +808,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-    if (!m_mipviz)
-		m_post_processing->renderLightbBlend(m_rtts->getRTT(RTT_TMP1), m_rtts->getRTT(RTT_TMP2), m_rtts->getRTT(RTT_SSAO), m_rtts->getRTT(RTT_SPECULARMAP), m_lightviz);
 }
 
 // ----------------------------------------------------------------------------
