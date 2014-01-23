@@ -304,11 +304,21 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
   //Tex detail0
   setTexture(1, mesh.textures[2], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
   if (irr_driver->getLightViz())
   {
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
   //Tex detail1
@@ -318,6 +328,11 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
   //Tex detail2
   setTexture(3, mesh.textures[4], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
   if (irr_driver->getLightViz())
@@ -325,11 +340,21 @@ void STKMesh::drawSplatting(const GLMesh &mesh)
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
   //Tex detail3
   setTexture(4, mesh.textures[5], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
   if (irr_driver->getLightViz())
   {
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
   // Diffuse
@@ -365,6 +390,11 @@ void STKMesh::drawObjectRefPass2(const GLMesh &mesh)
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
   setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
   setTexture(3, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
@@ -391,6 +421,11 @@ void STKMesh::drawGrassPass2(const GLMesh &mesh)
 	if (irr_driver->getLightViz())
 	{
 	  GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
+	  glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+	else
+	{
+	  GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
 	  glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
 	}
 	setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
@@ -444,6 +479,11 @@ void STKMesh::drawObjectPass2(const GLMesh &mesh)
   if (irr_driver->getLightViz())
   {
     GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
+    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
+  else
+  {
+    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
 
