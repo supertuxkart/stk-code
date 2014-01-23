@@ -32,6 +32,7 @@
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
+#include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkmesh.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
@@ -1111,11 +1112,19 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh, scene::ISceneNode* parent)
 {
-    return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
+    if (!isGLSL())
+        return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
                                                      core::vector3df(0,0,0),
                                                      core::vector3df(0,0,0),
                                                      core::vector3df(1,1,1),
                                                      /*addIfMeshIsZero*/true);
+
+      if (!parent)
+         parent = m_scene_manager->getRootSceneNode();
+      scene::IAnimatedMeshSceneNode* node =
+         new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, core::vector3df(0,0,0), core::vector3df(0,0,0), core::vector3df(1,1,1));
+      node->drop();
+      return node;
 }   // addAnimatedMesh
 
 // ----------------------------------------------------------------------------
