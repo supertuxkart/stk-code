@@ -224,13 +224,13 @@ void IrrDriver::renderGLSL(float dt)
         }
 
 
-        PROFILER_PUSH_CPU_MARKER("- Light", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
 
         // Lights
         renderLights(cambox, camnode, overridemat, cam, dt);
 		PROFILER_POP_CPU_MARKER();
 
-		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0xFF, 0x00, 0x00);
+		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
         irr_driver->setPhase(1);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         glStencilFunc(GL_EQUAL, 0, ~0);
@@ -241,7 +241,7 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_POP_CPU_MARKER();
 
-        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
 
 		// Render anything glowing.
 		if (!m_mipviz && !m_wireframe)
@@ -254,7 +254,7 @@ void IrrDriver::renderGLSL(float dt)
 
         if (!bgnodes)
         {
-            PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0x00);
+            PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
 
             // If there are no BG nodes, it's more efficient to do the skybox here.
             m_renderpass = scene::ESNRP_SKY_BOX;
@@ -263,7 +263,7 @@ void IrrDriver::renderGLSL(float dt)
             PROFILER_POP_CPU_MARKER();
         }
 
-        PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
@@ -300,7 +300,7 @@ void IrrDriver::renderGLSL(float dt)
         m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 
-		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0x00, 0x00);
+		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
 		m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
@@ -312,7 +312,7 @@ void IrrDriver::renderGLSL(float dt)
 			PROFILER_POP_CPU_MARKER();
 		}
 
-        PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
+        PROFILER_PUSH_CPU_MARKER("- Displacement", 0x00, 0x00, 0xFF);
         // Handle displacing nodes, if any
         const u32 displacingcount = m_displacing.size();
         if (displacingcount)
@@ -339,7 +339,7 @@ void IrrDriver::renderGLSL(float dt)
             World::getWorld()->getPhysics()->draw();
     }   // for i<world->getNumKarts()
 
-    PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0x00, 0x00);
+    PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0xFF, 0x00);
     // Render the post-processed scene
     m_post_processing->render();
     PROFILER_POP_CPU_MARKER();
