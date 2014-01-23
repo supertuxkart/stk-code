@@ -173,7 +173,7 @@ namespace scene
 		\return The newly created clone of this node. */
 		virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0);
 
-	private:
+	protected:
 
 		//! Get a static mesh for the current frame of this animated mesh
 		IMesh* getMeshForCurrentFrame();
