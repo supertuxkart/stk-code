@@ -2144,7 +2144,7 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
                                          const core::recti *clip,
                                          core::recti* checkClientArea)
 {
-    if (ModalDialog::getCurrent() == NULL) return;
+    if (ModalDialog::getCurrent() == NULL) return rect;
 
     drawBGFadeColor();
 
