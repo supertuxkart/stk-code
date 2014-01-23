@@ -254,7 +254,6 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 // ----------------------------------------------------------------------------
 void AddonsLoading::voteClicked()
 {
-    ModalDialog::dismiss();
     if (Online::CurrentUser::get()->isRegisteredUser())
         new VoteDialog(m_addon.getId());
 }   // voteClicked
