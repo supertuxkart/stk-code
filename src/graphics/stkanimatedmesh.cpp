@@ -123,8 +123,11 @@ void STKAnimatedMesh::render()
 		if (isObjectPass(material.MaterialType))
 		{
 			initvaostate(GLmeshes[i], material.MaterialType);
-			glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
-			glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+			if (irr_driver->getPhase() == 1)
+			{
+				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
+				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+			}
 			drawSolid(GLmeshes[i], material.MaterialType);
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
