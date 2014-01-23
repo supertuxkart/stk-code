@@ -24,15 +24,16 @@
 #include <assert.h>
 #include <stack>
 #include <sstream>
+#include <algorithm>
 
 Profiler profiler;
 
 // Unit is in pencentage of the screen dimensions
 #define MARGIN_X    0.02f    // left and right margin
 #define MARGIN_Y    0.02f    // top margin
-#define LINE_HEIGHT 0.015f   // height of a line representing a thread
+#define LINE_HEIGHT 0.030f   // height of a line representing a thread
 
-#define MARKERS_NAMES_POS      core::rect<s32>(50,50,150,150)
+#define MARKERS_NAMES_POS      core::rect<s32>(50,100,150,200)
 
 #define TIME_DRAWN_MS 30.0f // the width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 
@@ -204,7 +205,27 @@ void Profiler::draw()
 
     size_t nb_thread_infos = m_thread_infos.size();
 
-    const double factor = profiler_width / TIME_DRAWN_MS;
+
+    double start = -1.0f;
+    double end = -1.0f;
+    for (size_t i = 0; i < nb_thread_infos; i++)
+    {
+        MarkerList& markers = m_thread_infos[i].markers_done[read_id];
+
+        MarkerList::const_iterator it_end = markers.end();
+        for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
+        {
+            const Marker& m = *it;
+
+            if (start < 0.0) start = m.start;
+            else start = std::min(start, m.start);
+
+            if (end < 0.0) end = m.end;
+            else end = std::max(end, m.end);
+        }
+    }
+
+    const double factor = profiler_width / (end - start);
 
     // Get the mouse pos
     core::vector2di mouse_pos = GUIEngine::EventHandler::get()->getMousePos();
@@ -229,8 +250,8 @@ void Profiler::draw()
                                    (s32)( y_offset + (i+1)*line_height ));
 
             // Reduce vertically the size of the markers according to their layer
-            pos.UpperLeftCorner.Y  += m.layer;
-            pos.LowerRightCorner.Y -= m.layer;
+            pos.UpperLeftCorner.Y  += m.layer*2;
+            pos.LowerRightCorner.Y -= m.layer*2;
 
             GL32_draw2DRectangle(m.color, pos);
 
@@ -310,9 +331,9 @@ void Profiler::drawBackground()
     const core::dimension2d<u32>&   screen_size = driver->getScreenSize();
 
     core::rect<s32>background_rect((int)(MARGIN_X                      * screen_size.Width),
-                                   (int)(MARGIN_Y                      * screen_size.Height),
+                                   (int)((MARGIN_Y + 0.25f)             * screen_size.Height),
                                    (int)((1.0-MARGIN_X)                * screen_size.Width),
-                                   (int)((MARGIN_Y + 3.0f*LINE_HEIGHT) * screen_size.Height));
+                                   (int)((MARGIN_Y + 1.75f*LINE_HEIGHT) * screen_size.Height));
 
     video::SColor   color(0xFF, 0xFF, 0xFF, 0xFF);
     GL32_draw2DRectangle(color, background_rect);
