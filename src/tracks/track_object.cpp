@@ -273,7 +273,27 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
 {
     if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
     if (update_rigid_body && m_physical_object != NULL) 
-        m_physical_object->move(xyz, hpr);
+    {
+        TrackObjectPresentationSceneNode *tops =
+            dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
+        if(tops)
+        {
+            core::matrix4 m = tops->getNode()->getAbsoluteTransformation();
+            core::vector3df xyz_abs;
+            m.transformVect(xyz_abs, xyz);
+            core::vector3df hpr_abs;
+            // FIXME - adding the rotations appears odd
+            // perhaps we should create the matrix and multiply
+            // with the absolute transform?
+            hpr_abs = hpr + tops->getNode()->getAbsoluteTransformation()
+                                        .getRotationDegrees();
+            m_physical_object->move(xyz_abs, hpr_abs);
+        }
+        else
+        {
+            m_physical_object->move(xyz, hpr);
+        }
+    }
 }   // move
 
 // ----------------------------------------------------------------------------
