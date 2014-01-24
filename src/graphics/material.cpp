@@ -291,7 +291,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 
     if (m_disable_z_write && !m_alpha_blending && !m_add)
     {
-        Log::warn("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive");
+        Log::warn("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive (for %s)", m_texname.c_str());
         m_disable_z_write = false;
     }
 
