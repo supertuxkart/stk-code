@@ -225,7 +225,8 @@ void Profiler::draw()
         }
     }
 
-    const double factor = profiler_width / (end - start);
+    const double duration = end - start;
+    const double factor = profiler_width / duration;
 
     // Get the mouse pos
     core::vector2di mouse_pos = GUIEngine::EventHandler::get()->getMousePos();
@@ -281,7 +282,10 @@ void Profiler::draw()
         {
             Marker& m = hovered_markers.top();
             std::ostringstream oss;
-            oss << m.name << " [" << (m.end-m.start) << " ms]" << std::endl;
+            oss.precision(4);
+            oss << m.name << " [" << (m.end - m.start) << " ms / ";
+            oss.precision(3);
+            oss << (m.end - m.start)*100.0 / duration << "%]" << std::endl;
             text += oss.str().c_str();
             hovered_markers.pop();
         }

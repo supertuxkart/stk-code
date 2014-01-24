@@ -146,28 +146,49 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 	const irr::core::vector3df& scale) :
 		CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-	for (u32 i=0; i<Mesh->getMeshBufferCount(); ++i)
+	createGLMeshes();
+}
+
+void STKMesh::createGLMeshes()
+{
+	for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
 	{
 		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
 		GLmeshes.push_back(allocateMeshBuffer(mb));
-
 	}
+}
+
+void STKMesh::cleanGLMeshes()
+{
+	for (u32 i = 0; i < GLmeshes.size(); ++i)
+	{
+		GLMesh mesh = GLmeshes[i];
+		if (!mesh.vertex_buffer)
+			continue;
+		if (mesh.vao_first_pass)
+			glDeleteVertexArrays(1, &(mesh.vao_first_pass));
+		if (mesh.vao_second_pass)
+			glDeleteVertexArrays(1, &(mesh.vao_second_pass));
+		if (mesh.vao_glow_pass)
+			glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
+		if (mesh.vao_displace_pass)
+			glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
+		glDeleteBuffers(1, &(mesh.vertex_buffer));
+		glDeleteBuffers(1, &(mesh.index_buffer));
+	}
+	GLmeshes.clear();
+}
+
+void STKMesh::setMesh(irr::scene::IMesh* mesh)
+{
+	CMeshSceneNode::setMesh(mesh);
+	cleanGLMeshes();
+	createGLMeshes();
 }
 
 STKMesh::~STKMesh()
 {
-	for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
-	{
-		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-		if (!mb)
-			continue;
-		GLMesh mesh = GLmeshes[i];
-		glDeleteVertexArrays(1, &(mesh.vao_first_pass));
-		glDeleteVertexArrays(1, &(mesh.vao_second_pass));
-		glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
-		glDeleteBuffers(1, &(mesh.vertex_buffer));
-		glDeleteBuffers(1, &(mesh.index_buffer));
-	}
+	cleanGLMeshes();
 }
 
 void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
@@ -710,6 +731,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectRimLimitShader::attrib_position, MeshShader::ObjectRimLimitShader::attrib_texcoord, -1, MeshShader::ObjectRimLimitShader::attrib_normal, -1, -1, -1, mesh.Stride);
 		}
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
 		{

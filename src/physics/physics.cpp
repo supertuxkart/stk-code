@@ -36,6 +36,7 @@
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
+#include "utils/profiler.hpp"
 
 // ----------------------------------------------------------------------------
 /** Initialise physics.
@@ -135,6 +136,8 @@ void Physics::removeKart(const AbstractKart *kart)
  */
 void Physics::update(float dt)
 {
+    PROFILER_PUSH_CPU_MARKER("Physics", 0, 0, 0);
+
     m_physics_loop_active = true;
     // Bullet can report the same collision more than once (up to 4
     // contact points per collision). Additionally, more than one internal
@@ -275,6 +278,8 @@ void Physics::update(float dt)
     for(unsigned int i=0; i<m_karts_to_delete.size(); i++)
         removeKart(m_karts_to_delete[i]);
     m_karts_to_delete.clear();
+
+    PROFILER_POP_CPU_MARKER("Physics", 0, 0, 0);
 }   // update
 
 //-----------------------------------------------------------------------------
