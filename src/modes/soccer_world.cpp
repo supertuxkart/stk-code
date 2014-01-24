@@ -116,7 +116,7 @@ void SoccerWorld::reset()
             continue;
 
         obj->reset();
-        obj->getPhysics()->reset();
+        obj->getPhysicalObject()->reset();
     }
 
     if (m_goal_sound != NULL &&
@@ -205,7 +205,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             continue;
 
         obj->reset();
-        obj->getPhysics()->reset();
+        obj->getPhysicalObject()->reset();
     }
 
     //Resetting the ball triggers the goal check line one more time.

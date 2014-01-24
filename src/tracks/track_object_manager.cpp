@@ -101,8 +101,8 @@ void TrackObjectManager::handleExplosion(const Vec3 &pos, const PhysicalObject *
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
-        if(secondary_hits || mp == curr->getPhysics())
-            curr->handleExplosion(pos, mp == curr->getPhysics());
+        if(secondary_hits || mp == curr->getPhysicalObject())
+            curr->handleExplosion(pos, mp == curr->getPhysicalObject());
     }
 }   // handleExplosion
 

@@ -187,9 +187,7 @@ void PhysicalObject::move(const Vec3& xyz, const core::vector3df& hpr)
     irr::core::quaternion tempQuat(mat);
     q = btQuaternion(tempQuat.X, tempQuat.Y, tempQuat.Z, tempQuat.W);
 
-
-    Vec3 p(xyz);
-    btTransform trans(q,p);
+    btTransform trans(q,xyz);
     m_motion_state->setWorldTransform(trans);
 }   // move
 
