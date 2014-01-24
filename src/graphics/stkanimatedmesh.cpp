@@ -17,6 +17,13 @@ const core::vector3df& scale) :
 	firstTime = true;
 }
 
+void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
+{
+	firstTime = true;
+	GLmeshes.clear();
+	CAnimatedMeshSceneNode::setMesh(mesh);
+}
+
 void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
 	GLenum ptype = mesh.PrimitiveType;
