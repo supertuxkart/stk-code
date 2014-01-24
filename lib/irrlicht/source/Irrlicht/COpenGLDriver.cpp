@@ -2583,8 +2583,8 @@ void COpenGLDriver::setRenderStates3DMode()
 
 		ResetRenderStates = true;
 #ifdef GL_EXT_clip_volume_hint
-		if (FeatureAvailable[IRR_EXT_clip_volume_hint])
-			glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_NICEST);
+//		if (FeatureAvailable[IRR_EXT_clip_volume_hint])
+//			glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_NICEST);
 #endif
 	}
 
@@ -3241,8 +3241,8 @@ void COpenGLDriver::setRenderStates2DMode(bool alpha, bool texture, bool alphaCh
 		}
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 #ifdef GL_EXT_clip_volume_hint
-		if (FeatureAvailable[IRR_EXT_clip_volume_hint])
-			glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST);
+//		if (FeatureAvailable[IRR_EXT_clip_volume_hint])
+//			glHint(GL_CLIP_VOLUME_CLIPPING_HINT_EXT, GL_FASTEST);
 #endif
 
 	}
