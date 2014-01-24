@@ -711,6 +711,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectRimLimitShader::attrib_position, MeshShader::ObjectRimLimitShader::attrib_texcoord, -1, MeshShader::ObjectRimLimitShader::attrib_normal, -1, -1, -1, mesh.Stride);
+		}
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,

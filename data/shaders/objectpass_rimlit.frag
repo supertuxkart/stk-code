@@ -1,35 +1,26 @@
 #version 130
-uniform sampler2D tex;
-uniform int hastex;
-uniform float objectid;
+uniform sampler2D Albedo;
+uniform sampler2D DiffuseMap;
+uniform sampler2D SpecularMap;
+uniform sampler2D SSAO;
+uniform vec2 screen;
+uniform vec3 ambient;
 
-noperspective in vec3 nor;
-noperspective in vec3 eyenor;
-noperspective in vec3 viewpos;
-out vec4 Albedo;
-out vec4 NormalDepth;
-out vec4 Specular;
+noperspective in vec3 normal;
+in vec2 uv;
+
+out vec4 FragColor;
 
 void main() {
-	float rim = 1.0 - dot(eyenor, viewpos);
+	float rim = 1.0 - dot(normal, vec3(0., 0., -1));
 	rim = smoothstep(0.5, 1.5, rim) * 0.35;
-	vec4 color;
 
-	if (hastex != 0) {
-		vec4 col = texture(tex, gl_TexCoord[0].xy);
-
-		if (col.a < 0.1)
-			discard;
-
-		col.xyz += rim;
-
-		color = col;
-	} else {
-		color = gl_Color + vec4(vec3(rim), 0.0);
-	}
-
-	Albedo = vec4(color.xyz, 1.);
-	NormalDepth = vec4(0.5 * normalize(nor) + 0.5, gl_FragCoord.z);
-	Specular = vec4(1. - color.a);
+	vec4 color = texture(Albedo, uv);
+    vec2 tc = gl_FragCoord.xy / screen;
+    vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
+    vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
+    float ao = texture(SSAO, tc).x;
+    vec3 LightFactor = ao * ambient + DiffuseComponent + SpecularComponent * (1. - color.a);
+    FragColor = vec4(color.xyz * LightFactor + rim, 1.);
 }
 

@@ -242,6 +242,7 @@ void Shaders::loadShaders()
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+	MeshShader::ObjectRimLimitShader::init();
 	MeshShader::UntexturedObjectShader::init();
 	MeshShader::ObjectRefPass2Shader::init();
 	MeshShader::SphereMapShader::init();
@@ -360,6 +361,48 @@ namespace MeshShader
 	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_Albedo, TU_Albedo);
+		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
+		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint ObjectRimLimitShader::Program;
+	GLuint ObjectRimLimitShader::attrib_position;
+	GLuint ObjectRimLimitShader::attrib_texcoord;
+	GLuint ObjectRimLimitShader::attrib_normal;
+	GLuint ObjectRimLimitShader::uniform_MVP;
+	GLuint ObjectRimLimitShader::uniform_TIMV;
+	GLuint ObjectRimLimitShader::uniform_Albedo;
+	GLuint ObjectRimLimitShader::uniform_DiffuseMap;
+	GLuint ObjectRimLimitShader::uniform_SpecularMap;
+	GLuint ObjectRimLimitShader::uniform_SSAO;
+	GLuint ObjectRimLimitShader::uniform_screen;
+	GLuint ObjectRimLimitShader::uniform_ambient;
+
+	void ObjectRimLimitShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/objectpass_rimlit.vert").c_str(), file_manager->getAsset("shaders/objectpass_rimlit.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_normal = glGetAttribLocation(Program, "Normal");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void ObjectRimLimitShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
 		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
 		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
