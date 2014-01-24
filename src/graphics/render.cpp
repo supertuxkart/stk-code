@@ -334,18 +334,6 @@ void IrrDriver::renderGLSL(float dt)
     m_post_processing->render();
     PROFILER_POP_CPU_MARKER();
 
-	// Final blit
-	// TODO : Use glBlitFramebuffer
-	m_video_driver->setRenderTarget(ERT_FRAME_BUFFER, false, false);
-	if (irr_driver->getNormals())
-		m_post_processing->renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-	else if (irr_driver->getSSAOViz())
-		m_post_processing->renderPassThrough(irr_driver->getRTT(RTT_SSAO));
-	else if (irr_driver->getShadowViz())
-		m_post_processing->renderPassThrough(irr_driver->getRTT(RTT_SHADOW));
-	else
-		m_post_processing->renderColorLevel(irr_driver->getRTT(RTT_TMP1));
-
     // Set the viewport back to the full screen for race gui
     m_video_driver->setViewPort(core::recti(0, 0,
                                             UserConfigParams::m_width,

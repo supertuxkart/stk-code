@@ -87,7 +87,7 @@ public:
 
 	/** Render tex. Used for blit/texture resize */
 	void renderPassThrough(video::ITexture *tex);
-	void renderColorLevel(video::ITexture *in);
+
 	void renderGlow(video::ITexture *tex);
 
     /** Render the post-processed scene */

@@ -275,7 +275,8 @@ void renderPPDisplace(ITexture *in)
 	glDisable(GL_BLEND);
 }
 
-void PostProcessing::renderColorLevel(ITexture *in)
+static
+void renderColorLevel(ITexture *in)
 {
 	core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
 	core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
@@ -874,6 +875,18 @@ void PostProcessing::render()
             glDisable(GL_STENCIL_TEST);
             PROFILER_POP_CPU_MARKER();
         }
+
+        // Final blit
+		// TODO : Use glBlitFramebuffer
+		drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
+        if (irr_driver->getNormals())
+			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+        else if (irr_driver->getSSAOViz())
+			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
+        else if (irr_driver->getShadowViz())
+			renderPassThrough(irr_driver->getRTT(RTT_SHADOW));
+        else
+			renderColorLevel(in);
     }
 }   // render
 
