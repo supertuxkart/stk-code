@@ -45,6 +45,7 @@ m_frame_count(0)
 {
     m_curr_time = 0;
     m_prev_time = 0;
+    m_throttle_fps = true;
 }  // MainLoop
 
 //-----------------------------------------------------------------------------
@@ -78,12 +79,14 @@ float MainLoop::getLimitedDt()
         // When in menus, reduce FPS much, it's not necessary to push to the maximum for plain menus
         const int max_fps = (StateManager::get()->throttleFPS() ? 35 : UserConfigParams::m_max_fps);
         const int current_fps = (int)(1000.0f/dt);
-        if( current_fps > max_fps && !ProfileWorld::isProfileMode())
+        if (m_throttle_fps && current_fps > max_fps && !ProfileWorld::isProfileMode())
         {
             int wait_time = 1000/max_fps - 1000/current_fps;
             if(wait_time < 1) wait_time = 1;
 
+            PROFILER_PUSH_CPU_MARKER("Throttle framerate", 0, 0, 0);
             StkTime::sleep(wait_time);
+            PROFILER_POP_CPU_MARKER();
         }
         else break;
     }
@@ -122,7 +125,9 @@ void MainLoop::run()
 
         if (World::getWorld())  // race is active if world exists
         {
+            PROFILER_PUSH_CPU_MARKER("Update race", 255, 0, 255);
             updateRace(dt);
+            PROFILER_POP_CPU_MARKER();
         }   // if race is active
 
         // We need to check again because update_race may have requested
