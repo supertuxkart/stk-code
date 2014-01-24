@@ -78,7 +78,7 @@ protected:
     
     float                          m_distance;
 
-    PhysicalObject*                m_rigid_body;
+    PhysicalObject*                m_physical_object;
 
     ThreeDAnimation*               m_animator;
     
@@ -113,8 +113,8 @@ public:
     bool isGarage() const { return m_garage; }
     float getDistance() const { return m_distance; }
     
-    const PhysicalObject* getPhysics() const { return m_rigid_body; }
-    PhysicalObject* getPhysics() { return m_rigid_body; }
+    const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
+    PhysicalObject* getPhysicalObject() { return m_physical_object; }
 
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     const core::vector3df getInitRotation() const { return m_init_hpr; }
