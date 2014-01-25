@@ -937,8 +937,9 @@ void STKMesh::render()
 			}
 			if (!isObject(material.MaterialType))
 			{
-				driver->setMaterial(material);
-				driver->drawMeshBuffer(mb);
+#ifdef DEBUG
+				Log::warn("material", "Unhandled (static) material type : %d", material.MaterialType);
+#endif
 				continue;
 			}
 

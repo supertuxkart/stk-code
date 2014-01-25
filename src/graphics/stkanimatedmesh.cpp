@@ -185,8 +185,10 @@ void STKAnimatedMesh::render()
 		}
 		else 
 		{
-			driver->setMaterial(material);
-			driver->drawMeshBuffer(mb);
+#ifdef DEBUG
+			Log::warn("material", "Unhandled (animated) material type : %d", material.MaterialType);
+#endif
+			continue;
 		}
 	}
 }
