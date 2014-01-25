@@ -165,7 +165,7 @@ void IrrDriver::renderGLSL(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
 
         const u32 bgnodes = m_background.size();
-        if (bgnodes)
+/*        if (bgnodes)
         {
             // If there are background nodes (3d skybox), draw them now.
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
@@ -187,7 +187,7 @@ void IrrDriver::renderGLSL(float dt)
 
             overridemat = prev;
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, true);
-        }
+        }*/
 
         // Fire up the MRT
         m_video_driver->setRenderTarget(m_mrt, false, false);

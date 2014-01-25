@@ -2565,16 +2565,17 @@ void Kart::setOnScreenText(const wchar_t *text)
     // FIXME: Titlefont is the only font guaranteed to be loaded if STK
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
-    sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
+	// TODO: Add support in the engine for BillboardText or find a replacement
+    /*sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
                                                   : GUIEngine::getTitleFont(),
                                   text,
                                   getNode(),
                                   core::dimension2df(textsize.Width/55.0f,
                                                      textsize.Height/55.0f),
                                   core::vector3df(0.0f, 1.5f, 0.0f),
-                                  -1 /* id */,
+                                  -1, // id
                                   video::SColor(255, 255, 225, 0),
-                                  video::SColor(255, 255, 89, 0));
+                                  video::SColor(255, 255, 89, 0));*/
     // No need to store the reference to the billboard scene node:
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
