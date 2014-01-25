@@ -125,7 +125,7 @@ void MainLoop::run()
 
         if (World::getWorld())  // race is active if world exists
         {
-            PROFILER_PUSH_CPU_MARKER("Update race", 255, 0, 255);
+            PROFILER_PUSH_CPU_MARKER("Update race", 0, 255, 255);
             updateRace(dt);
             PROFILER_POP_CPU_MARKER();
         }   // if race is active
@@ -137,18 +137,15 @@ void MainLoop::run()
         // enabled.
         if (!m_abort && !ProfileWorld::isNoGraphics())
         {
-            PROFILER_PUSH_CPU_MARKER("Music manager update", 0x7F, 0x00, 0x00);
+            PROFILER_PUSH_CPU_MARKER("Music/input/GUI", 0x7F, 0x00, 0x00);
             music_manager->update(dt);
-            PROFILER_POP_CPU_MARKER();
 
-            PROFILER_PUSH_CPU_MARKER("Input manager update", 0x00, 0x7F, 0x00);
             input_manager->update(dt);
-            PROFILER_POP_CPU_MARKER();
 
             #ifdef ENABLE_WIIUSE
                 wiimote_manager->update();
             #endif
-            PROFILER_PUSH_CPU_MARKER("Update GUI widgets", 0x7F, 0x7F, 0x00);
+            
             GUIEngine::update(dt);
             PROFILER_POP_CPU_MARKER();
 
