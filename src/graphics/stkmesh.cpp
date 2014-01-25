@@ -542,13 +542,12 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
   glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawTransparentObject(const GLMesh &mesh)
+void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
-	computeMVP(ModelViewProjectionMatrix);
 	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 
 	glUseProgram(MeshShader::TransparentShader::Program);
@@ -558,7 +557,7 @@ void STKMesh::drawTransparentObject(const GLMesh &mesh)
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawBubble(const GLMesh &mesh)
+void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
 	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
 	float transparency = 1.;
@@ -567,7 +566,6 @@ void STKMesh::drawBubble(const GLMesh &mesh)
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
-	computeMVP(ModelViewProjectionMatrix);
 	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 
 	glUseProgram(MeshShader::BubbleShader::Program);
@@ -633,10 +631,12 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_CULL_FACE);
 
-	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
-		drawTransparentObject(mesh);
+	computeMVP(ModelViewProjectionMatrix);
+		
 	if (type == irr_driver->getShader(ES_BUBBLES))
-		drawBubble(mesh);
+		drawBubble(mesh, ModelViewProjectionMatrix);
+	else
+		drawTransparentObject(mesh, ModelViewProjectionMatrix);
 	return;
 }
 
@@ -805,7 +805,7 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
-		else if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
+		else
 		{
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);

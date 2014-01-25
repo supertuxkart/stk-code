@@ -43,6 +43,10 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
 void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 
+// Forward pass (for transparents meshes)
+void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+
 class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
@@ -51,10 +55,6 @@ protected:
 	core::vector3df windDir;
 	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-	
-	// Forward pass (for transparents meshes)
-	void drawTransparentObject(const GLMesh &mesh);
-	void drawBubble(const GLMesh &mesh);
 
 	// Misc passes shaders (glow, displace...)
 	void drawGlow(const GLMesh &mesh);
