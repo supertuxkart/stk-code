@@ -191,6 +191,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
 };
 
+class BillboardShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_corner, attrib_texcoord;
+	static GLuint uniform_MV, uniform_P, uniform_tex, uniform_Position, uniform_Size;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewMatrix, const core::matrix4 &ProjectionMatrix, const core::vector3df &Position, const core::dimension2d<float> &size, unsigned TU_tex);
+};
+
 
 class ColorizeShader
 {

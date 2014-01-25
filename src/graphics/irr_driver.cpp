@@ -33,6 +33,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
+#include "graphics/stkbillboard.hpp"
 #include "graphics/stkmesh.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
@@ -968,8 +969,17 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
                                            scene::ISceneNode* parent, bool alphaTesting)
 {
-    scene::IBillboardSceneNode* node =
-        m_scene_manager->addBillboardSceneNode(parent, size);
+	scene::IBillboardSceneNode* node;
+	if (isGLSL())
+	{
+		if (!parent)
+			parent = m_scene_manager->getRootSceneNode();
+
+		node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
+		node->drop();
+	}
+	else
+		node = m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
     if(alphaTesting)
