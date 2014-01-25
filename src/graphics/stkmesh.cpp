@@ -602,9 +602,6 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		drawTransparentObject(mesh);
 	if (type == irr_driver->getShader(ES_BUBBLES))
 		drawBubble(mesh);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 	return;
 }
 
@@ -616,6 +613,11 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	{
         windDir = getWind();
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
 
 		computeMVP(ModelViewProjectionMatrix);
 		computeTIMV(TransposeInverseModelView);
@@ -634,7 +636,12 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case 1:
 	{
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-	
+
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_BLEND);
+		
 		if (type == irr_driver->getShader(ES_SPHERE_MAP))
 			drawSphereMap(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		else if (type == irr_driver->getShader(ES_SPLATTING))
@@ -808,9 +815,9 @@ void STKMesh::render()
 			}
 			if (!isObject(material.MaterialType))
 			{
-				continue;
 				driver->setMaterial(material);
 				driver->drawMeshBuffer(mb);
+				continue;
 			}
 
 			// only render transparent buffer if this is the transparent render pass
@@ -827,6 +834,15 @@ void STKMesh::render()
 					drawTransparent(GLmeshes[i], material.MaterialType);
 				else
 					drawSolid(GLmeshes[i], material.MaterialType);
+				glBindVertexArray(0);
+				glBindBuffer(GL_ARRAY_BUFFER, 0);
+				video::SMaterial material;
+				material.MaterialType = irr_driver->getShader(ES_RAIN);
+				material.BlendOperation = video::EBO_NONE;
+				material.ZWriteEnable = true;
+				material.Lighting = false;
+				irr_driver->getVideoDriver()->setMaterial(material);
+				static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
 			}
 		}
 	}

@@ -165,7 +165,7 @@ void STKAnimatedMesh::render()
 			driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 		else if (Mesh->getMeshType() == scene::EAMT_SKINNED)
 			driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
-		if (isObjectPass(material.MaterialType) && !transparent)
+		if (isObjectPass(material.MaterialType))
 		{
 			initvaostate(GLmeshes[i], material.MaterialType);
 			if (irr_driver->getPhase() == 0)
@@ -174,10 +174,18 @@ void STKAnimatedMesh::render()
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
 			}
 			drawSolid(GLmeshes[i], material.MaterialType);
+			glBindVertexArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, 0);
+			video::SMaterial material;
+			material.MaterialType = irr_driver->getShader(ES_RAIN);
+			material.BlendOperation = video::EBO_NONE;
+			material.ZWriteEnable = true;
+			material.Lighting = false;
+			irr_driver->getVideoDriver()->setMaterial(material);
+			static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
 		}
 		else 
 		{
-			continue;
 			driver->setMaterial(material);
 			driver->drawMeshBuffer(mb);
 		}
