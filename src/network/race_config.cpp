@@ -289,9 +289,9 @@ void RaceConfig::computeRaceMode()
         }
     }
     // now we know :
-    m_major_mode = ((major_histogram.size() > 0) ? getHighestInHistogram<int>(&major_histogram) : 1);
-    m_races_count = ((minor_histogram.size() > 0) ? getHighestInHistogram<int>(&races_count_histogram) : 1);
-    m_minor_mode = ((minor_histogram.size() > 0) ? getHighestInHistogram<int>(&minor_histogram) : 0);
+    m_major_mode = (!major_histogram.empty() ? getHighestInHistogram<int>(&major_histogram) : 1);
+    m_races_count = (!minor_histogram.empty() ? getHighestInHistogram<int>(&races_count_histogram) : 1);
+    m_minor_mode = (!minor_histogram.empty() ? getHighestInHistogram<int>(&minor_histogram) : 0);
 
     if (m_major_mode == RaceManager::MAJOR_MODE_GRAND_PRIX)
         m_tracks.resize(m_races_count);

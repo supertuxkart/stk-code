@@ -330,7 +330,6 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
             sfx_manager->quickSound( "wee" );
         }
         return EVENT_BLOCK;
-        break;
     }
     case PA_MENU_CANCEL:
     {
@@ -351,7 +350,6 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         }
 
         return EVENT_BLOCK;
-        break;
     }
     default:
         break;
