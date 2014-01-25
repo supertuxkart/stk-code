@@ -279,7 +279,7 @@ void Physics::update(float dt)
         removeKart(m_karts_to_delete[i]);
     m_karts_to_delete.clear();
 
-    PROFILER_POP_CPU_MARKER("Physics", 0, 0, 0);
+    PROFILER_POP_CPU_MARKER();
 }   // update
 
 //-----------------------------------------------------------------------------
