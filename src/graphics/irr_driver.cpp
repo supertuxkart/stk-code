@@ -141,12 +141,12 @@ void IrrDriver::reset()
     if (m_glsl) m_post_processing->reset();
 }   // reset
 
-void IrrDriver::setPhase(unsigned p)
+void IrrDriver::setPhase(STKRenderingPass p)
 {
   phase = p;
 }
 
-unsigned IrrDriver::getPhase() const
+STKRenderingPass IrrDriver::getPhase() const
 {
   return phase;
 }

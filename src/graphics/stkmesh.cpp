@@ -624,6 +624,7 @@ void STKMesh::drawDisplace(const GLMesh &mesh)
 
 void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
+	assert(irr_driver->getPhase() == TRANSPARENT_PASS);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
@@ -643,7 +644,7 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
 	{
-	case 0:
+	case SOLID_NORMAL_AND_DEPTH_PASS:
 	{
         windDir = getWind();
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
@@ -667,7 +668,7 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 		break;
 	}
-	case 1:
+	case SOLID_LIT_PASS:
 	{
 		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
@@ -728,7 +729,7 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
 	{
-	case 0: // Solid Pass 1
+	case SOLID_NORMAL_AND_DEPTH_PASS:
 		if (mesh.vao_first_pass)
 			return;
 		if (type == irr_driver->getShader(ES_NORMAL_MAP))
@@ -752,7 +753,7 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
 		}
 		return;
-	case 1: // Solid pass 2
+	case SOLID_LIT_PASS:
 		if (mesh.vao_second_pass)
 			return;
 		if (type == irr_driver->getShader(ES_SPHERE_MAP))
@@ -791,12 +792,12 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
 		return;
-	case 2: // Glow
+	case GLOW_PASS:
 		if (mesh.vao_glow_pass)
 			return;
 		mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
 		return;
-	case 3: // Transparent
+	case TRANSPARENT_PASS:
 		if (mesh.vao_first_pass)
 			return;
 		if (type == irr_driver->getShader(ES_BUBBLES))
@@ -810,7 +811,7 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
 		return;
-	case 4:
+	case DISPLACEMENT_PASS:
 		if (mesh.vao_displace_pass)
 			return;
 		mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
@@ -845,7 +846,7 @@ void STKMesh::render()
 
 			if (isTransparentPass != transparent)
 				continue;
-			if (irr_driver->getPhase() == 4)
+			if (irr_driver->getPhase() == DISPLACEMENT_PASS)
 			{
 				initvaostate(GLmeshes[i], material.MaterialType);
 				drawDisplace(GLmeshes[i]);
@@ -860,7 +861,7 @@ void STKMesh::render()
 
 			// only render transparent buffer if this is the transparent render pass
 			// and solid only in solid pass
-			if (irr_driver->getPhase() == 2)
+			if (irr_driver->getPhase() == GLOW_PASS)
 			{
 				initvaostate(GLmeshes[i], material.MaterialType);
 				drawGlow(GLmeshes[i]);

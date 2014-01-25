@@ -191,10 +191,9 @@ void IrrDriver::renderGLSL(float dt)
 
         // Fire up the MRT
         m_video_driver->setRenderTarget(m_mrt, false, false);
-
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
-        irr_driver->setPhase(0);
+        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
         m_scene_manager->drawAll(m_renderpass);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -225,7 +224,7 @@ void IrrDriver::renderGLSL(float dt)
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-        irr_driver->setPhase(1);
+        irr_driver->setPhase(SOLID_LIT_PASS);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         m_scene_manager->drawAll(m_renderpass);
 
@@ -243,7 +242,7 @@ void IrrDriver::renderGLSL(float dt)
 		// Render anything glowing.
 		if (!m_mipviz && !m_wireframe)
 		{
-			irr_driver->setPhase(2);
+			irr_driver->setPhase(GLOW_PASS);
 			renderGlow(overridemat, glows, cambox, cam);
 		} // end glow
 
@@ -289,10 +288,9 @@ void IrrDriver::renderGLSL(float dt)
         }
         PROFILER_POP_CPU_MARKER();
 
-
         // We need to re-render camera due to the per-cam-node hack.
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
-		irr_driver->setPhase(3);
+		irr_driver->setPhase(TRANSPARENT_PASS);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
         m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
@@ -835,7 +833,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 	cb->update();
 
     const int displacingcount = m_displacing.size();
-	irr_driver->setPhase(4);
+	irr_driver->setPhase(DISPLACEMENT_PASS);
     for (int i = 0; i < displacingcount; i++)
     {
 

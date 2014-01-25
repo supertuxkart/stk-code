@@ -63,6 +63,16 @@ class PostProcessing;
 class LightNode;
 class ShadowImportance;
 
+enum STKRenderingPass
+{
+	SOLID_NORMAL_AND_DEPTH_PASS,
+	SOLID_LIT_PASS,
+	TRANSPARENT_PASS,
+	GLOW_PASS,
+	DISPLACEMENT_PASS,
+	SHADOW_PASS
+};
+
 /**
   * \brief class that creates the irrLicht device and offers higher-level
   *  ways to manage the 3D scene
@@ -174,7 +184,7 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
-    unsigned phase;
+	STKRenderingPass phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -208,8 +218,8 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
-    void setPhase(unsigned);
-    unsigned getPhase() const;
+	void setPhase(STKRenderingPass);
+	STKRenderingPass getPhase() const;
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;

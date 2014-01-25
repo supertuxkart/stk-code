@@ -28,7 +28,7 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
 	{
-	case 0:
+	case SOLID_NORMAL_AND_DEPTH_PASS:
 	{
 			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 
@@ -47,7 +47,7 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 			  break;
 	}
-	case 1:
+	case SOLID_LIT_PASS:
 	{
 			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 
@@ -134,7 +134,7 @@ void STKAnimatedMesh::render()
 		if (isObjectPass(material.MaterialType))
 		{
 			initvaostate(GLmeshes[i], material.MaterialType);
-			if (irr_driver->getPhase() == 0)
+			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
 			{
 				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
