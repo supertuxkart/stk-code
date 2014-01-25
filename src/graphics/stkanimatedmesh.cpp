@@ -24,6 +24,25 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 	CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
+void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
+{
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glDisable(GL_CULL_FACE);
+
+	computeMVP(ModelViewProjectionMatrix);
+
+	drawTransparentObject(mesh, ModelViewProjectionMatrix);
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
+	return;
+}
+
 void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
@@ -79,6 +98,8 @@ isObjectPass(video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 		return true;
 	if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+		return true;
+	if (type == video::EMT_ONETEXTURE_BLEND)
 		return true;
 	return false;
 }
@@ -139,7 +160,10 @@ void STKAnimatedMesh::render()
 				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
 			}
-			drawSolid(GLmeshes[i], material.MaterialType);
+			if (isTransparentPass)
+				drawTransparent(GLmeshes[i], material.MaterialType);
+			else
+				drawSolid(GLmeshes[i], material.MaterialType);
 			glBindVertexArray(0);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			video::SMaterial material;

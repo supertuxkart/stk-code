@@ -722,6 +722,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		return true;
+	if (type == video::EMT_ONETEXTURE_BLEND)
+		return true;
 	return false;
 }
 

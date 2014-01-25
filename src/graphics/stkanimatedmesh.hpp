@@ -14,6 +14,7 @@ protected:
 	std::vector<GLMesh> GLmeshes;
 	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
 	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
+	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 public:
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
      irr::scene::ISceneManager* mgr, irr::s32 id,
