@@ -1159,17 +1159,26 @@ namespace FullScreenShader
 		vao = createVAO(Program);
 
 		for (unsigned i = 0; i < 16; i++) {
-			// Generate x/y component between -1 and 1
 			// Use double to avoid denorm and get a true uniform distribution
+			// Generate z component between [0.1; 1] to avoid being too close from surface
+			double z = rand();
+			z /= RAND_MAX;
+			z = 0.1 + 0.9 * z;
+
+			// Now generate x,y on the unit circle
 			double x = rand();
 			x /= RAND_MAX;
 			x = 2 * x - 1;
 			double y = rand();
 			y /= RAND_MAX;
 			y = 2 * y - 1;
+			double xynorm = sqrt(x * x + y * y);
+			x /= xynorm;
+			y /= xynorm;
+			// Now resize x,y so that norm(x,y,z) is one
+			x *= sqrt(1. - z * z);
+			y *= sqrt(1. - z * z);
 
-			// compute z so that norm (x,y,z) is one
-			double z = sqrt(x * x + y * y);
 			// Norm factor
 			double w = rand();
 			w /= RAND_MAX;
