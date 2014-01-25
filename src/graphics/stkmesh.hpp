@@ -42,6 +42,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
 void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 // Forward pass (for transparents meshes)
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);

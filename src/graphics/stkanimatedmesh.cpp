@@ -79,6 +79,8 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				  drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
 				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+			  else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
+				  drawObjectUnlit(mesh, ModelViewProjectionMatrix);
 			  else
 				  drawObjectPass2(mesh, ModelViewProjectionMatrix);
 			  break;
@@ -98,6 +100,8 @@ isObjectPass(video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 		return true;
 	if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+		return true;
+	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 		return true;
 	if (type == video::EMT_ONETEXTURE_BLEND)
 		return true;

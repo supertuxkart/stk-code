@@ -508,6 +508,32 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 	glDrawElements(ptype, count, itype, 0);
 }
 
+void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+{
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	if (irr_driver->getLightViz())
+	{
+		GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+	else
+	{
+		GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+
+
+	glUseProgram(MeshShader::ObjectUnlitShader::Program);
+	MeshShader::ObjectUnlitShader::setUniforms(ModelViewProjectionMatrix, 0);
+
+	glBindVertexArray(mesh.vao_second_pass);
+	glDrawElements(ptype, count, itype, 0);
+}
+
 void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
@@ -687,6 +713,8 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
 		else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
 			drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+		else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
+			drawObjectUnlit(mesh, ModelViewProjectionMatrix);
 		else if (!mesh.textures[0])
 			drawUntexturedObject(mesh, ModelViewProjectionMatrix);
 		else
@@ -719,6 +747,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_GRASS_REF))
 		return true;
 	if (type == irr_driver->getShader(ES_BUBBLES))
+		return true;
+	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 		return true;
 	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		return true;
@@ -782,6 +812,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::GrassPass2Shader::attrib_position, MeshShader::GrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassPass2Shader::attrib_color, mesh.Stride);
+		}
+		else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
+		{
+			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+				MeshShader::ObjectUnlitShader::attrib_position, MeshShader::ObjectUnlitShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
 		else if (!mesh.textures[0])
 		{

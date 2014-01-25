@@ -81,6 +81,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
 };
 
+class ObjectUnlitShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_MVP, uniform_tex;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
+};
+
 class ObjectRefPass2Shader
 {
 public:
@@ -419,6 +430,7 @@ public:
     ACT(ES_COLORIZE) \
     ACT(ES_COLORIZE_REF) \
     ACT(ES_GLOW) \
+	ACT(ES_OBJECT_UNLIT) \
     ACT(ES_OBJECTPASS) \
     ACT(ES_OBJECTPASS_REF) \
     ACT(ES_SUNLIGHT) \

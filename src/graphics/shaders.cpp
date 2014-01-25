@@ -145,6 +145,8 @@ void Shaders::loadShaders()
 
     m_shaders[ES_OBJECTPASS] = glslmat(dir + "objectpass.vert", dir + "objectpass.frag",
                                     m_callbacks[ES_OBJECTPASS], EMT_SOLID);
+	m_shaders[ES_OBJECT_UNLIT] = glslmat(dir + "objectpass.vert", dir + "objectpass.frag",
+									m_callbacks[ES_OBJECTPASS], EMT_SOLID);
     m_shaders[ES_OBJECTPASS_REF] = glslmat(dir + "objectpass.vert", dir + "objectpass_ref.frag",
                                     m_callbacks[ES_OBJECTPASS], EMT_SOLID);
     m_shaders[ES_OBJECTPASS_RIMLIT] = glslmat(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag",
@@ -245,6 +247,7 @@ void Shaders::loadShaders()
 	MeshShader::ObjectRimLimitShader::init();
 	MeshShader::UntexturedObjectShader::init();
 	MeshShader::ObjectRefPass2Shader::init();
+	MeshShader::ObjectUnlitShader::init();
 	MeshShader::SphereMapShader::init();
 	MeshShader::SplattingShader::init();
 	MeshShader::GrassPass1Shader::init();
@@ -368,6 +371,27 @@ namespace MeshShader
 		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint ObjectUnlitShader::Program;
+	GLuint ObjectUnlitShader::attrib_position;
+	GLuint ObjectUnlitShader::attrib_texcoord;
+	GLuint ObjectUnlitShader::uniform_MVP;
+	GLuint ObjectUnlitShader::uniform_tex;
+
+	void ObjectUnlitShader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_tex = glGetUniformLocation(Program, "tex");
+	}
+
+	void ObjectUnlitShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_tex, TU_tex);
 	}
 
 	GLuint ObjectRimLimitShader::Program;
