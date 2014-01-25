@@ -41,6 +41,7 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
+void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 
 class STKMesh : public irr::scene::CMeshSceneNode
 {

@@ -474,6 +474,40 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProj
 
 }
 
+void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+{
+	GLenum ptype = mesh.PrimitiveType;
+	GLenum itype = mesh.IndexType;
+	size_t count = mesh.IndexCount;
+
+	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	if (irr_driver->getLightViz())
+	{
+		GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+	else
+	{
+		GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+
+	setTexture(1, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP1))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(2, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_TMP2))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(3, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_SSAO))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	if (!UserConfigParams::m_ssao)
+	{
+		GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+		glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+	}
+
+	glUseProgram(MeshShader::ObjectRimLimitShader::Program);
+	MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0, 1, 2, 3);
+
+	glBindVertexArray(mesh.vao_second_pass);
+	glDrawElements(ptype, count, itype, 0);
+}
+
 void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
@@ -650,6 +684,8 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
 		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
 			drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
+		else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
+			drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		else if (!mesh.textures[0])
 			drawUntexturedObject(mesh, ModelViewProjectionMatrix);
 		else
@@ -668,6 +704,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
 		return true;
 	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+		return true;
+	if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
 		return true;
 	if (type == irr_driver->getShader(ES_NORMAL_MAP))
 		return true;
