@@ -248,16 +248,12 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_POP_CPU_MARKER();
 
-        if (!bgnodes)
-        {
-            PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-
-            // If there are no BG nodes, it's more efficient to do the skybox here.
-            m_renderpass = scene::ESNRP_SKY_BOX;
-            m_scene_manager->drawAll(m_renderpass);
-
-            PROFILER_POP_CPU_MARKER();
-        }
+		if (!SkyboxTextures.empty())
+		{
+			PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+			renderSkybox();
+			PROFILER_POP_CPU_MARKER();
+		}
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
@@ -806,6 +802,105 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+}
+
+
+static GLuint cubevao = 0;
+static GLuint cubevbo;
+static GLuint cubeidx;
+
+static void createcubevao()
+{
+	// From CSkyBoxSceneNode. Not optimal at all
+	float corners[] = 
+	{
+		// top side
+		1., 1., -1.,       1., 1.,
+		1., 1., 1.,        0., 1.,
+		-1., 1., 1.,       0., 0.,
+		-1., 1., -1.,      1., 0.,
+
+		// Bottom side
+		1., -1., 1.,       0., 0.,
+		1., -1., -1.,      1., 0.,
+		-1., -1., -1.,     1., 1.,
+		-1., -1., 1.,      0., 1.,
+
+		// right side
+		1., -1, -1,        1., 1.,
+		1., -1, 1,         0., 1.,
+		1., 1., 1.,        0., 0.,
+		1., 1., -1.,       1., 0.,
+
+		// left side
+		-1., -1., 1.,      1., 1.,
+		-1., -1., -1.,     0., 1.,
+		-1., 1., -1.,      0., 0.,
+		-1., 1., 1.,       1., 0.,
+
+		// back side
+		-1., -1., -1.,     1., 1.,
+		1., -1, -1.,       0., 1.,
+		1, 1, -1.,         0., 0.,
+		-1, 1, -1.,        1., 0.,
+		
+		// front side
+		1., -1., 1.,       1., 1.,
+		-1., -1., 1.,      0., 1.,
+		-1, 1., 1.,        0., 0.,
+		1., 1., 1.,        1., 0.,
+	};
+	int indices[] = {
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4,
+		8, 9, 10, 10, 11, 8,
+		12, 13, 14, 14, 15, 12,
+		16, 17, 18, 18, 19, 16,
+		20, 21, 22, 22, 23, 20
+	};
+
+	glGenBuffers(1, &cubevbo);
+	glGenBuffers(1, &cubeidx);
+	glGenVertexArrays(1, &cubevao);
+
+	glBindVertexArray(cubevao);
+	glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
+	glBufferData(GL_ARRAY_BUFFER, 6 * 5 * 4 * sizeof(float), corners, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_position);
+	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_texcoord);
+	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
+}
+
+void IrrDriver::renderSkybox()
+{
+    scene::ICameraSceneNode *camera = m_scene_manager->getActiveCamera();
+	if (!cubevao)
+		createcubevao();
+	glBindVertexArray(cubevao);
+	glDisable(GL_CULL_FACE);
+	assert(SkyboxTextures.size() == 6);
+	core::matrix4 transform = irr_driver->getProjViewMatrix();
+	core::matrix4 translate;
+	translate.setTranslation(camera->getAbsolutePosition());
+
+	// Draw the sky box between the near and far clip plane
+	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
+	core::matrix4 scale;
+	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
+	transform *= translate * scale;
+	
+	for (unsigned i = 0; i < 6; i++)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(SkyboxTextures[i])->getOpenGLTextureName());
+		glUseProgram(MeshShader::ObjectUnlitShader::Program);
+		MeshShader::ObjectUnlitShader::setUniforms(transform, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*) (6 * i * sizeof(int)));
+	}
+	glBindVertexArray(0);
 }
 
 // ----------------------------------------------------------------------------

@@ -112,6 +112,8 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
+	std::vector<video::ITexture *> SkyboxTextures;
+
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
      *  change to new resolution and trigger confirmation dialog.
@@ -206,6 +208,7 @@ private:
                     std::vector<GlowData>& glows,
                     const core::aabbox3df& cambox,
                     int cam);
+	void renderSkybox();
     void renderLights(const core::aabbox3df& cambox,
                       scene::ICameraSceneNode * const camnode,
                       video::SOverrideMaterial &overridemat,

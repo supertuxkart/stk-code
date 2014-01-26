@@ -1145,6 +1145,7 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
                                          float texture_percent,
                                          float sphere_percent)
 {
+	Log::error("skybox", "Using deprecated SkyDome");
     return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
                                                 texture_percent,
                                                 sphere_percent);
@@ -1164,6 +1165,7 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
 scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                         &texture)
 {
+	SkyboxTextures = texture;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
