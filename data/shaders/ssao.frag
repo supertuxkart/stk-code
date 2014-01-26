@@ -17,7 +17,7 @@ const float invSamples = strengh / SAMPLES;
 
 vec3 rand(vec2 co)
 {
-   return texture(noise_texture, co).xyz;
+   return texture(noise_texture, co*20).xyz;
 }
 
 void main(void)

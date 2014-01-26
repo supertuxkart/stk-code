@@ -547,7 +547,7 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, 0);
 
 	if (!noise_tex)
-		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/tarmac.jpg").c_str());
+		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName());
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
