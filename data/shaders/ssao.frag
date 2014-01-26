@@ -10,7 +10,7 @@ out vec4 FragColor;
 
 const float radius = .4f;
 
-#define SAMPLES 8
+#define SAMPLES 16
 
 const float invSamples = 1. / SAMPLES;
 

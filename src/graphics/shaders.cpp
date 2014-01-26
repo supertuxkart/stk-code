@@ -1269,7 +1269,7 @@ namespace FullScreenShader
 
 		SSAOSamples[32] = -0.654493;
 		SSAOSamples[33] = -0.140866;
-		SSAOSamples[32] = 0.742830;
+		SSAOSamples[34] = 0.742830;
 		SSAOSamples[35] = 0.699820;
 
 		SSAOSamples[36] = 0.114730;
