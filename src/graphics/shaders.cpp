@@ -339,8 +339,10 @@ namespace MeshShader
 	GLuint ObjectPass2Shader::Program;
 	GLuint ObjectPass2Shader::attrib_position;
 	GLuint ObjectPass2Shader::attrib_texcoord;
+	GLuint ObjectPass2Shader::attrib_second_texcoord;
 	GLuint ObjectPass2Shader::uniform_MVP;
 	GLuint ObjectPass2Shader::uniform_Albedo;
+	GLuint ObjectPass2Shader::uniform_Detail;
 	GLuint ObjectPass2Shader::uniform_DiffuseMap;
 	GLuint ObjectPass2Shader::uniform_SpecularMap;
 	GLuint ObjectPass2Shader::uniform_SSAO;
@@ -352,8 +354,10 @@ namespace MeshShader
 		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+		uniform_Detail = glGetUniformLocation(Program, "Detail");
 		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
 		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
 		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
@@ -361,10 +365,11 @@ namespace MeshShader
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
 	}
 
-	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_detail, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
+		glUniform1i(uniform_Detail, TU_detail);
 		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
 		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
 		glUniform1i(uniform_SSAO, TU_SSAO);
