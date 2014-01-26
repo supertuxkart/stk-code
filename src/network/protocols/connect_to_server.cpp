@@ -212,7 +212,7 @@ void ConnectToServer::asynchronousUpdate()
                         int count = 0;
                         while(error==ERROR_INSUFFICIENT_BUFFER && count < 10)
                         {
-                            delete table;   // deleting NULL is legal
+                            delete[] table;   // deleting NULL is legal
                             table =  (MIB_IPADDRTABLE*)new char[size];
                             error = GetIpAddrTable(table, &size, 0);
                             count ++;
@@ -226,7 +226,7 @@ void ConnectToServer::asynchronousUpdate()
                                 break;
                             }
                         }
-                        delete table;
+                        delete[] table;
 
 #endif
                         m_server_address = sender;

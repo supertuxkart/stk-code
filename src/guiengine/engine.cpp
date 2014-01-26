@@ -754,7 +754,6 @@ namespace GUIEngine
     // ------------------------------------------------------------------------
     Widget* getFocusForPlayer(const unsigned int playerID)
     {
-        assert(playerID >= 0);
         assert(playerID < MAX_PLAYER_COUNT);
 
         return g_focus_for_player[playerID];
@@ -773,7 +772,6 @@ namespace GUIEngine
     bool isFocusedForPlayer(const Widget* w, const unsigned int playerID)
     {
         assert(w != NULL);
-        assert(playerID >= 0);
         assert(playerID < MAX_PLAYER_COUNT);
 
         // If no focus

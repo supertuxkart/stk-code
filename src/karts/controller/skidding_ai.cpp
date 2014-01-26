@@ -851,8 +851,7 @@ bool SkiddingAI::handleSelectedItem(float kart_aim_angle, Vec3 *aim_point)
     // If the item is unavailable or has been switched into a bad item
     // stop aiming for it.
     if(m_item_to_collect->getDisableTime()>0 ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA   )
+        m_item_to_collect->getType() == Item::ITEM_BANANA )
         return false;
 
     const Vec3 &xyz = m_item_to_collect->getXYZ();

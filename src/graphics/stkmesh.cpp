@@ -117,6 +117,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 		break;
 	case scene::EPT_LINES:
 		result.PrimitiveType = GL_LINES;
+        break;
 	case scene::EPT_TRIANGLES:
 		result.PrimitiveType = GL_TRIANGLES;
 		break;
