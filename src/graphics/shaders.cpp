@@ -1225,7 +1225,90 @@ namespace FullScreenShader
 		uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");
 		vao = createVAO(Program);
 
-		for (unsigned i = 0; i < 16; i++) {
+		// SSAOSamples[4 * i] and SSAOSamples[4 * i + 1] can be negative
+
+		SSAOSamples[0] = 0.135061;
+		SSAOSamples[1] = 0.207948;
+		SSAOSamples[2] = 0.968770;
+		SSAOSamples[3] = 0.983032;
+
+		SSAOSamples[4] = 0.273456;
+		SSAOSamples[5] = -0.805390;
+		SSAOSamples[6] = 0.525898;
+		SSAOSamples[7] = 0.942808;
+
+		SSAOSamples[8] = 0.443450;
+		SSAOSamples[9] = -0.803786;
+		SSAOSamples[10] = 0.396585;
+		SSAOSamples[11] = 0.007996;
+
+		SSAOSamples[12] = 0.742420;
+		SSAOSamples[13] = -0.620072;
+		SSAOSamples[14] = 0.253621;
+		SSAOSamples[15] = 0.284829;
+
+		SSAOSamples[16] = 0.892464;
+		SSAOSamples[17] = 0.046221;
+		SSAOSamples[18] = 0.448744;
+		SSAOSamples[19] = 0.753655;
+
+		SSAOSamples[20] = 0.830350;
+		SSAOSamples[21] = -0.043593;
+		SSAOSamples[22] = 0.555535;
+		SSAOSamples[23] = 0.357463;
+
+		SSAOSamples[24] = -0.600612;
+		SSAOSamples[25] = -0.536421;
+		SSAOSamples[26] = 0.592889;
+		SSAOSamples[27] = 0.670583;
+
+		SSAOSamples[28] = -0.280658;
+		SSAOSamples[29] = 0.674894;
+		SSAOSamples[30] = 0.682458;
+		SSAOSamples[31] = 0.553362;
+
+		SSAOSamples[32] = -0.654493;
+		SSAOSamples[33] = -0.140866;
+		SSAOSamples[32] = 0.742830;
+		SSAOSamples[35] = 0.699820;
+
+		SSAOSamples[36] = 0.114730;
+		SSAOSamples[37] = 0.873130;
+		SSAOSamples[38] = 0.473794;
+		SSAOSamples[39] = 0.483901;
+
+		SSAOSamples[40] = 0.699167;
+		SSAOSamples[41] = 0.632210;
+		SSAOSamples[42] = 0.333879;
+		SSAOSamples[43] = 0.010956;
+
+		SSAOSamples[44] = 0.904603;
+		SSAOSamples[45] = 0.393410;
+		SSAOSamples[46] = 0.164080;
+		SSAOSamples[47] = 0.780297;
+
+		SSAOSamples[48] = 0.631662;
+		SSAOSamples[49] = -0.405195;
+		SSAOSamples[50] = 0.660924;
+		SSAOSamples[51] = 0.865596;
+
+		SSAOSamples[52] = -0.195668;
+		SSAOSamples[53] = 0.629185;
+		SSAOSamples[54] = 0.752223;
+		SSAOSamples[55] = 0.019013;
+
+		SSAOSamples[56] = -0.511316;
+		SSAOSamples[57] = 0.635504;
+		SSAOSamples[58] = 0.578524;
+		SSAOSamples[59] = 0.605457;
+
+		SSAOSamples[60] = -0.898843;
+		SSAOSamples[61] = 0.067382;
+		SSAOSamples[62] = 0.433061;
+		SSAOSamples[63] = 0.772942;
+
+		// Generate another random distribution, if needed
+/*		for (unsigned i = 0; i < 16; i++) {
 			// Use double to avoid denorm and get a true uniform distribution
 			// Generate z component between [0.1; 1] to avoid being too close from surface
 			double z = rand();
@@ -1253,7 +1336,7 @@ namespace FullScreenShader
 			SSAOSamples[4 * i + 1] = (float)y;
 			SSAOSamples[4 * i + 2] = (float)z;
 			SSAOSamples[4 * i + 3] = (float)w;
-		}
+		}*/
 	}
 
 	GLuint FogShader::Program;
