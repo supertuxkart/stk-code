@@ -274,20 +274,17 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
     if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
     if (update_rigid_body && m_physical_object != NULL) 
     {
+        // If we set a bullet position from an irrlicht position, we need to
+        // get the absolute transform from the presentation object (as set in
+        // the line before), since xyz etc here are only relative to a
+        // potential parent scene node.
         TrackObjectPresentationSceneNode *tops =
             dynamic_cast<TrackObjectPresentationSceneNode*>(m_presentation);
         if(tops)
         {
-            core::matrix4 m = tops->getNode()->getAbsoluteTransformation();
-            core::vector3df xyz_abs;
-            m.transformVect(xyz_abs, xyz);
-            core::vector3df hpr_abs;
-            // FIXME - adding the rotations appears odd
-            // perhaps we should create the matrix and multiply
-            // with the absolute transform?
-            hpr_abs = hpr + tops->getNode()->getAbsoluteTransformation()
-                                        .getRotationDegrees();
-            m_physical_object->move(xyz_abs, hpr_abs);
+            const core::matrix4 &m = tops->getNode()
+                                   ->getAbsoluteTransformation();
+            m_physical_object->move(m.getTranslation(),m.getRotationDegrees());
         }
         else
         {
