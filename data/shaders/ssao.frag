@@ -8,12 +8,11 @@ uniform vec4 samplePoints[16];
 in vec2 uv;
 out vec4 FragColor;
 
-const float strengh = 4.;
 const float radius = .4f;
 
 #define SAMPLES 8
 
-const float invSamples = strengh / SAMPLES;
+const float invSamples = 1. / SAMPLES;
 
 vec3 rand(vec2 co)
 {
@@ -53,7 +52,7 @@ void main(void)
 		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
 		occluderPos /= occluderPos.w;
 
-		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
+		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0));
 		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) : 0.;
 	}
 
