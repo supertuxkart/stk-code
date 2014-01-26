@@ -91,7 +91,7 @@ void PhysicalObject::Settings::init()
     m_body_type          = PhysicalObject::MP_NONE;
     m_crash_reset        = false;
     m_knock_kart         = false;
-    m_mass               = -1.0f;
+    m_mass               = 0.0f;
     m_radius             = -1.0f;
     m_reset_when_too_low = false;
     m_flatten_kart       = false;
