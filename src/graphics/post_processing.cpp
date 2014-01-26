@@ -531,6 +531,7 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+	glDisable(GL_ALPHA_TEST);
 
 	glUseProgram(FullScreenShader::SSAOShader::Program);
 	glBindVertexArray(FullScreenShader::SSAOShader::vao);
