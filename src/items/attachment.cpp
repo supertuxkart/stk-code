@@ -53,6 +53,7 @@ Attachment::Attachment(AbstractKart* kart)
     m_bomb_sound           = NULL;
     m_bubble_explode_sound = NULL;
     m_node_scale           = 1.0f;
+    m_initial_speed        = 0.0f;
 
     // If we attach a NULL mesh, we get a NULL scene node back. So we
     // have to attach some kind of mesh, but make it invisible.

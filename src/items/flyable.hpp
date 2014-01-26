@@ -46,10 +46,6 @@ class Flyable : public Moveable, public TerrainInfo
 public:
 private:
     bool              m_has_hit_something;
-    /** This flag is used to avoid that a rocket explodes mode than once.
-     *  It can happen that more than one collision between a rocket and
-     *  a track or kart is reported by the physics.                        */
-    bool              m_exploded;
 
     /** If this flag is set, the up velocity of the kart will not be
      *  adjusted in case that the objects is too high or too low above the
