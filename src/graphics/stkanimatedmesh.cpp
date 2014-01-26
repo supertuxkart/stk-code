@@ -81,6 +81,8 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 			  else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 				  drawObjectUnlit(mesh, ModelViewProjectionMatrix);
+			  else if (mesh.textures[1])
+				  drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
 			  else
 				  drawObjectPass2(mesh, ModelViewProjectionMatrix);
 			  break;

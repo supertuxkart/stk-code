@@ -35,6 +35,7 @@ void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProje
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)
+void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);

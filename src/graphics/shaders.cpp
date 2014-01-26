@@ -244,6 +244,7 @@ void Shaders::loadShaders()
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+	MeshShader::DetailledObjectPass2Shader::init();
 	MeshShader::ObjectRimLimitShader::init();
 	MeshShader::UntexturedObjectShader::init();
 	MeshShader::ObjectRefPass2Shader::init();
@@ -339,10 +340,8 @@ namespace MeshShader
 	GLuint ObjectPass2Shader::Program;
 	GLuint ObjectPass2Shader::attrib_position;
 	GLuint ObjectPass2Shader::attrib_texcoord;
-	GLuint ObjectPass2Shader::attrib_second_texcoord;
 	GLuint ObjectPass2Shader::uniform_MVP;
 	GLuint ObjectPass2Shader::uniform_Albedo;
-	GLuint ObjectPass2Shader::uniform_Detail;
 	GLuint ObjectPass2Shader::uniform_DiffuseMap;
 	GLuint ObjectPass2Shader::uniform_SpecularMap;
 	GLuint ObjectPass2Shader::uniform_SSAO;
@@ -352,6 +351,45 @@ namespace MeshShader
 	void ObjectPass2Shader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_pass2.frag").c_str());
+		attrib_position = glGetAttribLocation(Program, "Position");
+		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+		uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+		uniform_screen = glGetUniformLocation(Program, "screen");
+		uniform_ambient = glGetUniformLocation(Program, "ambient");
+	}
+
+	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	{
+		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+		glUniform1i(uniform_Albedo, TU_Albedo);
+		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+		glUniform1i(uniform_SSAO, TU_SSAO);
+		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+		glUniform3f(uniform_ambient, s.r, s.g, s.b);
+	}
+
+	GLuint DetailledObjectPass2Shader::Program;
+	GLuint DetailledObjectPass2Shader::attrib_position;
+	GLuint DetailledObjectPass2Shader::attrib_texcoord;
+	GLuint DetailledObjectPass2Shader::attrib_second_texcoord;
+	GLuint DetailledObjectPass2Shader::uniform_MVP;
+	GLuint DetailledObjectPass2Shader::uniform_Albedo;
+	GLuint DetailledObjectPass2Shader::uniform_Detail;
+	GLuint DetailledObjectPass2Shader::uniform_DiffuseMap;
+	GLuint DetailledObjectPass2Shader::uniform_SpecularMap;
+	GLuint DetailledObjectPass2Shader::uniform_SSAO;
+	GLuint DetailledObjectPass2Shader::uniform_screen;
+	GLuint DetailledObjectPass2Shader::uniform_ambient;
+
+	void DetailledObjectPass2Shader::init()
+	{
+		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
@@ -365,7 +403,7 @@ namespace MeshShader
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
 	}
 
-	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_detail, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	void DetailledObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_detail, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
