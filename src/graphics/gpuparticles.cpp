@@ -532,10 +532,8 @@ void ParticleSystemProxy::drawFlip()
 	glDisable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 
-	if (m_alpha_additive)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	else
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glUseProgram(ParticleShader::FlipParticleRender::Program);
 
 	float screen[2] = {
@@ -543,7 +541,7 @@ void ParticleSystemProxy::drawFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	setTexture(0, texture, GL_LINEAR, GL_LINEAR);
+	setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 	setTexture(1, normal_and_depth, GL_NEAREST, GL_NEAREST);
 
 	ParticleShader::FlipParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
@@ -575,7 +573,7 @@ void ParticleSystemProxy::drawNotFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	setTexture(0, texture, GL_LINEAR, GL_LINEAR);
+	setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
 	setTexture(1, normal_and_depth, GL_NEAREST, GL_NEAREST);
 
 	ParticleShader::SimpleParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
