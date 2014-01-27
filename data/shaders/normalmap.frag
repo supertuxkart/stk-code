@@ -4,7 +4,7 @@ uniform sampler2D normalMap;
 noperspective in vec3 tangent;
 noperspective in vec3 bitangent;
 in vec2 uv;
-out vec4 FragColor;
+out vec3 Normal;
 
 void main()
 {
@@ -18,5 +18,5 @@ void main()
 	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;
 	FragmentNormal = normalize(FragmentNormal);
 	
-	FragColor = vec4(0.5 * FragmentNormal + 0.5, gl_FragCoord.z);
+	Normal = 0.5 * FragmentNormal + 0.5, gl_FragCoord.z;
 }

@@ -238,6 +238,12 @@ GLint COpenGLTexture::getOpenGLFormatAndParametersFromColorFormat(ECOLOR_FORMAT 
 #endif
 		}
 			break;
+		case ECF_R11G11B10F:
+			filtering = GL_NEAREST;
+			colorformat = GL_RGB;
+			type = GL_FLOAT;
+			internalformat = GL_R11F_G11F_B10F;
+			break;
 		case ECF_G32R32F:
 		{
 #ifdef GL_ARB_texture_rg
