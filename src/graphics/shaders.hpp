@@ -415,12 +415,12 @@ class SSAOShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_normals_and_depth, uniform_noise_texture, uniform_invprojm, uniform_projm, uniform_samplePoints;
+	static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_invprojm, uniform_projm, uniform_samplePoints;
 	static GLuint vao;
 	static float SSAOSamples[64];
 	
 	static void init();
-	static void setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_noise);
+	static void setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise);
 };
 
 class FogShader

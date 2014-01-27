@@ -529,10 +529,11 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 
 	glUseProgram(FullScreenShader::SSAOShader::Program);
 	glBindVertexArray(FullScreenShader::SSAOShader::vao);
-	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
-	setTexture(1, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
+	setTexture(2, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
 
-	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1);
+	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

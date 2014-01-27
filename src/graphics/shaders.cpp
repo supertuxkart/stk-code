@@ -1256,7 +1256,8 @@ namespace FullScreenShader
 	}
 
 	GLuint SSAOShader::Program;
-	GLuint SSAOShader::uniform_normals_and_depth;
+	GLuint SSAOShader::uniform_ntex;
+	GLuint SSAOShader::uniform_dtex;
 	GLuint SSAOShader::uniform_noise_texture;
 	GLuint SSAOShader::uniform_invprojm;
 	GLuint SSAOShader::uniform_projm;
@@ -1267,7 +1268,8 @@ namespace FullScreenShader
 	void SSAOShader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
-		uniform_normals_and_depth = glGetUniformLocation(Program, "normals_and_depth");
+		uniform_ntex = glGetUniformLocation(Program, "ntex");
+		uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_noise_texture = glGetUniformLocation(Program, "noise_texture");
 		uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		uniform_projm = glGetUniformLocation(Program, "projm");
@@ -1388,13 +1390,14 @@ namespace FullScreenShader
 		}*/
 	}
 
-	void SSAOShader::setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_noise)
+	void SSAOShader::setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise)
 	{
 		glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
 		glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
 		glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
 
-		glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, TU_ntex);
+		glUniform1i(FullScreenShader::SSAOShader::uniform_ntex, TU_ntex);
+		glUniform1i(FullScreenShader::SSAOShader::uniform_dtex, TU_dtex);
 		glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, TU_noise);
 	}
 
