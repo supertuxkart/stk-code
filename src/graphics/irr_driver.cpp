@@ -1171,6 +1171,11 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                                texture[4], texture[5]);
 }   // addSkyBox
 
+void IrrDriver::suppressSkyBox()
+{
+	SkyboxTextures.clear();
+}
+
 // ----------------------------------------------------------------------------
 /** Adds a camera to the scene.
  */
