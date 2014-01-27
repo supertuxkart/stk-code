@@ -272,6 +272,7 @@ public:
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
+	void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
