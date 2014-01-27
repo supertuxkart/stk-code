@@ -34,7 +34,6 @@ namespace video
 		//! The normalized non-float formats from the _rg extension
 		ECF_R8,
 		ECF_R8G8,
-		ECF_R11G11B10F,
 		ECF_R16,
 		ECF_R16G16,
 

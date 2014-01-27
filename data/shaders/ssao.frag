@@ -21,6 +21,13 @@ vec3 rand(vec2 co)
    return texture(noise_texture, co*20.16).xyz;
 }
 
+vec3 DecodeNormal(vec2 n)
+{
+  float z = dot(n, n) * 2. - 1.;
+  vec2 xy = normalize(n) * sqrt(1. - z * z);
+  return vec3(xy,z);
+}
+
 void main(void)
 {
 	vec4 cur = texture(ntex, uv);
@@ -29,7 +36,7 @@ void main(void)
 	FragPos /= FragPos.w;
 
 	// get the normal of current fragment
-	vec3 norm = normalize(cur.xyz * vec3(2.0) - vec3(1.0));
+	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 	// Workaround for nvidia and skyboxes
 	float len = dot(vec3(1.0), abs(cur.xyz));
 	if (len < 0.2 || curdepth > 0.999) discard;

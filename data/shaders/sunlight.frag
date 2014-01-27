@@ -14,6 +14,13 @@ out vec4 Diff;
 out vec4 Spec;
 out vec4 SpecularMap;
 
+vec3 DecodeNormal(vec2 n)
+{
+  float z = dot(n, n) * 2. - 1.;
+  vec2 xy = normalize(n) * sqrt(1. - z * z);
+  return vec3(xy,z);
+}
+
 void main() {
 	float z = texture(dtex, uv).x;
 	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
@@ -28,7 +35,7 @@ void main() {
 		return;
 	}
 
-	vec3 norm = normalize(2. * texture(ntex, uv).xyz - 1.);
+	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 
 	// Normalized on the cpu
 	vec3 L = direction;

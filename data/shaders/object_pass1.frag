@@ -1,8 +1,14 @@
 #version 130
 noperspective in vec3 nor;
-out vec3 Normal;
+out vec2 EncodedNormal;
+
+// from Crytek "a bit more deferred CryEngine"
+vec2 EncodeNormal(vec3 n)
+{
+	return normalize(n.xy) * sqrt(n.z * 0.5 + 0.5);
+}
 
 void main(void)
 {
-    Normal = 0.5 * nor + 0.5;
+	EncodedNormal = 0.5 * EncodeNormal(normalize(nor)) + 0.5;
 }
