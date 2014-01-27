@@ -15,8 +15,6 @@ void main()
 	vec3 Frag_normal = normalize(cross(Frag_tangent, bitangent));
 	vec3 Frag_bitangent = cross(Frag_normal, Frag_tangent);
 
-	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;
-	FragmentNormal = normalize(FragmentNormal);
-	
-	Normal = 0.5 * FragmentNormal + 0.5, gl_FragCoord.z;
+	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;	
+	Normal = 0.5 * FragmentNormal + 0.5;
 }

@@ -28,8 +28,7 @@ void main() {
 		return;
 	}
 
-	vec3 norm = texture(ntex, uv).xyz;
-	norm = (norm - 0.5) * 2.0;
+	vec3 norm = normalize(2. * texture(ntex, uv).xyz - 1.);
 
 	// Normalized on the cpu
 	vec3 L = direction;

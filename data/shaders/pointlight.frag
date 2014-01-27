@@ -16,8 +16,7 @@ out vec4 Specular;
 void main() {
 	vec2 texc = uv;
 	float z = texture(dtex, texc).x;
-	vec3 norm = texture(ntex, texc).xyz;
-	norm = (norm - 0.5) * 2.0;
+	vec3 norm = normalize(2. * texture(ntex, texc).xyz - 1.);
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;
