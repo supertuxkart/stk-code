@@ -9,6 +9,6 @@ void main() {
 	vec4 col = texture(tex, uv);
 	if (col.a < 0.5)
 		discard;
-	Normal = 0.5 * normalize(nor) + 0.5, gl_FragCoord.z;
+	Normal = 0.5 * normalize(nor) + 0.5;
 }
 
