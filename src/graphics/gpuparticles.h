@@ -37,7 +37,7 @@ protected:
 
 	static GLuint quad_vertex_buffer;
 
-	GLuint texture, normal_and_depth;
+	GLuint texture;
 	unsigned count;
 	static void SimpleParticleVAOBind(GLuint PositionBuffer);
 	static void FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer);
