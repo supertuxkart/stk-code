@@ -524,20 +524,15 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glDisable(GL_BLEND);
 	glDisable(GL_ALPHA_TEST);
 
-	glUseProgram(FullScreenShader::SSAOShader::Program);
-	glBindVertexArray(FullScreenShader::SSAOShader::vao);
-	glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
-	glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
-	glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
-
-	glActiveTexture(GL_TEXTURE0);
-	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
-	glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, 0);
-
 	if (!noise_tex)
 		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
+
+	glUseProgram(FullScreenShader::SSAOShader::Program);
+	glBindVertexArray(FullScreenShader::SSAOShader::vao);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
 	setTexture(1, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
-	glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, 1);
+
+	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

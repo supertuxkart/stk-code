@@ -420,6 +420,7 @@ public:
 	static float SSAOSamples[64];
 	
 	static void init();
+	static void setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_noise);
 };
 
 class FogShader

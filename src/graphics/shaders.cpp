@@ -1263,6 +1263,7 @@ namespace FullScreenShader
 	GLuint SSAOShader::uniform_samplePoints;
 	GLuint SSAOShader::vao;
 	float SSAOShader::SSAOSamples[64];
+
 	void SSAOShader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
@@ -1385,6 +1386,16 @@ namespace FullScreenShader
 			SSAOSamples[4 * i + 2] = (float)z;
 			SSAOSamples[4 * i + 3] = (float)w;
 		}*/
+	}
+
+	void SSAOShader::setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_noise)
+	{
+		glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
+		glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
+		glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
+
+		glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, TU_ntex);
+		glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, TU_noise);
 	}
 
 	GLuint FogShader::Program;
