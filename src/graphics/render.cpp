@@ -787,7 +787,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		accumulatedLightColor.push_back(0.);
 		accumulatedLightEnergy.push_back(0.);
 	}
-	m_post_processing->renderPointlight(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH) , accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
+	m_post_processing->renderPointlight(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
                          SColor(255, 255, 255, 255));

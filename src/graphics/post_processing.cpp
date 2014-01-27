@@ -302,7 +302,7 @@ void renderColorLevel(ITexture *in)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
+void PostProcessing::renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
 {
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
@@ -312,18 +312,8 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glUseProgram(FullScreenShader::PointLightShader::Program);
 	glBindVertexArray(FullScreenShader::PointLightShader::vao);
 
-	glUniform4fv(FullScreenShader::PointLightShader::uniform_center, 16, positions.data());
-	glUniform4fv(FullScreenShader::PointLightShader::uniform_col, 16, colors.data());
-	glUniform1fv(FullScreenShader::PointLightShader::uniform_energy, 16, energy.data());
-	glUniform1f(FullScreenShader::PointLightShader::uniform_spec, 200);
-	glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-	glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_viewm, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::PointLightShader::uniform_ntex, 0);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

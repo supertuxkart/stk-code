@@ -1115,6 +1115,7 @@ namespace FullScreenShader
 	GLuint PointLightShader::uniform_invproj;
 	GLuint PointLightShader::uniform_viewm;
 	GLuint PointLightShader::vao;
+
 	void PointLightShader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
@@ -1126,6 +1127,18 @@ namespace FullScreenShader
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_viewm = glGetUniformLocation(Program, "viewm");
 		vao = createVAO(Program);
+	}
+
+	void PointLightShader::setUniforms(const core::matrix4 &InvProjMatrix, const core::matrix4 &ViewMatrix, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy, unsigned spec, unsigned TU_ntex)
+	{
+		glUniform4fv(FullScreenShader::PointLightShader::uniform_center, 16, positions.data());
+		glUniform4fv(FullScreenShader::PointLightShader::uniform_col, 16, colors.data());
+		glUniform1fv(FullScreenShader::PointLightShader::uniform_energy, 16, energy.data());
+		glUniform1f(FullScreenShader::PointLightShader::uniform_spec, 200);
+		glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+		glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_viewm, 1, GL_FALSE, ViewMatrix.pointer());
+
+		glUniform1i(FullScreenShader::PointLightShader::uniform_ntex, TU_ntex);
 	}
 
 	GLuint SunLightShader::Program;
