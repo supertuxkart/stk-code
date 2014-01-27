@@ -69,6 +69,7 @@ public:
 
 	virtual void setEmitter(scene::IParticleEmitter* emitter);
 	virtual void render();
+	virtual void OnRegisterSceneNode();
 	void setAlphaAdditive(bool);
 	void setIncreaseFactor(float);
 	void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);
