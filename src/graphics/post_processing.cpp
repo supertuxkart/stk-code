@@ -555,9 +555,9 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	const float end = track->getFogEnd();
 	const SColor tmpcol = track->getFogColor();
 
-	const float col[3] = { tmpcol.getRed() / 255.0f,
+	core::vector3df col( tmpcol.getRed() / 255.0f,
 		tmpcol.getGreen() / 255.0f,
-		tmpcol.getBlue() / 255.0f };
+		tmpcol.getBlue() / 255.0f );
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -567,17 +567,8 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	glUseProgram(FullScreenShader::FogShader::Program);
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
-	glUniform1f(FullScreenShader::FogShader::uniform_fogmax, fogmax);
-	glUniform1f(FullScreenShader::FogShader::uniform_startH, startH);
-	glUniform1f(FullScreenShader::FogShader::uniform_endH, endH);
-	glUniform1f(FullScreenShader::FogShader::uniform_start, start);
-	glUniform1f(FullScreenShader::FogShader::uniform_end, end);
-	glUniform3f(FullScreenShader::FogShader::uniform_col, col[0], col[1], col[2]);
-	glUniform3f(FullScreenShader::FogShader::uniform_campos, campos.X, campos.Y, campos.Z);
-	glUniformMatrix4fv(FullScreenShader::FogShader::uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
-	glUniform1i(FullScreenShader::FogShader::uniform_tex, 0);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, campos, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

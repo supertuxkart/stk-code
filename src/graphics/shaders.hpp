@@ -431,6 +431,7 @@ public:
 	static GLuint vao;
 
 	static void init();
+	static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_ntex);
 };
 
 }
