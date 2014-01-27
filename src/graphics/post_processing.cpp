@@ -567,7 +567,7 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	glUseProgram(FullScreenShader::FogShader::Program);
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
-	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(0, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
 	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, campos, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

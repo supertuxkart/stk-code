@@ -15,9 +15,9 @@ out vec4 FragColor;
 
 void main()
 {
-	float z = texture(tex, uv).a;
+	float z = texture(tex, uv).x;
 
-	vec3 tmp = vec3(gl_TexCoord[0].xy, z);
+	vec3 tmp = vec3(uv, z);
 	tmp = tmp * 2.0 - 1.0;
 
 	vec4 xpos = vec4(tmp, 1.0);
