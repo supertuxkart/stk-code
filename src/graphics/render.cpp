@@ -345,8 +345,10 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_POP_CPU_MARKER();
     }  // for i<getNumKarts
 
+    PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
     // Either render the gui, or the global elements of the race gui.
     GUIEngine::render(dt);
+    PROFILER_POP_CPU_MARKER();
 
     // Render the profiler
     if(UserConfigParams::m_profiler_enabled)
@@ -359,7 +361,9 @@ void IrrDriver::renderGLSL(float dt)
     drawDebugMeshes();
 #endif
 
+    PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
     m_video_driver->endScene();
+    PROFILER_POP_CPU_MARKER();
 
     getPostProcessing()->update(dt);
 }
