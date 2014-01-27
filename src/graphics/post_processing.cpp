@@ -313,7 +313,8 @@ void PostProcessing::renderPointlight(const std::vector<float> &positions, const
 	glBindVertexArray(FullScreenShader::PointLightShader::vao);
 
 	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
-	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0);
+	setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0, 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

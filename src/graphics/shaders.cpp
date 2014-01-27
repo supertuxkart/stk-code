@@ -1108,6 +1108,7 @@ namespace FullScreenShader
 
 	GLuint PointLightShader::Program;
 	GLuint PointLightShader::uniform_ntex;
+	GLuint PointLightShader::uniform_dtex;
 	GLuint PointLightShader::uniform_center;
 	GLuint PointLightShader::uniform_col;
 	GLuint PointLightShader::uniform_energy;
@@ -1120,6 +1121,7 @@ namespace FullScreenShader
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
 		uniform_ntex = glGetUniformLocation(Program, "ntex");
+		uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_center = glGetUniformLocation(Program, "center[0]");
 		uniform_col = glGetUniformLocation(Program, "col[0]");
 		uniform_energy = glGetUniformLocation(Program, "energy[0]");
@@ -1129,7 +1131,7 @@ namespace FullScreenShader
 		vao = createVAO(Program);
 	}
 
-	void PointLightShader::setUniforms(const core::matrix4 &InvProjMatrix, const core::matrix4 &ViewMatrix, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy, unsigned spec, unsigned TU_ntex)
+	void PointLightShader::setUniforms(const core::matrix4 &InvProjMatrix, const core::matrix4 &ViewMatrix, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
 	{
 		glUniform4fv(FullScreenShader::PointLightShader::uniform_center, 16, positions.data());
 		glUniform4fv(FullScreenShader::PointLightShader::uniform_col, 16, colors.data());
@@ -1139,6 +1141,7 @@ namespace FullScreenShader
 		glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_viewm, 1, GL_FALSE, ViewMatrix.pointer());
 
 		glUniform1i(FullScreenShader::PointLightShader::uniform_ntex, TU_ntex);
+		glUniform1i(FullScreenShader::PointLightShader::uniform_dtex, TU_dtex);
 	}
 
 	GLuint SunLightShader::Program;

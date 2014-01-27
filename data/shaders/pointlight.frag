@@ -1,5 +1,6 @@
 #version 130
 uniform sampler2D ntex;
+uniform sampler2D dtex;
 
 uniform vec4 center[16];
 uniform vec4 col[16];
@@ -14,7 +15,7 @@ out vec4 Specular;
 
 void main() {
 	vec2 texc = uv;
-	float z = texture(ntex, texc).a;
+	float z = texture(dtex, texc).x;
 	vec3 norm = texture(ntex, texc).xyz;
 	norm = (norm - 0.5) * 2.0;
 
