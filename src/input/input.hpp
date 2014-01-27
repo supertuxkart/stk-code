@@ -79,7 +79,7 @@ struct Input
 
     Input()
         : m_type(IT_NONE), m_device_id(0), m_button_id(0),
-          m_axis_direction(0), m_character(0), m_axis_range(Input::AR_FULL)
+        m_axis_direction(0), m_axis_range(Input::AR_FULL), m_character(0)
     {
         // Nothing to do.
     }
