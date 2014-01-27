@@ -334,11 +334,11 @@ class SunLightShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_ntex, uniform_direction, uniform_col, uniform_invproj;
+	static GLuint uniform_ntex, uniform_dtex, uniform_direction, uniform_col, uniform_invproj;
 	static GLuint vao;
 
 	static void init();
-	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex);
+	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class LightBlendShader

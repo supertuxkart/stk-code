@@ -1,5 +1,6 @@
 #version 130
 uniform sampler2D ntex;
+uniform sampler2D dtex;
 //uniform sampler2D cloudtex;
 
 uniform vec3 direction;
@@ -14,7 +15,7 @@ out vec4 Spec;
 out vec4 SpecularMap;
 
 void main() {
-	float z = texture(ntex, uv).a;
+	float z = texture(dtex, uv).x;
 	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
 	xpos = invproj * xpos;
 	xpos.xyz /= xpos.w;

@@ -335,9 +335,9 @@ void PostProcessing::renderSunlight()
 
   glUseProgram(FullScreenShader::SunLightShader::Program);
   glBindVertexArray(FullScreenShader::SunLightShader::vao);
-  GLuint ntex_id = static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName();
-  setTexture(0, ntex_id, GL_NEAREST, GL_NEAREST);
-  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0);
+  setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
 }
