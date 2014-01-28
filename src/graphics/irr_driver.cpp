@@ -1515,7 +1515,7 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    static char buffer[64];
+    static char buffer[128];
 
     if (UserConfigParams::m_artist_debug_mode)
     {
