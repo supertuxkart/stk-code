@@ -26,6 +26,7 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 
 void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
+	assert(irr_driver->getPhase() == TRANSPARENT_PASS);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
