@@ -288,6 +288,13 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
 		irr_driver->setPhase(TRANSPARENT_PASS);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_CULL_FACE);
         m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 

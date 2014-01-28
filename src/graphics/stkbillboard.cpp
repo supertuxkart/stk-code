@@ -40,10 +40,6 @@ STKBillboard::STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneMan
 
 void STKBillboard::render()
 {
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBlendEquation(GL_FUNC_ADD);
-	glDepthMask(GL_FALSE);
 	core::vector3df pos = getAbsolutePosition();
 	glBindVertexArray(billboardvao);
 	GLuint texid = static_cast<irr::video::COpenGLTexture*>(Material.getTexture(0))->getOpenGLTextureName();

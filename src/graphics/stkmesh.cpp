@@ -686,16 +686,9 @@ void STKMesh::drawDisplace(const GLMesh &mesh)
 void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	assert(irr_driver->getPhase() == TRANSPARENT_PASS);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
 
 	computeMVP(ModelViewProjectionMatrix);
-		
+
 	if (type == irr_driver->getShader(ES_BUBBLES))
 		drawBubble(mesh, ModelViewProjectionMatrix);
 	else
@@ -957,16 +950,18 @@ void STKMesh::render()
 				if (transparent)
 					drawTransparent(GLmeshes[i], material.MaterialType);
 				else
+				{
 					drawSolid(GLmeshes[i], material.MaterialType);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-				video::SMaterial material;
-				material.MaterialType = irr_driver->getShader(ES_RAIN);
-				material.BlendOperation = video::EBO_NONE;
-				material.ZWriteEnable = true;
-				material.Lighting = false;
-				irr_driver->getVideoDriver()->setMaterial(material);
-				static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
+					glBindVertexArray(0);
+					glBindBuffer(GL_ARRAY_BUFFER, 0);
+					video::SMaterial material;
+					material.MaterialType = irr_driver->getShader(ES_RAIN);
+					material.BlendOperation = video::EBO_NONE;
+					material.ZWriteEnable = true;
+					material.Lighting = false;
+					irr_driver->getVideoDriver()->setMaterial(material);
+					static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
+				}
 			}
 		}
 	}
