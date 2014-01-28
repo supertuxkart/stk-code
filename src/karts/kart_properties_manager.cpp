@@ -75,17 +75,16 @@ void KartPropertiesManager::unloadAllKarts()
 }   // unloadAllKarts
 
 //-----------------------------------------------------------------------------
-/** Reloads all karts, i.e. reloads the meshes and textures. This is used
+/** Unloads all karts but doesn't clear m_kart_search_path. This is used
  *  when changing the screen resolution.
  */
-void KartPropertiesManager::reLoadAllKarts()
+void KartPropertiesManager::resetAllKarts()
 {
     m_karts_properties.clearAndDeleteAll();
     m_selected_karts.clear();
     m_kart_available.clear();
     m_groups_2_indices.clear();
     m_all_groups.clear();
-    loadAllKarts(false);
 }   // reLoadAllKarts
 
 //-----------------------------------------------------------------------------
