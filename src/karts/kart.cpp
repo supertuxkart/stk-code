@@ -1805,7 +1805,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                 m_body->applyCentralImpulse( -4000.0f*push );
                 m_bounce_back_time = 2.0f;
 
-                core::stringw msg = _("You need more points\nto enter this challenge!");
+                core::stringw msg = _("You need more points\nto enter this challenge!\nCheck the minimap for\navailable challenges.");
                 std::vector<core::stringw> parts = StringUtils::split(msg, '\n', false);
 
                 // For now, until we have scripting, special-case the overworld... (TODO)
