@@ -41,13 +41,6 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	{
 	case SOLID_NORMAL_AND_DEPTH_PASS:
 	{
-			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-
-			  glEnable(GL_DEPTH_TEST);
-			  glDisable(GL_ALPHA_TEST);
-			  glDepthMask(GL_TRUE);
-			  glDisable(GL_BLEND);
-
 			  computeMVP(ModelViewProjectionMatrix);
 			  computeTIMV(TransposeInverseModelView);
 
@@ -55,18 +48,10 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				  drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 			  else
 				  drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 			  break;
 	}
 	case SOLID_LIT_PASS:
 	{
-			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-			  glEnable(GL_DEPTH_TEST);
-			  glDisable(GL_ALPHA_TEST);
-			  glDepthMask(GL_FALSE);
-			  glDisable(GL_BLEND);
-
 			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 				  drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
@@ -158,24 +143,14 @@ void STKAnimatedMesh::render()
 			initvaostate(GLmeshes[i], material.MaterialType);
 			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
 			{
+				glBindVertexArray(0);
 				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
 			}
 			if (isTransparentPass)
 				drawTransparent(GLmeshes[i], material.MaterialType);
 			else
-			{
 				drawSolid(GLmeshes[i], material.MaterialType);
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, 0);
-				video::SMaterial material;
-				material.MaterialType = irr_driver->getShader(ES_RAIN);
-				material.BlendOperation = video::EBO_NONE;
-				material.ZWriteEnable = true;
-				material.Lighting = false;
-				irr_driver->getVideoDriver()->setMaterial(material);
-				static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
-			}
 		}
 		else 
 		{
