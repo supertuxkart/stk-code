@@ -436,6 +436,46 @@ public:
 
 }
 
+namespace UIShader
+{
+class TextureRectShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_tex, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
+	static GLuint vao;
+
+	static void init();
+	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
+};
+
+class ColoredTextureRectShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_color;
+	static GLuint uniform_tex, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
+	static GLuint colorvbo;
+	static GLuint vao;
+
+	static void init();
+	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
+};
+
+class ColoredRectShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position;
+	static GLuint uniform_center, uniform_size, uniform_color;
+	static GLuint vao;
+
+	static void init();
+	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, const video::SColor &color);
+};
+}
+
 #define FOREACH_SHADER(ACT) \
     ACT(ES_NORMAL_MAP) \
     ACT(ES_NORMAL_MAP_LIGHTMAP) \
