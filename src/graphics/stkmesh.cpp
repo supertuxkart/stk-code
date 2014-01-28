@@ -949,6 +949,7 @@ void STKMesh::render()
 			}
 			else
 			{
+				irr_driver->IncreaseObjectCount();
 				initvaostate(GLmeshes[i], material.MaterialType);
 				if (transparent)
 					drawTransparent(GLmeshes[i], material.MaterialType);

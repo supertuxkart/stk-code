@@ -160,6 +160,7 @@ void STKAnimatedMesh::render()
 			driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
 		if (isObjectPass(material.MaterialType))
 		{
+			irr_driver->IncreaseObjectCount();
 			initvaostate(GLmeshes[i], material.MaterialType);
 			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
 			{
