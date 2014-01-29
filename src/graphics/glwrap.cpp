@@ -57,7 +57,7 @@ PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 
 static bool is_gl_init = false;
 
-#define ARB_DEBUG_OUTPUT
+//#define ARB_DEBUG_OUTPUT
 #ifdef ARB_DEBUG_OUTPUT
 static
 void debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
