@@ -1301,85 +1301,85 @@ namespace FullScreenShader
 
 		// SSAOSamples[4 * i] and SSAOSamples[4 * i + 1] can be negative
 
-		SSAOSamples[0] = 0.135061;
-		SSAOSamples[1] = 0.207948;
-		SSAOSamples[2] = 0.968770;
-		SSAOSamples[3] = 0.983032;
+		SSAOSamples[0] = 0.135061f;
+		SSAOSamples[1] = 0.207948f;
+		SSAOSamples[2] = 0.968770f;
+		SSAOSamples[3] = 0.983032f;
 
-		SSAOSamples[4] = 0.273456;
-		SSAOSamples[5] = -0.805390;
-		SSAOSamples[6] = 0.525898;
-		SSAOSamples[7] = 0.942808;
+		SSAOSamples[4] = 0.273456f;
+		SSAOSamples[5] = -0.805390f;
+		SSAOSamples[6] = 0.525898f;
+		SSAOSamples[7] = 0.942808f;
 
-		SSAOSamples[8] = 0.443450;
-		SSAOSamples[9] = -0.803786;
-		SSAOSamples[10] = 0.396585;
-		SSAOSamples[11] = 0.007996;
+		SSAOSamples[8] = 0.443450f;
+		SSAOSamples[9] = -0.803786f;
+		SSAOSamples[10] = 0.396585f;
+		SSAOSamples[11] = 0.007996f;
 
-		SSAOSamples[12] = 0.742420;
-		SSAOSamples[13] = -0.620072;
-		SSAOSamples[14] = 0.253621;
-		SSAOSamples[15] = 0.284829;
+		SSAOSamples[12] = 0.742420f;
+		SSAOSamples[13] = -0.620072f;
+		SSAOSamples[14] = 0.253621f;
+		SSAOSamples[15] = 0.284829f;
 
-		SSAOSamples[16] = 0.892464;
-		SSAOSamples[17] = 0.046221;
-		SSAOSamples[18] = 0.448744;
-		SSAOSamples[19] = 0.753655;
+		SSAOSamples[16] = 0.892464f;
+		SSAOSamples[17] = 0.046221f;
+		SSAOSamples[18] = 0.448744f;
+		SSAOSamples[19] = 0.753655f;
 
-		SSAOSamples[20] = 0.830350;
-		SSAOSamples[21] = -0.043593;
-		SSAOSamples[22] = 0.555535;
-		SSAOSamples[23] = 0.357463;
+		SSAOSamples[20] = 0.830350f;
+		SSAOSamples[21] = -0.043593f;
+		SSAOSamples[22] = 0.555535f;
+		SSAOSamples[23] = 0.357463f;
 
-		SSAOSamples[24] = -0.600612;
-		SSAOSamples[25] = -0.536421;
-		SSAOSamples[26] = 0.592889;
-		SSAOSamples[27] = 0.670583;
+		SSAOSamples[24] = -0.600612f;
+		SSAOSamples[25] = -0.536421f;
+		SSAOSamples[26] = 0.592889f;
+		SSAOSamples[27] = 0.670583f;
 
-		SSAOSamples[28] = -0.280658;
-		SSAOSamples[29] = 0.674894;
-		SSAOSamples[30] = 0.682458;
-		SSAOSamples[31] = 0.553362;
+		SSAOSamples[28] = -0.280658f;
+		SSAOSamples[29] = 0.674894f;
+		SSAOSamples[30] = 0.682458f;
+		SSAOSamples[31] = 0.553362f;
 
-		SSAOSamples[32] = -0.654493;
-		SSAOSamples[33] = -0.140866;
-		SSAOSamples[34] = 0.742830;
-		SSAOSamples[35] = 0.699820;
+		SSAOSamples[32] = -0.654493f;
+		SSAOSamples[33] = -0.140866f;
+		SSAOSamples[34] = 0.742830f;
+		SSAOSamples[35] = 0.699820f;
 
-		SSAOSamples[36] = 0.114730;
-		SSAOSamples[37] = 0.873130;
-		SSAOSamples[38] = 0.473794;
-		SSAOSamples[39] = 0.483901;
+		SSAOSamples[36] = 0.114730f;
+		SSAOSamples[37] = 0.873130f;
+		SSAOSamples[38] = 0.473794f;
+		SSAOSamples[39] = 0.483901f;
 
-		SSAOSamples[40] = 0.699167;
-		SSAOSamples[41] = 0.632210;
-		SSAOSamples[42] = 0.333879;
-		SSAOSamples[43] = 0.010956;
+		SSAOSamples[40] = 0.699167f;
+		SSAOSamples[41] = 0.632210f;
+		SSAOSamples[42] = 0.333879f;
+		SSAOSamples[43] = 0.010956f;
 
-		SSAOSamples[44] = 0.904603;
-		SSAOSamples[45] = 0.393410;
-		SSAOSamples[46] = 0.164080;
-		SSAOSamples[47] = 0.780297;
+		SSAOSamples[44] = 0.904603f;
+		SSAOSamples[45] = 0.393410f;
+		SSAOSamples[46] = 0.164080f;
+		SSAOSamples[47] = 0.780297f;
 
-		SSAOSamples[48] = 0.631662;
-		SSAOSamples[49] = -0.405195;
-		SSAOSamples[50] = 0.660924;
-		SSAOSamples[51] = 0.865596;
+		SSAOSamples[48] = 0.631662f;
+		SSAOSamples[49] = -0.405195f;
+		SSAOSamples[50] = 0.660924f;
+		SSAOSamples[51] = 0.865596f;
 
-		SSAOSamples[52] = -0.195668;
-		SSAOSamples[53] = 0.629185;
-		SSAOSamples[54] = 0.752223;
-		SSAOSamples[55] = 0.019013;
+		SSAOSamples[52] = -0.195668f;
+		SSAOSamples[53] = 0.629185f;
+		SSAOSamples[54] = 0.752223f;
+		SSAOSamples[55] = 0.019013f;
 
-		SSAOSamples[56] = -0.511316;
-		SSAOSamples[57] = 0.635504;
-		SSAOSamples[58] = 0.578524;
-		SSAOSamples[59] = 0.605457;
+		SSAOSamples[56] = -0.511316f;
+		SSAOSamples[57] = 0.635504f;
+		SSAOSamples[58] = 0.578524f;
+		SSAOSamples[59] = 0.605457f;
 
-		SSAOSamples[60] = -0.898843;
-		SSAOSamples[61] = 0.067382;
-		SSAOSamples[62] = 0.433061;
-		SSAOSamples[63] = 0.772942;
+		SSAOSamples[60] = -0.898843f;
+		SSAOSamples[61] = 0.067382f;
+		SSAOSamples[62] = 0.433061f;
+		SSAOSamples[63] = 0.772942f;
 
 		// Generate another random distribution, if needed
 /*		for (unsigned i = 0; i < 16; i++) {
