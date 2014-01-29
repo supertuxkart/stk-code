@@ -165,7 +165,7 @@ void IrrDriver::renderGLSL(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
 
         const u32 bgnodes = m_background.size();
-        if (bgnodes)
+/*        if (bgnodes)
         {
             // If there are background nodes (3d skybox), draw them now.
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
@@ -187,12 +187,17 @@ void IrrDriver::renderGLSL(float dt)
 
             overridemat = prev;
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, true);
-        }
+        }*/
 
         // Fire up the MRT
-        m_video_driver->setRenderTarget(m_mrt, false, false);
+		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+		glDepthFunc(GL_LEQUAL);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
         m_scene_manager->drawAll(m_renderpass);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
@@ -225,6 +230,10 @@ void IrrDriver::renderGLSL(float dt)
 
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
         irr_driver->setPhase(SOLID_LIT_PASS);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_BLEND);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         m_scene_manager->drawAll(m_renderpass);
 
@@ -288,11 +297,22 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
 		irr_driver->setPhase(TRANSPARENT_PASS);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_CULL_FACE);
         m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
 		m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 
@@ -633,6 +653,11 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
 
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+
     for (u32 i = 0; i < glowcount; i++)
     {
         const GlowData &dat = glows[i];
@@ -933,6 +958,11 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 
     const int displacingcount = m_displacing.size();
 	irr_driver->setPhase(DISPLACEMENT_PASS);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+
     for (int i = 0; i < displacingcount; i++)
     {
 

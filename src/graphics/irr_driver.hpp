@@ -70,7 +70,8 @@ enum STKRenderingPass
 	TRANSPARENT_PASS,
 	GLOW_PASS,
 	DISPLACEMENT_PASS,
-	SHADOW_PASS
+	SHADOW_PASS,
+	PASS_COUNT,
 };
 
 /**
@@ -164,7 +165,9 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
+	/** Performance stats */
     unsigned             m_last_light_bucket_distance;
+	unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     scene::IMeshSceneNode *m_sun_interposer;
@@ -223,6 +226,7 @@ public:
     void reset();
 	void setPhase(STKRenderingPass);
 	STKRenderingPass getPhase() const;
+	void IncreaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;

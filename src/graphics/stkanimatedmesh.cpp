@@ -26,20 +26,12 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 
 void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_CULL_FACE);
+	assert(irr_driver->getPhase() == TRANSPARENT_PASS);
 
 	computeMVP(ModelViewProjectionMatrix);
 
 	drawTransparentObject(mesh, ModelViewProjectionMatrix);
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 	return;
 }
 
@@ -49,13 +41,6 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	{
 	case SOLID_NORMAL_AND_DEPTH_PASS:
 	{
-			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-
-			  glEnable(GL_DEPTH_TEST);
-			  glDisable(GL_ALPHA_TEST);
-			  glDepthMask(GL_TRUE);
-			  glDisable(GL_BLEND);
-
 			  computeMVP(ModelViewProjectionMatrix);
 			  computeTIMV(TransposeInverseModelView);
 
@@ -63,18 +48,10 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 				  drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 			  else
 				  drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getMainSetup(), false, false);
 			  break;
 	}
 	case SOLID_LIT_PASS:
 	{
-			  irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-
-			  glEnable(GL_DEPTH_TEST);
-			  glDisable(GL_ALPHA_TEST);
-			  glDepthMask(GL_FALSE);
-			  glDisable(GL_BLEND);
-
 			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
 				  drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
@@ -106,6 +83,8 @@ isObjectPass(video::E_MATERIAL_TYPE type)
 	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 		return true;
 	if (type == video::EMT_ONETEXTURE_BLEND)
+		return true;
+	if (type == video::EMT_TRANSPARENT_ADD_COLOR)
 		return true;
 	return false;
 }
@@ -160,9 +139,11 @@ void STKAnimatedMesh::render()
 			driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
 		if (isObjectPass(material.MaterialType))
 		{
+			irr_driver->IncreaseObjectCount();
 			initvaostate(GLmeshes[i], material.MaterialType);
 			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
 			{
+				glBindVertexArray(0);
 				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
 			}
@@ -170,20 +151,13 @@ void STKAnimatedMesh::render()
 				drawTransparent(GLmeshes[i], material.MaterialType);
 			else
 				drawSolid(GLmeshes[i], material.MaterialType);
-			glBindVertexArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			video::SMaterial material;
-			material.MaterialType = irr_driver->getShader(ES_RAIN);
-			material.BlendOperation = video::EBO_NONE;
-			material.ZWriteEnable = true;
-			material.Lighting = false;
-			irr_driver->getVideoDriver()->setMaterial(material);
-			static_cast<irr::video::COpenGLDriver*>(irr_driver->getVideoDriver())->setRenderStates3DMode();
 		}
 		else 
 		{
-			driver->setMaterial(material);
-			driver->drawMeshBuffer(mb);
+#ifdef DEBUG
+			Log::warn("material", "Unhandled (animated) material type : %d", material.MaterialType);
+#endif
+			continue;
 		}
 	}
 }

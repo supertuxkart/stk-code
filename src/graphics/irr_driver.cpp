@@ -152,6 +152,11 @@ STKRenderingPass IrrDriver::getPhase() const
   return phase;
 }
 
+void IrrDriver::IncreaseObjectCount()
+{
+	object_count[phase]++;
+}
+
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 {
   return m_mrt;
@@ -1509,12 +1514,13 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    static char buffer[64];
+    static char buffer[128];
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris - LightDst : ~%d",
-                min, fps, max, low, kilotris, high, m_last_light_bucket_distance);
+        sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
+                min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[TRANSPARENT_PASS] = 0;
     }
     else
     {
