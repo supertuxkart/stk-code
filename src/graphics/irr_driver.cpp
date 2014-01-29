@@ -652,7 +652,7 @@ void IrrDriver::applyResolutionSettings()
     attachment_manager->removeTextures();
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
-    kart_properties_manager->resetAllKarts();
+    kart_properties_manager->unloadAllKarts();
     powerup_manager->unloadPowerups();
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
@@ -705,7 +705,7 @@ void IrrDriver::applyResolutionSettings()
 
     file_manager->popTextureSearchPath();
 
-    kart_properties_manager->loadAllKarts(false);
+    kart_properties_manager->loadAllKarts();
 
     attachment_manager->loadModels();
     std::string banana = file_manager->getAsset(FileManager::GUI, "banana.png");

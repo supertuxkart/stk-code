@@ -64,6 +64,9 @@ void KartPropertiesManager::addKartSearchDir(const std::string &s)
 }   // addKartSearchDir
 
 //-----------------------------------------------------------------------------
+/** Removes all karts from the KartPropertiesManager, so that they can be
+ *  reloade. This is necessary after a change of the screen resolution.
+ */
 void KartPropertiesManager::unloadAllKarts()
 {
     m_karts_properties.clearAndDeleteAll();
@@ -71,21 +74,7 @@ void KartPropertiesManager::unloadAllKarts()
     m_kart_available.clear();
     m_groups_2_indices.clear();
     m_all_groups.clear();
-    m_kart_search_path.clear();
 }   // unloadAllKarts
-
-//-----------------------------------------------------------------------------
-/** Unloads all karts but doesn't clear m_kart_search_path. This is used
- *  when changing the screen resolution.
- */
-void KartPropertiesManager::resetAllKarts()
-{
-    m_karts_properties.clearAndDeleteAll();
-    m_selected_karts.clear();
-    m_kart_available.clear();
-    m_groups_2_indices.clear();
-    m_all_groups.clear();
-}   // reLoadAllKarts
 
 //-----------------------------------------------------------------------------
 /** Remove a kart from the kart manager.
