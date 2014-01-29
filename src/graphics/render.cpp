@@ -649,6 +649,11 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
 
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+
     for (u32 i = 0; i < glowcount; i++)
     {
         const GlowData &dat = glows[i];
@@ -949,6 +954,11 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 
     const int displacingcount = m_displacing.size();
 	irr_driver->setPhase(DISPLACEMENT_PASS);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+
     for (int i = 0; i < displacingcount; i++)
     {
 

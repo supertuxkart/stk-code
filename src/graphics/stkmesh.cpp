@@ -640,10 +640,7 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 void STKMesh::drawGlow(const GLMesh &mesh)
 {
 	ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
+
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
@@ -654,17 +651,12 @@ void STKMesh::drawGlow(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_glow_pass);
 	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void STKMesh::drawDisplace(const GLMesh &mesh)
 {
 	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
+
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
@@ -678,8 +670,6 @@ void STKMesh::drawDisplace(const GLMesh &mesh)
 
 	glBindVertexArray(mesh.vao_displace_pass);
 	glDrawElements(ptype, count, itype, 0);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
@@ -702,11 +692,6 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case SOLID_NORMAL_AND_DEPTH_PASS:
 	{
         windDir = getWind();
-
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_TRUE);
-		glDisable(GL_BLEND);
 
 		computeMVP(ModelViewProjectionMatrix);
 		computeTIMV(TransposeInverseModelView);
