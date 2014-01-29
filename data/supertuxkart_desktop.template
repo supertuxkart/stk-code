@@ -2,10 +2,11 @@
 Name=SuperTuxKart
 Icon=@PREFIX@/share/pixmaps/supertuxkart_128.png
 GenericName=A kart racing game
-GenericName[de_DE]=Ein Kart-Rennspiel
-GenericName[fr_FR]=Un jeu de karting
+GenericName[de]=Ein Kart-Rennspiel
+GenericName[fr]=Un jeu de karting
 GenericName[gl]=Xogo de carreiras con karts
-GenericName[ro_RO]=Un joc de curse cu carturi
+GenericName[pl]=Wyścigi gokartów
+GenericName[ro]=Un joc de curse cu carturi
 Exec=@PREFIX@/@STK_INSTALL_BINARY_DIR@/supertuxkart --no-console
 Terminal=false
 StartupNotify=false

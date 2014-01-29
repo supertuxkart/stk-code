@@ -79,7 +79,7 @@ struct Input
 
     Input()
         : m_type(IT_NONE), m_device_id(0), m_button_id(0),
-          m_axis_direction(0), m_character(0)
+        m_axis_direction(0), m_axis_range(Input::AR_FULL), m_character(0)
     {
         // Nothing to do.
     }
@@ -109,7 +109,7 @@ struct Input
      */
     Input(InputType ntype, int deviceID , int btnID = 0, int axisDirection= 0)
         : m_type(ntype), m_device_id(deviceID), m_button_id(btnID),
-          m_axis_direction(axisDirection)
+          m_axis_direction(axisDirection), m_axis_range(Input::AR_FULL)
     {
         // Nothing to do.
     }

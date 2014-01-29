@@ -165,7 +165,7 @@ void IrrDriver::renderGLSL(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
 
         const u32 bgnodes = m_background.size();
-        if (bgnodes)
+/*        if (bgnodes)
         {
             // If there are background nodes (3d skybox), draw them now.
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
@@ -187,14 +187,18 @@ void IrrDriver::renderGLSL(float dt)
 
             overridemat = prev;
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, true);
-        }
+        }*/
 
         // Fire up the MRT
-        m_video_driver->setRenderTarget(m_mrt, false, false);
-
+		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
-        irr_driver->setPhase(0);
+		glDepthFunc(GL_LEQUAL);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_TRUE);
+		glDisable(GL_BLEND);
+        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
         m_scene_manager->drawAll(m_renderpass);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -225,7 +229,11 @@ void IrrDriver::renderGLSL(float dt)
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-        irr_driver->setPhase(1);
+        irr_driver->setPhase(SOLID_LIT_PASS);
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glDisable(GL_BLEND);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         m_scene_manager->drawAll(m_renderpass);
 
@@ -243,22 +251,18 @@ void IrrDriver::renderGLSL(float dt)
 		// Render anything glowing.
 		if (!m_mipviz && !m_wireframe)
 		{
-			irr_driver->setPhase(2);
+			irr_driver->setPhase(GLOW_PASS);
 			renderGlow(overridemat, glows, cambox, cam);
 		} // end glow
 
         PROFILER_POP_CPU_MARKER();
 
-        if (!bgnodes)
-        {
-            PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-
-            // If there are no BG nodes, it's more efficient to do the skybox here.
-            m_renderpass = scene::ESNRP_SKY_BOX;
-            m_scene_manager->drawAll(m_renderpass);
-
-            PROFILER_POP_CPU_MARKER();
-        }
+		if (!SkyboxTextures.empty())
+		{
+			PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+			renderSkybox();
+			PROFILER_POP_CPU_MARKER();
+		}
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
@@ -289,16 +293,26 @@ void IrrDriver::renderGLSL(float dt)
         }
         PROFILER_POP_CPU_MARKER();
 
-
         // We need to re-render camera due to the per-cam-node hack.
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
-		irr_driver->setPhase(3);
+		irr_driver->setPhase(TRANSPARENT_PASS);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_ALPHA_TEST);
+		glDepthMask(GL_FALSE);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDisable(GL_CULL_FACE);
         m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
 		m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 
@@ -351,8 +365,10 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_POP_CPU_MARKER();
     }  // for i<getNumKarts
 
+    PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
     // Either render the gui, or the global elements of the race gui.
     GUIEngine::render(dt);
+    PROFILER_POP_CPU_MARKER();
 
     // Render the profiler
     if(UserConfigParams::m_profiler_enabled)
@@ -365,7 +381,9 @@ void IrrDriver::renderGLSL(float dt)
     drawDebugMeshes();
 #endif
 
+    PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
     m_video_driver->endScene();
+    PROFILER_POP_CPU_MARKER();
 
     getPostProcessing()->update(dt);
 }
@@ -635,6 +653,11 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
 
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+
     for (u32 i = 0; i < glowcount; i++)
     {
         const GlowData &dat = glows[i];
@@ -793,7 +816,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		accumulatedLightColor.push_back(0.);
 		accumulatedLightEnergy.push_back(0.);
 	}
-	m_post_processing->renderPointlight(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH) , accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
+	m_post_processing->renderPointlight(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
     // Handle SSAO
     m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
                          SColor(255, 255, 255, 255));
@@ -808,6 +831,105 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+}
+
+
+static GLuint cubevao = 0;
+static GLuint cubevbo;
+static GLuint cubeidx;
+
+static void createcubevao()
+{
+	// From CSkyBoxSceneNode. Not optimal at all
+	float corners[] = 
+	{
+		// top side
+		1., 1., -1.,       1., 1.,
+		1., 1., 1.,        0., 1.,
+		-1., 1., 1.,       0., 0.,
+		-1., 1., -1.,      1., 0.,
+
+		// Bottom side
+		1., -1., 1.,       0., 0.,
+		1., -1., -1.,      1., 0.,
+		-1., -1., -1.,     1., 1.,
+		-1., -1., 1.,      0., 1.,
+
+		// right side
+		1., -1, -1,        1., 1.,
+		1., -1, 1,         0., 1.,
+		1., 1., 1.,        0., 0.,
+		1., 1., -1.,       1., 0.,
+
+		// left side
+		-1., -1., 1.,      1., 1.,
+		-1., -1., -1.,     0., 1.,
+		-1., 1., -1.,      0., 0.,
+		-1., 1., 1.,       1., 0.,
+
+		// back side
+		-1., -1., -1.,     1., 1.,
+		1., -1, -1.,       0., 1.,
+		1, 1, -1.,         0., 0.,
+		-1, 1, -1.,        1., 0.,
+		
+		// front side
+		1., -1., 1.,       1., 1.,
+		-1., -1., 1.,      0., 1.,
+		-1, 1., 1.,        0., 0.,
+		1., 1., 1.,        1., 0.,
+	};
+	int indices[] = {
+		0, 1, 2, 2, 3, 0,
+		4, 5, 6, 6, 7, 4,
+		8, 9, 10, 10, 11, 8,
+		12, 13, 14, 14, 15, 12,
+		16, 17, 18, 18, 19, 16,
+		20, 21, 22, 22, 23, 20
+	};
+
+	glGenBuffers(1, &cubevbo);
+	glGenBuffers(1, &cubeidx);
+	glGenVertexArrays(1, &cubevao);
+
+	glBindVertexArray(cubevao);
+	glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
+	glBufferData(GL_ARRAY_BUFFER, 6 * 5 * 4 * sizeof(float), corners, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_position);
+	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_texcoord);
+	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
+	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
+}
+
+void IrrDriver::renderSkybox()
+{
+    scene::ICameraSceneNode *camera = m_scene_manager->getActiveCamera();
+	if (!cubevao)
+		createcubevao();
+	glBindVertexArray(cubevao);
+	glDisable(GL_CULL_FACE);
+	assert(SkyboxTextures.size() == 6);
+	core::matrix4 transform = irr_driver->getProjViewMatrix();
+	core::matrix4 translate;
+	translate.setTranslation(camera->getAbsolutePosition());
+
+	// Draw the sky box between the near and far clip plane
+	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
+	core::matrix4 scale;
+	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
+	transform *= translate * scale;
+	
+	for (unsigned i = 0; i < 6; i++)
+	{
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(SkyboxTextures[i])->getOpenGLTextureName());
+		glUseProgram(MeshShader::ObjectUnlitShader::Program);
+		MeshShader::ObjectUnlitShader::setUniforms(transform, 0);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*) (6 * i * sizeof(int)));
+	}
+	glBindVertexArray(0);
 }
 
 // ----------------------------------------------------------------------------
@@ -835,7 +957,12 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 	cb->update();
 
     const int displacingcount = m_displacing.size();
-	irr_driver->setPhase(4);
+	irr_driver->setPhase(DISPLACEMENT_PASS);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
+
     for (int i = 0; i < displacingcount; i++)
     {
 

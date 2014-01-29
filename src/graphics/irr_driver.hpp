@@ -63,6 +63,17 @@ class PostProcessing;
 class LightNode;
 class ShadowImportance;
 
+enum STKRenderingPass
+{
+	SOLID_NORMAL_AND_DEPTH_PASS,
+	SOLID_LIT_PASS,
+	TRANSPARENT_PASS,
+	GLOW_PASS,
+	DISPLACEMENT_PASS,
+	SHADOW_PASS,
+	PASS_COUNT,
+};
+
 /**
   * \brief class that creates the irrLicht device and offers higher-level
   *  ways to manage the 3D scene
@@ -101,6 +112,8 @@ private:
 
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
+
+	std::vector<video::ITexture *> SkyboxTextures;
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -152,7 +165,9 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
+	/** Performance stats */
     unsigned             m_last_light_bucket_distance;
+	unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     scene::IMeshSceneNode *m_sun_interposer;
@@ -174,7 +189,7 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
-    unsigned phase;
+	STKRenderingPass phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -196,6 +211,7 @@ private:
                     std::vector<GlowData>& glows,
                     const core::aabbox3df& cambox,
                     int cam);
+	void renderSkybox();
     void renderLights(const core::aabbox3df& cambox,
                       scene::ICameraSceneNode * const camnode,
                       video::SOverrideMaterial &overridemat,
@@ -208,8 +224,9 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
-    void setPhase(unsigned);
-    unsigned getPhase() const;
+	void setPhase(STKRenderingPass);
+	STKRenderingPass getPhase() const;
+	void IncreaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
@@ -259,6 +276,7 @@ public:
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
+	void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);

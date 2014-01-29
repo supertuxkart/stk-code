@@ -61,6 +61,7 @@ src/graphics/skid_marks.cpp
 src/graphics/slip_stream.cpp
 src/graphics/stars.cpp
 src/graphics/stkanimatedmesh.cpp
+src/graphics/stkbillboard.cpp
 src/graphics/stkmesh.cpp
 src/graphics/sun.cpp
 src/graphics/water.cpp
@@ -389,6 +390,7 @@ src/graphics/skid_marks.hpp
 src/graphics/slip_stream.hpp
 src/graphics/stars.hpp
 src/graphics/stkanimatedmesh.hpp
+src/graphics/stkbillboard.hpp
 src/graphics/stkmesh.hpp
 src/graphics/sun.hpp
 src/graphics/water.hpp

@@ -33,6 +33,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
+#include "graphics/stkbillboard.hpp"
 #include "graphics/stkmesh.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
@@ -141,14 +142,19 @@ void IrrDriver::reset()
     if (m_glsl) m_post_processing->reset();
 }   // reset
 
-void IrrDriver::setPhase(unsigned p)
+void IrrDriver::setPhase(STKRenderingPass p)
 {
   phase = p;
 }
 
-unsigned IrrDriver::getPhase() const
+STKRenderingPass IrrDriver::getPhase() const
 {
   return phase;
+}
+
+void IrrDriver::IncreaseObjectCount()
+{
+	object_count[phase]++;
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -651,8 +657,8 @@ void IrrDriver::applyResolutionSettings()
     attachment_manager->removeTextures();
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
-    kart_properties_manager -> unloadAllKarts();
-    powerup_manager-> unloadPowerups();
+    kart_properties_manager->unloadAllKarts();
+    powerup_manager->unloadPowerups();
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
@@ -704,7 +710,6 @@ void IrrDriver::applyResolutionSettings()
 
     file_manager->popTextureSearchPath();
 
-    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsFile("karts"));
     kart_properties_manager->loadAllKarts();
 
     attachment_manager->loadModels();
@@ -968,8 +973,17 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
                                            scene::ISceneNode* parent, bool alphaTesting)
 {
-    scene::IBillboardSceneNode* node =
-        m_scene_manager->addBillboardSceneNode(parent, size);
+	scene::IBillboardSceneNode* node;
+	if (isGLSL())
+	{
+		if (!parent)
+			parent = m_scene_manager->getRootSceneNode();
+
+		node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
+		node->drop();
+	}
+	else
+		node = m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
     if(alphaTesting)
@@ -1145,6 +1159,7 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
                                          float texture_percent,
                                          float sphere_percent)
 {
+	Log::error("skybox", "Using deprecated SkyDome");
     return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
                                                 texture_percent,
                                                 sphere_percent);
@@ -1164,10 +1179,16 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
 scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                         &texture)
 {
+	SkyboxTextures = texture;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
 }   // addSkyBox
+
+void IrrDriver::suppressSkyBox()
+{
+	SkyboxTextures.clear();
+}
 
 // ----------------------------------------------------------------------------
 /** Adds a camera to the scene.
@@ -1493,12 +1514,13 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    static char buffer[64];
+    static char buffer[128];
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris - LightDst : ~%d",
-                min, fps, max, low, kilotris, high, m_last_light_bucket_distance);
+        sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
+                min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[TRANSPARENT_PASS] = 0;
     }
     else
     {

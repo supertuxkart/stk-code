@@ -41,6 +41,8 @@ TerrainInfo::TerrainInfo()
 TerrainInfo::TerrainInfo(const Vec3 &pos)
 {
     // initialise HoT
+    m_last_material = NULL;
+    m_material = NULL;
     update(pos);
 }   // TerrainInfo
 //-----------------------------------------------------------------------------

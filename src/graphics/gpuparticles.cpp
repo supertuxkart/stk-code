@@ -415,9 +415,6 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 		return;
 	has_height_map = false;
 	flip = false;
-	// Pass a fake material type to force irrlicht to update its internal states on rendering
-	setMaterialType(irr_driver->getShader(ES_RAIN));
-	setAutomaticCulling(0);
 
 	count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
 	switch (emitter->getType())
@@ -454,7 +451,6 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 	glBindVertexArray(0);
 
 	texture = getTextureGLuint(getMaterial(0).getTexture(0));
-	normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
 }
 
 void ParticleSystemProxy::simulateHeightmap()
@@ -528,14 +524,7 @@ void ParticleSystemProxy::simulate()
 
 void ParticleSystemProxy::drawFlip()
 {
-	glDepthMask(GL_FALSE);
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-
-	if (m_alpha_additive)
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	else
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glUseProgram(ParticleShader::FlipParticleRender::Program);
 
 	float screen[2] = {
@@ -543,27 +532,17 @@ void ParticleSystemProxy::drawFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	setTexture(0, texture, GL_LINEAR, GL_LINEAR);
-	setTexture(1, normal_and_depth, GL_NEAREST, GL_NEAREST);
+	setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	setTexture(1, static_cast<video::COpenGLFBOTexture *>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
 
 	ParticleShader::FlipParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
 
 	glBindVertexArray(current_rendering_flip_vao);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glActiveTexture(GL_TEXTURE0);
-	glDisable(GL_BLEND);
-
 }
 
 void ParticleSystemProxy::drawNotFlip()
 {
-	glDepthMask(GL_FALSE);
-	glDisable(GL_CULL_FACE);
-	glEnable(GL_BLEND);
-
 	if (m_alpha_additive)
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	else
@@ -575,19 +554,13 @@ void ParticleSystemProxy::drawNotFlip()
 		(float)UserConfigParams::m_height
 	};
 
-	setTexture(0, texture, GL_LINEAR, GL_LINEAR);
-	setTexture(1, normal_and_depth, GL_NEAREST, GL_NEAREST);
+	setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+	setTexture(1, static_cast<video::COpenGLFBOTexture *>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
 
 	ParticleShader::SimpleParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
 
 	glBindVertexArray(current_rendering_vao);
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glActiveTexture(GL_TEXTURE0);
-	glDisable(GL_BLEND);
-
 }
 
 void ParticleSystemProxy::draw()
@@ -606,10 +579,17 @@ void ParticleSystemProxy::render() {
 	}
 	simulate();
 	draw();
-	// We need to force irrlicht to update its internal states
-	irr::video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-	drv->setMaterial(fakemat);
-	static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
+}
+
+void ParticleSystemProxy::OnRegisterSceneNode()
+{
+	doParticleSystem(os::Timer::getTime());
+
+	if (IsVisible && (Particles.size() != 0))
+	{
+		SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT_EFFECT);
+		ISceneNode::OnRegisterSceneNode();
+	}
 }
 
 RainNode::RainNode(scene::ISceneManager* mgr, ITexture *tex)

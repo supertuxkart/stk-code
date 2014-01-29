@@ -945,17 +945,18 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
-            scene::ISceneNode* sn =
+			// TODO: Add support in the engine for BillboardText or find a replacement
+/*            scene::ISceneNode* sn =
                 sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
                                               msg.c_str(),
                                               NULL,
                                               core::dimension2df(textsize.Width/45.0f,
                                                                  textsize.Height/45.0f),
                                               xyz,
-                                              -1 /* id */,
+                                              -1, // id 
                                               video::SColor(255, 255, 225, 0),
                                               video::SColor(255, 255, 89, 0));
-            m_all_nodes.push_back(sn);
+            m_all_nodes.push_back(sn);*/
             if (!shown) continue;
         }
         else if (condition == "allchallenges")
@@ -1341,7 +1342,7 @@ void Track::createWater(const XMLNode &node)
 
     if (UserConfigParams::m_graphical_effects)
     {
-        scene::IMesh *welded;
+        /*scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
                                               wave_height,
                                               wave_speed,
@@ -1351,7 +1352,7 @@ void Track::createWater(const XMLNode &node)
         irr_driver->grabAllTextures(mesh);
         m_all_cached_meshes.push_back(mesh);
 
-        mesh = welded;
+        mesh = welded;*/
     }
     else
     {
@@ -1585,6 +1586,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Sky dome and boxes support
     // --------------------------
+	irr_driver->suppressSkyBox();
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],

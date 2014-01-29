@@ -1,5 +1,6 @@
 #version 130
 uniform sampler2D ntex;
+uniform sampler2D dtex;
 //uniform sampler2D cloudtex;
 
 uniform vec3 direction;
@@ -13,8 +14,15 @@ out vec4 Diff;
 out vec4 Spec;
 out vec4 SpecularMap;
 
+vec3 DecodeNormal(vec2 n)
+{
+  float z = dot(n, n) * 2. - 1.;
+  vec2 xy = normalize(n) * sqrt(1. - z * z);
+  return vec3(xy,z);
+}
+
 void main() {
-	float z = texture(ntex, uv).a;
+	float z = texture(dtex, uv).x;
 	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
 	xpos = invproj * xpos;
 	xpos.xyz /= xpos.w;
@@ -27,8 +35,7 @@ void main() {
 		return;
 	}
 
-	vec3 norm = texture(ntex, uv).xyz;
-	norm = (norm - 0.5) * 2.0;
+	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 
 	// Normalized on the cpu
 	vec3 L = direction;

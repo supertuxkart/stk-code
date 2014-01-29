@@ -42,6 +42,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_selected_column = NULL;
     m_sort_desc = false;
     m_sort_default = true;
+    m_sort_col = 0;
 }
 
 // -----------------------------------------------------------------------------

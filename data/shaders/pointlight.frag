@@ -1,5 +1,6 @@
 #version 130
 uniform sampler2D ntex;
+uniform sampler2D dtex;
 
 uniform vec4 center[16];
 uniform vec4 col[16];
@@ -12,11 +13,17 @@ in vec2 uv;
 out vec4 Diffuse;
 out vec4 Specular;
 
+vec3 DecodeNormal(vec2 n)
+{
+  float z = dot(n, n) * 2. - 1.;
+  vec2 xy = normalize(n) * sqrt(1. - z * z);
+  return vec3(xy,z);
+}
+
 void main() {
 	vec2 texc = uv;
-	float z = texture(ntex, texc).a;
-	vec3 norm = texture(ntex, texc).xyz;
-	norm = (norm - 0.5) * 2.0;
+	float z = texture(dtex, texc).x;
+	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;

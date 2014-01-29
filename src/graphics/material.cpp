@@ -653,17 +653,13 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 
 
-    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
-    {
-        // we abuse alpha blender a little here : in the shader-based pipeline,
-        // transparent objects are rendered after lighting has been applied.
-        // Therefore, pretending the object is transparent will have the effect
-        // of making it unaffected by lights
-        m_alpha_blending = true;
-        m_disable_z_write = false;
-    }
-
     int modes = 0;
+
+	if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
+	{
+		m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+		modes++;
+	}
 
     if (m_alpha_testing)
     {

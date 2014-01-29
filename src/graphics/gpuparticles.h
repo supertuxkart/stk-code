@@ -37,7 +37,7 @@ protected:
 
 	static GLuint quad_vertex_buffer;
 
-	GLuint texture, normal_and_depth;
+	GLuint texture;
 	unsigned count;
 	static void SimpleParticleVAOBind(GLuint PositionBuffer);
 	static void FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer);
@@ -69,6 +69,7 @@ public:
 
 	virtual void setEmitter(scene::IParticleEmitter* emitter);
 	virtual void render();
+	virtual void OnRegisterSceneNode();
 	void setAlphaAdditive(bool);
 	void setIncreaseFactor(float);
 	void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);

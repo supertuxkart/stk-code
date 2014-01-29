@@ -115,7 +115,7 @@ void ShowCurve::addPoint(const Vec3 &pnt)
     // 4 sides of the 'tunnel', so all in all 24 indices.
     irr::u16 *indices = new irr::u16[24];
     m_buffer->append(vertices, 4, indices, 24);
-    delete indices;
+    delete[] indices;
     indices = m_buffer->getIndices();
 
     // index = first newly added index
