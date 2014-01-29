@@ -107,7 +107,7 @@ isObjectPass(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == video::EMT_ONETEXTURE_BLEND)
 		return true;
-	if (type == video::EMT_ONETEXTURE_BLEND)
+	if (type == video::EMT_TRANSPARENT_ADD_COLOR)
 		return true;
 	return false;
 }
