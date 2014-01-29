@@ -309,6 +309,10 @@ void IrrDriver::renderGLSL(float dt)
 
 		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
 		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+		glDepthMask(GL_FALSE);
+		glDisable(GL_CULL_FACE);
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
 		m_scene_manager->drawAll(m_renderpass);
 		PROFILER_POP_CPU_MARKER();
 
