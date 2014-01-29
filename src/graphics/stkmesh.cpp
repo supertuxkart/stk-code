@@ -752,7 +752,7 @@ void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 		else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 			drawObjectUnlit(mesh, ModelViewProjectionMatrix);
-		else if (mesh.textures[1])
+		else if (mesh.textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))
 			drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
 		else if (!mesh.textures[0])
 			drawUntexturedObject(mesh, ModelViewProjectionMatrix);
