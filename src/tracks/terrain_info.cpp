@@ -45,18 +45,33 @@ TerrainInfo::TerrainInfo(const Vec3 &pos)
     m_material = NULL;
     update(pos);
 }   // TerrainInfo
+
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
  *  \param Position from which to start the rayast from.
  */
-void TerrainInfo::update(const Vec3& pos)
+void TerrainInfo::update(const Vec3 &from)
 {
     m_last_material = m_material;
-    btVector3 to(pos);
-    to.setY(-100000.f);
+    btVector3 to(from);
+    to.setY(-10000.0f);
 
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    tm.castRay(pos, to, &m_hit_point, &m_material, &m_normal);
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
+}   // update
+//-----------------------------------------------------------------------------
+/** Update the terrain information based on the latest position.
+ *  \param Position from which to start the rayast from.
+ */
+void TerrainInfo::update(const btTransform &trans, const Vec3 &offset)
+{
+    m_last_material = m_material;
+    btVector3 from = trans(offset);
+    btVector3 to(0, -10000.0f, 0);
+    to = trans(to);
+
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
 }   // update
 
 // -----------------------------------------------------------------------------

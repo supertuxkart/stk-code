@@ -21,6 +21,7 @@
 
 #include "utils/vec3.hpp"
 
+class btTransform;
 class Material;
 
 /** This class stores information about the triangle that's under an object, i.e.:
@@ -44,10 +45,17 @@ public:
              TerrainInfo(const Vec3 &pos);
     virtual ~TerrainInfo() {};
 
-    virtual void update(const Vec3 &pos);
     bool     getSurfaceInfo(const Vec3 &from, Vec3 *position,
                             const Material **m);
+    virtual void update(const btTransform &trans, const Vec3 &offset);
+    virtual void update(const Vec3 &from);
 
+    // ------------------------------------------------------------------------
+    /** Simple wrapper with no offset. */
+    virtual void update(const btTransform &trans)
+    {
+        update(trans, Vec3(0,0,0));
+    }
     // ------------------------------------------------------------------------
     /** Returns the height of the terrain. we're currently above */
     float getHoT()                       const {return m_hit_point.getY(); }
