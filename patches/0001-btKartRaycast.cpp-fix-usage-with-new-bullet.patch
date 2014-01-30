@@ -1,0 +1,61 @@
+From 44c1ff53faf31f4550ee26af4107802773c6f625 Mon Sep 17 00:00:00 2001
+From: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+Date: Fri, 17 Jan 2014 13:11:54 +0400
+Subject: [PATCH] btKartRaycast.cpp: fix usage with new bullet
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+btKartRaycast.cpp:66:78: error: invalid conversion from ‘const btRigidBody*’ to ‘btRigidBody*’ [-fpermissive]
+         btRigidBody* body = btRigidBody::upcast(rayCallback.m_collisionObject);
+                                                                              ^
+make[2]: *** [CMakeFiles/supertuxkart.dir/src/physics/btKartRaycast.cpp.o] Error 1
+
+Signed-off-by: Igor Gnatenko <i.gnatenko.brain@gmail.com>
+---
+ src/physics/btKartRaycast.cpp | 4 ++--
+ src/physics/physics.cpp       | 6 ++----
+ 2 files changed, 4 insertions(+), 6 deletions(-)
+
+diff --git a/src/physics/btKartRaycast.cpp b/src/physics/btKartRaycast.cpp
+index 13b310f..7c00d42 100644
+--- a/src/physics/btKartRaycast.cpp
++++ b/src/physics/btKartRaycast.cpp
+@@ -63,7 +63,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
+ 
+     if (rayCallback.hasHit())
+     {
+-        btRigidBody* body = btRigidBody::upcast(rayCallback.m_collisionObject);
++        const btRigidBody* body = btRigidBody::upcast(rayCallback.m_collisionObject);
+         if (body && body->hasContactResponse())
+         {
+             result.m_hitPointInWorld = rayCallback.m_hitPointWorld;
+@@ -88,7 +88,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
+                     result.m_hitNormalInWorld.getZ());
+ #endif
+             }
+-            return body;
++            return (void *) body;
+         }
+     }
+     return 0;
+diff --git a/src/physics/physics.cpp b/src/physics/physics.cpp
+index 927ad6f..d2d00f9 100644
+--- a/src/physics/physics.cpp
++++ b/src/physics/physics.cpp
+@@ -449,10 +449,8 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
+         btPersistentManifold* contact_manifold =
+             m_dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
+ 
+-        btCollisionObject* objA =
+-            static_cast<btCollisionObject*>(contact_manifold->getBody0());
+-        btCollisionObject* objB =
+-            static_cast<btCollisionObject*>(contact_manifold->getBody1());
++        const btCollisionObject* objA = contact_manifold->getBody0();
++        const btCollisionObject* objB = contact_manifold->getBody1();
+ 
+         unsigned int num_contacts = contact_manifold->getNumContacts();
+         if(!num_contacts) continue;   // no real collision
+-- 
+1.8.4.2
+

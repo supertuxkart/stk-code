@@ -36,13 +36,36 @@ set(STK_INSTALL_BINARY_DIR "bin" CACHE
 set(STK_INSTALL_DATA_DIR "share/supertuxkart" CACHE
     STRING "Install data folder to this directory, absolute or relative to CMAKE_INSTALL_PREFIX")
 
+INCLUDE (FindPkgConfig)
+
 # Build the Bullet physics library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
+pkg_search_module(BULLET bullet)
+if(NOT BULLET_FOUND)
+    message("Using bundled bullet libs")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/bullet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/bullet/src")
+    set(BULLET_LIBRARIES "bulletdynamics;bulletcollision;bulletmath")
+else(NOT BULLET_FOUND)
+    message("Using system bullet libs")
+    include_directories(${BULLET_INCLUDE_DIRS})
+    if(BULLET_VERSION GREATER 2.80)
+        message("We must apply patch for new bullet")
+        execute_process(COMMAND patch -p1 -d ${PROJECT_SOURCE_DIR} -i
+                                      ${PROJECT_SOURCE_DIR}/patches/0001-btKartRaycast.cpp-fix-usage-with-new-bullet.patch)
+    endif(BULLET_VERSION GREATER 2.80)
+endif(NOT BULLET_FOUND)
 
 # Build the ENet UDP network library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
-include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+find_package(ENet)
+if(NOT ENET_FOUND)
+    message("Using bundled enet libs")
+    add_subdirectory("${PROJECT_SOURCE_DIR}/lib/enet")
+    include_directories("${PROJECT_SOURCE_DIR}/lib/enet/include")
+    set(ENet_LIBRARIES "enet")
+else(NOT ENET_FOUND)
+    message("Using system enet libs")
+    include_directories(${ENet_INCLUDE_DIRS})
+endif(NOT ENET_FOUND)
 
 # Build the irrlicht library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/irrlicht")
@@ -230,10 +253,8 @@ endif()
 
 # Common library dependencies
 target_link_libraries(supertuxkart
-    bulletdynamics
-    bulletcollision
-    bulletmath
-    enet
+    ${BULLET_LIBRARIES}
+    ${ENet_LIBRARIES}
     stkirrlicht
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
