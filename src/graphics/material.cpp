@@ -146,6 +146,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 
     node->get("water-splash",     &m_water_splash      );
     node->get("jump",             &m_is_jump_texture   );
+    node->get("has-gravity",      &m_has_gravity       );
 
     if (m_collision_reaction != NORMAL)
     {
@@ -344,6 +345,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         }
 
     }   // for i <node->getNumNodes()
+
+    if(m_has_gravity)
+        m_high_tire_adhesion = true;
+
     install(/*is_full_path*/false);
 }   // Material
 
@@ -410,6 +415,7 @@ void Material::init(unsigned int index)
     m_is_heightmap              = false;
     m_water_splash              = false;
     m_is_jump_texture           = false;
+    m_has_gravity               = false;
 
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {

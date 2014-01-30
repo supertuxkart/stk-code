@@ -454,16 +454,16 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         btPersistentManifold* contact_manifold =
             m_dynamics_world->getDispatcher()->getManifoldByIndexInternal(i);
 
-        btCollisionObject* objA =
-            static_cast<btCollisionObject*>(contact_manifold->getBody0());
-        btCollisionObject* objB =
-            static_cast<btCollisionObject*>(contact_manifold->getBody1());
+        const btCollisionObject* objA =
+            static_cast<const btCollisionObject*>(contact_manifold->getBody0());
+        const btCollisionObject* objB =
+            static_cast<const btCollisionObject*>(contact_manifold->getBody1());
 
         unsigned int num_contacts = contact_manifold->getNumContacts();
         if(!num_contacts) continue;   // no real collision
 
-        UserPointer *upA        = (UserPointer*)(objA->getUserPointer());
-        UserPointer *upB        = (UserPointer*)(objB->getUserPointer());
+        const UserPointer *upA = (UserPointer*)(objA->getUserPointer());
+        const UserPointer *upB = (UserPointer*)(objB->getUserPointer());
 
         if(!upA || !upB) continue;
 

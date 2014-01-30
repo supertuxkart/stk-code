@@ -409,7 +409,7 @@ void Kart::reset()
     }
 
 
-    m_terrain_info->update(getXYZ());
+    m_terrain_info->update(getTrans());
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.
@@ -1102,15 +1102,18 @@ void Kart::update(float dt)
 
     if (!m_flying)
     {
-        // When really on air, free fly, when near ground, try to glide / adjust for landing
-        // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
-        if(!isNearGround() &&
-            m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f )
+        // When really on air, free fly, when near ground, try to glide /
+        // adjust for landing. If zipped, be stable, so ramp+zipper can
+        // allow nice jumps without scripting the fly
+        // Also disable he upright constraint when gravity is changed by 
+        // the terrain
+        if( (!isNearGround() &&
+              m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f ) ||
+              (getMaterial() && getMaterial()->hasGravity())                                  )
             m_uprightConstraint->setLimit(M_PI);
         else
             m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
     }
-
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
@@ -1177,22 +1180,27 @@ void Kart::update(float dt)
     m_skid_sound->position   ( getXYZ() );
     m_boing_sound->position  ( getXYZ() );
 
-    // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if(World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+    // Check if a kart is (nearly) upside down and not moving much --> 
+    // automatic rescue
+    // But only do this if auto-rescue is enabled (i.e. it will be disabled in
+    // battle mode), and the material the kart is driving on does not have
+    // gravity (which can 
+    if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
+        (!m_terrain_info->getMaterial() || 
+         !m_terrain_info->getMaterial()->hasGravity())          &&
         !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD &&
                               fabs(getSpeed())<3.0f                )
     {
         new RescueAnimation(this, /*is_auto_rescue*/true);
     }
 
-    btTransform trans=getTrans();
     // Add a certain epsilon (0.3) to the height of the kart. This avoids
     // problems of the ray being cast from under the track (which happened
     // e.g. on tux tollway when jumping down from the ramp, when the chassis
     // partly tunnels through the track). While tunneling should not be
     // happening (since Z velocity is clamped), the epsilon is left in place
     // just to be on the safe side (it will not hit the chassis itself).
-    Vec3 pos_plus_epsilon = trans.getOrigin()+btVector3(0,0.3f,0);
+    Vec3 epsilon(0,0.3f,0);
 
     // Make sure that the ray doesn't hit the kart. This is done by
     // resetting the collision filter group, so that this collision
@@ -1203,7 +1211,8 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
-    m_terrain_info->update(pos_plus_epsilon);
+
+    m_terrain_info->update(getTrans(), epsilon);
     if(m_body->getBroadphaseHandle())
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
@@ -1212,6 +1221,10 @@ void Kart::update(float dt)
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
+        Vec3 gravity(0, -9.8f, 0);
+        btRigidBody *body = getVehicle()->getRigidBody();
+        body->setGravity(gravity);
+
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
@@ -1221,6 +1234,16 @@ void Kart::update(float dt)
     }
     else
     {
+        Vec3 gravity(0.0f, -9.8f, 0.0f);
+        btRigidBody *body = getVehicle()->getRigidBody();
+        // If the material should overwrite the gravity, 
+        if(material->hasGravity())
+        {
+            Vec3 normal = m_terrain_info->getNormal();
+            gravity = normal * -9.8f;
+        }
+        body->setGravity(gravity);
+
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
             new RescueAnimation(this);
