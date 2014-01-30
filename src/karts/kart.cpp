@@ -1177,8 +1177,14 @@ void Kart::update(float dt)
     m_skid_sound->position   ( getXYZ() );
     m_boing_sound->position  ( getXYZ() );
 
-    // Check if a kart is (nearly) upside down and not moving much --> automatic rescue
-    if(World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+    // Check if a kart is (nearly) upside down and not moving much --> 
+    // automatic rescue
+    // But only do this if auto-rescue is enabled (i.e. it will be disabled in
+    // battle mode), and the material the kart is driving on does not have
+    // gravity (which can 
+    if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
+        (!m_terrain_info->getMaterial() || 
+         !m_terrain_info->getMaterial()->hasGravity())          &&
         !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD &&
                               fabs(getSpeed())<3.0f                )
     {
