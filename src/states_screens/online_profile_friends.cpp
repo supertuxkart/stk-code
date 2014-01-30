@@ -114,13 +114,13 @@ void OnlineProfileFriends::onUpdate(float delta)
             m_friends_list_widget->clear();
             for(unsigned int i = 0; i < m_visiting_profile->getFriends().size(); i++)
             {
-                PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-                Profile * friend_profile = ProfileManager::get()->getProfileByID(m_visiting_profile->getFriends()[i]);
-                row->push_back(new GUIEngine::ListWidget::ListCell(friend_profile->getUserName(),-1,2));
+                std::vector<GUIEngine::ListWidget::ListCell> row;
+                Profile* friend_profile = ProfileManager::get()->getProfileByID(m_visiting_profile->getFriends()[i]);
+                row.push_back(GUIEngine::ListWidget::ListCell(friend_profile->getUserName(),-1,2));
                 if(m_visiting_profile->isCurrentUser())
                 {
                     Profile::RelationInfo * relation_info = friend_profile->getRelationInfo();
-                    row->push_back(new GUIEngine::ListWidget::ListCell(relation_info->getDate(),-1,1, true));
+                    row.push_back(GUIEngine::ListWidget::ListCell(relation_info->getDate(),-1,1, true));
                     irr::core::stringw status("");
                     if(relation_info->isPending())
                     {
@@ -128,7 +128,7 @@ void OnlineProfileFriends::onUpdate(float delta)
                     }
                     else
                         status = (relation_info->isOnline() ? _("Online") : _("Offline"));
-                    row->push_back(new GUIEngine::ListWidget::ListCell(status,-1,2, true));
+                    row.push_back(GUIEngine::ListWidget::ListCell(status,-1,2, true));
                 }
                 m_friends_list_widget->addItem("friend", row);
             }

@@ -210,16 +210,16 @@ void ListWidget::addItem(   const std::string& internal_name,
 // -----------------------------------------------------------------------------
 
 void ListWidget::addItem(const std::string& internal_name,
-                         PtrVector<ListCell> * contents)
+                         const std::vector<ListCell>& contents)
 {
     // May only be called AFTER this widget has been add()ed
     assert(m_element != NULL);
 
     ListItem newItem;
     newItem.m_internal_name = internal_name;
-    for(int i = 0; i < (int)contents->size(); i++)
+    for (unsigned int i = 0; i < contents.size(); i++)
     {
-        newItem.m_contents.push_back(*contents->get(i));
+        newItem.m_contents.push_back(contents[i]);
     }
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();

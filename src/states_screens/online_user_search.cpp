@@ -76,12 +76,12 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
 void OnlineUserSearch::showList()
 {
     m_user_list_widget->clear();
-    for(unsigned int i=0; i < m_users.size(); i++)
+    for (unsigned int i=0; i < m_users.size(); i++)
     {
-        PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
+        std::vector<GUIEngine::ListWidget::ListCell> row;
         Profile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
         assert(profile != NULL);
-        row->push_back(new GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
+        row.push_back(GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
         m_user_list_widget->addItem("user", row);
     }
 }

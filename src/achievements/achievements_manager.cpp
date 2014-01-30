@@ -103,6 +103,8 @@ void AchievementsManager::parseAssetFile()
     if(num_nodes != m_achievements_info.size())
         Log::error("AchievementsManager::parseAchievements",
                    "Multiple achievements with the same id!");
+
+    delete root;
 }
 
 

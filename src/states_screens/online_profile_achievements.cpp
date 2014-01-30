@@ -83,10 +83,11 @@ void OnlineProfileAchievements::init()
         m_achievements_list_widget->clear();
         const std::map<uint32_t, Achievement *> & all_achievements = AchievementsManager::get()->getActive()->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
-        for ( it = all_achievements.begin(); it != all_achievements.end(); ++it ) {
-            PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-            row->push_back(new GUIEngine::ListWidget::ListCell(it->second->getInfo()->getTitle(),-1,2));
-            row->push_back(new GUIEngine::ListWidget::ListCell(it->second->getProgressAsString(),-1,1, true));
+        for (it = all_achievements.begin(); it != all_achievements.end(); ++it )
+        {
+            std::vector<GUIEngine::ListWidget::ListCell> row;
+            row.push_back(GUIEngine::ListWidget::ListCell(it->second->getInfo()->getTitle(),-1,2));
+            row.push_back(GUIEngine::ListWidget::ListCell(it->second->getProgressAsString(),-1,1, true));
             m_achievements_list_widget->addItem(StringUtils::toString(it->second->getInfo()->getID()), row);
         }
     }
