@@ -124,7 +124,7 @@ bool NotificationDialog::onEscapePressed()
 void NotificationDialog::onUpdate(float dt)
 {
     //If we want to open the registration dialog, we need to close this one first
-    m_view && (m_self_destroy = true);
+    if (m_view) m_self_destroy = true;
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
