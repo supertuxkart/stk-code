@@ -117,7 +117,7 @@ namespace Online
     /** Checks the request if it has enough (correct) information to be
      *  executed (and thus allowed to add to the queue).
      */
-    bool HTTPRequest::isAllowedToAdd()
+    bool HTTPRequest::isAllowedToAdd() const
     {
         return Request::isAllowedToAdd() && m_url.substr(0, 5) == "http:";
     }   // isAllowedToAdd

@@ -87,7 +87,7 @@ namespace Online
                                        bool manage_memory = false, 
                                        int priority = 1);
         virtual           ~HTTPRequest() {};
-        virtual bool       isAllowedToAdd() OVERRIDE;
+        virtual bool       isAllowedToAdd() const OVERRIDE;
         void               setServerURL(const std::string& url);
         void               setAddonsURL(const std::string& path);
         // ------------------------------------------------------------------------
