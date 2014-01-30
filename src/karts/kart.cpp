@@ -1102,15 +1102,18 @@ void Kart::update(float dt)
 
     if (!m_flying)
     {
-        // When really on air, free fly, when near ground, try to glide / adjust for landing
-        // If zipped, be stable, so ramp+zipper can allow nice jumps without scripting the fly
-        if(!isNearGround() &&
-            m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f )
+        // When really on air, free fly, when near ground, try to glide /
+        // adjust for landing. If zipped, be stable, so ramp+zipper can
+        // allow nice jumps without scripting the fly
+        // Also disable he upright constraint when gravity is changed by 
+        // the terrain
+        if( (!isNearGround() &&
+              m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f ) ||
+              (getMaterial() && getMaterial()->hasGravity())                                  )
             m_uprightConstraint->setLimit(M_PI);
         else
             m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
     }
-
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
