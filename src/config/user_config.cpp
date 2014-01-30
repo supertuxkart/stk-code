@@ -256,25 +256,13 @@ void ListUserConfigParam<T>::write(XMLWriter& stream) const
     // actual elements
     for (int n=0; n<elts_amount; n++)
     {
-        stream << L"        " << n << "=\"" << m_elements[n] << "\"\n";
+        stream << L"        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
     }
     stream << L"    >\n";
     stream << L"    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-
-// Write your own convert function depending on the type of list you use.
-void convert(std::string str, char** str2)
-{
-    *str2 = (char*)(malloc(str.size()+1));
-    strcpy(*str2, str.c_str());
-}
-// Write your own equals function depending on the type of list you use.
-bool equals(char* str1, char* str2)
-{
-    return (strcmp(str1, str2) == 0);
-}
 
 template<typename T>
 void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
@@ -292,16 +280,15 @@ void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
     for (int n=0; n<attr_count; n++)
     {
         T elt;
-        std::ostringstream oss;
-        oss << n;
         std::string str;
-        child->get( oss.str(), &str);
-        convert(str, &elt);
+        child->get( StringUtils::toString(n), &str);
+        StringUtils::fromString<T>(str, elt);
+        
         // check if the element is already there :
         bool there = false;
         for (unsigned int i = 0; i < m_elements.size(); i++)
         {
-            if (equals(m_elements[i], elt))
+            if (elt == m_elements[i])
             {
                 there = true;
                 break;

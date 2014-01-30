@@ -102,7 +102,7 @@ void GetPublicAddress::asynchronousUpdate()
         bytes[20] = '\0';
 
         // time to pick a random stun server
-        std::vector<char*> stun_servers = UserConfigParams::m_stun_servers;
+        std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
 
         RandomGenerator random_gen;
         int rand_result = random_gen.get(stun_servers.size());
@@ -116,7 +116,7 @@ void GetPublicAddress::asynchronousUpdate()
         hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
         hints.ai_socktype = SOCK_STREAM;
 
-        if ((status = getaddrinfo(stun_servers[rand_result], NULL, &hints, &res)) != 0) {
+        if ((status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
             return;
         }

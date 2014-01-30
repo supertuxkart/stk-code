@@ -135,7 +135,7 @@ public:
     float& operator=(const ListUserConfigParam& v)
             { m_elements = std::vector<T>(v); return m_elements; }
 };   // ListUserConfigParam
-typedef ListUserConfigParam<char*>    StringListUserConfigParam;
+typedef ListUserConfigParam<std::string>    StringListUserConfigParam;
 
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
@@ -536,30 +536,30 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringListUserConfigParam("Stun_servers", "The stun servers"
                             " that will be used to know the public address.",
                             24,
-                            "provserver.televolution.net",
-                            "sip1.lakedestiny.cordiaip.com",
-                            "stun1.voiceeclipse.net",
-                            "stun01.sipphone.com",
-                            "stun.callwithus.com",
-                            "stun.counterpath.net",
-                            "stun.endigovoip.com",
-                            "stun.ekiga.net",
-                            "stun.ideasip.com" ,
-                            "stun.internetcalls.com",
-                            "stun.ipns.com",
-                            "stun.noc.ams-ix.net",
-                            "stun.phonepower.com",
-                            "stun.phoneserve.com",
-                            "stun.rnktel.com",
-                            "stun.softjoys.com",
-                            "stunserver.org",
-                            "stun.sipgate.net",
-                            "stun.stunprotocol.org",
-                            "stun.voip.aebc.com",
-                            "stun.voipbuster.com",
-                            "stun.voxalot.com",
-                            "stun.voxgratia.org",
-                            "stun.xten.com") );
+                            std::string("provserver.televolution.net"),
+                            std::string("sip1.lakedestiny.cordiaip.com"),
+                            std::string("stun1.voiceeclipse.net"),
+                            std::string("stun01.sipphone.com"),
+                            std::string("stun.callwithus.com"),
+                            std::string("stun.counterpath.net"),
+                            std::string("stun.endigovoip.com"),
+                            std::string("stun.ekiga.net"),
+                            std::string("stun.ideasip.com"),
+                            std::string("stun.internetcalls.com"),
+                            std::string("stun.ipns.com"),
+                            std::string("stun.noc.ams-ix.net"),
+                            std::string("stun.phonepower.com"),
+                            std::string("stun.phoneserve.com"),
+                            std::string("stun.rnktel.com"),
+                            std::string("stun.softjoys.com"),
+                            std::string("stunserver.org"),
+                            std::string("stun.sipgate.net"),
+                            std::string("stun.stunprotocol.org"),
+                            std::string("stun.voip.aebc.com"),
+                            std::string("stun.voipbuster.com"),
+                            std::string("stun.voxalot.com"),
+                            std::string("stun.voxgratia.org"),
+                            std::string("stun.xten.com")) );
 
     PARAM_PREFIX StringUserConfigParam m_packets_log_filename
             PARAM_DEFAULT( StringUserConfigParam("packets_log.txt", "packets_log_filename",
