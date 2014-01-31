@@ -183,8 +183,8 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            const char* comment)
 {
     m_param_name = param_name;
@@ -193,8 +193,8 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
 }   // ListUserConfigParam
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T,U>::ListUserConfigParam(const char* param_name,
                                            const char* comment,
                                            int nb_elements,
                                            ...)
@@ -207,13 +207,13 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
     va_list arguments;
     va_start ( arguments, nb_elements );
     for ( int i = 0; i < nb_elements; i++ )
-        m_elements.push_back(va_arg ( arguments, T ));
+        m_elements.push_back(T(va_arg ( arguments, U )));
     va_end ( arguments );                  // Cleans up the list
 }   // ListUserConfigParam
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            GroupUserConfigParam* group,
                                            const char* comment)
 {
@@ -223,8 +223,8 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
 }   // ListUserConfigParam
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            GroupUserConfigParam* group,
                                            const char* comment,
                                            int nb_elements,
@@ -243,8 +243,8 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
 }   // ListUserConfigParam
 
 // ----------------------------------------------------------------------------
-template<typename T>
-void ListUserConfigParam<T>::write(XMLWriter& stream) const
+template<typename T, typename U>
+void ListUserConfigParam<T, U>::write(XMLWriter& stream) const
 {
     const int elts_amount = m_elements.size();
 
@@ -264,8 +264,8 @@ void ListUserConfigParam<T>::write(XMLWriter& stream) const
 
 // ----------------------------------------------------------------------------
 
-template<typename T>
-void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
+template<typename T, typename U>
+void ListUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( m_param_name );
     if (child == NULL)
@@ -304,21 +304,21 @@ void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
-template<typename T>
-void ListUserConfigParam<T>::findYourDataInAnAttributeOf(const XMLNode* node)
+template<typename T, typename U>
+void ListUserConfigParam<T, U>::findYourDataInAnAttributeOf(const XMLNode* node)
 {
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-template<typename T>
-void ListUserConfigParam<T>::addElement(T element)
+template<typename T, typename U>
+void ListUserConfigParam<T,U>::addElement(T element)
 {
     m_elements.push_back(element);
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-template<typename T>
-irr::core::stringw ListUserConfigParam<T>::toString() const
+template<typename T, typename U>
+irr::core::stringw ListUserConfigParam<T,U>::toString() const
 {
     return "";
 }   // toString
