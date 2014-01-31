@@ -512,7 +512,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                  UserConfigParams::m_height - GUIEngine::getFontHeight()*2,
                                  UserConfigParams::m_width,
                                  UserConfigParams::m_height);
-            GUIEngine::getFont()->draw(_("Press fire to start the challenge"), pos2,
+            GUIEngine::getFont()->draw(_("Press fire to start the challenge.\nComplete all challenges to unlock the big door!\n"), pos2,
                                        video::SColor(255,255,150,60),
                                        true, true /* vcenter */, NULL);
         }
