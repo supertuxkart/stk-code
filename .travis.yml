@@ -1,0 +1,34 @@
+# Travis-CI configuration file for SuperTuxKart
+#
+# Configuration manual:
+# http://docs.travis-ci.com/user/build-configuration/
+#
+language: cpp
+compiler:
+  - gcc
+  #- clang
+git:
+  submodules: false
+#branches:
+#  only:
+#    - master
+before_install:
+  # UPDATE REPOS
+  - sudo apt-get update -qq
+  # INSTALL DEPENDENCIES
+  - sudo apt-get install autoconf automake build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
+script:
+  #  BUILD COMMANDS
+  - ./tools/build-linux-travis.sh
+notifications:
+  irc:
+    channels:
+      - "irc.freenode.org#stk"
+    skip_join: false
+    use_notice: true
+    template:
+      #- "[%{commit}: %{author}] %{message}"
+      #- "%{build_url}"
+      - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
+      - "Diff: %{compare_url}"
+      - "Build: %{build_url}"
