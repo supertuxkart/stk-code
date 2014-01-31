@@ -1,5 +1,6 @@
 #SuperTuxKart
 [![Build Status](https://travis-ci.org/supertuxkart/stk-code.png?branch=master)](https://travis-ci.org/supertuxkart/stk-code)
+
 SuperTuxKart is a free kart racing game. It is focusing on fun and
 not on realistic kart physics. Instruction can be found on the
 in-game help page.
