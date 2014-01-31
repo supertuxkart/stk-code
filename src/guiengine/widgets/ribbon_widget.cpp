@@ -730,7 +730,6 @@ void RibbonWidget::setLabel(const unsigned int id, irr::core::stringw new_name)
     // ignore this call for ribbons without labels
     if (m_labels.size() == 0) return;
 
-    assert(id >= 0);
     assert(id < m_labels.size());
     m_labels[id].setText( new_name.c_str() );
     m_text = new_name;

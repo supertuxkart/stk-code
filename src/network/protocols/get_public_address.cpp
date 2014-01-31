@@ -197,7 +197,7 @@ void GetPublicAddress::asynchronousUpdate()
                         case 0:
                         case 1:
                             assert(size == 8);
-                            assert(attributes[5] = 0x01); // IPv4 only
+                            assert(attributes[5] == 0x01); // IPv4 only
                             port = attributes[6]*256+attributes[7];
                             address = (attributes[8]<<24 & 0xFF000000)+(attributes[9]<<16 & 0x00FF0000)+(attributes[10]<<8 & 0x0000FF00)+(attributes[11] & 0x000000FF);
                             finish = true;
