@@ -1,3 +1,4 @@
+bld/
 build/
 build-32/
 build-64/
@@ -37,3 +38,4 @@ data/.svn
 
 packets_log.txt
 history.dat
+README.dependencies
