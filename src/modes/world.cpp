@@ -946,7 +946,6 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
             continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
-        assert(index[pos] >= 0);
         assert(index[pos] < m_karts.size());
         Kart *k = (Kart*)m_karts[index[pos]];
 
