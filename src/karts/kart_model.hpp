@@ -255,8 +255,8 @@ public:
     /** Returns the position of a wheel relative to the kart.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
      *           right, 3 = rear left.  */
-    const Vec3& getWheelGraphicsPosition(int i) const
-                {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
+    const Vec3& getWheelGraphicsPosition(unsigned int i) const
+                {assert(i<4); return m_wheel_graphics_position[i];}
     // ------------------------------------------------------------------------
     /** Returns the position of wheels relative to the kart.
      */
@@ -268,20 +268,20 @@ public:
      *  karts more stable.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
      *           right, 3 = rear left.  */
-    const Vec3& getWheelPhysicsPosition(int i) const
-                {assert(i>=0 && i<4); return m_wheel_physics_position[i];}
+    const Vec3& getWheelPhysicsPosition(unsigned int i) const
+                {assert(i<4); return m_wheel_physics_position[i];}
     // ------------------------------------------------------------------------
     /** Returns the radius of the graphical wheels.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
      *           right, 3 = rear left.  */
-    float       getWheelGraphicsRadius(int i) const
-                {assert(i>=0 && i<4); return m_wheel_graphics_radius[i]; }
+    float       getWheelGraphicsRadius(unsigned int i) const
+                {assert(i<4); return m_wheel_graphics_radius[i]; }
     // ------------------------------------------------------------------------
     /** Returns the position of nitro emitter relative to the kart.
      *  \param i Index of the emitter: 0 = right, 1 = left
      */
     const Vec3& getNitroEmittersPositon(unsigned int i) const
-                { assert(i>=0 && i<2);  return m_nitro_emitter_position[i]; }
+                { assert(i<2);  return m_nitro_emitter_position[i]; }
     // ------------------------------------------------------------------------
     /** Returns true if kart has nitro emitters */
     const bool hasNitroEmitters() const

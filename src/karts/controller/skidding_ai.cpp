@@ -1060,7 +1060,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
             // fall through: if we have enough space to store a big
             // container, we can also store a small container, and
             // finally fall through to the bonus box code.
-        case Item::ITEM_NITRO_SMALL: avoid = false; break;
+        case Item::ITEM_NITRO_SMALL: avoid = false;
             // Only collect nitro, if it can actually be stored.
             if (m_kart->getEnergy() +
                     m_kart->getKartProperties()->getNitroSmallContainer()
