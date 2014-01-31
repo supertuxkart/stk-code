@@ -296,7 +296,6 @@ void ListUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
         }
         if (!there)
         {
-            Log::info("ListUserConfigParam", "New data : %s, \"%s\"", str.c_str(), elt);
             m_elements.push_back(elt);
         }
     }

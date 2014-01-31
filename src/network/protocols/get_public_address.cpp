@@ -106,7 +106,8 @@ void GetPublicAddress::asynchronousUpdate()
 
         RandomGenerator random_gen;
         int rand_result = random_gen.get(stun_servers.size());
-        Log::verbose("GetPublicAddress", "Using STUN server %s", stun_servers[rand_result]);
+        Log::verbose("GetPublicAddress", "Using STUN server %s", 
+                     stun_servers[rand_result].c_str());
 
         // resolve the name into an IP address
         struct addrinfo hints, *res, *p;
