@@ -144,7 +144,7 @@ void ProtocolManager::notifyEvent(Event* event)
     pthread_mutex_unlock(&m_protocols_mutex);
     if (searchedProtocol == PROTOCOL_NONE) // no protocol was aimed, show the msg to debug
     {
-        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"", event2->data().c_str());
+        Log::debug("ProtocolManager", "NO PROTOCOL : Message is \"%s\"", event2->data().std_string().c_str());
     }
 
     if (protocols_ids.size() != 0)

@@ -95,7 +95,7 @@ void STKPeer::sendPacket(NetworkString const& data, bool reliable)
                 data.size(), (m_peer->address.host>>0)&0xff,
                 (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
                 (m_peer->address.host>>24)&0xff,m_peer->address.port);
-    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
+    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                 (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     /* to debug the packet output
     printf("STKPeer: ");
