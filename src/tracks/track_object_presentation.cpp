@@ -674,6 +674,13 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         new RacePausedDialog(0.8f, 0.6f);
         //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
     }
+    //action trigger near big doors in the overword to notify players that they'll open once they finish all the challenges
+    else if (m_action == "big_door")
+    {
+        m_action_active = false;
+
+        new TutorialMessageDialog(_("Complete all challenges to unlock the big door!"), true);
+    }
     else if (m_action == "tutorial_drive")
     {
         //if (World::getWorld()->getPhase() == World::RACE_PHASE)
