@@ -1730,6 +1730,28 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         if (name == "track" || name == "default-start") continue;
         if (name == "object")
         {
+            std::string condition;
+            node->get("ifnot", &condition);
+            if (condition == "allchallenges"){
+            unsigned int unlocked_challenges = 0;
+            GameSlot* slot = unlock_manager->getCurrentSlot();
+            for (unsigned int c=0; c<m_challenges.size(); c++)
+            {
+                if (m_challenges[c].m_challenge_id == "tutorial")
+                {
+                    unlocked_challenges++;
+                    continue;
+                }
+                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                        ->isSolvedAtAnyDifficulty())
+                {
+                    unlocked_challenges++;
+                }
+            }
+            // allow ONE unsolved challenge : the last one and check for negation
+            if (!(unlocked_challenges < m_challenges.size() - 1)) continue;
+                          
+            }
             m_track_object_manager->add(*node, parent, lod_loader);
         }
         else if (name == "library")
