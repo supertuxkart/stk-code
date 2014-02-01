@@ -28,6 +28,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/kart_selection.hpp"
 #include "states_screens/state_manager.hpp"
+#include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 
@@ -57,18 +58,18 @@ bool DeviceManager::initialize()
 
     if(UserConfigParams::logMisc())
     {
-        Log::info("Initializing Device Manager\n");
-        Log::info("---------------------------\n");
+        Log::info("Device manager","Initializing Device Manager");
+        Log::info("-","---------------------------");
     }
 
     deserialize();
 
     // Assign a configuration to the keyboard, or create one if we haven't yet
-    if(UserConfigParams::logMisc()) Log::info("Initializing keyboard support.\n");
+    if(UserConfigParams::logMisc()) Log::info("Device manager","Initializing keyboard support.");
     if (m_keyboard_configs.size() == 0)
     {
         if(UserConfigParams::logMisc())
-            Log::info("No keyboard configuration exists, creating one.\n");
+            Log::info("Device manager","No keyboard configuration exists, creating one.");
         m_keyboard_configs.push_back(new KeyboardConfig());
         created = true;
     }
@@ -80,13 +81,13 @@ bool DeviceManager::initialize()
     }
 
     if(UserConfigParams::logMisc())
-            Log::info("Initializing gamepad support.\n");
+            Log::info("Device manager","Initializing gamepad support.");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
     int num_gamepads = m_irrlicht_gamepads.size();
     if(UserConfigParams::logMisc())
     {
-        Log::info("Irrlicht reports %d gamepads are attached to the system.\n",
+        Log::info("Device manager","Irrlicht reports %d gamepads are attached to the system.",
                num_gamepads);
     }
 
@@ -110,19 +111,19 @@ bool DeviceManager::initialize()
 
         if (UserConfigParams::logMisc())
         {
-            Log::info("#%d: %s detected...", id, name.c_str());
+            Log::info("Device manager","#%d: %s detected...", id, name.c_str());
         }
         // Returns true if new configuration was created
         if (getConfigForGamepad(id, name, &gamepadConfig) == true)
         {
             if(UserConfigParams::logMisc())
-               Log::info("creating new configuration.\n");
+               Log::info("Device manager","creating new configuration.");
             created = true;
         }
         else
         {
             if(UserConfigParams::logMisc())
-                Log::info("using existing configuration.\n");
+                Log::info("Device manager","using existing configuration.");
         }
 
         gamepadConfig->setPlugged();
@@ -441,12 +442,12 @@ bool DeviceManager::deserialize()
     static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
 
     if(UserConfigParams::logMisc())
-        Log::info("Deserializing input.xml...\n");
+        Log::info("Device manager","Deserializing input.xml...");
 
     if(!file_manager->fileExists(filepath))
     {
         if(UserConfigParams::logMisc())
-            Log::warn("No configuration file exists.\n");
+            Log::warn("Device manager","No configuration file exists.");
     }
     else
     {
@@ -500,15 +501,15 @@ bool DeviceManager::deserialize()
                         {
                             if(keyboard_config != NULL)
                                 if(!keyboard_config->deserializeAction(xml))
-                                    Log::error(Ignoring an ill-formed keyboard action in input config.\n");
+                                    Log::error("Device manager","Ignoring an ill-formed keyboard action in input config.");
                         }
                         else if(reading_now == GAMEPAD)
                         {
                             if(gamepad_config != NULL)
                                 if(!gamepad_config->deserializeAction(xml))
-                                     Log::error("Ignoring an ill-formed gamepad action in input config.\n");
+                                     Log::error("Device manager","Ignoring an ill-formed gamepad action in input config.");
                         }
-                        else  Log::error("Warning: An action is placed in an unexpected area in the input config file.\n");
+                        else  Log::warn("Device manager","An action is placed in an unexpected area in the input config file.");
                     }
                 }
                 break;
@@ -535,7 +536,7 @@ bool DeviceManager::deserialize()
 
         if(UserConfigParams::logMisc())
         {
-            Log::info("Found %d keyboard and %d gamepad configurations.\n",
+            Log::info("Device manager","Found %d keyboard and %d gamepad configurations.",
                    m_keyboard_configs.size(), m_gamepad_configs.size());
         }
 
@@ -558,7 +559,7 @@ bool DeviceManager::deserialize()
 void DeviceManager::serialize()
 {
     static std::string filepath = file_manager->getUserConfigFile(INPUT_FILE_NAME);
-    if(UserConfigParams::logMisc()) Log::info("Serializing input.xml...\n");
+    if(UserConfigParams::logMisc()) Log::info("Device manager","Serializing input.xml...");
 
 
     std::ofstream configfile;
@@ -566,7 +567,7 @@ void DeviceManager::serialize()
 
     if(!configfile.is_open())
     {
-        Log::error("Failed to open %s for writing, controls won't be saved\n",filepath.c_str());
+        Log::error("Device manager","Failed to open %s for writing, controls won't be saved",filepath.c_str());
         return;
     }
 
@@ -584,7 +585,7 @@ void DeviceManager::serialize()
 
     configfile << "</input>\n";
     configfile.close();
-    if(UserConfigParams::logMisc()) Log::info("Serialization complete.\n\n");
+    if(UserConfigParams::logMisc()) Log::info("Device manager","Serialization complete.");
 }   // serialize
 
 // -----------------------------------------------------------------------------
