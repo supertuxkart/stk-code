@@ -640,10 +640,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     const u32 glowcount = glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
 
-    GlowProvider * const glowcb = (GlowProvider *) m_shaders->m_callbacks[ES_GLOW];
-    glowcb->setResolution(UserConfigParams::m_width,
-                            UserConfigParams::m_height);
-
 /*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
     overridemat.EnablePasses = scene::ESNRP_SOLID;

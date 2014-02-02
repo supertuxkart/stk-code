@@ -39,15 +39,6 @@ GlowNode::GlowNode(scene::ISceneManager* mgr, float radius): ISceneNode(mgr->get
 {
     if (!sphere)
     {
-        mat.Lighting = false;
-        mat.MaterialType = irr_driver->getShader(ES_GLOW);
-
-        mat.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-        mat.TextureLayer[0].TextureWrapU =
-        mat.TextureLayer[0].TextureWrapV = ETC_CLAMP_TO_EDGE;
-        mat.setFlag(EMF_TRILINEAR_FILTER, true);
-        mat.BlendOperation = EBO_ADD;
-
         sphere = mgr->getGeometryCreator()->createSphereMesh(1, 4, 4);
         box = sphere->getBoundingBox();
     }
@@ -65,10 +56,5 @@ void GlowNode::render()
 
 void GlowNode::OnRegisterSceneNode()
 {
-    if (IsVisible)
-    {
-        SceneManager->registerNodeForRendering(this, ESNRP_TRANSPARENT);
-    }
 
-    ISceneNode::OnRegisterSceneNode();
 }
