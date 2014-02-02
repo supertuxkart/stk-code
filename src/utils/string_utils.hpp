@@ -72,7 +72,7 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
     /** Specialisiation for bools to return 'true' or 'false'*/
-    inline std::string toString(bool &b)
+    inline std::string toString(const bool& b)
     {
         return (b ? "true" : "false");
     }    // toString(bool)

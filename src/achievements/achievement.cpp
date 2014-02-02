@@ -131,13 +131,14 @@ MapAchievement::MapAchievement(const AchievementInfo * info)
 // ============================================================================
 void MapAchievement::load(XMLNode * input)
 {
-    std::string achieved("");
+    bool achieved = false;
     input->get("achieved", &achieved);
-    if(achieved == "true")
+    if(achieved)
     {
         m_achieved = true;
         return;
     }
+
     std::vector<XMLNode*> xml_entries;
     input->getNodes("entry", xml_entries);
     for (unsigned int n=0; n < xml_entries.size(); n++)
