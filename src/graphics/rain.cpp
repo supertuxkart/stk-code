@@ -20,7 +20,7 @@
 #include "audio/sfx_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/gpuparticles.h"
+#include "graphics/gpuparticles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
