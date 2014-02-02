@@ -210,11 +210,13 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 }
 
 
-#if defined(_IRR_COMPILE_WITH_X11_) && defined(_DEBUG)
+#if defined(_IRR_COMPILE_WITH_X11_)
+static bool XErrorSignaled = false;
 int IrrPrintXError(Display *display, XErrorEvent *event)
 {
 	char msg[256];
 	char msg2[256];
+	XErrorSignaled = true;
 
 	snprintf(msg, 256, "%d", event->request_code);
 	XGetErrorDatabaseText(display, "XRequest", msg, "unknown", msg2, 256);
@@ -370,10 +372,8 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 bool CIrrDeviceLinux::createWindow()
 {
 #ifdef _IRR_COMPILE_WITH_X11_
-#ifdef _DEBUG
 	os::Printer::log("Creating X window...", ELL_INFORMATION);
 	XSetErrorHandler(IrrPrintXError);
-#endif
 
 	display = XOpenDisplay(0);
 	if (!display)
@@ -750,12 +750,22 @@ bool CIrrDeviceLinux::createWindow()
 					GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
 					None
 				};
-			
 			PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
 			glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
 								glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
 			// create glx context
 			Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, context_attribs);
+			if (XErrorSignaled)
+			{
+				int context_attribs[] =
+					{
+						GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
+						GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+						None
+					};
+				Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, context_attribs);
+				XErrorSignaled = false;
+			}
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))

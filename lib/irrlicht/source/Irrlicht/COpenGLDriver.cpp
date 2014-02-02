@@ -4397,12 +4397,6 @@ IImage* COpenGLDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RE
 	if (target==video::ERT_MULTI_RENDER_TEXTURES || target==video::ERT_RENDER_TEXTURE || target==video::ERT_STEREO_BOTH_BUFFERS)
 		return 0;
 
-	// allows to read pixels in top-to-bottom order
-#ifdef GL_MESA_pack_invert
-	if (FeatureAvailable[IRR_MESA_pack_invert])
-		glPixelStorei(GL_PACK_INVERT_MESA, GL_TRUE);
-#endif
-
 	if (format==video::ECF_UNKNOWN)
 		format=getColorFormat();
 	GLenum fmt;
@@ -4542,11 +4536,6 @@ IImage* COpenGLDriver::createScreenShot(video::ECOLOR_FORMAT format, video::E_RE
 		glReadBuffer(GL_BACK);
 	}
 
-#ifdef GL_MESA_pack_invert
-	if (FeatureAvailable[IRR_MESA_pack_invert])
-		glPixelStorei(GL_PACK_INVERT_MESA, GL_FALSE);
-	else
-#endif
 	if (pixels)
 	{
 		// opengl images are horizontally flipped, so we have to fix that here.
