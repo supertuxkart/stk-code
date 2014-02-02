@@ -42,7 +42,7 @@ using namespace core;
 
 // The rain manager
 
-Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
+Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent) : m_thunder_sound(0)
 {
     m_lightning = camera->getIndex()==0;
 

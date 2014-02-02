@@ -106,9 +106,8 @@ void STKAnimatedMesh::render()
 	}
 	else
 	{
-#ifdef _DEBUG
-		os::Printer::log("Animated Mesh returned no mesh to render.", Mesh->getDebugName(), ELL_WARNING);
-#endif
+		Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
+		return;
 	}
 
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);

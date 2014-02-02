@@ -57,7 +57,11 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
                          "AreaMap33", false);
-    if (!areamap) Log::fatal("postprocessing", "Failed to load the areamap");
+	if (!areamap)
+	{
+		Log::fatal("postprocessing", "Failed to load the areamap");
+		return;
+	}
     m_areamap = irr_driver->getVideoDriver()->getTexture(areamap);
     areamap->drop();
 

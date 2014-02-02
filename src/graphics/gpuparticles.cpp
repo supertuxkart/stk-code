@@ -78,6 +78,23 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 	glGenVertexArrays(1, &current_rendering_vao);
 	glGenVertexArrays(1, &non_current_rendering_vao);
 	size_increase_factor = 0.;
+
+    // We set these later but avoid coverity report them
+    heighmapbuffer = 0;
+    heightmaptexture = 0;
+    current_simulation_vao = 0;
+    non_currenthm__simulation_vao = 0;
+    current_hm_simulation_vao = 0;
+    current_rendering_flip_vao = 0;
+    non_current_rendering_flip_vao = 0;
+    has_height_map = false;
+    flip = false;
+    track_x = 0;
+    track_z = 0;
+    track_x_len = 0;
+    track_z_len = 0;
+    texture = 0;
+
 	if (quad_vertex_buffer)
 		return;
 	static const GLfloat quad_vertex[] = {
