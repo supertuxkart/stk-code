@@ -150,6 +150,35 @@ Track::~Track()
 }   // ~Track
 
 //-----------------------------------------------------------------------------
+/** returns true if all challenges are complete (for  
+ *  event/message triggering)
+ */
+bool Track::isAllChallengesComplete()
+{
+    unsigned int unlocked_challenges = 0;
+    GameSlot* slot = unlock_manager->getCurrentSlot();
+    for (unsigned int c=0; c<m_challenges.size(); c++)
+    {
+        if (m_challenges[c].m_challenge_id == "tutorial")
+        {
+            unlocked_challenges++;
+            continue;
+        }
+        if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                ->isSolvedAtAnyDifficulty())
+        {
+            unlocked_challenges++;
+        }
+    }
+
+    // allow ONE unsolved challenge : the last one
+    if (unlocked_challenges < m_challenges.size() - 1) 
+         return false;
+    else 
+         return true;
+}   // isAllChallengesCompleted
+
+//-----------------------------------------------------------------------------
 /** Removes all cached data structures. This is called before the resolution
  *  is changed.
  */
@@ -961,24 +990,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (condition == "allchallenges")
         {
-            unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-                if (m_challenges[c].m_challenge_id == "tutorial")
-                {
-                    unlocked_challenges++;
-                    continue;
-                }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
-                        ->isSolvedAtAnyDifficulty())
-                {
-                    unlocked_challenges++;
-                }
-            }
-
-            // allow ONE unsolved challenge : the last one
-            if (unlocked_challenges < m_challenges.size() - 1) continue;
+            if( !isAllChallengesComplete())
+                continue;
         }
         else if (condition.size() > 0)
         {
@@ -993,24 +1006,8 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (neg_condition == "allchallenges")
         {
-            unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-                if (m_challenges[c].m_challenge_id == "tutorial")
-                {
-                    unlocked_challenges++;
-                    continue;
-                }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
-                        ->isSolvedAtAnyDifficulty())
-                {
-                    unlocked_challenges++;
-                }
-            }
-
-            // allow ONE unsolved challenge : the last one
-            if (unlocked_challenges >= m_challenges.size() - 1) continue;
+            if (isAllChallengesComplete())
+                continue;
         }
         else if (neg_condition.size() > 0)
         {
