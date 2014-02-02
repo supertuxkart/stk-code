@@ -206,6 +206,7 @@ private:
     /** True if this track (textures and track data) should be cached. Used
      *  for the overworld. */
     bool m_cache_track;
+    
 
 #ifdef DEBUG
     /** A list of textures that were cached before the track is loaded.
@@ -577,6 +578,9 @@ public:
     // ------------------------------------------------------------------------
     /** True if push back of karts towards the track should be enabled. */
     bool isPushBackEnabled() const { return m_enable_push_back; }
+    // ------------------------------------------------------------------------
+    /** True if all challenges have been completed. */
+    bool isAllChallengesComplete();
     // ------------------------------------------------------------------------
     /** Returns true if the normals of this track can be smoothed. */
     bool smoothNormals() const { return m_smooth_normals; }

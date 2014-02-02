@@ -679,27 +679,8 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "big_door")
     {
         m_action_active = false;
-        
-        unsigned int unlocked_challenges = 0;
-        GameSlot* slot = unlock_manager->getCurrentSlot();
-        std::vector<OverworldChallenge> m_challenges = World::getWorld()->getTrack()->getChallengeList();
-
-        for (unsigned int i=0; i<m_challenges.size(); i++)
-        {
-            if (m_challenges[i].m_challenge_id == "tutorial")
-            {
-                unlocked_challenges++;
-                continue;
-            }
-            if (slot->getChallenge(m_challenges[i].m_challenge_id)
-                    ->isSolvedAtAnyDifficulty())
-            {
-                unlocked_challenges++;
-            }
-        }
-
-        // allow ONE unsolved challenge : the last one and check for negation
-        if ((unlocked_challenges < m_challenges.size() - 1))
+        bool challenges_complete = World::getWorld()->getTrack()->isAllChallengesComplete();
+        if (!challenges_complete)
         {
             new TutorialMessageDialog(_("Complete all challenges to unlock the big door!"), true);
         }
