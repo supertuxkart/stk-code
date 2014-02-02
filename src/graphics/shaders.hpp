@@ -341,16 +341,6 @@ public:
 	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
-class LightBlendShader
-{
-public:
-	static GLuint Program;
-	static GLuint uniform_diffuse, uniform_specular, uniform_ambient_occlusion, uniform_specular_map, uniform_ambient;
-	static GLuint vao;
-
-	static void init();
-};
-
 class Gaussian6HBlurShader
 {
 public:

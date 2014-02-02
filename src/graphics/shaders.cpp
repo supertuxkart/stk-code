@@ -249,7 +249,6 @@ void Shaders::loadShaders()
 	FullScreenShader::Gaussian6HBlurShader::init();
 	FullScreenShader::Gaussian6VBlurShader::init();
 	FullScreenShader::GlowShader::init();
-	FullScreenShader::LightBlendShader::init();
 	FullScreenShader::PassThroughShader::init();
 	FullScreenShader::PointLightShader::init();
 	FullScreenShader::PPDisplaceShader::init();
@@ -1190,24 +1189,6 @@ namespace FullScreenShader
 		glUniform3f(uniform_col, r, g, b);
 		glUniform1i(uniform_ntex, TU_ntex);
 		glUniform1i(uniform_dtex, TU_dtex);
-	}
-
-	GLuint LightBlendShader::Program;
-	GLuint LightBlendShader::uniform_diffuse;
-	GLuint LightBlendShader::uniform_specular;
-	GLuint LightBlendShader::uniform_ambient_occlusion;
-	GLuint LightBlendShader::uniform_specular_map;
-	GLuint LightBlendShader::uniform_ambient;
-	GLuint LightBlendShader::vao;
-	void LightBlendShader::init()
-	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/lightblend.frag").c_str());
-		uniform_diffuse = glGetUniformLocation(Program, "diffuse");
-		uniform_specular = glGetUniformLocation(Program, "specular");
-		uniform_ambient_occlusion = glGetUniformLocation(Program, "ambient_occlusion");
-		uniform_specular_map = glGetUniformLocation(Program, "specular_map");
-		uniform_ambient = glGetUniformLocation(Program, "ambient");
-		vao = createVAO(Program);
 	}
 
 	GLuint Gaussian6HBlurShader::Program;
