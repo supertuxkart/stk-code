@@ -260,9 +260,6 @@ public:
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   scene::ISceneNode *parent=NULL);
-    PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh,
-                                           scene::ICameraSceneNode* node,
-                                           scene::ISceneNode *parent = NULL);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);

@@ -945,17 +945,6 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
 
 // ----------------------------------------------------------------------------
 
-PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
-                                           scene::ICameraSceneNode* camera,
-                                           scene::ISceneNode *parent)
-{
-    scene::ISceneNode *node = m_scene_manager->addMeshSceneNode(mesh);
-
-    return new PerCameraNode((parent ? parent
-                                     : m_scene_manager->getRootSceneNode()),
-                             m_scene_manager, -1, camera, node);
-}   // addMesh
-
 PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* camera,
                                            scene::ISceneNode *parent)
