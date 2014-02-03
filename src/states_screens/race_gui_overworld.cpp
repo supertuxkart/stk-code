@@ -480,9 +480,12 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                             challenges[n].m_challenge_id.c_str());
                     break;
                 }
-
+                
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
                 font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
+                           false, true /* vcenter */, NULL);
+                //just below GP name
+                font->draw(_("\n\nType : Grand Prix"), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
