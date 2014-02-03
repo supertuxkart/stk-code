@@ -254,6 +254,7 @@ void Shaders::loadShaders()
 	MeshShader::GrassPass2Shader::init();
 	MeshShader::BubbleShader::init();
 	MeshShader::TransparentShader::init();
+    MeshShader::TransparentFogShader::init();
 	MeshShader::BillboardShader::init();
 	MeshShader::DisplaceShader::init();
 	ParticleShader::FlipParticleRender::init();
@@ -777,6 +778,51 @@ namespace MeshShader
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_tex, TU_tex);
 	}
+
+    GLuint TransparentFogShader::Program;
+    GLuint TransparentFogShader::attrib_position;
+    GLuint TransparentFogShader::attrib_texcoord;
+    GLuint TransparentFogShader::uniform_MVP;
+    GLuint TransparentFogShader::uniform_tex;
+    GLuint TransparentFogShader::uniform_fogmax;
+    GLuint TransparentFogShader::uniform_startH;
+    GLuint TransparentFogShader::uniform_endH;
+    GLuint TransparentFogShader::uniform_start;
+    GLuint TransparentFogShader::uniform_end;
+    GLuint TransparentFogShader::uniform_col;
+    GLuint TransparentFogShader::uniform_screen;
+    GLuint TransparentFogShader::uniform_ipvmat;
+
+    void TransparentFogShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparentfog.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_fogmax = glGetUniformLocation(Program, "fogmax");
+        uniform_startH = glGetUniformLocation(Program, "startH");
+        uniform_endH = glGetUniformLocation(Program, "endH");
+        uniform_start = glGetUniformLocation(Program, "start");
+        uniform_end = glGetUniformLocation(Program, "end");
+        uniform_col = glGetUniformLocation(Program, "col");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
+    }
+
+    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniform1f(uniform_fogmax, fogmax);
+        glUniform1f(uniform_startH, startH);
+        glUniform1f(uniform_endH, endH);
+        glUniform1f(uniform_start, start);
+        glUniform1f(uniform_end, end);
+        glUniform3f(uniform_col, col.X, col.Y, col.Z);
+        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
+        glUniform1i(uniform_tex, TU_tex);
+    }
 	
 	GLuint BillboardShader::Program;
 	GLuint BillboardShader::attrib_corner;

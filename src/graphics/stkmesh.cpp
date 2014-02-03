@@ -1,10 +1,13 @@
 #include "stkmesh.hpp"
 #include "graphics/irr_driver.hpp"
+#include "tracks/track.hpp"
 #include <ISceneManager.h>
 #include <IMaterialRenderer.h>
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "utils/helpers.hpp"
+#include "graphics/camera.hpp"
+#include "modes/world.hpp"
 
 
 GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
@@ -623,6 +626,35 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 	glDrawElements(ptype, count, itype, 0);
 }
 
+void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+{
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    const Track * const track = World::getWorld()->getTrack();
+
+    // This function is only called once per frame - thus no need for setters.
+    const float fogmax = track->getFogMax();
+    const float startH = track->getFogStartHeight();
+    const float endH = track->getFogEndHeight();
+    const float start = track->getFogStart();
+    const float end = track->getFogEnd();
+    const video::SColor tmpcol = track->getFogColor();
+
+    core::vector3df col(tmpcol.getRed() / 255.0f,
+        tmpcol.getGreen() / 255.0f,
+        tmpcol.getBlue() / 255.0f);
+
+    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+
+    glUseProgram(MeshShader::TransparentFogShader::Program);
+    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvProjMatrix(), fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+
+    glBindVertexArray(mesh.vao_first_pass);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
 	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -682,8 +714,10 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 
 	computeMVP(ModelViewProjectionMatrix);
 
-	if (type == irr_driver->getShader(ES_BUBBLES))
-		drawBubble(mesh, ModelViewProjectionMatrix);
+    if (type == irr_driver->getShader(ES_BUBBLES))
+        drawBubble(mesh, ModelViewProjectionMatrix);
+    else if (World::getWorld()->getTrack()->isFogEnabled())
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
 	else
 		drawTransparentObject(mesh, ModelViewProjectionMatrix);
 	return;
@@ -860,6 +894,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
+        else if (World::getWorld()->getTrack()->isFogEnabled())
+        {
+            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+                MeshShader::TransparentFogShader::attrib_position, MeshShader::TransparentFogShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        }
 		else
 		{
 			mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
