@@ -242,7 +242,7 @@ void IrrDriver::renderGLSL(float dt)
 		  if (World::getWorld()->getTrack()->isFogEnabled())
 		  {
 			  PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			  m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
+			  m_post_processing->renderFog(irr_driver->getInvProjMatrix());
 			  PROFILER_POP_CPU_MARKER();
 		  }
 
@@ -639,10 +639,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     const u32 glowcount = glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
-
-    GlowProvider * const glowcb = (GlowProvider *) m_shaders->m_callbacks[ES_GLOW];
-    glowcb->setResolution(UserConfigParams::m_width,
-                            UserConfigParams::m_height);
 
 /*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;

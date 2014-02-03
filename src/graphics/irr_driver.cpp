@@ -1509,7 +1509,9 @@ void IrrDriver::displayFPS()
     {
         sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
                 min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
-		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[TRANSPARENT_PASS] = 0;
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+		object_count[TRANSPARENT_PASS] = 0;
     }
     else
     {

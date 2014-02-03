@@ -4,6 +4,8 @@
 #include <ISkinnedMesh.h>
 #include "graphics/irr_driver.hpp"
 #include "config/user_config.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 using namespace irr;
 
@@ -30,7 +32,10 @@ void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE
 
 	computeMVP(ModelViewProjectionMatrix);
 
-	drawTransparentObject(mesh, ModelViewProjectionMatrix);
+    if (World::getWorld()->getTrack()->isFogEnabled())
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
+    else
+        drawTransparentObject(mesh, ModelViewProjectionMatrix);
 
 	return;
 }
@@ -106,9 +111,8 @@ void STKAnimatedMesh::render()
 	}
 	else
 	{
-#ifdef _DEBUG
-		os::Printer::log("Animated Mesh returned no mesh to render.", Mesh->getDebugName(), ELL_WARNING);
-#endif
+		Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
+		return;
 	}
 
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
