@@ -480,9 +480,15 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                             challenges[n].m_challenge_id.c_str());
                     break;
                 }
+                core::rect<s32> pos3(15,
+                                     10 + GUIEngine::getFontHeight()*2, //just below GP name
+                                     15 + UserConfigParams::m_width/2,
+                                     10 + GUIEngine::getTitleFontHeight());
 
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
                 font->draw(gp->getName(), pos, video::SColor(255,255,255,255),
+                           false, true /* vcenter */, NULL);
+                font->draw(_("Type : Grand Prix"), pos3, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
             }
             else
@@ -496,10 +502,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                             challenges[n].m_challenge_id.c_str());
                     break;
                 }
-
                 gui::ScalableFont* font = GUIEngine::getTitleFont();
                 font->draw(track->getName(), pos, video::SColor(255,255,255,255),
                            false, true /* vcenter */, NULL);
+
             }
 
             pos.UpperLeftCorner.Y += GUIEngine::getTitleFontHeight();
