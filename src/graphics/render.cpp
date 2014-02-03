@@ -242,7 +242,7 @@ void IrrDriver::renderGLSL(float dt)
 		  if (World::getWorld()->getTrack()->isFogEnabled())
 		  {
 			  PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			  m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
+			  m_post_processing->renderFog(irr_driver->getInvProjMatrix());
 			  PROFILER_POP_CPU_MARKER();
 		  }
 

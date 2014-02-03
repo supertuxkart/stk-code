@@ -495,7 +495,7 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glEnable(GL_DEPTH_TEST);
 }
 
-void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat)
+void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 {
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 	const Track * const track = World::getWorld()->getTrack();
@@ -521,7 +521,7 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
 	setTexture(0, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
-	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, campos, 0);
+	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

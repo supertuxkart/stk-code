@@ -76,7 +76,7 @@ public:
 	void         renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
 	void         renderSunlight();
 
-	void renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat);
+	void renderFog(const core::matrix4 &ipvmat);
 	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
 
 	/** Blur the in texture */

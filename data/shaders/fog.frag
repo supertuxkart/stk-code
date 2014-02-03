@@ -7,7 +7,6 @@ uniform float endH;
 uniform float start;
 uniform float end;
 uniform vec3 col;
-uniform vec3 campos;
 uniform mat4 ipvmat;
 
 in vec2 uv;
@@ -24,9 +23,8 @@ void main()
 	xpos = ipvmat * xpos;
 	xpos.xyz /= xpos.w;
 
-	float dist = distance(campos, xpos.xyz);
+	float dist = length(xpos.xyz);
 	float fog = smoothstep(start, end, dist);
-	fog *= 1.0 - smoothstep(startH, endH, xpos.y);
 
 	fog = min(fog, fogmax);
 

@@ -1397,7 +1397,6 @@ namespace FullScreenShader
 	GLuint FogShader::uniform_start;
 	GLuint FogShader::uniform_end;
 	GLuint FogShader::uniform_col;
-	GLuint FogShader::uniform_campos;
 	GLuint FogShader::uniform_ipvmat;
 	GLuint FogShader::vao;
 
@@ -1411,22 +1410,20 @@ namespace FullScreenShader
 		uniform_start = glGetUniformLocation(Program, "start");
 		uniform_end = glGetUniformLocation(Program, "end");
 		uniform_col = glGetUniformLocation(Program, "col");
-		uniform_campos = glGetUniformLocation(Program, "campos");
 		uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
 		vao = createVAO(Program);
 	}
 
-	void FogShader::setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_ntex)
+	void FogShader::setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex)
 	{
-		glUniform1f(FullScreenShader::FogShader::uniform_fogmax, fogmax);
-		glUniform1f(FullScreenShader::FogShader::uniform_startH, startH);
-		glUniform1f(FullScreenShader::FogShader::uniform_endH, endH);
-		glUniform1f(FullScreenShader::FogShader::uniform_start, start);
-		glUniform1f(FullScreenShader::FogShader::uniform_end, end);
-		glUniform3f(FullScreenShader::FogShader::uniform_col, col.X, col.Y, col.Z);
-		glUniform3f(FullScreenShader::FogShader::uniform_campos, campos.X, campos.Y, campos.Z);
-		glUniformMatrix4fv(FullScreenShader::FogShader::uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
-		glUniform1i(FullScreenShader::FogShader::uniform_tex, TU_ntex);
+		glUniform1f(uniform_fogmax, fogmax);
+		glUniform1f(uniform_startH, startH);
+		glUniform1f(uniform_endH, endH);
+		glUniform1f(uniform_start, start);
+		glUniform1f(uniform_end, end);
+		glUniform3f(uniform_col, col.X, col.Y, col.Z);
+		glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
+		glUniform1i(uniform_tex, TU_ntex);
 	}
 }
 
