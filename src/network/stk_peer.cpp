@@ -126,7 +126,7 @@ uint16_t STKPeer::getPort() const
 
 bool STKPeer::isConnected() const
 {
-    Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
+    Log::info("STKPeer", "The peer state is %i", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
 
