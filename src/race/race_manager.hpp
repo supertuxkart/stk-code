@@ -590,7 +590,7 @@ public:
     // ------------------------------------------------------------------------
     /** \brief get information about given mode (returns true if 'mode' is of
      *  linear races type) */
-    bool isLinearRaceMode()
+    const bool isLinearRaceMode()
     {
         const int id = (int)m_minor_mode;
         // info is stored in its ID for conveniance, see the macros LINEAR_RACE
@@ -601,7 +601,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** \brief Returns true if the current mode is a battle mode. */
-    bool isBattleMode()
+    const bool isBattleMode()
     {
         const int id = (int)m_minor_mode;
         // This uses the  numerical id of the mode, see the macros
@@ -612,7 +612,7 @@ public:
 
     // ------------------------------------------------------------------------
 
-    bool isTutorialMode()
+    const bool isTutorialMode()
     {
         return m_minor_mode == MINOR_MODE_TUTORIAL;
     }
@@ -629,7 +629,7 @@ public:
     }   // modeHasLaps
     // ------------------------------------------------------------------------
     /** Returns true if the currently selected minor mode has highscores. */
-    bool modeHasHighscores()
+    const bool modeHasHighscores()
     {
         //FIXME: this information is duplicated. RaceManager knows about it,
         //       and each World may set m_use_highscores to true or false.

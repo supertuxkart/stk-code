@@ -305,7 +305,6 @@ void AddonsLoading::onUpdate(float delta)
  **/
 void AddonsLoading::startDownload()
 {
-    std::string file   = m_addon.getZipFileName();
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
     m_download_request = new Online::HTTPRequest(save, /*manage mem*/false, 
