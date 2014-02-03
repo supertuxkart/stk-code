@@ -843,7 +843,6 @@ namespace MeshShader
 		uniform_Position = glGetUniformLocation(Program, "Position");
 		uniform_Size = glGetUniformLocation(Program, "Size");
 		uniform_tex = glGetUniformLocation(Program, "tex");
-		printf("TUTex is %d, Texcoord is %d\n", uniform_tex, attrib_texcoord);
 	}
 
 	void BillboardShader::setUniforms(const core::matrix4 &ModelViewMatrix, const core::matrix4 &ProjectionMatrix, const core::vector3df &Position, const core::dimension2d<float> &size, unsigned TU_tex)
@@ -1209,7 +1208,6 @@ namespace FullScreenShader
 		uniform_col = glGetUniformLocation(Program, "col");
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		vao = createVAO(Program);
-		printf("uniform %d\n", uniform_ntex);
 	}
 
 	void SunLightShader::setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex)
