@@ -21,7 +21,6 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 #include "io/file_manager.hpp"
-#include "io/xml_writer.hpp"
 #include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "online/current_user.hpp"

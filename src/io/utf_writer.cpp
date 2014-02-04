@@ -16,90 +16,53 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "io/xml_writer.hpp"
+#include "io/utf_writer.hpp"
+
 #include <wchar.h>
 #include <string>
 #include <stdexcept>
 using namespace irr;
 
-#if IRRLICHT_VERSION_MAJOR > 1 || (IRRLICHT_VERSION_MAJOR == 1 && IRRLICHT_VERSION_MINOR >= 8)
-
 // ----------------------------------------------------------------------------
 
-XMLWriter::XMLWriter(const char* dest) : m_base(dest, std::ios::out | std::ios::binary)
+UTFWriter::UTFWriter(const char* dest) 
+         : m_base(dest, std::ios::out | std::ios::binary)
 {
     if (!m_base.is_open())
     {
-        throw std::runtime_error("Failed to open file for writing : " + std::string(dest));
+        throw std::runtime_error("Failed to open file for writing : " + 
+                                  std::string(dest));
     }
 
     // FIXME: make sure to properly handle endianness
-    wchar_t BOM = 0xFEFF; // UTF-16 BOM is 0xFEFF; UTF-32 BOM is 0x0000FEFF. So this works in either case
+    // UTF-16 BOM is 0xFEFF; UTF-32 BOM is 0x0000FEFF. So this works in either case
+    wchar_t BOM = 0xFEFF;
 
     m_base.write((char *) &BOM, sizeof(wchar_t));
-}
+}   // UTFWriter
 
 // ----------------------------------------------------------------------------
 
-XMLWriter& XMLWriter::operator<< (const irr::core::stringw& txt)
+UTFWriter& UTFWriter::operator<< (const irr::core::stringw& txt)
 {
     m_base.write((char *) txt.c_str(), txt.size() * sizeof(wchar_t));
     return *this;
-}
+}   // operator<< (stringw)
 
 // ----------------------------------------------------------------------------
 
-XMLWriter& XMLWriter::operator<< (const wchar_t*txt)
+UTFWriter& UTFWriter::operator<< (const wchar_t*txt)
 {
     m_base.write((char *) txt, wcslen(txt) * sizeof(wchar_t));
     return *this;
-}
+}   // operator<< (wchar_t)
 
 // ----------------------------------------------------------------------------
 
-void XMLWriter::close()
+void UTFWriter::close()
 {
     m_base.close();
-}
-
-// ----------------------------------------------------------------------------
-// ----------------------------------------------------------------------------
-
-#else // Non-unicode version for irrlicht 1.7 and before
-
-XMLWriter::XMLWriter(const char* dest) : m_base(dest, std::ios::out | std::ios::binary)
-{
-    if (!m_base.is_open())
-    {
-        throw std::runtime_error("Failed to open file for writing : " + std::string(dest));
-    }
-}
+}   // close
 
 // ----------------------------------------------------------------------------
 
-XMLWriter& XMLWriter::operator<< (const irr::core::stringw& txt)
-{
-    core::stringc s( txt.c_str() );
-    m_base.write((char *) s.c_str(), s.size());
-    return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-XMLWriter& XMLWriter::operator<< (const wchar_t*txt)
-{
-    core::stringc s( txt );
-    m_base.write((char *) s.c_str(), s.size());
-    return *this;
-}
-
-// ----------------------------------------------------------------------------
-
-void XMLWriter::close()
-{
-    m_base.close();
-}
-
-// ----------------------------------------------------------------------------
-
-#endif

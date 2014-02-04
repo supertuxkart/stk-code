@@ -24,12 +24,13 @@
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
-#include "io/xml_writer.hpp"
 #include "online/current_user.hpp"
 
 #include <sstream>
+#include <fstream>
 #include <stdlib.h>
 #include <assert.h>
+
 // ============================================================================
 AchievementsSlot::AchievementsSlot(const XMLNode * input)
 {
