@@ -28,5 +28,5 @@ void main()
 
 	fog = min(fog, fogmax);
 
-	FragColor = vec4(vec4(col, 1.) * fog + color *(1. - fog));
+	FragColor = vec4(vec4(col, 0.) * fog + color *(1. - fog));
 }
