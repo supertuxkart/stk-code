@@ -1260,7 +1260,7 @@ void Kart::update(float dt)
 #ifdef DEBUG
             if(UserConfigParams::m_material_debug)
             {
-                Log::info("Kart","%s\tfraction %f\ttime %f.\n",
+                Log::info("Kart","%s\tfraction %f\ttime %f.",
                        material->getTexFname().c_str(),
                        material->getMaxSpeedFraction(),
                        material->getSlowDownTime()       );
@@ -1727,7 +1727,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         // Add a counter to make it easier to see if a new line of
         // output was added.
         static int counter=0;
-        Log::info("Kart","Kart %s hit track: %d material %s.\n",
+        Log::info("Kart","Kart %s hit track: %d material %s.",
                getIdent().c_str(), counter++,
                m ? m->getTexFname().c_str() : "None");
     }
@@ -2061,7 +2061,7 @@ void Kart::updatePhysics(float dt)
     
     updateEngineSFX();
 #ifdef XX
-    Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f\n"
+    Log::info("Kart","forward %f %f %f %f  side %f %f %f %f angVel %f %f %f heading %f"
        ,m_vehicle->m_forwardImpulse[0]
        ,m_vehicle->m_forwardImpulse[1]
        ,m_vehicle->m_forwardImpulse[2]

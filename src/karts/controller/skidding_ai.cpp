@@ -2353,7 +2353,7 @@ void SkiddingAI::setSteering(float angle, float dt)
         m_controls->m_skid = KartControl::SC_NONE;
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.\n",
+            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.",
                     m_kart->getIdent().c_str());
 #endif
     }
@@ -2368,7 +2368,7 @@ void SkiddingAI::setSteering(float angle, float dt)
         {
 #ifdef DEBUG
             if(m_ai_debug)
-                Log::info("SkiddingAI", "%s steering too much (%f).\n",
+                Log::info("SkiddingAI", "%s steering too much (%f).",
                        m_kart->getIdent().c_str(), steer_fraction);
 #endif
             m_controls->m_skid = KartControl::SC_NONE;

@@ -311,7 +311,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            Log::info("[addons] Marking '%s' as being installed.\n",
+            Log::info("[addons] Marking '%s' as being installed.",
                    kp->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;
@@ -330,7 +330,7 @@ void AddonsManager::checkInstalledAddons()
         if(n<0) continue;
         if(!m_addons_list.getData()[n].isInstalled())
         {
-            Log::info("[addons] Marking '%s' as being installed.\n",
+            Log::info("[addons] Marking '%s' as being installed.",
                    track->getIdent().c_str());
             m_addons_list.getData()[n].setInstalled(true);
             something_was_changed = true;

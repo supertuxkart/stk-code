@@ -167,7 +167,7 @@ bool onEvent(const SEvent &event)
             {
                 if(cmdID == DEBUG_GRAPHICS_RELOAD_SHADERS)
                 {
-                    Log::info("Debug", "Reloading shaders...\n");
+                    Log::info("Debug", "Reloading shaders...");
                     irr_driver->updateShaders();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
