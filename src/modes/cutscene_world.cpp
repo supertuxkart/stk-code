@@ -95,7 +95,7 @@ void CutsceneWorld::init()
 
                 if (!StringUtils::fromString(frameStr, frame))
                 {
-                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n",
+                    Log::error("[CutsceneWorld]", "Invalid condition '%s'",
                                     condition.c_str());
                     continue;
                 }
@@ -115,7 +115,7 @@ void CutsceneWorld::init()
 
                 if (!StringUtils::fromString(frameStr, frame))
                 {
-                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n",
+                    Log::error("[CutsceneWorld]", "Invalid condition '%s'",
                                     condition.c_str());
                     continue;
                 }
@@ -130,7 +130,7 @@ void CutsceneWorld::init()
 
                 if (!StringUtils::fromString(frameStr, frame))
                 {
-                    fprintf(stderr, "[CutsceneWorld] Invalid condition '%s'\n",
+                    Log::error("[CutsceneWorld]", "Invalid condition '%s'",
                                     condition.c_str());
                     continue;
                 }
@@ -150,7 +150,7 @@ void CutsceneWorld::init()
 
     if (m_duration <= 0.0f)
     {
-        fprintf(stderr, "[CutsceneWorld] WARNING: cutscene has no duration\n");
+        Log::error("[CutsceneWorld]", "WARNING: cutscene has no duration");
     }
 }   // CutsceneWorld
 
