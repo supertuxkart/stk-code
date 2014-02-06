@@ -60,7 +60,7 @@ protected:
      * WARNING : m_savedgp_group has to be declared before the other userconfigparams!
      */
     GroupUserConfigParam        m_savedgp_group;
-    StringUserConfigParam       m_player_id;
+    unsigned int                m_player_id;
 
     /** Identifier of this GP. */
     StringUserConfigParam       m_gp_id;
@@ -81,7 +81,7 @@ public:
     /**
       * Constructor to create a new entry.
       */
-    SavedGrandPrix(const std::string &player_id,
+    SavedGrandPrix(unsigned int player_id,
                    const std::string &gp_id,
                    RaceManager::Difficulty difficulty,
                    int player_karts,
@@ -98,7 +98,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the player id for this saved GP. */
-    const std::string getPlayerID() const { return m_player_id; }
+    unsigned int getPlayerID() const { return m_player_id; }
 
     // ------------------------------------------------------------------------
     /** Returns the grand prix id. */
@@ -137,7 +137,7 @@ public:
     /** Finds the right SavedGrandPrix given the specified data, or
      *  NULL if no matching GP was found.
      */
-    static SavedGrandPrix* getSavedGP(const std::string &player,
+    static SavedGrandPrix* getSavedGP(unsigned int player,
                                 const std::string &gpid,
                                 int difficulty, int total_karts,
                                 int player_karts)

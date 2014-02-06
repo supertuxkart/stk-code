@@ -729,38 +729,6 @@ UserConfig::~UserConfig()
 }   // ~UserConfig
 
 // -----------------------------------------------------------------------------
-void UserConfig::addDefaultPlayer()
-{
-
-    std::string username = "unnamed player";
-
-    if(getenv("USERNAME")!=NULL)        // for windows
-        username = getenv("USERNAME");
-    else if(getenv("USER")!=NULL)       // Linux, Macs
-        username = getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
-        username = getenv("LOGNAME");
-
-
-    class GuestPlayerProfile : public PlayerProfile
-    {
-    public:
-        GuestPlayerProfile() : PlayerProfile(_LTR("Guest"))
-        {
-            m_is_guest_account = true;
-        }
-    };
-
-    // add default guest player
-    UserConfigParams::m_all_players.push_back( new GuestPlayerProfile() );
-
-    // Set the name as the default name for all players.
-    UserConfigParams::m_all_players.push_back(
-                                         new PlayerProfile(username.c_str()) );
-
-}   // addDefaultPlayer
-
-// -----------------------------------------------------------------------------
 
 /** Comparison used to sort players. Most frequent players should be
  *  listed first, so a<b actually means that

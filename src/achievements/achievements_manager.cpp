@@ -138,7 +138,7 @@ void AchievementsManager::parseUserConfigFile()
 }   // load
 
 
-AchievementsSlot * AchievementsManager::createNewSlot(std::string id, bool online)
+AchievementsSlot * AchievementsManager::createNewSlot(unsigned int id, bool online)
 {
     AchievementsSlot* slot = new AchievementsSlot(id, online);
     m_slots.push_back(slot);
@@ -207,7 +207,7 @@ void AchievementsManager::onRaceEnd()
 }
 
 // ============================================================================
-AchievementsSlot * AchievementsManager::getSlot(const std::string & id, bool online)
+AchievementsSlot * AchievementsManager::getSlot(unsigned int id, bool online)
 {
     for(unsigned int i = 0; i < m_slots.size(); i++)
     {
@@ -224,10 +224,10 @@ void AchievementsManager::updateCurrentPlayer()
 {
     if(Online::CurrentUser::get()->isRegisteredUser())
     {
-        m_active_slot = getSlot(StringUtils::toString(Online::CurrentUser::get()->getID()), true);
+        m_active_slot = getSlot(Online::CurrentUser::get()->getID(), true);
         if(m_active_slot == NULL)
         {
-            m_active_slot = createNewSlot(StringUtils::toString(Online::CurrentUser::get()->getID()), true);
+            m_active_slot = createNewSlot(Online::CurrentUser::get()->getID(), true);
             save();
         }
     }

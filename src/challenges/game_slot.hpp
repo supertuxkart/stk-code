@@ -46,7 +46,7 @@ class GameSlot
      *  are done everywhere, assign a unique ID to each profiler.
      *  Will save much headaches.
      */
-    std::string m_player_unique_id;
+    unsigned int m_player_unique_id;
 
     /** Contains whether each feature of the challenge is locked or unlocked */
     std::map<std::string, bool>   m_locked_features;
@@ -79,19 +79,19 @@ public:
     // do NOT attempt to pass 'player_unique_id' by reference here. I don't
     // know why (compiler bug maybe?) but this screws up everything. Better
     // pass by copy.
-    GameSlot(std::string player_unique_id)
+    GameSlot(unsigned int player_unique_id)
     {
-        m_player_unique_id = player_unique_id;
-        m_points = 0;
-        m_first_time = true;
-        m_easy_challenges = 0;
+        m_player_unique_id  = player_unique_id;
+        m_points            = 0;
+        m_first_time        = true;
+        m_easy_challenges   = 0;
         m_medium_challenges = 0;
-        m_hard_challenges = 0;
+        m_hard_challenges   = 0;
         m_current_challenge = NULL;
     }
     ~GameSlot();
 
-    const std::string& getPlayerID() const { return m_player_unique_id; }
+    unsigned int getPlayerID() const { return m_player_unique_id; }
     const std::string& getKartIdent () const { return m_kart_ident;  }
     void setKartIdent(const std::string& kart_ident)
     {

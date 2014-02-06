@@ -19,12 +19,16 @@
 #ifndef HEADER_PLAYER_HPP
 #define HEADER_PLAYER_HPP
 
-#include <string>
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
+
 #include <irrString.h>
 using namespace irr;
+
+#include <string>
+
+class UTFWriter;
 
 /**
   * \brief Class for managing player profiles (name, control configuration, etc.)
@@ -36,43 +40,31 @@ class PlayerProfile : public NoCopy
 {
 protected:
 
-    /**
-     * For saving to config file.
-     * WARNING : m_player_group has to be declared before the other userconfigparams!
-     */
-    GroupUserConfigParam  m_player_group;
+    /** The name of the player (wide string, so it can be in native 
+     *  language). */
+    core::stringw m_name;
 
-    WStringUserConfigParam m_name;
-
-    BoolUserConfigParam   m_is_guest_account;
+    /** True if this account is a guest account. */
+    bool m_is_guest_account;
 
 #ifdef DEBUG
     unsigned int m_magic_number;
 #endif
 
-    IntUserConfigParam    m_use_frequency;
+    /** Counts how often this player was used. */
+    unsigned int m_use_frequency;
 
-    /** Profile names can change, so rather than try to make sure all renames are done everywhere,
-     *  assign a unique ID to each profiler. Will save much headaches.
-     */
-    StringUserConfigParam m_unique_id;
-
-    int64_t generateUniqueId(const char* playerName);
+    /** A unique number for this player, used to link it to challenges etc. */
+    unsigned int m_unique_id;
 
 public:
 
-    /**
-      * Constructor to create a new player that didn't exist before
-      */
-    PlayerProfile(const core::stringw& name);
+    PlayerProfile(const core::stringw& name, bool is_guest = false);
 
-    /**
-      * Constructor to deserialize a player that was saved to a XML file
-      * (...UserConfigParam classes will automagically take care of serializing all
-      * create players to the user's config file)
-      */
     PlayerProfile(const XMLNode* node);
 
+    void save(UTFWriter &out);
+    void incrementUseFrequency();
 
     ~PlayerProfile()
     {
@@ -112,15 +104,12 @@ public:
     }
 
 
-    void incrementUseFrequency();
 
-    // please do NOT try to optimise this to return a reference, I don't know why,
-    // maybe compiler bug, but hell breaks loose when you do that
-    std::string getUniqueID() const
-    {
-        return m_unique_id;
-    }
-};
+    // ------------------------------------------------------------------------
+    /** Returns the unique id of this player. */
+    unsigned int getUniqueID() const { return m_unique_id; }
+
+};   // class PlayerProfile
 
 #endif
 

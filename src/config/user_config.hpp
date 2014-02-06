@@ -826,7 +826,6 @@ public:
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
     void  postLoadInit();
-    void  addDefaultPlayer();
 
 };   // UserConfig
 

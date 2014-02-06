@@ -47,7 +47,7 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager = this;
 
-    m_current_game_slot = "";
+    m_current_game_slot = 0;
 
     m_locked_sound = sfx_manager->createSoundSource("locked");
 
@@ -94,7 +94,7 @@ UnlockManager::~UnlockManager()
     }
 
 
-    std::map<std::string, GameSlot*>::iterator it;
+    std::map<unsigned int, GameSlot*>::iterator it;
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
         delete it->second;
@@ -222,7 +222,7 @@ void UnlockManager::load()
     root->getNodes("gameslot", xml_game_slots);
     for (unsigned int n=0; n<xml_game_slots.size(); n++)
     {
-        std::string player_id;
+        unsigned int player_id;
         if (!xml_game_slots[n]->get("playerID", &player_id))
         {
             Log::warn("unlock_manager", "Found game slot without "
@@ -279,7 +279,7 @@ void UnlockManager::save()
     challenge_file << "<?xml version=\"1.0\"?>\n";
     challenge_file << "<challenges>\n";
 
-    std::map<std::string, GameSlot*>::iterator it;
+    std::map<unsigned int, GameSlot*>::iterator it;
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
         std::string name = "unknown player";
@@ -313,7 +313,7 @@ bool UnlockManager::createSlotsIfNeeded()
     {
         bool exists = false;
 
-        std::map<std::string, GameSlot*>::iterator it;
+        std::map<unsigned int, GameSlot*>::iterator it;
         for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
         {
             GameSlot* curr_slot = it->second;
@@ -351,7 +351,7 @@ bool UnlockManager::createSlotsIfNeeded()
 bool UnlockManager::deleteSlotsIfNeeded()
 {
     bool changed = false;
-    std::map<std::string, GameSlot*>::iterator it = m_game_slots.begin();
+    std::map<unsigned int, GameSlot*>::iterator it = m_game_slots.begin();
     while (it != m_game_slots.end())
     {
         bool found = false;
@@ -370,7 +370,7 @@ bool UnlockManager::deleteSlotsIfNeeded()
         {
 #ifdef DEBUG
             printf("Deleting gameslot %s, no player found.\n",
-                    it->second->getPlayerID().c_str());
+                    it->second->getPlayerID());
 #endif
             // Iterators aren't invalidated this way
             m_game_slots.erase(it++);
@@ -424,7 +424,7 @@ void UnlockManager::updateActiveChallengeList()
 
 
 //-----------------------------------------------------------------------------
-void UnlockManager::setCurrentSlot(std::string slotid)
+void UnlockManager::setCurrentSlot(unsigned int slotid)
 {
     m_current_game_slot = slotid;
     AchievementsManager::get()->updateCurrentPlayer();

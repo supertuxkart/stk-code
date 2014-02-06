@@ -149,6 +149,7 @@
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -680,8 +681,7 @@ int handleCmdLine()
 
     if(CommandLine::has("--kart", &s))
     {
-        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                       .getUniqueID()                    );
+        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0).getUniqueID());
 
         if (!unlock_manager->getCurrentSlot()->isLocked(s))
         {
@@ -972,6 +972,7 @@ void initUserConfig()
 {
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager();
+    PlayerManager::get()->load();
     user_config             = new UserConfig();     // needs file_manager
     const bool config_ok    = user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
@@ -989,10 +990,10 @@ void initUserConfig()
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
     user_config->postLoadInit();
-    if (!config_ok || UserConfigParams::m_all_players.size() == 0)
+    if (!config_ok || PlayerManager::get()->getNumPlayers() == 0)
     {
-        user_config->addDefaultPlayer();
-        user_config->saveConfig();
+        PlayerManager::get()->addDefaultPlayer();
+        PlayerManager::get()->save();
     }
 
 }   // initUserConfig
@@ -1113,6 +1114,7 @@ static void cleanSuperTuxKart()
     delete ParticleKindManager::get();
     if(stk_config)              delete stk_config;
     if(user_config)             delete user_config;
+    PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
     if(translations)            delete translations;
     if(file_manager)            delete file_manager;

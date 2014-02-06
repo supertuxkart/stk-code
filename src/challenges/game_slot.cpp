@@ -22,7 +22,6 @@
 #include "challenges/challenge.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "io/xml_writer.hpp"
 
 //-----------------------------------------------------------------------------
 GameSlot::~GameSlot()
@@ -238,7 +237,7 @@ void GameSlot::grandPrixFinished()
 
 void GameSlot::save(std::ofstream& out, const std::string& name)
 {
-    out << "    <gameslot playerID=\"" << m_player_unique_id.c_str()
+    out << "    <gameslot playerID=\"" << m_player_unique_id
         << "\" kart=\""                << m_kart_ident.c_str()
         << "\" firstTime=\""           << (m_first_time ? "true" : "false")
         << "\"> <!-- " << name.c_str() << " -->\n";

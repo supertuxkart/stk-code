@@ -23,6 +23,7 @@ src/challenges/game_slot.cpp
 src/challenges/unlock_manager.cpp
 src/config/device_config.cpp
 src/config/player.cpp
+src/config/player_manager.cpp
 src/config/saved_grand_prix.cpp
 src/config/stk_config.cpp
 src/config/user_config.cpp
@@ -101,8 +102,8 @@ src/input/input_manager.cpp
 src/input/wiimote.cpp
 src/input/wiimote_manager.cpp
 src/io/file_manager.cpp
+src/io/utf_writer.cpp
 src/io/xml_node.cpp
-src/io/xml_writer.cpp
 src/items/attachment.cpp
 src/items/attachment_manager.cpp
 src/items/bowling.cpp
@@ -351,6 +352,7 @@ src/challenges/game_slot.hpp
 src/challenges/unlock_manager.hpp
 src/config/device_config.hpp
 src/config/player.hpp
+src/config/player_manager.hpp
 src/config/saved_grand_prix.hpp
 src/config/stk_config.hpp
 src/config/user_config.hpp
@@ -428,8 +430,8 @@ src/input/input_manager.hpp
 src/input/wiimote.hpp
 src/input/wiimote_manager.hpp
 src/io/file_manager.hpp
+src/io/utf_writer.hpp
 src/io/xml_node.hpp
-src/io/xml_writer.hpp
 src/items/attachment.hpp
 src/items/attachment_manager.hpp
 src/items/attachment_plugin.hpp

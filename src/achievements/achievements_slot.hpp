@@ -33,9 +33,9 @@ class AchievementsSlot
 {
 private:
     std::map<uint32_t, Achievement *> m_achievements;
-    bool m_online;
-    bool m_valid;
-    std::string m_id;
+    bool         m_online;
+    bool         m_valid;
+    unsigned int m_id;
 
     void createFreshSlot();
     void deleteAchievements();
@@ -48,14 +48,14 @@ private:
 
 public :
     AchievementsSlot(const XMLNode * input);
-    AchievementsSlot(std::string id, bool online);
+    AchievementsSlot(unsigned int id, bool online);
     ~AchievementsSlot();
     bool isValid() const { return m_valid;}
     void save(std::ofstream & out);
     bool isOnline() const {return m_online;}
     void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
-    const std::string & getID() const {return m_id;}
+    unsigned int getID() const {return m_id;}
     const std::map<uint32_t, Achievement *> & getAllAchievements() {return m_achievements;}
     Achievement * getAchievement(uint32_t id);
 };

@@ -78,7 +78,7 @@ void OptionsScreenPlayers::init()
     refreshPlayerList();
 
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
-    const std::string& playerID = unlock_manager->getCurrentSlot()->getPlayerID();
+    unsigned int playerID = unlock_manager->getCurrentSlot()->getPlayerID();
     core::stringw playerName = L"-";
     PlayerProfile* curr;
     for_in (curr, UserConfigParams::m_all_players)

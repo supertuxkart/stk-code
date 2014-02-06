@@ -48,12 +48,12 @@ private:
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
 
-    std::map<std::string, GameSlot*> m_game_slots;
+    std::map<unsigned int , GameSlot*> m_game_slots;
 
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
 
     /** ID of the active player */
-    std::string m_current_game_slot;
+    unsigned int m_current_game_slot;
 
     friend class GameSlot;
 
@@ -73,7 +73,7 @@ public:
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
 
-    const std::string& getCurrentSlotID() const { return m_current_game_slot; }
+    unsigned int getCurrentSlotID() const { return m_current_game_slot; }
 
     GameSlot*  getCurrentSlot()
     {
@@ -82,7 +82,7 @@ public:
     }
 
     /** \param slotid name of the player */
-    void       setCurrentSlot(std::string slotid);
+    void       setCurrentSlot(unsigned int slotid);
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
