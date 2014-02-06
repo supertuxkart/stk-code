@@ -413,9 +413,12 @@ void IrrDriver::initDevice()
     m_scene_manager = m_device->getSceneManager();
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
-    m_glsl          = m_video_driver->queryFeature(video::EVDF_ARB_GLSL) &&
-                      m_video_driver->queryFeature(video::EVDF_TEXTURE_NPOT) &&
-                      UserConfigParams::m_pixel_shaders;
+
+	int GLMajorVersion;
+	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
+	printf("OPENGL VERSION IS %d\n", GLMajorVersion);
+	m_glsl = (GLMajorVersion >= 3) && UserConfigParams::m_pixel_shaders;
+                      
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);

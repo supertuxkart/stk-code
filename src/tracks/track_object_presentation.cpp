@@ -41,6 +41,7 @@
 #include <IBillboardSceneNode.h>
 #include <IParticleSystemSceneNode.h>
 #include <ILightSceneNode.h>
+#include <IMeshManipulator.h>
 
 // ----------------------------------------------------------------------------
 
@@ -169,16 +170,22 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     std::string render_pass;
     xml_node.get("renderpass", &render_pass);
 
-    if(render_pass == "skybox")
+    bool skeletal_animation = true; // for backwards compatibility, if unspecified assume there is
+    xml_node.get("skeletal-animation", &skeletal_animation);
+
+    if (render_pass == "skybox")
     {
         m_is_in_skybox = true;
     }
 
+    bool tangent = false;
+    xml_node.get("tangents", &tangent);
+    
     //std::string full_path =
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
-    bool animated = (UserConfigParams::m_graphical_effects ||
-                 World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
+                     World::getWorld()->getIdent() == IDENT_CUSTSCENE);
 
 
     if (animated)
@@ -188,6 +195,13 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     else
     {
         m_mesh = irr_driver->getMesh(model_name);
+
+        if (tangent)
+        {
+            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+            // TODO: perhaps the original mesh leaks here?
+            m_mesh = manip->createMeshWithTangents(m_mesh);
+       }
     }
 
     if (!m_mesh)
@@ -232,7 +246,10 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
 
 void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled)
 {
-    bool animated = (UserConfigParams::m_graphical_effects ||
+    bool skeletal_animation = true; // for backwards compatibility, if unspecified assume there is
+    xml_node->get("skeletal-animation", &skeletal_animation);
+
+    bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUSTSCENE);
 
     m_mesh->grab();

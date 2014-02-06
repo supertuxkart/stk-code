@@ -26,6 +26,7 @@
 #include <sstream>
 #include <irrString.h>
 #include "utils/types.hpp"
+#include "utils/log.hpp"
 
 namespace StringUtils
 {
@@ -73,10 +74,8 @@ namespace StringUtils
     }   // toString template
 
     // ------------------------------------------------------------------------
-    /** Specialisiation for bools to return 'true' or 'false'/
-     */
-    template<bool>
-    std::string toString(bool &b)
+    /** Specialisiation for bools to return 'true' or 'false'*/
+    inline std::string toString(bool &b)
     {
         return (b ? "true" : "false");
     }    // toString(bool)
