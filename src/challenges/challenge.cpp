@@ -22,7 +22,6 @@
 
 #include "challenges/challenge_data.hpp"
 #include "io/xml_node.hpp"
-#include "io/xml_writer.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "race/grand_prix_manager.hpp"

@@ -369,7 +369,7 @@ bool UnlockManager::deleteSlotsIfNeeded()
         if (!found)
         {
 #ifdef DEBUG
-            printf("Deleting gameslot %s, no player found.\n",
+            printf("Deleting gameslot %d, no player found.\n",
                     it->second->getPlayerID());
 #endif
             // Iterators aren't invalidated this way
