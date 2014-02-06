@@ -58,8 +58,13 @@ void PlayerManager::load()
     {
         const XMLNode *player_xml = players->getNode(i);
         PlayerProfile *profile = new PlayerProfile(player_xml);
+
+        if(profile->isGuestAccount())
+            profile->setName(_LTR("Guest"));
+
         m_all_players.push_back(profile);
     }
+    m_all_players.insertionSort();
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -101,6 +106,12 @@ void PlayerManager::addNewPlayer(const core::stringw& name)
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
+void PlayerManager::deletePlayer(PlayerProfile *player)
+{
+    m_all_players.erase(player);
+}   // deletePlayer
+
+// ----------------------------------------------------------------------------
 void PlayerManager::addDefaultPlayer()
 {
     std::string username = "unnamed player";
@@ -137,5 +148,27 @@ unsigned int PlayerManager::getUniqueId() const
 }   // getUniqueId
 
 // ----------------------------------------------------------------------------
+const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
+{
+    const PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if(player->getUniqueID()==id)
+            return player;
+    }
+    return NULL;
+}   // getPlayerById
+
+// ----------------------------------------------------------------------------
+PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
+{
+    PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if(player->getName()==name)
+            return player;
+    }
+    return NULL;
+}   // getPlayer
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------

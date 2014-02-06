@@ -724,28 +724,8 @@ UserConfig::UserConfig()
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
 {
-    UserConfigParams::m_all_players.clearAndDeleteAll();
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
 }   // ~UserConfig
-
-// -----------------------------------------------------------------------------
-
-/** Comparison used to sort players. Most frequent players should be
- *  listed first, so a<b actually means that
- *  a.m_use_frequency > b.m_use_frequency
- *  This way we get a reversed sorted list.
- */
-bool operator<(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() > b.getUseFrequency();
-}   // operator<
-
-// -----------------------------------------------------------------------------
-/** \brief Needed for toggling sort order **/
-bool operator>(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() < b.getUseFrequency();
-}   // operator>
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
@@ -791,26 +771,6 @@ bool UserConfig::loadConfig()
     }
 
 
-    // ---- Read players
-    // we create those AFTER other values are being read simply because we have many Player
-    // nodes that all bear the same name, so the generic loading code won't work here
-    UserConfigParams::m_all_players.clearAndDeleteAll();
-
-    std::vector<XMLNode*> players;
-    root->getNodes("Player", players);
-    const int amount = players.size();
-    for (int i=0; i<amount; i++)
-    {
-        //std::string name;
-        //players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back(
-                                               new PlayerProfile(players[i]) );
-    }
-
-    // sort players by frequency of use
-    UserConfigParams::m_all_players.insertionSort();
-
-
     // ---- Read Saved GP's
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
     std::vector<XMLNode*> saved_gps;
@@ -825,17 +785,6 @@ bool UserConfig::loadConfig()
 
     return true;
 }   // loadConfig
-
-// ----------------------------------------------------------------------------
-
-void UserConfig::postLoadInit()
-{
-    for (unsigned int i = 0; i < UserConfigParams::m_all_players.size(); i++)
-    {
-        PlayerProfile* player = UserConfigParams::m_all_players.get(i);
-        if (player->isGuestAccount()) player->setName(_LTR("Guest"));
-    }
-}
 
 // ----------------------------------------------------------------------------
 /** Write settings to config file. */

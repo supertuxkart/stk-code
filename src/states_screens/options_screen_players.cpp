@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "config/device_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -79,17 +80,12 @@ void OptionsScreenPlayers::init()
 
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
     unsigned int playerID = unlock_manager->getCurrentSlot()->getPlayerID();
-    core::stringw playerName = L"-";
-    PlayerProfile* curr;
-    for_in (curr, UserConfigParams::m_all_players)
-    {
-        if (curr->getUniqueID() == playerID)
-        {
-            playerName = curr->getName();
-            break;
-        }
-    }
-    you->setText( playerName );
+    core::stringw player_name = L"-";
+    const PlayerProfile* curr = PlayerManager::get()->getPlayerById(playerID);
+    if(curr)
+        player_name = curr->getName();
+
+    you->setText( player_name );
     ((gui::IGUIButton*)you->getIrrlichtElement())->setOverrideFont( GUIEngine::getSmallFont() );
 
     if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
@@ -129,7 +125,7 @@ void OptionsScreenPlayers::onNewPlayerWithName(const stringw& newName)
 
 void OptionsScreenPlayers::deletePlayer(PlayerProfile* player)
 {
-    UserConfigParams::m_all_players.erase(player);
+    PlayerManager::get()->deletePlayer(player);
 
     refreshPlayerList();
 }   // deletePlayer
@@ -174,14 +170,15 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
         assert(players != NULL);
 
         core::stringw selectedPlayer = players->getSelectionLabel();
-        const int playerAmount = UserConfigParams::m_all_players.size();
-        for (int n=0; n<playerAmount; n++)
+        const int player_amount = PlayerManager::get()->getNumPlayers();
+        for (int i=0; i<player_amount; i++)
         {
-            if (selectedPlayer == translations->fribidize(UserConfigParams::m_all_players[n].getName()))
+            PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+            if (selectedPlayer == translations->fribidize(player->getName()))
             {
-                if (!(UserConfigParams::m_all_players[n].isGuestAccount()))
+                if (!(player->isGuestAccount()))
                 {
-                    new PlayerInfoDialog( &UserConfigParams::m_all_players[n], 0.5f, 0.6f );
+                    new PlayerInfoDialog( player, 0.5f, 0.6f );
                 }
                 return;
             }
@@ -217,15 +214,16 @@ bool OptionsScreenPlayers::refreshPlayerList()
     // Get rid of previous
     players->clear();
     // Rebuild it
-    const int playerAmount = UserConfigParams::m_all_players.size();
-    for (int i = 0; i < playerAmount; i++)
+    const int player_amount = PlayerManager::get()->getNumPlayers();
+    for (int i = 0; i < player_amount; i++)
     {
         // FIXME: Using a truncated ASCII string for internal ID. Let's cross
         // our fingers and hope no one enters two player names that,
         // when stripped down to ASCII, give the same identifier...
+        const PlayerProfile *player = PlayerManager::get()->getPlayer(i);
         players->addItem(
-            core::stringc(UserConfigParams::m_all_players[i].getName().c_str()).c_str(),
-            translations->fribidize(UserConfigParams::m_all_players[i].getName()));
+            core::stringc(player->getName().c_str()).c_str(),
+            translations->fribidize(player->getName()));
     }
 
     return true;

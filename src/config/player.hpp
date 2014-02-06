@@ -65,6 +65,9 @@ public:
 
     void save(UTFWriter &out);
     void incrementUseFrequency();
+    bool operator<(const PlayerProfile &other);
+    bool operator>(const PlayerProfile &other);
+
 
     ~PlayerProfile()
     {

@@ -16,10 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/kart_selection.hpp"
+
 #include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "kart_selection.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
@@ -252,10 +254,10 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_properties[PROP_ID] = spinnerID;
     if (parent->m_multiplayer)
     {
-        const int playerAmount = UserConfigParams::m_all_players.size();
+        const int player_amount = PlayerManager::get()->getNumPlayers();
         m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
         m_player_ident_spinner->m_properties[PROP_MAX_VALUE] =
-            StringUtils::toString(playerAmount-1);
+            StringUtils::toString(player_amount-1);
         m_player_ident_spinner->m_properties[PROP_WRAP_AROUND] = "true";
     }
     else
@@ -474,10 +476,10 @@ void PlayerKartWidget::add()
 
     if (m_parent_screen->m_multiplayer)
     {
-        const int playerAmount = UserConfigParams::m_all_players.size();
-        for (int n=0; n<playerAmount; n++)
+        const int player_amount = PlayerManager::get()->getNumPlayers();
+        for (int n=0; n<player_amount; n++)
         {
-            core::stringw name = UserConfigParams::m_all_players[n].getName();
+            core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
             m_player_ident_spinner->addLabel( translations->fribidize(name) );
         }
 
@@ -700,7 +702,7 @@ GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(
         if (m_parent_screen->m_multiplayer)
         {
             m_associatedPlayer->setPlayerProfile(
-                UserConfigParams::m_all_players.get(m_player_ident_spinner
+                PlayerManager::get()->getPlayer(m_player_ident_spinner
                                                     ->getValue()) );
         }
     }
@@ -1097,16 +1099,17 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
                           kartsAreaWidget->m_y + kartsAreaWidget->m_h);
 
     // ---- Create new active player
-    PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
+    PlayerProfile* profile_to_use = unlock_manager->getCurrentPlayer();
 
     if (!firstPlayer)
     {
-        const int playerProfileCount = UserConfigParams::m_all_players.size();
-        for (int n=0; n<playerProfileCount; n++)
+        const int player_profile_count = PlayerManager::get()->getNumPlayers();
+        for (int i=0; i<player_profile_count; i++)
         {
-            if (UserConfigParams::m_all_players[n].isGuestAccount())
+            PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+            if (player->isGuestAccount())
             {
-                profileToUse = UserConfigParams::m_all_players.get(n);
+                profile_to_use = player;
                 break;
             }
         }
@@ -1124,7 +1127,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
 
     const int new_player_id =
-        StateManager::get()->createActivePlayer( profileToUse, device, NULL );
+        StateManager::get()->createActivePlayer( profile_to_use, device, NULL );
     StateManager::ActivePlayer* aplayer =
         StateManager::get()->getActivePlayer(new_player_id);
 
@@ -1816,9 +1819,10 @@ bool KartSelectionScreen::validateIdentChoices()
             // verify internal consistency in debug mode
             if (m_multiplayer)
             {
-                assert( m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
-                        UserConfigParams::m_all_players.get(m_kart_widgets[n]
-                                .m_player_ident_spinner->getValue()) );
+                assert(m_kart_widgets[n].getAssociatedPlayer()->getProfile() ==
+                    PlayerManager::get()->getPlayer(m_kart_widgets[n]
+                                           .m_player_ident_spinner->getValue())
+                                                      );
             }
         }
     }

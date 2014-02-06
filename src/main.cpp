@@ -146,10 +146,10 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "config/stk_config.hpp"
-#include "config/user_config.hpp"
 #include "config/player.hpp"
 #include "config/player_manager.hpp"
+#include "config/stk_config.hpp"
+#include "config/user_config.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
@@ -681,7 +681,8 @@ int handleCmdLine()
 
     if(CommandLine::has("--kart", &s))
     {
-        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0).getUniqueID());
+        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
+                                                           ->getUniqueID());
 
         if (!unlock_manager->getCurrentSlot()->isLocked(s))
         {
@@ -750,8 +751,8 @@ int handleCmdLine()
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
-        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                      .getUniqueID()                    );
+        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
+                                                           ->getUniqueID());
         if (!unlock_manager->getCurrentSlot()->isLocked(s))
         {
             race_manager->setTrack(s);
@@ -898,8 +899,8 @@ int handleCmdLine()
     // Demo mode
     if(CommandLine::has("--demo-mode", &s))
     {
-        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                       .getUniqueID()                    );
+        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
+                                                           ->getUniqueID());
         float t;
         StringUtils::fromString(s, t);
         DemoWorld::enableDemoMode(t);
@@ -941,8 +942,8 @@ int handleCmdLine()
     CommandLine::reportInvalidParameters();
 
     if(UserConfigParams::m_no_start_screen)
-        unlock_manager->setCurrentSlot(UserConfigParams::m_all_players[0]
-                                       .getUniqueID()                    );
+        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
+                                                           ->getUniqueID());
     if(ProfileWorld::isProfileMode())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects
@@ -989,7 +990,6 @@ void initUserConfig()
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-    user_config->postLoadInit();
     if (!config_ok || PlayerManager::get()->getNumPlayers() == 0)
     {
         PlayerManager::get()->addDefaultPlayer();
@@ -1257,12 +1257,11 @@ int main(int argc, char *argv[] )
         // no graphics, and no profile mode
         if (ProfileWorld::isNoGraphics() && !ProfileWorld::isProfileMode())
         {
+            core::stringw name = UserConfigParams::m_default_player.toString();
+            PlayerProfile *player = PlayerManager::get()->getPlayer(name);
             // hack to have a running game slot :
-            PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-            if (UserConfigParams::m_default_player.toString().size() > 0)
-                for (unsigned int n=0; n<players.size(); n++)
-                    if (players[n].getName() == UserConfigParams::m_default_player.toString())
-                        unlock_manager->setCurrentSlot(players[n].getUniqueID());
+            if(player)
+                unlock_manager->setCurrentSlot(player->getUniqueID());
 
         }
         else if(!UserConfigParams::m_no_start_screen)
@@ -1316,7 +1315,7 @@ int main(int argc, char *argv[] )
 
             // Create player and associate player with keyboard
             StateManager::get()->createActivePlayer(
-                    UserConfigParams::m_all_players.get(0), device, NULL);
+                         PlayerManager::get()->getPlayer(0), device, NULL);
 
             if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
             {

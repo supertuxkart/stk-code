@@ -18,13 +18,14 @@
 
 #include "achievements/achievements_manager.hpp"
 
+#include "challenges/unlock_manager.hpp"
+#include "config/player.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
+#include "io/file_manager.hpp"
+#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
-#include "io/file_manager.hpp"
-#include "config/player.hpp"
-#include "config/user_config.hpp"
-#include "online/current_user.hpp"
-#include "challenges/unlock_manager.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -155,12 +156,12 @@ void AchievementsManager::createSlotsIfNeeded()
     bool something_changed = false;
 
     // make sure all players have at least one game slot associated
-    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (unsigned int n=0; n<players.size(); n++)
+    for (unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
     {
-        if (getSlot(players[n].getUniqueID(), false) == NULL )
+        const PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+        if (getSlot(player->getUniqueID(), false) == NULL )
         {
-            createNewSlot(players[n].getUniqueID(), false);
+            createNewSlot(player->getUniqueID(), false);
             something_changed = true;
         }
     }

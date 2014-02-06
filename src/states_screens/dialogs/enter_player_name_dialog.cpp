@@ -107,10 +107,10 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     if (StringUtils::notEmpty(player_name))
     {
         // check for duplicates
-        const int amount = UserConfigParams::m_all_players.size();
+        const int amount = PlayerManager::get()->getNumPlayers();
         for (int n=0; n<amount; n++)
         {
-            if (UserConfigParams::m_all_players[n].getName() == player_name)
+            if (PlayerManager::get()->getPlayer(n)->getName() == player_name)
             {
                 LabelWidget* label = getWidget<LabelWidget>("title");
                 label->setText(_("Cannot add a player with this name."), false);
@@ -121,7 +121,6 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
         // Finally, add the new player.
         PlayerManager::get()->addNewPlayer(player_name);
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(player_name));
         bool created = unlock_manager->createSlotsIfNeeded();
         if (created) unlock_manager->save();
         user_config->saveConfig();

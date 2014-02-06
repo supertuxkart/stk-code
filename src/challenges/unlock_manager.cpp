@@ -18,17 +18,13 @@
 
 #include "challenges/unlock_manager.hpp"
 
-#include <set>
-#include <string>
-#include <vector>
-#include <stdio.h>
-#include <iostream>
 
 #include "achievements/achievements_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/challenge_data.hpp"
 #include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -36,6 +32,12 @@
 #include "tracks/track_manager.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
+
+#include <set>
+#include <string>
+#include <vector>
+#include <stdio.h>
+#include <iostream>
 
 UnlockManager* unlock_manager=0;
 //-----------------------------------------------------------------------------
@@ -283,11 +285,12 @@ void UnlockManager::save()
     for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
     {
         std::string name = "unknown player";
-        for (unsigned int i = 0; i < UserConfigParams::m_all_players.size(); i++)
+        for (unsigned int i = 0; i < PlayerManager::get()->getNumPlayers(); i++)
         {
-            if (UserConfigParams::m_all_players[i].getUniqueID() == it->second->getPlayerID())
+            const PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+            if (player->getUniqueID() == it->second->getPlayerID())
             {
-                name = core::stringc(UserConfigParams::m_all_players[i].getName().c_str()).c_str();
+                name = core::stringc(player->getName().c_str()).c_str();
                 break;
             }
         }
@@ -308,25 +311,25 @@ bool UnlockManager::createSlotsIfNeeded()
     bool something_changed = false;
 
     // make sure all players have at least one game slot associated
-    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (unsigned int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
         bool exists = false;
 
+        const PlayerProfile *profile = PlayerManager::get()->getPlayer(n);
         std::map<unsigned int, GameSlot*>::iterator it;
         for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
         {
             GameSlot* curr_slot = it->second;
-            if (curr_slot->getPlayerID() == players[n].getUniqueID())
+            if (curr_slot->getPlayerID() == profile->getUniqueID())
             {
                 exists = true;
                 break;
             }
-        }
+        }   // for it in m_game_slots
 
         if (!exists)
         {
-            GameSlot* slot = new GameSlot(players[n].getUniqueID());
+            GameSlot* slot = new GameSlot(profile->getUniqueID());
             for(AllChallengesType::iterator i = m_all_challenges.begin();
                 i!=m_all_challenges.end();  i++)
             {
@@ -335,7 +338,7 @@ bool UnlockManager::createSlotsIfNeeded()
             }
             slot->computeActive();
 
-            m_game_slots[players[n].getUniqueID()] = slot;
+            m_game_slots[profile->getUniqueID()] = slot;
 
             something_changed = true;
         }
@@ -355,11 +358,11 @@ bool UnlockManager::deleteSlotsIfNeeded()
     while (it != m_game_slots.end())
     {
         bool found = false;
-        const int playerAmount = UserConfigParams::m_all_players.size();
-        for (int i = 0; i < playerAmount; i++)
+        const int player_amount = PlayerManager::get()->getNumPlayers();
+        for (int i = 0; i < player_amount; i++)
         {
             if (it->second->getPlayerID() ==
-                    UserConfigParams::m_all_players[i].getUniqueID())
+                    PlayerManager::get()->getPlayer(i)->getUniqueID())
             {
                 found = true;
                 break;
@@ -407,10 +410,10 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
 
 PlayerProfile* UnlockManager::getCurrentPlayer()
 {
-    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (unsigned int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
-        if (players[n].getUniqueID() == m_current_game_slot) return players.get(n);
+        PlayerProfile* player = PlayerManager::get()->getPlayer(n);
+        if (player->getUniqueID() == m_current_game_slot) return player;
     }
     return NULL;
 }

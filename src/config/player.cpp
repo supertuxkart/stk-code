@@ -79,3 +79,24 @@ void PlayerProfile::incrementUseFrequency()
     if (m_is_guest_account) m_use_frequency = -1;
     else m_use_frequency++;
 }   // incrementUseFrequency
+
+//------------------------------------------------------------------------------
+/** Comparison used to sort players. Most frequent players should be
+ *  listed first, so a<b actually means that
+ *  a.m_use_frequency > b.m_use_frequency
+ *  This way we get a reversed sorted list.
+ */
+bool PlayerProfile::operator<(const PlayerProfile &other)
+{
+    return getUseFrequency() > other.getUseFrequency();
+}   // operator<
+
+// -----------------------------------------------------------------------------
+/** \brief Needed for toggling sort order **/
+bool PlayerProfile::operator>(const PlayerProfile &other)
+{
+    return getUseFrequency() < other.getUseFrequency();
+}   // operator>
+
+// -----------------------------------------------------------------------------
+

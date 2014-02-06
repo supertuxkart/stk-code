@@ -63,12 +63,22 @@ public:
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
+    void deletePlayer(PlayerProfile *player);
+    const PlayerProfile *getPlayerById(unsigned int id);
+    // ------------------------------------------------------------------------
+    PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------
     /** Returns the number of players in the config file.*/
     unsigned int getNumPlayers() const { return m_all_players.size(); }
     // ------------------------------------------------------------------------
     /** Returns a player with a given unique id. */
-    const PlayerProfile &getPlayer(unsigned int n)  { return m_all_players[n];}
+    const PlayerProfile *getPlayer(unsigned int n) const
+    {
+        return &m_all_players[n];
+    }   // getPlayer
+    // ------------------------------------------------------------------------
+    /** Returns a player with a given unique id. */
+    PlayerProfile *getPlayer(unsigned int n)  { return &m_all_players[n];}
     // ------------------------------------------------------------------------
 };   // PlayerManager
 
