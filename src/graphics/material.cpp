@@ -146,6 +146,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 
     node->get("water-splash",     &m_water_splash      );
     node->get("jump",             &m_is_jump_texture   );
+    node->get("has-gravity",      &m_has_gravity       );
 
     if (m_collision_reaction != NORMAL)
     {
@@ -291,7 +292,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
 
     if (m_disable_z_write && !m_alpha_blending && !m_add)
     {
-        Log::warn("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive");
+        Log::warn("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive (for %s)", m_texname.c_str());
         m_disable_z_write = false;
     }
 
@@ -344,6 +345,10 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         }
 
     }   // for i <node->getNumNodes()
+
+    if(m_has_gravity)
+        m_high_tire_adhesion = true;
+
     install(/*is_full_path*/false);
 }   // Material
 
@@ -410,6 +415,7 @@ void Material::init(unsigned int index)
     m_is_heightmap              = false;
     m_water_splash              = false;
     m_is_jump_texture           = false;
+    m_has_gravity               = false;
 
     for (int n=0; n<EMIT_KINDS_COUNT; n++)
     {
@@ -653,17 +659,13 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 
 
-    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
-    {
-        // we abuse alpha blender a little here : in the shader-based pipeline,
-        // transparent objects are rendered after lighting has been applied.
-        // Therefore, pretending the object is transparent will have the effect
-        // of making it unaffected by lights
-        m_alpha_blending = true;
-        m_disable_z_write = false;
-    }
-
     int modes = 0;
+
+	if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
+	{
+		m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+		modes++;
+	}
 
     if (m_alpha_testing)
     {

@@ -146,15 +146,19 @@ class NetworkString
             return *this;
         }
 
-        const char* c_str() const
+        const std::string std_string() const
         {
             std::string str(m_string.begin(), m_string.end());
-            return str.c_str();
+            return str;
         }
+
         int size() const
         {
             return m_string.size();
         }
+
+        uint8_t* getBytes() { return &m_string[0]; };
+        const uint8_t* getBytes() const { return &m_string[0]; };
 
         template<typename T, size_t n>
         T get(int pos) const

@@ -26,6 +26,7 @@
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
+#include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "utils/log.hpp"
 #include <IGUIEnvironment.h>
@@ -69,7 +70,8 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_NITRO,
-    DEBUG_TOGGLE_GUI
+    DEBUG_TOGGLE_GUI,
+    DEBUG_THROTTLE_FPS
 };
 
 // -----------------------------------------------------------------------------
@@ -133,6 +135,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
             
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
+            mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             mnu->addItem(L"FPS",DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
@@ -164,7 +167,7 @@ bool onEvent(const SEvent &event)
             {
                 if(cmdID == DEBUG_GRAPHICS_RELOAD_SHADERS)
                 {
-                    Log::info("Debug", "Reloading shaders...\n");
+                    Log::info("Debug", "Reloading shaders...");
                     irr_driver->updateShaders();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
@@ -250,6 +253,10 @@ bool onEvent(const SEvent &event)
                 {
                     UserConfigParams::m_profiler_enabled =
                                             !UserConfigParams::m_profiler_enabled;
+                }
+                else if (cmdID == DEBUG_THROTTLE_FPS)
+                {
+                    main_loop->setThrottleFPS(false);
                 }
                 else if (cmdID == DEBUG_FPS)
                 {

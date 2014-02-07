@@ -46,6 +46,7 @@ RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 // -----------------------------------------------------------------------------
 void RegisterScreen::init()
 {
+    Screen::init();
     // Make sure this tab is actually focused.
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("login_tabs");
     if (tabs) tabs->select( "tab_register", PLAYER_ID_GAME_MASTER );
@@ -65,6 +66,9 @@ void RegisterScreen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
+/** Handles the actual registration process. It does some tests on id, password
+ *  and email address, then submits a corresponding request.
+ */
 void RegisterScreen::doRegister()
 {
     core::stringw username = getWidget<TextBoxWidget>("username")->getText().trim();

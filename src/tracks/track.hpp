@@ -207,6 +207,7 @@ private:
     /** True if this track (textures and track data) should be cached. Used
      *  for the overworld. */
     bool m_cache_track;
+    
 
 #ifdef DEBUG
     /** A list of textures that were cached before the track is loaded.
@@ -528,6 +529,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of modes available for this track. */
     unsigned int       getNumberOfModes() const { return m_all_modes.size();  }
+    // ------------------------------------------------------------------------
+    /** Returns number of completed challenges. */
+    unsigned int getNumOfCompletedChallenges();
     // ------------------------------------------------------------------------
     /** Returns the name of the i-th. mode. */
     const std::string &getModeName(unsigned int i) const

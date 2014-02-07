@@ -45,6 +45,7 @@ LoginScreen::LoginScreen() : Screen("online/login.stkgui")
 // -----------------------------------------------------------------------------
 void LoginScreen::init()
 {
+    Screen::init();
     // Make sure this tab is actually focused.
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("login_tabs");
     if (tabs) tabs->select( "tab_login", PLAYER_ID_GAME_MASTER );
@@ -62,7 +63,7 @@ void LoginScreen::init()
 
     // As default don't select 'remember'
     getWidget<CheckBoxWidget>("remember")->setState(false);
-}   // loadedFromFile
+}   // init
 
 // -----------------------------------------------------------------------------
 /** Collects the data entered into the gui and submits a login request.

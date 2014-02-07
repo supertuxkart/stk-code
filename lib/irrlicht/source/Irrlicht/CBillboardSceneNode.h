@@ -79,7 +79,7 @@ public:
 	//! Creates a clone of this scene node and its children.
 	virtual ISceneNode* clone(ISceneNode* newParent=0, ISceneManager* newManager=0);
 	
-private:
+protected:
 
 	//! Size.Width is the bottom edge width
 	core::dimension2d<f32> Size;

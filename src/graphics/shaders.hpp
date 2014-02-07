@@ -59,6 +59,28 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
 };
 
+class DetailledObjectPass2Shader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
+	static GLuint uniform_MVP, uniform_Albedo, uniform_Detail, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_detail, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
+class ObjectRimLimitShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_normal, attrib_texcoord;
+	static GLuint uniform_MVP, uniform_TIMV, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO,	uniform_screen,	uniform_ambient;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
 class UntexturedObjectShader
 {
 public:
@@ -68,6 +90,17 @@ public:
 
 	static void init();
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
+class ObjectUnlitShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_MVP, uniform_tex;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
 };
 
 class ObjectRefPass2Shader
@@ -158,6 +191,28 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
 };
 
+class TransparentFogShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_screen, uniform_ipvmat;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
+};
+
+class BillboardShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_corner, attrib_texcoord;
+	static GLuint uniform_MV, uniform_P, uniform_tex, uniform_Position, uniform_Size;
+
+	static void init();
+	static void setUniforms(const core::matrix4 &ModelViewMatrix, const core::matrix4 &ProjectionMatrix, const core::vector3df &Position, const core::dimension2d<float> &size, unsigned TU_tex);
+};
+
 
 class ColorizeShader
 {
@@ -214,7 +269,7 @@ class SimpleParticleRender
 public:
 	static GLuint Program;
 	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
-	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_dtex, uniform_screen, uniform_invproj;
 
 	static void init();
 	static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth);
@@ -225,7 +280,7 @@ class FlipParticleRender
 public:
 	static GLuint Program;
 	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz, attrib_rotationvec, attrib_anglespeed;
-	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_normal_and_depths, uniform_screen, uniform_invproj;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_dtex, uniform_screen, uniform_invproj;
 
 	static void init();
 	static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth);
@@ -279,31 +334,22 @@ class PointLightShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_ntex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_invproj, uniform_viewm;
+	static GLuint uniform_ntex, uniform_dtex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_invproj, uniform_viewm;
 	static GLuint vao;
 
 	static void init();
+	static void setUniforms(const core::matrix4 &InvProjMatrix, const core::matrix4 &ViewMatrix, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class SunLightShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_ntex, uniform_direction, uniform_col, uniform_invproj;
+	static GLuint uniform_ntex, uniform_dtex, uniform_direction, uniform_col, uniform_invproj;
 	static GLuint vao;
 
 	static void init();
-	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex);
-};
-
-class LightBlendShader
-{
-public:
-	static GLuint Program;
-	static GLuint uniform_diffuse, uniform_specular, uniform_ambient_occlusion, uniform_specular_map, uniform_ambient;
-	static GLuint vao;
-
-	static void init();
+	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class Gaussian6HBlurShader
@@ -370,23 +416,65 @@ class SSAOShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_normals_and_depth, uniform_noise_texture, uniform_invprojm, uniform_projm, uniform_samplePoints;
+	static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_invprojm, uniform_projm, uniform_samplePoints;
 	static GLuint vao;
 	static float SSAOSamples[64];
 	
 	static void init();
+	static void setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise);
 };
 
 class FogShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_campos, uniform_ipvmat;
+	static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_ipvmat;
 	static GLuint vao;
 
 	static void init();
+	static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
 };
 
+}
+
+namespace UIShader
+{
+class TextureRectShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord;
+	static GLuint uniform_tex, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
+	static GLuint vao;
+
+	static void init();
+	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
+};
+
+class ColoredTextureRectShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position, attrib_texcoord, attrib_color;
+	static GLuint uniform_tex, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
+	static GLuint colorvbo;
+	static GLuint vao;
+
+	static void init();
+	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
+};
+
+class ColoredRectShader
+{
+public:
+	static GLuint Program;
+	static GLuint attrib_position;
+	static GLuint uniform_center, uniform_size, uniform_color;
+	static GLuint vao;
+
+	static void init();
+	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, const video::SColor &color);
+};
 }
 
 #define FOREACH_SHADER(ACT) \
@@ -407,7 +495,7 @@ public:
     ACT(ES_MIPVIZ) \
     ACT(ES_COLORIZE) \
     ACT(ES_COLORIZE_REF) \
-    ACT(ES_GLOW) \
+	ACT(ES_OBJECT_UNLIT) \
     ACT(ES_OBJECTPASS) \
     ACT(ES_OBJECTPASS_REF) \
     ACT(ES_SUNLIGHT) \

@@ -61,9 +61,9 @@
 	#include <GL/gl.h>
 	#include <GL/glx.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-	#include "glext.h"
+	#include <GL/glext.h>
 	#undef GLX_ARB_get_proc_address // avoid problems with local glxext.h
-	#include "glxext.h"
+	#include <GL/glxext.h>
 	#endif
 #endif
 

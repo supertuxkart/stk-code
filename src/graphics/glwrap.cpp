@@ -2,6 +2,7 @@
 #include "irr_driver.hpp"
 #include <fstream>
 #include <string>
+#include "config/user_config.hpp"
 
 #ifdef _IRR_WINDOWS_API_
 #define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
@@ -55,8 +56,6 @@ PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
 
-static GLuint quad_buffer;
-static GLuint ColoredVertex;
 static bool is_gl_init = false;
 
 //#define ARB_DEBUG_OUTPUT
@@ -185,27 +184,6 @@ void initGL()
 #ifdef ARB_DEBUG_OUTPUT
 	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
-	const float quad_vertex[] = {
-		-1., -1., -1., 1., // UpperLeft
-		-1., 1., -1., -1., // LowerLeft
-		1., -1., 1., 1., // UpperRight
-		1., 1., 1., -1., // LowerRight
-	};
-	glGenBuffers(1, &quad_buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
-
-	const unsigned quad_color[] = {
-		0, 0, 0, 255,
-		255, 0, 0, 255,
-		0, 255, 0, 255,
-		0, 0, 255, 255,
-	};
-	glGenBuffers(1, &ColoredVertex);
-	glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
-	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(unsigned), quad_color, GL_DYNAMIC_DRAW);
-	
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 // Mostly from shader tutorial
@@ -296,7 +274,7 @@ void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUni
 	glUniform1i(location, textureUnit);
 }
 
-void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter)
+void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
 {
 	glActiveTexture(GL_TEXTURE0 + TextureUnit);
 	glBindTexture(GL_TEXTURE_2D, TextureId);
@@ -304,30 +282,8 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinFilter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, allowAF ? UserConfigParams::m_anisotropic : 0);
 }
-
-static GLuint TexturedQuadShader;
-static GLuint TexturedQuadAttribPosition;
-static GLuint TexturedQuadAttribTexCoord;
-static GLuint TexturedQuadUniformTex;
-static GLuint TexturedQuadUniformCenter;
-static GLuint TexturedQuadUniformSize;
-static GLuint TexturedQuadUniformTexcenter;
-static GLuint TexturedQuadUniformTexsize;
-
-static GLuint TQvao;
-
-static GLuint ColorTexturedQuadShader;
-static GLuint ColorTexturedQuadAttribPosition;
-static GLuint ColorTexturedQuadAttribTexCoord;
-static GLuint ColorTexturedQuadAttribColor;
-static GLuint ColorTexturedQuadUniformTex;
-static GLuint ColorTexturedQuadUniformCenter;
-static GLuint ColorTexturedQuadUniformSize;
-static GLuint ColorTexturedQuadUniformTexcenter;
-static GLuint ColorTexturedQuadUniformTexsize;
-
-static GLuint CTQvao;
 
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
@@ -340,42 +296,15 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
   col[3].getRed(), col[3].getGreen(), col[3].getBlue(), col[3].getAlpha(),
   };
 
-  if (!ColorTexturedQuadShader) {
-     ColorTexturedQuadShader = LoadProgram(file_manager->getAsset("shaders/colortexturedquad.vert").c_str(), file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
-
-	  ColorTexturedQuadAttribPosition = glGetAttribLocation(ColorTexturedQuadShader, "position");
-	  ColorTexturedQuadAttribTexCoord = glGetAttribLocation(ColorTexturedQuadShader, "texcoord");
-	  ColorTexturedQuadAttribColor = glGetAttribLocation(ColorTexturedQuadShader, "color");
-	  ColorTexturedQuadUniformTex = glGetUniformLocation(ColorTexturedQuadShader, "tex");
-	  ColorTexturedQuadUniformCenter = glGetUniformLocation(ColorTexturedQuadShader, "center");
-	  ColorTexturedQuadUniformSize = glGetUniformLocation(ColorTexturedQuadShader, "size");
-	  ColorTexturedQuadUniformTexcenter = glGetUniformLocation(ColorTexturedQuadShader, "texcenter");
-	  ColorTexturedQuadUniformTexsize = glGetUniformLocation(ColorTexturedQuadShader, "texsize");
-	  glGenVertexArrays(1, &CTQvao);
-	  glBindVertexArray(CTQvao);
-	  glEnableVertexAttribArray(ColorTexturedQuadAttribPosition);
-	  glEnableVertexAttribArray(ColorTexturedQuadAttribTexCoord);
-	  glEnableVertexAttribArray(ColorTexturedQuadAttribColor);
-	  glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-	  glVertexAttribPointer(ColorTexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	  glVertexAttribPointer(ColorTexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-	  glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
-	  glVertexAttribIPointer(ColorTexturedQuadAttribColor, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
-	  glBindVertexArray(0);
-  }
-  glBindBuffer(GL_ARRAY_BUFFER, ColoredVertex);
+  glBindBuffer(GL_ARRAY_BUFFER, UIShader::ColoredTextureRectShader::colorvbo);
   glBufferSubData(GL_ARRAY_BUFFER, 0, 16 * sizeof(unsigned), colors);
-  glUseProgram(ColorTexturedQuadShader);
-  glBindVertexArray(CTQvao);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glUniform1i(ColorTexturedQuadUniformTex, 0);
-  glUniform2f(ColorTexturedQuadUniformCenter, center_pos_x, center_pos_y);
-  glUniform2f(ColorTexturedQuadUniformSize, width, height);
-  glUniform2f(ColorTexturedQuadUniformTexcenter, tex_center_pos_x, tex_center_pos_y);
-  glUniform2f(ColorTexturedQuadUniformTexsize, tex_width, tex_height);
+
+  glUseProgram(UIShader::ColoredTextureRectShader::Program);
+  glBindVertexArray(UIShader::ColoredTextureRectShader::vao);
+
+  setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+  UIShader::TextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, 0);
+
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -385,36 +314,12 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
     float tex_width, float tex_height)
 {
-  if (!TexturedQuadShader) {
-     TexturedQuadShader = LoadProgram(file_manager->getAsset("shaders/texturedquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
+  glUseProgram(UIShader::TextureRectShader::Program);
+  glBindVertexArray(UIShader::TextureRectShader::vao);
 
-	  TexturedQuadAttribPosition = glGetAttribLocation(TexturedQuadShader, "position");
-	  TexturedQuadAttribTexCoord = glGetAttribLocation(TexturedQuadShader, "texcoord");
-	  TexturedQuadUniformTex = glGetUniformLocation(TexturedQuadShader, "tex");
-	  TexturedQuadUniformCenter = glGetUniformLocation(TexturedQuadShader, "center");
-	  TexturedQuadUniformSize = glGetUniformLocation(TexturedQuadShader, "size");
-	  TexturedQuadUniformTexcenter = glGetUniformLocation(TexturedQuadShader, "texcenter");
-	  TexturedQuadUniformTexsize = glGetUniformLocation(TexturedQuadShader, "texsize");
-	  glGenVertexArrays(1, &TQvao);
-	  glBindVertexArray(TQvao);
-	  glEnableVertexAttribArray(TexturedQuadAttribPosition);
-	  glEnableVertexAttribArray(TexturedQuadAttribTexCoord);
-	  glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-	  glVertexAttribPointer(TexturedQuadAttribPosition, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-	  glVertexAttribPointer(TexturedQuadAttribTexCoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-     glBindVertexArray(0);
-  }
-  glUseProgram(TexturedQuadShader);
-  glBindVertexArray(TQvao);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName());
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glUniform1i(TexturedQuadUniformTex, 0);
-  glUniform2f(TexturedQuadUniformCenter, center_pos_x, center_pos_y);
-  glUniform2f(TexturedQuadUniformSize, width, height);
-  glUniform2f(TexturedQuadUniformTexcenter, tex_center_pos_x, tex_center_pos_y);
-  glUniform2f(TexturedQuadUniformTexsize, tex_width, tex_height);
+  setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+  UIShader::TextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, 0);
+
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -458,6 +363,10 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	float tex_height = sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y;
 	tex_height /= ss.Height * 2.;
 
+	if (texture->isRenderTarget()) {
+		tex_height = - tex_height;
+	}
+
 	const f32 invW = 1.f / static_cast<f32>(ss.Width);
 	const f32 invH = 1.f / static_cast<f32>(ss.Height);
 	const core::rect<f32> tcoords(
@@ -465,8 +374,6 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 		sourceRect.UpperLeftCorner.Y * invH,
 		sourceRect.LowerRightCorner.X * invW,
 		sourceRect.LowerRightCorner.Y *invH);
-
-	initGL();
 
 	if (useAlphaChannelOfTexture)
 	{
@@ -485,12 +392,6 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	      tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
 	glUseProgram(0);
 }
-
-static GLuint ColoredQuadShader;
-static GLuint ColoredQuadUniformCenter;
-static GLuint ColoredQuadUniformSize;
-static GLuint ColoredQuadUniformColor;
-static GLuint CQvao;
 
 void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	const core::rect<s32>* clip)
@@ -517,8 +418,6 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	float height = position.LowerRightCorner.Y - position.UpperLeftCorner.Y;
 	height /= screen_h;
 
-	initGL();
-
 	if (color.getAlpha() < 255)
 	{
 		glEnable(GL_BLEND);
@@ -529,24 +428,10 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 		glDisable(GL_BLEND);
 	}
 
-	if (!ColoredQuadShader)
-	{
-		ColoredQuadShader = LoadProgram(file_manager->getAsset("shaders/coloredquad.vert").c_str(), file_manager->getAsset("shaders/coloredquad.frag").c_str());
-		ColoredQuadUniformColor = glGetUniformLocation(ColoredQuadShader, "color");
-		ColoredQuadUniformCenter = glGetUniformLocation(ColoredQuadShader, "center");
-		ColoredQuadUniformSize = glGetUniformLocation(ColoredQuadShader, "size");
-		glGenVertexArrays(1, &CQvao);
-		glBindVertexArray(CQvao);
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-		glBindVertexArray(0);
-	}
-	glUseProgram(ColoredQuadShader);
-	glBindVertexArray(CQvao);
-	glUniform2f(ColoredQuadUniformCenter, center_pos_x, center_pos_y);
-	glUniform2f(ColoredQuadUniformSize, width, height);
-	glUniform4i(ColoredQuadUniformColor, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+	glUseProgram(UIShader::ColoredRectShader::Program);
+	glBindVertexArray(UIShader::ColoredRectShader::vao);
+	UIShader::ColoredRectShader::setUniforms(center_pos_x, center_pos_y, width, height, color);
+
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);

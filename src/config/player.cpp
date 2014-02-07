@@ -36,9 +36,9 @@ PlayerProfile::PlayerProfile(const core::stringw& name) :
 #endif
     int64_t unique_id = generateUniqueId(core::stringc(name.c_str()).c_str());
 
-    std::ostringstream tostring;
-    tostring << std::hex << unique_id;
-    m_unique_id = tostring.str();
+    std::ostringstream to_string;
+    to_string << std::hex << unique_id;
+    m_unique_id = to_string.str();
 }
 
 //------------------------------------------------------------------------------
@@ -67,19 +67,26 @@ PlayerProfile::PlayerProfile(const XMLNode* node) :
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
-}
+}   // PlayerProfile
 
 //------------------------------------------------------------------------------
 void PlayerProfile::incrementUseFrequency()
 {
     if (m_is_guest_account) m_use_frequency = -1;
     else m_use_frequency++;
-}
+}   // incrementUseFrequency
 
 //------------------------------------------------------------------------------
-int64_t PlayerProfile::generateUniqueId(const char* playerName)
+int64_t PlayerProfile::generateUniqueId(const char* player_name)
 {
+    // First create a simple hash based on he player name
+    int hash = 0;
+    for (int n=0; player_name[n] != 0; n++)
+    {
+        hash += (hash << (hash & 0xF)) ^ player_name[n];
+    }
+
     return ((int64_t)(StkTime::getTimeSinceEpoch()) << 32) |
-           ((rand() << 16) & 0xFFFF0000) |
-           (StringUtils::simpleHash(playerName) & 0xFFFF);
-}
+           ((rand() << 16) & 0xFFFF0000)                   | 
+           hash;
+}   // generateUniqueId

@@ -57,7 +57,11 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
                          "AreaMap33", false);
-    if (!areamap) Log::fatal("postprocessing", "Failed to load the areamap");
+	if (!areamap)
+	{
+		Log::fatal("postprocessing", "Failed to load the areamap");
+		return;
+	}
     m_areamap = irr_driver->getVideoDriver()->getTexture(areamap);
     areamap->drop();
 
@@ -302,7 +306,7 @@ void renderColorLevel(ITexture *in)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
+void PostProcessing::renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
 {
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
@@ -312,18 +316,9 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glUseProgram(FullScreenShader::PointLightShader::Program);
 	glBindVertexArray(FullScreenShader::PointLightShader::vao);
 
-	glUniform4fv(FullScreenShader::PointLightShader::uniform_center, 16, positions.data());
-	glUniform4fv(FullScreenShader::PointLightShader::uniform_col, 16, colors.data());
-	glUniform1fv(FullScreenShader::PointLightShader::uniform_energy, 16, energy.data());
-	glUniform1f(FullScreenShader::PointLightShader::uniform_spec, 200);
-	glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-	glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_viewm, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::PointLightShader::uniform_ntex, 0);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0, 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -344,57 +339,11 @@ void PostProcessing::renderSunlight()
 
   glUseProgram(FullScreenShader::SunLightShader::Program);
   glBindVertexArray(FullScreenShader::SunLightShader::vao);
-  GLuint ntex_id = static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName();
-  setTexture(0, ntex_id, GL_NEAREST, GL_NEAREST);
-  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0);
+  setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+  setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
-}
-
-void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, ITexture *ao, ITexture *specmap, bool debug)
-{
-	const SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-	glStencilFunc(GL_EQUAL, 1, ~0);
-	glEnable(GL_STENCIL_TEST);
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	if (debug)
-		glBlendFunc(GL_ONE, GL_ZERO);
-	else
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(FullScreenShader::LightBlendShader::Program);
-	glBindVertexArray(FullScreenShader::LightBlendShader::vao);
-
-	glUniform3f(FullScreenShader::LightBlendShader::uniform_ambient, s.r, s.g, s.b);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(diffuse)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_diffuse, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specular)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_specular, 1);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(ao)->getOpenGLTextureName());
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_ambient_occlusion, 2);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specmap)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_specular_map, 3);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_STENCIL_TEST);
 }
 
 
@@ -526,30 +475,18 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+	glDisable(GL_ALPHA_TEST);
+
+	if (!noise_tex)
+		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 
 	glUseProgram(FullScreenShader::SSAOShader::Program);
 	glBindVertexArray(FullScreenShader::SSAOShader::vao);
-	glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
-	glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
-	glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
+	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+	setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
+	setTexture(2, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, 0);
-
-	if (!noise_tex)
-		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/tarmac.jpg").c_str());
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, 1);
+	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -558,7 +495,7 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glEnable(GL_DEPTH_TEST);
 }
 
-void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat)
+void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 {
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 	const Track * const track = World::getWorld()->getTrack();
@@ -571,9 +508,9 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	const float end = track->getFogEnd();
 	const SColor tmpcol = track->getFogColor();
 
-	const float col[3] = { tmpcol.getRed() / 255.0f,
+	core::vector3df col( tmpcol.getRed() / 255.0f,
 		tmpcol.getGreen() / 255.0f,
-		tmpcol.getBlue() / 255.0f };
+		tmpcol.getBlue() / 255.0f );
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -583,17 +520,8 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	glUseProgram(FullScreenShader::FogShader::Program);
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
-	glUniform1f(FullScreenShader::FogShader::uniform_fogmax, fogmax);
-	glUniform1f(FullScreenShader::FogShader::uniform_startH, startH);
-	glUniform1f(FullScreenShader::FogShader::uniform_endH, endH);
-	glUniform1f(FullScreenShader::FogShader::uniform_start, start);
-	glUniform1f(FullScreenShader::FogShader::uniform_end, end);
-	glUniform3f(FullScreenShader::FogShader::uniform_col, col[0], col[1], col[2]);
-	glUniform3f(FullScreenShader::FogShader::uniform_campos, campos.X, campos.Y, campos.Z);
-	glUniformMatrix4fv(FullScreenShader::FogShader::uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
-	glUniform1i(FullScreenShader::FogShader::uniform_tex, 0);
+	setTexture(0, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

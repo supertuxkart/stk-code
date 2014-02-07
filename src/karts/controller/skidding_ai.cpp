@@ -856,8 +856,7 @@ bool SkiddingAI::handleSelectedItem(float kart_aim_angle, Vec3 *aim_point)
     // If the item is unavailable or has been switched into a bad item
     // stop aiming for it.
     if(m_item_to_collect->getDisableTime()>0 ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA ||
-        m_item_to_collect->getType() == Item::ITEM_BANANA   )
+        m_item_to_collect->getType() == Item::ITEM_BANANA )
         return false;
 
     const Vec3 &xyz = m_item_to_collect->getXYZ();
@@ -1066,7 +1065,7 @@ void SkiddingAI::evaluateItems(const Item *item, float kart_aim_angle,
             // fall through: if we have enough space to store a big
             // container, we can also store a small container, and
             // finally fall through to the bonus box code.
-        case Item::ITEM_NITRO_SMALL: avoid = false; break;
+        case Item::ITEM_NITRO_SMALL: avoid = false;
             // Only collect nitro, if it can actually be stored.
             if (m_kart->getEnergy() +
                     m_kart->getKartProperties()->getNitroSmallContainer()
@@ -2359,7 +2358,7 @@ void SkiddingAI::setSteering(float angle, float dt)
         m_controls->m_skid = KartControl::SC_NONE;
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.\n",
+            Log::info("SkiddingAI", "'%s' wrong steering, stop skid.",
                     m_kart->getIdent().c_str());
 #endif
     }
@@ -2374,7 +2373,7 @@ void SkiddingAI::setSteering(float angle, float dt)
         {
 #ifdef DEBUG
             if(m_ai_debug)
-                Log::info("SkiddingAI", "%s steering too much (%f).\n",
+                Log::info("SkiddingAI", "%s steering too much (%f).",
                        m_kart->getIdent().c_str(), steer_fraction);
 #endif
             m_controls->m_skid = KartControl::SC_NONE;

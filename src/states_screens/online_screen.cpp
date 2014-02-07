@@ -111,7 +111,9 @@ void OnlineScreen::beforeAddingWidget()
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);
     hasStateChanged();
-    if (m_recorded_state == CurrentUser::US_SIGNED_OUT || m_recorded_state == CurrentUser::US_SIGNING_IN || m_recorded_state == CurrentUser::US_SIGNING_OUT)
+    if (m_recorded_state == CurrentUser::US_SIGNED_OUT || 
+        m_recorded_state == CurrentUser::US_SIGNING_IN || 
+        m_recorded_state == CurrentUser::US_SIGNING_OUT    )
     {
         m_quick_play_widget->setDeactivated();
         m_find_server_widget->setDeactivated();
@@ -175,6 +177,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
         CurrentUser::get()->requestSignOut();
+        StateManager::get()->popMenu();
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {

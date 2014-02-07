@@ -165,15 +165,6 @@ void OverWorld::getKartsDisplayInfo(
 }   // getKartsDisplayInfo
 
 //-----------------------------------------------------------------------------
-/** Override the base class method to change behavior. We don't want wrong
- *  direction messages in the overworld since there is no direction there.
- *  \param i Kart id.
- */
-void OverWorld::checkForWrongDirection(unsigned int i)
-{
-}   // checkForWrongDirection
-
-//-----------------------------------------------------------------------------
 
 void OverWorld::createRaceGUI()
 {

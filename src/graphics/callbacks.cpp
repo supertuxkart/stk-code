@@ -254,13 +254,6 @@ void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void GlowProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("res", m_res, 2);
-}
-
-//-------------------------------------
-
 void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);

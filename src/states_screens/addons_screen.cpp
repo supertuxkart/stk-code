@@ -47,7 +47,7 @@ AddonsScreen::AddonsScreen() : Screen("addons_screen.stkgui")
     // I18N: Time filters for add-ons
     DateFilter filter_all = {_("All"), 0, 0, 0};
     DateFilter filter_1w = {_("1 week"), 0, 0, 7};
-    DateFilter filter_2w = {_("2 weeks"), 0, 0, 12};
+    DateFilter filter_2w = {_("2 weeks"), 0, 0, 14};
     DateFilter filter_1m = {_("1 month"), 0, 1, 0};
     DateFilter filter_3m = {_("3 months"), 0, 3, 0};
     DateFilter filter_6m = {_("6 months"), 0, 6, 0};
@@ -358,9 +358,9 @@ void AddonsScreen::loadList()
             icon += 2;
         }
 
-        PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-        row->push_back(new GUIEngine::ListWidget::ListCell(s.c_str(), icon, 3, false));
-        row->push_back(new GUIEngine::ListWidget::ListCell(addon->getDateAsString().c_str(), -1, 1, true));
+        std::vector<GUIEngine::ListWidget::ListCell> row;
+        row.push_back(GUIEngine::ListWidget::ListCell(s.c_str(), icon, 3, false));
+        row.push_back(GUIEngine::ListWidget::ListCell(addon->getDateAsString().c_str(), -1, 1, true));
         w_list->addItem(addon->getId(), row);
 
         // Highlight if it's not approved in artists debug mode.

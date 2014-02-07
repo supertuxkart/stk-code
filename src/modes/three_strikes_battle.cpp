@@ -354,7 +354,7 @@ void ThreeStrikesBattle::update(float dt)
         getTrack()->getTrackObjectManager()->insertObject(tire_obj);
 
         // FIXME: orient the force relative to kart orientation
-        tire_obj->getPhysics()->getBody()
+        tire_obj->getPhysicalObject()->getBody()
                 ->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
 
         m_insert_tire--;

@@ -151,6 +151,29 @@ Track::~Track()
 }   // ~Track
 
 //-----------------------------------------------------------------------------
+/** Returns number of completed challenges */
+unsigned int Track::getNumOfCompletedChallenges()
+{
+    unsigned int unlocked_challenges = 0;
+    GameSlot* slot = unlock_manager->getCurrentSlot();
+    for (unsigned int i=0; i<m_challenges.size(); i++)
+    {
+        if (m_challenges[i].m_challenge_id == "tutorial")
+        {
+            unlocked_challenges++;
+            continue;
+        }
+        if (slot->getChallenge(m_challenges[i].m_challenge_id)
+                ->isSolvedAtAnyDifficulty())
+        {
+            unlocked_challenges++;
+        }
+    }
+
+    return unlocked_challenges;
+}   // getNumOfCompletedChallenges
+
+//-----------------------------------------------------------------------------
 /** Removes all cached data structures. This is called before the resolution
  *  is changed.
  */
@@ -478,8 +501,8 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
             m_music.push_back(mi);
         else
             Log::warn("track",
-                      "Music information file '%s' not found - ignored.\n",
-                      filenames[i].c_str());
+                      "Music information file '%s' not found for track '%s' - ignored.\n",
+                      filenames[i].c_str(), m_name.c_str());
 
     }   // for i in filenames
 
@@ -953,39 +976,25 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
-            scene::ISceneNode* sn =
+			// TODO: Add support in the engine for BillboardText or find a replacement
+/*            scene::ISceneNode* sn =
                 sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
                                               msg.c_str(),
                                               NULL,
                                               core::dimension2df(textsize.Width/45.0f,
                                                                  textsize.Height/45.0f),
                                               xyz,
-                                              -1 /* id */,
+                                              -1, // id 
                                               video::SColor(255, 255, 225, 0),
                                               video::SColor(255, 255, 89, 0));
-            m_all_nodes.push_back(sn);
+            m_all_nodes.push_back(sn);*/
             if (!shown) continue;
         }
         else if (condition == "allchallenges")
         {
-            unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-                if (m_challenges[c].m_challenge_id == "tutorial")
-                {
-                    unlocked_challenges++;
-                    continue;
-                }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
-                        ->isSolvedAtAnyDifficulty())
-                {
-                    unlocked_challenges++;
-                }
-            }
-
             // allow ONE unsolved challenge : the last one
-            if (unlocked_challenges < m_challenges.size() - 1) continue;
+            if (getNumOfCompletedChallenges() < m_challenges.size() - 1)
+                continue;
         }
         else if (condition.size() > 0)
         {
@@ -1000,24 +1009,9 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (neg_condition == "allchallenges")
         {
-            unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-                if (m_challenges[c].m_challenge_id == "tutorial")
-                {
-                    unlocked_challenges++;
-                    continue;
-                }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
-                        ->isSolvedAtAnyDifficulty())
-                {
-                    unlocked_challenges++;
-                }
-            }
-
             // allow ONE unsolved challenge : the last one
-            if (unlocked_challenges >= m_challenges.size() - 1) continue;
+            if (getNumOfCompletedChallenges() >= m_challenges.size() - 1)
+                continue;
         }
         else if (neg_condition.size() > 0)
         {
@@ -1349,7 +1343,7 @@ void Track::createWater(const XMLNode &node)
 
     if (UserConfigParams::m_graphical_effects)
     {
-        scene::IMesh *welded;
+        /*scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
                                               wave_height,
                                               wave_speed,
@@ -1359,7 +1353,7 @@ void Track::createWater(const XMLNode &node)
         irr_driver->grabAllTextures(mesh);
         m_all_cached_meshes.push_back(mesh);
 
-        mesh = welded;
+        mesh = welded;*/
     }
     else
     {
@@ -1594,6 +1588,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Sky dome and boxes support
     // --------------------------
+	irr_driver->suppressSkyBox();
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],

@@ -99,7 +99,7 @@ public:
 };   // GroupUserConfigParam
 
 // ============================================================================
-template<typename T>
+template<typename T, typename U>
 class ListUserConfigParam : public UserConfigParam
 {
     std::vector<T> m_elements;
@@ -135,7 +135,7 @@ public:
     float& operator=(const ListUserConfigParam& v)
             { m_elements = std::vector<T>(v); return m_elements; }
 };   // ListUserConfigParam
-typedef ListUserConfigParam<char*>    StringListUserConfigParam;
+typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
 
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
@@ -541,7 +541,7 @@ namespace UserConfigParams
                             "stun.counterpath.net",
                             "stun.endigovoip.com",
                             "stun.ekiga.net",
-                            "stun.ideasip.com" ,
+                            "stun.ideasip.com",
                             "stun.internetcalls.com",
                             "stun.ipns.com",
                             "stun.noc.ams-ix.net",

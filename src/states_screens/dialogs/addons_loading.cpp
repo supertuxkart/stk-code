@@ -243,13 +243,17 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
             return GUIEngine::EVENT_BLOCK;
         }
     }
+    else if (event_source == "rating")
+    {
+        voteClicked();
+        return GUIEngine::EVENT_BLOCK;
+    }
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::voteClicked()
 {
-    ModalDialog::dismiss();
     if (Online::CurrentUser::get()->isRegisteredUser())
         new VoteDialog(m_addon.getId());
 }   // voteClicked
@@ -301,7 +305,6 @@ void AddonsLoading::onUpdate(float delta)
  **/
 void AddonsLoading::startDownload()
 {
-    std::string file   = m_addon.getZipFileName();
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
     m_download_request = new Online::HTTPRequest(save, /*manage mem*/false, 

@@ -313,7 +313,6 @@ void DynamicRibbonWidget::buildInternalStructure()
             elem->remove();
             m_children.erase(i);
             i--;
-            if (i<0) i = 0;
         }
     }
     m_rows.clearWithoutDeleting(); // rows already deleted above, don't double-delete

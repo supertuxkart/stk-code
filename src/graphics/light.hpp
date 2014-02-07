@@ -66,8 +66,6 @@ public:
 protected:
     static core::aabbox3df box;
 
-    class ScreenQuad *sq;
-
     //float m_radius;
     float m_color[3];
     float m_energy;

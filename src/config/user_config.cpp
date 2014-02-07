@@ -183,8 +183,8 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            const char* comment)
 {
     m_param_name = param_name;
@@ -193,8 +193,8 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
 }   // ListUserConfigParam
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T,U>::ListUserConfigParam(const char* param_name,
                                            const char* comment,
                                            int nb_elements,
                                            ...)
@@ -207,13 +207,13 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
     va_list arguments;
     va_start ( arguments, nb_elements );
     for ( int i = 0; i < nb_elements; i++ )
-        m_elements.push_back(va_arg ( arguments, T ));
+        m_elements.push_back(T(va_arg ( arguments, U )));
     va_end ( arguments );                  // Cleans up the list
 }   // ListUserConfigParam
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            GroupUserConfigParam* group,
                                            const char* comment)
 {
@@ -223,8 +223,8 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
 }   // ListUserConfigParam
 
 // ============================================================================
-template<typename T>
-ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
+template<typename T, typename U>
+ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            GroupUserConfigParam* group,
                                            const char* comment,
                                            int nb_elements,
@@ -243,8 +243,8 @@ ListUserConfigParam<T>::ListUserConfigParam(const char* param_name,
 }   // ListUserConfigParam
 
 // ----------------------------------------------------------------------------
-template<typename T>
-void ListUserConfigParam<T>::write(XMLWriter& stream) const
+template<typename T, typename U>
+void ListUserConfigParam<T, U>::write(XMLWriter& stream) const
 {
     const int elts_amount = m_elements.size();
 
@@ -256,7 +256,7 @@ void ListUserConfigParam<T>::write(XMLWriter& stream) const
     // actual elements
     for (int n=0; n<elts_amount; n++)
     {
-        stream << L"        " << n << "=\"" << m_elements[n] << "\"\n";
+        stream << L"        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
     }
     stream << L"    >\n";
     stream << L"    </" << m_param_name.c_str() << ">\n\n";
@@ -264,20 +264,8 @@ void ListUserConfigParam<T>::write(XMLWriter& stream) const
 
 // ----------------------------------------------------------------------------
 
-// Write your own convert function depending on the type of list you use.
-void convert(std::string str, char** str2)
-{
-    *str2 = (char*)(malloc(str.size()+1));
-    strcpy(*str2, str.c_str());
-}
-// Write your own equals function depending on the type of list you use.
-bool equals(char* str1, char* str2)
-{
-    return (strcmp(str1, str2) == 0);
-}
-
-template<typename T>
-void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
+template<typename T, typename U>
+void ListUserConfigParam<T, U>::findYourDataInAChildOf(const XMLNode* node)
 {
     const XMLNode* child = node->getNode( m_param_name );
     if (child == NULL)
@@ -292,16 +280,15 @@ void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
     for (int n=0; n<attr_count; n++)
     {
         T elt;
-        std::ostringstream oss;
-        oss << n;
         std::string str;
-        child->get( oss.str(), &str);
-        convert(str, &elt);
+        child->get( StringUtils::toString(n), &str);
+        StringUtils::fromString<T>(str, elt);
+        
         // check if the element is already there :
         bool there = false;
         for (unsigned int i = 0; i < m_elements.size(); i++)
         {
-            if (equals(m_elements[i], elt))
+            if (elt == m_elements[i])
             {
                 there = true;
                 break;
@@ -309,7 +296,6 @@ void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
         }
         if (!there)
         {
-            Log::info("ListUserConfigParam", "New data : %s, \"%s\"", str.c_str(), elt);
             m_elements.push_back(elt);
         }
     }
@@ -317,21 +303,21 @@ void ListUserConfigParam<T>::findYourDataInAChildOf(const XMLNode* node)
 }   // findYourDataInAChildOf
 
 // ----------------------------------------------------------------------------
-template<typename T>
-void ListUserConfigParam<T>::findYourDataInAnAttributeOf(const XMLNode* node)
+template<typename T, typename U>
+void ListUserConfigParam<T, U>::findYourDataInAnAttributeOf(const XMLNode* node)
 {
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-template<typename T>
-void ListUserConfigParam<T>::addElement(T element)
+template<typename T, typename U>
+void ListUserConfigParam<T,U>::addElement(T element)
 {
     m_elements.push_back(element);
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-template<typename T>
-irr::core::stringw ListUserConfigParam<T>::toString() const
+template<typename T, typename U>
+irr::core::stringw ListUserConfigParam<T,U>::toString() const
 {
     return "";
 }   // toString

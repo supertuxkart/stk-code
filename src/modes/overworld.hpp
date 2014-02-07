@@ -54,8 +54,6 @@ public:
     /** Returns if this race mode has laps. */
     virtual bool  raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
-    virtual void checkForWrongDirection(unsigned int i) OVERRIDE;
-    // ------------------------------------------------------------------------
     /** The overworld is not a race per se so it's never over */
     virtual bool    isRaceOver() OVERRIDE { return false; }
     // ------------------------------------------------------------------------

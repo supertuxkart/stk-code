@@ -898,6 +898,7 @@ bool COpenGLFBODepthTexture::attach(ITexture* renderTex)
 		return false;
 	}
 	rtt->DepthTexture=this;
+	rtt->DepthBufferTexture = DepthRenderBuffer;
 	grab(); // grab the depth buffer, not the RTT
 	rtt->unbindRTT();
 	return true;

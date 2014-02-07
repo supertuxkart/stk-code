@@ -111,6 +111,11 @@ private:
      *  leaving it and being in the air. */
     bool             m_is_jump_texture;
 
+    /** True if driving on this texture should adjust the gravity of the kart
+     *  to be along the normal of the triangle. This allows karts to drive e.g
+     *  upside down. */
+    bool             m_has_gravity;
+
     /** Speed of the 'main' wave in the water shader. Only used if
         m_graphical_effect == WATER_SHADER */
     float            m_water_shader_speed_1;
@@ -311,6 +316,11 @@ public:
     /** Returns if being in the air after this texture should start the
      *  jump animation. */
     bool isJumpTexture() const { return m_is_jump_texture; }
+    // ------------------------------------------------------------------------
+    /** Returns true if this texture adjusts the gravity vector of the kart
+     *  to be parallel to the normal of the triangle - which allows karts to
+     *  e.g. drive upside down. */
+    bool hasGravity() const { return m_has_gravity; }
     // ------------------------------------------------------------------------
     /** Returns the zipper parametersfor the current material. */
     void getZipperParameter(float *zipper_max_speed_increase,
