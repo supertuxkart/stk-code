@@ -477,6 +477,7 @@ void ThreeStrikesBattle::updateKartNodes()
         
             }
 
+            //Current node is still unkown
             if(controller->getCurrentNode() == BattleGraph::UNKNOWN_POLY)
             {
                 bool flag = 0;
