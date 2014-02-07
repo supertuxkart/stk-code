@@ -39,7 +39,6 @@
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
-#include "utils/log.hpp" 
 
 /** Initialises the attachment each kart has.
  */
