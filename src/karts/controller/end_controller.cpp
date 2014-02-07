@@ -218,7 +218,7 @@ void EndController::handleSteering(float dt)
         const int next = m_next_node_index[m_track_node];
         target_point = QuadGraph::get()->getQuadOfNode(next).getCenter();
 #ifdef AI_DEBUG
-        Log::debug("end_controller.cpp", "- Outside of road: steer to center point.\n");
+        Log::debug("end_controller.cpp", "- Outside of road: steer to center point.");
 #endif
     }
     else

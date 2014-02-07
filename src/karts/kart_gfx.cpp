@@ -27,6 +27,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
+#include "utils/log.hpp"
 
 #include <iostream>
 
@@ -122,7 +123,7 @@ void KartGFX::addEffect(KartGFXType type, const std::string &file_name,
         // by adding a NULL to the list (which is tested for in all
         // cases). C++ guarantees that all memory allocated in the
         // constructor is properly freed.
-        std::cerr << e.what() << std::endl;
+        Log::error("[KartGFX]", "%s",e.what());
         kind    = NULL;
         emitter = NULL;
     }

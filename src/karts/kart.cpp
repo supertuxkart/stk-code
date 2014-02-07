@@ -198,7 +198,7 @@ void Kart::init(RaceManager::KartType type)
 
     if(!m_engine_sound)
     {
-        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!\n");
+        Log::error("Kart","Could not allocate a sfx object for the kart. Further errors may ensue!");
     }
 
 
@@ -256,7 +256,7 @@ Kart::~Kart()
     if(m_slipstream)             delete m_slipstream;
     if(m_sky_particles_emitter)  delete m_sky_particles_emitter;
     if(m_attachment)             delete m_attachment;
-    if (m_stars_effect)          delete m_stars_effect;
+    if(m_stars_effect)          delete m_stars_effect;
 
     delete m_shadow;
 

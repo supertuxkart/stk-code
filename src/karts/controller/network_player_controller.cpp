@@ -255,7 +255,7 @@ void NetworkPlayerController::update(float dt)
     {
         // Print a dividing line so that it's easier to see which events
         // get received in which order in the one frame.
-        Log::debug("PlayerController", "irr_driver", "-------------------------------------\n");
+        Log::debug("PlayerController", "irr_driver", "-------------------------------------");
     }
 
     // Don't do steering if it's replay. In position only replay it doesn't

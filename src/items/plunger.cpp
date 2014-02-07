@@ -34,8 +34,6 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-#include "utils/log.hpp" //TODO: remove after debugging is done
-
 // -----------------------------------------------------------------------------
 Plunger::Plunger(AbstractKart *kart)
        : Flyable(kart, PowerupManager::POWERUP_PLUNGER)

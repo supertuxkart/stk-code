@@ -73,7 +73,7 @@ void* STKHost::receive_data(void* self)
         }
     }
     myself->m_listening = false;
-    delete myself->m_listening_thread;
+    free(myself->m_listening_thread);
     myself->m_listening_thread = NULL;
     Log::info("STKHost", "Listening has been stopped");
     return NULL;
