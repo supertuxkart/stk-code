@@ -102,7 +102,7 @@ void TriangleMesh::createCollisionShape(bool create_collision_object, const char
         FILE *f = fopen(serialized_bhv, "rb");
         fseek(f, 0, SEEK_END);
         long pos = ftell(f);
-        assert(pos == -1L);
+        assert(pos != -1L);
         fseek(f, 0, SEEK_SET);
 
         void* bytes = btAlignedAlloc(pos, 16);
