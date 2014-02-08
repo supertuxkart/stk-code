@@ -201,9 +201,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
     catch(std::exception& err)
     {
-        Log::error("KartProperties", "Error while parsing KartProperties '%s':\n",
+        Log::error("[KartProperties]", "Error while parsing KartProperties '%s':",
                    filename.c_str());
-        Log::error("KartProperties", "%s\n", err.what());
+        Log::error("[KartProperties]", "%s", err.what());
     }
     if(root) delete root;
 
@@ -392,15 +392,15 @@ void KartProperties::getAllData(const XMLNode * root)
         engine_node->get("power", &m_engine_power);
         if(m_engine_power.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            Log::fatal("KartProperties",
-                       "Incorrect engine-power specifications for kart '%s'\n",
+            Log::fatal("[KartProperties]",
+                       "Incorrect engine-power specifications for kart '%s'",
                        getIdent().c_str());
         }
         engine_node->get("max-speed", &m_max_speed);
         if(m_max_speed.size()!=RaceManager::DIFFICULTY_COUNT)
         {
-            Log::fatal("KartProperties",
-                       "Incorrect max-speed specifications for kart '%s'\n",
+            Log::fatal("[KartProperties]",
+                       "Incorrect max-speed specifications for kart '%s'",
                        getIdent().c_str());
         }
     }   // if getNode("engine")
@@ -477,8 +477,8 @@ void KartProperties::getAllData(const XMLNode * root)
             m_terrain_impulse_type = IMPULSE_TO_DRIVELINE;
         else
         {
-            Log::fatal("KartProperties",
-                       "Missing or incorrect value for impulse-type: '%s'.\n",
+            Log::fatal("[KartProperties]",
+                       "Missing or incorrect value for impulse-type: '%s'.",
                        s.c_str());
         }
     }
@@ -560,7 +560,7 @@ void KartProperties::getAllData(const XMLNode * root)
         else if (s == "small") m_engine_sfx_type = "engine_small";
         else
         {
-            Log::warn("KartProperties", "Kart '%s' has invalid engine '%s'.",
+            Log::warn("[KartProperties]", "Kart '%s' has invalid engine '%s'.",
                        m_name.c_str(), s.c_str());
             m_engine_sfx_type = "engine_small";
         }
@@ -603,32 +603,32 @@ void KartProperties::checkAllSet(const std::string &filename)
 {
     if(m_gear_switch_ratio.size()==0)
     {
-        Log::fatal("KartProperties",
-                   "Missing default value for 'gear-switch-ratio' in '%s'.\n",
+        Log::fatal("[KartProperties]",
+                   "Missing default value for 'gear-switch-ratio' in '%s'.",
                    filename.c_str());
     }
     if(m_gear_power_increase.size()==0)
     {
-        Log::fatal("KartProperties",
-                   "Missing default value for 'gear-power-increase' in '%s'.\n",
+        Log::fatal("[KartProperties]",
+                   "Missing default value for 'gear-power-increase' in '%s'.",
                 filename.c_str());
     }
     if(m_gear_switch_ratio.size()!=m_gear_power_increase.size())    {
         Log::error("KartProperties",
                    "Number of entries for 'gear-switch-ratio' and "
-                   "'gear-power-increase\n");
-        Log::fatal("KartProperties", "in '%s' must be equal.\n",
+                   "'gear-power-increase");
+        Log::fatal("KartProperties", "in '%s' must be equal.",
                     filename.c_str());
     }
     if(m_startup_boost.size()!=m_startup_times.size())
     {
-        Log::error("KartProperties",
-                 "Number of entried for 'startup times' and 'startup-boost\n");
-        Log::fatal("KartProperties", "must be identical.\n");
+        Log::error("[KartProperties]",
+                 "Number of entried for 'startup times' and 'startup-boost");
+        Log::fatal("KartProperties", "must be identical.");
     }
 #define CHECK_NEG(  a,strA) if(a<=UNDEFINED) {                      \
-        Log::fatal("KartProperties",                                \
-                    "Missing default value for '%s' in '%s'.\n",    \
+        Log::fatal("[KartProperties]",                                \
+                    "Missing default value for '%s' in '%s'.",    \
                     strA,filename.c_str());                \
     }
 

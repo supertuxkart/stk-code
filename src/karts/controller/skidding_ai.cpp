@@ -203,7 +203,7 @@ void SkiddingAI::reset()
     {
         Log::error("SkiddingAI",
                 "Invalid starting position for '%s' - not on track"
-                " - can be ignored.\n",
+                " - can be ignored.",
                 m_kart->getIdent().c_str());
         m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
     }
@@ -406,7 +406,7 @@ void SkiddingAI::handleBraking()
     {
 #ifdef DEBUG
     if(m_ai_debug)
-        Log::debug("SkiddingAI", "braking: %s ahead of leader.\n",
+        Log::debug("SkiddingAI", "braking: %s ahead of leader.",
                m_kart->getIdent().c_str());
 #endif
 
@@ -426,7 +426,7 @@ void SkiddingAI::handleBraking()
     {
 #ifdef DEBUG
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "%s not aligned with track.\n",
+            Log::debug("SkiddingAI", "%s not aligned with track.",
                    m_kart->getIdent().c_str());
 #endif
         m_controls->m_brake = true;
@@ -491,7 +491,7 @@ void SkiddingAI::handleSteering(float dt)
 #ifdef AI_DEBUG
         m_debug_sphere[0]->setPosition(QuadGraph::get()->getQuadOfNode(next)
                        .getCenter().toIrrVector());
-        Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
+        Log::debug("skidding_ai","-Outside of road: steer to center point.");
 #endif
     }
     //If we are going to crash against a kart, avoid it if it doesn't
@@ -527,7 +527,7 @@ void SkiddingAI::handleSteering(float dt)
 #ifdef AI_DEBUG
         Log::debug("skidding_ai",  "- Velocity vector crashes with kart "
                    "and doesn't crashes with road : steer 90 "
-                   "degrees away from kart.\n");
+                   "degrees away from kart.");
 #endif
 
     }
@@ -706,7 +706,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
         }
 
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "%s unselects item.\n",
+            Log::debug("SkiddingAI", "%s unselects item.",
                         m_kart->getIdent().c_str());
         // Otherwise remove the pre-selected item (and start
         // looking for a new item).
@@ -776,7 +776,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                                                            .toIrrVector());
 #endif
                 if(m_ai_debug)
-                    Log::debug("SkiddingAI", "%s selects item type '%d'.\n",
+                    Log::debug("SkiddingAI", "%s selects item type '%d'.",
                            m_kart->getIdent().c_str(),
                            item_to_collect->getType());
                 m_item_to_collect = item_to_collect;
@@ -800,7 +800,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
 #endif
                     if(m_ai_debug)
                         Log::debug("SkiddingAI",
-                               "%s adjusts to hit type %d angle %f.\n",
+                               "%s adjusts to hit type %d angle %f.",
                                m_kart->getIdent().c_str(),
                                item_to_collect->getType(), angle);
                 }
@@ -808,7 +808,7 @@ void SkiddingAI::handleItemCollectionAndAvoidance(Vec3 *aim_point,
                 {
                     if(m_ai_debug)
                         Log::debug("SkiddingAI",
-                               "%s won't hit '%d', angle %f.\n",
+                               "%s won't hit '%d', angle %f.",
                                m_kart->getIdent().c_str(),
                                item_to_collect->getType(), angle);
                 }
@@ -1383,7 +1383,7 @@ void SkiddingAI::handleItems(const float dt)
         break;
     default:
         Log::error("SkiddingAI",
-                "Invalid or unhandled powerup '%d' in default AI.\n",
+                "Invalid or unhandled powerup '%d' in default AI.",
                 m_kart->getPowerup()->getType());
         assert(false);
     }
@@ -1704,7 +1704,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
     if(steps<1 || steps>1000)
     {
         Log::warn("SkiddingAI",
-            "Incorrect STEPS=%d. kart_length %f velocity %f\n",
+            "Incorrect STEPS=%d. kart_length %f velocity %f",
             steps, m_kart_length, m_kart->getVelocityLC().getZ());
         steps=1000;
     }
@@ -2186,7 +2186,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
             if(m_ai_debug)
             {
                 if(fabsf(steer_fraction)>=2.5f)
-                    Log::debug("SkiddingAI", "%s stops skidding (%f).\n",
+                    Log::debug("SkiddingAI", "%s stops skidding (%f).",
                            m_kart->getIdent().c_str(), steer_fraction);
             }
 #endif
@@ -2206,7 +2206,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
         {
-            Log::debug("SkiddingAI", "%s stops skidding on straight.\n",
+            Log::debug("SkiddingAI", "%s stops skidding on straight.",
                 m_kart->getIdent().c_str());
         }
 #endif
@@ -2243,7 +2243,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
     if(m_controls->m_skid && duration < 1.0f)
     {
         if(m_ai_debug)
-            Log::debug("SkiddingAI", "'%s' too short, stop skid.\n",
+            Log::debug("SkiddingAI", "'%s' too short, stop skid.",
                     m_kart->getIdent().c_str());
         return false;
     }
@@ -2259,7 +2259,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
 #ifdef DEBUG
             if(m_controls->m_skid && m_ai_debug)
                 Log::debug("SkiddingAI",
-                        "%s skidding against track direction.\n",
+                        "%s skidding against track direction.",
                         m_kart->getIdent().c_str());
 #endif
             return false;
@@ -2270,7 +2270,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
     {
 #ifdef DEBUG
         if(!m_controls->m_skid && m_ai_debug)
-            Log::debug("SkiddingAI", "%s start skid, duration %f.\n",
+            Log::debug("SkiddingAI", "%s start skid, duration %f.",
                         m_kart->getIdent().c_str(), duration);
 #endif
         return true;
@@ -2279,7 +2279,7 @@ bool SkiddingAI::doSkid(float steer_fraction)
 
 #ifdef DEBUG
         if(m_controls->m_skid && m_ai_debug)
-            Log::debug("SkiddingAI", "%s has no reasons to skid anymore.\n",
+            Log::debug("SkiddingAI", "%s has no reasons to skid anymore.",
                    m_kart->getIdent().c_str());
 #endif
     return false;

@@ -121,9 +121,9 @@ void Shaders::loadShaders()
 
 	m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass_spheremap.frag");
 
-	m_shaders[ES_GRASS] = glslmat(dir + "grass.vert", dir + "grass.frag",
+    m_shaders[ES_GRASS] = glslmat(std::string(""), dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
-	m_shaders[ES_GRASS_REF] = glslmat(dir + "grass.vert", dir + "grass.frag",
+    m_shaders[ES_GRASS_REF] = glslmat(std::string(""), dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
     m_shaders[ES_BUBBLES] = glslmat(dir + "bubble.vert", dir + "bubble.frag",

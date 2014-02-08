@@ -64,7 +64,7 @@ void ThreeStrikesBattle::init()
     // FIXME : remove this bit of code in future since ai will be added
 /*    if(getNumKarts() > race_manager->getNumPlayers())
     {
-        Log::fatal("Three Strikes Battle", "No AI exists for this game mode");
+        Log::fatal("[Three Strikes Battle]", "No AI exists for this game mode");
     }
 */
     m_kart_info.resize(m_karts.size());
