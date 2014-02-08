@@ -85,6 +85,7 @@ Event::Event(const Event& event)
 
 Event::~Event()
 {
+    delete peer;
     peer = NULL;
     m_packet = NULL;
 }
