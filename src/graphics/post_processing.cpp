@@ -359,7 +359,9 @@ void PostProcessing::renderShadowedSunlight(const core::matrix4 &sun_ortho_matri
     glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
     setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
     setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
-    setTexture(2, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+    setTexture(2, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);

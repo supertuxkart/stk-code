@@ -1,7 +1,7 @@
 #version 130
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2D shadowtex;
+uniform sampler2DShadow shadowtex;
 //uniform sampler2D warpx;
 ///uniform sampler2D warpy;
 
@@ -73,21 +73,14 @@ void main() {
 //	float dy = movey * 2.0 - 1.0;
 //	shadowcoord.xy += vec2(dx, dy);*/
 
-	float shadowmapz = 2. * texture(shadowtex, shadowtexcoord).x - 1.;
+	//float shadowmapz = 2. * texture(shadowtex, vec3(shadowtexcoord, shadowcoord.z).x - 1.;
 	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
 	//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
 	bias = clamp(bias, 0.001, 0.014);
+	float factor = texture(shadowtex, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias) + 0.5));
 
-	if (shadowmapz > shadowcoord.z + bias)
-	{
-		Diff = vec4(NdotL * col, 1.);
-		Spec = vec4(Specular * col, 1.);
-	}
-	else
-	{
-		Diff = vec4(0., 0., 0., 1.);
-		Spec = vec4(0., 0., 0., 1.);
-	}
+	Diff = vec4(factor * NdotL * col, 1.);
+	Spec = vec4(factor * Specular * col, 1.);
 	SpecularMap = vec4(1.0);
 	return;
 
