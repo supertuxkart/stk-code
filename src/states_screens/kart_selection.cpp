@@ -1100,7 +1100,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
                           kartsAreaWidget->m_y + kartsAreaWidget->m_h);
 
     // ---- Create new active player
-    PlayerProfile* profile_to_use = unlock_manager->getCurrentPlayer();
+    PlayerProfile* profile_to_use = PlayerManager::get()->getCurrentPlayer();
 
     if (!firstPlayer)
     {

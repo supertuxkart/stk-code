@@ -52,9 +52,6 @@ private:
 
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
 
-    /** ID of the active player */
-    unsigned int m_current_game_slot;
-
     friend class GameSlot;
 
 public:
@@ -73,13 +70,10 @@ public:
     /** Eye- (or rather ear-) candy. Play a sound when user tries to access a locked area */
     void       playLockSound() const;
 
-    unsigned int getCurrentSlotID() const { return m_current_game_slot; }
-
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
 
-    PlayerProfile* getCurrentPlayer();
     GameSlot *createGameSlot(const XMLNode *node=NULL);
 
 };   // UnlockManager

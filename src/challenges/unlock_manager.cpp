@@ -49,8 +49,6 @@ UnlockManager::UnlockManager()
     // in main).
     unlock_manager = this;
 
-    m_current_game_slot = 0;
-
     m_locked_sound = sfx_manager->createSoundSource("locked");
 
 
@@ -426,18 +424,6 @@ bool UnlockManager::isSupportedVersion(const ChallengeData &challenge)
     return (challenge.getVersion()>=2 && challenge.getVersion()<=2);
 }   // isSupportedVersion
 
-
-//-----------------------------------------------------------------------------
-
-PlayerProfile* UnlockManager::getCurrentPlayer()
-{
-    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
-    {
-        PlayerProfile* player = PlayerManager::get()->getPlayer(n);
-        if (player->getUniqueID() == m_current_game_slot) return player;
-    }
-    return NULL;
-}
 
 //-----------------------------------------------------------------------------
 
