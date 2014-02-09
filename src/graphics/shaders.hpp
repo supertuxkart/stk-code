@@ -247,6 +247,17 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
 };
 
+class GrassShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_color;
+    static GLuint uniform_MVP, uniform_tex, uniform_windDir;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex);
+};
+
 class DisplaceShader
 {
 public:

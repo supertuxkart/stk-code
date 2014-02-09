@@ -740,6 +740,12 @@ void STKMesh::drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
         glUseProgram(MeshShader::RefShadowShader::Program);
         MeshShader::RefShadowShader::setUniforms(ShadowMVP, 0);
     }
+    else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+    {
+        setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        glUseProgram(MeshShader::GrassShadowShader::Program);
+        MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
+    }
     else
     {
         glUseProgram(MeshShader::ShadowShader::Program);
@@ -942,6 +948,10 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
         if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
         {
             mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::RefShadowShader::attrib_position, MeshShader::RefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        }
+        else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::GrassShadowShader::attrib_position, MeshShader::GrassShadowShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassShadowShader::attrib_color, mesh.Stride);
         }
         else
         {

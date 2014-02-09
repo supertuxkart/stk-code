@@ -260,6 +260,7 @@ void Shaders::loadShaders()
 	MeshShader::DisplaceShader::init();
     MeshShader::ShadowShader::init();
     MeshShader::RefShadowShader::init();
+    MeshShader::GrassShadowShader::init();
 	ParticleShader::FlipParticleRender::init();
 	ParticleShader::HeightmapSimulationShader::init();
 	ParticleShader::SimpleParticleRender::init();
@@ -911,6 +912,32 @@ namespace MeshShader
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
+    }
+
+    GLuint GrassShadowShader::Program;
+    GLuint GrassShadowShader::attrib_position;
+    GLuint GrassShadowShader::attrib_texcoord;
+    GLuint GrassShadowShader::attrib_color;
+    GLuint GrassShadowShader::uniform_MVP;
+    GLuint GrassShadowShader::uniform_tex;
+    GLuint GrassShadowShader::uniform_windDir;
+
+    void GrassShadowShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/grass_pass2.vert").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        attrib_color = glGetAttribLocation(Program, "Color");
+        uniform_windDir = glGetUniformLocation(Program, "windDir");
+    }
+
+    void GrassShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniform1i(uniform_tex, TU_tex);
+        glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
     }
 
 	GLuint DisplaceShader::Program;
