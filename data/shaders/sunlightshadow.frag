@@ -7,7 +7,6 @@ uniform sampler2DShadow shadowtex;
 
 uniform vec3 direction;
 uniform vec3 col;
-uniform vec2 screen;
 uniform mat4 invproj;
 uniform mat4 shadowmat;
 //uniform int hasclouds;
@@ -17,7 +16,6 @@ uniform mat4 shadowmat;
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
-out vec4 SpecularMap;
 
 vec3 DecodeNormal(vec2 n)
 {
@@ -81,7 +79,6 @@ void main() {
 
 	Diff = vec4(factor * NdotL * col, 1.);
 	Spec = vec4(factor * Specular * col, 1.);
-	SpecularMap = vec4(1.0);
 	return;
 
 //	float moved = (abs(dx) + abs(dy)) * 0.5;
