@@ -18,7 +18,6 @@
 
 #include "achievements/achievements_manager.hpp"
 
-#include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -234,10 +233,10 @@ void AchievementsManager::updateCurrentPlayer()
     }
     else
     {
-        m_active_slot = getSlot(unlock_manager->getCurrentPlayer()->getUniqueID(), false);
+        m_active_slot = getSlot(PlayerManager::get()->getCurrentPlayer()->getUniqueID(), false);
         if(m_active_slot == NULL)
         {
-            m_active_slot = createNewSlot(unlock_manager->getCurrentPlayer()->getUniqueID(), false);
+            m_active_slot = createNewSlot(PlayerManager::get()->getCurrentPlayer()->getUniqueID(), false);
             save();
         }
     }

@@ -1193,7 +1193,8 @@ int main(int argc, char *argv[] )
                 addons_manager->initAddons(xml);
             }
         }
-        else if(!UserConfigParams::m_no_start_screen)
+
+        if(!UserConfigParams::m_no_start_screen)
         {
             StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
 #ifdef ENABLE_WIIUSE

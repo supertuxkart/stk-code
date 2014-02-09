@@ -151,9 +151,17 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getPoints() const { return m_game_slot->getPoints(); }
     // ------------------------------------------------------------------------
+    void setFirstTime(bool b) { m_game_slot->setFirstTime(b); }
+    // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_game_slot->isFirstTime(); }
     // ------------------------------------------------------------------------
     void clearUnlocked() { m_game_slot->clearUnlocked(); }
+    // ------------------------------------------------------------------------
+    /** Returns the current challenge for this player. */
+    const Challenge* getCurrentChallenge() const
+    {
+        return m_game_slot->getCurrentChallenge();
+    }   // getCurrentChallenge
     // ------------------------------------------------------------------------
     const Challenge* getChallenge(const std::string &id)
     {
