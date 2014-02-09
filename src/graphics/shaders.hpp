@@ -225,6 +225,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
 };
 
+class ShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position;
+    static GLuint uniform_MVP;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
+};
+
 class DisplaceShader
 {
 public:
@@ -350,6 +361,17 @@ public:
 
 	static void init();
 	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
+};
+
+class ShadowedSunLightShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_shadowmat, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
 };
 
 class Gaussian6HBlurShader

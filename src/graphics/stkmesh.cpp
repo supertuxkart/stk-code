@@ -723,6 +723,21 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	return;
 }
 
+void STKMesh::drawShadow(const GLMesh &mesh)
+{
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+    assert(irr_driver->getPhase() == SHADOW_PASS);
+
+    core::matrix4 ShadowMVP;
+    computeMVP(ShadowMVP);
+    glUseProgram(MeshShader::ShadowShader::Program);
+    MeshShader::ShadowShader::setUniforms(ShadowMVP);
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
@@ -910,6 +925,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			return;
 		mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
 		return;
+    case SHADOW_PASS:
+        if (mesh.vao_shadow_pass)
+            return;
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+        return;
 	}
 }
 
@@ -961,6 +981,11 @@ void STKMesh::render()
 				initvaostate(GLmeshes[i], material.MaterialType);
 				drawGlow(GLmeshes[i]);
 			}
+            else if (irr_driver->getPhase() == SHADOW_PASS)
+            {
+                initvaostate(GLmeshes[i], material.MaterialType);
+                drawShadow(GLmeshes[i]);
+            }
 			else
 			{
 				irr_driver->IncreaseObjectCount();
