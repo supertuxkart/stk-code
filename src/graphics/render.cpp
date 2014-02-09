@@ -622,6 +622,7 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 //    overridemat.EnablePasses = 0;
 //    overridemat.Enabled = false;
     camera->activate();
+    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
 
     tick++;
     tick %= 2;
