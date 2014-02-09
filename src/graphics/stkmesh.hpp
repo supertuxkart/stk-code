@@ -63,7 +63,7 @@ protected:
 	// Misc passes shaders (glow, displace...)
 	void drawGlow(const GLMesh &mesh);
 	void drawDisplace(const GLMesh &mesh);
-    void drawShadow(const GLMesh &mesh);
+    void drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void createGLMeshes();
 	void cleanGLMeshes();
 public:

@@ -723,17 +723,28 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	return;
 }
 
-void STKMesh::drawShadow(const GLMesh &mesh)
+void STKMesh::drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
+
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
-    assert(irr_driver->getPhase() == SHADOW_PASS);
+
 
     core::matrix4 ShadowMVP;
     computeMVP(ShadowMVP);
-    glUseProgram(MeshShader::ShadowShader::Program);
-    MeshShader::ShadowShader::setUniforms(ShadowMVP);
+
+    if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+    {
+        setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        glUseProgram(MeshShader::RefShadowShader::Program);
+        MeshShader::RefShadowShader::setUniforms(ShadowMVP, 0);
+    }
+    else
+    {
+        glUseProgram(MeshShader::ShadowShader::Program);
+        MeshShader::ShadowShader::setUniforms(ShadowMVP);
+    }
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElements(ptype, count, itype, 0);
 }
@@ -928,7 +939,14 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
     case SHADOW_PASS:
         if (mesh.vao_shadow_pass)
             return;
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+        if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::RefShadowShader::attrib_position, MeshShader::RefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        }
+        else
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+        }
         return;
 	}
 }
@@ -984,7 +1002,7 @@ void STKMesh::render()
             else if (irr_driver->getPhase() == SHADOW_PASS)
             {
                 initvaostate(GLmeshes[i], material.MaterialType);
-                drawShadow(GLmeshes[i]);
+                drawShadow(GLmeshes[i], material.MaterialType);
             }
 			else
 			{

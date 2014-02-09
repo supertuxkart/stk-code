@@ -259,6 +259,7 @@ void Shaders::loadShaders()
 	MeshShader::BillboardShader::init();
 	MeshShader::DisplaceShader::init();
     MeshShader::ShadowShader::init();
+    MeshShader::RefShadowShader::init();
 	ParticleShader::FlipParticleRender::init();
 	ParticleShader::HeightmapSimulationShader::init();
 	ParticleShader::SimpleParticleRender::init();
@@ -889,6 +890,27 @@ namespace MeshShader
     void ShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+    }
+
+    GLuint RefShadowShader::Program;
+    GLuint RefShadowShader::attrib_position;
+    GLuint RefShadowShader::attrib_texcoord;
+    GLuint RefShadowShader::uniform_MVP;
+    GLuint RefShadowShader::uniform_tex;
+
+    void RefShadowShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+    }
+
+    void RefShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniform1i(uniform_tex, TU_tex);
     }
 
 	GLuint DisplaceShader::Program;
