@@ -156,7 +156,9 @@ void UnlockManager::readAllChallengesInDirs(const std::vector<std::string>* all_
 void UnlockManager::addOrFreeChallenge(ChallengeData *c)
 {
     if(isSupportedVersion(*c))
+    {
         m_all_challenges[c->getId()]=c;
+    }
     else
     {
         Log::warn("Challenge", "Challenge '%s' is not supported - ignored.",
@@ -213,7 +215,7 @@ void UnlockManager::load()
     {
         Log::info("unlock_manager", "Challenge file '%s' will be created.",
                   filename.c_str());
-        createSlotsIfNeeded();
+//        createSlotsIfNeeded();
         save();
 
         if (root) delete root;
@@ -232,17 +234,10 @@ void UnlockManager::load()
             continue;
         }
 
-        GameSlot* slot = new GameSlot(player_id);
-
-        std::string kart_id;
-        xml_game_slots[n]->get("kart", &kart_id);
-        slot->setKartIdent(kart_id);
+        GameSlot* slot = new GameSlot(NULL);
 
         m_game_slots[player_id] = slot;
 
-        bool first_time = true;
-        xml_game_slots[n]->get("firstTime", &first_time);
-        slot->setFirstTime(first_time);
 
         for(AllChallengesType::iterator i = m_all_challenges.begin();
             i!=m_all_challenges.end();  i++)
@@ -256,11 +251,37 @@ void UnlockManager::load()
         slot->computeActive();
     }
 
-    bool something_changed = createSlotsIfNeeded();
-    if (something_changed) save();
+    // FIXME
+//    bool something_changed = createSlotsIfNeeded();
+//    if (something_changed) save();
 
     delete root;
 }   // load
+
+//-----------------------------------------------------------------------------
+/** Creates a game slot. It initialises the game slot's status with the
+ *  information in the xml node (if given), basically restoring the saved
+ *  states for a player.
+ *  \param node The XML game-slots node with all data for a player.
+ */
+GameSlot *UnlockManager::createGameSlot(const XMLNode *node)
+{
+
+    GameSlot *slot = new GameSlot(node);
+
+    for(AllChallengesType::iterator i = m_all_challenges.begin();
+                                    i!=m_all_challenges.end();  i++)
+    {
+        ChallengeData* cd = i->second;
+        Challenge *challenge = new Challenge(cd);
+        if(node)
+            challenge->load(node);
+        slot->m_challenges_state[cd->getId()] = challenge;
+    }
+
+    slot->computeActive();
+    return slot;
+}   // createGameSlot
 
 //-----------------------------------------------------------------------------
 
@@ -295,7 +316,7 @@ void UnlockManager::save()
             }
         }
 
-        it->second->save(challenge_file, name);
+//FIXME        it->second->save(challenge_file, name);
     }
 
     challenge_file << "</challenges>\n\n";
@@ -329,7 +350,7 @@ bool UnlockManager::createSlotsIfNeeded()
 
         if (!exists)
         {
-            GameSlot* slot = new GameSlot(profile->getUniqueID());
+            GameSlot* slot = new GameSlot(NULL);
             for(AllChallengesType::iterator i = m_all_challenges.begin();
                 i!=m_all_challenges.end();  i++)
             {
@@ -420,22 +441,6 @@ PlayerProfile* UnlockManager::getCurrentPlayer()
 
 //-----------------------------------------------------------------------------
 
-void UnlockManager::updateActiveChallengeList()
-{
-    getCurrentSlot()->computeActive();
-}
-
-
-//-----------------------------------------------------------------------------
-void UnlockManager::setCurrentSlot(unsigned int slotid)
-{
-    m_current_game_slot = slotid;
-    AchievementsManager::get()->updateCurrentPlayer();
-}
-
-
-//-----------------------------------------------------------------------------
-
 void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
                                         std::vector<std::string>& tracks,
                                         std::vector<std::string>& gps)
@@ -449,12 +454,12 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
         {
             if (c->getMode() == ChallengeData::CM_SINGLE_RACE && c->getTrackId() != "")
             {
-                if (!getCurrentSlot()->isLocked(c->getTrackId()))
+                if (!PlayerManager::get()->getCurrentPlayer()->isLocked(c->getTrackId()))
                     tracks.push_back(c->getTrackId());
             }
             else if (c->getMode() == ChallengeData::CM_GRAND_PRIX && c->getGPId() != "")
             {
-                if (!getCurrentSlot()->isLocked(c->getGPId()))
+                if (!PlayerManager::get()->getCurrentPlayer()->isLocked(c->getGPId()))
                     gps.push_back(c->getGPId());
             }
         }

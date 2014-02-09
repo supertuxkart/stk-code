@@ -681,10 +681,9 @@ int handleCmdLine()
 
     if(CommandLine::has("--kart", &s))
     {
-        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
-                                                           ->getUniqueID());
+        const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
 
-        if (!unlock_manager->getCurrentSlot()->isLocked(s))
+        if(!player->isLocked(s))
         {
             const KartProperties *prop =
                 kart_properties_manager->getKart(s);
@@ -751,9 +750,8 @@ int handleCmdLine()
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
-        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
-                                                           ->getUniqueID());
-        if (!unlock_manager->getCurrentSlot()->isLocked(s))
+        const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        if (!player->isLocked(s))
         {
             race_manager->setTrack(s);
             Log::verbose("main", "You choose to start in track '%s'.",
@@ -899,8 +897,6 @@ int handleCmdLine()
     // Demo mode
     if(CommandLine::has("--demo-mode", &s))
     {
-        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
-                                                           ->getUniqueID());
         float t;
         StringUtils::fromString(s, t);
         DemoWorld::enableDemoMode(t);
@@ -941,9 +937,6 @@ int handleCmdLine()
 
     CommandLine::reportInvalidParameters();
 
-    if(UserConfigParams::m_no_start_screen)
-        unlock_manager->setCurrentSlot(PlayerManager::get()->getPlayer(0)
-                                                           ->getUniqueID());
     if(ProfileWorld::isProfileMode())
     {
         UserConfigParams::m_sfx = false;  // Disable sound effects
@@ -973,9 +966,8 @@ void initUserConfig()
 {
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager();
-    PlayerManager::get()->load();
     user_config             = new UserConfig();     // needs file_manager
-    const bool config_ok    = user_config->loadConfig();    
+    user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -990,11 +982,6 @@ void initUserConfig()
     translations            = new Translations();   // needs file_manager
     stk_config              = new STKConfig();      // in case of --stk-config
                                                     // command line parameters
-    if (!config_ok || PlayerManager::get()->getNumPlayers() == 0)
-    {
-        PlayerManager::get()->addDefaultPlayer();
-        PlayerManager::get()->save();
-    }
 
 }   // initUserConfig
 
@@ -1026,7 +1013,6 @@ void initRest()
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
 
-    AchievementsManager::get()->init();
     music_manager           = new MusicManager();
     sfx_manager             = new SFXManager();
     // The order here can be important, e.g. KartPropertiesManager needs
@@ -1068,61 +1054,6 @@ void initRest()
                  (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
 
 }   // initRest
-
-//=============================================================================
-/** Frees all manager and their associated memory.
- */
-static void cleanSuperTuxKart()
-{
-
-    delete main_loop;
-
-    irr_driver->updateConfigIfRelevant();
-
-    if(Online::RequestManager::isRunning())
-        Online::RequestManager::get()->stopNetworkThread();
-
-    //delete in reverse order of what they were created in.
-    //see InitTuxkart()
-    Online::RequestManager::deallocate();
-    Online::ServersManager::deallocate();
-    Online::ProfileManager::deallocate();
-    AchievementsManager::deallocate();
-    Online::CurrentUser::deallocate();
-    GUIEngine::DialogQueue::deallocate();
-
-    Referee::cleanup();
-    if(ReplayPlay::get())       ReplayPlay::destroy();
-    if(race_manager)            delete race_manager;
-    NewsManager::deallocate();
-    if(addons_manager)          delete addons_manager;
-    NetworkManager::kill();
-
-    if(grand_prix_manager)      delete grand_prix_manager;
-    if(highscore_manager)       delete highscore_manager;
-    if(attachment_manager)      delete attachment_manager;
-    ItemManager::removeTextures();
-    if(powerup_manager)         delete powerup_manager;
-    if(projectile_manager)      delete projectile_manager;
-    if(kart_properties_manager) delete kart_properties_manager;
-    if(track_manager)           delete track_manager;
-    if(material_manager)        delete material_manager;
-    if(history)                 delete history;
-    ReplayRecorder::destroy();
-    if(sfx_manager)             delete sfx_manager;
-    if(music_manager)           delete music_manager;
-    delete ParticleKindManager::get();
-    if(stk_config)              delete stk_config;
-    if(user_config)             delete user_config;
-    PlayerManager::destroy();
-    if(unlock_manager)          delete unlock_manager;
-    if(translations)            delete translations;
-    if(file_manager)            delete file_manager;
-    if(irr_driver)              delete irr_driver;
-
-    StateManager::deallocate();
-    GUIEngine::EventHandler::deallocate();
-}   // cleanSuperTuxKart
 
 //=============================================================================
 #ifdef BREAKPAD
@@ -1191,10 +1122,19 @@ int main(int argc, char *argv[] )
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
         handleXmasMode();
-        unlock_manager          = new UnlockManager();
+
+        // Needs the kart and track directories to load potential challenges
+        // in those dirs.
+        unlock_manager = new UnlockManager();
+        // Needs the unlock manager to initialise the game slots of all players
+        PlayerManager::create();
+
+        // Needs the player manager
+        AchievementsManager::get()->init();
+
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
                                                           "gui_lock.png"  ) );
-        projectile_manager      -> loadData        ();
+        projectile_manager->loadData();
 
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
@@ -1220,7 +1160,7 @@ int main(int argc, char *argv[] )
 
         file_manager->popTextureSearchPath();
 
-        attachment_manager      -> loadModels      ();
+        attachment_manager->loadModels();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "banana.png")    );
@@ -1252,17 +1192,6 @@ int main(int argc, char *argv[] )
                 const XMLNode *xml = new XMLNode (xml_file);
                 addons_manager->initAddons(xml);
             }
-        }
-
-        // no graphics, and no profile mode
-        if (ProfileWorld::isNoGraphics() && !ProfileWorld::isProfileMode())
-        {
-            core::stringw name = UserConfigParams::m_default_player.toString();
-            PlayerProfile *player = PlayerManager::get()->getPlayer(name);
-            // hack to have a running game slot :
-            if(player)
-                unlock_manager->setCurrentSlot(player->getUniqueID());
-
         }
         else if(!UserConfigParams::m_no_start_screen)
         {
@@ -1436,10 +1365,68 @@ int main(int argc, char *argv[] )
     return 0 ;
 }   // main
 
+// ============================================================================
 #ifdef WIN32
 //routine for running under windows
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpCmdLine, int nCmdShow)
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+                     LPTSTR lpCmdLine, int nCmdShow)
 {
     return main(__argc, __argv);
 }
 #endif
+
+//=============================================================================
+/** Frees all manager and their associated memory.
+ */
+static void cleanSuperTuxKart()
+{
+
+    delete main_loop;
+
+    irr_driver->updateConfigIfRelevant();
+
+    if(Online::RequestManager::isRunning())
+        Online::RequestManager::get()->stopNetworkThread();
+
+    //delete in reverse order of what they were created in.
+    //see InitTuxkart()
+    Online::RequestManager::deallocate();
+    Online::ServersManager::deallocate();
+    Online::ProfileManager::deallocate();
+    AchievementsManager::deallocate();
+    Online::CurrentUser::deallocate();
+    GUIEngine::DialogQueue::deallocate();
+
+    Referee::cleanup();
+    if(ReplayPlay::get())       ReplayPlay::destroy();
+    if(race_manager)            delete race_manager;
+    NewsManager::deallocate();
+    if(addons_manager)          delete addons_manager;
+    NetworkManager::kill();
+
+    if(grand_prix_manager)      delete grand_prix_manager;
+    if(highscore_manager)       delete highscore_manager;
+    if(attachment_manager)      delete attachment_manager;
+    ItemManager::removeTextures();
+    if(powerup_manager)         delete powerup_manager;
+    if(projectile_manager)      delete projectile_manager;
+    if(kart_properties_manager) delete kart_properties_manager;
+    if(track_manager)           delete track_manager;
+    if(material_manager)        delete material_manager;
+    if(history)                 delete history;
+    ReplayRecorder::destroy();
+    if(sfx_manager)             delete sfx_manager;
+    if(music_manager)           delete music_manager;
+    delete ParticleKindManager::get();
+    if(stk_config)              delete stk_config;
+    if(user_config)             delete user_config;
+    PlayerManager::destroy();
+    if(unlock_manager)          delete unlock_manager;
+    if(translations)            delete translations;
+    if(file_manager)            delete file_manager;
+    if(irr_driver)              delete irr_driver;
+
+    StateManager::deallocate();
+    GUIEngine::EventHandler::deallocate();
+}   // cleanSuperTuxKart
+

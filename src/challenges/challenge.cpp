@@ -18,9 +18,8 @@
 
 #include "challenges/challenge.hpp"
 
-#include <fstream>
-
 #include "challenges/challenge_data.hpp"
+#include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
@@ -89,17 +88,17 @@ void Challenge::setSolved(RaceManager::Difficulty d)
 
 //-----------------------------------------------------------------------------
 
-void Challenge::save(std::ofstream& writer)
+void Challenge::save(UTFWriter& writer)
 {
-    writer << "        <" << m_data->getId().c_str() << ">\n"
-           << "            <easy   solved=\"" 
-           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_EASY))
-           << "\"/>\n"
-           << "            <medium solved=\"" 
-           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_MEDIUM))
-           << "\"/>\n"
-           << "            <hard   solved=\"" 
-           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_HARD)) 
-           << "\"/>\n"
-           << "        </" << m_data->getId().c_str() << ">\n";
+    writer << L"        <"<< m_data->getId() << L">\n"
+           << L"            <easy   solved=\"" 
+           << isSolved(RaceManager::DIFFICULTY_EASY)
+           << L"\"/>\n"
+           << L"            <medium solved=\"" 
+           << isSolved(RaceManager::DIFFICULTY_MEDIUM)
+           << L"\"/>\n"
+           << L"            <hard   solved=\"" 
+           << isSolved(RaceManager::DIFFICULTY_HARD)
+           << L"\"/>\n"
+           << L"        </" << m_data->getId() << L">\n";
 }   // save

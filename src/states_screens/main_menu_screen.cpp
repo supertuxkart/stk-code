@@ -23,6 +23,7 @@
 
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -362,8 +363,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        GameSlot* slot = unlock_manager->getCurrentSlot();
-        if (slot->isFirstTime())
+        PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        if (player->isFirstTime())
         {
             StateManager::get()->enterGameState();
             race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -382,7 +383,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             const std::string default_kart = UserConfigParams::m_default_kart;
-            if (slot->isLocked(default_kart))
+            if (player->isLocked(default_kart))
             {
                 KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();

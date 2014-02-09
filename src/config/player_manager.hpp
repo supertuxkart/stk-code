@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PLAYER_CONFIG_HPP
-#define HEADER_PLAYER_CONFIG_HPP
+#ifndef HEADER_PLAYER_MANAGER_HPP
+#define HEADER_PLAYER_MANAGER_HPP
 
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -37,34 +37,42 @@ private:
 
     PtrVector<PlayerProfile> m_all_players;
 
+    /** A pointer to the current player. */
+    PlayerProfile* m_current_player;
 
+    void load();
      PlayerManager();
     ~PlayerManager();
 
 
 public:
+    static void create();
+    // ------------------------------------------------------------------------
     /** Static singleton get function. */
     static PlayerManager* get()
     {
-        if(!m_player_manager)
-            m_player_manager = new PlayerManager();
+        assert(m_player_manager);
         return m_player_manager;
     }   // get
     // ------------------------------------------------------------------------
     static void destroy()
     {
+        assert(m_player_manager);
         delete m_player_manager;
         m_player_manager = NULL;
     }   // destroy
     // ------------------------------------------------------------------------
     
-    void load();
     void save();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
     void deletePlayer(PlayerProfile *player);
+    void setCurrentPlayer(PlayerProfile *player);
     const PlayerProfile *getPlayerById(unsigned int id);
+    // ------------------------------------------------------------------------
+    /** Returns the current player. */
+    PlayerProfile* getCurrentPlayer() { return m_current_player; }
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------

@@ -75,21 +75,12 @@ public:
 
     unsigned int getCurrentSlotID() const { return m_current_game_slot; }
 
-    GameSlot*  getCurrentSlot()
-    {
-        assert(m_game_slots.find(m_current_game_slot) != m_game_slots.end());
-        return m_game_slots[m_current_game_slot];
-    }
-
-    /** \param slotid name of the player */
-    void       setCurrentSlot(unsigned int slotid);
     void       findWhatWasUnlocked(int pointsBefore, int pointsNow,
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
 
     PlayerProfile* getCurrentPlayer();
-
-    void updateActiveChallengeList();
+    GameSlot *createGameSlot(const XMLNode *node=NULL);
 
 };   // UnlockManager
 

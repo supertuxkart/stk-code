@@ -19,17 +19,11 @@
 
 #include "tracks/track.hpp"
 
-#include <iostream>
-#include <stdexcept>
-#include <sstream>
-#include <IBillboardTextSceneNode.h>
-
-using namespace irr;
-
 #include "addons/addon.hpp"
 #include "audio/music_manager.hpp"
 #include "challenges/challenge.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -68,11 +62,19 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#include <ISceneManager.h>
-#include <IMeshSceneNode.h>
-#include <IMeshManipulator.h>
+#include <IBillboardTextSceneNode.h>
 #include <ILightSceneNode.h>
 #include <IMeshCache.h>
+#include <IMeshManipulator.h>
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+
+#include <iostream>
+#include <stdexcept>
+#include <sstream>
+
+using namespace irr;
+
 
 const float Track::NOHIT           = -99999.9f;
 
@@ -931,8 +933,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                 continue;
             }
 
-            const int val = challenge->getNumTrophies();
-            bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
+            const unsigned int val = challenge->getNumTrophies();
+            bool shown = (PlayerManager::get()->getCurrentPlayer()->getPoints() < val);
             m_force_fields.push_back(OverworldForceField(xyz, shown, val));
 
             m_challenges[closest_challenge_id].setForceField(
@@ -962,7 +964,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         else if (condition == "allchallenges")
         {
             unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
+            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
                 if (m_challenges[c].m_challenge_id == "tutorial")
@@ -970,7 +972,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                     unlocked_challenges++;
                     continue;
                 }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                if (player->getChallenge(m_challenges[c].m_challenge_id)
                         ->isSolvedAtAnyDifficulty())
                 {
                     unlocked_challenges++;
@@ -994,7 +996,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         else if (neg_condition == "allchallenges")
         {
             unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
+            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
             for (unsigned int c=0; c<m_challenges.size(); c++)
             {
                 if (m_challenges[c].m_challenge_id == "tutorial")
@@ -1002,7 +1004,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                     unlocked_challenges++;
                     continue;
                 }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
+                if (player->getChallenge(m_challenges[c].m_challenge_id)
                         ->isSolvedAtAnyDifficulty())
                 {
                     unlocked_challenges++;

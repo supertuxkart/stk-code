@@ -18,6 +18,8 @@
 
 #include "config/player.hpp"
 
+#include "challenges/game_slot.hpp"
+#include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/xml_node.hpp"
 #include "io/utf_writer.hpp"
@@ -40,6 +42,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_is_guest_account = is_guest;
     m_use_frequency    = 0;
     m_unique_id        = PlayerManager::get()->getUniqueId();
+    m_game_slot        = unlock_manager->createGameSlot();
 
 }   // PlayerProfile
 
@@ -53,9 +56,13 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     node->get("guest",         &m_is_guest_account);
     node->get("use-frequency", &m_use_frequency   );
     node->get("unique-id",     &m_unique_id       );
+    node->get("is-default",    &m_is_default      );
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
+    const XMLNode *xml_game_slot = node->getNode("game-slot");
+    m_game_slot = unlock_manager->createGameSlot(xml_game_slot);
+
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -64,11 +71,14 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    out << L"    <player name=\""         << m_name             << L"\"\n";
-    out << L"            guest=\""        << m_is_guest_account << L"\"\n";
-    out << L"            use-frequency=\""<< m_use_frequency    << L"\"\n";
-    out << L"            unique-id=\""    << m_unique_id        << L"\"\n";
-    out << L"    />\n";
+    out << L"    <player name=\"" << m_name 
+        << L"\" guest=\""         << m_is_guest_account 
+        << L"\" use-frequency=\"" << m_use_frequency
+        << L"\" is-default=\""    << m_is_default
+        << L"\" unique-id=\""     << m_unique_id        << L"\">\n";
+    assert(m_game_slot);
+    m_game_slot->save(out);
+    out << L"    </player>\n";
 }   // save
 
 //------------------------------------------------------------------------------

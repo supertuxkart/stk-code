@@ -62,7 +62,7 @@ void StoryModeLobbyScreen::init()
         PlayerProfile *player = PlayerManager::get()->getPlayer(name);
         if(player)
         {
-            unlock_manager->setCurrentSlot(player->getUniqueID());
+            PlayerManager::get()->setCurrentPlayer(player);
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
             return;
         }
@@ -115,8 +115,8 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
                               ->getPlayer(list->getSelectionLabel());
         if(player)
         {
-            unlock_manager->setCurrentSlot(player->getUniqueID());
-            unlock_manager->updateActiveChallengeList();
+            PlayerManager::get()->setCurrentPlayer(player);
+            player->computeActive();
             CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
             if (cb->getState())
             {
@@ -147,8 +147,8 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& new_name)
     PlayerProfile *player = PlayerManager::get()->getPlayer(new_name);
     if(player)
     {
-        unlock_manager->setCurrentSlot(player->getUniqueID());
-        unlock_manager->updateActiveChallengeList();
+        PlayerManager::get()->setCurrentPlayer(player);
+        player->computeActive();
     }
     else
     {

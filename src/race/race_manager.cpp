@@ -22,6 +22,7 @@
 #include <algorithm>
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
@@ -630,7 +631,7 @@ void RaceManager::exitRace(bool delete_world)
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
     {
-        unlock_manager->getCurrentSlot()->grandPrixFinished();
+        PlayerManager::get()->getCurrentPlayer()->grandPrixFinished();
         if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
         {
             //Delete saved GP

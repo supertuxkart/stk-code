@@ -22,6 +22,33 @@
 #include "challenges/challenge.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "io/utf_writer.hpp"
+#include "io/xml_node.hpp"
+
+//-----------------------------------------------------------------------------
+GameSlot::GameSlot(const XMLNode *node)
+{
+    m_kart_ident        = "";
+    m_points            = 0;
+    m_first_time        = true;
+    m_easy_challenges   = 0;
+    m_medium_challenges = 0;
+    m_hard_challenges   = 0;
+    m_current_challenge = NULL;
+
+    // If there is saved data, load it
+    if(node)
+    {
+        node->get("kart",       &m_kart_ident);
+        node->get("first-time", &m_first_time);
+
+        for(unsigned int i=0; i<node->getNumNodes(); i++)
+        {
+            const XMLNode *challenge = node->getNode(i);
+        }   // for i <getNumNodes
+    }   // if node
+
+}   // GameSlot
 
 //-----------------------------------------------------------------------------
 GameSlot::~GameSlot()
@@ -234,13 +261,14 @@ void GameSlot::grandPrixFinished()
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
-
-void GameSlot::save(std::ofstream& out, const std::string& name)
+/** Writes the data of this GameSlot to the specified stream.
+ *  \param out UTF stream to write to.
+ */
+void GameSlot::save(UTFWriter &out)
 {
-    out << "    <gameslot playerID=\"" << m_player_unique_id
-        << "\" kart=\""                << m_kart_ident.c_str()
-        << "\" firstTime=\""           << (m_first_time ? "true" : "false")
-        << "\"> <!-- " << name.c_str() << " -->\n";
+    out << L"      <game-slot playerID=\"" << m_player_unique_id
+        << L"\" kart=\""                    << m_kart_ident
+        << L"\" firstTime=\""               << m_first_time  << L"\">\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
@@ -248,5 +276,5 @@ void GameSlot::save(std::ofstream& out, const std::string& name)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << "    </gameslot>\n";
-}
+    out << "      </game-slot>\n";
+}  // save

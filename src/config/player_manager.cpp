@@ -18,6 +18,7 @@
 
 #include "config/player_manager.hpp"
 
+#include "achievements/achievements_manager.hpp"
 #include "config/player.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
@@ -27,10 +28,29 @@
 
 PlayerManager *PlayerManager::m_player_manager = NULL;
 
+
+/** Create the instance of the player manager. 
+ *  Also make sure that at least one player is defined (and if not,
+ *  create a default player and a guest player).
+ */
+void PlayerManager::create()
+{
+    assert(!m_player_manager);
+    m_player_manager = new PlayerManager();
+    if(m_player_manager->getNumPlayers() == 0)
+    {
+        m_player_manager->addDefaultPlayer();
+        m_player_manager->save();
+    }
+
+}   // create
+
+// ============================================================================
 /** Constructor.
  */
 PlayerManager::PlayerManager()
 {
+    load();
 }   // PlayerManager
 
 // ----------------------------------------------------------------------------
@@ -48,23 +68,44 @@ void PlayerManager::load()
     std::string filename = file_manager->getUserConfigFile("players.xml");
 
     const XMLNode *players = file_manager->createXMLTree(filename);
-    if(!players || players->getName()!="players")
+    if(!players)
+    {
+        Log::info("player_manager", "A new players.xml file will be created.");
+        return;
+    }
+    else if(players->getName()!="players")
     {
         Log::info("player_manager", "The players.xml file is invalid.");
         return;
     }
 
+    m_current_player = NULL;
     for(unsigned int i=0; i<players->getNumNodes(); i++)
     {
         const XMLNode *player_xml = players->getNode(i);
-        PlayerProfile *profile = new PlayerProfile(player_xml);
-
-        if(profile->isGuestAccount())
-            profile->setName(_LTR("Guest"));
-
-        m_all_players.push_back(profile);
+        PlayerProfile *player = new PlayerProfile(player_xml);
+        m_all_players.push_back(player);
+        if(player->isDefault())
+            m_current_player = player;
     }
     m_all_players.insertionSort();
+
+    if(!m_current_player)
+    {
+        PlayerProfile *player;
+        for_in(player, m_all_players)
+        {
+            if(!player->isGuestAccount())
+            {
+                m_current_player = player;
+                player->setDefault(true);
+                break;
+            }
+        }
+    }
+    if(!m_current_player)
+        Log::fatal("PlayerManager", "Can't find a default player.");
+
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -92,7 +133,6 @@ void PlayerManager::save()
                     filename.c_str());
         Log::error("PlayerManager", "Error: %s", e.what());
     }
-
 
 }   // save
 
@@ -171,4 +211,14 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
     return NULL;
 }   // getPlayer
 // ----------------------------------------------------------------------------
+void PlayerManager::setCurrentPlayer(PlayerProfile *player)
+{
+    // Reset current default player
+    if(m_current_player)
+        m_current_player->setDefault(false);
+    m_current_player = player;
+    m_current_player->setDefault(true);
+    AchievementsManager::get()->updateCurrentPlayer();
+}   // setCurrentPlayer
+
 // ----------------------------------------------------------------------------

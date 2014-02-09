@@ -34,10 +34,21 @@ class UTFWriter
 public:
 
     UTFWriter(const char* dest);
+    void close();
 
     UTFWriter& operator<< (const irr::core::stringw& txt);
     UTFWriter& operator<< (const wchar_t* txt);
-
+    // ------------------------------------------------------------------------
+    UTFWriter& operator<< (const char *txt)
+    {
+        return operator<<(irr::core::stringw(txt));
+    }   // operator<<(char*)
+    // ------------------------------------------------------------------------
+    UTFWriter& operator<< (const std::string &txt)
+    {
+        return operator<< (irr::core::stringw(txt.c_str()));
+    }   // operator<<(std::string)
+    // ------------------------------------------------------------------------
     template<typename T>
     UTFWriter& operator<< (const T t)
     {
@@ -45,10 +56,8 @@ public:
         tmp += t;
         (*this) << tmp;
         return *this;
-    }
-
-    void close();
-
+    }   // operator<< (template)
+    // ------------------------------------------------------------------------
     bool is_open() { return m_base.is_open(); }
 };
 

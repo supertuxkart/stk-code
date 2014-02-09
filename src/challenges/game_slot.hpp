@@ -19,17 +19,20 @@
 #ifndef GAME_SLOT_HPP
 #define GAME_SLOT_HPP
 
+#include "race/race_manager.hpp"
+
+#include <irrString.h>
+using namespace irr;
 
 #include <string>
 #include <map>
 #include <vector>
-#include <irrString.h>
 
-#include "race/race_manager.hpp"
 
-class ChallengeData;
 class Challenge;
-class XMLWriter;
+class ChallengeData;
+class UTFWriter;
+class XMLNode;
 
 const int CHALLENGE_POINTS[] = { 8, 9, 10 };
 
@@ -63,8 +66,6 @@ class GameSlot
 
     friend class UnlockManager;
 
-    void computeActive();
-
     int m_points;
 
     /** Set to false after the initial stuff (intro, select kart, etc.) */
@@ -76,50 +77,35 @@ class GameSlot
 
 public:
 
-    // do NOT attempt to pass 'player_unique_id' by reference here. I don't
-    // know why (compiler bug maybe?) but this screws up everything. Better
-    // pass by copy.
-    GameSlot(unsigned int player_unique_id)
-    {
-        m_player_unique_id  = player_unique_id;
-        m_points            = 0;
-        m_first_time        = true;
-        m_easy_challenges   = 0;
-        m_medium_challenges = 0;
-        m_hard_challenges   = 0;
-        m_current_challenge = NULL;
-    }
+     GameSlot(const XMLNode *node=NULL);
     ~GameSlot();
 
     unsigned int getPlayerID() const { return m_player_unique_id; }
     const std::string& getKartIdent () const { return m_kart_ident;  }
+    void computeActive();
+    bool       isLocked          (const std::string& feature);
+    void       lockFeature       (Challenge *challenge);
+    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d,
+                                  bool do_save=true);
+    void       raceFinished      ();
+    void       grandPrixFinished ();
+    void       save              (UTFWriter &out);
+    void       setCurrentChallenge(const std::string &challenge_id);
+
+    // ------------------------------------------------------------------------
     void setKartIdent(const std::string& kart_ident)
     {
         m_kart_ident = kart_ident;
     }
-
-
+    // ------------------------------------------------------------------------
     /** Returns the list of recently unlocked features (e.g. call at the end
      *  of a race to know if any features were unlocked) */
     const std::vector<const ChallengeData*>
         getRecentlyCompletedChallenges() {return m_unlocked_features;}
-
+    // ------------------------------------------------------------------------
     /** Clear the list of recently unlocked challenges */
     void       clearUnlocked     () {m_unlocked_features.clear(); }
-
-    bool       isLocked          (const std::string& feature);
-
-    void       lockFeature       (Challenge *challenge);
-
-    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d,
-                                  bool do_save=true);
-
-    void       raceFinished      ();
-    void       grandPrixFinished ();
-
-    void       save              (std::ofstream& file, const std::string& name);
-    void       setCurrentChallenge(const std::string &challenge_id);
-
+    // ------------------------------------------------------------------------
     /** Returns the number of points accumulated. */
     int        getPoints          () const { return m_points; }
     // ------------------------------------------------------------------------

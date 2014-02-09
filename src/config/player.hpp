@@ -19,6 +19,8 @@
 #ifndef HEADER_PLAYER_HPP
 #define HEADER_PLAYER_HPP
 
+#include "challenges/game_slot.hpp"
+
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
@@ -28,6 +30,7 @@ using namespace irr;
 
 #include <string>
 
+class GameSlot;
 class UTFWriter;
 
 /**
@@ -38,7 +41,7 @@ class UTFWriter;
   */
 class PlayerProfile : public NoCopy
 {
-protected:
+private:
 
     /** The name of the player (wide string, so it can be in native 
      *  language). */
@@ -57,6 +60,12 @@ protected:
     /** A unique number for this player, used to link it to challenges etc. */
     unsigned int m_unique_id;
 
+    /** True if this is the default (last used) player. */
+    bool m_is_default;
+
+    /** The complete challenge state. */
+    GameSlot *m_game_slot;
+
 public:
 
     PlayerProfile(const core::stringw& name, bool is_guest = false);
@@ -69,6 +78,7 @@ public:
     bool operator>(const PlayerProfile &other);
 
 
+    // ------------------------------------------------------------------------
     ~PlayerProfile()
     {
         #ifdef DEBUG
@@ -76,6 +86,7 @@ public:
         #endif
     }
 
+    // ------------------------------------------------------------------------
     void setName(const core::stringw& name)
     {
         #ifdef DEBUG
@@ -84,6 +95,7 @@ public:
         m_name = name;
     }
 
+    // ------------------------------------------------------------------------
     core::stringw getName() const
     {
         #ifdef DEBUG
@@ -92,6 +104,7 @@ public:
         return m_name.c_str();
     }
 
+    // ------------------------------------------------------------------------
     bool isGuestAccount() const
     {
         #ifdef DEBUG
@@ -100,17 +113,74 @@ public:
         return m_is_guest_account;
     }
 
+    // ------------------------------------------------------------------------
     int getUseFrequency() const
     {
         if (m_is_guest_account) return -1;
         else return m_use_frequency;
     }
 
-
-
     // ------------------------------------------------------------------------
     /** Returns the unique id of this player. */
     unsigned int getUniqueID() const { return m_unique_id; }
+    // ------------------------------------------------------------------------
+    /** Returned if the feature (kart, track) is locked. */
+    bool isLocked(const std::string &feature) const
+    {
+        return m_game_slot->isLocked(feature); 
+    }   // isLocked
+    // ------------------------------------------------------------------------
+    /** Returns all active challenges. */
+    void computeActive() { m_game_slot->computeActive(); }
+    // ------------------------------------------------------------------------
+    std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
+    {
+        return m_game_slot->getRecentlyCompletedChallenges();
+    }   // getRecently Completed Challenges
+    // ------------------------------------------------------------------------
+    void setCurrentChallenge(const std::string &name)
+    {
+        m_game_slot->setCurrentChallenge(name);
+    }   // setCurrentChallenge
+    // ------------------------------------------------------------------------
+    /** Notification of a finished race, which can trigger fulfilling 
+     *  challenges. */
+    void raceFinished() { m_game_slot->raceFinished(); }
+    // ------------------------------------------------------------------------
+    void grandPrixFinished() { m_game_slot->grandPrixFinished(); }
+    // ------------------------------------------------------------------------
+    unsigned int getPoints() const { return m_game_slot->getPoints(); }
+    // ------------------------------------------------------------------------
+    bool isFirstTime() const { return m_game_slot->isFirstTime(); }
+    // ------------------------------------------------------------------------
+    void clearUnlocked() { m_game_slot->clearUnlocked(); }
+    // ------------------------------------------------------------------------
+    const Challenge* getChallenge(const std::string &id)
+    {
+        return m_game_slot->getChallenge(id);
+    }   // getChallenge
+    // ------------------------------------------------------------------------
+    unsigned int getNumEasyTrophies() const
+    {
+        return m_game_slot->getNumEasyTrophies(); 
+    }   // getNumEasyTrophies
+    // ------------------------------------------------------------------------
+    unsigned int getNumMediumTrophies() const
+    {
+        return m_game_slot->getNumMediumTrophies();
+    }   // getNumEasyTrophies
+    // -----------------------------------------------------------------------
+    unsigned int getNumHardTrophies() const
+    {
+        return m_game_slot->getNumHardTrophies(); 
+    }   // getNumHardTropies
+    // -----------------------------------------------------------------------
+    /** Returns true if this is the default (last used) player. */
+    bool isDefault() const { return m_is_default; }
+    // ------------------------------------------------------------------------
+    /** Sets if this player is the default player or not. */
+    void setDefault(bool is_default) { m_is_default = is_default; }
+    // ------------------------------------------------------------------------
 
 };   // class PlayerProfile
 
