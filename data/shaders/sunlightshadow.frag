@@ -19,8 +19,6 @@ out vec4 Diff;
 out vec4 Spec;
 out vec4 SpecularMap;
 
-const float tolerance_z = 0.001;
-
 vec3 DecodeNormal(vec2 n)
 {
   float z = dot(n, n) * 2. - 1.;
@@ -76,8 +74,11 @@ void main() {
 //	shadowcoord.xy += vec2(dx, dy);*/
 
 	float shadowmapz = 2. * texture(shadowtex, shadowtexcoord).x - 1.;
+	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
+	//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
+	bias = clamp(bias, 0.001, 0.014);
 
-	if (shadowmapz > shadowcoord.z - tolerance_z)
+	if (shadowmapz > shadowcoord.z + bias)
 	{
 		Diff = vec4(NdotL * col, 1.);
 		Spec = vec4(Specular * col, 1.);
@@ -91,12 +92,6 @@ void main() {
 	return;
 
 //	float moved = (abs(dx) + abs(dy)) * 0.5;
-
-
-
-//	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
-//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
-//	bias = clamp(bias, 0.001, 0.014);
 
 //  float avi = 0.002;
 //  float abi = 0.0025;
