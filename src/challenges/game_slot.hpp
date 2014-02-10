@@ -43,8 +43,6 @@ const int CHALLENGE_POINTS[] = { 8, 9, 10 };
 
 class GameSlot
 {
-    std::string m_kart_ident;
-
     /** Profile names can change, so rather than try to make sure all renames
      *  are done everywhere, assign a unique ID to each profiler.
      *  Will save much headaches.
@@ -80,8 +78,6 @@ public:
      GameSlot(const XMLNode *node=NULL);
     ~GameSlot();
 
-    unsigned int getPlayerID() const { return m_player_unique_id; }
-    const std::string& getKartIdent () const { return m_kart_ident;  }
     void computeActive();
     bool       isLocked          (const std::string& feature);
     void       lockFeature       (Challenge *challenge);
@@ -92,11 +88,6 @@ public:
     void       save              (UTFWriter &out);
     void       setCurrentChallenge(const std::string &challenge_id);
 
-    // ------------------------------------------------------------------------
-    void setKartIdent(const std::string& kart_ident)
-    {
-        m_kart_ident = kart_ident;
-    }
     // ------------------------------------------------------------------------
     /** Returns the list of recently unlocked features (e.g. call at the end
      *  of a race to know if any features were unlocked) */

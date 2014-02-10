@@ -88,7 +88,7 @@ void PlayerManager::load()
         if(player->isDefault())
             m_current_player = player;
     }
-    m_all_players.insertionSort();
+    m_all_players.insertionSort(/*start*/0, /*desc*/true);
 
     if(!m_current_player)
     {

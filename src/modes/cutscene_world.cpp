@@ -385,7 +385,7 @@ void CutsceneWorld::enterRaceOverState()
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
                 player->setFirstTime(false);
-                unlock_manager->save();
+                PlayerManager::get()->save();
                 KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();

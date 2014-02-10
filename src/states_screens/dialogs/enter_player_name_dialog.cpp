@@ -121,9 +121,7 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
         // Finally, add the new player.
         PlayerManager::get()->addNewPlayer(player_name);
-        bool created = unlock_manager->createSlotsIfNeeded();
-        if (created) unlock_manager->save();
-        user_config->saveConfig();
+        PlayerManager::get()->save();
 
         // It's unsafe to delete from inside the event handler so we do it
         // in onUpdate (which checks for m_self_destroy)

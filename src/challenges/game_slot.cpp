@@ -22,13 +22,13 @@
 #include "challenges/challenge.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 
 //-----------------------------------------------------------------------------
 GameSlot::GameSlot(const XMLNode *node)
 {
-    m_kart_ident        = "";
     m_points            = 0;
     m_first_time        = true;
     m_easy_challenges   = 0;
@@ -39,7 +39,6 @@ GameSlot::GameSlot(const XMLNode *node)
     // If there is saved data, load it
     if(node)
     {
-        node->get("kart",       &m_kart_ident);
         node->get("first-time", &m_first_time);
 
         for(unsigned int i=0; i<node->getNumNodes(); i++)
@@ -201,7 +200,7 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
         if (p == m_locked_features.end())
         {
             c->setSolved(d);
-            if(do_save) unlock_manager->save();
+            if(do_save) PlayerManager::get()->save();
             return;
         }
         m_locked_features.erase(p);
@@ -212,7 +211,7 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
     c->setSolved(d);  // reset isActive flag
 
     // Save the new unlock information
-    if (do_save) unlock_manager->save();
+    if (do_save) PlayerManager::get()->save();
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------
@@ -267,7 +266,6 @@ void GameSlot::grandPrixFinished()
 void GameSlot::save(UTFWriter &out)
 {
     out << L"      <game-slot playerID=\"" << m_player_unique_id
-        << L"\" kart=\""                    << m_kart_ident
         << L"\" firstTime=\""               << m_first_time  << L"\">\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin();

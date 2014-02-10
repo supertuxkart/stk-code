@@ -52,10 +52,7 @@ public:
     template<typename T>
     UTFWriter& operator<< (const T t)
     {
-        irr::core::stringw tmp;
-        tmp += t;
-        (*this) << tmp;
-        return *this;
+        return operator<<(StringUtils::toString<T>(t));
     }   // operator<< (template)
     // ------------------------------------------------------------------------
     bool is_open() { return m_base.is_open(); }

@@ -91,21 +91,18 @@ void PlayerProfile::incrementUseFrequency()
 }   // incrementUseFrequency
 
 //------------------------------------------------------------------------------
-/** Comparison used to sort players. Most frequent players should be
- *  listed first, so a<b actually means that
- *  a.m_use_frequency > b.m_use_frequency
- *  This way we get a reversed sorted list.
+/** Comparison used to sort players. 
  */
 bool PlayerProfile::operator<(const PlayerProfile &other)
 {
-    return getUseFrequency() > other.getUseFrequency();
+    return getUseFrequency() < other.getUseFrequency();
 }   // operator<
 
 // -----------------------------------------------------------------------------
 /** \brief Needed for toggling sort order **/
 bool PlayerProfile::operator>(const PlayerProfile &other)
 {
-    return getUseFrequency() < other.getUseFrequency();
+    return getUseFrequency() > other.getUseFrequency();
 }   // operator>
 
 // -----------------------------------------------------------------------------
