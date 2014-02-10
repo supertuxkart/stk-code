@@ -50,7 +50,7 @@ SunNode::SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, 
 
     if (UserConfigParams::m_shadows)
     {
-        m.setTexture(3, irr_driver->getRTT(RTT_SHADOW));
+//        m.setTexture(3, irr_driver->getRTT(RTT_SHADOW));
         m.setTexture(4, irr_driver->getRTT(RTT_WARPH));
         m.setTexture(5, irr_driver->getRTT(RTT_WARPV));
 

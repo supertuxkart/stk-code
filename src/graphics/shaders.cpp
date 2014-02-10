@@ -1289,8 +1289,12 @@ namespace FullScreenShader
     GLuint ShadowedSunLightShader::Program;
     GLuint ShadowedSunLightShader::uniform_ntex;
     GLuint ShadowedSunLightShader::uniform_dtex;
-    GLuint ShadowedSunLightShader::uniform_shadowtex;
-    GLuint ShadowedSunLightShader::uniform_shadowmat;
+    GLuint ShadowedSunLightShader::uniform_shadowtex0;
+    GLuint ShadowedSunLightShader::uniform_shadowmat0;
+    GLuint ShadowedSunLightShader::uniform_shadowtex1;
+    GLuint ShadowedSunLightShader::uniform_shadowmat1;
+    GLuint ShadowedSunLightShader::uniform_shadowtex2;
+    GLuint ShadowedSunLightShader::uniform_shadowmat2;
     GLuint ShadowedSunLightShader::uniform_direction;
     GLuint ShadowedSunLightShader::uniform_col;
     GLuint ShadowedSunLightShader::uniform_invproj;
@@ -1301,23 +1305,31 @@ namespace FullScreenShader
         Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
-        uniform_shadowmat = glGetUniformLocation(Program, "shadowmat"),
+        uniform_shadowtex0 = glGetUniformLocation(Program, "shadowtex0");
+        uniform_shadowmat0 = glGetUniformLocation(Program, "shadowmat0");
+        uniform_shadowtex1 = glGetUniformLocation(Program, "shadowtex1");
+        uniform_shadowmat1 = glGetUniformLocation(Program, "shadowmat1");
+        uniform_shadowtex2 = glGetUniformLocation(Program, "shadowtex2");
+        uniform_shadowmat2 = glGetUniformLocation(Program, "shadowmat2");
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_col = glGetUniformLocation(Program, "col");
         uniform_invproj = glGetUniformLocation(Program, "invproj");
         vao = createVAO(Program);
     }
 
-    void ShadowedSunLightShader::setUniforms(const core::matrix4 &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
+    void ShadowedSunLightShader::setUniforms(const core::matrix4 &shadowmat0, const core::matrix4 &shadowmat1, const core::matrix4 &shadowmat2, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex0, unsigned TU_shadowtex1, unsigned TU_shadowtex2)
     {
-        glUniformMatrix4fv(uniform_shadowmat, 1, GL_FALSE, shadowmat.pointer());
+        glUniformMatrix4fv(uniform_shadowmat0, 1, GL_FALSE, shadowmat0.pointer());
+        glUniformMatrix4fv(uniform_shadowmat1, 1, GL_FALSE, shadowmat1.pointer());
+        glUniformMatrix4fv(uniform_shadowmat2, 1, GL_FALSE, shadowmat2.pointer());
         glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
         glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
         glUniform3f(uniform_col, r, g, b);
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
-        glUniform1i(uniform_shadowtex, TU_shadowtex);
+        glUniform1i(uniform_shadowtex0, TU_shadowtex0);
+        glUniform1i(uniform_shadowtex1, TU_shadowtex1);
+        glUniform1i(uniform_shadowtex2, TU_shadowtex2);
     }
 
 	GLuint Gaussian6HBlurShader::Program;

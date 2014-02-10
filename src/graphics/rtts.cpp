@@ -36,8 +36,10 @@ RTT::RTT()
 
     const dimension2du ssaosize = UserConfigParams::m_ssao == 2 ? res : quarter;
 
-    const u16 shadowside = 8192;
-    const dimension2du shadowsize(shadowside, shadowside);
+    const u16 shadowside = 2048;
+    const dimension2du shadowsize0(shadowside, shadowside);
+    const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
+    const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
     const dimension2du warpvsize(1, 512);
     const dimension2du warphsize(512, 1);
 
@@ -87,7 +89,9 @@ RTT::RTT()
 
     rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
 
-    rtts[RTT_SHADOW] = drv->addRenderTargetTexture(shadowsize, "rtt.shadow", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SHADOW0] = drv->addRenderTargetTexture(shadowsize0, "rtt.shadow0", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SHADOW1] = drv->addRenderTargetTexture(shadowsize1, "rtt.shadow1", ECF_A8R8G8B8, stencil);
+    rtts[RTT_SHADOW2] = drv->addRenderTargetTexture(shadowsize2, "rtt.shadow2", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
 
@@ -96,7 +100,7 @@ RTT::RTT()
     if (((COpenGLDriver *) drv)->queryOpenGLFeature(COpenGLDriver::IRR_ARB_texture_rg))
     {
         // Use optimized formats if supported
-        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize, "rtt.collapse", ECF_R8, stencil);
+        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize0, "rtt.collapse", ECF_R8, stencil);
 
         rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_R8, stencil);
         rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_R8, stencil);
@@ -106,7 +110,7 @@ RTT::RTT()
         rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_R8, stencil);
     } else
     {
-        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize, "rtt.collapse", ECF_A8R8G8B8, stencil);
+        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize0, "rtt.collapse", ECF_A8R8G8B8, stencil);
 
         rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_A8R8G8B8, stencil);
         rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_A8R8G8B8, stencil);

@@ -346,7 +346,7 @@ void PostProcessing::renderSunlight()
   glBindVertexArray(0);
 }
 
-void PostProcessing::renderShadowedSunlight(const core::matrix4 &sun_ortho_matrix)
+void PostProcessing::renderShadowedSunlight(const core::matrix4 &sun_ortho_matrix0, const core::matrix4 &sun_ortho_matrix1, const core::matrix4 &sun_ortho_matrix2)
 {
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
@@ -359,10 +359,16 @@ void PostProcessing::renderShadowedSunlight(const core::matrix4 &sun_ortho_matri
     glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
     setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
     setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
-    setTexture(2, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
+    setTexture(2, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW0))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+    setTexture(3, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW1))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    setTexture(4, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW2))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix0, sun_ortho_matrix1, sun_ortho_matrix2, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2, 3, 4);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
@@ -849,7 +855,7 @@ void PostProcessing::render()
         else if (irr_driver->getSSAOViz())
 			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
         else if (irr_driver->getShadowViz())
-            renderPassThrough(static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW))->DepthBufferTexture);
+            renderPassThrough(static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW0))->DepthBufferTexture);
         else
 			renderColorLevel(in);
     }
