@@ -45,14 +45,14 @@ float getShadowFactor(vec3 pos, float bias)
 
 	//float shadowmapz = 2. * texture(shadowtex, vec3(shadowtexcoord, shadowcoord.z).x - 1.;
 	//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
-		return texture(shadowtex0, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias) + 0.5));
+		return texture(shadowtex0, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
 	else if (pos.z < 60)
 	{
 		vec4 shadowcoord = (shadowmat1 * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
 		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex1, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias) + 0.5));
+		return texture(shadowtex1, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
 	else
 	{
