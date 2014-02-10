@@ -76,6 +76,8 @@ public:
     ~RTT();
 
     ITexture *getRTT(TypeRTT which);
+    unsigned getShadowFBO() const { return shadowFBO; }
+    unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
 private:
     ITexture *rtts[RTT_COUNT];

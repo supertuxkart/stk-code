@@ -255,6 +255,35 @@ GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_pat
 	return ProgramID;
 }
 
+GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path) {
+    GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
+    GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
+    GLuint GeometryShaderID = LoadShader(geometry_file_path, GL_GEOMETRY_SHADER);
+
+    GLuint ProgramID = glCreateProgram();
+    glAttachShader(ProgramID, VertexShaderID);
+    glAttachShader(ProgramID, GeometryShaderID);
+    glAttachShader(ProgramID, FragmentShaderID);
+    glLinkProgram(ProgramID);
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    if (Result == GL_FALSE) {
+        glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        char *ErrorMessage = new char[InfoLogLength];
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
+        printf(ErrorMessage);
+        delete[] ErrorMessage;
+    }
+
+    glDeleteShader(VertexShaderID);
+    glDeleteShader(GeometryShaderID);
+    glDeleteShader(FragmentShaderID);
+
+    return ProgramID;
+}
+
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount) {
 	GLuint Shader = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
 	GLuint Program = glCreateProgram();

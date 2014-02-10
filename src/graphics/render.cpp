@@ -480,12 +480,6 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         m_rtts->getRTT(RTT_SHADOW2)
     };
 
-    unsigned rtt_size[] = {
-        2048,
-        1024,
-        512,
-    };
-
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
@@ -502,6 +496,7 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     };
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    sun_ortho_matrix.clear();
 
     // Build the 3 ortho projection (for the 3 shadow resolution levels)
     for (unsigned i = 0; i < 3; i++)
@@ -529,8 +524,8 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         float z = box.MaxEdge.Z;
 
         // Snap to texels
-        const float units_per_w = w / rtt_size[i];
-        const float units_per_h = h / rtt_size[i];
+        const float units_per_w = w / 1024;
+        const float units_per_h = h / 1024;
 
         float left = box.MinEdge.X;
         float right = box.MaxEdge.X;
@@ -557,18 +552,21 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         m_scene_manager->setActiveCamera(m_suncam);
         m_suncam->render();
 
-        sun_ortho_matrix[i] = getVideoDriver()->getTransform(video::ETS_PROJECTION);
-        sun_ortho_matrix[i] *= getVideoDriver()->getTransform(video::ETS_VIEW);
-        sun_ortho_matrix[i] *= getInvViewMatrix();
-        irr_driver->setPhase(SHADOW_PASS);
-        glDisable(GL_BLEND);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        m_video_driver->setRenderTarget(ShadowRTT[i], true, true);
-        glDrawBuffer(GL_NONE);
-        m_scene_manager->drawAll(scene::ESNRP_SOLID);
-        glCullFace(GL_BACK);
+        sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
+    assert(sun_ortho_matrix.size() == 3);
+
+    irr_driver->setPhase(SHADOW_PASS);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+//    m_video_driver->setRenderTarget(ShadowRTT[0], true, true);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
+    glViewport(0, 0, 1024, 1024);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glDrawBuffer(GL_NONE);
+    m_scene_manager->drawAll(scene::ESNRP_SOLID);
+    glCullFace(GL_BACK);
 
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
@@ -770,6 +768,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam, float dt)
 {
+    for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
+        sun_ortho_matrix[i] *= getInvViewMatrix();
     core::array<video::IRenderTarget> rtts;
     // Diffuse
     rtts.push_back(m_rtts->getRTT(RTT_TMP1));
@@ -792,7 +792,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         {
           m_lights[i]->render();
           if (UserConfigParams::m_shadows)
-              m_post_processing->renderShadowedSunlight(sun_ortho_matrix[0], sun_ortho_matrix[1], sun_ortho_matrix[2]);
+              m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
           else
               m_post_processing->renderSunlight();
           continue;

@@ -20,6 +20,7 @@
 
 void initGL();
 GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path);
+GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path);
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
 void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUnit);
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF = false);

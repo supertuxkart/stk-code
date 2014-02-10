@@ -37,7 +37,7 @@ RTT::RTT()
 
     const dimension2du ssaosize = UserConfigParams::m_ssao == 2 ? res : quarter;
 
-    const u16 shadowside = 2048;
+    const u16 shadowside = 1024;
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);

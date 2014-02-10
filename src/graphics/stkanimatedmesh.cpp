@@ -100,8 +100,9 @@ void STKAnimatedMesh::drawShadow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
     assert(irr_driver->getPhase() == SHADOW_PASS);
-    core::matrix4 ShadowMVP;
-    computeMVP(ShadowMVP);
+    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
+    for (unsigned i = 0; i < ShadowMVP.size(); i++)
+        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
     glUseProgram(MeshShader::ShadowShader::Program);
     MeshShader::ShadowShader::setUniforms(ShadowMVP);
     glBindVertexArray(mesh.vao_shadow_pass);

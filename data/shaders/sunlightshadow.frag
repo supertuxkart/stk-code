@@ -1,18 +1,14 @@
 #version 130
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2DShadow shadowtex0;
-uniform sampler2DShadow shadowtex1;
-uniform sampler2DShadow shadowtex2;
+uniform sampler2DArrayShadow shadowtex;
 //uniform sampler2D warpx;
 ///uniform sampler2D warpy;
 
 uniform vec3 direction;
 uniform vec3 col;
 uniform mat4 invproj;
-uniform mat4 shadowmat0;
-uniform mat4 shadowmat1;
-uniform mat4 shadowmat2;
+uniform mat4 shadowmat[3];
 //uniform int hasclouds;
 //uniform vec2 wind;
 //uniform float shadowoffset;
@@ -32,7 +28,7 @@ float getShadowFactor(vec3 pos, float bias)
 {
 	if (pos.z < 10.)
 	{
-		vec4 shadowcoord = (shadowmat0 * vec4(pos, 1.0));
+		vec4 shadowcoord = (shadowmat[0] * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
 		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
 //	shadowcoord = (shadowcoord * 0.5) + vec3(0.5);
@@ -45,21 +41,21 @@ float getShadowFactor(vec3 pos, float bias)
 
 	//float shadowmapz = 2. * texture(shadowtex, vec3(shadowtexcoord, shadowcoord.z).x - 1.;
 	//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
-		return texture(shadowtex0, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+		return texture(shadowtex, vec4(shadowtexcoord, 0., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
 	else if (pos.z < 60)
 	{
-		vec4 shadowcoord = (shadowmat1 * vec4(pos, 1.0));
+		vec4 shadowcoord = (shadowmat[1] * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
 		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex1, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+		return texture(shadowtex, vec4(shadowtexcoord, 1., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
 	else
 	{
-		vec4 shadowcoord = (shadowmat2 * vec4(pos, 1.0));
+		vec4 shadowcoord = (shadowmat[2] * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
 		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex2, vec3(shadowtexcoord, 0.5 * (shadowcoord.z + bias) + 0.5));
+		return texture(shadowtex, vec4(shadowtexcoord, 2., 0.5 * (shadowcoord.z + bias) + 0.5));
 	}
 }
 

@@ -731,8 +731,9 @@ void STKMesh::drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
     size_t count = mesh.IndexCount;
 
 
-    core::matrix4 ShadowMVP;
-    computeMVP(ShadowMVP);
+    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
+    for (unsigned i = 0; i < ShadowMVP.size(); i++)
+        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
     if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
     {
@@ -740,12 +741,12 @@ void STKMesh::drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
         glUseProgram(MeshShader::RefShadowShader::Program);
         MeshShader::RefShadowShader::setUniforms(ShadowMVP, 0);
     }
-    else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+/*    else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
     {
         setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         glUseProgram(MeshShader::GrassShadowShader::Program);
         MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
-    }
+    }*/
     else
     {
         glUseProgram(MeshShader::ShadowShader::Program);
@@ -949,10 +950,10 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
         {
             mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::RefShadowShader::attrib_position, MeshShader::RefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
         }
-        else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
+        /*else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
         {
             mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::GrassShadowShader::attrib_position, MeshShader::GrassShadowShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassShadowShader::attrib_color, mesh.Stride);
-        }
+        }*/
         else
         {
             mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
