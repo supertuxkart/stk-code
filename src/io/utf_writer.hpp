@@ -19,8 +19,11 @@
 #ifndef HEADER_UTF_WRITER_HPP
 #define HEADER_UTF_WRITER_HPP
 
-#include <fstream>
+#include "utils/string_utils.hpp"
+
 #include <irrString.h>
+
+#include <fstream>
 
 /**
  * \brief utility class used to write wide (UTF-16 or UTF-32, depending of size of wchar_t) XML files
@@ -49,8 +52,13 @@ public:
         return operator<< (irr::core::stringw(txt.c_str()));
     }   // operator<<(std::string)
     // ------------------------------------------------------------------------
+    UTFWriter& operator<< (const bool &b)
+    {
+        return operator<<(StringUtils::toString(b));
+    }
+    // ------------------------------------------------------------------------
     template<typename T>
-    UTFWriter& operator<< (const T t)
+    UTFWriter& operator<< (const T &t)
     {
         return operator<<(StringUtils::toString<T>(t));
     }   // operator<< (template)
