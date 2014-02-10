@@ -18,6 +18,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#include "utils/ptr_vector.hpp"
+
+// The order here is important. If all_params is declared later (e.g. after
+// the #includes), all elements will be added to all_params, and then
+// all_params will be initialised, i.e. cleared!
+class UserConfigParam;
+static PtrVector<UserConfigParam, REF> all_params;
+
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
@@ -31,7 +39,6 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
-#include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -40,10 +47,6 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
-
-class UserConfigParam;
-static PtrVector<UserConfigParam, REF> all_params;
-
 
 const int UserConfig::m_current_config_version = 8;
 
