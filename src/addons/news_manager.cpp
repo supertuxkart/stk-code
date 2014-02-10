@@ -208,10 +208,8 @@ void NewsManager::checkRedirect(const XMLNode *xml)
     {
         if(UserConfigParams::logAddons())
         {
-            std::cout << "[Addons] Current server: "
-                      << (std::string)UserConfigParams::m_server_addons
-                      << std::endl
-                      << "[Addons] New server: " << new_server << std::endl;
+            Log::info("[Addons]", "Current server: '%s'\n [Addons] New server: '%s'",
+                        UserConfigParams::m_server_addons.c_str(), new_server.c_str());
         }
         UserConfigParams::m_server_addons = new_server;
     }

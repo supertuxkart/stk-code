@@ -945,17 +945,6 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
 
 // ----------------------------------------------------------------------------
 
-PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
-                                           scene::ICameraSceneNode* camera,
-                                           scene::ISceneNode *parent)
-{
-    scene::ISceneNode *node = m_scene_manager->addMeshSceneNode(mesh);
-
-    return new PerCameraNode((parent ? parent
-                                     : m_scene_manager->getRootSceneNode()),
-                             m_scene_manager, -1, camera, node);
-}   // addMesh
-
 PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* camera,
                                            scene::ISceneNode *parent)
@@ -1457,15 +1446,15 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
  */
 void IrrDriver::displayFPS()
 {
-    gui::IGUIFont* font = GUIEngine::getFont();
+    gui::IGUIFont* font = GUIEngine::getSmallFont();
 
     if(UserConfigParams::m_artist_debug_mode)
     {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,50),NULL);
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,40),NULL);
     }
     else
     {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,40),NULL);
     }
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1520,7 +1509,9 @@ void IrrDriver::displayFPS()
     {
         sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
                 min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
-		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[SOLID_NORMAL_AND_DEPTH_PASS] = object_count[TRANSPARENT_PASS] = 0;
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+		object_count[TRANSPARENT_PASS] = 0;
     }
     else
     {

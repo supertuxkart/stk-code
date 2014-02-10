@@ -4,6 +4,8 @@
 #include <ISkinnedMesh.h>
 #include "graphics/irr_driver.hpp"
 #include "config/user_config.hpp"
+#include "modes/world.hpp"
+#include "tracks/track.hpp"
 
 using namespace irr;
 
@@ -30,7 +32,10 @@ void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE
 
 	computeMVP(ModelViewProjectionMatrix);
 
-	drawTransparentObject(mesh, ModelViewProjectionMatrix);
+    if (World::getWorld()->getTrack()->isFogEnabled())
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
+    else
+        drawTransparentObject(mesh, ModelViewProjectionMatrix);
 
 	return;
 }
@@ -89,6 +94,20 @@ isObjectPass(video::E_MATERIAL_TYPE type)
 	return false;
 }
 
+void STKAnimatedMesh::drawShadow(const GLMesh &mesh)
+{
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+    assert(irr_driver->getPhase() == SHADOW_PASS);
+    core::matrix4 ShadowMVP;
+    computeMVP(ShadowMVP);
+    glUseProgram(MeshShader::ShadowShader::Program);
+    MeshShader::ShadowShader::setUniforms(ShadowMVP);
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void STKAnimatedMesh::render()
 {
 	video::IVideoDriver* driver = SceneManager->getVideoDriver();
@@ -106,9 +125,8 @@ void STKAnimatedMesh::render()
 	}
 	else
 	{
-#ifdef _DEBUG
-		os::Printer::log("Animated Mesh returned no mesh to render.", Mesh->getDebugName(), ELL_WARNING);
-#endif
+		Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
+		return;
 	}
 
 	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
@@ -147,7 +165,9 @@ void STKAnimatedMesh::render()
 				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
 			}
-			if (isTransparentPass)
+            if (irr_driver->getPhase() == SHADOW_PASS)
+                drawShadow(GLmeshes[i]);
+			else if (isTransparentPass)
 				drawTransparent(GLmeshes[i], material.MaterialType);
 			else
 				drawSolid(GLmeshes[i], material.MaterialType);

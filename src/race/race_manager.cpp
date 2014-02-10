@@ -143,7 +143,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
                                    const std::string& kart)
 {
     assert(kart.size() > 0);
-    assert(0<=player_id && player_id <m_local_player_karts.size());
+    assert(player_id <m_local_player_karts.size());
     assert(kart_properties_manager->getKart(kart) != NULL);
 
     const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(player_id);
@@ -157,7 +157,7 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
 */
 void RaceManager::setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team)
 {
-    assert(0<=player_id && player_id <m_local_player_karts.size());
+    assert(player_id <m_local_player_karts.size());
 
     m_local_player_karts[player_id].setSoccerTeam(team);
 }

@@ -20,7 +20,7 @@
 #include "audio/sfx_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/gpuparticles.h"
+#include "graphics/gpuparticles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
@@ -42,7 +42,7 @@ using namespace core;
 
 // The rain manager
 
-Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
+Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent) : m_thunder_sound(0)
 {
     m_lightning = camera->getIndex()==0;
 

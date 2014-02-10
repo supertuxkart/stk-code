@@ -13,6 +13,7 @@ struct GLMesh {
 	GLuint vao_second_pass;
 	GLuint vao_glow_pass;
 	GLuint vao_displace_pass;
+    GLuint vao_shadow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
 	GLuint textures[6];
@@ -47,6 +48,7 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 
 // Forward pass (for transparents meshes)
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 class STKMesh : public irr::scene::CMeshSceneNode
@@ -61,6 +63,7 @@ protected:
 	// Misc passes shaders (glow, displace...)
 	void drawGlow(const GLMesh &mesh);
 	void drawDisplace(const GLMesh &mesh);
+    void drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void createGLMeshes();
 	void cleanGLMeshes();
 public:

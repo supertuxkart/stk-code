@@ -26,7 +26,6 @@
 #include "karts/kart_properties.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
-#include "utils/log.hpp" //TODO: remove after debugging is done
 
 /** A static create function that does only create an explosion if
  *  the explosion happens to be close enough to affect the kart.

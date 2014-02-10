@@ -102,6 +102,7 @@ private:
     RTT                *m_rtts;
     /** Shadow importance. */
     ShadowImportance   *m_shadow_importance;
+    core::matrix4 sun_ortho_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -111,7 +112,7 @@ private:
     core::array<video::IRenderTarget> m_mrt;
 
     /** Matrixes used in several places stored here to avoid recomputation. */
-    core::matrix4 m_ViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
+    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
 	std::vector<video::ITexture *> SkyboxTextures;
 
@@ -203,9 +204,9 @@ private:
 
     void renderFixed(float dt);
     void renderGLSL(float dt);
-    void renderShadows(ShadowImportanceProvider * const sicb,
+    void renderShadows(//ShadowImportanceProvider * const sicb,
                        scene::ICameraSceneNode * const camnode,
-                       video::SOverrideMaterial &overridemat,
+                       //video::SOverrideMaterial &overridemat,
                        Camera * const camera);
     void renderGlow(video::SOverrideMaterial &overridemat,
                     std::vector<GlowData>& glows,
@@ -260,9 +261,6 @@ public:
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   scene::ISceneNode *parent=NULL);
-    PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh,
-                                           scene::ICameraSceneNode* node,
-                                           scene::ISceneNode *parent = NULL);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -495,8 +493,9 @@ public:
     // ------------------------------------------------------------------------
     scene::IMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
-    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; }
+    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
+    const core::matrix4 &getInvViewMatrix() const { return m_InvViewMatrix; }
     void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
     const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }

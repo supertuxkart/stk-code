@@ -176,7 +176,7 @@ void EasterEggScreen::beforeAddingWidget()
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    tracks_widget->setItemCountHint(num_of_arenas); //set the item hint to that number to prevent weird formatting
+    tracks_widget->setItemCountHint(num_of_arenas+1); //set the item hint to that number to prevent weird formatting
 }
 
 // -----------------------------------------------------------------------------

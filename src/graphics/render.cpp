@@ -215,10 +215,10 @@ void IrrDriver::renderGLSL(float dt)
         const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
 
         // Shadows
-        if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows &&
-            World::getWorld()->getTrack()->hasShadows())
+        if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows)
+           //&& World::getWorld()->getTrack()->hasShadows())
         {
-            //renderShadows(sicb, camnode, overridemat, camera);
+            renderShadows(camnode, camera);
         }
 
 
@@ -242,7 +242,7 @@ void IrrDriver::renderGLSL(float dt)
 		  if (World::getWorld()->getTrack()->isFogEnabled())
 		  {
 			  PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			  m_post_processing->renderFog(camnode->getAbsolutePosition(), irr_driver->getInvProjViewMatrix());
+			  m_post_processing->renderFog(irr_driver->getInvProjMatrix());
 			  PROFILER_POP_CPU_MARKER();
 		  }
 
@@ -268,7 +268,7 @@ void IrrDriver::renderGLSL(float dt)
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-        if (hasflare | hasgodrays)
+        if (hasflare || hasgodrays)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
@@ -464,9 +464,9 @@ void IrrDriver::renderFixed(float dt)
 
 // ----------------------------------------------------------------------------
 
-void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
+void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
                               scene::ICameraSceneNode * const camnode,
-                              video::SOverrideMaterial &overridemat,
+                              //video::SOverrideMaterial &overridemat,
                               Camera * const camera)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
@@ -486,7 +486,6 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
     camnode->render();
 
     // Set up a nice ortho projection that contains our camera frustum
-    core::matrix4 ortho;
     core::aabbox3df box = smallcambox;
     box = box.intersect(trackbox);
 
@@ -518,16 +517,16 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
     if (up == down) down += 0.1f;
     if (z == 30) z += 0.1f;
 
-    ortho.buildProjectionMatrixOrthoLH(left, right,
+    sun_ortho_matrix.buildProjectionMatrixOrthoLH(left, right,
                                         up, down,
                                         30, z);
 
-    m_suncam->setProjectionMatrix(ortho, true);
+    m_suncam->setProjectionMatrix(sun_ortho_matrix, true);
     m_scene_manager->setActiveCamera(m_suncam);
     m_suncam->render();
 
-    ortho *= m_suncam->getViewMatrix();
-    ((SunLightProvider *) m_shaders->m_callbacks[ES_SUNLIGHT])->setShadowMatrix(ortho);
+    //sun_ortho_matrix *= m_suncam->getViewMatrix();
+/*    ((SunLightProvider *) m_shaders->m_callbacks[ES_SUNLIGHT])->setShadowMatrix(ortho);
     sicb->setShadowMatrix(ortho);
 
     overridemat.Enabled = 0;
@@ -563,7 +562,7 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
                 m_rtts->getRTT(RTT_WARPV)->getSize().Height,
                 m_rtts->getRTT(RTT_WARPV)->getSize().Height);
 
-/*    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
+    sq.setMaterialType(m_shaders->getShader(ES_GAUSSIAN6H));
     sq.setTexture(m_rtts->getRTT(RTT_WARPH));
     sq.render(m_rtts->getRTT(curh));
 
@@ -577,7 +576,7 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
     // calculating the min, max, and total, it's several hundred us
     // faster to do that than to do it once in a separate shader
     // (shader switch overhead, measured).
-    colcb->setResolution(m_rtts->getRTT(RTT_WARPV)->getSize().Height,
+    /*colcb->setResolution(m_rtts->getRTT(RTT_WARPV)->getSize().Height,
                             m_rtts->getRTT(RTT_WARPV)->getSize().Height);
 
     sq.setMaterialType(m_shaders->getShader(ES_SHADOW_WARPH));
@@ -586,11 +585,12 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
 
     sq.setMaterialType(m_shaders->getShader(ES_SHADOW_WARPV));
     sq.setTexture(m_rtts->getRTT(curv));
-    sq.render(m_rtts->getRTT(RTT_WARPV));
+    sq.render(m_rtts->getRTT(RTT_WARPV));*/
 
     // Actual shadow map
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SHADOW), true, true);
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_SHADOWPASS);
+
+
+/*    overridemat.Material.MaterialType = m_shaders->getShader(ES_SHADOWPASS);
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE1 |
                                 video::EMF_TEXTURE2;
     overridemat.EnablePasses = scene::ESNRP_SOLID;
@@ -607,19 +607,22 @@ void IrrDriver::renderShadows(ShadowImportanceProvider * const sicb,
     overridemat.Material.TextureLayer[1].AnisotropicFilter =
     overridemat.Material.TextureLayer[2].AnisotropicFilter = 0;
     overridemat.Material.Wireframe = 1;
-    overridemat.Enabled = true;
-
+    overridemat.Enabled = true;*/
+    sun_ortho_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION);
+    sun_ortho_matrix *= getVideoDriver()->getTransform(video::ETS_VIEW);
+    irr_driver->setPhase(SHADOW_PASS);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SHADOW), true, true);
+    glDrawBuffer(GL_NONE);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
+    glCullFace(GL_BACK);
 
-    if (m_shadowviz)
-    {
-        overridemat.EnableFlags |= video::EMF_WIREFRAME;
-        m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    }
-
-    overridemat.EnablePasses = 0;
-    overridemat.Enabled = false;
+//    overridemat.EnablePasses = 0;
+//    overridemat.Enabled = false;
     camera->activate();
+    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
 
     tick++;
     tick %= 2;
@@ -639,10 +642,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
     const u32 glowcount = glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
-
-    GlowProvider * const glowcb = (GlowProvider *) m_shaders->m_callbacks[ES_GLOW];
-    glowcb->setResolution(UserConfigParams::m_width,
-                            UserConfigParams::m_height);
 
 /*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
     overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
@@ -732,6 +731,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam, float dt)
 {
+    sun_ortho_matrix *= getInvViewMatrix();
     core::array<video::IRenderTarget> rtts;
     // Diffuse
     rtts.push_back(m_rtts->getRTT(RTT_TMP1));
@@ -753,7 +753,10 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         if (!m_lights[i]->isPointLight())
         {
           m_lights[i]->render();
-          m_post_processing->renderSunlight();
+          if (UserConfigParams::m_shadows)
+              m_post_processing->renderShadowedSunlight(sun_ortho_matrix);
+          else
+              m_post_processing->renderSunlight();
           continue;
         }
         const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);

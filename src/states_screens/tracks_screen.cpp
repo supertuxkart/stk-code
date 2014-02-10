@@ -192,7 +192,7 @@ void TracksScreen::beforeAddingWidget()
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    tracks_widget->setItemCountHint( track_manager->getNumberOfTracks() );
+    tracks_widget->setItemCountHint( track_manager->getNumberOfTracks()+1 );
 }
 
 // -----------------------------------------------------------------------------

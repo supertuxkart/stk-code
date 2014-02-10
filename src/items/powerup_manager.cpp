@@ -125,8 +125,8 @@ void PowerupManager::loadAllPowerups()
             LoadPowerup(type, *node);
         else
         {
-            printf("Can't find item '%s' from powerup.xml, entry %d/\n",
-                    name.c_str(), i+1);
+            Log::fatal("[PowerupManager]", "Can't find item '%s' from powerup.xml, entry %d/",
+                        name.c_str(), i+1);
             exit(-1);
         }
     }
@@ -157,7 +157,7 @@ void PowerupManager::LoadPowerup(PowerupType type, const XMLNode &node)
 #ifdef DEBUG
     if (icon_file.size() == 0)
     {
-        fprintf(stderr, "Cannot load powerup %i, no 'icon' attribute under XML node\n", type);
+        Log::debug("[PowerupManager]", "Cannot load powerup %i, no 'icon' attribute under XML node", type);
         assert(false);
     }
 #endif
@@ -221,8 +221,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     if(!node || s=="" || s_multi=="")
     {
-        printf("No weights found for class '%s' - probabilities will be incorrect.\n",
-               class_name.c_str());
+        Log::error("[PowerupManager]", "No weights found for class '%s'"
+                    " - probabilities will be incorrect.",
+                    class_name.c_str());
         return;
     }
 
@@ -245,9 +246,9 @@ void PowerupManager::loadWeights(const XMLNode &root,
 
     if(weight_list.size()!=2*(int)POWERUP_LAST)
     {
-        printf("Incorrect number of weights found in class '%s':\n",
+        Log::error("[PowerupManager]", "Incorrect number of weights found in class '%s':",
                class_name.c_str());
-        printf("%d instead of %d - probabilities will be incorrect.\n",
+        Log::error("[PowerupManager]", "%d instead of %d - probabilities will be incorrect.",
                (int)weight_list.size(), (int)POWERUP_LAST);
         return;
     }

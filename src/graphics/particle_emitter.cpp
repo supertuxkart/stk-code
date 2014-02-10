@@ -28,7 +28,7 @@
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
-#include "graphics/gpuparticles.h"
+#include "graphics/gpuparticles.hpp"
 
 #include <SParticle.h>
 #include <IParticleAffector.h>

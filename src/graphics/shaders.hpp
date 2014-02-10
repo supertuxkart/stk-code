@@ -191,6 +191,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
 };
 
+class TransparentFogShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_screen, uniform_ipvmat;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
+};
+
 class BillboardShader
 {
 public:
@@ -212,6 +223,39 @@ public:
 
 	static void init();
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
+};
+
+class ShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position;
+    static GLuint uniform_MVP;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
+};
+
+class RefShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_tex;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
+};
+
+class GrassShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_color;
+    static GLuint uniform_MVP, uniform_tex, uniform_windDir;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex);
 };
 
 class DisplaceShader
@@ -341,14 +385,15 @@ public:
 	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
-class LightBlendShader
+class ShadowedSunLightShader
 {
 public:
-	static GLuint Program;
-	static GLuint uniform_diffuse, uniform_specular, uniform_ambient_occlusion, uniform_specular_map, uniform_ambient;
-	static GLuint vao;
+    static GLuint Program;
+    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_shadowmat, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint vao;
 
-	static void init();
+    static void init();
+    static void setUniforms(const core::matrix4 &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
 };
 
 class Gaussian6HBlurShader
@@ -427,11 +472,11 @@ class FogShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_campos, uniform_ipvmat;
+	static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_ipvmat;
 	static GLuint vao;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_ntex);
+	static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
 };
 
 }
@@ -494,7 +539,6 @@ public:
     ACT(ES_MIPVIZ) \
     ACT(ES_COLORIZE) \
     ACT(ES_COLORIZE_REF) \
-    ACT(ES_GLOW) \
 	ACT(ES_OBJECT_UNLIT) \
     ACT(ES_OBJECTPASS) \
     ACT(ES_OBJECTPASS_REF) \
