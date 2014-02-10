@@ -79,6 +79,7 @@ public:
 
 private:
     ITexture *rtts[RTT_COUNT];
+    unsigned shadowFBO, shadowColorTex, shadowDepthTex;
 };
 
 #endif
