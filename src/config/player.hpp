@@ -54,8 +54,8 @@ private:
     unsigned int m_magic_number;
 #endif
 
-    /** Counts how often this player was used. */
-    unsigned int m_use_frequency;
+    /** Counts how often this player was used (always -1 for guests). */
+    int m_use_frequency;
 
     /** A unique number for this player, used to link it to challenges etc. */
     unsigned int m_unique_id;
@@ -84,47 +84,49 @@ public:
         #ifdef DEBUG
         m_magic_number = 0xDEADBEEF;
         #endif
-    }
+    }   // ~PlayerProfile
 
     // ------------------------------------------------------------------------
+    /** Sets the name of this player. */
     void setName(const core::stringw& name)
     {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
         m_name = name;
-    }
+    }   // setName
 
     // ------------------------------------------------------------------------
+    /** Returns the name of this player. */
     core::stringw getName() const
     {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
         return m_name.c_str();
-    }
+    }   // getName
 
     // ------------------------------------------------------------------------
+    /** Returns true if this player is a guest account. */
     bool isGuestAccount() const
     {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
         return m_is_guest_account;
-    }
-
-    // ------------------------------------------------------------------------
-    int getUseFrequency() const
-    {
-        if (m_is_guest_account) return -1;
-        else return m_use_frequency;
-    }
+    }   // isGuestAccount
 
     // ------------------------------------------------------------------------
     /** Returns the unique id of this player. */
     unsigned int getUniqueID() const { return m_unique_id; }
+    // -----------------------------------------------------------------------
+    /** Returns true if this is the default (last used) player. */
+    bool isDefault() const { return m_is_default; }
     // ------------------------------------------------------------------------
-    /** Returned if the feature (kart, track) is locked. */
+    /** Sets if this player is the default player or not. */
+    void setDefault(bool is_default) { m_is_default = is_default; }
+    // ------------------------------------------------------------------------
+    /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
     {
         return m_game_slot->isLocked(feature); 
@@ -133,11 +135,13 @@ public:
     /** Returns all active challenges. */
     void computeActive() { m_game_slot->computeActive(); }
     // ------------------------------------------------------------------------
+    /** Returns the list of recently completed challenges. */
     std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
     {
         return m_game_slot->getRecentlyCompletedChallenges();
     }   // getRecently Completed Challenges
     // ------------------------------------------------------------------------
+    /** Sets the currently active challenge. */
     void setCurrentChallenge(const std::string &name)
     {
         m_game_slot->setCurrentChallenge(name);
@@ -147,6 +151,8 @@ public:
      *  challenges. */
     void raceFinished() { m_game_slot->raceFinished(); }
     // ------------------------------------------------------------------------
+    /** Callback when a GP is finished (to test if a challenge was
+     *  fulfilled). */
     void grandPrixFinished() { m_game_slot->grandPrixFinished(); }
     // ------------------------------------------------------------------------
     unsigned int getPoints() const { return m_game_slot->getPoints(); }
@@ -182,13 +188,6 @@ public:
     {
         return m_game_slot->getNumHardTrophies(); 
     }   // getNumHardTropies
-    // -----------------------------------------------------------------------
-    /** Returns true if this is the default (last used) player. */
-    bool isDefault() const { return m_is_default; }
-    // ------------------------------------------------------------------------
-    /** Sets if this player is the default player or not. */
-    void setDefault(bool is_default) { m_is_default = is_default; }
-    // ------------------------------------------------------------------------
 
 };   // class PlayerProfile
 

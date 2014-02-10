@@ -265,10 +265,8 @@ void GameSlot::grandPrixFinished()
  */
 void GameSlot::save(UTFWriter &out)
 {
-    out << "    <gameslot playerID=\"" << m_player_unique_id.c_str()
-        << "\" kart=\""                << m_kart_ident.c_str()
-        << "\" firstTime=\""           << StringUtils::toString(m_first_time)
-        << "\"> <!-- " << name.c_str() << " -->\n";
+    out << "    <game-slot playerID=\"" << m_player_unique_id
+        << "\" firstTime=\""           << m_first_time  << L"\">\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)

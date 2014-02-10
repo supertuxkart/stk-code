@@ -35,6 +35,8 @@
  */
 void Challenge::load(const XMLNode* challengesNode)
 {
+    if(m_data->getId()=="olivermath")
+        printf("");
     const XMLNode* node = challengesNode->getNode( m_data->getId() );
     if(node == NULL)
     {

@@ -40,7 +40,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 #endif
     m_name             =  name;
     m_is_guest_account = is_guest;
-    m_use_frequency    = 0;
+    m_use_frequency    = is_guest ? -1 : 0;
     m_unique_id        = PlayerManager::get()->getUniqueId();
     m_game_slot        = unlock_manager->createGameSlot();
 
@@ -95,14 +95,14 @@ void PlayerProfile::incrementUseFrequency()
  */
 bool PlayerProfile::operator<(const PlayerProfile &other)
 {
-    return getUseFrequency() < other.getUseFrequency();
+    return m_use_frequency < other.m_use_frequency;
 }   // operator<
 
 // -----------------------------------------------------------------------------
 /** \brief Needed for toggling sort order **/
 bool PlayerProfile::operator>(const PlayerProfile &other)
 {
-    return getUseFrequency() > other.getUseFrequency();
+    return m_use_frequency > other.m_use_frequency;
 }   // operator>
 
 // -----------------------------------------------------------------------------

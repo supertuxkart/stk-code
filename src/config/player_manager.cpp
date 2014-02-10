@@ -50,6 +50,7 @@ void PlayerManager::create()
  */
 PlayerManager::PlayerManager()
 {
+    m_current_player = NULL;
     load();
 }   // PlayerManager
 
@@ -167,7 +168,7 @@ void PlayerManager::addDefaultPlayer()
     m_all_players.push_back(new PlayerProfile(username.c_str()) );
 
     // add default guest player
-    m_all_players.push_back( new PlayerProfile(_LTR("Guest")) );
+    m_all_players.push_back( new PlayerProfile(_LTR("Guest"), /*guest*/true) );
 
 
 }   // addDefaultPlayer
