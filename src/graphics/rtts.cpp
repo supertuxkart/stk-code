@@ -37,7 +37,7 @@ RTT::RTT()
     const dimension2du ssaosize = UserConfigParams::m_ssao == 2 ? res : quarter;
 
     const u16 shadowside = 8192;
-    const dimension2du shadowsize(shadowside, shadowside);
+    dimension2du shadowsize(shadowside, shadowside);
     const dimension2du warpvsize(1, 512);
     const dimension2du warphsize(512, 1);
 
@@ -88,6 +88,12 @@ RTT::RTT()
     rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
 
     rtts[RTT_SHADOW] = drv->addRenderTargetTexture(shadowsize, "rtt.shadow", ECF_A8R8G8B8, stencil);
+    if(!rtts[RTT_SHADOW])
+    {
+        int n = UserConfigParams::m_shadows == 2 ? 2048 : 512;
+        shadowsize.set(n, n);
+        rtts[RTT_SHADOW] = drv->addRenderTargetTexture(shadowsize, "rtt.shadow", ECF_A8R8G8B8, stencil);
+    }
     rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
 
