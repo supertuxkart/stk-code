@@ -43,8 +43,6 @@ class UnlockManager : public NoCopy
 private:
     SFXBase    *m_locked_sound;
 
-    void       load              ();
-
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
 
@@ -59,9 +57,6 @@ public:
               ~UnlockManager     ();
     void       addOrFreeChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
-    void       save              ();
-    bool       createSlotsIfNeeded();
-    bool       deleteSlotsIfNeeded();
 
     const ChallengeData *getChallenge      (const std::string& id);
 

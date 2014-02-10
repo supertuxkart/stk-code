@@ -76,8 +76,6 @@ UnlockManager::UnlockManager()
 
     // Hard coded challenges can be added here.
 
-    load();
-
 }   // UnlockManager
 
 //-----------------------------------------------------------------------------
@@ -85,8 +83,6 @@ UnlockManager::UnlockManager()
  */
 UnlockManager::~UnlockManager()
 {
-    save();
-
     for(AllChallengesType::iterator i =m_all_challenges.begin();
         i!=m_all_challenges.end();  i++)
     {
@@ -203,60 +199,6 @@ const ChallengeData* UnlockManager::getChallenge(const std::string& id)
 }   // getChallenge
 
 //-----------------------------------------------------------------------------
-/** This is called from user_config when reading the config file
-*/
-void UnlockManager::load()
-{
-    const std::string filename=file_manager->getUserConfigFile("challenges.xml");
-    XMLNode* root = file_manager->createXMLTree(filename);
-    if(!root || root->getName() != "challenges")
-    {
-        Log::info("unlock_manager", "Challenge file '%s' will be created.",
-                  filename.c_str());
-//        createSlotsIfNeeded();
-        save();
-
-        if (root) delete root;
-        return;
-    }
-
-    std::vector<XMLNode*> xml_game_slots;
-    root->getNodes("gameslot", xml_game_slots);
-    for (unsigned int n=0; n<xml_game_slots.size(); n++)
-    {
-        unsigned int player_id;
-        if (!xml_game_slots[n]->get("playerID", &player_id))
-        {
-            Log::warn("unlock_manager", "Found game slot without "
-                      "a player ID attached. Discarding it.");
-            continue;
-        }
-
-        GameSlot* slot = new GameSlot(NULL);
-
-        m_game_slots[player_id] = slot;
-
-
-        for(AllChallengesType::iterator i = m_all_challenges.begin();
-            i!=m_all_challenges.end();  i++)
-        {
-            ChallengeData* curr = i->second;
-            Challenge* state = new Challenge(curr);
-
-            slot->m_challenges_state[curr->getId()] = state;
-            state->load(xml_game_slots[n]);
-        }
-        slot->computeActive();
-    }
-
-    // FIXME
-//    bool something_changed = createSlotsIfNeeded();
-//    if (something_changed) save();
-
-    delete root;
-}   // load
-
-//-----------------------------------------------------------------------------
 /** Creates a game slot. It initialises the game slot's status with the
  *  information in the xml node (if given), basically restoring the saved
  *  states for a player.
@@ -280,132 +222,6 @@ GameSlot *UnlockManager::createGameSlot(const XMLNode *node)
     slot->computeActive();
     return slot;
 }   // createGameSlot
-
-//-----------------------------------------------------------------------------
-
-void UnlockManager::save()
-{
-    std::string filename = file_manager->getUserConfigFile("challenges.xml");
-
-    std::ofstream challenge_file(filename.c_str(), std::ios::out);
-
-    if (!challenge_file.is_open())
-    {
-        Log::warn("unlock_manager",
-                  "Failed to open '%s' for writing, challenges won't be saved\n",
-                  filename.c_str());
-        return;
-    }
-
-    challenge_file << "<?xml version=\"1.0\"?>\n";
-    challenge_file << "<challenges>\n";
-
-    std::map<unsigned int, GameSlot*>::iterator it;
-    for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
-    {
-        std::string name = "unknown player";
-        for (unsigned int i = 0; i < PlayerManager::get()->getNumPlayers(); i++)
-        {
-            const PlayerProfile *player = PlayerManager::get()->getPlayer(i);
-            if (player->getUniqueID() == it->second->getPlayerID())
-            {
-                name = core::stringc(player->getName().c_str()).c_str();
-                break;
-            }
-        }
-
-//FIXME        it->second->save(challenge_file, name);
-    }
-
-    challenge_file << "</challenges>\n\n";
-    challenge_file.close();
-}   // save
-
-//-----------------------------------------------------------------------------
-/** Creates a gameslot for players that don't have one yet
- *  \return true if any were created
- */
-bool UnlockManager::createSlotsIfNeeded()
-{
-    bool something_changed = false;
-
-    // make sure all players have at least one game slot associated
-    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
-    {
-        bool exists = false;
-
-        const PlayerProfile *profile = PlayerManager::get()->getPlayer(n);
-        std::map<unsigned int, GameSlot*>::iterator it;
-        for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
-        {
-            GameSlot* curr_slot = it->second;
-            if (curr_slot->getPlayerID() == profile->getUniqueID())
-            {
-                exists = true;
-                break;
-            }
-        }   // for it in m_game_slots
-
-        if (!exists)
-        {
-            GameSlot* slot = new GameSlot(NULL);
-            for(AllChallengesType::iterator i = m_all_challenges.begin();
-                i!=m_all_challenges.end();  i++)
-            {
-                ChallengeData* cd = i->second;
-                slot->m_challenges_state[cd->getId()] = new Challenge(cd);
-            }
-            slot->computeActive();
-
-            m_game_slots[profile->getUniqueID()] = slot;
-
-            something_changed = true;
-        }
-    }
-
-    return something_changed;
-} // UnlockManager::createSlotsIfNeeded
-
-//-----------------------------------------------------------------------------
-/** Removes gameslots that refer to a non-existing player.
- *  \return true if any were removed
- */
-bool UnlockManager::deleteSlotsIfNeeded()
-{
-    bool changed = false;
-    std::map<unsigned int, GameSlot*>::iterator it = m_game_slots.begin();
-    while (it != m_game_slots.end())
-    {
-        bool found = false;
-        const int player_amount = PlayerManager::get()->getNumPlayers();
-        for (int i = 0; i < player_amount; i++)
-        {
-            if (it->second->getPlayerID() ==
-                    PlayerManager::get()->getPlayer(i)->getUniqueID())
-            {
-                found = true;
-                break;
-            }
-        } // for players
-
-        if (!found)
-        {
-#ifdef DEBUG
-            printf("Deleting gameslot %d, no player found.\n",
-                    it->second->getPlayerID());
-#endif
-            // Iterators aren't invalidated this way
-            m_game_slots.erase(it++);
-            changed = true;
-        }
-        else
-        {
-            ++it;
-        }
-    } // for gameslots
-
-    return changed;
-} // UnlockManager::deleteSlotsIfNeeded
 
 //-----------------------------------------------------------------------------
 void UnlockManager::playLockSound() const
