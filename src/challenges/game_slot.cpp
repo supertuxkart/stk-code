@@ -40,11 +40,6 @@ GameSlot::GameSlot(const XMLNode *node)
     if(node)
     {
         node->get("first-time", &m_first_time);
-
-        for(unsigned int i=0; i<node->getNumNodes(); i++)
-        {
-            const XMLNode *challenge = node->getNode(i);
-        }   // for i <getNumNodes
     }   // if node
 
 }   // GameSlot
@@ -266,7 +261,7 @@ void GameSlot::grandPrixFinished()
 void GameSlot::save(UTFWriter &out)
 {
     out << "    <game-slot playerID=\"" << m_player_unique_id
-        << "\" firstTime=\""           << m_first_time  << L"\">\n";
+        << "\" first-time=\""           << m_first_time  << L"\">\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
