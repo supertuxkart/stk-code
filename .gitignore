@@ -35,6 +35,7 @@ data/.svn
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*~
 
 packets_log.txt
 history.dat
