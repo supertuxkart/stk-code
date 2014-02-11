@@ -8,7 +8,7 @@ uniform sampler2DArrayShadow shadowtex;
 uniform vec3 direction;
 uniform vec3 col;
 uniform mat4 invproj;
-uniform mat4 shadowmat[3];
+uniform mat4 shadowmat[4];
 //uniform int hasclouds;
 //uniform vec2 wind;
 //uniform float shadowoffset;
@@ -26,7 +26,7 @@ vec3 DecodeNormal(vec2 n)
 
 float getShadowFactor(vec3 pos, float bias)
 {
-	if (pos.z < 10.)
+	if (pos.z < 5.)
 	{
 		vec4 shadowcoord = (shadowmat[0] * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
@@ -43,19 +43,26 @@ float getShadowFactor(vec3 pos, float bias)
 	//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
 		return texture(shadowtex, vec4(shadowtexcoord, 0., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
-	else if (pos.z < 60)
+	else if (pos.z < 10.)
 	{
 		vec4 shadowcoord = (shadowmat[1] * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
 		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
 		return texture(shadowtex, vec4(shadowtexcoord, 1., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
-	else
+	else if (pos.z < 75.)
 	{
 		vec4 shadowcoord = (shadowmat[2] * vec4(pos, 1.0));
 		shadowcoord /= shadowcoord.w;
 		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex, vec4(shadowtexcoord, 2., 0.5 * (shadowcoord.z + bias) + 0.5));
+		return texture(shadowtex, vec4(shadowtexcoord, 2., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+	}
+	else
+	{
+		vec4 shadowcoord = (shadowmat[3] * vec4(pos, 1.0));
+		shadowcoord /= shadowcoord.w;
+		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
+		return texture(shadowtex, vec4(shadowtexcoord, 3., 0.5 * (shadowcoord.z + bias) + 0.5));
 	}
 }
 

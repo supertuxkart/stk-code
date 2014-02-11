@@ -145,10 +145,10 @@ RTT::RTT()
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glGenTextures(1, &shadowColorTex);
     glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 3, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
     glGenTextures(1, &shadowDepthTex);
     glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 3, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);

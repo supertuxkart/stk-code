@@ -484,22 +484,24 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
     {
+        5.,
         10.,
-        60.,
+        75.,
         oldfar,
     };
     float NearValues[] =
     {
         oldnear,
+        5.,
         10.,
-        60.,
+        75.,
     };
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
     sun_ortho_matrix.clear();
 
     // Build the 3 ortho projection (for the 3 shadow resolution levels)
-    for (unsigned i = 0; i < 3; i++)
+    for (unsigned i = 0; i < 4; i++)
     {
         camnode->setFarValue(FarValues[i]);
         camnode->setNearValue(NearValues[i]);
@@ -554,7 +556,7 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
-    assert(sun_ortho_matrix.size() == 3);
+    assert(sun_ortho_matrix.size() == 4);
 
     irr_driver->setPhase(SHADOW_PASS);
     glDisable(GL_BLEND);
