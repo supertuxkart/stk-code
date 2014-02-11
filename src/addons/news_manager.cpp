@@ -181,6 +181,9 @@ void* NewsManager::downloadNews(void *obj)
         xml = NULL;
     }   // hadDownloadError
 
+    if(xml) delete xml;
+    xml = NULL;
+    
     // Process new.xml now.
     if(file_manager->fileExists(xml_file))
     {

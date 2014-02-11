@@ -270,7 +270,7 @@ namespace Online{
         assert (profile != NULL);
         if(!this->m_has_fetched_friends && profile->m_has_fetched_friends)
             this->m_friends = profile->m_friends;
-        if(!this->m_has_fetched_achievements && profile->m_has_fetched_friends)
+        if(!this->m_has_fetched_achievements && profile->m_has_fetched_achievements)
             this->m_achievements = profile->m_achievements;
         if(this->m_relation_info == NULL && profile->m_relation_info != NULL)
         {
