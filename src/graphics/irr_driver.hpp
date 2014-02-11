@@ -102,7 +102,7 @@ private:
     RTT                *m_rtts;
     /** Shadow importance. */
     ShadowImportance   *m_shadow_importance;
-    core::matrix4 sun_ortho_matrix;
+    core::matrix4 sun_ortho_matrix[3];
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */

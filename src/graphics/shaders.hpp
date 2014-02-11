@@ -389,11 +389,11 @@ class ShadowedSunLightShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_shadowmat, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex0, uniform_shadowmat0, uniform_shadowtex1, uniform_shadowmat1, uniform_shadowtex2, uniform_shadowmat2, uniform_direction, uniform_col, uniform_invproj;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const core::matrix4 &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
+    static void setUniforms(const core::matrix4 &shadowmat0, const core::matrix4 &shadowmat1, const core::matrix4 &shadowmat2, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex0, unsigned TU_shadowtex1, unsigned TU_shadowtex2);
 };
 
 class Gaussian6HBlurShader

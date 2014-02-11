@@ -335,8 +335,8 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
         tex = 5;
         srv->setVertexShaderConstant("warpy", &tex, 1);
 
-        const float shadowoffset = 1.0f / irr_driver->getRTT(RTT_SHADOW)->getSize().Width;
-        srv->setVertexShaderConstant("shadowoffset", &shadowoffset, 1);
+//        const float shadowoffset = 1.0f / irr_driver->getRTT(RTT_SHADOW)->getSize().Width;
+//        srv->setVertexShaderConstant("shadowoffset", &shadowoffset, 1);
 
         firstdone = true;
     }

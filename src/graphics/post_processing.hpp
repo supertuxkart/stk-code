@@ -75,7 +75,7 @@ public:
 	/** Generate diffuse and specular map */
 	void         renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
 	void         renderSunlight();
-    void         renderShadowedSunlight(const core::matrix4 &sun_ortho_matrix);
+    void         renderShadowedSunlight(const core::matrix4 &sun_ortho_matrix0, const core::matrix4 &sun_ortho_matrix1, const core::matrix4 &sun_ortho_matrix2);
 
 	void renderFog(const core::matrix4 &ipvmat);
 	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);

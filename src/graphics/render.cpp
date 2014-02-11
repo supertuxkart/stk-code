@@ -470,60 +470,112 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
                               Camera * const camera)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-    static u8 tick = 0;
 
     const Vec3 *vmin, *vmax;
     World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
-    core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
-                                                    core::vector3df(0, 30, 0));
+
+    ITexture *ShadowRTT[] = {
+        m_rtts->getRTT(RTT_SHADOW0),
+        m_rtts->getRTT(RTT_SHADOW1),
+        m_rtts->getRTT(RTT_SHADOW2)
+    };
+
+    unsigned rtt_size[] = {
+        2048,
+        1024,
+        512,
+    };
 
     const float oldfar = camnode->getFarValue();
-    camnode->setFarValue(std::min(100.0f, oldfar));
-    camnode->render();
-    const core::aabbox3df smallcambox = camnode->
-                                        getViewFrustum()->getBoundingBox();
+    const float oldnear = camnode->getNearValue();
+    float FarValues[] =
+    {
+        10.,
+        60.,
+        oldfar,
+    };
+    float NearValues[] =
+    {
+        oldnear,
+        10.,
+        60.,
+    };
+
+    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+
+    // Build the 3 ortho projection (for the 3 shadow resolution levels)
+    for (unsigned i = 0; i < 3; i++)
+    {
+        camnode->setFarValue(FarValues[i]);
+        camnode->setNearValue(NearValues[i]);
+        camnode->render();
+        const core::aabbox3df smallcambox = camnode->
+            getViewFrustum()->getBoundingBox();
+        core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+            core::vector3df(0, 30, 0));
+
+
+        // Set up a nice ortho projection that contains our camera frustum
+        core::aabbox3df box = smallcambox;
+        box = box.intersect(trackbox);
+
+
+        SunCamViewMatrix.transformBoxEx(trackbox);
+        SunCamViewMatrix.transformBoxEx(box);
+
+        core::vector3df extent = trackbox.getExtent();
+        const float w = fabsf(extent.X);
+        const float h = fabsf(extent.Y);
+        float z = box.MaxEdge.Z;
+
+        // Snap to texels
+        const float units_per_w = w / rtt_size[i];
+        const float units_per_h = h / rtt_size[i];
+
+        float left = box.MinEdge.X;
+        float right = box.MaxEdge.X;
+        float up = box.MaxEdge.Y;
+        float down = box.MinEdge.Y;
+
+        left -= fmodf(left, units_per_w);
+        right -= fmodf(right, units_per_w);
+        up -= fmodf(up, units_per_h);
+        down -= fmodf(down, units_per_h);
+        z -= fmodf(z, 0.5f);
+
+        // FIXME: quick and dirt (and wrong) workaround to avoid division by zero
+        if (left == right) right += 0.1f;
+        if (up == down) down += 0.1f;
+        if (z == 30) z += 0.1f;
+
+        core::matrix4 tmp_matrix;
+
+        tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
+            up, down,
+            30, z);
+        m_suncam->setProjectionMatrix(tmp_matrix, true);
+        m_scene_manager->setActiveCamera(m_suncam);
+        m_suncam->render();
+
+        sun_ortho_matrix[i] = getVideoDriver()->getTransform(video::ETS_PROJECTION);
+        sun_ortho_matrix[i] *= getVideoDriver()->getTransform(video::ETS_VIEW);
+        sun_ortho_matrix[i] *= getInvViewMatrix();
+        irr_driver->setPhase(SHADOW_PASS);
+        glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
+        m_video_driver->setRenderTarget(ShadowRTT[i], true, true);
+        glDrawBuffer(GL_NONE);
+        m_scene_manager->drawAll(scene::ESNRP_SOLID);
+        glCullFace(GL_BACK);
+    }
+
+    camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
     camnode->render();
+    camera->activate();
+    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
 
-    // Set up a nice ortho projection that contains our camera frustum
-    core::aabbox3df box = smallcambox;
-    box = box.intersect(trackbox);
-
-    m_suncam->getViewMatrix().transformBoxEx(box);
-    m_suncam->getViewMatrix().transformBoxEx(trackbox);
-
-    core::vector3df extent = trackbox.getExtent();
-    const float w = fabsf(extent.X);
-    const float h = fabsf(extent.Y);
-    float z = box.MaxEdge.Z;
-
-    // Snap to texels
-    const float units_per_w = w / m_rtts->getRTT(RTT_SHADOW)->getSize().Width;
-    const float units_per_h = h / m_rtts->getRTT(RTT_SHADOW)->getSize().Height;
-
-    float left = box.MinEdge.X;
-    float right = box.MaxEdge.X;
-    float up = box.MaxEdge.Y;
-    float down = box.MinEdge.Y;
-
-    left -= fmodf(left, units_per_w);
-    right -= fmodf(right, units_per_w);
-    up -= fmodf(up, units_per_h);
-    down -= fmodf(down, units_per_h);
-    z -= fmodf(z, 0.5f);
-
-    // FIXME: quick and dirt (and wrong) workaround to avoid division by zero
-    if (left == right) right += 0.1f;
-    if (up == down) down += 0.1f;
-    if (z == 30) z += 0.1f;
-
-    sun_ortho_matrix.buildProjectionMatrixOrthoLH(left, right,
-                                        up, down,
-                                        30, z);
-
-    m_suncam->setProjectionMatrix(sun_ortho_matrix, true);
-    m_scene_manager->setActiveCamera(m_suncam);
-    m_suncam->render();
 
     //sun_ortho_matrix *= m_suncam->getViewMatrix();
 /*    ((SunLightProvider *) m_shaders->m_callbacks[ES_SUNLIGHT])->setShadowMatrix(ortho);
@@ -608,24 +660,11 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     overridemat.Material.TextureLayer[2].AnisotropicFilter = 0;
     overridemat.Material.Wireframe = 1;
     overridemat.Enabled = true;*/
-    sun_ortho_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION);
-    sun_ortho_matrix *= getVideoDriver()->getTransform(video::ETS_VIEW);
-    irr_driver->setPhase(SHADOW_PASS);
-    glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SHADOW), true, true);
-    glDrawBuffer(GL_NONE);
-    m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    glCullFace(GL_BACK);
+
+
 
 //    overridemat.EnablePasses = 0;
 //    overridemat.Enabled = false;
-    camera->activate();
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-
-    tick++;
-    tick %= 2;
 }
 
 // ----------------------------------------------------------------------------
@@ -731,7 +770,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam, float dt)
 {
-    sun_ortho_matrix *= getInvViewMatrix();
     core::array<video::IRenderTarget> rtts;
     // Diffuse
     rtts.push_back(m_rtts->getRTT(RTT_TMP1));
@@ -754,7 +792,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         {
           m_lights[i]->render();
           if (UserConfigParams::m_shadows)
-              m_post_processing->renderShadowedSunlight(sun_ortho_matrix);
+              m_post_processing->renderShadowedSunlight(sun_ortho_matrix[0], sun_ortho_matrix[1], sun_ortho_matrix[2]);
           else
               m_post_processing->renderSunlight();
           continue;
