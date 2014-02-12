@@ -9,8 +9,6 @@
 
 namespace irr { namespace video{ class ITexture; } }
 
-GLuint getTextureGLuint(irr::video::ITexture *tex);
-
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
     GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;

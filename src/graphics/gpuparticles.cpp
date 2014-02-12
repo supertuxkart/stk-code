@@ -6,10 +6,6 @@
 #include <IParticleSystemSceneNode.h>
 #include "guiengine/engine.hpp"
 
-GLuint getTextureGLuint(irr::video::ITexture *tex) {
-    return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
-}
-
 #define COMPONENTCOUNT 8
 
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(

@@ -42,7 +42,7 @@ void STKBillboard::render()
 {
 	core::vector3df pos = getAbsolutePosition();
 	glBindVertexArray(billboardvao);
-	GLuint texid = static_cast<irr::video::COpenGLTexture*>(Material.getTexture(0))->getOpenGLTextureName();
+    GLuint texid = getTextureGLuint(Material.getTexture(0));
 	setTexture(0, texid, GL_LINEAR, GL_LINEAR);
 	glUseProgram(MeshShader::BillboardShader::Program);
 	MeshShader::BillboardShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), pos, Size, 0);

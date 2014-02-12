@@ -212,7 +212,7 @@ void renderBloom(ITexture *in)
 	glUniform1f(FullScreenShader::BloomShader::uniform_low, threshold);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::BloomShader::uniform_texture, 0);
@@ -235,7 +235,7 @@ void renderBloomBlend(ITexture *in)
 	glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::BloomBlendShader::uniform_texture, 0);
@@ -261,11 +261,11 @@ void renderPPDisplace(ITexture *in)
 	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_viz, irr_driver->getDistortViz());
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_tex, 0);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_DISPLACE))->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(irr_driver->getRTT(RTT_DISPLACE)));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_dtex, 1);
@@ -294,7 +294,7 @@ void renderColorLevel(ITexture *in)
 	glUniform2f(FullScreenShader::ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
@@ -316,8 +316,8 @@ void PostProcessing::renderPointlight(const std::vector<float> &positions, const
 	glUseProgram(FullScreenShader::PointLightShader::Program);
 	glBindVertexArray(FullScreenShader::PointLightShader::vao);
 
-	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
-	setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
 	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0, 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -339,8 +339,8 @@ void PostProcessing::renderSunlight()
 
   glUseProgram(FullScreenShader::SunLightShader::Program);
   glBindVertexArray(FullScreenShader::SunLightShader::vao);
-  setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
-  setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+  setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+  setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
   FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
@@ -357,8 +357,8 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
 
     glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
     glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
-    setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
-    setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D_ARRAY, depthtex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -385,7 +385,7 @@ void PostProcessing::renderGaussian3Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
@@ -400,7 +400,7 @@ void PostProcessing::renderGaussian3Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(temprtt)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(temprtt));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
@@ -425,7 +425,7 @@ void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian6VBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
@@ -440,7 +440,7 @@ void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian6HBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(temprtt)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(temprtt));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
@@ -461,7 +461,7 @@ void PostProcessing::renderPassThrough(ITexture *tex)
 	glBindVertexArray(FullScreenShader::PassThroughShader::vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
@@ -503,7 +503,7 @@ void PostProcessing::renderGlow(ITexture *tex)
 	glBindVertexArray(FullScreenShader::GlowShader::vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::GlowShader::uniform_tex, 0);
@@ -529,9 +529,9 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 
 	glUseProgram(FullScreenShader::SSAOShader::Program);
 	glBindVertexArray(FullScreenShader::SSAOShader::vao);
-	setTexture(0, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
-	setTexture(1, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_LINEAR, GL_LINEAR);
-	setTexture(2, static_cast<irr::video::COpenGLTexture*>(noise_tex)->getOpenGLTextureName(), GL_NEAREST, GL_NEAREST);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_LINEAR, GL_LINEAR);
+    setTexture(2, getTextureGLuint(noise_tex), GL_NEAREST, GL_NEAREST);
 
 	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
@@ -567,7 +567,7 @@ void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 	glUseProgram(FullScreenShader::FogShader::Program);
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
-	setTexture(0, static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+    setTexture(0, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
 	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

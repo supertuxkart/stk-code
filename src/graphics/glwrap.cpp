@@ -305,12 +305,13 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 	return Program;
 }
 
+GLuint getTextureGLuint(irr::video::ITexture *tex) {
+    return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
+}
 
-
-void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUnit) {
-	glActiveTexture(GL_TEXTURE0 + textureUnit);
-	glBindTexture(GL_TEXTURE_2D, texid);
-	glUniform1i(location, textureUnit);
+GLuint getDepthTexture(irr::video::ITexture *tex) {
+    assert(tex->isRenderTarget());
+    return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
 }
 
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
