@@ -90,9 +90,6 @@ RTT::RTT()
 
     rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
 
-    rtts[RTT_SHADOW0] = drv->addRenderTargetTexture(shadowsize0, "rtt.shadow0", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SHADOW1] = drv->addRenderTargetTexture(shadowsize1, "rtt.shadow1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SHADOW2] = drv->addRenderTargetTexture(shadowsize2, "rtt.shadow2", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
 

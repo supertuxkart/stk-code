@@ -474,12 +474,6 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     const Vec3 *vmin, *vmax;
     World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
 
-    ITexture *ShadowRTT[] = {
-        m_rtts->getRTT(RTT_SHADOW0),
-        m_rtts->getRTT(RTT_SHADOW1),
-        m_rtts->getRTT(RTT_SHADOW2)
-    };
-
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
@@ -562,7 +556,6 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
-//    m_video_driver->setRenderTarget(ShadowRTT[0], true, true);
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
     glViewport(0, 0, 1024, 1024);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -682,11 +675,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     const u32 glowcount = glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
 
-/*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
-    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
-    overridemat.EnablePasses = scene::ESNRP_SOLID;
-    overridemat.Enabled = true;*/
-
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
@@ -709,25 +697,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
         cb->setColor(dat.r, dat.g, dat.b);
         cur->render();
     }
-
-    // Second round for transparents; it's a no-op for solids
-/*    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE_REF);
-    for (u32 i = 0; i < glowcount; i++)
-    {
-        const GlowData &dat = glows[i];
-        scene::ISceneNode * const cur = dat.node;
-
-        // Quick box-based culling
-        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-        if (!nodebox.intersectsWithBox(cambox))
-            continue;
-
-        cb->setColor(dat.r, dat.g, dat.b);
-        cur->render();
-    }
-    overridemat.Enabled = false;
-    overridemat.EnablePasses = 0;*/
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glDisable(GL_STENCIL_TEST);
@@ -984,18 +953,6 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    overridemat.Enabled = 1;
-    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE0;
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_DISPLACE);
-
-    overridemat.Material.TextureLayer[0].Texture =
-        irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
-    overridemat.Material.TextureLayer[0].BilinearFilter =
-    overridemat.Material.TextureLayer[0].TrilinearFilter = true;
-    overridemat.Material.TextureLayer[0].AnisotropicFilter = 0;
-    overridemat.Material.TextureLayer[0].TextureWrapU =
-    overridemat.Material.TextureLayer[0].TextureWrapV = video::ETC_REPEAT;
-
 	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
 	cb->update();
 
@@ -1008,7 +965,6 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 
     for (int i = 0; i < displacingcount; i++)
     {
-
         m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
         m_displacing[i]->render();
 
@@ -1016,18 +972,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
         m_displacing[i]->render();
     }
 
-    overridemat.Enabled = 0;
-
     // Blur it
-    video::SMaterial minimat;
-    minimat.Lighting = false;
-    minimat.ZWriteEnable = false;
-    minimat.ZBuffer = video::ECFN_ALWAYS;
-    minimat.setFlag(video::EMF_TRILINEAR_FILTER, true);
-
-    minimat.TextureLayer[0].TextureWrapU =
-    minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-
 	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);

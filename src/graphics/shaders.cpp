@@ -145,8 +145,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
-    m_shaders[ES_COLORIZE_REF] = glslmat(std::string(""), dir + "colorize_ref.frag",
-                                    m_callbacks[ES_COLORIZE], EMT_SOLID);
 
 	m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
 	m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
@@ -154,7 +152,6 @@ void Shaders::loadShaders()
 	m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag");
 
 	m_shaders[ES_SUNLIGHT] = glsl_noinput(std::string(""), dir + "sunlight.frag");
-	m_shaders[ES_SUNLIGHT_SHADOW] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
     m_shaders[ES_MLAA_COLOR1] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_color1.frag",
                                     m_callbacks[ES_MLAA_COLOR1]);

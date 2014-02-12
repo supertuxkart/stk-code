@@ -26,7 +26,6 @@ public:
 
 class ParticleSystemProxy : public scene::CParticleSystemSceneNode {
 protected:
-    video::SMaterial fakemat;
     GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;
     GLuint current_simulation_vao, non_current_simulation_vao;
     GLuint current_hm_simulation_vao, non_currenthm__simulation_vao;

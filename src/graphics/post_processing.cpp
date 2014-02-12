@@ -853,8 +853,6 @@ void PostProcessing::render()
 			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         else if (irr_driver->getSSAOViz())
 			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
-        else if (irr_driver->getShadowViz())
-            renderPassThrough(static_cast<irr::video::COpenGLFBOTexture*>(irr_driver->getRTT(RTT_SHADOW0))->DepthBufferTexture);
         else
 			renderColorLevel(in);
     }

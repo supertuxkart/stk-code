@@ -65,13 +65,6 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     const core::vector3df& position,
     const core::vector3df& rotation,
     const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
-    fakemat.Lighting = false;
-    fakemat.ZWriteEnable = false;
-    fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
-    fakemat.setTexture(0, getMaterial(0).getTexture(0));
-    fakemat.BlendOperation = video::EBO_NONE;
-    fakemat.FrontfaceCulling = false;
-    fakemat.BackfaceCulling = false;
     glGenBuffers(1, &initial_values_buffer);
     glGenBuffers(2, tfb_buffers);
     glGenBuffers(1, &quaternionsbuffer);
