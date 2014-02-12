@@ -1,7 +1,8 @@
-#version 330 compatibility
+#version 330
 uniform sampler2D tex;
 uniform vec2 pixel;
 
+in vec2 uv;
 out vec4 FragColor;
 
 // Separated penumbra, vertical
@@ -10,8 +11,8 @@ void main()
 {
 	float sum = 0.0;
 	vec4 tmp;
-	float X = gl_TexCoord[0].x;
-	float Y = gl_TexCoord[0].y;
+	float X = uv.x;
+	float Y = uv.y;
 	float width = 0.0;
 	float zsum = 0.00001;
 
