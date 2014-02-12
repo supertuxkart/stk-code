@@ -150,7 +150,7 @@ STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::IScene
 	const irr::core::vector3df& scale) :
 		CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-    setMesh(mesh);
+	createGLMeshes();
 }
 
 void STKMesh::createGLMeshes()
@@ -185,16 +185,9 @@ void STKMesh::cleanGLMeshes()
 
 void STKMesh::setMesh(irr::scene::IMesh* mesh)
 {
-    CMeshSceneNode::setReadOnlyMaterials(true);
 	CMeshSceneNode::setMesh(mesh);
 	cleanGLMeshes();
 	createGLMeshes();
-}
-
-void STKMesh::setReadOnlyMaterials(bool readonly)
-{
-    if (!readonly)
-        Log::error("STKMesh", "Cannot set non read only material, use setMesh instead");
 }
 
 STKMesh::~STKMesh()
@@ -989,8 +982,7 @@ void STKMesh::render()
 		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
 		if (mb)
 		{
-            assert(isReadOnlyMaterials());
-            const video::SMaterial& material = Materials[i];
+			const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];				
 
 			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
 			bool transparent = (rnd && rnd->isTransparent());
