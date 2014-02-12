@@ -1,4 +1,4 @@
-#version 130
+#version 330
 noperspective in vec3 nor;
 out vec2 EncodedNormal;
 

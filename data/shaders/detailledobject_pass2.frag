@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D Albedo;
 uniform sampler2D Detail;
 uniform sampler2D DiffuseMap;

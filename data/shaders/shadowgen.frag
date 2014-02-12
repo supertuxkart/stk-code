@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 uniform sampler2D halft; // half is a reserved word
 uniform sampler2D quarter;
 uniform sampler2D eighth;

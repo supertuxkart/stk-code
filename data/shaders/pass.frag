@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 uniform sampler2D tex;
 
 out vec4 FragColor;

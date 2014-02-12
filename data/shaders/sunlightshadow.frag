@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2DArrayShadow shadowtex;

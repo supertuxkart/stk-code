@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 uniform vec2 PIXEL_SIZE;
 uniform mat4 ModelViewProjectionMatrix;
 
