@@ -170,7 +170,10 @@ void RaceGUI::renderGlobal(float dt)
 
     if (!m_is_tutorial)
     {
-        drawGlobalTimer();
+        //stop displaying timer as soon as race is over
+        if (world->getPhase()<WorldStatus::DELAY_FINISH_PHASE)
+           drawGlobalTimer();
+        
         if(world->getPhase() == WorldStatus::GO_PHASE ||
            world->getPhase() == WorldStatus::MUSIC_PHASE)
         {
