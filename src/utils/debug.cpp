@@ -29,6 +29,7 @@
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "utils/log.hpp"
+#include "utils/profiler.hpp"
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
 using namespace irr;
@@ -57,6 +58,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
     DEBUG_PROFILER,
+    DEBUG_PROFILER_GENERATE_REPORT,
     DEBUG_FPS,
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
@@ -135,6 +137,8 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
             
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
+            if (UserConfigParams::m_profiler_enabled)
+                mnu->addItem(L"Toggle capture profiler report", DEBUG_PROFILER_GENERATE_REPORT);
             mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             mnu->addItem(L"FPS",DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
@@ -253,6 +257,10 @@ bool onEvent(const SEvent &event)
                 {
                     UserConfigParams::m_profiler_enabled =
                                             !UserConfigParams::m_profiler_enabled;
+                }
+                else if (cmdID == DEBUG_PROFILER_GENERATE_REPORT)
+                {
+                    profiler.setCaptureReport(!profiler.getCaptureReport());
                 }
                 else if (cmdID == DEBUG_THROTTLE_FPS)
                 {

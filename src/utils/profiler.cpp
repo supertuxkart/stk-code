@@ -21,6 +21,7 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "io/xml_writer.hpp"
 #include <assert.h>
 #include <stack>
 #include <sstream>
@@ -71,11 +72,39 @@ Profiler::Profiler()
     m_time_last_sync = _getTimeMilliseconds();
     m_time_between_sync = 0.0;
     m_freeze_state = UNFROZEN;
+    m_capture_report = false;
+    m_first_capture_sweep = true;
+    m_capture_report_buffer = NULL;
 }
 
 //-----------------------------------------------------------------------------
 Profiler::~Profiler()
 {
+}
+
+//-----------------------------------------------------------------------------
+
+void Profiler::setCaptureReport(bool captureReport)
+{
+    if (!m_capture_report && captureReport)
+    {
+        m_capture_report = true;
+        m_first_capture_sweep = true;
+        // TODO: a 20 MB hardcoded buffer for now. That should amply suffice for
+        // all reasonable purposes. But it's not too clean to hardcode
+        m_capture_report_buffer = new StringBuffer(20 * 1024 * 1024);
+    }
+    else if (m_capture_report && !captureReport)
+    {
+        // when disabling capture to file, flush captured data to a file
+        {
+            XMLWriter writer(file_manager->getUserConfigFile("profiling.csv").c_str());
+            writer << m_capture_report_buffer->getRawBuffer();
+        }
+        m_capture_report = false;
+        delete m_capture_report_buffer;
+        m_capture_report_buffer = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -194,7 +223,7 @@ void Profiler::draw()
     // Force to show the pointer
     irr_driver->showPointer();
 
-    int read_id = !m_write_id;
+    int read_id = (m_freeze_state == FROZEN ? !m_write_id : m_write_id);
 
     // Compute some values for drawing (unit: pixels, but we keep floats for reducing errors accumulation)
     core::dimension2d<u32>    screen_size    = driver->getScreenSize();
@@ -232,19 +261,34 @@ void Profiler::draw()
     core::vector2di mouse_pos = GUIEngine::EventHandler::get()->getMousePos();
 
     // For each thread:
-    for(size_t i=0 ; i < nb_thread_infos ; i++)
+    for (size_t i = 0; i < nb_thread_infos; i++)
     {
         // Draw all markers
         MarkerList& markers = m_thread_infos[i].markers_done[read_id];
 
-        if(markers.empty())
+        if (markers.empty())
             continue;
 
+        if (m_capture_report)
+        {
+            if (m_first_capture_sweep)
+                m_capture_report_buffer->getStdStream() << "\"Thread\";";
+            else
+                m_capture_report_buffer->getStdStream() << i << ";";
+        }
         MarkerList::const_iterator it_end = markers.end();
-        for(MarkerList::const_iterator it = markers.begin() ; it != it_end ; it++)
+        for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
         {
             const Marker&    m = *it;
             assert(m.end >= 0.0);
+
+            if (m_capture_report)
+            {
+                if (m_first_capture_sweep)
+                    m_capture_report_buffer->getStdStream() << "\"" << m.name << "\";";
+                else
+                    m_capture_report_buffer->getStdStream() << (int)std::round((m.end - m.start) * 1000) << ";";
+            }
             core::rect<s32>    pos((s32)( x_offset + factor*m.start ),
                                    (s32)( y_offset + i*line_height ),
                                    (s32)( x_offset + factor*m.end ),
@@ -259,6 +303,12 @@ void Profiler::draw()
             // If the mouse cursor is over the marker, get its information
             if(pos.isPointInside(mouse_pos))
                 hovered_markers.push(m);
+        }
+
+        if (m_capture_report)
+        {
+            m_capture_report_buffer->getStdStream() << "\n";
+            m_first_capture_sweep = false;
         }
     }
 
