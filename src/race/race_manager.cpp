@@ -521,6 +521,9 @@ void RaceManager::next()
                 );
             }
             user_config->saveConfig();
+            std::cout << "Grand Prix data saved "<< std::endl;
+		//Inform user grand prix is saved 
+				
         }
         startNextRace();
     }
@@ -631,9 +634,45 @@ void RaceManager::exitRace(bool delete_world)
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
     {
         unlock_manager->getCurrentSlot()->grandPrixFinished();
+ 
+        
         if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
         {
-            //Delete saved GP
+          SavedGrandPrix* gp =
+                SavedGrandPrix::getSavedGP(StateManager::get()
+                                           ->getActivePlayerProfile(0)
+                                           ->getUniqueID(),
+                                           m_grand_prix.getId(),
+                                           m_difficulty,
+                                           m_num_karts,
+                                           m_player_karts.size());
+            if(gp != NULL)
+            {
+                //if so addept it
+                gp->setKarts(m_kart_status);
+                gp->setNextTrack(m_track_number);
+            }
+            else
+            {
+                //create a new entry
+                UserConfigParams::m_saved_grand_prix_list.push_back(
+                    new SavedGrandPrix(
+                        StateManager::get()->getActivePlayerProfile(0)
+                                           ->getUniqueID(),
+                        m_grand_prix.getId(),
+                        m_difficulty,
+                        m_player_karts.size(),
+                        m_track_number,
+                        m_kart_status
+                    )
+                );
+            }
+            user_config->saveConfig();
+			
+            std::cout << "Grand Prix data saved "<< std::endl;
+		//Inform user grand prix is saved 
+		
+        /*    //Delete saved GP
             SavedGrandPrix* gp =
                 SavedGrandPrix::getSavedGP(StateManager::get()
                                            ->getActivePlayerProfile(0)
@@ -643,6 +682,7 @@ void RaceManager::exitRace(bool delete_world)
                                            m_num_karts,
                                            m_player_karts.size());
             if(gp != NULL) gp->remove();
+        */
         }
         StateManager::get()->resetAndGoToScreen( MainMenuScreen::getInstance() );
 
@@ -733,7 +773,11 @@ void RaceManager::kartFinishedRace(const AbstractKart *kart, float time)
     if(kart->getController()->isPlayerController() ||
         kart->getController()->isNetworkController())
         m_num_finished_players++;
+
+		
+		
 }   // kartFinishedRace
+
 
 //-----------------------------------------------------------------------------
 
