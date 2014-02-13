@@ -24,6 +24,8 @@
 #include <stack>
 #include <string>
 #include <streambuf>
+#include <ostream>
+#include <iostream>
 
 
 class Profiler;
@@ -60,7 +62,7 @@ struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char
     ostreambuf(char_type* buffer, std::streamsize bufferLength)
     {
         // set the "put" pointer the start of the buffer and record it's length.
-        setp(buffer, buffer + bufferLength);
+        this->setp(buffer, buffer + bufferLength);
     }
 };
 

@@ -287,7 +287,7 @@ void Profiler::draw()
                 if (m_first_capture_sweep)
                     m_capture_report_buffer->getStdStream() << "\"" << m.name << "\";";
                 else
-                    m_capture_report_buffer->getStdStream() << (int)std::round((m.end - m.start) * 1000) << ";";
+                    m_capture_report_buffer->getStdStream() << (int)round((m.end - m.start) * 1000) << ";";
             }
             core::rect<s32>    pos((s32)( x_offset + factor*m.start ),
                                    (s32)( y_offset + i*line_height ),
