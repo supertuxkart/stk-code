@@ -47,16 +47,19 @@ private:
     int m_current_node;
     int m_next_node;
     int m_target_node;
-
-    std::vector<std::pair<Vec3,Vec3> > portals;
-
+    Vec3 m_target_point;
     float m_target_angle;
+
+    std::vector<std::pair<Vec3,Vec3> > m_portals;
+    std::vector<Vec3> m_path_corners;
+
 
     float m_time_since_stuck;
     bool m_currently_reversing;
 
     float determineTurnRadius(std::vector<Vec3>& points);
-    void findPortals(int start, int end, std::vector<std::pair<Vec3,Vec3> > &portals);
+    void findPortals(int start, int end);
+    void stringPull(const Vec3, const Vec3);
     void handleAcceleration(const float dt) ;
     void handleSteering(const float dt);
     void handleBraking();
