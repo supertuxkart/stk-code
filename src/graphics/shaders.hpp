@@ -225,6 +225,39 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
 };
 
+class ShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position;
+    static GLuint uniform_MVP;
+
+    static void init();
+    static void setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix);
+};
+
+class RefShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_tex;
+
+    static void init();
+    static void setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex);
+};
+
+class GrassShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_color;
+    static GLuint uniform_MVP, uniform_tex, uniform_windDir;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex);
+};
+
 class DisplaceShader
 {
 public:
@@ -352,6 +385,17 @@ public:
 	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
+class ShadowedSunLightShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_shadowmat, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const std::vector<core::matrix4> &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
+};
+
 class Gaussian6HBlurShader
 {
 public:
@@ -390,6 +434,39 @@ public:
 	static GLuint vao;
 
 	static void init();
+};
+
+class PenumbraHShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_pixel;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &pixels, GLuint TU_tex);
+};
+
+class PenumbraVShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_pixel;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &pixels, GLuint TU_tex);
+};
+
+class ShadowGenShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_halft, uniform_quarter, uniform_height;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(GLuint TU_halft, GLuint TU_quarter, GLuint TU_height);
 };
 
 class PassThroughShader
@@ -494,12 +571,10 @@ public:
     ACT(ES_GAUSSIAN3V) \
     ACT(ES_MIPVIZ) \
     ACT(ES_COLORIZE) \
-    ACT(ES_COLORIZE_REF) \
 	ACT(ES_OBJECT_UNLIT) \
     ACT(ES_OBJECTPASS) \
     ACT(ES_OBJECTPASS_REF) \
     ACT(ES_SUNLIGHT) \
-    ACT(ES_SUNLIGHT_SHADOW) \
     ACT(ES_OBJECTPASS_RIMLIT) \
     ACT(ES_MLAA_COLOR1) \
     ACT(ES_MLAA_BLEND2) \

@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D tex_layout;
 uniform sampler2D tex_detail0;
 uniform sampler2D tex_detail1;

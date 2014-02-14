@@ -20,8 +20,8 @@
 
 void initGL();
 GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path);
+GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path);
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
-void bindUniformToTextureUnit(GLuint location, GLuint texid, unsigned textureUnit);
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF = false);
 
 // already includes glext.h, which defines useful GL constants.
@@ -75,6 +75,11 @@ extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
 extern PFNGLTEXBUFFERPROC glTexBuffer;
 extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
 extern PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
+extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+extern PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
+extern PFNGLTEXIMAGE3DPROC glTexImage3D;
+extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
@@ -84,6 +89,9 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
+
+GLuint getTextureGLuint(irr::video::ITexture *tex);
+GLuint getDepthTexture(irr::video::ITexture *tex);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
 	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

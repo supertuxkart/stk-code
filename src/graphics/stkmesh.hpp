@@ -13,6 +13,7 @@ struct GLMesh {
 	GLuint vao_second_pass;
 	GLuint vao_glow_pass;
 	GLuint vao_displace_pass;
+    GLuint vao_shadow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
 	GLuint textures[6];
@@ -62,6 +63,7 @@ protected:
 	// Misc passes shaders (glow, displace...)
 	void drawGlow(const GLMesh &mesh);
 	void drawDisplace(const GLMesh &mesh);
+    void drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void createGLMeshes();
 	void cleanGLMeshes();
 public:

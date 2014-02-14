@@ -51,7 +51,13 @@ STKPeer::~STKPeer()
         m_peer = NULL;
     if (m_player_profile)
         delete m_player_profile;
-    m_player_profile = NULL;
+    m_player_profile = NULL;    
+    if (m_client_server_token)
+        delete m_client_server_token;
+    m_client_server_token = NULL;
+    if (m_token_set)
+        delete m_token_set;
+    m_token_set = NULL;
 }
 
 //-----------------------------------------------------------------------------

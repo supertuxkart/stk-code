@@ -6,40 +6,7 @@
 #include <IParticleSystemSceneNode.h>
 #include "guiengine/engine.hpp"
 
-GLuint getTextureGLuint(irr::video::ITexture *tex) {
-    return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
-}
-
 #define COMPONENTCOUNT 8
-
-GPUParticle::GPUParticle(scene::ISceneNode *parent, scene::ISceneManager* mgr, ITexture *tex)
-: scene::ISceneNode(parent, mgr, -1) {
-    fakemat.Lighting = false;
-    fakemat.ZWriteEnable = false;
-    fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
-    fakemat.Thickness = 200;
-    fakemat.setTexture(0, tex);
-    fakemat.BlendOperation = video::EBO_NONE;
-    setAutomaticCulling(0);
-}
-
-void GPUParticle::render() {
-    simulate();
-    draw();
-    // We need to force irrlicht to update its internal states
-    irr::video::IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setMaterial(fakemat);
-    static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
-}
-
-void GPUParticle::OnRegisterSceneNode() {
-    if (
-        (irr_driver->getRenderPass() & irr::scene::ESNRP_TRANSPARENT) == irr::scene::ESNRP_TRANSPARENT)
-    {
-        SceneManager->registerNodeForRendering(this, irr::scene::ESNRP_TRANSPARENT);
-    }
-    ISceneNode::OnRegisterSceneNode();
-}
 
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
     bool withDefaultEmitter, ISceneNode* parent, s32 id,
@@ -65,13 +32,6 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     const core::vector3df& position,
     const core::vector3df& rotation,
     const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
-    fakemat.Lighting = false;
-    fakemat.ZWriteEnable = false;
-    fakemat.MaterialType = irr_driver->getShader(ES_RAIN);
-    fakemat.setTexture(0, getMaterial(0).getTexture(0));
-    fakemat.BlendOperation = video::EBO_NONE;
-    fakemat.FrontfaceCulling = false;
-    fakemat.BackfaceCulling = false;
     glGenBuffers(1, &initial_values_buffer);
     glGenBuffers(2, tfb_buffers);
     glGenBuffers(1, &quaternionsbuffer);
@@ -607,103 +567,4 @@ void ParticleSystemProxy::OnRegisterSceneNode()
         SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT_EFFECT);
         ISceneNode::OnRegisterSceneNode();
     }
-}
-
-RainNode::RainNode(scene::ISceneManager* mgr, ITexture *tex)
-: GPUParticle(0, mgr, tex)
-{
-    RenderProgram = LoadProgram(file_manager->getAsset("shaders/rain.vert").c_str(), file_manager->getAsset("shaders/rain.frag").c_str());
-    loc_screenw = glGetUniformLocation(RenderProgram, "screenw");
-    loc_screen = glGetUniformLocation(RenderProgram, "screen");
-    loc_invproj = glGetUniformLocation(RenderProgram, "invproj");
-    texloc_tex = glGetUniformLocation(RenderProgram, "tex");
-    texloc_normal_and_depths = glGetUniformLocation(RenderProgram, "normals_and_depth");
-
-    const char *varyings[] = { "currentPosition" };
-    SimulationProgram = LoadTFBProgram(file_manager->getAsset("shaders/rainsim.vert").c_str(), varyings, 1);
-    loc_campos = glGetUniformLocation(SimulationProgram, "campos");
-    loc_viewm = glGetUniformLocation(SimulationProgram, "viewm");
-    loc_time = glGetUniformLocation(SimulationProgram, "time");
-    count = 2500;
-    area = 3500;
-
-    u32 i;
-    float x, y, z, vertices[7500];
-    for (i = 0; i < count; i++)
-    {
-        x = ((rand() % area) - area / 2) / 100.0f;
-        y = ((rand() % 2400)) / 100.0f;
-        z = ((rand() % area) - area / 2) / 100.0f;
-
-        vertices[3 * i] = x;
-        vertices[3 * i + 1] = y;
-        vertices[3 * i + 2] = z;
-    }
-
-    texture = getTextureGLuint(tex);
-    normal_and_depth = getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-    glGenBuffers(2, tfb_vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_vertex_buffer[0]);
-    glBufferData(GL_ARRAY_BUFFER, 3 * count * sizeof(float), vertices, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_vertex_buffer[1]);
-    glBufferData(GL_ARRAY_BUFFER, 3 * count * sizeof(float), 0, GL_STREAM_DRAW);
-
-    box.addInternalPoint(vector3df((float)(-area / 2)));
-    box.addInternalPoint(vector3df((float)(area / 2)));
-}
-
-void RainNode::simulate() {
-    glUseProgram(SimulationProgram);
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 90.0f;
-    const irr::core::matrix4 viewm = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_VIEW);
-    const irr::core::vector3df campos = irr_driver->getSceneManager()->getActiveCamera()->getPosition();
-
-    glEnable(GL_RASTERIZER_DISCARD);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_vertex_buffer[0]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_vertex_buffer[1]);
-
-    glUniformMatrix4fv(loc_viewm, 1, GL_FALSE, viewm.pointer());
-    glUniform1f(loc_time, time);
-    glUniform3f(loc_campos, campos.X, campos.Y, campos.Z);
-    glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, count);
-    glEndTransformFeedback();
-    glDisable(GL_RASTERIZER_DISCARD);
-}
-
-void RainNode::draw() {
-    const float screenw = (float)UserConfigParams::m_width;
-
-    glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
-    glEnable(GL_POINT_SPRITE);
-    glUseProgram(RenderProgram);
-    glEnableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_vertex_buffer[1]);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
-    float screen[2] = {
-        (float)UserConfigParams::m_width,
-        (float)UserConfigParams::m_height
-    };
-    irr::core::matrix4 invproj = irr_driver->getVideoDriver()->getTransform(irr::video::ETS_PROJECTION);
-    invproj.makeInverse();
-
-    bindUniformToTextureUnit(texloc_tex, texture, 0);
-    bindUniformToTextureUnit(texloc_normal_and_depths, normal_and_depth, 1);
-
-    glUniformMatrix4fv(loc_invproj, 1, GL_FALSE, invproj.pointer());
-    glUniform2f(loc_screen, screen[0], screen[1]);
-    glUniform1f(loc_screenw, screenw);
-    glDrawArrays(GL_POINTS, 0, count);
-    glDisableVertexAttribArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glActiveTexture(GL_TEXTURE0);
-    glDisable(GL_VERTEX_PROGRAM_POINT_SIZE);
-}
-
-const core::aabbox3d<f32>& RainNode::getBoundingBox() const
-{
-    return box;
 }

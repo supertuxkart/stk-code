@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 uniform float power;
 uniform sampler2D tex;
 

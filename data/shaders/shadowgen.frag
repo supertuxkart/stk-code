@@ -1,15 +1,17 @@
-#version 130
+#version 330
 uniform sampler2D halft; // half is a reserved word
 uniform sampler2D quarter;
 uniform sampler2D eighth;
+
+in vec2 uv;
 out vec4 FragColor;
 
 void main()
 {
 	vec3 val[3];
-	val[0] = texture(halft, gl_TexCoord[0].xy).xyz;
-	val[1] = texture(quarter, gl_TexCoord[0].xy).xyz;
-	val[2] = texture(eighth, gl_TexCoord[0].xy).xyz;
+	val[0] = texture(halft, uv).xyz;
+	val[1] = texture(quarter, uv).xyz;
+	val[2] = texture(eighth, uv).xyz;
 
 	// Find the first level with a penumbra value
 	int i;

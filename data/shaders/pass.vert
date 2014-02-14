@@ -1,5 +1,5 @@
 // Passthrough shader for drawQuad()
-#version 130
+#version 330 compatibility
 
 out vec2 uv;
 

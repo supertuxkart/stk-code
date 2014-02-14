@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D tex;
 uniform vec3 inlevel;
 uniform vec2 outlevel;

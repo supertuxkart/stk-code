@@ -51,7 +51,6 @@ enum TypeRTT
 
     RTT_SSAO,
 
-    RTT_SHADOW,
     RTT_COLLAPSE,
     RTT_COLLAPSEH,
     RTT_COLLAPSEV,
@@ -74,9 +73,12 @@ public:
     ~RTT();
 
     ITexture *getRTT(TypeRTT which);
+    unsigned getShadowFBO() const { return shadowFBO; }
+    unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
 private:
     ITexture *rtts[RTT_COUNT];
+    unsigned shadowFBO, shadowColorTex, shadowDepthTex;
 };
 
 #endif

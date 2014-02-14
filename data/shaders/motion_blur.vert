@@ -17,7 +17,7 @@
 
 
 // motion_blur.vert
-#version 130
+#version 330 compatibility
 
 void main()
 {
