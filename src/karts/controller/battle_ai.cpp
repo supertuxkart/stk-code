@@ -85,7 +85,7 @@ BattleAI::BattleAI(AbstractKart *kart,
     // billboard showing 'AIBaseController' to the kar.
     Controller::setControllerName("BattleAI");
 
-}
+}   // BattleAI
 
 BattleAI::~BattleAI()
 {
@@ -94,62 +94,76 @@ BattleAI::~BattleAI()
 #endif
 }   //  ~BattleAI
 
+//-----------------------------------------------------------------------------
+/** Resets the AI when a race is restarted.
+ */
 void BattleAI::reset()
 {
     m_current_node = BattleGraph::UNKNOWN_POLY;
+    m_next_node = BattleGraph::UNKNOWN_POLY;
+    m_target_node = BattleGraph::UNKNOWN_POLY;
+    m_target_point = Vec3(0,0,0);
+    m_target_angle = 0.0f;
     m_time_since_stuck = 0.0f;
     m_currently_reversing = false;
     AIBaseController::reset();
 }
 
+//-----------------------------------------------------------------------------
+/** This is the main entry point for the AI.
+ *  It is called once per frame for each AI and determines the behaviour of
+ *  the AI, e.g. steering, accelerating/braking, firing.
+ */
 void BattleAI::update(float dt)
 {
-    //m_controls->m_accel     = 0.5f;
- //   m_controls->m_steer     = 0;
-   // updateCurrentNode();
     handleAcceleration(dt);
     handleSteering(dt);
     handleBraking();
     handleGetUnstuck(dt);
     AIBaseController::update(dt);
-}   //BattleAI
+}   //update
 
 
-void BattleAI::handleGetUnstuck(const float dt)
+//-----------------------------------------------------------------------------
+/** Handles acceleration. It also takes the plunger into account.
+ *  \param dt Time step size.
+ */
+void BattleAI::handleAcceleration( const float dt)
 {
-    if(isStuck() == true)
+    //Do not accelerate until we have delayed the start enough
+   /* if( m_start_delay > 0.0f )
     {
-        std::cout<<"GOT STUCK\n";
-        m_time_since_stuck = 0.0f;
-        m_currently_reversing = true;
-        m_controls->reset();
+        m_start_delay -= dt;
+        m_controls->m_accel = 0.0f;
+        return;
     }
-    if(m_currently_reversing == true)
+    */
+
+    if( m_controls->m_brake )
     {
-        setSteering(-1.0f*m_target_angle,dt);
-        setSteering(-2.0f*m_target_angle,dt);
-        setSteering(-2.0f*m_target_angle,dt);
-        m_controls->m_accel = -0.35f;
-        /*
-        if(m_target_angle > 0)
-        setSteering(M_PI,dt);
-        else setSteering(-M_PI,dt);
-        */
-        m_time_since_stuck += dt;
-        
-
-        if(m_time_since_stuck >= 0.6f)
-        {
-            m_currently_reversing = false;
-            std::cout<<"GOT UNSTUCK\n";
-            m_time_since_stuck = 0.0f;
-        }
+        m_controls->m_accel = 0.0f;
+        return;
     }
-}
 
+    if(m_kart->getBlockedByPlungerTime()>0)
+    {
+        if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
+            m_controls->m_accel = 0.05f;
+        else
+            m_controls->m_accel = 0.0f;
+        return;
+    }
 
+    m_controls->m_accel = stk_config->m_ai_acceleration;
 
-// Handles steering. 
+}   // handleAcceleration
+
+//-----------------------------------------------------------------------------
+/** This function sets the steering.
+ *  NOTE: The Battle AI is in development and currently this function is a
+ *  sandbox for testing out the AI. It may actually be doing a lot more than 
+ *  just steering to a point, which means this function could be messy. 
+ */
 void BattleAI::handleSteering(const float dt)
 {
     const AbstractKart* kart = m_world->getPlayerKart(0);
@@ -196,9 +210,26 @@ void BattleAI::handleSteering(const float dt)
         Log::debug("skidding_ai","-Outside of road: steer to center point.\n");
 #endif
 
-}
+}   // handleSteering
 
-
+//-----------------------------------------------------------------------------
+/** This function finds the polyon edges(portals) that the AI will cross before
+ *  reaching its destination. We start from the current polygon and call  
+ *  BattleGraph::getNextShortestPathPoly() to find the next polygon on the shortest 
+ *  path to the destination. Then find the common edge between the current
+ *  poly and the next poly, store it and step through the channel.
+ *
+ *       1----2----3            In this case, the portals are:
+ *       |strt|    |            (2,5) (4,5) (10,7) (10,9) (11,12) 
+ *       6----5----4
+ *            |    |
+ *            7----10----11----14
+ *            |    |     | end |
+ *            8----9-----12----13
+ *
+ *  \param start The start node(polygon) of the channel.
+ *  \param end The end node(polygon) of the channel.
+ */
 void BattleAI::findPortals(int start, int end)
 {
    int this_node = start;
@@ -244,9 +275,29 @@ void BattleAI::findPortals(int start, int end)
        //m_debug_sphere->setPosition((portalLeft).toIrrVector());
        this_node=next_node;
    }
-}
+}   // findPortals
 
-void BattleAI::stringPull(const Vec3 start_pos, const Vec3 end_pos)
+//-----------------------------------------------------------------------------
+/** This function implements the funnel algorithm for finding shortest paths 
+ *  through a polygon channel. This means that we should move from corner to 
+ *  corner to move on the most straight and shortest path to the destination.
+ *  This can be visualized as pulling a string from the end point to the start.
+ *  The string will bend at the corners, and this algorithm will find those 
+ *  corners using portals from findPortals(). The AI will aim at the first 
+ *  corner and the rest can be used for estimating the curve (braking).
+ *
+ *       1----2----3            In this case, the corners are:
+ *       |strt|    |            <5,10,end>
+ *       6----5----4
+ *            |    |
+ *            7----10----11----14
+ *            |    |     | end |
+ *            8----9-----12----13
+ *
+ *  \param start_pos The start position (usually the AI's current position).
+ *  \param end_pos The end position (m_target_point).
+ */
+void BattleAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
 {
     Vec3 funnel_apex = start_pos;
     Vec3 funnel_left = m_portals[0].first;
@@ -254,13 +305,13 @@ void BattleAI::stringPull(const Vec3 start_pos, const Vec3 end_pos)
     unsigned int apex_index=0, fun_left_index=0, fun_right_index=0;
     m_portals.push_back(std::make_pair(end_pos,end_pos));
     m_path_corners.clear();
+    const float eps=0.0001f;
     
     for(int i=0; i<m_portals.size(); i++)
     {
         Vec3 portal_left = m_portals[i].first;
         Vec3 portal_right = m_portals[i].second;
 
-        const float eps=0.0001f;
 
         //Compute for left edge
         if((funnel_left==funnel_apex) || portal_left.sideOfLine2D(funnel_apex,funnel_left)<=-eps)
@@ -308,42 +359,50 @@ void BattleAI::stringPull(const Vec3 start_pos, const Vec3 end_pos)
 
     //Push end_pos to m_path_corners so if no corners, we aim at target
     m_path_corners.push_back(end_pos);
-}
+}   //  stringPull
 
-
-
-void BattleAI::handleAcceleration( const float dt)
+//-----------------------------------------------------------------------------
+/** Calls AIBaseController::isStuck() to determine if the AI is stuck.
+ *  If the AI is stuck then it will override the controls and start reverse
+ *  the kart while turning.
+ */
+void BattleAI::handleGetUnstuck(const float dt)
 {
-    //Do not accelerate until we have delayed the start enough
-   /* if( m_start_delay > 0.0f )
+    if(isStuck() == true)
     {
-        m_start_delay -= dt;
-        m_controls->m_accel = 0.0f;
-        return;
+        m_time_since_stuck = 0.0f;
+        m_currently_reversing = true;
+        m_controls->reset();
     }
-    */
-
-    if( m_controls->m_brake )
+    if(m_currently_reversing == true)
     {
-        m_controls->m_accel = 0.0f;
-        return;
+        setSteering(-1.0f*m_target_angle,dt);
+        setSteering(-2.0f*m_target_angle,dt);
+        setSteering(-2.0f*m_target_angle,dt);
+        m_controls->m_accel = -0.35f;
+        /*
+        if(m_target_angle > 0)
+        setSteering(M_PI,dt);
+        else setSteering(-M_PI,dt);
+        */
+        m_time_since_stuck += dt;
+        
+
+        if(m_time_since_stuck >= 0.6f)
+        {
+            m_currently_reversing = false;
+            m_time_since_stuck = 0.0f;
+        }
     }
-
-    if(m_kart->getBlockedByPlungerTime()>0)
-    {
-        if(m_kart->getSpeed() < m_kart->getCurrentMaxSpeed() / 2)
-            m_controls->m_accel = 0.05f;
-        else
-            m_controls->m_accel = 0.0f;
-        return;
-    }
-
-    m_controls->m_accel = stk_config->m_ai_acceleration;
-
-}   // handleAcceleration
+} // handleGetUnstuck
 
 
-
+//-----------------------------------------------------------------------------
+/** This function handles braking. It calls determineTurnRadius() to find out
+ *  the curve radius. Depending on the turn radius, it finds out the maximum
+ *  speed. If the current speed is greater than the max speed and a set minimum 
+ *  speed, brakes are applied.
+ */
 void BattleAI::handleBraking()
 {
     m_controls->m_brake = false;
@@ -388,8 +447,14 @@ void BattleAI::handleBraking()
    
 }   // handleBraking
 
-// Fits a parabola to 3 points.
-// Solve AX=B
+//-----------------------------------------------------------------------------
+/** The turn radius is determined by fitting a parabola to 3 points: current 
+ *  location of AI, first corner and the second corner. Once the constants are 
+ *  computed, a formula is used to find the radius of curvature at the kart's 
+ *  current location.
+ *  NOTE: This method does not apply enough braking, should think of something
+ *  else.
+ */
 float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
 {
     // Declaring variables
@@ -443,6 +508,7 @@ float BattleAI::determineTurnRadius( std::vector<Vec3>& points )
 
 }
 
+// Alternative implementation of isStuck()
 /*
 float BattleAI::isStuck(const float dt)
 {

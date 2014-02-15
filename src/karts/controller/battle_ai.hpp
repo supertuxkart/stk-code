@@ -44,22 +44,41 @@ class BattleAI : public AIBaseController
 
 private: 
 
+    /** Holds the current position of the AI on the battle graph. Sets to  
+     *  BattleGraph::UNKNOWN_POLY if the location is unknown. This variable is
+     *  updated in ThreeStrikesBattle::updateKartNodes() */
     int m_current_node;
+    
+    /** Holds the next node the kart is expected to drive to. Currently unused. */
     int m_next_node;
+
+    /** The node(poly) at which the target point lies in. */
     int m_target_node;
+
+    /** The target point. */
     Vec3 m_target_point;
+
+    /** The steering angle required to reach the target point. */
     float m_target_angle;
 
+    /** Holds the set of portals that the kart will cross when moving through 
+     *  polygon channel. See findPortals() */
     std::vector<std::pair<Vec3,Vec3> > m_portals;
+
+    /** Holds the corner points computed using the funnel algorithm that the AI
+     * will eventaully move through. See stringPull() */
     std::vector<Vec3> m_path_corners;
 
-
+    /** This is a timer that counts down when the kart is reversing to get unstuck */
     float m_time_since_stuck;
+
+    /** Indicates that the kart is currently reversing, and m_time_since_stuck is 
+     *  counting down. */
     bool m_currently_reversing;
 
     float determineTurnRadius(std::vector<Vec3>& points);
     void findPortals(int start, int end);
-    void stringPull(const Vec3, const Vec3);
+    void stringPull(const Vec3&, const Vec3&);
     void handleAcceleration(const float dt) ;
     void handleSteering(const float dt);
     void handleBraking();
