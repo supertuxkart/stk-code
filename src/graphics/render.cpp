@@ -478,17 +478,17 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
     {
-        5.,
-        10.,
-        75.,
+        20.,
+        50.,
+        100.,
         oldfar,
     };
     float NearValues[] =
     {
         oldnear,
-        5.,
-        10.,
-        75.,
+        20.,
+        50.,
+        100.,
     };
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
