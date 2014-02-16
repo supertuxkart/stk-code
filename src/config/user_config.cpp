@@ -18,33 +18,35 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <fstream>
-#include <vector>
-#include "io/xml_writer.hpp"
 #include "utils/ptr_vector.hpp"
 
+// The order here is important. If all_params is declared later (e.g. after
+// the #includes), all elements will be added to all_params, and then
+// all_params will be initialised, i.e. cleared!
 class UserConfigParam;
 static PtrVector<UserConfigParam, REF> all_params;
-
 
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
-#include "config/saved_grand_prix.hpp"
 #include "config/player.hpp"
+#include "config/saved_grand_prix.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
-#include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <vector>
 
 const int UserConfig::m_current_config_version = 8;
 
@@ -60,7 +62,7 @@ UserConfigParam::~UserConfigParam()
  *  \param stream the xml writer.
  *  \param level determines indentation level.
  */
-void UserConfigParam::writeInner(XMLWriter& stream, int level) const
+void UserConfigParam::writeInner(UTFWriter& stream, int level) const
 {
     std::string tab(level * 4,' ');
     stream << L"    " << tab.c_str() << m_param_name.c_str() << L"=\""
@@ -87,7 +89,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
 }   // GroupUserConfigParam
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::write(XMLWriter& stream) const
+void GroupUserConfigParam::write(UTFWriter& stream) const
 {
     const int attr_amount = m_attributes.size();
 
@@ -117,7 +119,7 @@ void GroupUserConfigParam::write(XMLWriter& stream) const
 }   // write
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::writeInner(XMLWriter& stream, int level) const
+void GroupUserConfigParam::writeInner(UTFWriter& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
@@ -244,7 +246,7 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-void ListUserConfigParam<T, U>::write(XMLWriter& stream) const
+void ListUserConfigParam<T, U>::write(UTFWriter& stream) const
 {
     const int elts_amount = m_elements.size();
 
@@ -350,7 +352,7 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 }   // IntUserConfigParam
 
 // ----------------------------------------------------------------------------
-void IntUserConfigParam::write(XMLWriter& stream) const
+void IntUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -412,7 +414,7 @@ TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-void TimeUserConfigParam::write(XMLWriter& stream) const
+void TimeUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -483,7 +485,7 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 }   // StringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void StringUserConfigParam::write(XMLWriter& stream) const
+void StringUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -535,7 +537,7 @@ WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_valu
 }   // WStringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void WStringUserConfigParam::write(XMLWriter& stream) const
+void WStringUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -586,7 +588,7 @@ BoolUserConfigParam::BoolUserConfigParam(bool default_value,
 
 
 // ----------------------------------------------------------------------------
-void BoolUserConfigParam::write(XMLWriter& stream) const
+void BoolUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -673,7 +675,7 @@ FloatUserConfigParam::FloatUserConfigParam(float default_value,
 }   // FloatUserConfigParam
 
 // ----------------------------------------------------------------------------
-void FloatUserConfigParam::write(XMLWriter& stream) const
+void FloatUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -725,60 +727,8 @@ UserConfig::UserConfig()
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
 {
-    UserConfigParams::m_all_players.clearAndDeleteAll();
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
 }   // ~UserConfig
-
-// -----------------------------------------------------------------------------
-void UserConfig::addDefaultPlayer()
-{
-
-    std::string username = "unnamed player";
-
-    if(getenv("USERNAME")!=NULL)        // for windows
-        username = getenv("USERNAME");
-    else if(getenv("USER")!=NULL)       // Linux, Macs
-        username = getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
-        username = getenv("LOGNAME");
-
-
-    class GuestPlayerProfile : public PlayerProfile
-    {
-    public:
-        GuestPlayerProfile() : PlayerProfile(_LTR("Guest"))
-        {
-            m_is_guest_account = true;
-        }
-    };
-
-    // add default guest player
-    UserConfigParams::m_all_players.push_back( new GuestPlayerProfile() );
-
-    // Set the name as the default name for all players.
-    UserConfigParams::m_all_players.push_back(
-                                         new PlayerProfile(username.c_str()) );
-
-}   // addDefaultPlayer
-
-// -----------------------------------------------------------------------------
-
-/** Comparison used to sort players. Most frequent players should be
- *  listed first, so a<b actually means that
- *  a.m_use_frequency > b.m_use_frequency
- *  This way we get a reversed sorted list.
- */
-bool operator<(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() > b.getUseFrequency();
-}   // operator<
-
-// -----------------------------------------------------------------------------
-/** \brief Needed for toggling sort order **/
-bool operator>(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() < b.getUseFrequency();
-}   // operator>
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
@@ -824,26 +774,6 @@ bool UserConfig::loadConfig()
     }
 
 
-    // ---- Read players
-    // we create those AFTER other values are being read simply because we have many Player
-    // nodes that all bear the same name, so the generic loading code won't work here
-    UserConfigParams::m_all_players.clearAndDeleteAll();
-
-    std::vector<XMLNode*> players;
-    root->getNodes("Player", players);
-    const int amount = players.size();
-    for (int i=0; i<amount; i++)
-    {
-        //std::string name;
-        //players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back(
-                                               new PlayerProfile(players[i]) );
-    }
-
-    // sort players by frequency of use
-    UserConfigParams::m_all_players.insertionSort();
-
-
     // ---- Read Saved GP's
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
     std::vector<XMLNode*> saved_gps;
@@ -860,17 +790,6 @@ bool UserConfig::loadConfig()
 }   // loadConfig
 
 // ----------------------------------------------------------------------------
-
-void UserConfig::postLoadInit()
-{
-    for (unsigned int i = 0; i < UserConfigParams::m_all_players.size(); i++)
-    {
-        PlayerProfile* player = UserConfigParams::m_all_players.get(i);
-        if (player->isGuestAccount()) player->setName(_LTR("Guest"));
-    }
-}
-
-// ----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig()
 {
@@ -878,7 +797,7 @@ void UserConfig::saveConfig()
 
     try
     {
-        XMLWriter configfile(filename.c_str());
+        UTFWriter configfile(filename.c_str());
 
         configfile << L"<?xml version=\"1.0\"?>\n";
         configfile << L"<stkconfig version=\"" << m_current_config_version

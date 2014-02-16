@@ -19,12 +19,19 @@
 #ifndef HEADER_PLAYER_HPP
 #define HEADER_PLAYER_HPP
 
-#include <string>
+#include "challenges/game_slot.hpp"
+
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
+
 #include <irrString.h>
 using namespace irr;
+
+#include <string>
+
+class GameSlot;
+class UTFWriter;
 
 /**
   * \brief Class for managing player profiles (name, control configuration, etc.)
@@ -34,93 +41,155 @@ using namespace irr;
   */
 class PlayerProfile : public NoCopy
 {
-protected:
+private:
 
-    /**
-     * For saving to config file.
-     * WARNING : m_player_group has to be declared before the other userconfigparams!
-     */
-    GroupUserConfigParam  m_player_group;
+    /** The name of the player (wide string, so it can be in native 
+     *  language). */
+    core::stringw m_name;
 
-    WStringUserConfigParam m_name;
-
-    BoolUserConfigParam   m_is_guest_account;
+    /** True if this account is a guest account. */
+    bool m_is_guest_account;
 
 #ifdef DEBUG
     unsigned int m_magic_number;
 #endif
 
-    IntUserConfigParam    m_use_frequency;
+    /** Counts how often this player was used (always -1 for guests). */
+    int m_use_frequency;
 
-    /** Profile names can change, so rather than try to make sure all renames are done everywhere,
-     *  assign a unique ID to each profiler. Will save much headaches.
-     */
-    StringUserConfigParam m_unique_id;
+    /** A unique number for this player, used to link it to challenges etc. */
+    unsigned int m_unique_id;
 
-    int64_t generateUniqueId(const char* playerName);
+    /** True if this is the default (last used) player. */
+    bool m_is_default;
+
+    /** The complete challenge state. */
+    GameSlot *m_game_slot;
 
 public:
 
-    /**
-      * Constructor to create a new player that didn't exist before
-      */
-    PlayerProfile(const core::stringw& name);
+    PlayerProfile(const core::stringw& name, bool is_guest = false);
 
-    /**
-      * Constructor to deserialize a player that was saved to a XML file
-      * (...UserConfigParam classes will automagically take care of serializing all
-      * create players to the user's config file)
-      */
     PlayerProfile(const XMLNode* node);
 
+    void save(UTFWriter &out);
+    void incrementUseFrequency();
+    bool operator<(const PlayerProfile &other);
+    bool operator>(const PlayerProfile &other);
 
+
+    // ------------------------------------------------------------------------
     ~PlayerProfile()
     {
         #ifdef DEBUG
         m_magic_number = 0xDEADBEEF;
         #endif
-    }
+    }   // ~PlayerProfile
 
+    // ------------------------------------------------------------------------
+    /** Sets the name of this player. */
     void setName(const core::stringw& name)
     {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
         m_name = name;
-    }
+    }   // setName
 
+    // ------------------------------------------------------------------------
+    /** Returns the name of this player. */
     core::stringw getName() const
     {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
         return m_name.c_str();
-    }
+    }   // getName
 
+    // ------------------------------------------------------------------------
+    /** Returns true if this player is a guest account. */
     bool isGuestAccount() const
     {
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
         return m_is_guest_account;
-    }
+    }   // isGuestAccount
 
-    int getUseFrequency() const
+    // ------------------------------------------------------------------------
+    /** Returns the unique id of this player. */
+    unsigned int getUniqueID() const { return m_unique_id; }
+    // -----------------------------------------------------------------------
+    /** Returns true if this is the default (last used) player. */
+    bool isDefault() const { return m_is_default; }
+    // ------------------------------------------------------------------------
+    /** Sets if this player is the default player or not. */
+    void setDefault(bool is_default) { m_is_default = is_default; }
+    // ------------------------------------------------------------------------
+    /** Returnes if the feature (kart, track) is locked. */
+    bool isLocked(const std::string &feature) const
     {
-        if (m_is_guest_account) return -1;
-        else return m_use_frequency;
-    }
-
-
-    void incrementUseFrequency();
-
-    // please do NOT try to optimise this to return a reference, I don't know why,
-    // maybe compiler bug, but hell breaks loose when you do that
-    std::string getUniqueID() const
+        return m_game_slot->isLocked(feature); 
+    }   // isLocked
+    // ------------------------------------------------------------------------
+    /** Returns all active challenges. */
+    void computeActive() { m_game_slot->computeActive(); }
+    // ------------------------------------------------------------------------
+    /** Returns the list of recently completed challenges. */
+    std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
     {
-        return m_unique_id;
-    }
-};
+        return m_game_slot->getRecentlyCompletedChallenges();
+    }   // getRecently Completed Challenges
+    // ------------------------------------------------------------------------
+    /** Sets the currently active challenge. */
+    void setCurrentChallenge(const std::string &name)
+    {
+        m_game_slot->setCurrentChallenge(name);
+    }   // setCurrentChallenge
+    // ------------------------------------------------------------------------
+    /** Notification of a finished race, which can trigger fulfilling 
+     *  challenges. */
+    void raceFinished() { m_game_slot->raceFinished(); }
+    // ------------------------------------------------------------------------
+    /** Callback when a GP is finished (to test if a challenge was
+     *  fulfilled). */
+    void grandPrixFinished() { m_game_slot->grandPrixFinished(); }
+    // ------------------------------------------------------------------------
+    unsigned int getPoints() const { return m_game_slot->getPoints(); }
+    // ------------------------------------------------------------------------
+    void setFirstTime(bool b) { m_game_slot->setFirstTime(b); }
+    // ------------------------------------------------------------------------
+    bool isFirstTime() const { return m_game_slot->isFirstTime(); }
+    // ------------------------------------------------------------------------
+    void clearUnlocked() { m_game_slot->clearUnlocked(); }
+    // ------------------------------------------------------------------------
+    /** Returns the current challenge for this player. */
+    const Challenge* getCurrentChallenge() const
+    {
+        return m_game_slot->getCurrentChallenge();
+    }   // getCurrentChallenge
+    // ------------------------------------------------------------------------
+    const Challenge* getChallenge(const std::string &id)
+    {
+        return m_game_slot->getChallenge(id);
+    }   // getChallenge
+    // ------------------------------------------------------------------------
+    unsigned int getNumEasyTrophies() const
+    {
+        return m_game_slot->getNumEasyTrophies(); 
+    }   // getNumEasyTrophies
+    // ------------------------------------------------------------------------
+    unsigned int getNumMediumTrophies() const
+    {
+        return m_game_slot->getNumMediumTrophies();
+    }   // getNumEasyTrophies
+    // -----------------------------------------------------------------------
+    unsigned int getNumHardTrophies() const
+    {
+        return m_game_slot->getNumHardTrophies(); 
+    }   // getNumHardTropies
+
+};   // class PlayerProfile
 
 #endif
 

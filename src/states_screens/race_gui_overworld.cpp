@@ -24,6 +24,7 @@ using namespace irr;
 #include <algorithm>
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
@@ -206,8 +207,8 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUIOverworld::drawTrophyPoints()
 {
-    GameSlot* slot = unlock_manager->getCurrentSlot();
-    const int points = slot->getPoints();
+    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    const int points = player->getPoints();
     std::string s = StringUtils::toString(points);
     core::stringw sw(s.c_str());
 
@@ -238,7 +239,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     }
 
     dest += core::position2di((int)(size*1.5f), 0);
-    std::string easyTrophies = StringUtils::toString(slot->getNumEasyTrophies());
+    std::string easyTrophies = StringUtils::toString(player->getNumEasyTrophies());
     core::stringw easyTrophiesW(easyTrophies.c_str());
     if (!m_close_to_a_challenge)
     {
@@ -253,7 +254,7 @@ void RaceGUIOverworld::drawTrophyPoints()
     }
 
     dest += core::position2di((int)(size*1.5f), 0);
-    std::string mediumTrophies = StringUtils::toString(slot->getNumMediumTrophies());
+    std::string mediumTrophies = StringUtils::toString(player->getNumMediumTrophies());
     core::stringw mediumTrophiesW(mediumTrophies.c_str());
     if (!m_close_to_a_challenge)
     {
@@ -267,7 +268,7 @@ void RaceGUIOverworld::drawTrophyPoints()
                                                   NULL, true /* alpha */);
     }
     dest += core::position2di((int)(size*1.5f), 0);
-    std::string hardTrophies = StringUtils::toString(slot->getNumHardTrophies());
+    std::string hardTrophies = StringUtils::toString(player->getNumHardTrophies());
     core::stringw hardTrophiesW(hardTrophies.c_str());
     if (!m_close_to_a_challenge)
     {
@@ -397,7 +398,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
         int state = (challenges[n].getForceField().m_is_locked ? LOCKED : OPEN);
 
-        const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenges[n].m_challenge_id);
+        const Challenge* c = PlayerManager::get()->getCurrentPlayer()
+                                  ->getChallenge(challenges[n].m_challenge_id);
         if (c->isSolved(RaceManager::DIFFICULTY_HARD))        state = COMPLETED_HARD;
         else if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM)) state = COMPLETED_MEDIUM;
         else if (c->isSolved(RaceManager::DIFFICULTY_EASY))   state = COMPLETED_EASY;

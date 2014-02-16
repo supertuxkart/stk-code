@@ -34,9 +34,9 @@
 #include "utils/no_copy.hpp"
 #include "utils/translation.hpp"
 
-class XMLNode;
-class XMLWriter;
 class ChallengeData;
+class UTFWriter;
+class XMLNode;
 
 /**
   * \brief The state of a challenge for one player.
@@ -53,10 +53,11 @@ private:
           CH_SOLVED}                   // challenge was solved
     m_state[RaceManager::DIFFICULTY_COUNT];
 
-    ChallengeData* m_data;
+    /** Pointer to the original challenge data. */
+    const ChallengeData* m_data;
 
 public:
-    Challenge(ChallengeData* data)
+    Challenge(const ChallengeData* data)
     {
         m_data = data;
         m_state[RaceManager::DIFFICULTY_EASY]   = CH_INACTIVE;
@@ -65,7 +66,7 @@ public:
     }
     virtual ~Challenge() {};
     void load(const XMLNode* config);
-    void save(std::ofstream& writer);
+    void save(UTFWriter& writer);
     void setSolved(RaceManager::Difficulty d);
 
     // ------------------------------------------------------------------------
@@ -97,10 +98,6 @@ public:
     {
         m_state[d] = CH_ACTIVE;
     }   // setActive
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the actual Challenge data.
-     */
-    ChallengeData* getData() { return m_data; }
     // ------------------------------------------------------------------------
     /** Returns a pointer to the actual Challenge data.
      */

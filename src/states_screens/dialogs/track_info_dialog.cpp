@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/track_info_dialog.hpp"
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
@@ -250,7 +251,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
     // Disable accidentally unlocking of a challenge
-    unlock_manager->getCurrentSlot()->setCurrentChallenge("");
+    PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge("");
 
     ModalDialog::dismiss();
     race_manager->startSingleRace(track_ident, num_laps, false);

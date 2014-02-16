@@ -16,11 +16,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_XML_WRITER_HPP
-#define HEADER_XML_WRITER_HPP
+#ifndef HEADER_UTF_WRITER_HPP
+#define HEADER_UTF_WRITER_HPP
+
+#include "utils/string_utils.hpp"
+
+#include <irrString.h>
 
 #include <fstream>
-#include <irrString.h>
 
 /**
  * \brief utility class used to write wide (UTF-16 or UTF-32, depending of size of wchar_t) XML files
@@ -28,27 +31,38 @@
  *       we only want to accept arrays of wchar_t to make sure we get reasonable files out
  * \ingroup io
  */
-class XMLWriter
+class UTFWriter
 {
     std::ofstream m_base;
 public:
 
-    XMLWriter(const char* dest);
-
-    XMLWriter& operator<< (const irr::core::stringw& txt);
-    XMLWriter& operator<< (const wchar_t* txt);
-
-    template<typename T>
-    XMLWriter& operator<< (const T t)
-    {
-        irr::core::stringw tmp;
-        tmp += t;
-        (*this) << tmp;
-        return *this;
-    }
-
+    UTFWriter(const char* dest);
     void close();
 
+    UTFWriter& operator<< (const irr::core::stringw& txt);
+    UTFWriter& operator<< (const wchar_t* txt);
+    // ------------------------------------------------------------------------
+    UTFWriter& operator<< (const char *txt)
+    {
+        return operator<<(irr::core::stringw(txt));
+    }   // operator<<(char*)
+    // ------------------------------------------------------------------------
+    UTFWriter& operator<< (const std::string &txt)
+    {
+        return operator<< (irr::core::stringw(txt.c_str()));
+    }   // operator<<(std::string)
+    // ------------------------------------------------------------------------
+    UTFWriter& operator<< (const bool &b)
+    {
+        return operator<<(StringUtils::toString(b));
+    }
+    // ------------------------------------------------------------------------
+    template<typename T>
+    UTFWriter& operator<< (const T &t)
+    {
+        return operator<<(StringUtils::toString<T>(t));
+    }   // operator<< (template)
+    // ------------------------------------------------------------------------
     bool is_open() { return m_base.is_open(); }
 };
 
