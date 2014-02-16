@@ -1,6 +1,6 @@
 // Shader based on work by Fabien Sanglard
 // Released under the terms of CC-BY 3.0
-#version 130
+#version 330 compatibility
 uniform float speed;
 uniform float height;
 uniform float waveLength;

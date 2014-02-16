@@ -1,4 +1,4 @@
-#version 130
+#version 330
 
 in vec2 Position;
 in vec2 Texcoord;

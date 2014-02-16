@@ -474,37 +474,28 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     const Vec3 *vmin, *vmax;
     World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
 
-    ITexture *ShadowRTT[] = {
-        m_rtts->getRTT(RTT_SHADOW0),
-        m_rtts->getRTT(RTT_SHADOW1),
-        m_rtts->getRTT(RTT_SHADOW2)
-    };
-
-    unsigned rtt_size[] = {
-        2048,
-        1024,
-        512,
-    };
-
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
     {
-        10.,
-        60.,
+        20.,
+        50.,
+        100.,
         oldfar,
     };
     float NearValues[] =
     {
         oldnear,
-        10.,
-        60.,
+        20.,
+        50.,
+        100.,
     };
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    sun_ortho_matrix.clear();
 
     // Build the 3 ortho projection (for the 3 shadow resolution levels)
-    for (unsigned i = 0; i < 3; i++)
+    for (unsigned i = 0; i < 4; i++)
     {
         camnode->setFarValue(FarValues[i]);
         camnode->setNearValue(NearValues[i]);
@@ -529,8 +520,8 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         float z = box.MaxEdge.Z;
 
         // Snap to texels
-        const float units_per_w = w / rtt_size[i];
-        const float units_per_h = h / rtt_size[i];
+        const float units_per_w = w / 1024;
+        const float units_per_h = h / 1024;
 
         float left = box.MinEdge.X;
         float right = box.MaxEdge.X;
@@ -557,18 +548,20 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         m_scene_manager->setActiveCamera(m_suncam);
         m_suncam->render();
 
-        sun_ortho_matrix[i] = getVideoDriver()->getTransform(video::ETS_PROJECTION);
-        sun_ortho_matrix[i] *= getVideoDriver()->getTransform(video::ETS_VIEW);
-        sun_ortho_matrix[i] *= getInvViewMatrix();
-        irr_driver->setPhase(SHADOW_PASS);
-        glDisable(GL_BLEND);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-        m_video_driver->setRenderTarget(ShadowRTT[i], true, true);
-        glDrawBuffer(GL_NONE);
-        m_scene_manager->drawAll(scene::ESNRP_SOLID);
-        glCullFace(GL_BACK);
+        sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
+    assert(sun_ortho_matrix.size() == 4);
+
+    irr_driver->setPhase(SHADOW_PASS);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
+    glViewport(0, 0, 1024, 1024);
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glDrawBuffer(GL_NONE);
+    m_scene_manager->drawAll(scene::ESNRP_SOLID);
+    glCullFace(GL_BACK);
 
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
@@ -682,11 +675,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     const u32 glowcount = glows.size();
     ColorizeProvider * const cb = (ColorizeProvider *) m_shaders->m_callbacks[ES_COLORIZE];
 
-/*    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE);
-    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE;
-    overridemat.EnablePasses = scene::ESNRP_SOLID;
-    overridemat.Enabled = true;*/
-
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
@@ -709,25 +697,6 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
         cb->setColor(dat.r, dat.g, dat.b);
         cur->render();
     }
-
-    // Second round for transparents; it's a no-op for solids
-/*    m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_COLORIZE_REF);
-    for (u32 i = 0; i < glowcount; i++)
-    {
-        const GlowData &dat = glows[i];
-        scene::ISceneNode * const cur = dat.node;
-
-        // Quick box-based culling
-        const core::aabbox3df nodebox = cur->getTransformedBoundingBox();
-        if (!nodebox.intersectsWithBox(cambox))
-            continue;
-
-        cb->setColor(dat.r, dat.g, dat.b);
-        cur->render();
-    }
-    overridemat.Enabled = false;
-    overridemat.EnablePasses = 0;*/
 
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
     glDisable(GL_STENCIL_TEST);
@@ -770,6 +739,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam, float dt)
 {
+    for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
+        sun_ortho_matrix[i] *= getInvViewMatrix();
     core::array<video::IRenderTarget> rtts;
     // Diffuse
     rtts.push_back(m_rtts->getRTT(RTT_TMP1));
@@ -792,7 +763,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         {
           m_lights[i]->render();
           if (UserConfigParams::m_shadows)
-              m_post_processing->renderShadowedSunlight(sun_ortho_matrix[0], sun_ortho_matrix[1], sun_ortho_matrix[2]);
+              m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
           else
               m_post_processing->renderSunlight();
           continue;
@@ -982,18 +953,6 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     glClearColor(0, 0, 0, 0);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    overridemat.Enabled = 1;
-    overridemat.EnableFlags = video::EMF_MATERIAL_TYPE | video::EMF_TEXTURE0;
-    overridemat.Material.MaterialType = m_shaders->getShader(ES_DISPLACE);
-
-    overridemat.Material.TextureLayer[0].Texture =
-        irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
-    overridemat.Material.TextureLayer[0].BilinearFilter =
-    overridemat.Material.TextureLayer[0].TrilinearFilter = true;
-    overridemat.Material.TextureLayer[0].AnisotropicFilter = 0;
-    overridemat.Material.TextureLayer[0].TextureWrapU =
-    overridemat.Material.TextureLayer[0].TextureWrapV = video::ETC_REPEAT;
-
 	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
 	cb->update();
 
@@ -1006,7 +965,6 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 
     for (int i = 0; i < displacingcount; i++)
     {
-
         m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
         m_displacing[i]->render();
 
@@ -1014,18 +972,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
         m_displacing[i]->render();
     }
 
-    overridemat.Enabled = 0;
-
     // Blur it
-    video::SMaterial minimat;
-    minimat.Lighting = false;
-    minimat.ZWriteEnable = false;
-    minimat.ZBuffer = video::ECFN_ALWAYS;
-    minimat.setFlag(video::EMF_TRILINEAR_FILTER, true);
-
-    minimat.TextureLayer[0].TextureWrapU =
-    minimat.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
-
 	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);

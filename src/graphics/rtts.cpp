@@ -37,7 +37,7 @@ RTT::RTT()
 
     const dimension2du ssaosize = UserConfigParams::m_ssao == 2 ? res : quarter;
 
-    const u16 shadowside = 2048;
+    const u16 shadowside = 1024;
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
@@ -90,9 +90,6 @@ RTT::RTT()
 
     rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
 
-    rtts[RTT_SHADOW0] = drv->addRenderTargetTexture(shadowsize0, "rtt.shadow0", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SHADOW1] = drv->addRenderTargetTexture(shadowsize1, "rtt.shadow1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SHADOW2] = drv->addRenderTargetTexture(shadowsize2, "rtt.shadow2", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
     rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
 
@@ -145,10 +142,10 @@ RTT::RTT()
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glGenTextures(1, &shadowColorTex);
     glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 3, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
     glGenTextures(1, &shadowDepthTex);
     glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 3, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
     glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);

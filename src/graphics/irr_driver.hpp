@@ -102,7 +102,7 @@ private:
     RTT                *m_rtts;
     /** Shadow importance. */
     ShadowImportance   *m_shadow_importance;
-    core::matrix4 sun_ortho_matrix[3];
+    std::vector<core::matrix4> sun_ortho_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -227,6 +227,10 @@ public:
     void reset();
 	void setPhase(STKRenderingPass);
 	STKRenderingPass getPhase() const;
+    const std::vector<core::matrix4> &getShadowViewProj() const
+    {
+        return sun_ortho_matrix;
+    }
 	void IncreaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();

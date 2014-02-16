@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D DiffuseMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D SSAO;

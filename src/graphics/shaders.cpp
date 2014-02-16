@@ -145,8 +145,6 @@ void Shaders::loadShaders()
 
     m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
-    m_shaders[ES_COLORIZE_REF] = glslmat(std::string(""), dir + "colorize_ref.frag",
-                                    m_callbacks[ES_COLORIZE], EMT_SOLID);
 
 	m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
 	m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
@@ -154,7 +152,6 @@ void Shaders::loadShaders()
 	m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag");
 
 	m_shaders[ES_SUNLIGHT] = glsl_noinput(std::string(""), dir + "sunlight.frag");
-	m_shaders[ES_SUNLIGHT_SHADOW] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
     m_shaders[ES_MLAA_COLOR1] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_color1.frag",
                                     m_callbacks[ES_MLAA_COLOR1]);
@@ -232,6 +229,8 @@ void Shaders::loadShaders()
 	FullScreenShader::Gaussian3VBlurShader::init();
 	FullScreenShader::Gaussian6HBlurShader::init();
 	FullScreenShader::Gaussian6VBlurShader::init();
+    FullScreenShader::PenumbraHShader::init();
+    FullScreenShader::PenumbraVShader::init();
 	FullScreenShader::GlowShader::init();
 	FullScreenShader::PassThroughShader::init();
 	FullScreenShader::PointLightShader::init();
@@ -883,14 +882,20 @@ namespace MeshShader
 
     void ShadowShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/white.frag").c_str());
+        Program = LoadProgram(file_manager->getAsset("shaders/shadow.vert").c_str(), file_manager->getAsset("shaders/shadow.geom").c_str(), file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
     }
 
-    void ShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
+    void ShadowShader::setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        size_t size = ModelViewProjectionMatrix.size();
+        float *tmp = new float[16 * size];
+        for (unsigned i = 0; i < size; i++) {
+            memcpy(&tmp[16 * i], ModelViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
+        }
+        glUniformMatrix4fv(uniform_MVP, size, GL_FALSE, tmp);
+        delete[] tmp;
     }
 
     GLuint RefShadowShader::Program;
@@ -901,17 +906,23 @@ namespace MeshShader
 
     void RefShadowShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        Program = LoadProgram(file_manager->getAsset("shaders/shadow.vert").c_str(), file_manager->getAsset("shaders/shadow.geom").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
     }
 
-    void RefShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex)
+    void RefShadowShader::setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        size_t size = ModelViewProjectionMatrix.size();
+        float *tmp = new float[16 * size];
+        for (unsigned i = 0; i < size; i++) {
+            memcpy(&tmp[16 * i], ModelViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
+        }
+        glUniformMatrix4fv(uniform_MVP, size, GL_FALSE, tmp);
         glUniform1i(uniform_tex, TU_tex);
+        delete[] tmp;
     }
 
     GLuint GrassShadowShader::Program;
@@ -1289,12 +1300,8 @@ namespace FullScreenShader
     GLuint ShadowedSunLightShader::Program;
     GLuint ShadowedSunLightShader::uniform_ntex;
     GLuint ShadowedSunLightShader::uniform_dtex;
-    GLuint ShadowedSunLightShader::uniform_shadowtex0;
-    GLuint ShadowedSunLightShader::uniform_shadowmat0;
-    GLuint ShadowedSunLightShader::uniform_shadowtex1;
-    GLuint ShadowedSunLightShader::uniform_shadowmat1;
-    GLuint ShadowedSunLightShader::uniform_shadowtex2;
-    GLuint ShadowedSunLightShader::uniform_shadowmat2;
+    GLuint ShadowedSunLightShader::uniform_shadowtex;
+    GLuint ShadowedSunLightShader::uniform_shadowmat;
     GLuint ShadowedSunLightShader::uniform_direction;
     GLuint ShadowedSunLightShader::uniform_col;
     GLuint ShadowedSunLightShader::uniform_invproj;
@@ -1305,31 +1312,30 @@ namespace FullScreenShader
         Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_shadowtex0 = glGetUniformLocation(Program, "shadowtex0");
-        uniform_shadowmat0 = glGetUniformLocation(Program, "shadowmat0");
-        uniform_shadowtex1 = glGetUniformLocation(Program, "shadowtex1");
-        uniform_shadowmat1 = glGetUniformLocation(Program, "shadowmat1");
-        uniform_shadowtex2 = glGetUniformLocation(Program, "shadowtex2");
-        uniform_shadowmat2 = glGetUniformLocation(Program, "shadowmat2");
+        uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
+        uniform_shadowmat = glGetUniformLocation(Program, "shadowmat[0]");
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_col = glGetUniformLocation(Program, "col");
         uniform_invproj = glGetUniformLocation(Program, "invproj");
         vao = createVAO(Program);
     }
 
-    void ShadowedSunLightShader::setUniforms(const core::matrix4 &shadowmat0, const core::matrix4 &shadowmat1, const core::matrix4 &shadowmat2, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex0, unsigned TU_shadowtex1, unsigned TU_shadowtex2)
+    void ShadowedSunLightShader::setUniforms(const std::vector<core::matrix4> &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
     {
-        glUniformMatrix4fv(uniform_shadowmat0, 1, GL_FALSE, shadowmat0.pointer());
-        glUniformMatrix4fv(uniform_shadowmat1, 1, GL_FALSE, shadowmat1.pointer());
-        glUniformMatrix4fv(uniform_shadowmat2, 1, GL_FALSE, shadowmat2.pointer());
+        size_t size = shadowmat.size();
+        float *tmp = new float[16 * size];
+        for (unsigned i = 0; i < size; i++) {
+            memcpy(&tmp[16 * i], shadowmat[i].pointer(), 16 * sizeof(float));
+        }
+
+        glUniformMatrix4fv(uniform_shadowmat, size, GL_FALSE, tmp);
         glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
         glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
         glUniform3f(uniform_col, r, g, b);
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
-        glUniform1i(uniform_shadowtex0, TU_shadowtex0);
-        glUniform1i(uniform_shadowtex1, TU_shadowtex1);
-        glUniform1i(uniform_shadowtex2, TU_shadowtex2);
+        glUniform1i(uniform_shadowtex, TU_shadowtex);
+        delete[] tmp;
     }
 
 	GLuint Gaussian6HBlurShader::Program;
@@ -1379,6 +1385,63 @@ namespace FullScreenShader
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
 		vao = createVAO(Program);
 	}
+
+    GLuint PenumbraHShader::Program;
+    GLuint PenumbraHShader::uniform_tex;
+    GLuint PenumbraHShader::uniform_pixel;
+    GLuint PenumbraHShader::vao;
+    void PenumbraHShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/penumbrah.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_pixel = glGetUniformLocation(Program, "pixel");
+        vao = createVAO(Program);
+    }
+
+    void PenumbraHShader::setUniforms(const core::vector2df &pixels, GLuint TU_tex)
+    {
+        glUniform2f(uniform_pixel, pixels.X, pixels.Y);
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
+    GLuint PenumbraVShader::Program;
+    GLuint PenumbraVShader::uniform_tex;
+    GLuint PenumbraVShader::uniform_pixel;
+    GLuint PenumbraVShader::vao;
+    void PenumbraVShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/penumbrav.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_pixel = glGetUniformLocation(Program, "pixel");
+        vao = createVAO(Program);
+    }
+
+    void PenumbraVShader::setUniforms(const core::vector2df &pixels, GLuint TU_tex)
+    {
+        glUniform2f(uniform_pixel, pixels.X, pixels.Y);
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
+    GLuint ShadowGenShader::Program;
+    GLuint ShadowGenShader::uniform_halft;
+    GLuint ShadowGenShader::uniform_quarter;
+    GLuint ShadowGenShader::uniform_height;
+    GLuint ShadowGenShader::vao;
+    void ShadowGenShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/shadowgen.frag").c_str());
+        uniform_halft = glGetUniformLocation(Program, "halft");
+        uniform_quarter = glGetUniformLocation(Program, "quarter");
+        uniform_height = glGetUniformLocation(Program, "height");
+        vao = createVAO(Program);
+    }
+
+    void ShadowGenShader::setUniforms(GLuint TU_halft, GLuint TU_quarter, GLuint TU_height)
+    {
+        glUniform1i(uniform_halft, TU_halft);
+        glUniform1i(uniform_quarter, TU_quarter);
+        glUniform1i(uniform_height, TU_height);
+    }
 
 	GLuint PassThroughShader::Program;
 	GLuint PassThroughShader::uniform_texture;

@@ -37,39 +37,6 @@ using namespace core;
 SunNode::SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, float g, float b):
                      LightNode(mgr, parent, 0., r, g, b)
 {
-    sq = new ScreenQuad(irr_driver->getVideoDriver());
-
-    SMaterial &m = sq->getMaterial();
-
-    m.MaterialType = irr_driver->getShader(ES_SUNLIGHT);
-    m.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-    m.setTexture(2, irr_driver->getTexture(file_manager->getAsset(FileManager::TEXTURE,"cloudshadow.png")));
-    m.setFlag(EMF_BILINEAR_FILTER, false);
-    m.MaterialTypeParam = pack_textureBlendFunc(EBF_ONE, EBF_ONE);
-    m.BlendOperation = EBO_ADD;
-
-    if (UserConfigParams::m_shadows)
-    {
-//        m.setTexture(3, irr_driver->getRTT(RTT_SHADOW));
-        m.setTexture(4, irr_driver->getRTT(RTT_WARPH));
-        m.setTexture(5, irr_driver->getRTT(RTT_WARPV));
-
-        m.TextureLayer[4].BilinearFilter =
-        m.TextureLayer[5].BilinearFilter = true;
-
-        m.MaterialType = irr_driver->getShader(ES_SUNLIGHT_SHADOW);
-    }
-
-    for (u32 i = 0; i < MATERIAL_MAX_TEXTURES; i++)
-    {
-        m.TextureLayer[i].TextureWrapU = m.TextureLayer[i].TextureWrapV =
-            ETC_CLAMP_TO_EDGE;
-    }
-
-    m.TextureLayer[2].TextureWrapU = m.TextureLayer[2].TextureWrapV = ETC_REPEAT;
-
-    m.TextureLayer[2].TrilinearFilter = true;
-
     m_color[0] = r;
     m_color[1] = g;
     m_color[2] = b;
@@ -89,7 +56,7 @@ void SunNode::render()
     cb->setPosition(pos.X, pos.Y, pos.Z);
     return;
 
-    array<IRenderTarget> mrt;
+/*    array<IRenderTarget> mrt;
     mrt.reallocate(2);
     mrt.push_back(irr_driver->getRTT(RTT_TMP2));
     mrt.push_back(irr_driver->getRTT(RTT_TMP3));
@@ -151,5 +118,5 @@ void SunNode::render()
     tmpsq.getMaterial().BlendOperation = EBO_ADD;
 
     irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_TMP1), false, false);
-    tmpsq.render(false);
+    tmpsq.render(false);*/
 }

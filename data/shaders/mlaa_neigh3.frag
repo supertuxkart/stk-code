@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 in vec4 offset[2];
 in vec2 uv;
 out vec4 FragColor;
