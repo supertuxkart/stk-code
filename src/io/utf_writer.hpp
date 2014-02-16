@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_XML_WRITER_HPP
-#define HEADER_XML_WRITER_HPP
+#ifndef HEADER_UTF_WRITER_HPP
+#define HEADER_UTF_WRITER_HPP
 
 #include <fstream>
 #include <irrString.h>
@@ -28,18 +28,18 @@
  *       we only want to accept arrays of wchar_t to make sure we get reasonable files out
  * \ingroup io
  */
-class XMLWriter
+class UTFWriter
 {
     std::ofstream m_base;
 public:
 
-    XMLWriter(const char* dest);
+    UTFWriter(const char* dest);
 
-    XMLWriter& operator<< (const irr::core::stringw& txt);
-    XMLWriter& operator<< (const wchar_t* txt);
+    UTFWriter& operator<< (const irr::core::stringw& txt);
+    UTFWriter& operator<< (const wchar_t* txt);
 
     template<typename T>
-    XMLWriter& operator<< (const T t)
+    UTFWriter& operator<< (const T t)
     {
         irr::core::stringw tmp;
         tmp += t;

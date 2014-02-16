@@ -27,7 +27,7 @@
 #include <irrString.h>
 
 class XMLNode;
-class XMLWriter;
+class UTFWriter;
 
 /**
  *  Represents one highscore entry, i.e. the (atm up to three) highscores
@@ -62,7 +62,7 @@ public:
     Highscores (const XMLNode &node);
 
     void readEntry (const XMLNode &node);
-    void writeEntry(XMLWriter &writer);
+    void writeEntry(UTFWriter &writer);
     int  matches   (HighscoreType highscore_type, int num_karts,
                     const RaceManager::Difficulty difficulty,
                     const std::string track, const int number_of_laps,

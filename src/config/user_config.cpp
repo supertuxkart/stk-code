@@ -18,33 +18,32 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <fstream>
-#include <vector>
-#include "io/xml_writer.hpp"
-#include "utils/ptr_vector.hpp"
-
-class UserConfigParam;
-static PtrVector<UserConfigParam, REF> all_params;
-
-
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
-#include "config/saved_grand_prix.hpp"
 #include "config/player.hpp"
+#include "config/saved_grand_prix.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <vector>
+
+class UserConfigParam;
+static PtrVector<UserConfigParam, REF> all_params;
+
 
 const int UserConfig::m_current_config_version = 8;
 
@@ -60,7 +59,7 @@ UserConfigParam::~UserConfigParam()
  *  \param stream the xml writer.
  *  \param level determines indentation level.
  */
-void UserConfigParam::writeInner(XMLWriter& stream, int level) const
+void UserConfigParam::writeInner(UTFWriter& stream, int level) const
 {
     std::string tab(level * 4,' ');
     stream << L"    " << tab.c_str() << m_param_name.c_str() << L"=\""
@@ -87,7 +86,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
 }   // GroupUserConfigParam
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::write(XMLWriter& stream) const
+void GroupUserConfigParam::write(UTFWriter& stream) const
 {
     const int attr_amount = m_attributes.size();
 
@@ -117,7 +116,7 @@ void GroupUserConfigParam::write(XMLWriter& stream) const
 }   // write
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::writeInner(XMLWriter& stream, int level) const
+void GroupUserConfigParam::writeInner(UTFWriter& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
@@ -244,7 +243,7 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-void ListUserConfigParam<T, U>::write(XMLWriter& stream) const
+void ListUserConfigParam<T, U>::write(UTFWriter& stream) const
 {
     const int elts_amount = m_elements.size();
 
@@ -350,7 +349,7 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 }   // IntUserConfigParam
 
 // ----------------------------------------------------------------------------
-void IntUserConfigParam::write(XMLWriter& stream) const
+void IntUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -412,7 +411,7 @@ TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-void TimeUserConfigParam::write(XMLWriter& stream) const
+void TimeUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -483,7 +482,7 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 }   // StringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void StringUserConfigParam::write(XMLWriter& stream) const
+void StringUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -535,7 +534,7 @@ WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_valu
 }   // WStringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void WStringUserConfigParam::write(XMLWriter& stream) const
+void WStringUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -586,7 +585,7 @@ BoolUserConfigParam::BoolUserConfigParam(bool default_value,
 
 
 // ----------------------------------------------------------------------------
-void BoolUserConfigParam::write(XMLWriter& stream) const
+void BoolUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -673,7 +672,7 @@ FloatUserConfigParam::FloatUserConfigParam(float default_value,
 }   // FloatUserConfigParam
 
 // ----------------------------------------------------------------------------
-void FloatUserConfigParam::write(XMLWriter& stream) const
+void FloatUserConfigParam::write(UTFWriter& stream) const
 {
     if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
                                     << L" -->\n";
@@ -878,7 +877,7 @@ void UserConfig::saveConfig()
 
     try
     {
-        XMLWriter configfile(filename.c_str());
+        UTFWriter configfile(filename.c_str());
 
         configfile << L"<?xml version=\"1.0\"?>\n";
         configfile << L"<stkconfig version=\"" << m_current_config_version
