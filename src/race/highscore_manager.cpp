@@ -30,6 +30,7 @@
 #include "utils/translation.hpp"
 
 HighscoreManager* highscore_manager=0;
+const unsigned int HighscoreManager::CURRENT_HSCORE_FILE_VERSION = 3;
 
 HighscoreManager::HighscoreManager()
 {
