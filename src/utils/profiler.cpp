@@ -21,13 +21,13 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "io/xml_writer.hpp"
 #include "utils/vs.hpp"
 
 #include <assert.h>
 #include <stack>
 #include <sstream>
 #include <algorithm>
+#include <fstream>
 
 Profiler profiler;
 
@@ -100,8 +100,9 @@ void Profiler::setCaptureReport(bool captureReport)
     {
         // when disabling capture to file, flush captured data to a file
         {
-            XMLWriter writer(file_manager->getUserConfigFile("profiling.csv").c_str());
-            writer << m_capture_report_buffer->getRawBuffer();
+            std::ofstream filewriter(file_manager->getUserConfigFile("profiling.csv").c_str(), std::ios::out | std::ios::binary);
+            const char* str = m_capture_report_buffer->getRawBuffer();
+            filewriter.write(str, strlen(str));
         }
         m_capture_report = false;
         delete m_capture_report_buffer;
