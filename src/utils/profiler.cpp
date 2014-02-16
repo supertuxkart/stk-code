@@ -21,7 +21,7 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "io/xml_writer.hpp"
+#include "io/utf_writer.hpp"
 #include <assert.h>
 #include <stack>
 #include <sstream>
@@ -98,7 +98,7 @@ void Profiler::setCaptureReport(bool captureReport)
     {
         // when disabling capture to file, flush captured data to a file
         {
-            XMLWriter writer(file_manager->getUserConfigFile("profiling.csv").c_str());
+            UTFWriter writer(file_manager->getUserConfigFile("profiling.csv").c_str());
             writer << m_capture_report_buffer->getRawBuffer();
         }
         m_capture_report = false;
