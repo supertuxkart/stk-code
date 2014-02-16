@@ -214,13 +214,14 @@ void IrrDriver::renderGLSL(float dt)
         // Used to cull glowing items & lights
         const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
 
+        PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
         // Shadows
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows)
            //&& World::getWorld()->getTrack()->hasShadows())
         {
             renderShadows(camnode, camera);
         }
-
+        PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
 
