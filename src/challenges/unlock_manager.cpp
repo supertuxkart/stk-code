@@ -89,15 +89,6 @@ UnlockManager::~UnlockManager()
         delete i->second;
     }
 
-
-    std::map<unsigned int, GameSlot*>::iterator it;
-    for (it = m_game_slots.begin(); it != m_game_slots.end(); it++)
-    {
-        delete it->second;
-    }
-
-    // sfx_manager is destroyed before UnlockManager is, so SFX will be already deleted
-    // sfx_manager->deleteSFX(m_locked_sound);
 }   // ~UnlockManager
 
 //-----------------------------------------------------------------------------

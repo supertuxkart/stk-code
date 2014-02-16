@@ -46,8 +46,6 @@ private:
     typedef std::map<std::string, ChallengeData*> AllChallengesType;
     AllChallengesType             m_all_challenges;
 
-    std::map<unsigned int , GameSlot*> m_game_slots;
-
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
 
     friend class GameSlot;
