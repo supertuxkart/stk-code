@@ -22,6 +22,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/xml_writer.hpp"
+#include "utils/vs.hpp"
+
 #include <assert.h>
 #include <stack>
 #include <sstream>
