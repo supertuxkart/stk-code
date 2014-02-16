@@ -23,7 +23,7 @@
 
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "io/xml_writer.hpp"
+#include "io/utf_writer.hpp"
 #include "race/race_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
@@ -149,7 +149,7 @@ void HighscoreManager::saveHighscores()
 
     try
     {
-        XMLWriter highscore_file(m_filename.c_str());
+        UTFWriter highscore_file(m_filename.c_str());
         highscore_file << L"<?xml version=\"1.0\"?>\n";
         highscore_file << L"<highscores version=\"" << CURRENT_HSCORE_FILE_VERSION << "\">\n";
 

@@ -16,60 +16,74 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/player.hpp"
+
+#include "challenges/game_slot.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "io/xml_node.hpp"
+#include "io/utf_writer.hpp"
+#include "utils/string_utils.hpp"
+
+#include <sstream>
 #include <stdlib.h>
 
-#include "config/player.hpp"
-#include "utils/string_utils.hpp"
-#include <sstream>
-
-
 //------------------------------------------------------------------------------
-PlayerProfile::PlayerProfile(const core::stringw& name) :
-    m_player_group("Player", "Represents one human player"),
-    m_name(name, "name", &m_player_group),
-    m_is_guest_account(false, "guest", &m_player_group),
-    m_use_frequency(0, "use_frequency", &m_player_group),
-    m_unique_id("", "unique_id", &m_player_group)
+/** Constructor to create a new player that didn't exist before.
+ *  \param name Name of the player.
+ *  \param is_guest True if this is a guest account.
+*/
+PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 {
 #ifdef DEBUG
     m_magic_number = 0xABCD1234;
 #endif
-    int64_t unique_id = generateUniqueId(core::stringc(name.c_str()).c_str());
+    m_name             =  name;
+    m_is_guest_account = is_guest;
+    m_use_frequency    = is_guest ? -1 : 0;
+    m_unique_id        = PlayerManager::get()->getUniqueId();
+    m_game_slot        = unlock_manager->createGameSlot();
 
-    std::ostringstream to_string;
-    to_string << std::hex << unique_id;
-    m_unique_id = to_string.str();
-}
-
-//------------------------------------------------------------------------------
-PlayerProfile::PlayerProfile(const XMLNode* node) :
-    m_player_group("Player", "Represents one human player"),
-    m_name("-", "name", &m_player_group),
-    m_is_guest_account(false, "guest", &m_player_group),
-    m_use_frequency(0, "use_frequency", &m_player_group),
-    m_unique_id("", "unique_id", &m_player_group)
-{
-    //m_player_group.findYourDataInAChildOf(node);
-    m_name.findYourDataInAnAttributeOf(node);
-    m_is_guest_account.findYourDataInAnAttributeOf(node);
-    m_use_frequency.findYourDataInAnAttributeOf(node);
-    m_unique_id.findYourDataInAnAttributeOf(node);
-
-    if ((std::string)m_unique_id == "")
-    {
-        fprintf(stderr, "** WARNING: Player has no unique ID, probably it is from an older STK version\n");
-        int64_t unique_id = generateUniqueId(core::stringc(m_name.c_str()).c_str());
-        std::ostringstream tostring;
-        tostring << std::hex << unique_id;
-        m_unique_id = tostring.str();
-    }
-
-    #ifdef DEBUG
-    m_magic_number = 0xABCD1234;
-    #endif
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
+/** Constructor to deserialize a player that was saved to a XML file.
+ *  \param node The XML node representing this player.
+*/
+PlayerProfile::PlayerProfile(const XMLNode* node)
+{
+    node->get("name",          &m_name            );
+    node->get("guest",         &m_is_guest_account);
+    node->get("use-frequency", &m_use_frequency   );
+    node->get("unique-id",     &m_unique_id       );
+    node->get("is-default",    &m_is_default      );
+    #ifdef DEBUG
+    m_magic_number = 0xABCD1234;
+    #endif
+    const XMLNode *xml_game_slot = node->getNode("game-slot");
+    m_game_slot = unlock_manager->createGameSlot(xml_game_slot);
+
+}   // PlayerProfile
+
+//------------------------------------------------------------------------------
+/** Writes the data for this player to the specified UTFWriter.
+ *  \param out The utf writer to write the data to.
+ */
+void PlayerProfile::save(UTFWriter &out)
+{
+    out << L"    <player name=\"" << m_name 
+        << L"\" guest=\""         << m_is_guest_account 
+        << L"\" use-frequency=\"" << m_use_frequency
+        << L"\" is-default=\""    << m_is_default
+        << L"\" unique-id=\""     << m_unique_id        << L"\">\n";
+    assert(m_game_slot);
+    m_game_slot->save(out);
+    out << L"    </player>\n";
+}   // save
+
+//------------------------------------------------------------------------------
+/** Increments how often that account was used. Guest accounts are not counted.
+ */
 void PlayerProfile::incrementUseFrequency()
 {
     if (m_is_guest_account) m_use_frequency = -1;
@@ -77,16 +91,19 @@ void PlayerProfile::incrementUseFrequency()
 }   // incrementUseFrequency
 
 //------------------------------------------------------------------------------
-int64_t PlayerProfile::generateUniqueId(const char* player_name)
+/** Comparison used to sort players. 
+ */
+bool PlayerProfile::operator<(const PlayerProfile &other)
 {
-    // First create a simple hash based on he player name
-    int hash = 0;
-    for (int n=0; player_name[n] != 0; n++)
-    {
-        hash += (hash << (hash & 0xF)) ^ player_name[n];
-    }
+    return m_use_frequency < other.m_use_frequency;
+}   // operator<
 
-    return ((int64_t)(StkTime::getTimeSinceEpoch()) << 32) |
-           ((rand() << 16) & 0xFFFF0000)                   | 
-           hash;
-}   // generateUniqueId
+// -----------------------------------------------------------------------------
+/** \brief Needed for toggling sort order **/
+bool PlayerProfile::operator>(const PlayerProfile &other)
+{
+    return m_use_frequency > other.m_use_frequency;
+}   // operator>
+
+// -----------------------------------------------------------------------------
+

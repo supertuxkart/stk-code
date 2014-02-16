@@ -17,15 +17,12 @@
 
 #include "modes/cutscene_world.hpp"
 
-#include <string>
-#include <IMeshSceneNode.h>
-#include <ISceneManager.h>
-
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
 #include "audio/music_manager.hpp"
 #include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -42,6 +39,11 @@
 #include "tracks/track_object_manager.hpp"
 #include "utils/constants.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+
+#include <string>
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -376,14 +378,14 @@ void CutsceneWorld::enterRaceOverState()
         else if (race_manager->getTrackName() == "introcutscene" ||
                  race_manager->getTrackName() == "introcutscene2")
         {
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            if (slot->isFirstTime())
+            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+            if (player->isFirstTime())
             {
                 race_manager->exitRace();
                 StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
-                slot->setFirstTime(false);
-                unlock_manager->save();
+                player->setFirstTime(false);
+                PlayerManager::get()->save();
                 KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();

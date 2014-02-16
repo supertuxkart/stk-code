@@ -18,12 +18,12 @@
 
 #include "race/highscores.hpp"
 
+#include "io/utf_writer.hpp"
+#include "io/xml_node.hpp"
+#include "race/race_manager.hpp"
+
 #include <stdexcept>
 #include <fstream>
-
-#include "io/xml_node.hpp"
-#include "io/xml_writer.hpp"
-#include "race/race_manager.hpp"
 
 // -----------------------------------------------------------------------------
 Highscores::Highscores(const HighscoreType highscore_type,
@@ -105,7 +105,7 @@ void Highscores::readEntry(const XMLNode &node)
  *  resulting in empty entries here.
  *  \param writer The file stream to write the data to.
  */
-void Highscores::writeEntry(XMLWriter &writer)
+void Highscores::writeEntry(UTFWriter &writer)
 {
     // Only
     bool one_is_set = false;

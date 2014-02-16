@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
@@ -92,7 +93,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             break;
     }
 
-    const Challenge* c = unlock_manager->getCurrentSlot()->getChallenge(challenge_id);
+    const Challenge* c = PlayerManager::get()->getCurrentPlayer()->getChallenge(challenge_id);
 
     if (c->isSolved(RaceManager::DIFFICULTY_EASY))
     {
@@ -169,7 +170,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             return GUIEngine::EVENT_LET;
         }
 
-        unlock_manager->getCurrentSlot()->setCurrentChallenge(m_challenge_id);
+        PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge(m_challenge_id);
 
         ModalDialog::dismiss();
 

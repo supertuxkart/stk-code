@@ -19,13 +19,9 @@
 
 #include "karts/kart_properties_manager.hpp"
 
-#include <algorithm>
-#include <ctime>
-#include <stdio.h>
-#include <stdexcept>
-#include <iostream>
-
 #include "challenges/unlock_manager.hpp"
+#include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -34,6 +30,12 @@
 #include "karts/kart_properties.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
+
+#include <algorithm>
+#include <ctime>
+#include <stdio.h>
+#include <stdexcept>
+#include <iostream>
 
 KartPropertiesManager *kart_properties_manager=0;
 
@@ -353,7 +355,8 @@ bool KartPropertiesManager::kartAvailable(int kartid)
         if ( kartid == *it) return false;
     }
     const KartProperties *kartprop = getKartById(kartid);
-    if(unlock_manager->getCurrentSlot()->isLocked(kartprop->getIdent())) return false;
+    if( PlayerManager::get()->getCurrentPlayer()->isLocked(kartprop->getIdent()) )
+        return false;
     return true;
 }   // kartAvailable
 
@@ -461,7 +464,7 @@ void KartPropertiesManager::getRandomKartList(int count,
                 const KartProperties &kp=m_karts_properties[karts_in_group[i]];
                 if (!used[karts_in_group[i]]                 &&
                     m_kart_available[karts_in_group[i]]      &&
-                    !unlock_manager->getCurrentSlot()->isLocked(kp.getIdent())   )
+                    !PlayerManager::get()->getCurrentPlayer()->isLocked(kp.getIdent())   )
                 {
                     random_kart_queue.push_back(kp.getIdent());
                 }

@@ -23,6 +23,7 @@
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -155,7 +156,7 @@ void PlayerInfoDialog::showConfirmDialog()
         _("Do you really want to delete player '%s' ?", m_player->getName());
 
 
-    if (unlock_manager->getCurrentSlotID() == m_player->getUniqueID())
+    if (PlayerManager::get()->getCurrentPlayer() == m_player)
     {
         message = _("You cannot delete this player because it is currently in use.");
     }
@@ -170,7 +171,7 @@ void PlayerInfoDialog::showConfirmDialog()
                                               m_irrlicht_window);
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
-    if (unlock_manager->getCurrentSlotID() != m_player->getUniqueID())
+    if (PlayerManager::get()->getCurrentPlayer() != m_player)
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";
@@ -228,12 +229,13 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
         // accept entered name
         stringw playerName = textCtrl->getText().trim();
 
-        const int playerAmount =  UserConfigParams::m_all_players.size();
-        for(int n=0; n<playerAmount; n++)
+        const int player_amount =  PlayerManager::get()->getNumPlayers();
+        for(int n=0; n<player_amount; n++)
         {
-            if (UserConfigParams::m_all_players.get(n) == m_player) continue;
+            const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
+            if (player == m_player) continue;
 
-            if (UserConfigParams::m_all_players[n].getName() == playerName)
+            if (player->getName() == playerName)
             {
                 ButtonWidget* label = getWidget<ButtonWidget>("renameplayer");
                 label->setBadge(BAD_BADGE);
