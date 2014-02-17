@@ -22,7 +22,6 @@
 
 #include "audio/music_manager.hpp"
 #include "challenges/challenge_data.hpp"
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"

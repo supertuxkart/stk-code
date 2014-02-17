@@ -21,7 +21,7 @@
 
 #include "addons/addon.hpp"
 #include "audio/music_manager.hpp"
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
@@ -164,7 +164,7 @@ unsigned int Track::getNumOfCompletedChallenges()
             unlocked_challenges++;
             continue;
         }
-        if (player->getChallenge(m_challenges[i].m_challenge_id)
+        if (player->getChallengeStatus(m_challenges[i].m_challenge_id)
                 ->isSolvedAtAnyDifficulty())
         {
             unlocked_challenges++;
@@ -947,7 +947,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             assert(closest_challenge_id < (int)m_challenges.size());
 
             const std::string &s = m_challenges[closest_challenge_id].m_challenge_id;
-            const ChallengeData* challenge = unlock_manager->getChallenge(s);
+            const ChallengeData* challenge = unlock_manager->getChallengeData(s);
             if (challenge == NULL)
             {
                 if (s != "tutorial")
@@ -1126,7 +1126,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
                 if (challenge != "tutorial")
                 {
-                    c = unlock_manager->getChallenge(challenge);
+                    c = unlock_manager->getChallengeData(challenge);
                     if (c == NULL)
                     {
                         Log::error("track", "Cannot find challenge named <%s>\n",

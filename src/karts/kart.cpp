@@ -19,16 +19,10 @@
 
 #include "karts/kart.hpp"
 
-#include <math.h>
-#include <iostream>
-#include <algorithm> // for min and max
-
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -73,6 +67,12 @@
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/vs.hpp"
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+
+#include <algorithm> // for min and max
+#include <iostream>
+#include <math.h>
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
@@ -806,7 +806,7 @@ void Kart::finishedRace(float time)
         if (m_controller->isPlayerController()) // if player is on this computer
         {
             PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
-            const Challenge *challenge = player->getCurrentChallenge();
+            const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend
             // on if the challenge is fulfilled
             if(challenge && !challenge->getData()->isGrandPrix())

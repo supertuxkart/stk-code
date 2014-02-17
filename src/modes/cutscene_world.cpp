@@ -20,7 +20,6 @@
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
 #include "audio/music_manager.hpp"
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"

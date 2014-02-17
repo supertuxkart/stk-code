@@ -533,7 +533,10 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
                                       wanted_target - m_camera->getPosition());
         }
     }
-
+ 
+    // Rotate the up vector (0,1,0) by the rotation ... which is just column 1
+    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
+    m_camera->setUpVector(up.toIrrVector());
 }   // positionCamera
 
 // ----------------------------------------------------------------------------
