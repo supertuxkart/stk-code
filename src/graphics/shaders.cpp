@@ -119,7 +119,7 @@ void Shaders::loadShaders()
     m_shaders[ES_WATER_SURFACE] = glsl(dir + "water.vert", dir + "pass.frag",
                                   m_callbacks[ES_WATER]);
 
-	m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass_spheremap.frag");
+    m_shaders[ES_SPHERE_MAP] = glsl_noinput(std::string(""), dir + "objectpass_spheremap.frag");
 
     m_shaders[ES_GRASS] = glslmat(std::string(""), dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
@@ -146,10 +146,10 @@ void Shaders::loadShaders()
     m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
 
-	m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
-	m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
-	m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass_ref.frag");
-	m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag");
+	m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+	m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+	m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+	m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
 	m_shaders[ES_SUNLIGHT] = glsl_noinput(std::string(""), dir + "sunlight.frag");
 
