@@ -1,4 +1,4 @@
-#version 330
+#version 330 compatibility
 uniform sampler2D tex;
 uniform sampler2D normals_and_depth;
 uniform mat4 invproj;
