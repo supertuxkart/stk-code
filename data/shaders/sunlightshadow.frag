@@ -26,12 +26,14 @@ vec3 DecodeNormal(vec2 n)
 
 float getShadowFactor(vec3 pos, float bias, int index)
 {
-	const vec2 shadowoffset[] = {
+  //float a[5] = float[](3.4, 4.2, 5.0, 5.2, 1.1);
+  
+	const vec2 shadowoffset[4] = vec2[](
 		vec2(-1., -1.),
 		vec2(-1., 1.),
 		vec2(1., -1.),
 		vec2(1., 1.)
-	};
+	);
 
 	vec4 shadowcoord = (shadowmat[index] * vec4(pos, 1.0));
 	shadowcoord /= shadowcoord.w;
