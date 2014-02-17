@@ -536,7 +536,9 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
  
     // Rotate the up vector (0,1,0) by the rotation ... which is just column 1
     Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
-    m_camera->setUpVector(up.toIrrVector());
+    float f = 0.05f;  // weight for new up vector to reduce shaking
+    m_camera->setUpVector(  f      * up.toIrrVector() + 
+                          (1.0f-f) * m_camera->getUpVector()  );
 }   // positionCamera
 
 // ----------------------------------------------------------------------------
