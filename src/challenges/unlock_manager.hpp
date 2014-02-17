@@ -24,7 +24,7 @@
 #include "config/user_config.hpp"
 
 #include "challenges/challenge_data.hpp"
-#include "challenges/game_slot.hpp"
+#include "challenges/story_mode_status.hpp"
 
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -48,15 +48,13 @@ private:
 
     void readAllChallengesInDirs(const std::vector<std::string>* all_dirs);
 
-    friend class GameSlot;
-
 public:
                UnlockManager     ();
               ~UnlockManager     ();
     void       addOrFreeChallenge(ChallengeData *c);
     void       addChallenge      (const std::string& filename);
 
-    const ChallengeData *getChallenge      (const std::string& id);
+    const ChallengeData *getChallengeData(const std::string& id);
 
     bool       isSupportedVersion(const ChallengeData &challenge);
 
@@ -67,7 +65,7 @@ public:
                                    std::vector<std::string>& tracks,
                                    std::vector<std::string>& gps);
 
-    GameSlot *createGameSlot(const XMLNode *node=NULL);
+    StoryModeStatus *createStoryModeStatus(const XMLNode *node=NULL);
 
 };   // UnlockManager
 

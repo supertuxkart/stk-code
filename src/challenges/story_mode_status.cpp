@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "challenges/game_slot.hpp"
+#include "challenges/story_mode_status.hpp"
 
 #include "challenges/challenge_status.hpp"
 #include "challenges/challenge_data.hpp"
@@ -27,7 +27,7 @@
 #include "io/xml_node.hpp"
 
 //-----------------------------------------------------------------------------
-GameSlot::GameSlot(const XMLNode *node)
+StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
     m_points            = 0;
     m_first_time        = true;
@@ -42,25 +42,25 @@ GameSlot::GameSlot(const XMLNode *node)
         node->get("first-time", &m_first_time);
     }   // if node
 
-}   // GameSlot
+}   // StoryModeStatus
 
 //-----------------------------------------------------------------------------
-GameSlot::~GameSlot()
+StoryModeStatus::~StoryModeStatus()
 {
     std::map<std::string, ChallengeStatus*>::iterator it;
     for (it = m_challenges_state.begin();it != m_challenges_state.end();it++)
     {
         delete it->second;
     }
-} // ~GameSlot
+} // ~StoryModeStatus
 //-----------------------------------------------------------------------------
-bool GameSlot::isLocked(const std::string& feature)
+bool StoryModeStatus::isLocked(const std::string& feature)
 {
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
 
 //-----------------------------------------------------------------------------
-void GameSlot::computeActive()
+void StoryModeStatus::computeActive()
 {
     m_points = 0;
     m_easy_challenges = 0;
@@ -166,7 +166,7 @@ void GameSlot::computeActive()
 
 //-----------------------------------------------------------------------------
 
-void GameSlot::lockFeature(ChallengeStatus *challenge_status)
+void StoryModeStatus::lockFeature(ChallengeStatus *challenge_status)
 {
     const std::vector<ChallengeData::UnlockableFeature>& features =
         challenge_status->getData()->getFeatures();
@@ -184,7 +184,7 @@ void GameSlot::lockFeature(ChallengeStatus *challenge_status)
  *  \param d Difficulty at which the challenge was solved.
  *  \param do_save If true update the challenge file on disk.
  */
-void GameSlot::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty d,
+void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty d,
                              bool do_save)
 {
     const unsigned int amount=(unsigned int)c->getData()->getFeatures().size();
@@ -213,7 +213,7 @@ void GameSlot::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty d,
 /** Set the current challenge (or NULL if no challenge is done).
  *  \param challenge Pointer to the challenge (or NULL)
  */
-void GameSlot::setCurrentChallenge(const std::string &challenge_id)
+void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
 {
     m_current_challenge = challenge_id=="" ? NULL
                                            : getChallengeStatus(challenge_id);
@@ -223,7 +223,7 @@ void GameSlot::setCurrentChallenge(const std::string &challenge_id)
 /** This is called when a race is finished. See if there is an active
  *  challenge that was fulfilled.
  */
-void GameSlot::raceFinished()
+void StoryModeStatus::raceFinished()
 {
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
@@ -241,7 +241,7 @@ void GameSlot::raceFinished()
 /** This is called when a GP is finished. See if there is an active
  *  challenge that was fulfilled.
  */
-void GameSlot::grandPrixFinished()
+void StoryModeStatus::grandPrixFinished()
 {
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
@@ -255,10 +255,10 @@ void GameSlot::grandPrixFinished()
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
-/** Writes the data of this GameSlot to the specified stream.
+/** Writes the data of this StoryModeStatus to the specified stream.
  *  \param out UTF stream to write to.
  */
-void GameSlot::save(UTFWriter &out)
+void StoryModeStatus::save(UTFWriter &out)
 {
     out << "    <game-slot playerID=\"" << m_player_unique_id
         << "\" first-time=\""           << m_first_time  << L"\">\n";

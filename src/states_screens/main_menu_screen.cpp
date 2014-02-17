@@ -19,9 +19,7 @@
 
 #include "states_screens/main_menu_screen.hpp"
 
-#include <string>
-
-#include "challenges/game_slot.hpp"
+#include "addons/news_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
@@ -46,19 +44,20 @@
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #endif
-
 #include "states_screens/dialogs/message_dialog.hpp"
-
-#include "addons/news_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
+
+
+
+#include <string>
+
 
 using namespace GUIEngine;
 using namespace Online;

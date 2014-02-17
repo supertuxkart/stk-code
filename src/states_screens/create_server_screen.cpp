@@ -22,7 +22,6 @@
 #include <string>
 #include <iostream>
 
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "states_screens/online_screen.hpp"

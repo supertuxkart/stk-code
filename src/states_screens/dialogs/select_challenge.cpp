@@ -164,7 +164,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
     if (eventSource == "novice" || eventSource == "intermediate" ||
         eventSource == "expert")
     {
-        const ChallengeData* challenge = unlock_manager->getChallenge(m_challenge_id);
+        const ChallengeData* challenge = unlock_manager->getChallengeData(m_challenge_id);
 
         if (challenge == NULL)
         {

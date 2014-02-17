@@ -40,7 +40,7 @@ const int CHALLENGE_POINTS[] = { 8, 9, 10 };
  * This class contains the progression through challenges for one game slot
  */
 
-class GameSlot
+class StoryModeStatus
 {
     /** Profile names can change, so rather than try to make sure all renames
      *  are done everywhere, assign a unique ID to each profiler.
@@ -74,8 +74,8 @@ class GameSlot
 
 public:
 
-     GameSlot(const XMLNode *node=NULL);
-    ~GameSlot();
+     StoryModeStatus(const XMLNode *node=NULL);
+    ~StoryModeStatus();
 
     void computeActive();
     bool       isLocked          (const std::string& feature);
@@ -128,6 +128,6 @@ public:
         assert(it!=m_challenges_state.end());
         return it->second;
     }   // getChallengeStatus
-};   // GameSlot
+};   // StoryModeStatus
 
 #endif

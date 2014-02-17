@@ -19,7 +19,7 @@ src/audio/sfx_manager.cpp
 src/audio/sfx_openal.cpp
 src/challenges/challenge_data.cpp
 src/challenges/challenge_status.cpp
-src/challenges/game_slot.cpp
+src/challenges/story_mode_status.cpp
 src/challenges/unlock_manager.cpp
 src/config/device_config.cpp
 src/config/player_manager.cpp
@@ -348,7 +348,7 @@ src/audio/sfx_manager.hpp
 src/audio/sfx_openal.hpp
 src/challenges/challenge_data.hpp
 src/challenges/challenge_status.hpp
-src/challenges/game_slot.hpp
+src/challenges/story_mode_status.hpp
 src/challenges/unlock_manager.hpp
 src/config/device_config.hpp
 src/config/player_manager.hpp

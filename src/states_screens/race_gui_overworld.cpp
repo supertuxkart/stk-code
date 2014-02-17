@@ -460,7 +460,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 continue;
             }
 
-            const ChallengeData* challenge = unlock_manager->getChallenge(challenges[n].m_challenge_id);
+            const ChallengeData* challenge = 
+                unlock_manager->getChallengeData(challenges[n].m_challenge_id);
 
             if (challenge == NULL)
             {

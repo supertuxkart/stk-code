@@ -16,11 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_PLAYER_HPP
-#define HEADER_PLAYER_HPP
+#ifndef HEADER_PLAYER_PROFILE_HPP
+#define HEADER_PLAYER_PROFILE_HPP
 
-#include "challenges/game_slot.hpp"
-
+#include "challenges/story_mode_status.hpp"
 #include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
@@ -30,7 +29,6 @@ using namespace irr;
 
 #include <string>
 
-class GameSlot;
 class UTFWriter;
 
 /**
@@ -64,7 +62,7 @@ private:
     bool m_is_default;
 
     /** The complete challenge state. */
-    GameSlot *m_game_slot;
+    StoryModeStatus *m_story_mode_status;
 
 public:
 
@@ -129,64 +127,64 @@ public:
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
     {
-        return m_game_slot->isLocked(feature); 
+        return m_story_mode_status->isLocked(feature); 
     }   // isLocked
     // ------------------------------------------------------------------------
     /** Returns all active challenges. */
-    void computeActive() { m_game_slot->computeActive(); }
+    void computeActive() { m_story_mode_status->computeActive(); }
     // ------------------------------------------------------------------------
     /** Returns the list of recently completed challenges. */
     std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
     {
-        return m_game_slot->getRecentlyCompletedChallenges();
+        return m_story_mode_status->getRecentlyCompletedChallenges();
     }   // getRecently Completed Challenges
     // ------------------------------------------------------------------------
     /** Sets the currently active challenge. */
     void setCurrentChallenge(const std::string &name)
     {
-        m_game_slot->setCurrentChallenge(name);
+        m_story_mode_status->setCurrentChallenge(name);
     }   // setCurrentChallenge
     // ------------------------------------------------------------------------
     /** Notification of a finished race, which can trigger fulfilling 
      *  challenges. */
-    void raceFinished() { m_game_slot->raceFinished(); }
+    void raceFinished() { m_story_mode_status->raceFinished(); }
     // ------------------------------------------------------------------------
     /** Callback when a GP is finished (to test if a challenge was
      *  fulfilled). */
-    void grandPrixFinished() { m_game_slot->grandPrixFinished(); }
+    void grandPrixFinished() { m_story_mode_status->grandPrixFinished(); }
     // ------------------------------------------------------------------------
-    unsigned int getPoints() const { return m_game_slot->getPoints(); }
+    unsigned int getPoints() const { return m_story_mode_status->getPoints(); }
     // ------------------------------------------------------------------------
-    void setFirstTime(bool b) { m_game_slot->setFirstTime(b); }
+    void setFirstTime(bool b) { m_story_mode_status->setFirstTime(b); }
     // ------------------------------------------------------------------------
-    bool isFirstTime() const { return m_game_slot->isFirstTime(); }
+    bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
     // ------------------------------------------------------------------------
-    void clearUnlocked() { m_game_slot->clearUnlocked(); }
+    void clearUnlocked() { m_story_mode_status->clearUnlocked(); }
     // ------------------------------------------------------------------------
     /** Returns the current challenge for this player. */
     const ChallengeStatus* getCurrentChallengeStatus() const
     {
-        return m_game_slot->getCurrentChallengeStatus();
+        return m_story_mode_status->getCurrentChallengeStatus();
     }   // getCurrentChallengeStatus
     // ------------------------------------------------------------------------
     const ChallengeStatus* getChallengeStatus(const std::string &id)
     {
-        return m_game_slot->getChallengeStatus(id);
+        return m_story_mode_status->getChallengeStatus(id);
     }   // getChallengeStatus
     // ------------------------------------------------------------------------
     unsigned int getNumEasyTrophies() const
     {
-        return m_game_slot->getNumEasyTrophies(); 
+        return m_story_mode_status->getNumEasyTrophies(); 
     }   // getNumEasyTrophies
     // ------------------------------------------------------------------------
     unsigned int getNumMediumTrophies() const
     {
-        return m_game_slot->getNumMediumTrophies();
+        return m_story_mode_status->getNumMediumTrophies();
     }   // getNumEasyTrophies
     // -----------------------------------------------------------------------
     unsigned int getNumHardTrophies() const
     {
-        return m_game_slot->getNumHardTrophies(); 
+        return m_story_mode_status->getNumHardTrophies(); 
     }   // getNumHardTropies
 
 };   // class PlayerProfile
