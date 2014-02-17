@@ -22,7 +22,27 @@
 #include "challenges/challenge.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "io/xml_writer.hpp"
+#include "config/player_manager.hpp"
+#include "io/utf_writer.hpp"
+#include "io/xml_node.hpp"
+
+//-----------------------------------------------------------------------------
+GameSlot::GameSlot(const XMLNode *node)
+{
+    m_points            = 0;
+    m_first_time        = true;
+    m_easy_challenges   = 0;
+    m_medium_challenges = 0;
+    m_hard_challenges   = 0;
+    m_current_challenge = NULL;
+
+    // If there is saved data, load it
+    if(node)
+    {
+        node->get("first-time", &m_first_time);
+    }   // if node
+
+}   // GameSlot
 
 //-----------------------------------------------------------------------------
 GameSlot::~GameSlot()
@@ -175,7 +195,7 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
         if (p == m_locked_features.end())
         {
             c->setSolved(d);
-            if(do_save) unlock_manager->save();
+            if(do_save) PlayerManager::get()->save();
             return;
         }
         m_locked_features.erase(p);
@@ -186,7 +206,7 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
     c->setSolved(d);  // reset isActive flag
 
     // Save the new unlock information
-    if (do_save) unlock_manager->save();
+    if (do_save) PlayerManager::get()->save();
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------
@@ -235,13 +255,13 @@ void GameSlot::grandPrixFinished()
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
-
-void GameSlot::save(std::ofstream& out, const std::string& name)
+/** Writes the data of this GameSlot to the specified stream.
+ *  \param out UTF stream to write to.
+ */
+void GameSlot::save(UTFWriter &out)
 {
-    out << "    <gameslot playerID=\"" << m_player_unique_id.c_str()
-        << "\" kart=\""                << m_kart_ident.c_str()
-        << "\" firstTime=\""           << StringUtils::toString(m_first_time)
-        << "\"> <!-- " << name.c_str() << " -->\n";
+    out << "    <game-slot playerID=\"" << m_player_unique_id
+        << "\" first-time=\""           << m_first_time  << L"\">\n";
     std::map<std::string, Challenge*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
@@ -249,5 +269,5 @@ void GameSlot::save(std::ofstream& out, const std::string& name)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << "    </gameslot>\n";
-}
+    out << "      </game-slot>\n";
+}  // save

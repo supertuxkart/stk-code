@@ -30,6 +30,7 @@
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/explosion.hpp"
@@ -804,8 +805,8 @@ void Kart::finishedRace(float time)
                                         m_controller));
         if (m_controller->isPlayerController()) // if player is on this computer
         {
-            GameSlot *slot = unlock_manager->getCurrentSlot();
-            const Challenge *challenge = slot->getCurrentChallenge();
+            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+            const Challenge *challenge = player->getCurrentChallenge();
             // In case of a GP challenge don't make the end animation depend
             // on if the challenge is fulfilled
             if(challenge && !challenge->getData()->isGrandPrix())

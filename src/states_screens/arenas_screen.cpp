@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -234,7 +235,7 @@ void ArenasScreen::buildTrackList()
                 if(!curr->isArena()) continue;
             }
 
-            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
+            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );
@@ -264,7 +265,7 @@ void ArenasScreen::buildTrackList()
                 if(!curr->isArena()) continue;
             }
 
-            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
+            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );

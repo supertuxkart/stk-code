@@ -18,6 +18,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
+#include "utils/ptr_vector.hpp"
+
+// The order here is important. If all_params is declared later (e.g. after
+// the #includes), all elements will be added to all_params, and then
+// all_params will be initialised, i.e. cleared!
+class UserConfigParam;
+static PtrVector<UserConfigParam, REF> all_params;
+
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
@@ -31,7 +39,6 @@
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
-#include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -40,10 +47,6 @@
 #include <stdlib.h>
 #include <string>
 #include <vector>
-
-class UserConfigParam;
-static PtrVector<UserConfigParam, REF> all_params;
-
 
 const int UserConfig::m_current_config_version = 8;
 
@@ -724,60 +727,8 @@ UserConfig::UserConfig()
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
 {
-    UserConfigParams::m_all_players.clearAndDeleteAll();
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
 }   // ~UserConfig
-
-// -----------------------------------------------------------------------------
-void UserConfig::addDefaultPlayer()
-{
-
-    std::string username = "unnamed player";
-
-    if(getenv("USERNAME")!=NULL)        // for windows
-        username = getenv("USERNAME");
-    else if(getenv("USER")!=NULL)       // Linux, Macs
-        username = getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
-        username = getenv("LOGNAME");
-
-
-    class GuestPlayerProfile : public PlayerProfile
-    {
-    public:
-        GuestPlayerProfile() : PlayerProfile(_LTR("Guest"))
-        {
-            m_is_guest_account = true;
-        }
-    };
-
-    // add default guest player
-    UserConfigParams::m_all_players.push_back( new GuestPlayerProfile() );
-
-    // Set the name as the default name for all players.
-    UserConfigParams::m_all_players.push_back(
-                                         new PlayerProfile(username.c_str()) );
-
-}   // addDefaultPlayer
-
-// -----------------------------------------------------------------------------
-
-/** Comparison used to sort players. Most frequent players should be
- *  listed first, so a<b actually means that
- *  a.m_use_frequency > b.m_use_frequency
- *  This way we get a reversed sorted list.
- */
-bool operator<(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() > b.getUseFrequency();
-}   // operator<
-
-// -----------------------------------------------------------------------------
-/** \brief Needed for toggling sort order **/
-bool operator>(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() < b.getUseFrequency();
-}   // operator>
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
@@ -823,26 +774,6 @@ bool UserConfig::loadConfig()
     }
 
 
-    // ---- Read players
-    // we create those AFTER other values are being read simply because we have many Player
-    // nodes that all bear the same name, so the generic loading code won't work here
-    UserConfigParams::m_all_players.clearAndDeleteAll();
-
-    std::vector<XMLNode*> players;
-    root->getNodes("Player", players);
-    const int amount = players.size();
-    for (int i=0; i<amount; i++)
-    {
-        //std::string name;
-        //players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back(
-                                               new PlayerProfile(players[i]) );
-    }
-
-    // sort players by frequency of use
-    UserConfigParams::m_all_players.insertionSort();
-
-
     // ---- Read Saved GP's
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
     std::vector<XMLNode*> saved_gps;
@@ -857,17 +788,6 @@ bool UserConfig::loadConfig()
 
     return true;
 }   // loadConfig
-
-// ----------------------------------------------------------------------------
-
-void UserConfig::postLoadInit()
-{
-    for (unsigned int i = 0; i < UserConfigParams::m_all_players.size(); i++)
-    {
-        PlayerProfile* player = UserConfigParams::m_all_players.get(i);
-        if (player->isGuestAccount()) player->setName(_LTR("Guest"));
-    }
-}
 
 // ----------------------------------------------------------------------------
 /** Write settings to config file. */

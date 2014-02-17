@@ -769,8 +769,6 @@ namespace UserConfigParams
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
 
-    PARAM_PREFIX PtrVector<PlayerProfile>   m_all_players;
-
     /** List of all saved GPs. */
     PARAM_PREFIX PtrVector<SavedGrandPrix>   m_saved_grand_prix_list;
 
@@ -825,8 +823,6 @@ public:
     const irr::core::stringw& getWarning()        { return m_warning;  }
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
-    void  postLoadInit();
-    void  addDefaultPlayer();
 
 };   // UserConfig
 

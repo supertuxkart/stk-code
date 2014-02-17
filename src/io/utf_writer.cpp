@@ -58,7 +58,6 @@ UTFWriter& UTFWriter::operator<< (const wchar_t*txt)
 }   // operator<< (wchar_t)
 
 // ----------------------------------------------------------------------------
-
 void UTFWriter::close()
 {
     m_base.close();

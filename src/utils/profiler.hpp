@@ -66,6 +66,7 @@ struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char
     }
 };
 
+
 class StringBuffer
 {
 private:
@@ -75,13 +76,13 @@ private:
 
 public:
 
-    StringBuffer(unsigned int size) : m_buffer(new char[size]), ostreamBuffer(m_buffer, size), messageStream(&ostreamBuffer)
+    StringBuffer(unsigned int size) : m_buffer((char*)calloc(size, 1)), ostreamBuffer(m_buffer, size), messageStream(&ostreamBuffer)
     {
     }
 
     ~StringBuffer()
     {
-        delete[] m_buffer;
+        free(m_buffer);
     }
 
     std::ostream& getStdStream() { return messageStream; }
