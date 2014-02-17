@@ -37,17 +37,11 @@ const int CHALLENGE_POINTS[] = { 8, 9, 10 };
 
 /**
  * \ingroup challenges
- * This class contains the progression through challenges for one game slot
+ * This class contains the progression through challenges for the story mode.
  */
 
 class StoryModeStatus
 {
-    /** Profile names can change, so rather than try to make sure all renames
-     *  are done everywhere, assign a unique ID to each profiler.
-     *  Will save much headaches.
-     */
-    unsigned int m_player_unique_id;
-
     /** Contains whether each feature of the challenge is locked or unlocked */
     std::map<std::string, bool>   m_locked_features;
 

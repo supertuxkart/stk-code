@@ -260,8 +260,7 @@ void StoryModeStatus::grandPrixFinished()
  */
 void StoryModeStatus::save(UTFWriter &out)
 {
-    out << "    <game-slot playerID=\"" << m_player_unique_id
-        << "\" first-time=\""           << m_first_time  << L"\">\n";
+    out << "    <story-mode first-time=\"" << m_first_time  << L"\">\n";
     std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
@@ -269,5 +268,5 @@ void StoryModeStatus::save(UTFWriter &out)
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << "      </game-slot>\n";
+    out << "      </story-mode>\n";
 }  // save

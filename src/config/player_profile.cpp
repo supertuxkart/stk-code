@@ -59,7 +59,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
-    const XMLNode *xml_game_slot = node->getNode("game-slot");
+    const XMLNode *xml_game_slot = node->getNode("story-mode");
     m_story_mode_status = unlock_manager->createStoryModeStatus(xml_game_slot);
 
 }   // PlayerProfile
