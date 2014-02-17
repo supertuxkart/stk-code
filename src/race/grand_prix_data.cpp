@@ -19,7 +19,7 @@
 
 #include "race/grand_prix_data.hpp"
 
-#include "config/player.hpp"
+#include "config/player_profile.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/file_manager.hpp"

@@ -31,7 +31,7 @@ static PtrVector<UserConfigParam, REF> all_params;
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
-#include "config/player.hpp"
+#include "config/player_profile.hpp"
 #include "config/saved_grand_prix.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"

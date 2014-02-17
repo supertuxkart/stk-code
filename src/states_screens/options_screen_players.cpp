@@ -18,8 +18,8 @@
 #include "states_screens/options_screen_players.hpp"
 
 #include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/device_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"

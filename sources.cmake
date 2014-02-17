@@ -22,8 +22,8 @@ src/challenges/challenge_data.cpp
 src/challenges/game_slot.cpp
 src/challenges/unlock_manager.cpp
 src/config/device_config.cpp
-src/config/player.cpp
 src/config/player_manager.cpp
+src/config/player_profile.cpp
 src/config/saved_grand_prix.cpp
 src/config/stk_config.cpp
 src/config/user_config.cpp
@@ -351,8 +351,8 @@ src/challenges/challenge_data.hpp
 src/challenges/game_slot.hpp
 src/challenges/unlock_manager.hpp
 src/config/device_config.hpp
-src/config/player.hpp
 src/config/player_manager.hpp
+src/config/player_profile.hpp
 src/config/saved_grand_prix.hpp
 src/config/stk_config.hpp
 src/config/user_config.hpp

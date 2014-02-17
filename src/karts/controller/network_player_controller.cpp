@@ -1,6 +1,5 @@
 #include "karts/controller/network_player_controller.hpp"
 
-#include "config/player.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/post_processing.hpp"
 #include "input/input_manager.hpp"

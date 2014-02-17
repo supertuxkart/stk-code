@@ -18,8 +18,8 @@
 
 #include "achievements/achievements_manager.hpp"
 
-#include "config/player.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "online/current_user.hpp"

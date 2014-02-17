@@ -19,7 +19,7 @@
 #include "config/player_manager.hpp"
 
 #include "achievements/achievements_manager.hpp"
-#include "config/player.hpp"
+#include "config/player_profile.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"

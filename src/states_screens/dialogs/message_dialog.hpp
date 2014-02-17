@@ -19,7 +19,6 @@
 #ifndef HEADER_CONFIRM_DIALOG_HPP
 #define HEADER_CONFIRM_DIALOG_HPP
 
-#include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "utils/leak_check.hpp"
 
