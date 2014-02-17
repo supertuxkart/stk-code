@@ -21,7 +21,7 @@
 
 #include "addons/addon.hpp"
 #include "audio/music_manager.hpp"
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
@@ -164,7 +164,7 @@ unsigned int Track::getNumOfCompletedChallenges()
             unlocked_challenges++;
             continue;
         }
-        if (player->getChallenge(m_challenges[i].m_challenge_id)
+        if (player->getChallengeStatus(m_challenges[i].m_challenge_id)
                 ->isSolvedAtAnyDifficulty())
         {
             unlocked_challenges++;

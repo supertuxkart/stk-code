@@ -19,10 +19,7 @@
 
 #include "states_screens/race_gui_overworld.hpp"
 
-using namespace irr;
-
-#include <algorithm>
-
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -54,6 +51,9 @@ using namespace irr;
 
 #include <ISceneCollisionManager.h>
 #include <ISceneManager.h>
+using namespace irr;
+
+#include <algorithm>
 
 const int LOCKED = 0;
 const int OPEN = 1;
@@ -398,9 +398,9 @@ void RaceGUIOverworld::drawGlobalMiniMap()
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
         int state = (challenges[n].getForceField().m_is_locked ? LOCKED : OPEN);
 
-        const Challenge* c = PlayerManager::get()->getCurrentPlayer()
-                                  ->getChallenge(challenges[n].m_challenge_id);
-        if (c->isSolved(RaceManager::DIFFICULTY_HARD))        state = COMPLETED_HARD;
+        const ChallengeStatus* c = PlayerManager::get()->getCurrentPlayer()
+                                  ->getChallengeStatus(challenges[n].m_challenge_id);
+        if      (c->isSolved(RaceManager::DIFFICULTY_HARD))   state = COMPLETED_HARD;
         else if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM)) state = COMPLETED_MEDIUM;
         else if (c->isSolved(RaceManager::DIFFICULTY_EASY))   state = COMPLETED_EASY;
 

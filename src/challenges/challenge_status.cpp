@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_status.hpp"
 
 #include "challenges/challenge_data.hpp"
 #include "io/utf_writer.hpp"
@@ -33,12 +33,12 @@
 //-----------------------------------------------------------------------------
 /** Loads the state for a challenge object (esp. m_state)
  */
-void Challenge::load(const XMLNode* challengesNode)
+void ChallengeStatus::load(const XMLNode* challenges_node)
 {
-    const XMLNode* node = challengesNode->getNode( m_data->getId() );
+    const XMLNode* node = challenges_node->getNode( m_data->getId() );
     if(node == NULL)
     {
-        Log::info("Challenge", "Couldn't find node <%s> in challenge list."
+        Log::info("ChallengeStatus", "Couldn't find node <%s> in challenge list."
                 "(If this is the first time you play this is normal)\n",
                 m_data->getId().c_str());
         return;
@@ -76,7 +76,7 @@ void Challenge::load(const XMLNode* challengesNode)
 
 //-----------------------------------------------------------------------------
 
-void Challenge::setSolved(RaceManager::Difficulty d)
+void ChallengeStatus::setSolved(RaceManager::Difficulty d)
 {
     // solve not only the current difficulty but all those before
     // e.g. if you solved hard then you also get easy
@@ -88,7 +88,7 @@ void Challenge::setSolved(RaceManager::Difficulty d)
 
 //-----------------------------------------------------------------------------
 
-void Challenge::save(UTFWriter& writer)
+void ChallengeStatus::save(UTFWriter& writer)
 {
     writer << L"        <"<< m_data->getId() << L">\n"
            << L"            <easy   solved=\"" 

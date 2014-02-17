@@ -28,9 +28,8 @@ using namespace irr;
 #include <map>
 #include <vector>
 
-
-class Challenge;
 class ChallengeData;
+class ChallengeStatus;
 class UTFWriter;
 class XMLNode;
 
@@ -56,11 +55,11 @@ class GameSlot
       * until they are shown to the user) */
     std::vector<const ChallengeData*> m_unlocked_features;
 
-    std::map<std::string, Challenge*> m_challenges_state;
+    std::map<std::string, ChallengeStatus*> m_challenges_state;
 
     /** A pointer to the current challenge, or NULL
      *  if no challenge is active. */
-    const Challenge *m_current_challenge;
+    const ChallengeStatus *m_current_challenge;
 
     friend class UnlockManager;
 
@@ -80,8 +79,8 @@ public:
 
     void computeActive();
     bool       isLocked          (const std::string& feature);
-    void       lockFeature       (Challenge *challenge);
-    void       unlockFeature     (Challenge* c, RaceManager::Difficulty d,
+    void       lockFeature       (ChallengeStatus *challenge);
+    void       unlockFeature     (ChallengeStatus* c, RaceManager::Difficulty d,
                                   bool do_save=true);
     void       raceFinished      ();
     void       grandPrixFinished ();
@@ -115,17 +114,20 @@ public:
     /** Returns if this is the first time the intro is shown. */
     bool       isFirstTime() const   { return m_first_time; }
     // ------------------------------------------------------------------------
-    const Challenge *getCurrentChallenge() const { return m_current_challenge; }
+    const ChallengeStatus *getCurrentChallengeStatus() const 
+    {
+        return m_current_challenge; 
+    }   // getCurrentChallengeStatus
     // ------------------------------------------------------------------------
     /** Returns a challenge given the challenge id.
      */
-    const Challenge* getChallenge(const std::string& id) const
+    const ChallengeStatus* getChallengeStatus(const std::string& id) const
     {
-        std::map<std::string, Challenge*>::const_iterator it =
+        std::map<std::string, ChallengeStatus*>::const_iterator it =
             m_challenges_state.find(id);
         assert(it!=m_challenges_state.end());
         return it->second;
-    }   // getChallenge
+    }   // getChallengeStatus
 };   // GameSlot
 
 #endif

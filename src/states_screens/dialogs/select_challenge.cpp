@@ -15,6 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/dialogs/select_challenge.hpp"
+
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -29,7 +32,6 @@
 #include "network/network_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
-#include "states_screens/dialogs/select_challenge.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
@@ -93,7 +95,8 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             break;
     }
 
-    const Challenge* c = PlayerManager::get()->getCurrentPlayer()->getChallenge(challenge_id);
+    const ChallengeStatus* c = PlayerManager::get()->getCurrentPlayer()
+                             ->getChallengeStatus(challenge_id);
 
     if (c->isSolved(RaceManager::DIFFICULTY_EASY))
     {

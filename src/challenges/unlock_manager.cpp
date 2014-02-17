@@ -18,11 +18,11 @@
 
 #include "challenges/unlock_manager.hpp"
 
-
 #include "achievements/achievements_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/challenge_data.hpp"
+#include "challenges/challenge_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
@@ -204,10 +204,10 @@ GameSlot *UnlockManager::createGameSlot(const XMLNode *node)
                                     i!=m_all_challenges.end();  i++)
     {
         ChallengeData* cd = i->second;
-        Challenge *challenge = new Challenge(cd);
+        ChallengeStatus *challenge_status = new ChallengeStatus(cd);
         if(node)
-            challenge->load(node);
-        slot->m_challenges_state[cd->getId()] = challenge;
+            challenge_status->load(node);
+        slot->m_challenges_state[cd->getId()] = challenge_status;
     }
 
     slot->computeActive();

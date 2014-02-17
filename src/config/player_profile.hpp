@@ -164,15 +164,15 @@ public:
     void clearUnlocked() { m_game_slot->clearUnlocked(); }
     // ------------------------------------------------------------------------
     /** Returns the current challenge for this player. */
-    const Challenge* getCurrentChallenge() const
+    const ChallengeStatus* getCurrentChallengeStatus() const
     {
-        return m_game_slot->getCurrentChallenge();
-    }   // getCurrentChallenge
+        return m_game_slot->getCurrentChallengeStatus();
+    }   // getCurrentChallengeStatus
     // ------------------------------------------------------------------------
-    const Challenge* getChallenge(const std::string &id)
+    const ChallengeStatus* getChallengeStatus(const std::string &id)
     {
-        return m_game_slot->getChallenge(id);
-    }   // getChallenge
+        return m_game_slot->getChallengeStatus(id);
+    }   // getChallengeStatus
     // ------------------------------------------------------------------------
     unsigned int getNumEasyTrophies() const
     {
