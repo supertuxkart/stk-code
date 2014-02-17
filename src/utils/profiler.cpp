@@ -344,6 +344,11 @@ void Profiler::draw()
         }
         font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
     }
+
+    if (m_capture_report)
+    {
+        font->draw("Capturing profiler report...", MARKERS_NAMES_POS, video::SColor(0xFF, 0x00, 0x90, 0x00));
+    }
 }
 
 //-----------------------------------------------------------------------------
