@@ -159,7 +159,7 @@ void STKAnimatedMesh::render()
 		if (isObjectPass(material.MaterialType))
 		{
 			irr_driver->IncreaseObjectCount();
-			initvaostate(GLmeshes[i], material.MaterialType);
+			initvaostate(GLmeshes[i], material.MaterialType, false);
 			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
 			{
 				glBindVertexArray(0);

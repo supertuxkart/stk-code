@@ -59,6 +59,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
 };
 
+class MovingTextureShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_TM, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
 class DetailledObjectPass2Shader
 {
 public:
