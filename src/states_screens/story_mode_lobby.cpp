@@ -109,8 +109,6 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     {
         ListWidget* list = getWidget<ListWidget>("gameslots");
 
-        bool slot_found = false;
-
         PlayerProfile *player = PlayerManager::get()
                               ->getPlayer(list->getSelectionLabel());
         if(player)

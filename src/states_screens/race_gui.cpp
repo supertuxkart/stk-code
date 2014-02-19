@@ -610,7 +610,6 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
     offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
 
-    video::IVideoDriver *video = irr_driver->getVideoDriver();
     const core::rect<s32> meter_pos((int)offset.X,
                                     (int)(offset.Y-meter_height),
                                     (int)(offset.X+meter_width),

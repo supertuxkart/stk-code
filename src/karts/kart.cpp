@@ -2591,12 +2591,12 @@ btQuaternion Kart::getVisualRotation() const
 void Kart::setOnScreenText(const wchar_t *text)
 {
     core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
-    scene::ISceneManager* sm = irr_driver->getSceneManager();
     // FIXME: Titlefont is the only font guaranteed to be loaded if STK
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
 	// TODO: Add support in the engine for BillboardText or find a replacement
-    /*sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
+    /*scene::ISceneManager* sm = irr_driver->getSceneManager();
+    sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
                                                   : GUIEngine::getTitleFont(),
                                   text,
                                   getNode(),

@@ -966,12 +966,12 @@ bool Track::loadMainTrack(const XMLNode &root)
             core::stringw msg = StringUtils::toWString(val);
             core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
                                                    ->getDimension(msg.c_str());
-            scene::ISceneManager* sm = irr_driver->getSceneManager();
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
 			// TODO: Add support in the engine for BillboardText or find a replacement
-/*            scene::ISceneNode* sn =
+/*          scene::ISceneManager* sm = irr_driver->getSceneManager();
+            scene::ISceneNode* sn =
                 sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
                                               msg.c_str(),
                                               NULL,
