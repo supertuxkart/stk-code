@@ -42,6 +42,7 @@ const int CHALLENGE_POINTS[] = { 8, 9, 10 };
 
 class StoryModeStatus
 {
+private:
     /** Contains whether each feature of the challenge is locked or unlocked */
     std::map<std::string, bool>   m_locked_features;
 
@@ -54,8 +55,6 @@ class StoryModeStatus
     /** A pointer to the current challenge, or NULL
      *  if no challenge is active. */
     const ChallengeStatus *m_current_challenge;
-
-    friend class UnlockManager;
 
     int m_points;
 
@@ -79,6 +78,7 @@ public:
     void       raceFinished      ();
     void       grandPrixFinished ();
     void       save              (UTFWriter &out);
+    void       addStatus(ChallengeStatus *cs);
     void       setCurrentChallenge(const std::string &challenge_id);
 
     // ------------------------------------------------------------------------

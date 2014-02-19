@@ -53,6 +53,17 @@ StoryModeStatus::~StoryModeStatus()
         delete it->second;
     }
 } // ~StoryModeStatus
+
+//-----------------------------------------------------------------------------
+/** Adds a ChallengeStatus with the specified id to the set of all statuses
+ *  of this object.
+ *  \param cs The challenge status.
+ */
+void StoryModeStatus::addStatus(ChallengeStatus *cs)
+{
+    m_challenges_state[cs->getData()->getId()] = cs;
+}   // addStatus
+
 //-----------------------------------------------------------------------------
 bool StoryModeStatus::isLocked(const std::string& feature)
 {

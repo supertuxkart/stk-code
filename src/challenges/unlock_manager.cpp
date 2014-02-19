@@ -207,7 +207,7 @@ StoryModeStatus* UnlockManager::createStoryModeStatus(const XMLNode *node)
         ChallengeStatus *challenge_status = new ChallengeStatus(cd);
         if(node)
             challenge_status->load(node);
-        status->m_challenges_state[cd->getId()] = challenge_status;
+        status->addStatus(challenge_status);
     }
 
     status->computeActive();
