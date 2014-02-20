@@ -220,7 +220,6 @@ void PlayerManager::setCurrentPlayer(PlayerProfile *player)
     m_current_player = player;
     m_current_player->setDefault(true);
     m_current_player->computeActive();
-    AchievementsManager::get()->updateCurrentPlayer();
 }   // setCurrentPlayer
 
 // ----------------------------------------------------------------------------

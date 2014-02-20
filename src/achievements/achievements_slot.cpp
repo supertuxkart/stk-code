@@ -21,6 +21,7 @@
 
 #include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"
+#include "io/utf_writer.hpp"
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
@@ -31,109 +32,88 @@
 #include <stdlib.h>
 #include <assert.h>
 
-// ============================================================================
-AchievementsSlot::AchievementsSlot(const XMLNode * input)
+
+// ----------------------------------------------------------------------------
+AchievementsStatus::AchievementsStatus()
 {
-    int fetched_user_id = input->get("user_id", &m_id);
-    std::string online;
-    int fetched_online = input->get("online", &online);
-    if(!fetched_user_id || !fetched_online || !(online == "true" || online == "false"))
-    {
-        m_valid = false;
-    }
-    m_valid = true;
-    m_online = online == "true";
+    m_valid  = true;
+    m_online = true;
+}   // AchievementsStatus
 
-    createFreshSlot();
+// ----------------------------------------------------------------------------
+AchievementsStatus::~AchievementsStatus()
+{
+    deleteAchievements();
+}   // ~AchievementsStatus
 
+// ----------------------------------------------------------------------------
+/** Loads the saved state of all achievements from an XML file.
+ *  \param input The XML node to load the data from.
+ */
+void AchievementsStatus::load(const XMLNode * input)
+{
     std::vector<XMLNode*> xml_achievements;
     input->getNodes("achievement", xml_achievements);
-    for( unsigned int i=0; i<xml_achievements.size(); i++)
+    for (unsigned int i = 0; i < xml_achievements.size(); i++)
     {
         uint32_t achievement_id(0);
         xml_achievements[i]->get("id", &achievement_id);
         Achievement * achievement = getAchievement(achievement_id);
-        if(achievement == NULL)
+        if (achievement == NULL)
         {
-            Log::warn("AchievementsSlot", "Found saved achievement data for a non-existent achievement. Discarding.");
+            Log::warn("AchievementsStatus",
+                "Found saved achievement data for a non-existent "
+                "achievement. Discarding.");
             continue;
         }
         achievement->load(xml_achievements[i]);
-    }
-}
+    }   // for i in xml_achievements
 
-// ============================================================================
-AchievementsSlot::AchievementsSlot(unsigned int id, bool online)
+}   // load
+
+// ----------------------------------------------------------------------------
+void AchievementsStatus::add(Achievement *achievement)
 {
-    m_valid  = true;
-    m_online = online;
-    m_id     = id;
+    m_achievements[achievement->getID()] = achievement;
+}    // add
 
-    createFreshSlot();
-}
-
-// ============================================================================
-AchievementsSlot::~AchievementsSlot()
-{
-    deleteAchievements();
-}
-
-// ============================================================================
-void AchievementsSlot::deleteAchievements()
+// ----------------------------------------------------------------------------
+void AchievementsStatus::deleteAchievements()
 {
     std::map<uint32_t, Achievement *>::iterator it;
     for ( it = m_achievements.begin(); it != m_achievements.end(); ++it ) {
         delete it->second;
     }
     m_achievements.clear();
-}
+}   // deleteAchievements
 
-// ============================================================================
-void AchievementsSlot::createFreshSlot()
+// ----------------------------------------------------------------------------
+/** Saves the achievement status to a file. Achievements are stored as part
+ *  of the player data file players.xml.
+ *  \param out File to write to.
+ */
+void AchievementsStatus::save(UTFWriter &out)
 {
-    deleteAchievements();
-    const std::map<uint32_t, AchievementInfo *> all_info = AchievementsManager::get()->getAllInfo();
-    std::map<uint32_t, AchievementInfo *>::const_iterator it;
-    for ( it = all_info.begin(); it != all_info.end(); ++it ) {
-        Achievement::AchievementType achievement_type = it->second->getType();
-        Achievement * achievement;
-        if(achievement_type == Achievement::AT_SINGLE)
-        {
-            achievement = new SingleAchievement(it->second);
-        }
-        else if(achievement_type == Achievement::AT_MAP)
-        {
-            achievement = new MapAchievement(it->second);
-        }
-        m_achievements[achievement->getID()] = achievement;
-    }
-}
-
-// ============================================================================
-void AchievementsSlot::save(std::ofstream & out)
-{
-    out << "    <slot user_id=\"" << m_id
-        << "\" online=\""           << StringUtils::toString(m_online)
-        << "\"> \n";
+    out << L"    <achievements online=\"" << m_online << L"\"> \n";
     std::map<uint32_t, Achievement*>::const_iterator i;
     for(i = m_achievements.begin(); i != m_achievements.end();  i++)
     {
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << "    </slot>\n";
-}
+    out << L"    </achievements>\n";
+}   // save
 
-// ============================================================================
-Achievement * AchievementsSlot::getAchievement(uint32_t id)
+// ----------------------------------------------------------------------------
+Achievement * AchievementsStatus::getAchievement(uint32_t id)
 {
     if ( m_achievements.find(id) != m_achievements.end())
         return m_achievements[id];
     return NULL;
 }
 
-// ============================================================================
-void AchievementsSlot::sync(const std::vector<uint32_t> & achieved_ids)
+// ----------------------------------------------------------------------------
+void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
 {
     for(unsigned int i =0; i < achieved_ids.size(); ++i)
     {
@@ -143,8 +123,8 @@ void AchievementsSlot::sync(const std::vector<uint32_t> & achieved_ids)
     }
 }
 
-// ============================================================================
-void AchievementsSlot::onRaceEnd()
+// ----------------------------------------------------------------------------
+void AchievementsStatus::onRaceEnd()
 {
     //reset all values that need to be reset
     std::map<uint32_t, Achievement *>::iterator iter;

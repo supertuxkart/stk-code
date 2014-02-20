@@ -21,6 +21,7 @@
 
 #include "achievements/achievement_info.hpp"
 #include "guiengine/dialog_queue.hpp"
+#include "io/utf_writer.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -92,15 +93,16 @@ void SingleAchievement::load(XMLNode * input)
     input->get("value", &m_progress);
 }
 // ============================================================================
-void SingleAchievement::save(std::ofstream & out)
+void SingleAchievement::save(UTFWriter &out)
 {
-    out << "        <achievement id=\"" << m_id << "\" "
-        << "achieved=\"" << StringUtils::toString(m_achieved) << "\"";
-    if(!m_achieved)
+    out << L"        <achievement id=\"" << m_id << L"\" "
+        << "achieved=\"" << m_achieved << "\"";
+
+        if(!m_achieved)
     {
-        out << " value=\"" << StringUtils::toString(m_progress) << "\"";
+        out << L" value=\"" << m_progress << L"\"";
     }
-    out << "/>\n";
+    out << L"/>\n";
 }   // save
 
 // ============================================================================
@@ -152,7 +154,7 @@ void MapAchievement::load(XMLNode * input)
 }
 
 // ============================================================================
-void MapAchievement::save(std::ofstream & out)
+void MapAchievement::save(UTFWriter &out)
 {
     out << "        <achievement id=\"" << m_id << "\" achieved=\"" 
         << StringUtils::toString(m_achieved) << "\">\n";

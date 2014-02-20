@@ -22,9 +22,11 @@
 #include "utils/types.hpp"
 
 #include <irrString.h>
+#include <map>
 #include <string>
-#include "io/xml_node.hpp"
 
+class UTFWriter;
+class XMLNode;
 
 // ============================================================================
 
@@ -47,8 +49,8 @@ public:
     virtual ~Achievement                ();
     uint32_t getID                      () const { return m_id; }
     const AchievementInfo * getInfo     () const { return m_achievement_info;}
-    virtual void load                   (XMLNode * input) = 0;
-    virtual void save                   (std::ofstream & out) = 0;
+    virtual void load                   (XMLNode *input) = 0;
+    virtual void save                   (UTFWriter &out) = 0;
     virtual void reset                  () = 0;
     void onRaceEnd                      ();
     void setAchieved                    () {m_achieved = true; };
@@ -73,7 +75,7 @@ public:
 
     void load                           (XMLNode * input);
     int getValue                        () const { return m_progress; }
-    void save                           (std::ofstream & out);
+    void save                           (UTFWriter &out);
     void increase                       (int increase = 1);
     void reset                          ();
     virtual irr::core::stringw          getProgressAsString ();
@@ -91,7 +93,7 @@ public:
     void load                           (XMLNode * input);
     int getValue                        (const std::string & key);
     void increase                       (const std::string & key, int increase = 1);
-    void save                           (std::ofstream & out);
+    void save                           (UTFWriter &out);
     void reset                          ();
     virtual irr::core::stringw          getProgressAsString ();
 };   // class MapAchievement
