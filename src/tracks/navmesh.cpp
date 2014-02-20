@@ -32,19 +32,10 @@
 NavMesh *NavMesh::m_nav_mesh = NULL;
 
 
-
-void NavMesh::readVertex(const XMLNode *xml, Vec3* result) const
-{
-    float x,y,z;
-    xml->get("x", &x);
-    xml->get("y", &y);
-    xml->get("z", &z);
-    Vec3 temp(x,y,z);
-    *result = temp;
-}
-
-
-
+/** Constructor, loads the mesh information from a given set of polygons
+ *	from a navmesh.xml file.
+ *	\param filename Name of the file containing all polygons
+ */
 NavMesh::NavMesh(const std::string &filename)
 {
     
@@ -119,10 +110,24 @@ NavMesh::NavMesh(const std::string &filename)
 
     delete xml;
 
-}
+} // NavMesh
+
+// ----------------------------------------------------------------------------
 
 NavMesh::~NavMesh()
 {
-}
+}  // ~NavMesh
 
 // ----------------------------------------------------------------------------
+
+/** Reads the vertex information from an XMLNode */
+void NavMesh::readVertex(const XMLNode *xml, Vec3* result) const
+{
+	float x, y, z;
+	xml->get("x", &x);
+	xml->get("y", &y);
+	xml->get("z", &z);
+	Vec3 temp(x, y, z);
+	*result = temp;
+}	 //	readVertex
+

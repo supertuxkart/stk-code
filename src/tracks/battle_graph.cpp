@@ -32,6 +32,9 @@
 const int BattleGraph::UNKNOWN_POLY  = -1;
 BattleGraph * BattleGraph::m_battle_graph = NULL;
 
+/** Constructor, Creates a navmesh, builds a graph from the navmesh and 
+*	then runs shortest path algorithm to find and store paths to be used 
+*	by the AI. */
 BattleGraph::BattleGraph(const std::string &navmesh_file_name)
 {
     NavMesh::create(navmesh_file_name);
@@ -39,13 +42,16 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name)
     buildGraph(NavMesh::get());
     computeFloydWarshall();
 
-}
+} // BattleGraph
 
+// -----------------------------------------------------------------------------
+/** Builds a graph from an existing NavMesh. The graph is stored as an adjacency
+*	matrix. */
 void BattleGraph::buildGraph(NavMesh* navmesh)
 {
     unsigned int n_polys = navmesh->getNumberOfPolys();
-    //m_graph.resize(n_polys);
-    m_distance_matrix = std::vector< std::vector<float> > (n_polys, std::vector<float>(n_polys, 9999.9f));
+    
+	m_distance_matrix = std::vector< std::vector<float> > (n_polys, std::vector<float>(n_polys, 9999.9f));
     for(unsigned int i=0; i<n_polys; i++)
     {
         NavPoly currentPoly = navmesh->getNavPoly(i);
@@ -54,8 +60,7 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
         {
             Vec3 adjacentPolyCenter = navmesh->getCenterOfPoly(adjacents[j]);
             float distance = Vec3(adjacentPolyCenter - currentPoly.getCenter()).length_2d();
-            //m_graph[i].push_back(std::make_pair(adjacents[j], distance));
-
+            
             m_distance_matrix[i][adjacents[j]] = distance;
             //m_distance_matrix[adjacents[j]][i] = distance;
 
@@ -63,8 +68,9 @@ void BattleGraph::buildGraph(NavMesh* navmesh)
         m_distance_matrix[i][i] = 0.0f;
     }
 
-}
+}	// buildGraph 
 
+// -----------------------------------------------------------------------------
 /** computeFloydWarshall() computes the shortest distance between any two nodes.
  *  At the end of the computation, m_distance_matrix[i][j] stores the shortest path
  *  distance from i to j and m_parent_poly[i][j] stores the last vertex visited on the 
@@ -101,16 +107,20 @@ void BattleGraph::computeFloydWarshall()
         }
     }
 
-}
+}	// computeFloydWarshall
 
+// -----------------------------------------------------------------------------
+/** Destructor, destroys NavMesh and the debug mesh if it exists */
 BattleGraph::~BattleGraph(void)
 {
     NavMesh::destroy();
 
     if(UserConfigParams::m_track_debug)
         cleanupDebugMesh();
-}
+} // ~BattleGraph
 
+// -----------------------------------------------------------------------------
+/** Creates the actual mesh that is used by createDebugMesh() */ 
 void BattleGraph::createMesh(bool enable_transparency,
                            const video::SColor *track_color)
 {
@@ -204,10 +214,9 @@ void BattleGraph::createMesh(bool enable_transparency,
 
 }   // createMesh
 
-
+// -----------------------------------------------------------------------------
 /** Creates the debug mesh to display the quad graph on top of the track
  *  model. */
-
 void BattleGraph::createDebugMesh()
 {
     if(getNumNodes()<=0) return;  // no debug output if not graph
@@ -220,6 +229,8 @@ void BattleGraph::createDebugMesh()
 
 }   // createDebugMesh
 
+// -----------------------------------------------------------------------------
+/** Cleans up the debug mesh */
 void BattleGraph::cleanupDebugMesh()
 {
     if(m_node != NULL)

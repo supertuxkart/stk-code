@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <iostream>
 
+/** Constructor that takes a vector of points and a vector of adjacnet polygons */
 NavPoly::NavPoly(const  std::vector<int> &polygonVertIndices,  
             const std::vector<int> &adjacentPolygonIndices)
 {
