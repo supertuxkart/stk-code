@@ -45,13 +45,12 @@ AchievementsManager::AchievementsManager()
 // ----------------------------------------------------------------------------
 AchievementsManager::~AchievementsManager()
 {
-    save();
     std::map<uint32_t, AchievementInfo *>::iterator it;
     for ( it = m_achievements_info.begin(); it != m_achievements_info.end(); ++it ) {
         delete it->second;
     }
     m_achievements_info.clear();
-}
+}   // ~AchievementsManager
 
 // ----------------------------------------------------------------------------
 /** Parses the data/achievements.xml file and stores the information about
@@ -103,6 +102,7 @@ AchievementsStatus*
 {
     AchievementsStatus *status = new AchievementsStatus();
 
+    // First add all achievements, before restoring the saved data.
     std::map<uint32_t, AchievementInfo *>::const_iterator it;
     for (it  = m_achievements_info.begin(); 
          it != m_achievements_info.end(); ++it)
@@ -125,29 +125,6 @@ AchievementsStatus*
 
     return status;
 }   // createAchievementStatus
-
-// ----------------------------------------------------------------------------
-void AchievementsManager::save()
-{
-    std::string filename = file_manager->getUserConfigFile("achievements.xml");
-
-    std::ofstream achievements_file(filename.c_str(), std::ios::out);
-
-    if (!achievements_file.is_open())
-    {
-        Log::warn("AchievementsManager::save",
-                  "Failed to open '%s' for writing, achievements won't be saved\n",
-                  filename.c_str());
-        return;
-    }
-
-    achievements_file << "<?xml version=\"1.0\"?>\n";
-    achievements_file << "<achievements>\n";
-
-    achievements_file << "</achievements>\n\n";
-    achievements_file.close();
-}
-
 
 // ----------------------------------------------------------------------------
 void AchievementsManager::onRaceEnd()

@@ -69,9 +69,8 @@ public:
         delete m_achievements_manager;
         m_achievements_manager = NULL;
     }   // destroy
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
-    void save();
     void onRaceEnd();
     AchievementInfo* getAchievementInfo(uint32_t id) const;
     AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
