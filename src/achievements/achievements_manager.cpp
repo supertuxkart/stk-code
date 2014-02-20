@@ -19,7 +19,7 @@
 #include "achievements/achievements_manager.hpp"
 
 #include "achievements/achievement_info.hpp"
-#include "achievements/achievements_slot.hpp"
+#include "achievements/achievements_status.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"

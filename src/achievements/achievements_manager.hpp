@@ -19,7 +19,7 @@
 #ifndef HEADER_ACHIEVEMENTS_MANAGER_HPP
 #define HEADER_ACHIEVEMENTS_MANAGER_HPP
 
-#include "achievements/achievements_slot.hpp"
+#include "achievements/achievements_status.hpp"
 
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"

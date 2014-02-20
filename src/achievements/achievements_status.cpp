@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "achievements/achievements_slot.hpp"
+#include "achievements/achievements_status.hpp"
 
 #include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"

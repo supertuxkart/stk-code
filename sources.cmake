@@ -3,7 +3,7 @@ set(STK_SOURCES
 src/achievements/achievement.cpp
 src/achievements/achievement_info.cpp
 src/achievements/achievements_manager.cpp
-src/achievements/achievements_slot.cpp
+src/achievements/achievements_status.cpp
 src/addons/addon.cpp
 src/addons/addons_manager.cpp
 src/addons/news_manager.cpp
@@ -328,7 +328,7 @@ set(STK_HEADERS
 src/achievements/achievement.hpp
 src/achievements/achievement_info.hpp
 src/achievements/achievements_manager.hpp
-src/achievements/achievements_slot.hpp
+src/achievements/achievements_status.hpp
 src/addons/addon.hpp
 src/addons/addons_manager.hpp
 src/addons/news_manager.hpp
