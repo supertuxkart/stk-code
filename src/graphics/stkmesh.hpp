@@ -48,8 +48,8 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 // Forward pass (for transparents meshes)
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 class STKMesh : public irr::scene::CMeshSceneNode

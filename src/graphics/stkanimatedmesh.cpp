@@ -33,9 +33,9 @@ void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE
 	computeMVP(ModelViewProjectionMatrix);
 
     if (World::getWorld()->getTrack()->isFogEnabled())
-        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
     else
-        drawTransparentObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentObject(mesh, ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
 
 	return;
 }

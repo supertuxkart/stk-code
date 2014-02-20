@@ -637,8 +637,6 @@ void drawMovingTexture(const GLMesh &mesh, const core::matrix4 &ModelViewProject
         GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
         glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     }
-    const float *tmp = TextureMatrix.pointer();
-    printf("TMat : \n %f %f %f %f\n %f %f %f %f\n %f %f %f %f\n %f %f %f %f\n", tmp[0], tmp[1], tmp[2], tmp[3], tmp[4], tmp[5], tmp[6], tmp[7], tmp[8], tmp[9], tmp[10], tmp[11], tmp[12], tmp[13], tmp[14], tmp[15]);
 
     glUseProgram(MeshShader::MovingTextureShader::Program);
     MeshShader::MovingTextureShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0, 1, 2, 3);
@@ -647,7 +645,7 @@ void drawMovingTexture(const GLMesh &mesh, const core::matrix4 &ModelViewProject
     glDrawElements(ptype, count, itype, 0);
 }
 
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -656,13 +654,13 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
 	glUseProgram(MeshShader::TransparentShader::Program);
-	MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, 0);
+    MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
@@ -685,7 +683,7 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     glUseProgram(MeshShader::TransparentFogShader::Program);
-    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvProjMatrix(), fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, irr_driver->getInvProjMatrix(), fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElements(ptype, count, itype, 0);
@@ -753,9 +751,9 @@ void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
     if (type == irr_driver->getShader(ES_BUBBLES))
         drawBubble(mesh, ModelViewProjectionMatrix);
     else if (World::getWorld()->getTrack()->isFogEnabled())
-        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix, TextureMatrix);
 	else
-		drawTransparentObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentObject(mesh, ModelViewProjectionMatrix, TextureMatrix);
 	return;
 }
 
