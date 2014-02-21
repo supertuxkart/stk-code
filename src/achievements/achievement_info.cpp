@@ -28,10 +28,23 @@
 
 AchievementInfo::AchievementInfo(const XMLNode * input)
 {
-    input->get("id",               &m_id              );
-    input->get("title",            &m_title           );
-    input->get("description",      &m_description     );
-    input->get("reset_after_race", &m_reset_after_race);
+    m_reset_after_race = false;
+    m_id               = 0;
+    m_title            = "";
+    m_description      = "";
+    bool all;
+    all = input->get("id",               &m_id              ) &&
+          input->get("title",            &m_title           ) &&
+          input->get("description",      &m_description     );
+    if (!all)
+    {
+        Log::error("AchievementInfo", 
+                   "Not all necessary values for achievement defined.");
+        Log::error("AchievementInfo",
+                   "ID %d title '%s' description '%s'", m_id, m_title.c_str(),
+                                                        m_description.c_str());
+    }
+    input->get("reset-after-race", &m_reset_after_race);
 }   // AchievementInfo
 
 // ============================================================================
