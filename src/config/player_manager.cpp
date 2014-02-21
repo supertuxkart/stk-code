@@ -107,6 +107,7 @@ void PlayerManager::load()
     if(!m_current_player)
         Log::fatal("PlayerManager", "Can't find a default player.");
 
+    delete players;
 }   // load
 
 // ----------------------------------------------------------------------------
