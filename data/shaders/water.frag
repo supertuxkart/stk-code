@@ -1,6 +1,6 @@
 // Shader based on work by Fabien Sanglard
 // Released under the terms of CC-BY 3.0
-#version 130
+#version 330 compatibility
 uniform sampler2D BumpTex1; // Normal map 1
 uniform sampler2D BumpTex2; // Normal map 2
 uniform sampler2D DecalTex; //The texture

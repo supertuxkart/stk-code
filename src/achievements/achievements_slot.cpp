@@ -24,12 +24,13 @@
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
-#include "io/xml_writer.hpp"
 #include "online/current_user.hpp"
 
 #include <sstream>
+#include <fstream>
 #include <stdlib.h>
 #include <assert.h>
+
 // ============================================================================
 AchievementsSlot::AchievementsSlot(const XMLNode * input)
 {
@@ -62,11 +63,11 @@ AchievementsSlot::AchievementsSlot(const XMLNode * input)
 }
 
 // ============================================================================
-AchievementsSlot::AchievementsSlot(std::string id, bool online)
+AchievementsSlot::AchievementsSlot(unsigned int id, bool online)
 {
-    m_valid = true;
+    m_valid  = true;
     m_online = online;
-    m_id = id;
+    m_id     = id;
 
     createFreshSlot();
 }
@@ -111,7 +112,7 @@ void AchievementsSlot::createFreshSlot()
 // ============================================================================
 void AchievementsSlot::save(std::ofstream & out)
 {
-    out << "    <slot user_id=\"" << m_id.c_str()
+    out << "    <slot user_id=\"" << m_id
         << "\" online=\""           << StringUtils::toString(m_online)
         << "\"> \n";
     std::map<uint32_t, Achievement*>::const_iterator i;

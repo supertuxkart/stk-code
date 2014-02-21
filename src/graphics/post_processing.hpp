@@ -75,6 +75,7 @@ public:
 	/** Generate diffuse and specular map */
 	void         renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
 	void         renderSunlight();
+    void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
 	void renderFog(const core::matrix4 &ipvmat);
 	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
@@ -85,6 +86,7 @@ public:
 
 	/** Render tex. Used for blit/texture resize */
 	void renderPassThrough(video::ITexture *tex);
+    void renderPassThrough(unsigned tex);
 
 	void renderGlow(video::ITexture *tex);
 

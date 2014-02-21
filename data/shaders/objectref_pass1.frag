@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D tex;
 
 noperspective in vec3 nor;

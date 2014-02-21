@@ -22,14 +22,14 @@
 #include "achievements/achievement_info.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
-#include "io/xml_writer.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 
+#include <assert.h>
+#include <fstream>
 #include <sstream>
 #include <stdlib.h>
-#include <assert.h>
 
 // ============================================================================
 Achievement::Achievement(const AchievementInfo * info)

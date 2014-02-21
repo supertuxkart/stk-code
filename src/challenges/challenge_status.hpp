@@ -16,8 +16,8 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_CHALLENGE_HPP
-#define HEADER_CHALLENGE_HPP
+#ifndef HEADER_CHALLENGE_STATUS_HPP
+#define HEADER_CHALLENGE_STATUS_HPP
 
 /**
   * \defgroup challenges
@@ -34,38 +34,45 @@
 #include "utils/no_copy.hpp"
 #include "utils/translation.hpp"
 
-class XMLNode;
-class XMLWriter;
 class ChallengeData;
+class UTFWriter;
+class XMLNode;
 
 /**
   * \brief The state of a challenge for one player.
-  *  Each Challenge has one ChallengeData associcated, which stores
-  *  the actual data about the challenge.
+  *  Each ChallengeStatus has one ChallengeData associcated, which stores
+  *  the actual data about the challenge. The ChallengeStatus stores if the
+  *  challenge is not possible yet (inactive), active (i.e. user can try to
+  *  solve it), or solved. This status is stored for each difficulty level.
+  *  This data is saved to and loaded from the player.xml file.
+  *  A PlayerProfile will store an array of ChallengeStatuses, one for each
+  *  Challenge in STK.
   *
   * \ingroup challenges
   */
-class Challenge : public NoCopy
+class ChallengeStatus : public NoCopy
 {
 private:
+    /** The different states the challenge can be in. */
     enum {CH_INACTIVE,                 // challenge not yet possible
           CH_ACTIVE,                   // challenge possible, but not yet solved
           CH_SOLVED}                   // challenge was solved
     m_state[RaceManager::DIFFICULTY_COUNT];
 
-    ChallengeData* m_data;
+    /** Pointer to the original challenge data. */
+    const ChallengeData* m_data;
 
 public:
-    Challenge(ChallengeData* data)
+    ChallengeStatus(const ChallengeData* data)
     {
         m_data = data;
         m_state[RaceManager::DIFFICULTY_EASY]   = CH_INACTIVE;
         m_state[RaceManager::DIFFICULTY_MEDIUM] = CH_INACTIVE;
         m_state[RaceManager::DIFFICULTY_HARD]   = CH_INACTIVE;
     }
-    virtual ~Challenge() {};
+    virtual ~ChallengeStatus() {};
     void load(const XMLNode* config);
-    void save(std::ofstream& writer);
+    void save(UTFWriter& writer);
     void setSolved(RaceManager::Difficulty d);
 
     // ------------------------------------------------------------------------
@@ -100,10 +107,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the actual Challenge data.
      */
-    ChallengeData* getData() { return m_data; }
-    // ------------------------------------------------------------------------
-    /** Returns a pointer to the actual Challenge data.
-     */
     const ChallengeData* getData() const { return m_data; }
-};   // Challenge
+};   // ChallengeStatus
 #endif

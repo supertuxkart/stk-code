@@ -21,7 +21,8 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
+#include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -102,14 +103,14 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
 
     // ---- Otherwise, see if we can accept the new name
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    stringw playerName = textCtrl->getText().trim();
-    if (StringUtils::notEmpty(playerName))
+    stringw player_name = textCtrl->getText().trim();
+    if (StringUtils::notEmpty(player_name))
     {
         // check for duplicates
-        const int amount = UserConfigParams::m_all_players.size();
+        const int amount = PlayerManager::get()->getNumPlayers();
         for (int n=0; n<amount; n++)
         {
-            if (UserConfigParams::m_all_players[n].getName() == playerName)
+            if (PlayerManager::get()->getPlayer(n)->getName() == player_name)
             {
                 LabelWidget* label = getWidget<LabelWidget>("title");
                 label->setText(_("Cannot add a player with this name."), false);
@@ -119,10 +120,8 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         }
 
         // Finally, add the new player.
-        UserConfigParams::m_all_players.push_back( new PlayerProfile(playerName) );
-        bool created = unlock_manager->createSlotsIfNeeded();
-        if (created) unlock_manager->save();
-        user_config->saveConfig();
+        PlayerManager::get()->addNewPlayer(player_name);
+        PlayerManager::get()->save();
 
         // It's unsafe to delete from inside the event handler so we do it
         // in onUpdate (which checks for m_self_destroy)
@@ -144,7 +143,7 @@ void EnterPlayerNameDialog::onUpdate(float dt)
     if (m_self_destroy)
     {
         TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-        stringw playerName = textCtrl->getText().trim();
+        stringw player_name = textCtrl->getText().trim();
 
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
@@ -158,6 +157,6 @@ void EnterPlayerNameDialog::onUpdate(float dt)
 
         ModalDialog::dismiss();
 
-        if (listener != NULL) listener->onNewPlayerWithName( playerName );
+        if (listener != NULL) listener->onNewPlayerWithName( player_name );
     }
 }

@@ -8,5 +8,6 @@
 
 #  define isnan _isnan
 #  define roundf(x) (floorf(x + 0.5f))
+#  define round(x)  (floorf(x + 0.5))
 #endif
 

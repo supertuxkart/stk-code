@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform vec3 Position;

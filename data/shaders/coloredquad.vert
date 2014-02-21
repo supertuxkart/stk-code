@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform vec2 center;
 uniform vec2 size;
 

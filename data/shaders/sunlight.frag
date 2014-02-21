@@ -1,4 +1,4 @@
-#version 130
+#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 //uniform sampler2D cloudtex;
@@ -12,7 +12,6 @@ uniform mat4 invproj;
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
-out vec4 SpecularMap;
 
 vec3 DecodeNormal(vec2 n)
 {
@@ -58,5 +57,4 @@ void main() {
 
 	Diff = vec4(NdotL * col, 1.);
 	Spec = vec4(Specular * col, 1.);
-	SpecularMap = vec4(1.0);
 }

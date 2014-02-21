@@ -27,7 +27,7 @@
 
 #include <string>
 
-#include "config/player.hpp"
+#include "config/player_profile.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 

@@ -45,7 +45,7 @@ private :
     std::map<uint32_t, AchievementInfo *> m_achievements_info;
     AchievementsManager      ();
     ~AchievementsManager     ();
-    AchievementsSlot * createNewSlot(std::string id, bool online);
+    AchievementsSlot * createNewSlot(unsigned int id, bool online);
     void parseAssetFile();
     void parseUserConfigFile();
 
@@ -59,7 +59,7 @@ public:
     void onRaceEnd();
     void updateCurrentPlayer();
     AchievementsSlot * getActive() const { return m_active_slot; }
-    AchievementsSlot * getSlot(const std::string & id, bool online);
+    AchievementsSlot * getSlot(unsigned int id, bool online);
     void createSlotsIfNeeded();
     AchievementInfo * getAchievementInfo(uint32_t id);
     const std::map<uint32_t, AchievementInfo *> & getAllInfo() { return m_achievements_info;}

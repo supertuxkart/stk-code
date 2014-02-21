@@ -19,8 +19,9 @@
 #ifndef HEADER_PLAYERINFO_DIALOG_HPP
 #define HEADER_PLAYERINFO_DIALOG_HPP
 
-#include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
+
+class PlayerProfile;
 
 namespace GUIEngine
 {

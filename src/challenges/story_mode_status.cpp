@@ -17,30 +17,61 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "challenges/game_slot.hpp"
+#include "challenges/story_mode_status.hpp"
 
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_status.hpp"
 #include "challenges/challenge_data.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "io/xml_writer.hpp"
+#include "config/player_manager.hpp"
+#include "io/utf_writer.hpp"
+#include "io/xml_node.hpp"
 
 //-----------------------------------------------------------------------------
-GameSlot::~GameSlot()
+StoryModeStatus::StoryModeStatus(const XMLNode *node)
 {
-    std::map<std::string, Challenge*>::iterator it;
+    m_points            = 0;
+    m_first_time        = true;
+    m_easy_challenges   = 0;
+    m_medium_challenges = 0;
+    m_hard_challenges   = 0;
+    m_current_challenge = NULL;
+
+    // If there is saved data, load it
+    if(node)
+    {
+        node->get("first-time", &m_first_time);
+    }   // if node
+
+}   // StoryModeStatus
+
+//-----------------------------------------------------------------------------
+StoryModeStatus::~StoryModeStatus()
+{
+    std::map<std::string, ChallengeStatus*>::iterator it;
     for (it = m_challenges_state.begin();it != m_challenges_state.end();it++)
     {
         delete it->second;
     }
-} // ~GameSlot
+} // ~StoryModeStatus
+
 //-----------------------------------------------------------------------------
-bool GameSlot::isLocked(const std::string& feature)
+/** Adds a ChallengeStatus with the specified id to the set of all statuses
+ *  of this object.
+ *  \param cs The challenge status.
+ */
+void StoryModeStatus::addStatus(ChallengeStatus *cs)
+{
+    m_challenges_state[cs->getData()->getId()] = cs;
+}   // addStatus
+
+//-----------------------------------------------------------------------------
+bool StoryModeStatus::isLocked(const std::string& feature)
 {
     return m_locked_features.find(feature)!=m_locked_features.end();
 }  // featureIsLocked
 
 //-----------------------------------------------------------------------------
-void GameSlot::computeActive()
+void StoryModeStatus::computeActive()
 {
     m_points = 0;
     m_easy_challenges = 0;
@@ -49,7 +80,7 @@ void GameSlot::computeActive()
 
     m_locked_features.clear(); // start afresh
 
-    std::map<std::string, Challenge*>::const_iterator i;
+    std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
     {
@@ -146,10 +177,10 @@ void GameSlot::computeActive()
 
 //-----------------------------------------------------------------------------
 
-void GameSlot::lockFeature(Challenge *challenge)
+void StoryModeStatus::lockFeature(ChallengeStatus *challenge_status)
 {
     const std::vector<ChallengeData::UnlockableFeature>& features =
-        challenge->getData()->getFeatures();
+        challenge_status->getData()->getFeatures();
 
     const unsigned int amount = (unsigned int)features.size();
     for (unsigned int n=0; n<amount; n++)
@@ -164,7 +195,7 @@ void GameSlot::lockFeature(Challenge *challenge)
  *  \param d Difficulty at which the challenge was solved.
  *  \param do_save If true update the challenge file on disk.
  */
-void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
+void StoryModeStatus::unlockFeature(ChallengeStatus* c, RaceManager::Difficulty d,
                              bool do_save)
 {
     const unsigned int amount=(unsigned int)c->getData()->getFeatures().size();
@@ -175,7 +206,7 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
         if (p == m_locked_features.end())
         {
             c->setSolved(d);
-            if(do_save) unlock_manager->save();
+            if(do_save) PlayerManager::get()->save();
             return;
         }
         m_locked_features.erase(p);
@@ -186,24 +217,24 @@ void GameSlot::unlockFeature(Challenge* c, RaceManager::Difficulty d,
     c->setSolved(d);  // reset isActive flag
 
     // Save the new unlock information
-    if (do_save) unlock_manager->save();
+    if (do_save) PlayerManager::get()->save();
 }   // unlockFeature
 
 //-----------------------------------------------------------------------------
 /** Set the current challenge (or NULL if no challenge is done).
  *  \param challenge Pointer to the challenge (or NULL)
  */
-void GameSlot::setCurrentChallenge(const std::string &challenge_id)
+void StoryModeStatus::setCurrentChallenge(const std::string &challenge_id)
 {
     m_current_challenge = challenge_id=="" ? NULL
-                                           : getChallenge(challenge_id);
+                                           : getChallengeStatus(challenge_id);
 }   // setCurrentChallenge
 
 //-----------------------------------------------------------------------------
 /** This is called when a race is finished. See if there is an active
  *  challenge that was fulfilled.
  */
-void GameSlot::raceFinished()
+void StoryModeStatus::raceFinished()
 {
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
@@ -212,7 +243,7 @@ void GameSlot::raceFinished()
         // cast const away so that the challenge can be set to fulfilled.
         // The 'clean' implementation would involve searching the challenge
         // in m_challenges_state, which is a bit of an overkill
-        unlockFeature(const_cast<Challenge*>(m_current_challenge),
+        unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
                       race_manager->getDifficulty());
     }   // if isActive && challenge solved
 }   // raceFinished
@@ -221,13 +252,13 @@ void GameSlot::raceFinished()
 /** This is called when a GP is finished. See if there is an active
  *  challenge that was fulfilled.
  */
-void GameSlot::grandPrixFinished()
+void StoryModeStatus::grandPrixFinished()
 {
     if(m_current_challenge                                           &&
         m_current_challenge->isActive(race_manager->getDifficulty()) &&
         m_current_challenge->getData()->isGPFulfilled()                 )
     {
-        unlockFeature(const_cast<Challenge*>(m_current_challenge),
+        unlockFeature(const_cast<ChallengeStatus*>(m_current_challenge),
                       race_manager->getDifficulty());
     }   // if isActive && challenge solved
 
@@ -235,19 +266,18 @@ void GameSlot::grandPrixFinished()
 }   // grandPrixFinished
 
 //-----------------------------------------------------------------------------
-
-void GameSlot::save(std::ofstream& out, const std::string& name)
+/** Writes the data of this StoryModeStatus to the specified stream.
+ *  \param out UTF stream to write to.
+ */
+void StoryModeStatus::save(UTFWriter &out)
 {
-    out << "    <gameslot playerID=\"" << m_player_unique_id.c_str()
-        << "\" kart=\""                << m_kart_ident.c_str()
-        << "\" firstTime=\""           << StringUtils::toString(m_first_time)
-        << "\"> <!-- " << name.c_str() << " -->\n";
-    std::map<std::string, Challenge*>::const_iterator i;
+    out << "    <story-mode first-time=\"" << m_first_time  << L"\">\n";
+    std::map<std::string, ChallengeStatus*>::const_iterator i;
     for(i = m_challenges_state.begin();
         i != m_challenges_state.end();  i++)
     {
         if (i->second != NULL)
             i->second->save(out);
     }
-    out << "    </gameslot>\n";
-}
+    out << "      </story-mode>\n";
+}  // save

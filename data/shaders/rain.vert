@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 uniform float screenw;
 
 void main()

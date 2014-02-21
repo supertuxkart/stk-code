@@ -33,9 +33,9 @@ void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE
 	computeMVP(ModelViewProjectionMatrix);
 
     if (World::getWorld()->getTrack()->isFogEnabled())
-        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
     else
-        drawTransparentObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentObject(mesh, ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
 
 	return;
 }
@@ -94,6 +94,21 @@ isObjectPass(video::E_MATERIAL_TYPE type)
 	return false;
 }
 
+void STKAnimatedMesh::drawShadow(const GLMesh &mesh)
+{
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+    assert(irr_driver->getPhase() == SHADOW_PASS);
+    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
+    for (unsigned i = 0; i < ShadowMVP.size(); i++)
+        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+    glUseProgram(MeshShader::ShadowShader::Program);
+    MeshShader::ShadowShader::setUniforms(ShadowMVP);
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void STKAnimatedMesh::render()
 {
 	video::IVideoDriver* driver = SceneManager->getVideoDriver();
@@ -144,14 +159,16 @@ void STKAnimatedMesh::render()
 		if (isObjectPass(material.MaterialType))
 		{
 			irr_driver->IncreaseObjectCount();
-			initvaostate(GLmeshes[i], material.MaterialType);
+			initvaostate(GLmeshes[i], material.MaterialType, false);
 			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
 			{
 				glBindVertexArray(0);
 				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
 				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
 			}
-			if (isTransparentPass)
+            if (irr_driver->getPhase() == SHADOW_PASS)
+                drawShadow(GLmeshes[i]);
+			else if (isTransparentPass)
 				drawTransparent(GLmeshes[i], material.MaterialType);
 			else
 				drawSolid(GLmeshes[i], material.MaterialType);

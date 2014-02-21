@@ -17,6 +17,7 @@
 
 #include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
@@ -63,7 +64,7 @@ void OverWorld::enterOverWorld()
     InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
     // Create player and associate player with keyboard
-    StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+    StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
                                             device, NULL);
 
     if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))

@@ -13,6 +13,7 @@ struct GLMesh {
 	GLuint vao_second_pass;
 	GLuint vao_glow_pass;
 	GLuint vao_displace_pass;
+    GLuint vao_shadow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;
 	GLuint textures[6];
@@ -24,7 +25,7 @@ struct GLMesh {
 
 GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride);
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
-void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type);
+void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type, bool moving_texture);
 void computeMVP(core::matrix4 &ModelViewProjectionMatrix);
 void computeTIMV(core::matrix4 &TransposeInverseModelView);
 
@@ -37,6 +38,7 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 // Pass 2 shader (ie shaders that outputs final color)
 void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawMovingTexture(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
@@ -46,15 +48,15 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 // Forward pass (for transparents meshes)
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 class STKMesh : public irr::scene::CMeshSceneNode
 {
 protected:
 	std::vector<GLMesh> GLmeshes;
-	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix;
 	core::vector3df windDir;
 	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
@@ -62,6 +64,7 @@ protected:
 	// Misc passes shaders (glow, displace...)
 	void drawGlow(const GLMesh &mesh);
 	void drawDisplace(const GLMesh &mesh);
+    void drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void createGLMeshes();
 	void cleanGLMeshes();
 public:
@@ -71,6 +74,7 @@ public:
 		const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
 	virtual void render();
 	virtual void setMesh(irr::scene::IMesh* mesh);
+    void MovingTexture(unsigned, unsigned);
 	~STKMesh();
 };
 

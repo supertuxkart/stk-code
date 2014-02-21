@@ -17,7 +17,6 @@
 
 #include "states_screens/dialogs/add_device_dialog.hpp"
 
-#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"

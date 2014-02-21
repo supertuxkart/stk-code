@@ -1,4 +1,4 @@
-bld/
+bld*/
 build/
 build-32/
 build-64/
@@ -35,6 +35,7 @@ data/.svn
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*~
 
 packets_log.txt
 history.dat

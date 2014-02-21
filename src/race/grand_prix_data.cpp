@@ -19,7 +19,9 @@
 
 #include "race/grand_prix_data.hpp"
 
+#include "config/player_profile.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "io/file_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
@@ -157,7 +159,7 @@ bool GrandPrixData::checkConsistency(bool chatty) const
 bool GrandPrixData::isTrackAvailable(const std::string &id) const
 {
     return id!="fortmagma" ||
-           !unlock_manager->getCurrentSlot()->isLocked("fortmagma");
+           !PlayerManager::get()->getCurrentPlayer()->isLocked("fortmagma");
 }   // isTrackAvailable
 
 // ----------------------------------------------------------------------------

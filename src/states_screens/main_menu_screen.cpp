@@ -19,10 +19,9 @@
 
 #include "states_screens/main_menu_screen.hpp"
 
-#include <string>
-
-#include "challenges/game_slot.hpp"
+#include "addons/news_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -45,19 +44,20 @@
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #endif
-
 #include "states_screens/dialogs/message_dialog.hpp"
-
-#include "addons/news_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
+
+
+
+#include <string>
+
 
 using namespace GUIEngine;
 using namespace Online;
@@ -339,7 +339,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
         // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+        StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
                                                 device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
@@ -362,8 +362,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        GameSlot* slot = unlock_manager->getCurrentSlot();
-        if (slot->isFirstTime())
+        PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        if (player->isFirstTime())
         {
             StateManager::get()->enterGameState();
             race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -382,7 +382,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             const std::string default_kart = UserConfigParams::m_default_kart;
-            if (slot->isLocked(default_kart))
+            if (player->isLocked(default_kart))
             {
                 KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();

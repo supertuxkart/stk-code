@@ -18,6 +18,7 @@
 #include "states_screens/story_mode_lobby.hpp"
 
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
@@ -53,29 +54,29 @@ void StoryModeLobbyScreen::init()
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
 
-    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+    core::stringw name = UserConfigParams::m_default_player.toString();
+
 
     if (UserConfigParams::m_default_player.toString().size() > 0)
     {
-        for (unsigned int n=0; n<players.size(); n++)
+        PlayerProfile *player = PlayerManager::get()->getPlayer(name);
+        if(player)
         {
-            if (players[n].getName() == UserConfigParams::m_default_player.toString())
-            {
-                unlock_manager->setCurrentSlot(players[n].getUniqueID());
-                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-                return;
-            }
+            PlayerManager::get()->setCurrentPlayer(player);
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            return;
         }
     }
 
-    for (unsigned int n=0; n<players.size(); n++)
+    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
-        if (players[n].isGuestAccount()) continue;
+        const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
+        if (player->isGuestAccount()) continue;
 
         // FIXME: we're using a trunacted ascii version of the player name as
         //        identifier, let's hope this causes no issues...
-        list->addItem(core::stringc(players[n].getName().c_str()).c_str(),
-                      players[n].getName() );
+        list->addItem(core::stringc(player->getName().c_str()).c_str(),
+                                    player->getName() );
     }
 
     list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
@@ -108,33 +109,23 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     {
         ListWidget* list = getWidget<ListWidget>("gameslots");
 
-        bool slot_found = false;
-
-        PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-        for (unsigned int n=0; n<players.size(); n++)
+        PlayerProfile *player = PlayerManager::get()
+                              ->getPlayer(list->getSelectionLabel());
+        if(player)
         {
-            if (list->getSelectionLabel() == players[n].getName())
-            {
-                unlock_manager->setCurrentSlot(players[n].getUniqueID());
-                unlock_manager->updateActiveChallengeList();
-                slot_found = true;
-                break;
-            }
-        }
-
-        if (!slot_found)
-        {
-            Log::error("StoryModeLobby",
-                       "Cannot find player corresponding to slot '%s'.",
-                     core::stringc(list->getSelectionLabel().c_str()).c_str());
-        }
-        else
-        {
+            PlayerManager::get()->setCurrentPlayer(player);
+            player->computeActive();
             CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
             if (cb->getState())
             {
                 UserConfigParams::m_default_player = list->getSelectionLabel();
             }
+        }
+        else
+        {
+            Log::error("StoryModeLobby",
+                       "Cannot find player corresponding to slot '%s'.",
+                     core::stringc(list->getSelectionLabel().c_str()).c_str());
         }
 
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
@@ -149,27 +140,19 @@ void StoryModeLobbyScreen::unloaded()
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& newName)
+void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& new_name)
 {
-    bool slot_found = false;
-
-    PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-    for (unsigned int n=0; n<players.size(); n++)
+    PlayerProfile *player = PlayerManager::get()->getPlayer(new_name);
+    if(player)
     {
-        if (players[n].getName() == newName)
-        {
-            unlock_manager->setCurrentSlot(players[n].getUniqueID());
-            unlock_manager->updateActiveChallengeList();
-            slot_found = true;
-            break;
-        }
+        PlayerManager::get()->setCurrentPlayer(player);
+        player->computeActive();
     }
-
-    if (!slot_found)
+    else
     {
         Log::error("StoryModeLobbyScreen",
                    "Cannot find player corresponding to slot '%s'.",
-                   core::stringc(newName.c_str()).c_str());
+                   core::stringc(new_name.c_str()).c_str());
     }
 
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());

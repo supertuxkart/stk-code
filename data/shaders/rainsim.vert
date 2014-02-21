@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 uniform float time;
 uniform vec3 campos;
 uniform mat4 viewm;
