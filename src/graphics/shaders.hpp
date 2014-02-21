@@ -59,6 +59,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
 };
 
+class MovingTextureShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_TM, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+};
+
 class DetailledObjectPass2Shader
 {
 public:
@@ -174,10 +185,10 @@ class BubbleShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord;
-	static GLuint uniform_MVP, uniform_tex, uniform_time, uniform_transparency;
+    static GLuint uniform_MVP, uniform_tex, uniform_time, uniform_transparency;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency);
 };
 
 class TransparentShader
@@ -185,10 +196,10 @@ class TransparentShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord;
-	static GLuint uniform_MVP, uniform_tex;
+	static GLuint uniform_MVP, uniform_TM, uniform_tex;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex);
 };
 
 class TransparentFogShader
@@ -196,10 +207,10 @@ class TransparentFogShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_MVP, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_screen, uniform_ipvmat;
+    static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_screen, uniform_ipvmat;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
 };
 
 class BillboardShader

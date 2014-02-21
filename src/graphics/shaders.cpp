@@ -243,6 +243,7 @@ void Shaders::loadShaders()
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+    MeshShader::MovingTextureShader::init();
 	MeshShader::DetailledObjectPass2Shader::init();
 	MeshShader::ObjectRimLimitShader::init();
 	MeshShader::UntexturedObjectShader::init();
@@ -380,6 +381,46 @@ namespace MeshShader
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
+
+    GLuint MovingTextureShader::Program;
+    GLuint MovingTextureShader::attrib_position;
+    GLuint MovingTextureShader::attrib_texcoord;
+    GLuint MovingTextureShader::uniform_MVP;
+    GLuint MovingTextureShader::uniform_TM;
+    GLuint MovingTextureShader::uniform_Albedo;
+    GLuint MovingTextureShader::uniform_DiffuseMap;
+    GLuint MovingTextureShader::uniform_SpecularMap;
+    GLuint MovingTextureShader::uniform_SSAO;
+    GLuint MovingTextureShader::uniform_screen;
+    GLuint MovingTextureShader::uniform_ambient;
+
+    void MovingTextureShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/movingtexture.vert").c_str(), file_manager->getAsset("shaders/movingtexture.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
+        uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+        uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
+    }
+
+    void MovingTextureShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
+        glUniform1i(uniform_Albedo, TU_Albedo);
+        glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+        glUniform1i(uniform_SpecularMap, TU_SpecularMap);
+        glUniform1i(uniform_SSAO, TU_SSAO);
+        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
+    }
 
 	GLuint DetailledObjectPass2Shader::Program;
 	GLuint DetailledObjectPass2Shader::attrib_position;
@@ -753,7 +794,7 @@ namespace MeshShader
 		uniform_time = glGetUniformLocation(Program, "time");
 		uniform_transparency = glGetUniformLocation(Program, "transparency");
 	}
-	void BubbleShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency)
+    void BubbleShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_tex, TU_tex);
@@ -765,6 +806,7 @@ namespace MeshShader
 	GLuint TransparentShader::attrib_position;
 	GLuint TransparentShader::attrib_texcoord;
 	GLuint TransparentShader::uniform_MVP;
+    GLuint TransparentShader::uniform_TM;
 	GLuint TransparentShader::uniform_tex;
 
 	void TransparentShader::init()
@@ -773,12 +815,14 @@ namespace MeshShader
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 	}
 
-	void TransparentShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex)
+    void TransparentShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
 		glUniform1i(uniform_tex, TU_tex);
 	}
 
@@ -786,6 +830,7 @@ namespace MeshShader
     GLuint TransparentFogShader::attrib_position;
     GLuint TransparentFogShader::attrib_texcoord;
     GLuint TransparentFogShader::uniform_MVP;
+    GLuint TransparentFogShader::uniform_TM;
     GLuint TransparentFogShader::uniform_tex;
     GLuint TransparentFogShader::uniform_fogmax;
     GLuint TransparentFogShader::uniform_startH;
@@ -802,6 +847,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_fogmax = glGetUniformLocation(Program, "fogmax");
         uniform_startH = glGetUniformLocation(Program, "startH");
@@ -813,9 +859,10 @@ namespace MeshShader
         uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
     }
 
-    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
+    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform1f(uniform_fogmax, fogmax);
         glUniform1f(uniform_startH, startH);
         glUniform1f(uniform_endH, endH);
