@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -30,40 +31,61 @@ class XMLNode;
 
 // ============================================================================
 
-/**
-  * \brief
-  * \ingroup
-  */
+/** This is the base class for any achievement. It allows achievement status
+ *  to be saved, and detects when an achievement is fulfilled.
+ * \ingroup achievements
+ */
 class AchievementInfo;
 
 class Achievement
 {
 protected:
-    uint32_t                            m_id;
-    bool                                m_achieved;
-    const AchievementInfo *             m_achievement_info;
-    void                check           ();
+    /** The id of this achievement. */
+    uint32_t               m_id;
+
+    /** True if this achievement has been achieved. */
+    bool                   m_achieved;
+
+    /** A pointer to the corresponding AchievementInfo instance. */
+    const AchievementInfo *m_achievement_info;
+
+    void check();
 
 public:
-    Achievement                         (const AchievementInfo * info);
-    virtual ~Achievement                ();
-    uint32_t getID                      () const { return m_id; }
-    const AchievementInfo * getInfo     () const { return m_achievement_info;}
-    virtual void load                   (XMLNode *input) = 0;
-    virtual void save                   (UTFWriter &out) = 0;
-    virtual void reset                  () = 0;
-    void onRaceEnd                      ();
-    void setAchieved                    () {m_achieved = true; };
-    virtual irr::core::stringw          getProgressAsString () = 0;
-
     enum AchievementType
     {
         AT_SINGLE,
         AT_MAP
     };
 
+    Achievement(const AchievementInfo * info);
+    virtual ~Achievement       ();
+    virtual void load          (const XMLNode *node) ;
+    virtual void save          (UTFWriter &out) ;
+    virtual void reset         () = 0;
+    virtual irr::core::stringw getProgressAsString() = 0;
+    void onRaceEnd();
+    // ------------------------------------------------------------------------
+    /** Returns the id of this achievement. */
+    uint32_t getID() const { return m_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the AchievementInfo for this achievement. */
+    const AchievementInfo * getInfo() const { return m_achievement_info; }
+    // ------------------------------------------------------------------------
+    /** Sets this achievement to be fulfilled. */
+    void setAchieved() { m_achieved = true; };
+    // ------------------------------------------------------------------------
+    /** Returns if this achievement has been fulfilled. */
+    bool isAchieved() const { return m_achieved;  }
+
 };   // class Achievement
 
+// ============================================================================
+/** This is a base class for an achievement that counts how often an event
+ *  happened, and triggers the achievement to be fulfilled when a certain
+ *  goal value is reached.
+ * \ingroup achievements
+ */
 class SingleAchievement : public Achievement
 {
 protected:
@@ -73,7 +95,7 @@ public:
     SingleAchievement                   (const AchievementInfo * info);
     virtual ~SingleAchievement          () {};
 
-    void load                           (XMLNode * input);
+    void load                           (const XMLNode *node);
     int getValue                        () const { return m_progress; }
     void save                           (UTFWriter &out);
     void increase                       (int increase = 1);
@@ -81,16 +103,23 @@ public:
     virtual irr::core::stringw          getProgressAsString ();
 };   // class SingleAchievement
 
+// ============================================================================
+/** This achievement can keep track of a set of key-value pairs. Fulfillment is
+ *  triggered when all values defined in the data/achievements.xml file have
+ *  been reached.
+* \ingroup achievements
+*/
 class MapAchievement : public Achievement
 {
 protected:
+    /** The map of key-value pairs. */
     std::map<std::string, int> m_progress_map;
 
 public:
     MapAchievement                      (const AchievementInfo * info);
     virtual ~MapAchievement             () {};
 
-    void load                           (XMLNode * input);
+    void load                           (const XMLNode *node);
     int getValue                        (const std::string & key);
     void increase                       (const std::string & key, int increase = 1);
     void save                           (UTFWriter &out);
