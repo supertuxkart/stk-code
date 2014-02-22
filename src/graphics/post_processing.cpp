@@ -578,6 +578,41 @@ void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 	glDisable(GL_BLEND);
 }
 
+void PostProcessing::renderMotionBlur(unsigned cam, ITexture *in, ITexture *out)
+{
+
+    MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+        getCallback(ES_MOTIONBLUR);
+
+    scene::ICameraSceneNode * const camnode =
+        Camera::getCamera(cam)->getCameraSceneNode();
+    // Calculate the kart's Y position on screen
+    const core::vector3df pos =
+        Camera::getCamera(cam)->getKart()->getNode()->getPosition();
+    float ndc[4];
+    core::matrix4 trans = camnode->getProjectionMatrix();
+    trans *= camnode->getViewMatrix();
+
+    trans.transformVect(ndc, pos);
+    const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
+    setMotionBlurCenterY(cam, karty);
+
+    irr_driver->getVideoDriver()->setRenderTarget(out, true, false);
+
+    glUseProgram(FullScreenShader::MotionBlurShader::Program);
+    glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
+
+    setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MotionBlurShader::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam), cb->getDirection(cam), 0.15, cb->getMaxHeight(cam) * 0.7, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -751,24 +786,7 @@ void PostProcessing::render()
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
             PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
-            // Calculate the kart's Y position on screen
-            const core::vector3df pos =
-                Camera::getCamera(cam)->getKart()->getNode()->getPosition();
-            float ndc[4];
-            core::matrix4 trans = camnode->getProjectionMatrix();
-            trans *= camnode->getViewMatrix();
-
-            trans.transformVect(ndc, pos);
-            const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-            setMotionBlurCenterY(cam, karty);
-
-
-            m_material.MaterialType = irr_driver->getShader(ES_MOTIONBLUR);
-            m_material.setTexture(0, in);
-            drv->setRenderTarget(out, true, false);
-
-            drawQuad(cam, m_material);
-
+            renderMotionBlur(cam, in, out);
             ITexture *tmp = in;
             in = out;
             out = tmp;

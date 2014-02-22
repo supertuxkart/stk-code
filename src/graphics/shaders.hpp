@@ -523,6 +523,17 @@ public:
 	static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
 };
 
+class MotionBlurShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_boost_amount, uniform_color_buffer, uniform_center, uniform_direction, uniform_mask_radius, uniform_max_tex_height;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb);
+};
+
 }
 
 namespace UIShader
