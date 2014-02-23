@@ -35,6 +35,7 @@
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -273,9 +274,9 @@ void IrrDriver::renderGLSL(float dt)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
-            GLuint res;
-            gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
-            printf("pixel is %d\n", res);
+            GLuint res = 0;
+            if (m_query_issued)
+                gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
             m_post_processing->setSunPixels(res);
 
             // Prepare the query for the next frame.
@@ -286,6 +287,7 @@ void IrrDriver::renderGLSL(float dt)
             irr_driver->setPhase(GLOW_PASS);
             m_sun_interposer->render();
             gl_driver->extGlEndQuery(GL_SAMPLES_PASSED_ARB);
+            m_query_issued = true;
 
             m_lensflare->setStrength(res / 4000.0f);
 

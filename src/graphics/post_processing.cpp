@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -739,18 +740,18 @@ void PostProcessing::render()
 
             // Set the sun's color
             const SColor col = World::getWorld()->getTrack()->getSunColor();
-//          ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
-//            colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
+            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
+                colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
 
             // The sun interposer
             STKMeshSceneNode *sun = irr_driver->getSunInterposer();
 /*            sun->getMaterial(0).ColorMask = ECP_ALL;
+            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);*/
             irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
-            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);
-
+            irr_driver->setPhase(GLOW_PASS);
             sun->render();
 
-            sun->getMaterial(0).ColorMask = ECP_NONE;*/
+            //sun->getMaterial(0).ColorMask = ECP_NONE;
 
             // Fade to quarter
 

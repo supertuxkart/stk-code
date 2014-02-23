@@ -14,7 +14,7 @@ void main()
 	mul = step(mul, 0.02);
 	mul *= 0.97;
 
-//	res = res * vec4(mul);
+	res = res * vec4(mul);
 
 	FragColor = res;
 }
