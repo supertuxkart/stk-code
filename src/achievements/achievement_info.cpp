@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -45,49 +46,23 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
                                                         m_description.c_str());
     }
     input->get("reset-after-race", &m_reset_after_race);
-}   // AchievementInfo
 
-// ============================================================================
-SingleAchievementInfo::SingleAchievementInfo(const XMLNode * input)
-    : AchievementInfo(input)
-{
-    input->get("goal", &m_goal_value);
-}   // SingleAchievementInfo
-
-// ----------------------------------------------------------------------------
-irr::core::stringw SingleAchievementInfo::toString() const
-{
-    return StringUtils::toWString(m_goal_value);
-}   // toString
-
-// ----------------------------------------------------------------------------
-bool SingleAchievementInfo::checkCompletion(Achievement * achievement) const
-{
-    SingleAchievement * single_achievement = (SingleAchievement *) achievement;
-    if(single_achievement->getValue() >= m_goal_value)
-        return true;
-    return false;
-}
-
-// ============================================================================
-MapAchievementInfo::MapAchievementInfo(const XMLNode * input)
-    : AchievementInfo(input)
-{
-    std::vector<XMLNode*> xml_entries;
-    input->getNodes("entry", xml_entries);
-    for (unsigned int n=0; n < xml_entries.size(); n++)
+    // Now load the goal nodes
+    for (unsigned int n = 0; n < input->getNumNodes(); n++)
     {
-        std::string key("");
-        xml_entries[n]->get("key", &key);
-        int goal(0);
-        xml_entries[n]->get("goal", &goal);
+        const XMLNode *node = input->getNode(n);
+        std::string key = node->getName();
+        int goal = 0;
+        node->get("goal", &goal);
         m_goal_values[key] = goal;
     }
-    if(m_goal_values.size() != xml_entries.size())
-        Log::error("MapAchievementInfo","Duplicate keys for the entries of a MapAchievement found.");
-}
+    if (m_goal_values.size() != input->getNumNodes())
+        Log::error("MapAchievementInfo", 
+                  "Duplicate keys for the entries of a MapAchievement found.");
+}   // AchievementInfo
+
 // ----------------------------------------------------------------------------
-irr::core::stringw MapAchievementInfo::toString() const
+irr::core::stringw AchievementInfo::toString() const
 {
     int count = 0;
     std::map<std::string, int>::const_iterator iter;
@@ -96,10 +71,11 @@ irr::core::stringw MapAchievementInfo::toString() const
         count += iter->second;
     }
     return StringUtils::toWString(count);
+
 }   // toString
 
 // ----------------------------------------------------------------------------
-bool MapAchievementInfo::checkCompletion(Achievement * achievement) const
+bool AchievementInfo::checkCompletion(Achievement * achievement) const
 {
     MapAchievement * map_achievement = (MapAchievement *) achievement;
     std::map<std::string, int>::const_iterator iter;
@@ -110,3 +86,4 @@ bool MapAchievementInfo::checkCompletion(Achievement * achievement) const
     }
     return true;
 }
+// ----------------------------------------------------------------------------

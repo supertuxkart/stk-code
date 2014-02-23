@@ -30,7 +30,11 @@
 class AchievementsStatus;
 class PlayerProfile;
 
-/** A special class that manages all local player accounts.
+/** A special class that manages all local player accounts. It reads all player
+ *  accounts from the players.xml file in the user config directory. It also
+ *  keeps track of the currently logged in player. For each player an instance
+ *  of PlayerProfile is created, which keeps track of story mode progress,
+ *  achievements and other data.
  */
 class PlayerManager : public NoCopy
 {

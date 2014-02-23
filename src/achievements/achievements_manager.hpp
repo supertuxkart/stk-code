@@ -31,8 +31,9 @@ class AchievementsStatus;
 #include <map>
 
 
-/**
-  * \brief Class that takes care of online profiles
+/** This class manages the list of all achievements. It reads the
+ *  data/achievements.xml file, which contains the conditions for
+ *  each achievement.
   * \ingroup online
   */
 class AchievementsManager

@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -69,11 +70,11 @@ void AchievementsManager::parseAssetFile()
         AchievementInfo * achievement_info;
         if(type == "single")
         {
-            achievement_info = new SingleAchievementInfo(node);
+            achievement_info = new AchievementInfo(node);
         }
         else if(type == "map")
         {
-            achievement_info = new MapAchievementInfo(node);
+            achievement_info = new AchievementInfo(node);
         }
         else
         {
@@ -107,16 +108,9 @@ AchievementsStatus*
     for (it  = m_achievements_info.begin(); 
          it != m_achievements_info.end(); ++it)
     {
-        Achievement::AchievementType achievement_type = it->second->getType();
+        AchievementInfo::AchievementType achievement_type = it->second->getType();
         Achievement * achievement;
-        if (achievement_type == Achievement::AT_SINGLE)
-        {
-            achievement = new SingleAchievement(it->second);
-        }
-        else if (achievement_type == Achievement::AT_MAP)
-        {
-            achievement = new MapAchievement(it->second);
-        }
+        achievement = new Achievement(it->second);
         status->add(achievement);
     }
 

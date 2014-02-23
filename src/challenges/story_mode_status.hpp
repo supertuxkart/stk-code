@@ -35,9 +35,12 @@ class XMLNode;
 
 const int CHALLENGE_POINTS[] = { 8, 9, 10 };
 
-/**
+/** This class contains the progression through challenges for the story mode.
+ *  It maintains a list of all challenges in a mapping of challenge id to
+ *  an instance of ChallengeStatus. Each ChallengeStatus stores at which level
+ *  a challenge was solved.
+ *  This object also keeps track of the overall points a player has.
  * \ingroup challenges
- * This class contains the progression through challenges for the story mode.
  */
 
 class StoryModeStatus

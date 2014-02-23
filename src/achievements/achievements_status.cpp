@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,6 +35,8 @@
 
 
 // ----------------------------------------------------------------------------
+/** Constructor for an Achievement.
+ */
 AchievementsStatus::AchievementsStatus()
 {
     m_valid  = true;
@@ -41,9 +44,15 @@ AchievementsStatus::AchievementsStatus()
 }   // AchievementsStatus
 
 // ----------------------------------------------------------------------------
+/** Removes all achievements.
+ */
 AchievementsStatus::~AchievementsStatus()
 {
-    deleteAchievements();
+    std::map<uint32_t, Achievement *>::iterator it;
+    for (it = m_achievements.begin(); it != m_achievements.end(); ++it) {
+        delete it->second;
+    }
+    m_achievements.clear();
 }   // ~AchievementsStatus
 
 // ----------------------------------------------------------------------------
@@ -80,11 +89,6 @@ void AchievementsStatus::add(Achievement *achievement)
 // ----------------------------------------------------------------------------
 void AchievementsStatus::deleteAchievements()
 {
-    std::map<uint32_t, Achievement *>::iterator it;
-    for ( it = m_achievements.begin(); it != m_achievements.end(); ++it ) {
-        delete it->second;
-    }
-    m_achievements.clear();
 }   // deleteAchievements
 
 // ----------------------------------------------------------------------------

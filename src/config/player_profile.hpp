@@ -32,12 +32,13 @@ using namespace irr;
 class UTFWriter;
 class AchievementsStatus;
 
-/**
-  * \brief Class for managing player profiles (name, control configuration, etc.)
-  * A list of all possible players is stored as PlayerProfiles in the user config.
-  * A list of currently playing players will be stored somewhere else (FIXME : complete comment)
-  * \ingroup config
-  */
+/** Class for managing player profiles (name, usage frequency, 
+ *  etc.). All PlayerProfiles are managed by the PlayerManager.
+ *  A PlayerProfile keeps track of the story mode progress using an instance
+ *  of StoryModeStatus, and achievements with AchievementsStatus. All data
+ *  is saved in the players.xml file.
+ * \ingroup config
+ */
 class PlayerProfile : public NoCopy
 {
 private:

@@ -263,7 +263,7 @@ void Physics::update(float dt)
                 {
                     AchievementsStatus* status =
                         PlayerManager::getCurrentAchievementsStatus();
-                    ((SingleAchievement *) status->getAchievement(2))->increase(1);
+                    status->getAchievement(2)->increase("ball", 1);
                 }
             }
 
