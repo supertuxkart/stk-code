@@ -77,11 +77,10 @@ irr::core::stringw AchievementInfo::toString() const
 // ----------------------------------------------------------------------------
 bool AchievementInfo::checkCompletion(Achievement * achievement) const
 {
-    MapAchievement * map_achievement = (MapAchievement *) achievement;
     std::map<std::string, int>::const_iterator iter;
     for ( iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++ )
     {
-        if(map_achievement->getValue(iter->first) < iter->second)
+        if(achievement->getValue(iter->first) < iter->second)
             return false;
     }
     return true;

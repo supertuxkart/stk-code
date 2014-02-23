@@ -86,10 +86,6 @@ void AchievementsStatus::add(Achievement *achievement)
     m_achievements[achievement->getID()] = achievement;
 }    // add
 
-// ----------------------------------------------------------------------------
-void AchievementsStatus::deleteAchievements()
-{
-}   // deleteAchievements
 
 // ----------------------------------------------------------------------------
 /** Saves the achievement status to a file. Achievements are stored as part

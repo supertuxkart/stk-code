@@ -84,3 +84,4 @@ public:
     bool isAchieved() const { return m_achieved;  }
 
 };   // class Achievement
+#endif
