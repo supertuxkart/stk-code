@@ -461,7 +461,7 @@ void IrrDriver::initDevice()
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        m_sun_interposer = m_scene_manager->addMeshSceneNode(sphere);
+        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
         m_sun_interposer->setScale(core::vector3df(20));
@@ -469,7 +469,7 @@ void IrrDriver::initDevice()
         m_sun_interposer->getMaterial(0).Lighting = false;
         m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
         m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_PASSFAR);
+        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
 
         sphere->drop();
 

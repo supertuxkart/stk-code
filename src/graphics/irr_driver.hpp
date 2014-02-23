@@ -49,6 +49,7 @@ class ShadowImportanceProvider;
 
 #include "graphics/rtts.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "utils/aligned_array.hpp"
@@ -171,7 +172,7 @@ private:
 	unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
-    scene::IMeshSceneNode *m_sun_interposer;
+    class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
 
@@ -212,7 +213,6 @@ private:
                     std::vector<GlowData>& glows,
                     const core::aabbox3df& cambox,
                     int cam);
-	void renderSkybox();
     void renderLights(const core::aabbox3df& cambox,
                       scene::ICameraSceneNode * const camnode,
                       video::SOverrideMaterial &overridemat,
@@ -225,6 +225,7 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void renderSkybox();
 	void setPhase(STKRenderingPass);
 	STKRenderingPass getPhase() const;
     const std::vector<core::matrix4> &getShadowViewProj() const
@@ -495,7 +496,7 @@ public:
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
-    scene::IMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
     void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
