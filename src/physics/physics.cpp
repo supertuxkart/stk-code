@@ -20,6 +20,8 @@
 
 #include "achievements/achievements_manager.hpp"
 #include "animations/three_d_animation.hpp"
+#include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/stars.hpp"
@@ -257,8 +259,12 @@ void Physics::update(float dt)
             if(type != PowerupManager::POWERUP_BOWLING || !target_kart->isInvulnerable())
             {
                 p->getUserPointer(0)->getPointerFlyable()->hit(target_kart);
-                if ( type ==PowerupManager::POWERUP_BOWLING )
-                    ((SingleAchievement *) AchievementsManager::get()->getActive()->getAchievement(2))->increase(1);
+                if (type == PowerupManager::POWERUP_BOWLING)
+                {
+                    AchievementsStatus* status =
+                        PlayerManager::getCurrentAchievementsStatus();
+                    ((SingleAchievement *) status->getAchievement(2))->increase(1);
+                }
             }
 
         }

@@ -88,6 +88,7 @@ public:
 	void renderPassThrough(video::ITexture *tex);
     void renderPassThrough(unsigned tex);
 
+    void renderMotionBlur(unsigned cam, video::ITexture *in, video::ITexture *out);
 	void renderGlow(video::ITexture *tex);
 
     /** Render the post-processed scene */

@@ -26,18 +26,17 @@
 
 #include <irrString.h>
 #include <string>
-#include "io/xml_node.hpp"
 
+class UTFWriter;
+class XMLNode;
 
-class AchievementsSlot
+class AchievementsStatus
 {
 private:
     std::map<uint32_t, Achievement *> m_achievements;
     bool         m_online;
     bool         m_valid;
-    unsigned int m_id;
 
-    void createFreshSlot();
     void deleteAchievements();
 
     class SyncAchievementsRequest : public Online::XMLRequest {
@@ -47,18 +46,25 @@ private:
     };
 
 public :
-    AchievementsSlot(const XMLNode * input);
-    AchievementsSlot(unsigned int id, bool online);
-    ~AchievementsSlot();
-    bool isValid() const { return m_valid;}
-    void save(std::ofstream & out);
-    bool isOnline() const {return m_online;}
+    AchievementsStatus();
+    ~AchievementsStatus();
+    Achievement * getAchievement(uint32_t id);
+    void load(const XMLNode * input);
+    void save(UTFWriter &out);
+    void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
-    unsigned int getID() const {return m_id;}
-    const std::map<uint32_t, Achievement *> & getAllAchievements() {return m_achievements;}
-    Achievement * getAchievement(uint32_t id);
-};
+    // ------------------------------------------------------------------------
+    const std::map<uint32_t, Achievement *>& getAllAchievements() 
+    {
+        return m_achievements;
+    }
+    // ------------------------------------------------------------------------
+    bool isOnline() const { return m_online; }
+    // ------------------------------------------------------------------------
+    bool isValid() const { return m_valid; }
+    // ------------------------------------------------------------------------
+};   // class AchievementsStatus
 
 #endif
 

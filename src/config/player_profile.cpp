@@ -18,6 +18,7 @@
 
 #include "config/player_profile.hpp"
 
+#include "achievements/achievements_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "io/xml_node.hpp"
@@ -37,12 +38,13 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 #ifdef DEBUG
     m_magic_number = 0xABCD1234;
 #endif
-    m_name              =  name;
-    m_is_guest_account  = is_guest;
-    m_use_frequency     = is_guest ? -1 : 0;
-    m_unique_id         = PlayerManager::get()->getUniqueId();
-    m_story_mode_status = unlock_manager->createStoryModeStatus();
-
+    m_name                =  name;
+    m_is_guest_account    = is_guest;
+    m_use_frequency       = is_guest ? -1 : 0;
+    m_unique_id           = PlayerManager::get()->getUniqueId();
+    m_story_mode_status   = unlock_manager->createStoryModeStatus();
+    m_achievements_status = 
+                        AchievementsManager::get()->createAchievementsStatus();
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -59,8 +61,11 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
-    const XMLNode *xml_game_slot = node->getNode("story-mode");
-    m_story_mode_status = unlock_manager->createStoryModeStatus(xml_game_slot);
+    const XMLNode *xml_story_mode = node->getNode("story-mode");
+    m_story_mode_status = unlock_manager->createStoryModeStatus(xml_story_mode);
+    const XMLNode *xml_achievements = node->getNode("achievements");
+    m_achievements_status = AchievementsManager::get()
+                          ->createAchievementsStatus(xml_achievements);
 
 }   // PlayerProfile
 
@@ -74,9 +79,14 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" guest=\""         << m_is_guest_account 
         << L"\" use-frequency=\"" << m_use_frequency
         << L"\" is-default=\""    << m_is_default
-        << L"\" unique-id=\""     << m_unique_id        << L"\">\n";
-    assert(m_story_mode_status);
-    m_story_mode_status->save(out);
+        << L"\" unique-id=\"" << m_unique_id << L"\">\n";
+    {
+        assert(m_story_mode_status);
+        m_story_mode_status->save(out);
+
+        assert(m_achievements_status);
+        m_achievements_status->save(out);
+    }
     out << L"    </player>\n";
 }   // save
 

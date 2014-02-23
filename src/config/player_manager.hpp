@@ -19,6 +19,7 @@
 #ifndef HEADER_PLAYER_MANAGER_HPP
 #define HEADER_PLAYER_MANAGER_HPP
 
+#include "config/player_profile.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -26,6 +27,7 @@
 
 #include <cstddef>  // NULL
 
+class AchievementsStatus;
 class PlayerProfile;
 
 /** A special class that manages all local player accounts.
@@ -87,6 +89,12 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a player with a given unique id. */
     PlayerProfile *getPlayer(unsigned int n)  { return &m_all_players[n];}
+    // ------------------------------------------------------------------------
+    /** A handy shortcut funtion. */
+    static AchievementsStatus* getCurrentAchievementsStatus()
+    {
+        return get()->getCurrentPlayer()->getAchievementsStatus();
+    }   // getCurrentAchievementsStatus
     // ------------------------------------------------------------------------
 };   // PlayerManager
 

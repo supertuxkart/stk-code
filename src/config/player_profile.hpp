@@ -30,6 +30,7 @@ using namespace irr;
 #include <string>
 
 class UTFWriter;
+class AchievementsStatus;
 
 /**
   * \brief Class for managing player profiles (name, control configuration, etc.)
@@ -63,6 +64,8 @@ private:
 
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
+
+    AchievementsStatus *m_achievements_status;
 
 public:
 
@@ -186,6 +189,11 @@ public:
     {
         return m_story_mode_status->getNumHardTrophies(); 
     }   // getNumHardTropies
+    // ------------------------------------------------------------------------
+    AchievementsStatus* getAchievementsStatus() 
+    {
+        return m_achievements_status;
+    }   // getAchievementsStatus
 
 };   // class PlayerProfile
 

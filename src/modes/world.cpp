@@ -447,7 +447,8 @@ void World::terminateRace()
     }
 
     PlayerManager::get()->getCurrentPlayer()->raceFinished();
-    ((MapAchievement *) AchievementsManager::get()->getActive()->getAchievement(1))->increase(getTrack()->getIdent(), 1);
+    AchievementsStatus* status = PlayerManager::getCurrentAchievementsStatus();
+    dynamic_cast<MapAchievement*>(status->getAchievement(1))->increase(getTrack()->getIdent(), 1);
     AchievementsManager::get()->onRaceEnd();
 
     if (m_race_gui) m_race_gui->clearAllMessages();

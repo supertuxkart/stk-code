@@ -17,7 +17,9 @@
 
 #include "states_screens/online_profile_achievements.hpp"
 
+#include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -81,7 +83,9 @@ void OnlineProfileAchievements::init()
     {
         m_waiting_for_achievements = false;
         m_achievements_list_widget->clear();
-        const std::map<uint32_t, Achievement *> & all_achievements = AchievementsManager::get()->getActive()->getAllAchievements();
+        const std::map<uint32_t, Achievement *> & all_achievements =
+            PlayerManager::get()->getCurrentPlayer()->getAchievementsStatus()
+                                                    ->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
         for (it = all_achievements.begin(); it != all_achievements.end(); ++it )
         {
@@ -108,7 +112,9 @@ void OnlineProfileAchievements::eventCallback(Widget* widget, const std::string&
     {
         m_selected_achievement_index = m_achievements_list_widget->getSelectionID();
 
-        new MessageDialog(AchievementsManager::get()->getAchievementInfo(atoi(m_achievements_list_widget->getSelectionInternalName().c_str()))->getDescription());
+        int id;
+        StringUtils::fromString(m_achievements_list_widget->getSelectionInternalName(), id);
+        new MessageDialog(AchievementsManager::get()->getAchievementInfo(id)->getDescription());
     }
 }   // eventCallback
 

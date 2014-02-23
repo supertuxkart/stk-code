@@ -1126,11 +1126,11 @@ int main(int argc, char *argv[] )
         // Needs the kart and track directories to load potential challenges
         // in those dirs.
         unlock_manager = new UnlockManager();
-        // Needs the unlock manager to initialise the game slots of all players
-        PlayerManager::create();
+        AchievementsManager::create();
 
-        // Needs the player manager
-        AchievementsManager::get()->init();
+        // Needs the unlock manager to initialise the game slots of all players
+        // and the AchievementsManager to initialise the AchievementsStatus.
+        PlayerManager::create();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
                                                           "gui_lock.png"  ) );
@@ -1394,11 +1394,12 @@ static void cleanSuperTuxKart()
     Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
     Online::ProfileManager::deallocate();
-    AchievementsManager::deallocate();
     Online::CurrentUser::deallocate();
     GUIEngine::DialogQueue::deallocate();
 
+    AchievementsManager::destroy();
     Referee::cleanup();
+
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     NewsManager::deallocate();

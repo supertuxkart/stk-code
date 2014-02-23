@@ -20,20 +20,21 @@
 #include "online/current_user.hpp"
 
 #include "achievements/achievements_manager.hpp"
-#include "addons/addons_manager.hpp"
-#include "config/user_config.hpp"
-#include "online/servers_manager.hpp"
-#include "online/profile_manager.hpp"
-#include "utils/log.hpp"
-#include "utils/translation.hpp"
 #include "addons/addon.hpp"
+#include "addons/addons_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/screen.hpp"
+#include "online/servers_manager.hpp"
+#include "online/profile_manager.hpp"
 #include "states_screens/login_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "states_screens/online_profile_friends.hpp"
+#include "utils/log.hpp"
+#include "utils/translation.hpp"
 
 #include <sstream>
 #include <stdlib.h>
@@ -197,13 +198,12 @@ namespace Online
                 UserConfigParams::m_saved_session = true;
             }
             ProfileManager::get()->addPersistent(m_profile);
-            AchievementsManager::get()->updateCurrentPlayer();
             std::string achieved_string("");
             if(input->get("achieved", &achieved_string) == 1)
             {
                 std::vector<uint32_t> achieved_ids = 
                     StringUtils::splitToUInt(achieved_string, ' ');
-                AchievementsManager::get()->getActive()->sync(achieved_ids);
+                PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
             }
             m_profile->fetchFriends();
         }   // if success
@@ -248,7 +248,6 @@ namespace Online
         UserConfigParams::m_saved_user = 0;
         UserConfigParams::m_saved_token = "";
         UserConfigParams::m_saved_session = false;
-        AchievementsManager::get()->updateCurrentPlayer();
     }   // signOut
 
     // ------------------------------------------------------------------------

@@ -21,6 +21,7 @@
 
 #include "achievements/achievement_info.hpp"
 #include "guiengine/dialog_queue.hpp"
+#include "io/utf_writer.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -31,28 +32,46 @@
 #include <sstream>
 #include <stdlib.h>
 
-// ============================================================================
+
 Achievement::Achievement(const AchievementInfo * info)
     :m_achievement_info(info)
 {
     m_id = info->getID();
     m_achieved = false;
-}
+}   // Achievement
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 Achievement::~Achievement()
 {
+}   // ~Achievement
 
-}
+// ----------------------------------------------------------------------------
+/** Loads the value from an XML node.
+ *  \param input*/
+void Achievement::load(const XMLNode *node)
+{
+    node->get("id",       &m_id      );
+    node->get("achieved", &m_achieved);
+}   // load
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+/** Saves the achievement status to a file.
+ *  \param Output stream.
+ */
+void Achievement::save(UTFWriter &out)
+{
+    out << L"        <achievement id=\"" << m_id << L"\" "
+        << L"achieved=\"" << m_achieved << "\"";
+}   // save
+
+// ----------------------------------------------------------------------------
 void Achievement::onRaceEnd()
 {
     if(m_achievement_info->needsResetAfterRace())
         this->reset();
 }
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 void Achievement::check()
 {
     if(m_achieved)
@@ -71,105 +90,120 @@ void Achievement::check()
     }
 }
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+/** Constructor for a SingleAchievement.
+ */
 SingleAchievement::SingleAchievement(const AchievementInfo * info)
     : Achievement(info)
 {
     m_progress = 0;
     m_achieved = false;
-}
+}   // SingleAchievement
 
-// ============================================================================
-void SingleAchievement::load(XMLNode * input)
+// ----------------------------------------------------------------------------
+/** Loads the state from an xml node. 
+ *  \param node The XML data.
+ */
+void SingleAchievement::load(const XMLNode *node)
 {
-    std::string achieved("");
-    input->get("achieved", &achieved);
-    if(achieved == "true")
-    {
-        m_achieved = true;
-        return;
-    }
-    input->get("value", &m_progress);
-}
-// ============================================================================
-void SingleAchievement::save(std::ofstream & out)
+    Achievement::load(node);
+    if (!isAchieved())
+        node->get("progress", &m_progress);
+}   // load
+
+// ----------------------------------------------------------------------------
+/** Save the state to a file. The progress is only saved if the achievement 
+ *  has not been achieved yet.
+ *  \param out The output file.
+ */
+void SingleAchievement::save(UTFWriter &out)
 {
-    out << "        <achievement id=\"" << m_id << "\" "
-        << "achieved=\"" << StringUtils::toString(m_achieved) << "\"";
-    if(!m_achieved)
+    Achievement::save(out);
+    if (!m_achieved)
     {
-        out << " value=\"" << StringUtils::toString(m_progress) << "\"";
+        out << L" progress=\"" << m_progress << L"\"";
     }
-    out << "/>\n";
+    out << L"/>\n";
 }   // save
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+/** Resets the challenge. Calls if necessary (i.e. if a challenge needs to
+ *  be fulfilled in a single race).
+ */
 void SingleAchievement::reset()
 {
     m_progress = 0;
 }   // reset
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+/** Adds a value to this counter.
+ *  \param increase Value to add.
+ */
 void SingleAchievement::increase(int increase)
 {
     m_progress += increase;
     check();
-}
+}   // increase
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+/** Returns a "k/n" string indicating how much of an achievement was achieved.
+ */
 irr::core::stringw SingleAchievement::getProgressAsString()
 {
-    return StringUtils::toWString(m_progress) + "/" + StringUtils::toWString(((SingleAchievementInfo *) m_achievement_info)->getGoalValue());
-}
+    // The info class returns the goal value
+    return StringUtils::toWString(m_progress) + "/"
+          +getInfo()->toString();
+}   // getProgressAsString
 
 // ============================================================================
+
+/** Constructor for a MapAchievement.
+ */
 MapAchievement::MapAchievement(const AchievementInfo * info)
     : Achievement(info)
 {
-}
+}   // MapAchievement
 
-// ============================================================================
-void MapAchievement::load(XMLNode * input)
+// ----------------------------------------------------------------------------
+/** Loads the status from an XML node.
+ *  \param node The XML data to load the status from.
+ */
+void MapAchievement::load(const XMLNode *node)
 {
-    bool achieved = false;
-    input->get("achieved", &achieved);
-    if(achieved)
+    Achievement::load(node);
+    for (unsigned int i = 0; i < node->getNumNodes(); i++)
     {
-        m_achieved = true;
-        return;
-    }
-
-    std::vector<XMLNode*> xml_entries;
-    input->getNodes("entry", xml_entries);
-    for (unsigned int n=0; n < xml_entries.size(); n++)
-    {
-        std::string key("");
-        xml_entries[n]->get("key", &key);
-        int value(0);
-        xml_entries[n]->get("value", &value);
+        const XMLNode *n = node->getNode(i);
+        std::string key = n->getName();
+        int value = 0;
+        n->get("value", &value);
         m_progress_map[key] = value;
     }
-}
+}    // load
 
-// ============================================================================
-void MapAchievement::save(std::ofstream & out)
+// ----------------------------------------------------------------------------
+/** Saves the status of this achievement to a file.
+ *  \param out The file to write the state to.
+ */
+void MapAchievement::save(UTFWriter &out)
 {
-    out << "        <achievement id=\"" << m_id << "\" achieved=\"" 
-        << StringUtils::toString(m_achieved) << "\">\n";
-    if(!m_achieved)
+    Achievement::save(out);
+    if (isAchieved())
     {
-        std::map<std::string, int>::iterator i;
-        for ( i = m_progress_map.begin(); i != m_progress_map.end(); ++i )
-        {
-            out << "            <entry key=\"" << i->first.c_str()
-                << "\" value=\"" << StringUtils::toString(i->second) 
-                << "\"/>\n";
-        }
+        out << "/>\n";
+        return;
+    }
+    out << ">\n";
+    std::map<std::string, int>::iterator i;
+    for (i = m_progress_map.begin(); i != m_progress_map.end(); ++i)
+    {
+        out << "          <" << i->first 
+            << " value=\""     << i->second << "\"/>\n";
     }
     out << "        </achievement>\n";
 }   // save
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 int MapAchievement::getValue(const std::string & key)
 {
@@ -178,8 +212,7 @@ int MapAchievement::getValue(const std::string & key)
     return 0;
 }
 
-
-// ============================================================================
+// ----------------------------------------------------------------------------
 void MapAchievement::reset()
 {
     std::map<std::string, int>::iterator iter;
@@ -189,27 +222,27 @@ void MapAchievement::reset()
     }
 }   // reset
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 void MapAchievement::increase(const std::string & key, int increase)
 {
-    if ( m_progress_map.find(key) != m_progress_map.end())
+    if (m_progress_map.find(key) != m_progress_map.end())
     {
         m_progress_map[key] += increase;
         check();
     }
+    else
+        m_progress_map[key] = increase;
 }
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 irr::core::stringw MapAchievement::getProgressAsString()
-{
-    int progress(0);
-    int goal(0);
-    const std::map<std::string, int> goal_values = ((MapAchievementInfo *) m_achievement_info)->getGoalValues();
+{    
+    int progress = 0;
     std::map<std::string, int>::const_iterator iter;
-    for ( iter = goal_values.begin(); iter != goal_values.end(); ++iter ) {
-        goal += iter->second;
-        progress += m_progress_map[iter->first];
+    for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+    {
+        progress += iter->second;
     }
-    return StringUtils::toWString(progress) + "/" + StringUtils::toWString(goal);
+    return StringUtils::toWString(progress) + "/" + getInfo()->toString();
 }
 

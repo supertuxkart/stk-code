@@ -25,27 +25,42 @@
 #include <stdlib.h>
 #include <assert.h>
 
-// ============================================================================
+
 AchievementInfo::AchievementInfo(const XMLNode * input)
 {
-    input->get("id", &m_id);
-    input->get("title", &m_title);
-    input->get("description", &m_description);
-
-    std::string reset_after_race("");
-    input->get("reset_after_race", &reset_after_race);
-    m_reset_after_race = reset_after_race == "true";
-
-}
+    m_reset_after_race = false;
+    m_id               = 0;
+    m_title            = "";
+    m_description      = "";
+    bool all;
+    all = input->get("id",               &m_id              ) &&
+          input->get("title",            &m_title           ) &&
+          input->get("description",      &m_description     );
+    if (!all)
+    {
+        Log::error("AchievementInfo", 
+                   "Not all necessary values for achievement defined.");
+        Log::error("AchievementInfo",
+                   "ID %d title '%s' description '%s'", m_id, m_title.c_str(),
+                                                        m_description.c_str());
+    }
+    input->get("reset-after-race", &m_reset_after_race);
+}   // AchievementInfo
 
 // ============================================================================
 SingleAchievementInfo::SingleAchievementInfo(const XMLNode * input)
     : AchievementInfo(input)
 {
     input->get("goal", &m_goal_value);
-}
+}   // SingleAchievementInfo
 
-// ============================================================================
+// ----------------------------------------------------------------------------
+irr::core::stringw SingleAchievementInfo::toString() const
+{
+    return StringUtils::toWString(m_goal_value);
+}   // toString
+
+// ----------------------------------------------------------------------------
 bool SingleAchievementInfo::checkCompletion(Achievement * achievement) const
 {
     SingleAchievement * single_achievement = (SingleAchievement *) achievement;
@@ -71,13 +86,25 @@ MapAchievementInfo::MapAchievementInfo(const XMLNode * input)
     if(m_goal_values.size() != xml_entries.size())
         Log::error("MapAchievementInfo","Duplicate keys for the entries of a MapAchievement found.");
 }
+// ----------------------------------------------------------------------------
+irr::core::stringw MapAchievementInfo::toString() const
+{
+    int count = 0;
+    std::map<std::string, int>::const_iterator iter;
+    for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+    {
+        count += iter->second;
+    }
+    return StringUtils::toWString(count);
+}   // toString
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 bool MapAchievementInfo::checkCompletion(Achievement * achievement) const
 {
     MapAchievement * map_achievement = (MapAchievement *) achievement;
     std::map<std::string, int>::const_iterator iter;
-    for ( iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++ ) {
+    for ( iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++ )
+    {
         if(map_achievement->getValue(iter->first) < iter->second)
             return false;
     }

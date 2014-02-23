@@ -3,7 +3,7 @@ set(STK_SOURCES
 src/achievements/achievement.cpp
 src/achievements/achievement_info.cpp
 src/achievements/achievements_manager.cpp
-src/achievements/achievements_slot.cpp
+src/achievements/achievements_status.cpp
 src/addons/addon.cpp
 src/addons/addons_manager.cpp
 src/addons/news_manager.cpp
@@ -64,6 +64,7 @@ src/graphics/stars.cpp
 src/graphics/stkanimatedmesh.cpp
 src/graphics/stkbillboard.cpp
 src/graphics/stkmesh.cpp
+src/graphics/stkmeshscenenode.cpp
 src/graphics/sun.cpp
 src/graphics/water.cpp
 src/graphics/wind.cpp
@@ -328,7 +329,7 @@ set(STK_HEADERS
 src/achievements/achievement.hpp
 src/achievements/achievement_info.hpp
 src/achievements/achievements_manager.hpp
-src/achievements/achievements_slot.hpp
+src/achievements/achievements_status.hpp
 src/addons/addon.hpp
 src/addons/addons_manager.hpp
 src/addons/news_manager.hpp
@@ -395,6 +396,7 @@ src/graphics/stars.hpp
 src/graphics/stkanimatedmesh.hpp
 src/graphics/stkbillboard.hpp
 src/graphics/stkmesh.hpp
+src/graphics/stkmeshscenenode.hpp
 src/graphics/sun.hpp
 src/graphics/water.hpp
 src/graphics/wind.hpp

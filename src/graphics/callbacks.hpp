@@ -229,10 +229,20 @@ public:
         m_maxheight[who] = height;
     }
 
+    float getMaxHeight(u32 who) const
+    {
+        return m_maxheight[who];
+    }
+
     void setBoostTime(u32 who, float time)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_boost_time[who] = time;
+    }
+
+    float getBoostTime(u32 who) const
+    {
+        return m_boost_time[who];
     }
 
     void setCenter(u32 who, float X, float Y)
@@ -242,11 +252,21 @@ public:
         m_center[who].Y = Y;
     }
 
+    core::vector2df getCenter(u32 who) const
+    {
+        return core::vector2df(m_center[who].X, m_center[who].Y);
+    }
+
     void setDirection(u32 who, float X, float Y)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_direction[who].X = X;
         m_direction[who].Y = Y;
+    }
+
+    core::vector2df getDirection(u32 who) const
+    {
+        return core::vector2df(m_direction[who].X, m_direction[who].Y);
     }
 
     void setCurrentCamera(u32 who)

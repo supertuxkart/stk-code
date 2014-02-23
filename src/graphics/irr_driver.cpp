@@ -34,7 +34,7 @@
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/water.hpp"
@@ -937,7 +937,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMesh(mesh, parent, m_scene_manager, -1);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1);
     node->drop();
 
     return node;
