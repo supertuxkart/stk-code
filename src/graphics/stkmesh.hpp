@@ -28,6 +28,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
 void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type, bool moving_texture);
 void computeMVP(core::matrix4 &ModelViewProjectionMatrix);
 void computeTIMV(core::matrix4 &TransposeInverseModelView);
+bool isObject(video::E_MATERIAL_TYPE type);
 
 // Pass 1 shader (ie shaders that outputs normals and depth)
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
@@ -51,31 +52,5 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-
-class STKMesh : public irr::scene::CMeshSceneNode
-{
-protected:
-	std::vector<GLMesh> GLmeshes;
-	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix;
-	core::vector3df windDir;
-	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-
-	// Misc passes shaders (glow, displace...)
-	void drawGlow(const GLMesh &mesh);
-	void drawDisplace(const GLMesh &mesh);
-    void drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-	void createGLMeshes();
-	void cleanGLMeshes();
-public:
-	STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
-		const irr::core::vector3df& position = irr::core::vector3df(0,0,0),
-		const irr::core::vector3df& rotation = irr::core::vector3df(0,0,0),
-		const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
-	virtual void render();
-	virtual void setMesh(irr::scene::IMesh* mesh);
-    void MovingTexture(unsigned, unsigned);
-	~STKMesh();
-};
 
 #endif // STKMESH_H

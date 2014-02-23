@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -578,6 +579,75 @@ void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 	glDisable(GL_BLEND);
 }
 
+void PostProcessing::renderMotionBlur(unsigned cam, ITexture *in, ITexture *out)
+{
+
+    MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+        getCallback(ES_MOTIONBLUR);
+
+    scene::ICameraSceneNode * const camnode =
+        Camera::getCamera(cam)->getCameraSceneNode();
+    // Calculate the kart's Y position on screen
+    const core::vector3df pos =
+        Camera::getCamera(cam)->getKart()->getNode()->getPosition();
+    float ndc[4];
+    core::matrix4 trans = camnode->getProjectionMatrix();
+    trans *= camnode->getViewMatrix();
+
+    trans.transformVect(ndc, pos);
+    const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
+    setMotionBlurCenterY(cam, karty);
+
+    irr_driver->getVideoDriver()->setRenderTarget(out, true, false);
+
+    glUseProgram(FullScreenShader::MotionBlurShader::Program);
+    glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
+
+    setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MotionBlurShader::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam), cb->getDirection(cam), 0.15, cb->getMaxHeight(cam) * 0.7, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}
+
+static void renderGodFade(GLuint tex, const SColor &col)
+{
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(FullScreenShader::GodFadeShader::Program);
+    glBindVertexArray(FullScreenShader::GodFadeShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodFadeShader::setUniforms(col, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+}
+
+static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
+{
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(FullScreenShader::GodRayShader::Program);
+    glBindVertexArray(FullScreenShader::GodRayShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodRayShader::setUniforms(sunpos, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -653,9 +723,6 @@ void PostProcessing::render()
                 // Additively blend on top of tmp1
 				drv->setRenderTarget(out, false, false);
 				renderBloomBlend(irr_driver->getRTT(RTT_EIGHTH1));
-				m_material.MaterialType = irr_driver->getShader(ES_RAIN);
-				drv->setMaterial(m_material);
-				static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
             } // end if bloom
 
             in = irr_driver->getRTT(RTT_TMP1);
@@ -664,39 +731,41 @@ void PostProcessing::render()
         PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
-        if (World::getWorld()->getTrack()->hasGodRays() && m_sunpixels > 30) // god rays
+        if (m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
         {
             // Grab the sky
             drv->setRenderTarget(out, true, false);
-            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
+//            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
+            irr_driver->renderSkybox();
 
             // Set the sun's color
-            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
             const SColor col = World::getWorld()->getTrack()->getSunColor();
-            colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
+            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
+                colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
 
             // The sun interposer
-            IMeshSceneNode * const sun = irr_driver->getSunInterposer();
-            sun->getMaterial(0).ColorMask = ECP_ALL;
+            STKMeshSceneNode *sun = irr_driver->getSunInterposer();
+/*            sun->getMaterial(0).ColorMask = ECP_ALL;
+            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);*/
             irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
-            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);
-
+            irr_driver->setPhase(GLOW_PASS);
             sun->render();
 
-            sun->getMaterial(0).ColorMask = ECP_NONE;
+            //sun->getMaterial(0).ColorMask = ECP_NONE;
 
             // Fade to quarter
-            m_material.MaterialType = irr_driver->getShader(ES_GODFADE);
-            m_material.setTexture(0, out);
-            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), false, false);
 
-            drawQuad(cam, m_material);
+            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), false, false);
+            renderGodFade(getTextureGLuint(out), col);
+
 
             // Blur
 			renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER1),
                                 irr_driver->getRTT(RTT_QUARTER2),
                                 4.f / UserConfigParams::m_width,
                                 4.f / UserConfigParams::m_height);
+
+
 
             // Calculate the sun's position in texcoords
             const core::vector3df pos = sun->getPosition();
@@ -712,63 +781,33 @@ void PostProcessing::render()
             const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
             const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
 
-            ((GodRayProvider *) irr_driver->getCallback(ES_GODRAY))->
-                setSunPosition(sunx, suny);
+//            ((GodRayProvider *) irr_driver->getCallback(ES_GODRAY))->
+//                setSunPosition(sunx, suny);
 
             // Rays please
-            m_material.MaterialType = irr_driver->getShader(ES_GODRAY);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
             drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), true, false);
-
-            drawQuad(cam, m_material);
+            renderGodRay(getTextureGLuint(irr_driver->getRTT(RTT_QUARTER1)), core::vector2df(sunx, suny));
 
             // Blur
-            {
-                gacb->setResolution(UserConfigParams::m_width / 4,
-                                    UserConfigParams::m_height / 4);
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), true, false);
+            renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER2),
+                irr_driver->getRTT(RTT_QUARTER1),
+                4.f / UserConfigParams::m_width,
+                4.f / UserConfigParams::m_height);
 
-                drawQuad(cam, m_material);
+            // Blend
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
 
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), false, false);
-
-                drawQuad(cam, m_material);
-            }
-
-            // Overlay
-            m_material.MaterialType = EMT_TRANSPARENT_ADD_COLOR;
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
             drv->setRenderTarget(in, false, false);
-
-            drawQuad(cam, m_material);
+            renderPassThrough(irr_driver->getRTT(RTT_QUARTER2));
         }
         PROFILER_POP_CPU_MARKER();
 
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
             PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
-            // Calculate the kart's Y position on screen
-            const core::vector3df pos =
-                Camera::getCamera(cam)->getKart()->getNode()->getPosition();
-            float ndc[4];
-            core::matrix4 trans = camnode->getProjectionMatrix();
-            trans *= camnode->getViewMatrix();
-
-            trans.transformVect(ndc, pos);
-            const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-            setMotionBlurCenterY(cam, karty);
-
-
-            m_material.MaterialType = irr_driver->getShader(ES_MOTIONBLUR);
-            m_material.setTexture(0, in);
-            drv->setRenderTarget(out, true, false);
-
-            drawQuad(cam, m_material);
-
+            renderMotionBlur(cam, in, out);
             ITexture *tmp = in;
             in = out;
             out = tmp;
@@ -786,6 +825,10 @@ void PostProcessing::render()
             out = tmp;
             PROFILER_POP_CPU_MARKER();
         }
+
+        m_material.MaterialType = irr_driver->getShader(ES_RAIN);
+        drv->setMaterial(m_material);
+        static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
 
         if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
         {
@@ -852,7 +895,7 @@ void PostProcessing::render()
         if (irr_driver->getNormals())
 			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         else if (irr_driver->getSSAOViz())
-			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
+			renderPassThrough(irr_driver->getRTT(RTT_TMP3));
         else
 			renderColorLevel(in);
     }

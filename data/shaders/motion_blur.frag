@@ -17,11 +17,11 @@
 
 
 // motion_blur.frag
+#version 330
 
 // The actual boost amount (which linearly scales the blur to be shown).
 // should be in the range [0.0, 1.0], though a larger value might make
 // the blurring too string. Atm we are using [0, 0.5].
-#version 330 compatibility
 uniform float boost_amount;
 
 // The color buffer to use.
@@ -41,6 +41,7 @@ uniform float mask_radius;
 // Maximum height of texture used
 uniform float max_tex_height;
 
+in vec2 uv;
 out vec4 FragColor;
 
 // Number of samples used for blurring
@@ -48,7 +49,7 @@ out vec4 FragColor;
 
 void main()
 {
-	vec2 texcoords = gl_TexCoord[0].st;
+	vec2 texcoords = uv;
 
 	// Sample the color buffer
 	vec3 color = texture(color_buffer, texcoords).rgb;

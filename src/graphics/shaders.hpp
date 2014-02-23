@@ -523,6 +523,39 @@ public:
 	static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
 };
 
+class MotionBlurShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_boost_amount, uniform_color_buffer, uniform_center, uniform_direction, uniform_mask_radius, uniform_max_tex_height;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb);
+};
+
+class GodFadeShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_col;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const video::SColor &col, unsigned TU_tex);
+};
+
+class GodRayShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_sunpos;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
+};
+
 }
 
 namespace UIShader

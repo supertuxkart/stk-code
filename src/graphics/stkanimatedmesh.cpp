@@ -76,24 +76,6 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	}
 }
 
-static bool
-isObjectPass(video::E_MATERIAL_TYPE type)
-{
-	if (type == irr_driver->getShader(ES_OBJECTPASS))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-		return true;
-	if (type == video::EMT_ONETEXTURE_BLEND)
-		return true;
-	if (type == video::EMT_TRANSPARENT_ADD_COLOR)
-		return true;
-	return false;
-}
-
 void STKAnimatedMesh::drawShadow(const GLMesh &mesh)
 {
     GLenum ptype = mesh.PrimitiveType;
@@ -156,7 +138,7 @@ void STKAnimatedMesh::render()
 			driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 		else if (Mesh->getMeshType() == scene::EAMT_SKINNED)
 			driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
-		if (isObjectPass(material.MaterialType))
+        if (isObject(material.MaterialType))
 		{
 			irr_driver->IncreaseObjectCount();
 			initvaostate(GLmeshes[i], material.MaterialType, false);

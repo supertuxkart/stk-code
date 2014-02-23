@@ -238,6 +238,9 @@ void Shaders::loadShaders()
 	FullScreenShader::SSAOShader::init();
 	FullScreenShader::SunLightShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
+    FullScreenShader::MotionBlurShader::init();
+    FullScreenShader::GodFadeShader::init();
+    FullScreenShader::GodRayShader::init();
 	MeshShader::ColorizeShader::init();
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
@@ -1692,6 +1695,75 @@ namespace FullScreenShader
 		glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
 		glUniform1i(uniform_tex, TU_ntex);
 	}
+
+    GLuint MotionBlurShader::Program;
+    GLuint MotionBlurShader::uniform_boost_amount;
+    GLuint MotionBlurShader::uniform_center;
+    GLuint MotionBlurShader::uniform_color_buffer;
+    GLuint MotionBlurShader::uniform_direction;
+    GLuint MotionBlurShader::uniform_mask_radius;
+    GLuint MotionBlurShader::uniform_max_tex_height;
+    GLuint MotionBlurShader::vao;
+
+    void MotionBlurShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/motion_blur.frag").c_str());
+        uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
+        uniform_center = glGetUniformLocation(Program, "center");
+        uniform_color_buffer = glGetUniformLocation(Program, "color_buffer");
+        uniform_direction = glGetUniformLocation(Program, "direction");
+        uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
+        uniform_max_tex_height = glGetUniformLocation(Program, "max_tex_height");
+        vao = createVAO(Program);
+    }
+
+    void MotionBlurShader::setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb)
+    {
+        glUniform1f(uniform_boost_amount, boost_amount);
+        glUniform2f(uniform_center, center.X, center.Y);
+        glUniform2f(uniform_direction, direction.X, direction.Y);
+        glUniform1f(uniform_mask_radius, mask_radius);
+        glUniform1f(uniform_max_tex_height, max_tex_height);
+        glUniform1i(uniform_color_buffer, TU_cb);
+    }
+
+    GLuint GodFadeShader::Program;
+    GLuint GodFadeShader::uniform_tex;
+    GLuint GodFadeShader::uniform_col;
+    GLuint GodFadeShader::vao;
+
+    void GodFadeShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/godfade.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_col = glGetUniformLocation(Program, "col");
+        vao = createVAO(Program);
+    }
+
+    void GodFadeShader::setUniforms(const SColor &col, unsigned TU_tex)
+    {
+        glUniform3f(uniform_col, col.getRed() / 255., col.getGreen() / 255., col.getBlue() / 255.);
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
+    GLuint GodRayShader::Program;
+    GLuint GodRayShader::uniform_tex;
+    GLuint GodRayShader::uniform_sunpos;
+    GLuint GodRayShader::vao;
+
+    void GodRayShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/godray.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_sunpos = glGetUniformLocation(Program, "sunpos");
+        vao = createVAO(Program);
+    }
+
+    void GodRayShader::setUniforms(const core::vector2df &sunpos, unsigned TU_tex)
+    {
+        glUniform2f(uniform_sunpos, sunpos.X, sunpos.Y);
+        glUniform1i(uniform_tex, TU_tex);
+    }
 }
 
 namespace UIShader

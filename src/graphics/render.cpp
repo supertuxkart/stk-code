@@ -35,6 +35,7 @@
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -269,20 +270,24 @@ void IrrDriver::renderGLSL(float dt)
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-        if (hasflare || hasgodrays)
+        if (true)//hasflare || hasgodrays)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
-            GLuint res;
-            gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
+            GLuint res = 0;
+            if (m_query_issued)
+                gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
             m_post_processing->setSunPixels(res);
 
             // Prepare the query for the next frame.
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
             gl_driver->extGlBeginQuery(GL_SAMPLES_PASSED_ARB, m_lensflare_query);
             m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
             m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+            irr_driver->setPhase(GLOW_PASS);
             m_sun_interposer->render();
             gl_driver->extGlEndQuery(GL_SAMPLES_PASSED_ARB);
+            m_query_issued = true;
 
             m_lensflare->setStrength(res / 4000.0f);
 

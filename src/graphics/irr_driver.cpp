@@ -34,7 +34,7 @@
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/water.hpp"
@@ -459,9 +459,10 @@ void IrrDriver::initDevice()
 
         irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
+        m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        m_sun_interposer = m_scene_manager->addMeshSceneNode(sphere);
+        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
         m_sun_interposer->setScale(core::vector3df(20));
@@ -469,7 +470,7 @@ void IrrDriver::initDevice()
         m_sun_interposer->getMaterial(0).Lighting = false;
         m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
         m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_PASSFAR);
+        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
 
         sphere->drop();
 
@@ -937,7 +938,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMesh(mesh, parent, m_scene_manager, -1);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1);
     node->drop();
 
     return node;
