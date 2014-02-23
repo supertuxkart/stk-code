@@ -1,4 +1,4 @@
-#version 330 compatibility
+#version 330
 uniform sampler2D tex;
 uniform vec2 sunpos;
 
@@ -6,11 +6,12 @@ uniform vec2 sunpos;
 
 const float decaystep = 0.88;
 
+in vec2 uv;
 out vec4 FragColor;
 
 void main()
 {
-	vec2 texc = gl_TexCoord[0].xy;
+	vec2 texc = uv;
 	vec2 tosun = sunpos - texc;
 
 	if (dot(tosun, tosun) > 0.49) discard;

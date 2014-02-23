@@ -534,6 +534,28 @@ public:
     static void setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb);
 };
 
+class GodFadeShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_col;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const video::SColor &col, unsigned TU_tex);
+};
+
+class GodRayShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_sunpos;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
+};
+
 }
 
 namespace UIShader
