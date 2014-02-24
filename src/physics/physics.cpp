@@ -18,7 +18,7 @@
 
 #include "physics/physics.hpp"
 
-#include "achievements/achievements_manager.hpp"
+#include "achievements/achievement_info.hpp"
 #include "animations/three_d_animation.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
@@ -261,9 +261,8 @@ void Physics::update(float dt)
                 p->getUserPointer(0)->getPointerFlyable()->hit(target_kart);
                 if (type == PowerupManager::POWERUP_BOWLING)
                 {
-                    AchievementsStatus* status =
-                        PlayerManager::getCurrentAchievementsStatus();
-                    status->getAchievement(2)->increase("ball", 1);
+                    PlayerManager::increaseAchievement(
+                                   AchievementInfo::ACHIEVE_STRIKE, "ball", 1);
                 }
             }
 

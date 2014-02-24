@@ -19,6 +19,8 @@
 #ifndef HEADER_PLAYER_MANAGER_HPP
 #define HEADER_PLAYER_MANAGER_HPP
 
+#include "achievements/achievement.hpp"
+#include "achievements/achievements_status.hpp"
 #include "config/player_profile.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -99,6 +101,19 @@ public:
     {
         return get()->getCurrentPlayer()->getAchievementsStatus();
     }   // getCurrentAchievementsStatus
+    // ------------------------------------------------------------------------
+    /** A handy shortcut to increase points for an achievement key of the
+     *  current player. */
+    static void increaseAchievement(unsigned int index, const std::string &key,
+                                    int increase = 1)
+    {
+        Achievement *a = getCurrentAchievementsStatus()->getAchievement(index);
+        if (!a)
+        {
+            Log::fatal("PlayerManager", "Achievement '%d' not found.", index);
+        }
+        a->increase(key, increase);
+    }   // increaseAchievement
     // ------------------------------------------------------------------------
 };   // PlayerManager
 

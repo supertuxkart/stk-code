@@ -18,7 +18,7 @@
 
 #include "modes/world.hpp"
 
-#include "achievements/achievements_manager.hpp"
+#include "achievements/achievement_info.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
@@ -447,9 +447,8 @@ void World::terminateRace()
     }
 
     PlayerManager::get()->getCurrentPlayer()->raceFinished();
-    AchievementsStatus* status = PlayerManager::getCurrentAchievementsStatus();
-    status->getAchievement(1)->increase(getTrack()->getIdent(), 1);
-    AchievementsManager::get()->onRaceEnd();
+    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
+                                       getTrack()->getIdent(), 1);
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of

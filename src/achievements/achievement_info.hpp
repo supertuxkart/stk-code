@@ -41,6 +41,12 @@ class Achievement;
 class AchievementInfo
 {
 public:
+    /** Some handy names for the various achievements. */
+    enum { ACHIEVE_COLUMBUS = 1,
+           ACHIEVE_FIRST    = ACHIEVE_COLUMBUS,
+           ACHIEVE_STRIKE   = 2,
+           ACHIEVE_LAST     = ACHIEVE_STRIKE
+    };
     /** Achievement types:
      *  SINGLE_AT_LEAST: a single value, which must at least be the 
      *                   goal value.

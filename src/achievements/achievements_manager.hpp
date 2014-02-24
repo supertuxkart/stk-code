@@ -47,7 +47,6 @@ private:
     AchievementsManager      ();
     ~AchievementsManager     ();
     AchievementsStatus * createNewSlot(unsigned int id, bool online);
-    void parseAssetFile();
 
 public:
     /** Static function to create the instance of the achievement manager. */
