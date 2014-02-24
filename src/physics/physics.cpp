@@ -28,6 +28,7 @@
 #include "items/flyable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "karts/explosion_animation.hpp"
@@ -258,12 +259,26 @@ void Physics::update(float dt)
             PowerupManager::PowerupType type = p->getUserPointer(0)->getPointerFlyable()->getType();
             if(type != PowerupManager::POWERUP_BOWLING || !target_kart->isInvulnerable())
             {
-                p->getUserPointer(0)->getPointerFlyable()->hit(target_kart);
+                Flyable *f = p->getUserPointer(0)->getPointerFlyable();
+                f->hit(target_kart);
+
+                // Implement strike achievement
                 if (type == PowerupManager::POWERUP_BOWLING)
                 {
-                    PlayerManager::increaseAchievement(
-                                   AchievementInfo::ACHIEVE_STRIKE, "ball", 1);
-                }
+                    // 
+                    AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
+                    PlayerController *c = dynamic_cast<PlayerController*>(kart->getController());
+                    // Check that it's not a kart hitting itself (this can
+                    // happen at the time the ball is shot - release too close
+                    // to the kart, and it's the current player. At this stage
+                    // only the current player can get achievements.
+                    if (target_kart != kart && c &&
+                        c->getPlayer()->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+                    {
+                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE, 
+                                                           "ball", 1);
+                    }   // if target_kart != kart && is a player kart and is current player
+                }   // is bowling ball
             }
 
         }
