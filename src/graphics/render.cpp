@@ -259,12 +259,9 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_POP_CPU_MARKER();
 
-		if (!SkyboxTextures.empty())
-		{
-			PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-			renderSkybox();
-			PROFILER_POP_CPU_MARKER();
-		}
+		PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+		renderSkybox();
+		PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
@@ -923,6 +920,8 @@ static void createcubevao()
 
 void IrrDriver::renderSkybox()
 {
+    if (SkyboxTextures.empty()) return;
+
     scene::ICameraSceneNode *camera = m_scene_manager->getActiveCamera();
 	if (!cubevao)
 		createcubevao();
