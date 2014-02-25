@@ -18,8 +18,8 @@
     <ball goal="10"/>
   </achievement>
   <achievement id="3" check-type="one-at-least" reset-after-race="yes"
-               titl="Arch Enemy" description="Hit the same kart at least 5 times in one race">
-    <hit value="5"/>
+               title="Arch Enemy" description="Hit the same kart at least 5 times in one race">
+    <hit goal="5"/>
   </achievement>
 </achievements>
 
