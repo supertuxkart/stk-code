@@ -42,16 +42,22 @@ class AchievementInfo
 {
 public:
     /** Some handy names for the various achievements. */
-    enum { ACHIEVE_COLUMBUS = 1,
-           ACHIEVE_FIRST    = ACHIEVE_COLUMBUS,
-           ACHIEVE_STRIKE   = 2,
-           ACHIEVE_LAST     = ACHIEVE_STRIKE
+    enum { ACHIEVE_COLUMBUS   = 1,
+           ACHIEVE_FIRST      = ACHIEVE_COLUMBUS,
+           ACHIEVE_STRIKE     = 2,
+           ACHIEVE_ARCH_ENEMY = 3,
+           ACHIEVE_LAST       = ACHIEVE_ARCH_ENEMY
     };
-    /** Achievement types:
-     *  SINGLE_AT_LEAST: a single value, which must at least be the 
-     *                   goal value.
+    /** Achievement check type: 
+     *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
+     *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
      */
-    enum AchievementType { AT_SINGLE_AT_LEAST};
+    enum AchievementCheckType 
+    {
+        AC_ALL_AT_LEAST,
+        AC_ONE_AT_LEAST
+    };
+
 private:
     /** The id of this Achievement. */
     uint32_t           m_id;
@@ -62,7 +68,8 @@ private:
     /** The description of this achievement. */
     irr::core::stringw m_description;
 
-    AchievementType    m_type;
+    /** Determines how this achievement is checked if it is successful. */
+    AchievementCheckType  m_check_type;
 
     /** The target values needed to be reached. */
     std::map<std::string, int> m_goal_values;
@@ -71,9 +78,9 @@ private:
     bool m_reset_after_race;
 
 public:
-    AchievementInfo                     (const XMLNode * input);
-    virtual ~AchievementInfo            () {};
-    virtual AchievementType getType() const { return m_type; }
+             AchievementInfo(const XMLNode * input);
+    virtual ~AchievementInfo() {};
+
     virtual irr::core::stringw toString() const;
     virtual bool checkCompletion(Achievement * achievement) const;
 
@@ -88,6 +95,10 @@ public:
     irr::core::stringw getTitle() const { return m_title; }
     // ------------------------------------------------------------------------
     bool needsResetAfterRace() const { return m_reset_after_race; }
+    // ------------------------------------------------------------------------
+    /** Returns the check type for this achievement. */
+    AchievementCheckType getCheckType() const { return m_check_type; }
+
 };   // class AchievementInfo
 
 

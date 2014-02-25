@@ -84,7 +84,6 @@ AchievementsStatus*
     for (it  = m_achievements_info.begin(); 
          it != m_achievements_info.end(); ++it)
     {
-        AchievementInfo::AchievementType achievement_type = it->second->getType();
         Achievement * achievement;
         achievement = new Achievement(it->second);
         status->add(achievement);

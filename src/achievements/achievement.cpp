@@ -117,9 +117,23 @@ irr::core::stringw Achievement::getProgressAsString()
 {
     int progress = 0;
     std::map<std::string, int>::const_iterator iter;
-    for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+    switch (m_achievement_info->getCheckType())
     {
-        progress += iter->second;
+    case AchievementInfo::AC_ALL_AT_LEAST:
+        for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+        {
+            progress += iter->second;
+        }
+        break;
+    case AchievementInfo::AC_ONE_AT_LEAST:
+        for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+        {
+            if(iter->second>progress) progress = iter->second;
+        }
+        break;
+    default:
+        Log::fatal("Achievement", "Missing getProgressAsString for type %d.",
+                   m_achievement_info->getCheckType());
     }
     return StringUtils::toWString(progress) + "/" + getInfo()->toString();
 }   // getProgressAsString
@@ -132,12 +146,10 @@ irr::core::stringw Achievement::getProgressAsString()
 void Achievement::increase(const std::string & key, int increase)
 {
     if (m_progress_map.find(key) != m_progress_map.end())
-    {
         m_progress_map[key] += increase;
-        check();
-    }
     else
         m_progress_map[key] = increase;
+    check();
 }   // increase
 
 // ----------------------------------------------------------------------------

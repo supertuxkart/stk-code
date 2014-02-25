@@ -82,6 +82,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns if this achievement has been fulfilled. */
     bool isAchieved() const { return m_achieved;  }
-
+    // ------------------------------------------------------------------------
+    const std::map<std::string, int>& getProgress() const
+    {
+        return m_progress_map;
+    }   // getProgress
 };   // class Achievement
 #endif

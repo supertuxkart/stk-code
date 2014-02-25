@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <achievements>
-  <achievement id="1" type="map" title="Christoffel Columbus" description="Play every official track at least once." >
+  <achievement id="1" check-type="all-at-least" reset-after-race="no"
+               title="Christoffel Columbus" description="Play every official track at least once." >
       <farm goal="1"/>
       <scotland goal="1"/>
       <lighthouse goal="1"/>
@@ -12,8 +13,13 @@
       <hacienda goal="1"/>
       <jungle goal="1"/>      
   </achievement>
-  <achievement id="2" type="single" title="Strike!" description="Hit 10 karts with a bowling-ball.">
+  <achievement id="2" check-type="all-at-least" reset-after-race="no"
+               title="Strike!" description="Hit 10 karts with a bowling-ball.">
     <ball goal="10"/>
+  </achievement>
+  <achievement id="3" check-type="one-at-least" reset-after-race="yes"
+               titl="Arch Enemy" description="Hit the same kart at least 5 times in one race">
+    <hit value="5"/>
   </achievement>
 </achievements>
 
