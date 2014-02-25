@@ -895,7 +895,7 @@ void PostProcessing::render()
         if (irr_driver->getNormals())
 			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         else if (irr_driver->getSSAOViz())
-			renderPassThrough(irr_driver->getRTT(RTT_TMP3));
+			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
         else
 			renderColorLevel(in);
     }
