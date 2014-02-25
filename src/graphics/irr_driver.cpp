@@ -424,8 +424,8 @@ void IrrDriver::initDevice()
 	int GLMajorVersion = 0, GLMinorVersion = 0;
 	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
     glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
-    printf("OPENGL VERSION IS %d.%d\n", GLMajorVersion, GLMinorVersion);
-	m_glsl = (GLMajorVersion >3 || (GLMajorVersion == 3 && GLMinorVersion == 3)) && UserConfigParams::m_pixel_shaders;
+    Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
+	m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3)) && UserConfigParams::m_pixel_shaders;
                       
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
