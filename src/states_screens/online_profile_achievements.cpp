@@ -66,11 +66,11 @@ void OnlineProfileAchievements::beforeAddingWidget()
     OnlineProfileBase::beforeAddingWidget();
     m_achievements_list_widget->clearColumns();
     m_achievements_list_widget->addColumn( _("Name"), 2 );
-    if(m_visiting_profile->isCurrentUser())
+    if(m_visiting_profile && m_visiting_profile->isCurrentUser())
     {
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
     }
-}
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 
