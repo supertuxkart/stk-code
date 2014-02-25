@@ -66,8 +66,6 @@ void Moveable::setNode(scene::ISceneNode *n)
 void Moveable::updateGraphics(float dt, const Vec3& offset_xyz,
                               const btQuaternion& rotation)
 {
-    //if(offset_xyz.getX() || offset_xyz.getY() || offset_xyz.getZ())
-    //    printf("\noffset : %f %f %f\n",offset_xyz.getX(),offset_xyz.getY(),offset_xyz.getZ());
     Vec3 xyz=getXYZ()+offset_xyz;
     m_node->setPosition(xyz.toIrrVector());
     btQuaternion r_all = getRotation()*rotation;
