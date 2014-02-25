@@ -738,8 +738,13 @@ bool UserConfig::loadConfig()
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "stkconfig")
     {
-        std::cerr << "Could not read user config file file " << filename << std::endl;
+        Log::error("UserConfig",
+                   "Could not read user config file '%s'.", filename.c_str());
         if(root) delete root;
+        // Create a default config file - just in case that stk crashes later
+        // there is a config file that can be modified (to e.g. disable 
+        // shaders)
+        saveConfig();
         return false;
     }
 
