@@ -1755,28 +1755,21 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         //VdotN = cos(theta) where theta is angle b/w velocity and normal
         btScalar VdotN = btDot(kartvelocity.normalized(),normal);
         //impulse will have 2 components, parallel to the normal and perpendicular to the normal.
-        //the perpendicular component has been ignored becuase that way the collision looked nicer
-        //the parallel component is controlled by alpha.
-        //alpha should IDEALLY depend on the material and 0 <= alpha <= 1
+        //the parallel component is controlled by alpha and perpendicular by beta.
+        //alpha and beta should IDEALLY depend on the material and 0 <= (alpha,beta) <= 1
         //magnitude of parallel impulse = (1+alpha) * kartvelocity * cos(theta)
-        float alpha=0.5f;
+        //magnitude of perpendicular impulse = (1-beta) * kartvelocity * sin(theta)
+        float alpha=0.5f,beta=0.9f;
         btVector3 impulse_parallel = (kartvelocity.length()*(1+alpha)*VdotN)*normal;
-        btVector3 impulse = impulse_parallel;
+        btVector3 perpendicular_direction = (btCross(normal , btCross( kartvelocity, normal))).normalized();
+        btVector3 impulse_perpendicular = kartvelocity.length() * (1-beta) * btSqrt(1 - VdotN * VdotN) * perpendicular_direction;
+        btVector3 impulse = impulse_parallel - impulse_perpendicular;
         //take only that component of impulse into accout which is perpendicular to gravity
         impulse = impulse - btDot(impulse,gravity) * gravity;
         if(!impulse.getX() && !impulse.getZ())
-            impulse = btVector3(-1,0,0);//arbitary value
-        
-        //impulse and velocity should be in opposite directions.
-        if(impulse.getX() * kartvelocity.getX() >0)
-            impulse.setX(-impulse.getX());
-        if(impulse.getY() * kartvelocity.getY() >0)
-            impulse.setY(-impulse.getY());
-        if(impulse.getZ() * kartvelocity.getZ() >0)
-            impulse.setZ(-impulse.getZ());
-        
+            impulse = btVector3(0,0,-1);//arbitary value
+		printf("impulse.gravity: %f\n",btDot(impulse,gravity));
         m_bounce_back_time = 0.2f;
-        m_vehicle->setTimedCentralImpulse(0.1f, impulse);
     }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the
