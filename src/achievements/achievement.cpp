@@ -172,10 +172,11 @@ void Achievement::check()
     if(m_achievement_info->checkCompletion(this))
     {
         //show achievement
+        core::stringw s = StringUtils::insertValues(_("Completed achievement \"%s\"."),
+                                                    m_achievement_info->getTitle());
         GUIEngine::DialogQueue::get()->pushDialog(
-            new NotificationDialog(NotificationDialog::T_Achievements,
-            irr::core::stringw(_("Completed achievement")) + irr::core::stringw(" \"") + m_achievement_info->getTitle() + irr::core::stringw("\".")
-        ));
+            new NotificationDialog(NotificationDialog::T_Achievements, s));
+
         //send to server
         Online::CurrentUser::get()->onAchieving(m_id);
         m_achieved = true;
