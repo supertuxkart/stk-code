@@ -83,6 +83,7 @@ public:
 
     virtual irr::core::stringw toString() const;
     virtual bool checkCompletion(Achievement * achievement) const;
+    int getGoalValue(const std::string &key) const;
 
     // ------------------------------------------------------------------------
     /** Returns the id of this achievement. */
@@ -98,7 +99,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the check type for this achievement. */
     AchievementCheckType getCheckType() const { return m_check_type; }
-
+    // ------------------------------------------------------------------------
 };   // class AchievementInfo
 
 

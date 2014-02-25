@@ -139,16 +139,29 @@ irr::core::stringw Achievement::getProgressAsString()
 }   // getProgressAsString
 
 // ----------------------------------------------------------------------------
-/** Increases the value of a key by a specified amount.
+/** Increases the value of a key by a specified amount, but make sure to not
+ *  increase the value above the goal (otherwise the achievement progress
+ *  could be 12/10 (e.g. if one track is used 12 times for the Christoffel
+ *  achievement), even though the achievement is not achieved.
  *  \param key The key whose value is increased.
  *  \param increase Amount to add to the value of this key.
  */
 void Achievement::increase(const std::string & key, int increase)
 {
-    if (m_progress_map.find(key) != m_progress_map.end())
-        m_progress_map[key] += increase;
+    std::map<std::string, int>::iterator it;
+    it = m_progress_map.find(key);
+    if (it != m_progress_map.end())
+    {
+        it->second += increase;
+        if (it->second > m_achievement_info->getGoalValue(key))
+            it->second = m_achievement_info->getGoalValue(key);
+    }
     else
+    {
+        if (increase>m_achievement_info->getGoalValue(key))
+            increase = m_achievement_info->getGoalValue(key);
         m_progress_map[key] = increase;
+    }
     check();
 }   // increase
 

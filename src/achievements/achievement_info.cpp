@@ -145,3 +145,13 @@ bool AchievementInfo::checkCompletion(Achievement * achievement) const
     return false;
 }
 // ----------------------------------------------------------------------------
+int AchievementInfo::getGoalValue(const std::string &key) const
+{ 
+    std::map<std::string, int>::const_iterator it;
+    it = m_goal_values.find(key);
+    if (it != m_goal_values.end())
+        return it->second;
+    else
+        return 0;
+}   // getGoalValue
+// ----------------------------------------------------------------------------
