@@ -422,13 +422,6 @@ void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void GodRayProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setPixelShaderConstant("sunpos", m_sunpos, 2);
-}
-
-//-------------------------------------
-
 void ShadowPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const int hastex = mat.TextureLayer[0].Texture != NULL;
