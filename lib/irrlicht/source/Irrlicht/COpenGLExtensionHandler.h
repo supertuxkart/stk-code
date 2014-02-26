@@ -21,6 +21,7 @@
 	#endif
 	#include <GL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
+                typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 		#include "glext.h"
 	#endif
 	#include "wglext.h"
@@ -36,6 +37,7 @@
 	#endif
 	#include <OpenGL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
+                typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 		#include "glext.h"
 	#endif
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(_IRR_COMPILE_WITH_X11_DEVICE_)
@@ -49,6 +51,7 @@
 	#define NO_SDL_GLEXT
 	#include <SDL/SDL_video.h>
 	#include <SDL/SDL_opengl.h>
+        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 	#include "glext.h"
 #else
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
@@ -61,6 +64,7 @@
 	#include <GL/gl.h>
 	#include <GL/glx.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
+        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 	#include <GL/glext.h>
 	#undef GLX_ARB_get_proc_address // avoid problems with local glxext.h
 	#include <GL/glxext.h>
