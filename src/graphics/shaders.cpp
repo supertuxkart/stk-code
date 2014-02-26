@@ -1032,7 +1032,6 @@ namespace MeshShader
 
     GLuint SkyboxShader::Program;
     GLuint SkyboxShader::attrib_position;
-    GLuint SkyboxShader::attrib_texcoord;
     GLuint SkyboxShader::uniform_MVP;
     GLuint SkyboxShader::uniform_tex;
     GLuint SkyboxShader::uniform_screen;
@@ -1042,7 +1041,6 @@ namespace MeshShader
     {
         Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/sky.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_InvProjView = glGetUniformLocation(Program, "InvProjView");
         uniform_tex = glGetUniformLocation(Program, "tex");

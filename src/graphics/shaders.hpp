@@ -284,7 +284,7 @@ class SkyboxShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
+    static GLuint attrib_position;
     static GLuint uniform_MVP, uniform_InvProjView, uniform_tex, uniform_screen;
 
     static void init();

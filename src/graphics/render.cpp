@@ -855,44 +855,44 @@ static GLuint cubeidx;
 
 static void createcubevao()
 {
-	// From CSkyBoxSceneNode. Not optimal at all
+	// From CSkyBoxSceneNode
 	float corners[] = 
 	{
 		// top side
-		1., 1., -1.,       1., 1.,
-		1., 1., 1.,        0., 1.,
-		-1., 1., 1.,       0., 0.,
-		-1., 1., -1.,      1., 0.,
+		1., 1., -1.,
+		1., 1., 1.,
+		-1., 1., 1.,
+		-1., 1., -1.,
 
 		// Bottom side
-		1., -1., 1.,       0., 0.,
-		1., -1., -1.,      1., 0.,
-		-1., -1., -1.,     1., 1.,
-		-1., -1., 1.,      0., 1.,
+		1., -1., 1.,
+		1., -1., -1.,
+		-1., -1., -1.,
+		-1., -1., 1.,
 
 		// right side
-		1., -1, -1,        1., 1.,
-		1., -1, 1,         0., 1.,
-		1., 1., 1.,        0., 0.,
-		1., 1., -1.,       1., 0.,
+		1., -1, -1,
+		1., -1, 1,
+		1., 1., 1.,
+		1., 1., -1.,
 
 		// left side
-		-1., -1., 1.,      1., 1.,
-		-1., -1., -1.,     0., 1.,
-		-1., 1., -1.,      0., 0.,
-		-1., 1., 1.,       1., 0.,
+		-1., -1., 1.,
+		-1., -1., -1.,
+		-1., 1., -1.,
+		-1., 1., 1.,
 
 		// back side
-		-1., -1., -1.,     1., 1.,
-		1., -1, -1.,       0., 1.,
-		1, 1, -1.,         0., 0.,
-		-1, 1, -1.,        1., 0.,
+		-1., -1., -1.,
+		1., -1, -1.,
+		1, 1, -1.,
+		-1, 1, -1.,
 		
 		// front side
-		1., -1., 1.,       1., 1.,
-		-1., -1., 1.,      0., 1.,
-		-1, 1., 1.,        0., 0.,
-		1., 1., 1.,        1., 0.,
+		1., -1., 1.,
+		-1., -1., 1.,
+		-1, 1., 1.,
+		1., 1., 1.,
 	};
 	int indices[] = {
 		0, 1, 2, 2, 3, 0,
@@ -909,11 +909,9 @@ static void createcubevao()
 
 	glBindVertexArray(cubevao);
 	glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 5 * 4 * sizeof(float), corners, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_position);
-	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_texcoord);
-	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+	glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
@@ -982,18 +980,15 @@ void IrrDriver::renderSkybox()
 	transform *= translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
-	
-	for (unsigned i = 0; i < 6; i++)
-	{
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glUseProgram(MeshShader::SkyboxShader::Program);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glUseProgram(MeshShader::SkyboxShader::Program);
         MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*) (6 * i * sizeof(int)));
-	}
-	glBindVertexArray(0);
+    glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 // ----------------------------------------------------------------------------
