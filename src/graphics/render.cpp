@@ -918,6 +918,47 @@ static void createcubevao()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
 
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+
+void IrrDriver::generateSkyboxCubemap()
+{
+
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    glGenTextures(1, &SkyboxCubeMap);
+
+    GLint w = 0, h = 0;
+    for (unsigned i = 0; i < 6; i++)
+    {
+        w = MAX2(w, SkyboxTextures[i]->getOriginalSize().Width);
+        h = MAX2(h, SkyboxTextures[i]->getOriginalSize().Height);
+    }
+
+    const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
+    char *rgba = new char[w * h * 4];
+    for (unsigned i = 0; i < 6; i++)
+    {
+        unsigned idx = texture_permutation[i];
+
+        video::IImage* image = getVideoDriver()->createImageFromData(
+            SkyboxTextures[idx]->getColorFormat(),
+            SkyboxTextures[idx]->getSize(),
+            SkyboxTextures[idx]->lock(),
+            false
+            );
+        SkyboxTextures[idx]->unlock();
+
+        image->copyToScaling(rgba, w, h);
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba);
+        image->drop();
+    }
+    delete[] rgba;
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+
 void IrrDriver::renderSkybox()
 {
     if (SkyboxTextures.empty()) return;
@@ -925,6 +966,8 @@ void IrrDriver::renderSkybox()
     scene::ICameraSceneNode *camera = m_scene_manager->getActiveCamera();
 	if (!cubevao)
 		createcubevao();
+    if (!SkyboxCubeMap)
+        generateSkyboxCubemap();
 	glBindVertexArray(cubevao);
 	glDisable(GL_CULL_FACE);
 	assert(SkyboxTextures.size() == 6);
@@ -937,13 +980,17 @@ void IrrDriver::renderSkybox()
 	core::matrix4 scale;
 	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
 	transform *= translate * scale;
+    core::matrix4 invtransform;
+    transform.getInverse(invtransform);
 	
 	for (unsigned i = 0; i < 6; i++)
 	{
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(SkyboxTextures[i])->getOpenGLTextureName());
-		glUseProgram(MeshShader::ObjectUnlitShader::Program);
-		MeshShader::ObjectUnlitShader::setUniforms(transform, 0);
+		glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glUseProgram(MeshShader::SkyboxShader::Program);
+        MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*) (6 * i * sizeof(int)));
 	}
 	glBindVertexArray(0);

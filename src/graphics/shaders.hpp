@@ -280,6 +280,17 @@ public:
 	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex);
 };
 
+class SkyboxShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_MVP, uniform_InvProjView, uniform_tex, uniform_screen;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InvProjView, const core::vector2df &screen, unsigned TU_tex);
+};
+
 }
 
 namespace ParticleShader
