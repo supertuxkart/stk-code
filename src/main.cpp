@@ -158,8 +158,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
-#include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -170,20 +170,18 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/client_network_manager.hpp"
 #include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
+#include "network/server_network_manager.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
-#include "online/request_manager.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
-#include "online/current_user.hpp"
-#include "online/request_manager.hpp"
 #include "online/profile_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
@@ -1009,6 +1007,7 @@ void initRest()
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
     addons_manager          = new AddonsManager();
+    Online::ProfileManager::create();
 
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
@@ -1393,7 +1392,7 @@ static void cleanSuperTuxKart()
     //see InitTuxkart()
     Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
-    Online::ProfileManager::deallocate();
+    Online::ProfileManager::destroy();
     Online::CurrentUser::deallocate();
     GUIEngine::DialogQueue::deallocate();
 

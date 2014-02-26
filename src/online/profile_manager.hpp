@@ -27,52 +27,85 @@
 
 #include <string>
 
-namespace Online{
-    /**
-      * \brief Class that takes care of online profiles
-      * \ingroup online
-      */
-    class ProfileManager
+namespace Online
+{
+
+/** Class that takes care of online profiles.
+ * \ingroup online.
+ */
+class ProfileManager
+{
+private:
+    /** Singleton pointer. */
+    static ProfileManager* m_profile_manager;
+
+    ProfileManager();
+    ~ProfileManager();
+
+    /** The mapping of ids to profile. */
+    typedef std::map<uint32_t, Profile*>    ProfilesMap;
+
+    /** A map of profiles that is persistent. (i.e. no automatic
+     *  removing happens) Normally used for the current user's profile
+     *  and friends. */
+    ProfilesMap m_profiles_persistent;
+
+    /** Any profiles that don't go into the persistent map, go here.
+     *  Using a Least Recent Used caching algorithm with age bits to
+     *  remove entries when the max size is reached.*/
+    ProfilesMap  m_profiles_cache;
+
+    /** A temporary profile that is currently being 'visited',
+     *  e.g. its data is shown in a gui. */
+    Profile* m_currently_visiting;
+
+    /** The max size of the m_profiles cache.  */
+    static const unsigned int  m_max_cache_size = 20;
+
+    void iterateCache(Profile * profile);
+    void directToCache(Profile * profile);
+
+public:
+    /** Create the singleton instance. */
+    static void create()
     {
+        assert(!m_profile_manager);
+        m_profile_manager = new ProfileManager();
+    }   // create
+    // ----------------------------------------------------------------
+    /** Returns the singleton.
+     *  \pre create has been called to create the singleton.
+     */
+    static ProfileManager* get()
+    {
+        assert(m_profile_manager);
+        return m_profile_manager;
+    }   // get
+    // ----------------------------------------------------------------
+    /** Destroys the singleton. */
+    static void destroy()
+    {
+        assert(m_profile_manager);
+        delete m_profile_manager;
+        m_profile_manager = NULL;
+    }   // destroy
+    // ----------------------------------------------------------------
 
-        private:
-            ProfileManager      ();
-            ~ProfileManager     ();
+    void addToCache(Profile * profile);
+    void addPersistent(Profile * profile);
+    void deleteFromPersistent(const uint32_t id);
+    void clearPersistent();
+    void moveToCache(const uint32_t id);
+    void setVisiting(const uint32_t id);
+    bool cacheHit(const uint32_t id);
+    bool inPersistent(const uint32_t id);
+    Profile* getProfileByID(const uint32_t id);
+    // ----------------------------------------------------------------
+    /** \return the instance of the profile that's currently being
+     *  visited */
+    Profile* getVisitingProfile() { return m_currently_visiting; }
 
-            typedef std::map<uint32_t, Profile*>    ProfilesMap;
-
-            /** A map of profiles that is persistent. (i.e. no automatic removing happens) Normally used for the current user's profile and friends. */
-            ProfilesMap                             m_profiles_persistent;
-            /**
-             * Any profiles that don't go into the persistent map, go here.
-             * Using a Least Recent Used caching algorithm with age bits to remove entries when the max size is reached.
-             **/
-            ProfilesMap                             m_profiles_cache;
-            Profile *                               m_currently_visiting;
-            /** The max size of the m_profiles cache.  */
-            static const unsigned int               m_max_cache_size = 20;
-
-            void                                    iterateCache(Profile * profile);
-            void                                    directToCache(Profile * profile);
-
-        public:
-            /**Singleton */
-            static ProfileManager *                 get();
-            static void                             deallocate();
-
-            void                                    addToCache(Profile * profile);
-            void                                    addPersistent(Profile * profile);
-            void                                    deleteFromPersistent(const uint32_t id);
-            void                                    clearPersistent();
-            void                                    moveToCache(const uint32_t id);
-            void                                    setVisiting(const uint32_t id);
-            bool                                    cacheHit(const uint32_t id);
-            bool                                    inPersistent(const uint32_t id);
-            /** \return the instance of the profile that's currently being visited */
-            Profile *                               getVisitingProfile() {return m_currently_visiting;}
-            Profile *                               getProfileByID(const uint32_t id);
-
-    };   // class CurrentUser
+};   // class CurrentUser
 
 } // namespace Online
 
