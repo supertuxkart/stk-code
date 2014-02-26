@@ -115,6 +115,8 @@ private:
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
 	std::vector<video::ITexture *> SkyboxTextures;
+    GLuint SkyboxCubeMap;
+
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -225,6 +227,7 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
+    void generateSkyboxCubemap();
     void renderSkybox();
 	void setPhase(STKRenderingPass);
 	STKRenderingPass getPhase() const;
