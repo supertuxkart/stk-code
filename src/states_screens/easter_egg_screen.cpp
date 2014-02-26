@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"

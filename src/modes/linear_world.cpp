@@ -17,11 +17,10 @@
 
 #include "modes/linear_world.hpp"
 
-#include <iostream>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -33,6 +32,8 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 /** Constructs the linear world. Note that here no functions can be called

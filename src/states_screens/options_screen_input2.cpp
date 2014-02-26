@@ -17,6 +17,7 @@
 
 #include "states_screens/options_screen_input2.hpp"
 
+#include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"

@@ -22,6 +22,7 @@
 
 #include "addons/news_manager.hpp"
 #include "addons/zip.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart_properties.hpp"

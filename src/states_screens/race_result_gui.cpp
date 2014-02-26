@@ -22,6 +22,7 @@
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/engine.hpp"

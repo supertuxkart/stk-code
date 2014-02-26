@@ -20,7 +20,6 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
-#include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 

@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"

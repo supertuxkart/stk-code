@@ -32,7 +32,10 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
+#include <irrString.h>
+
 using namespace GUIEngine;
+using namespace irr;
 
 DEFINE_SCREEN_SINGLETON( LoginScreen );
 
@@ -76,9 +79,9 @@ void LoginScreen::login()
     info_widget->setDefaultColor();
     info_widget->setText("", false);
 
-    const stringw username = getWidget<TextBoxWidget>("username")
+    const core::stringw username = getWidget<TextBoxWidget>("username")
                             ->getText().trim();
-    const stringw password = getWidget<TextBoxWidget>("password")
+    const core::stringw password = getWidget<TextBoxWidget>("password")
                             ->getText().trim();
 
     if (username.size() < 4 || username.size() > 30 || 

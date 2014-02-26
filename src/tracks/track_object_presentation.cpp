@@ -21,6 +21,7 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"

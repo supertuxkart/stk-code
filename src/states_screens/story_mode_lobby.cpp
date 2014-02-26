@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
