@@ -21,7 +21,6 @@
 	#endif
 	#include <GL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-                typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 		#include "glext.h"
 	#endif
 	#include "wglext.h"
@@ -37,7 +36,6 @@
 	#endif
 	#include <OpenGL/gl.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-                typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 		#include "glext.h"
 	#endif
 #elif defined(_IRR_COMPILE_WITH_SDL_DEVICE_) && !defined(_IRR_COMPILE_WITH_X11_DEVICE_)
