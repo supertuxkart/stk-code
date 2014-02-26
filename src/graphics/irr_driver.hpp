@@ -191,7 +191,7 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
-	STKRenderingPass phase;
+	STKRenderingPass m_phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */

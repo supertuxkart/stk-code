@@ -101,6 +101,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
+    m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL);
     m_request_screenshot  = false;
     m_shaders             = NULL;
@@ -144,17 +145,17 @@ void IrrDriver::reset()
 
 void IrrDriver::setPhase(STKRenderingPass p)
 {
-  phase = p;
+    m_phase = p;
 }
 
 STKRenderingPass IrrDriver::getPhase() const
 {
-  return phase;
+  return m_phase;
 }
 
 void IrrDriver::IncreaseObjectCount()
 {
-	object_count[phase]++;
+	object_count[m_phase]++;
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
