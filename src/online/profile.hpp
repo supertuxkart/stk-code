@@ -111,12 +111,12 @@ public:
             ConstructorType type = C_DEFAULT);
     ~Profile();
     void fetchFriends();
-    const std::vector<uint32_t> &   getFriends();
+    const IDList&   getFriends();
     void fetchAchievements();
     void removeFriend(const uint32_t id);
     void addFriend(const uint32_t id);
     void deleteRelationalInfo();
-    const std::vector<uint32_t> &   getAchievements();
+    const IDList&   getAchievements();
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */
     bool hasFetchedAchievements() const { return m_has_fetched_achievements; }

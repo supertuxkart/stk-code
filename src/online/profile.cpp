@@ -54,7 +54,8 @@ void Profile::RelationInfo::setOnline(bool online)
 }
 
 // ============================================================================
-/** Constructor for a new profile. 
+/** Constructor for a new profile.  It does only store the ID, a name, and
+ *  if it is the current user.
  */
 Profile::Profile(const uint32_t  & userid,
                  const irr::core::stringw & username,
@@ -72,6 +73,14 @@ Profile::Profile(const uint32_t  & userid,
 }   // Profile
 
 // ----------------------------------------------------------------------------
+/** Creates a new profile from an XML Node. Two different profiles can be
+ *  created: either a simple one with no relation, or a profile with
+ *  relation information, i.e. it contains how this profile is related
+ *  to the current profile.
+ *  \param xml The XML node with the data to use.
+ *  \param type Either C_DEFAULT (no relation), or C_RELATION_INFO
+ *         if the XML node contains relation information.
+ */
 Profile::Profile(const XMLNode * xml, ConstructorType type)
 {
     m_relation_info            = NULL;
@@ -245,7 +254,7 @@ void Profile::storeFriends(const XMLNode * input)
 void Profile::removeFriend(const uint32_t id)
 {
     assert(m_has_fetched_friends);
-    std::vector<uint32_t>::iterator iter;
+    IDList::iterator iter;
     for (iter = m_friends.begin(); iter != m_friends.end();)
     {
         if (*iter == id)
@@ -281,14 +290,18 @@ void Profile::deleteRelationalInfo()
 }   // deleteRelationalInfo
 
 // ----------------------------------------------------------------------------
-const std::vector<uint32_t> & Profile::getFriends()
+/** Returns the list of all friend ids.
+ */
+const Profile::IDList& Profile::getFriends()
 {
     assert(m_has_fetched_friends && m_state == S_READY);
     return m_friends;
 }    // getFriends
 
 // ----------------------------------------------------------------------------
-const std::vector<uint32_t> & Profile::getAchievements()
+/** Returns the list of all achievement ids.
+ */
+const Profile::IDList& Profile::getAchievements()
 {
     assert(m_has_fetched_achievements && m_state == S_READY && !m_is_current_user);
     return m_achievements;
