@@ -192,7 +192,7 @@ void STKMeshSceneNode::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type
         else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
             drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
         else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-            drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+            drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
         else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
             drawObjectUnlit(mesh, ModelViewProjectionMatrix);
         else if (mesh.textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))

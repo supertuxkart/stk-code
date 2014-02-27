@@ -411,7 +411,7 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProj
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -439,7 +439,7 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 	}
 
 	glUseProgram(MeshShader::ObjectRimLimitShader::Program);
-	MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0, 1, 2, 3);
+	MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0, 1, 2, 3);
 
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);

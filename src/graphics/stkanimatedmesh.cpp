@@ -60,7 +60,7 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
                   drawObjectRefPass2(mesh, ModelViewProjectionMatrix, TextureMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 				  drawObjectUnlit(mesh, ModelViewProjectionMatrix);
 			  else if (mesh.textures[1])
@@ -125,7 +125,6 @@ void STKAnimatedMesh::render()
 	// render original meshes
 	for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
 	{
-        TextureMatrix = getMaterial(i).getTextureMatrix(0);
 		video::IMaterialRenderer* rnd = driver->getMaterialRenderer(Materials[i].MaterialType);
 		bool transparent = (rnd && rnd->isTransparent());
 
@@ -134,6 +133,7 @@ void STKAnimatedMesh::render()
 		if (transparent != isTransparentPass)
 			continue;
 		scene::IMeshBuffer* mb = m->getMeshBuffer(i);
+        TextureMatrix = getMaterial(i).getTextureMatrix(0);
 		const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
 		if (RenderFromIdentity)
 			driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
