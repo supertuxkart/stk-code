@@ -74,8 +74,11 @@ Profile::Profile(const uint32_t  & userid,
 // ----------------------------------------------------------------------------
 Profile::Profile(const XMLNode * xml, ConstructorType type)
 {
-    m_relation_info = NULL;
-    m_is_friend = false;
+    m_relation_info            = NULL;
+    m_is_friend                = false;
+    m_cache_bit                = true;
+    m_has_fetched_friends      = false;
+    m_has_fetched_achievements = false;
     if (type == C_RELATION_INFO)
     {
         irr::core::stringw date("");
@@ -101,10 +104,7 @@ Profile::Profile(const XMLNode * xml, ConstructorType type)
 
     xml->get("id",        &m_id      );
     xml->get("user_name", &m_username);
-    m_cache_bit                = true;
-    m_has_fetched_friends      = false;
-    m_has_fetched_achievements = false;
-    m_is_current_user = (m_id == CurrentUser::get()->getID());
+    m_is_current_user          = (m_id == CurrentUser::get()->getID());
     m_state = S_READY;
 }   // Profile(XMLNode)
 
@@ -115,12 +115,34 @@ Profile::~Profile()
 }   // ~Profile
 
 // ----------------------------------------------------------------------------
+/** Triggers an asynchronous request to get the achievements for this user
+ *  from the server. The state of this profile is changed to be fetching,
+ *  and will be reset to ready when the server request returns.
+ */
 void Profile::fetchAchievements()
 {
     assert(CurrentUser::get()->isRegisteredUser());
     if (m_has_fetched_achievements || m_is_current_user)
         return;
     m_state = S_FETCHING;
+
+    // ------------------------------------------------------------------------
+    /** A simple class that receives the achievements, and calls the right
+     *  Profile instance to store them. */
+    class AchievementsRequest : public XMLRequest
+    {
+    public:
+        AchievementsRequest() : XMLRequest(0, true) {}
+        virtual void callback()
+        {
+            uint32_t user_id = 0;
+            getXMLData()->get("visitingid", &user_id);
+            Profile *profile = ProfileManager::get()->getProfileByID(user_id);
+            if (profile)
+                profile->storeAchievements(getXMLData());
+        }   // AchievementsRequest::callback
+    };   // class AchievementsRequest
+    // ------------------------------------------------------------------------
 
     AchievementsRequest * request = new AchievementsRequest();
     request->setServerURL("client-user.php");
@@ -132,17 +154,12 @@ void Profile::fetchAchievements()
 }   // fetchAchievements
 
 // ----------------------------------------------------------------------------
-void Profile::AchievementsRequest::callback()
-{
-    uint32_t user_id(0);
-    getXMLData()->get("visitingid", &user_id);
-    if (ProfileManager::get()->getProfileByID(user_id) != NULL)
-        ProfileManager::get()->getProfileByID(user_id)
-        ->achievementsCallback(getXMLData());
-}   // AchievementsRequest::callback
-
-// ----------------------------------------------------------------------------
-void Profile::achievementsCallback(const XMLNode * input)
+/** Stores the achievement ids from an XML node into this profile. It also
+ *  sets that achievements have been fetched, and changes the state to be
+ *  READY again.
+ *  \param input XML node with the achievements data.
+ */
+void Profile::storeAchievements(const XMLNode * input)
 {
     m_achievements.clear();
     std::string achieved_string("");
@@ -152,21 +169,52 @@ void Profile::achievementsCallback(const XMLNode * input)
     }
     m_has_fetched_achievements = true;
     m_state = S_READY;
-    Log::info("test", "tit");
-}   // achievementsCallback
+}   // storeAchievements
 
 // ----------------------------------------------------------------------------
+/** Triggers an asynchronous request to download the friends for this user.
+ *  The state of this profile is changed to be fetching,
+ *  and will be reset to ready when the server request returns.
+ */
 void Profile::fetchFriends()
 {
     assert(CurrentUser::get()->isRegisteredUser());
     if (m_has_fetched_friends)
         return;
     m_state = S_FETCHING;
-    requestFriendsList();
+
+    // ------------------------------------------------------------------------
+    class FriendsListRequest : public XMLRequest
+    {
+    public:
+        FriendsListRequest() : XMLRequest(0, true) {}
+        virtual void callback()
+        {
+            uint32_t user_id = 0;
+            getXMLData()->get("visitingid", &user_id);
+            Profile *profile = ProfileManager::get()->getProfileByID(user_id);
+            if (profile)
+                profile->storeFriends(getXMLData());
+        }   // callback
+    };   // class FriendsListRequest
+    // ------------------------------------------------------------------------
+
+    FriendsListRequest * request = new FriendsListRequest();
+    request->setServerURL("client-user.php");
+    request->addParameter("action", "get-friends-list");
+    request->addParameter("token", CurrentUser::get()->getToken());
+    request->addParameter("userid", CurrentUser::get()->getID());
+    request->addParameter("visitingid", m_id);
+    RequestManager::get()->addRequest(request);
 }   // fetchFriends
 
 // ----------------------------------------------------------------------------
-void Profile::friendsListCallback(const XMLNode * input)
+/** Stores the friends from an XML node into this profile. It also
+ *  sets that friends have been fetched, and changes the state of the profile
+ *  to be READY again.
+ *  \param input XML node with the friends data.
+ */
+void Profile::storeFriends(const XMLNode * input)
 {
     const XMLNode * friends_xml = input->getNode("friends");
     m_friends.clear();
@@ -184,37 +232,15 @@ void Profile::friendsListCallback(const XMLNode * input)
             ProfileManager::get()->addToCache(profile);
         }
         m_friends.push_back(profile->getID());
-    }
+    }   // for i in nodes
     m_has_fetched_friends = true;
     m_state = S_READY;
-}   // friendsListCallback
+}   // storeFriends
 
 // ----------------------------------------------------------------------------
-
-void Profile::requestFriendsList()
-{
-    assert(CurrentUser::get()->isRegisteredUser());
-    FriendsListRequest * request = new FriendsListRequest();
-    request->setServerURL("client-user.php");
-    request->addParameter("action", "get-friends-list");
-    request->addParameter("token", CurrentUser::get()->getToken());
-    request->addParameter("userid", CurrentUser::get()->getID());
-    request->addParameter("visitingid", m_id);
-    RequestManager::get()->addRequest(request);
-}   // requestFriendsList
-
-// ----------------------------------------------------------------------------
-void Profile::FriendsListRequest::callback()
-{
-    uint32_t user_id(0);
-    getXMLData()->get("visitingid", &user_id);
-    if (ProfileManager::get()->getProfileByID(user_id) != NULL)
-        ProfileManager::get()->getProfileByID(user_id)
-        ->friendsListCallback(getXMLData());
-}   // FriendsListRequest::callback
-
-// ----------------------------------------------------------------------------
-
+/** Removed a friend with a given id.
+ *  \param id Friend id to remove.
+ */
 void Profile::removeFriend(const uint32_t id)
 {
     assert(m_has_fetched_friends);
@@ -232,7 +258,9 @@ void Profile::removeFriend(const uint32_t id)
 }   // removeFriend
 
 // ----------------------------------------------------------------------------
-
+/** Adds a friend to the friend list.
+ *  \param id The id of the profile to add.
+ */
 void Profile::addFriend(const uint32_t id)
 {
     assert(m_has_fetched_friends);
@@ -243,7 +271,8 @@ void Profile::addFriend(const uint32_t id)
 }   // addFriend
 
 // ----------------------------------------------------------------------------
-
+/** Deletes the relational info for this profile.
+ */
 void Profile::deleteRelationalInfo()
 {
     delete m_relation_info;

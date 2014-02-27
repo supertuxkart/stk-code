@@ -68,22 +68,6 @@ public:
         bool isOnline() const { return m_is_online; }
     };  // class RelationInfo
     // ========================================================================
-    class FriendsListRequest : public XMLRequest
-    {
-        virtual void callback();
-    public:
-        FriendsListRequest() : XMLRequest(0, true) {}
-    };   // class FriendsListRequest
-
-    // ========================================================================
-    class AchievementsRequest : public XMLRequest
-    {
-        virtual void callback();
-    public:
-        AchievementsRequest() : XMLRequest(0, true) {}
-    };   // class AchievementsRequest
-
-    // ========================================================================
 
     typedef std::vector<uint32_t> IDList;
 private:
@@ -116,10 +100,8 @@ private:
 
     bool                            m_cache_bit;
 
-    void requestFriendsList();
-    void friendsListCallback(const XMLNode * input);
-
-    void achievementsCallback(const XMLNode * input);
+    void storeFriends(const XMLNode * input);
+    void storeAchievements(const XMLNode * input);
 
 public:
     Profile(const uint32_t           & userid,
