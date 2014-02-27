@@ -173,7 +173,7 @@ void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjecti
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -183,7 +183,7 @@ void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProje
   setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
-  MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+  MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
@@ -322,7 +322,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
@@ -349,7 +349,7 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
   }
 
   glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
-  MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
+  MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0, 1, 2, 3);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
@@ -507,7 +507,7 @@ void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelView
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -535,44 +535,10 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 	}
 
 	glUseProgram(MeshShader::ObjectPass2Shader::Program);
-	MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
+	MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0, 1, 2, 3);
 
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
-}
-
-void drawMovingTexture(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
-    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
-    setTexture(3, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
-    if (!UserConfigParams::m_ssao)
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    glUseProgram(MeshShader::MovingTextureShader::Program);
-    MeshShader::MovingTextureShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0, 1, 2, 3);
-
-    glBindVertexArray(mesh.vao_second_pass);
-    glDrawElements(ptype, count, itype, 0);
 }
 
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
@@ -668,7 +634,7 @@ bool isObject(video::E_MATERIAL_TYPE type)
 	return false;
 }
 
-void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type, bool MovingTexture)
+void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 {
 	switch (irr_driver->getPhase())
 	{
@@ -739,11 +705,6 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type, bool MovingTexture)
 		  mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 			  MeshShader::UntexturedObjectShader::attrib_position, -1, -1, -1, -1, -1, MeshShader::UntexturedObjectShader::attrib_color, mesh.Stride);
 		}
-        else if (MovingTexture)
-        {
-            mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-                MeshShader::MovingTextureShader::attrib_position, MeshShader::MovingTextureShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-        }
 		else
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,

@@ -174,7 +174,7 @@ void STKMeshSceneNode::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type
         if (type == irr_driver->getShader(ES_NORMAL_MAP))
             drawNormalPass(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
         else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-            drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+            drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
         else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
             drawGrassPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
         else
@@ -188,7 +188,7 @@ void STKMeshSceneNode::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type
         else if (type == irr_driver->getShader(ES_SPLATTING))
             drawSplatting(mesh, ModelViewProjectionMatrix);
         else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-            drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
+            drawObjectRefPass2(mesh, ModelViewProjectionMatrix, TextureMatrix);
         else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
             drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
         else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
@@ -199,10 +199,8 @@ void STKMeshSceneNode::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type
             drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
         else if (!mesh.textures[0])
             drawUntexturedObject(mesh, ModelViewProjectionMatrix);
-        else if (!TextureMatrix.isIdentity())
-            drawMovingTexture(mesh, ModelViewProjectionMatrix, TextureMatrix);
         else
-            drawObjectPass2(mesh, ModelViewProjectionMatrix);
+            drawObjectPass2(mesh, ModelViewProjectionMatrix, TextureMatrix);
         break;
     }
     default:
@@ -242,7 +240,7 @@ void STKMeshSceneNode::render()
                 continue;
             if (irr_driver->getPhase() == DISPLACEMENT_PASS)
             {
-                initvaostate(GLmeshes[i], material.MaterialType, false);
+                initvaostate(GLmeshes[i], material.MaterialType);
                 drawDisplace(GLmeshes[i]);
                 continue;
             }
@@ -258,18 +256,18 @@ void STKMeshSceneNode::render()
             // and solid only in solid pass
             if (irr_driver->getPhase() == GLOW_PASS)
             {
-                initvaostate(GLmeshes[i], material.MaterialType, TextureMatrix.isIdentity());
+                initvaostate(GLmeshes[i], material.MaterialType);
                 drawGlow(GLmeshes[i]);
             }
             else if (irr_driver->getPhase() == SHADOW_PASS)
             {
-                initvaostate(GLmeshes[i], material.MaterialType, TextureMatrix.isIdentity());
+                initvaostate(GLmeshes[i], material.MaterialType);
                 drawShadow(GLmeshes[i], material.MaterialType);
             }
             else
             {
                 irr_driver->IncreaseObjectCount();
-                initvaostate(GLmeshes[i], material.MaterialType, TextureMatrix.isIdentity());
+                initvaostate(GLmeshes[i], material.MaterialType);
                 if (transparent)
                     drawTransparent(GLmeshes[i], material.MaterialType);
                 else

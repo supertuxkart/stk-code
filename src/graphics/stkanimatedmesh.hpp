@@ -12,7 +12,7 @@ class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode
 protected:
 	bool firstTime;
 	std::vector<GLMesh> GLmeshes;
-	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+    core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix;
 	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
     void drawShadow(const GLMesh &mesh);
