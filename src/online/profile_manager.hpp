@@ -55,9 +55,9 @@ private:
      *  and friends. */
     ProfilesMap m_profiles_persistent;
 
-    /** Any profiles that don't go into the persistent map, go here.
-     *  Using a Least Recent Used caching algorithm with age bits to
-     *  remove entries when the max size is reached.*/
+    /** Any profiles that don't go into the persistent map, go here. This
+     *  uses a pseudo-LRU algorithm with age bits to remove entries when 
+     *  the max size is reached. */
     ProfilesMap  m_profiles_cache;
 
     /** A temporary profile that is currently being 'visited',
@@ -67,8 +67,8 @@ private:
     /** The max size of the m_profiles cache.  */
     static const unsigned int  m_max_cache_size = 20;
 
-    void iterateCache(Profile * profile);
-    void directToCache(Profile * profile);
+    void updateCacheBits(Profile * profile);
+    void addDirectToCache(Profile * profile);
 
 public:
     /** Create the singleton instance. */
@@ -101,10 +101,18 @@ public:
     void deleteFromPersistent(const uint32_t id);
     void clearPersistent();
     void moveToCache(const uint32_t id);
-    void setVisiting(const uint32_t id);
+
     bool isInCache(const uint32_t id);
     bool inPersistent(const uint32_t id);
     Profile* getProfileByID(const uint32_t id);
+    // ----------------------------------------------------------------
+    /** Marks a given profile to be the currently visited one. This
+     *  is used to mark the profiles that ave its data display (e.g.
+     *  to see achievements either of a local or a remote player). */
+    void setVisiting(const uint32_t id)
+    {
+        m_currently_visiting = getProfileByID(id);
+    }   // setVisiting
     // ----------------------------------------------------------------
     /** \return the instance of the profile that's currently being
      *  visited */
