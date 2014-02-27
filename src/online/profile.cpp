@@ -224,14 +224,15 @@ void Profile::storeFriends(const XMLNode * input)
         if (m_is_current_user)
         {
             profile = new Profile(friends_xml->getNode(i), C_RELATION_INFO);
+            m_friends.push_back(profile->getID());
             ProfileManager::get()->addPersistent(profile);
         }
         else
         {
             profile = new Profile(friends_xml->getNode(i)->getNode("user"), C_DEFAULT);
+            m_friends.push_back(profile->getID());
             ProfileManager::get()->addToCache(profile);
         }
-        m_friends.push_back(profile->getID());
     }   // for i in nodes
     m_has_fetched_friends = true;
     m_state = S_READY;
