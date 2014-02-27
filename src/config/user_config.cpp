@@ -509,57 +509,6 @@ void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ============================================================================
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
-                                               const char* param_name,
-                                               const char* comment)
-{
-
-    m_value         = default_value;
-    m_default_value = default_value;
-
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if(comment != NULL) m_comment = comment;
-}   // WStringUserConfigParam
-
-// ----------------------------------------------------------------------------
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
-                                               const char* param_name,
-                                               GroupUserConfigParam* group,
-                                               const char* comment)
-{
-    m_value         = default_value;
-    m_default_value = default_value;
-
-    m_param_name = param_name;
-    group->addChild(this);
-    if(comment != NULL) m_comment = comment;
-}   // WStringUserConfigParam
-
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::write(UTFWriter& stream) const
-{
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
-}   // write
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
-{
-    const XMLNode* child = node->getNode( m_param_name );
-    if(child == NULL) return;
-
-    child->get( "value", &m_value );
-}   // findYourDataInAChildOf
-
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
-{
-    node->get( m_param_name, &m_value );
-}   // findYourDataInAnAttributeOf
-
-// ============================================================================
 BoolUserConfigParam::BoolUserConfigParam(bool default_value,
                                          const char* param_name,
                                          const char* comment)

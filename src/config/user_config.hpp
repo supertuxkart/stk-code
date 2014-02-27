@@ -224,37 +224,6 @@ public:
 };   // StringUserConfigParam
 
 // ============================================================================
-class WStringUserConfigParam : public UserConfigParam
-{
-    stringw m_value;
-    stringw m_default_value;
-
-public:
-
-    WStringUserConfigParam(const stringw& default_value,
-                           const char* param_name,
-                           const char* comment = NULL);
-    WStringUserConfigParam(const stringw& default_value,
-                           const char* param_name,
-                           GroupUserConfigParam* group,
-                           const char* comment = NULL);
-
-    void write(UTFWriter& stream) const;
-    void findYourDataInAChildOf(const XMLNode* node);
-    void findYourDataInAnAttributeOf(const XMLNode* node);
-
-    void revertToDefaults() { m_value = m_default_value; }
-
-    irr::core::stringw toString() const { return m_value; }
-
-    operator stringw() const { return m_value; }
-    stringw& operator=(const stringw& v) { m_value = v; return m_value;  }
-    stringw& operator=(const WStringUserConfigParam& v)
-                                 { m_value = (stringw)v; return m_value; }
-    const wchar_t* c_str() const { return m_value.c_str(); }
-};   // WStringUserConfigParam
-
-// ============================================================================
 class BoolUserConfigParam : public UserConfigParam
 {
     bool m_value;
@@ -676,10 +645,6 @@ namespace UserConfigParams
     PARAM_PREFIX StringUserConfigParam      m_skin_file
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file",
                                                   "Name of the skin to use") );
-
-    PARAM_PREFIX WStringUserConfigParam     m_default_player
-        PARAM_DEFAULT( WStringUserConfigParam(L"", "default_player",
-                                              "Which player to use by default (if empty, will prompt)") );
 
     // ---- Internet related
 
