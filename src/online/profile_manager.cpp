@@ -63,13 +63,16 @@ void ProfileManager::iterateCache(Profile * profile)
     {
         profile->setCacheBit(true);
         ProfilesMap::iterator iter;
-        for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
+        for (iter  = m_profiles_cache.begin(); 
+             iter != m_profiles_cache.end(); ++iter)
         {
             if (!iter->second->getCacheBit())
                 return;
         }
-        //All cache bits are one! Set them all to zero except the one currently being visited
-        for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
+        // All cache bits are one! Set them all to zero except the one
+        // currently being visited
+        for (iter  = m_profiles_cache.begin();
+             iter != m_profiles_cache.end(); ++iter)
         {
             iter->second->setCacheBit(false);
         }
@@ -86,7 +89,7 @@ void ProfileManager::iterateCache(Profile * profile)
  *  the RaceResultGUI to leave the race running (for the end animation) while
  *  the results are being shown.
  */
-void ProfileManager::directToCache(Profile * profile)
+void ProfileManager::directToCache(Profile* profile)
 {
     assert(profile != NULL);
     if (m_profiles_cache.size() == m_max_cache_size)
@@ -128,8 +131,8 @@ void ProfileManager::addPersistent(Profile * profile)
 }   // addPersistent
 
 // ------------------------------------------------------------------------
-/**
- * Removes and deletes an entry from the persistent map.
+/** Removes and deletes an entry from the persistent map.
+ *  \param id the id of the profile to be removed.
  */
 void ProfileManager::deleteFromPersistent(const uint32_t id)
 {
@@ -139,15 +142,20 @@ void ProfileManager::deleteFromPersistent(const uint32_t id)
         m_profiles_persistent.erase(id);
     }
     else
-        Log::warn("ProfileManager::removePersistent", "Tried to remove profile with id %d from persistent while not present", id);
+        Log::warn("ProfileManager",
+                  "Tried to remove profile with id %d from persistent while "
+                  "not present", id);
 }   // deleteFromPersistent
 
 // ------------------------------------------------------------------------
-
+/** Deletes all persistent profiles.
+ */
 void ProfileManager::clearPersistent()
 {
     ProfilesMap::iterator it;
-    for (it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it) {
+    for (it  = m_profiles_persistent.begin(); 
+         it != m_profiles_persistent.end(); ++it)
+    {
         delete it->second;
     }
     m_profiles_persistent.clear();
@@ -163,7 +171,9 @@ void ProfileManager::moveToCache(const uint32_t id)
         addToCache(profile);
     }
     else
-        Log::warn("ProfileManager::moveToCache", "Tried to move profile with id %d from persistent to cache while not present", id);
+        Log::warn("ProfileManager", 
+                  "Tried to move profile with id %d from persistent to "
+                  "cache while not present", id);
 }   // moveToCache
 
 // ------------------------------------------------------------------------
@@ -172,24 +182,24 @@ void ProfileManager::addToCache(Profile * profile)
 {
     if (inPersistent(profile->getID()))
         m_profiles_persistent[profile->getID()]->merge(profile);
-    else if (cacheHit(profile->getID()))
+    else if (isInCache(profile->getID()))
         m_profiles_cache[profile->getID()]->merge(profile);
     else
         directToCache(profile);
 }   // addToCache
 
 // ------------------------------------------------------------------------
-
+/** True if the profile with the given id is persistent.
+ *  \param id The id of the profile to test.
+ */
 bool ProfileManager::inPersistent(const uint32_t id)
 {
-    if (m_profiles_persistent.find(id) != m_profiles_persistent.end())
-        return true;
-    return false;
+    return m_profiles_persistent.find(id) != m_profiles_persistent.end();
 }   // inPersistent
 
 // ------------------------------------------------------------------------
 
-bool ProfileManager::cacheHit(const uint32_t id)
+bool ProfileManager::isInCache(const uint32_t id)
 {
     if (m_profiles_cache.find(id) != m_profiles_cache.end())
     {
@@ -197,7 +207,7 @@ bool ProfileManager::cacheHit(const uint32_t id)
         return true;
     }
     return false;
-}   // cacheHit
+}   // isInCache
 
 // ------------------------------------------------------------------------
 void ProfileManager::setVisiting(const uint32_t id)
@@ -212,7 +222,7 @@ Profile * ProfileManager::getProfileByID(const uint32_t id)
 
     if (inPersistent(id))
         return m_profiles_persistent[id];
-    if (cacheHit(id))
+    if (isInCache(id))
         return m_profiles_cache[id];
     //FIXME not able to get! Now this should actually fetch the info from the
     // server, but I haven't come up with a good asynchronous idea yet.

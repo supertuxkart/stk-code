@@ -30,7 +30,12 @@
 namespace Online
 {
 
-/** Class that takes care of online profiles.
+/** Class that manages all online profiles. Profiles are used for storing 
+ *  online information from local users, but also to store information about
+ *  remote users (e.g. if you want to see the achievements of another user
+ *  a Profile for this user is created, the server is then queried for
+ *  the information and the result is stored in that profile).
+ *  The profile manager has two 
  * \ingroup online.
  */
 class ProfileManager
@@ -97,7 +102,7 @@ public:
     void clearPersistent();
     void moveToCache(const uint32_t id);
     void setVisiting(const uint32_t id);
-    bool cacheHit(const uint32_t id);
+    bool isInCache(const uint32_t id);
     bool inPersistent(const uint32_t id);
     Profile* getProfileByID(const uint32_t id);
     // ----------------------------------------------------------------
