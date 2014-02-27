@@ -63,7 +63,6 @@ ProfileManager::~ProfileManager()
  */
 Profile * ProfileManager::getProfileByID(const uint32_t id)
 {
-
     if (inPersistent(id))
         return m_profiles_persistent[id];
     if (isInCache(id))
@@ -150,9 +149,9 @@ bool ProfileManager::isInCache(const uint32_t id)
 */
 void ProfileManager::updateCacheBits(Profile * profile)
 {
+    profile->setCacheBit(true);
     if (m_profiles_cache.size() == m_max_cache_size)
     {
-        profile->setCacheBit(true);
         ProfilesMap::iterator iter;
         for (iter = m_profiles_cache.begin();
             iter != m_profiles_cache.end(); ++iter)
