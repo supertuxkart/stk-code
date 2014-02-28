@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 
@@ -9,9 +8,16 @@ uniform float spec;
 uniform mat4 invproj;
 uniform mat4 viewm;
 
+#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 Diffuse;
 out vec4 Specular;
+#else
+varying vec2 uv;
+#define Diffuse gl_FragData[0]
+#define Specular gl_FragData[1]
+#endif
+
 
 vec3 DecodeNormal(vec2 n)
 {
@@ -49,8 +55,7 @@ void main() {
 		// Reflected light dir
 		vec3 R = reflect(-L, norm);
 		float RdotE = max(0.0, dot(R, eyedir));
-		float Specular = pow(RdotE, spec);
-		specular += Specular * light_col * spec_att;
+		specular += pow(RdotE, spec) * light_col * spec_att;
 	}
 
 	Diffuse = vec4(diffuse, 1.);

@@ -1,4 +1,3 @@
-#version 130
 uniform vec3 col;
 uniform sampler2D tex;
 

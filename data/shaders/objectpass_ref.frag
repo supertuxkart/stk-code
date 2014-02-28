@@ -1,9 +1,8 @@
-#version 330
 uniform sampler2D tex;
 uniform int hastex;
 uniform float objectid;
 
-noperspective in vec3 nor;
+in vec3 nor;
 in vec2 uv0;
 in vec2 uv1;
 out vec4 Albedo;

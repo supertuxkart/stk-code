@@ -1,8 +1,13 @@
-#version 330
 uniform sampler2D tex;
 
-noperspective in vec3 nor;
+#if __VERSION__ >= 130
+in vec3 nor;
 out vec4 FragColor;
+#else
+varying vec3 nor;
+#define FragColor gl_FragColor
+#endif
+
 
 void main() {
 	// Calculate the spherical UV

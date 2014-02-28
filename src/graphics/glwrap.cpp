@@ -200,7 +200,7 @@ void initGL()
 static
 GLuint LoadShader(const char * file, unsigned type) {
 	GLuint Id = glCreateShader(type);
-	std::string Code;
+    std::string Code = "#version 330\n";
 	std::ifstream Stream(file, std::ios::in);
 	if (Stream.is_open())
 	{

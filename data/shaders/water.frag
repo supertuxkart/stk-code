@@ -8,9 +8,9 @@ uniform sampler2D DecalTex; //The texture
 uniform vec2 delta1;
 uniform vec2 delta2;
 
-noperspective in vec3 lightVec;
-noperspective in vec3 halfVec;
-noperspective in vec3 eyeVec;
+in vec3 lightVec;
+in vec3 halfVec;
+in vec3 eyeVec;
 in vec2 uv;
 out vec4 FragColor;
 

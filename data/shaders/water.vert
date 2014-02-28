@@ -7,9 +7,9 @@ uniform float waveLength;
 
 uniform vec3 lightdir;
 
-noperspective out vec3 lightVec;
-noperspective out vec3 halfVec;
-noperspective out vec3 eyeVec;
+out vec3 lightVec;
+out vec3 halfVec;
+out vec3 eyeVec;
 out vec2 uv;
 
 void main()

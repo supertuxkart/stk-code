@@ -105,52 +105,52 @@ void Shaders::loadShaders()
     memcpy(saved_shaders, m_shaders, sizeof(m_shaders));
 
     // Ok, go
-	m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + "normalmap.vert", dir + "normalmap.frag");
-	m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + "normalmap.vert", dir + "normalmap.frag");
+    m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_SKYBOX] = glslmat(dir + "skybox.vert", dir + "skybox.frag",
+    m_shaders[ES_SKYBOX] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                    m_callbacks[ES_SKYBOX], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-	m_shaders[ES_SPLATTING] = glsl_noinput(dir + "splatting.vert", dir + "splatting.frag");
+    m_shaders[ES_SPLATTING] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_WATER] = glslmat(dir + "water.vert", dir + "water.frag",
+    m_shaders[ES_WATER] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_WATER], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_WATER_SURFACE] = glsl(dir + "water.vert", dir + "pass.frag",
+    m_shaders[ES_WATER_SURFACE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_WATER]);
 
-    m_shaders[ES_SPHERE_MAP] = glsl_noinput(std::string(""), dir + "objectpass_spheremap.frag");
+    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_GRASS] = glslmat(std::string(""), dir + "pass.frag",
+    m_shaders[ES_GRASS] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_GRASS_REF] = glslmat(std::string(""), dir + "pass.frag",
+    m_shaders[ES_GRASS_REF] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-    m_shaders[ES_BUBBLES] = glslmat(dir + "bubble.vert", dir + "bubble.frag",
+    m_shaders[ES_BUBBLES] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_BUBBLES], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_RAIN] = glslmat(dir + "rain.vert", dir + "rain.frag",
+    m_shaders[ES_RAIN] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_RAIN], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_MOTIONBLUR] = glsl(std::string(""), dir + "motion_blur.frag",
+    m_shaders[ES_MOTIONBLUR] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
-	m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "gaussian3h.frag",
+    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-	m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "gaussian3v.frag",
+    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-    m_shaders[ES_MIPVIZ] = glslmat(std::string(""), dir + "mipviz.frag",
+    m_shaders[ES_MIPVIZ] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
+    m_shaders[ES_COLORIZE] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
 
-	m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-	m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-	m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-	m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-	m_shaders[ES_SUNLIGHT] = glsl_noinput(std::string(""), dir + "sunlight.frag");
+    m_shaders[ES_SUNLIGHT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
     m_shaders[ES_MLAA_COLOR1] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_color1.frag",
                                     m_callbacks[ES_MLAA_COLOR1]);
@@ -159,37 +159,36 @@ void Shaders::loadShaders()
     m_shaders[ES_MLAA_NEIGH3] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_neigh3.frag",
                                     m_callbacks[ES_MLAA_NEIGH3]);
 
-    m_shaders[ES_SHADOWPASS] = glsl(dir + "shadowpass.vert", dir + "shadowpass.frag",
+    m_shaders[ES_SHADOWPASS] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOWPASS]);
 
-    m_shaders[ES_SHADOW_IMPORTANCE] = glsl(dir + "shadowimportance.vert",
-                                           dir + "shadowimportance.frag",
+    m_shaders[ES_SHADOW_IMPORTANCE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOW_IMPORTANCE]);
 
-    m_shaders[ES_COLLAPSE] = glsl(std::string(""), dir + "collapse.frag",
+    m_shaders[ES_COLLAPSE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLLAPSE]);
-    m_shaders[ES_SHADOW_WARPH] = glsl(std::string(""), dir + "shadowwarph.frag",
+    m_shaders[ES_SHADOW_WARPH] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLLAPSE]);
-    m_shaders[ES_SHADOW_WARPV] = glsl(std::string(""), dir + "shadowwarpv.frag",
+    m_shaders[ES_SHADOW_WARPV] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLLAPSE]);
 
-    m_shaders[ES_MULTIPLY_ADD] = glslmat(std::string(""), dir + "multiply.frag",
+    m_shaders[ES_MULTIPLY_ADD] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MULTIPLY_ADD], EMT_ONETEXTURE_BLEND);
 
-    m_shaders[ES_PENUMBRAH] = glslmat(std::string(""), dir + "penumbrah.frag",
+    m_shaders[ES_PENUMBRAH] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_PENUMBRAV] = glslmat(std::string(""), dir + "penumbrav.frag",
+    m_shaders[ES_PENUMBRAV] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_SHADOWGEN] = glslmat(std::string(""), dir + "shadowgen.frag",
+    m_shaders[ES_SHADOWGEN] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOWGEN], EMT_SOLID);
 
-    m_shaders[ES_CAUSTICS] = glslmat(std::string(""), dir + "caustics.frag",
+    m_shaders[ES_CAUSTICS] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_CAUSTICS], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_DISPLACE] = glsl(dir + "displace.vert", dir + "displace.frag",
+    m_shaders[ES_DISPLACE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_DISPLACE]);
 
-    m_shaders[ES_PASSFAR] = glsl(dir + "farplane.vert", dir + "colorize.frag",
+    m_shaders[ES_PASSFAR] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_COLORIZE]);
 
     // Check that all successfully loaded

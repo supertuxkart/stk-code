@@ -1,5 +1,3 @@
-#version 330 compatibility
-
 uniform sampler2D tex;
 uniform vec2 texsize;
 uniform int notex;
