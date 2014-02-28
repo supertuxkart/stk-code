@@ -68,6 +68,10 @@ namespace GUIEngine
           * it displays how close the value is to the maximum by filling a line
           */
         bool m_gauge;
+	
+	//for setting background
+	int m_backgroundcolor;
+	int m_spinner_widget_player_id;
         
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
@@ -93,6 +97,8 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
+	// to set the background image
+//	irr::video::ITexture* getBackgroundColor();
         
     public:
         
@@ -104,7 +110,13 @@ namespace GUIEngine
                 
         void addLabel(irr::core::stringw label);
         void clearLabels();
-        
+	// next four functions are for background colour behind playername in multikart screen selection
+        void setBackgroundColor();
+	int getBackgroundColor();
+	void setSpinnerWidgetPlayerID(int playerID);
+	int getSpinnerWidgetPlayerID();
+
+
         void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }
 
         /** \brief implement method from base class Widget */
@@ -165,6 +177,7 @@ namespace GUIEngine
 
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
+
     };
     
 }
