@@ -56,7 +56,7 @@ void StoryModeLobbyScreen::init()
     list->clear();
 
     PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
-    if(player)
+    if(!player->isGuestAccount())
     {
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         return;
@@ -107,14 +107,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
                               ->getPlayer(list->getSelectionLabel());
         if(player)
         {
-            PlayerManager::get()->setCurrentPlayer(player);
             player->computeActive();
             CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-            if (cb->getState())
-            {
-                PlayerManager::get()->setCurrentPlayer(PlayerManager::get()
-                                                       ->getPlayer(list->getSelectionLabel()));
-            }
+            PlayerManager::get()->setCurrentPlayer(player,cb->getState());
         }
         else
         {
@@ -140,7 +135,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& new_name)
     PlayerProfile *player = PlayerManager::get()->getPlayer(new_name);
     if(player)
     {
-        PlayerManager::get()->setCurrentPlayer(player);
+        PlayerManager::get()->setCurrentPlayer(player,false);
         player->computeActive();
     }
     else

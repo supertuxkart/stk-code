@@ -185,6 +185,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     else if (name == "playername")
     {
         race_manager->clearKartLastPositionOnOverworld();
+        PlayerManager::get()->setCurrentPlayer(PlayerManager::get()->getGuestPlayer(),false);
         StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
 

@@ -86,26 +86,17 @@ void PlayerManager::load()
         const XMLNode *player_xml = players->getNode(i);
         PlayerProfile *player = new PlayerProfile(player_xml);
         m_all_players.push_back(player);
-        if(player->isDefault())
+        if(player->isDefault()){
             m_current_player = player;
+        }
     }
     m_all_players.insertionSort(/*start*/0, /*desc*/true);
 
-    if(!m_current_player)
+    if(!m_current_player) // if there is no default player assigned set the current player to guest
     {
-        PlayerProfile *player;
-        for_in(player, m_all_players)
-        {
-            if(!player->isGuestAccount())
-            {
-                m_current_player = player;
-                player->setDefault(true);
-                break;
-            }
-        }
+        m_current_player = getGuestPlayer();
+        m_current_player->setDefault(true);
     }
-    if(!m_current_player)
-        Log::fatal("PlayerManager", "Can't find a default player.");
 
     delete players;
 }   // load
@@ -201,6 +192,24 @@ const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
     return NULL;
 }   // getPlayerById
 
+
+PlayerProfile* PlayerManager::getGuestPlayer(){
+
+    PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if(player->isGuestAccount())
+        {
+            return player;
+        }
+    }
+
+    player = new PlayerProfile(_LTR("Guest"), /*guest*/true);
+    m_all_players.push_back( player );
+
+    return player;
+}
+
 // ----------------------------------------------------------------------------
 PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
@@ -213,14 +222,15 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
     return NULL;
 }   // getPlayer
 // ----------------------------------------------------------------------------
-void PlayerManager::setCurrentPlayer(PlayerProfile *player)
+void PlayerManager::setCurrentPlayer(PlayerProfile *player, bool remember_me)
 {
     // Reset current default player
     if(m_current_player)
         m_current_player->setDefault(false);
     m_current_player = player;
-    m_current_player->setDefault(true);
+    m_current_player->setDefault(remember_me);
     m_current_player->computeActive();
+    m_remember_me = false;
 }   // setCurrentPlayer
 
 // ----------------------------------------------------------------------------

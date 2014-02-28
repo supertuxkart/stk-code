@@ -47,6 +47,7 @@ private:
 
     /** A pointer to the current player. */
     PlayerProfile* m_current_player;
+    bool m_remember_me;
 
     void load();
      PlayerManager();
@@ -76,11 +77,15 @@ public:
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
     void deletePlayer(PlayerProfile *player);
-    void setCurrentPlayer(PlayerProfile *player);
+    void setCurrentPlayer(PlayerProfile *player, bool remember_me);
+    void rememberCurrentPlayer(bool value) { m_remember_me = value; }
     const PlayerProfile *getPlayerById(unsigned int id);
     // ------------------------------------------------------------------------
     /** Returns the current player. */
     PlayerProfile* getCurrentPlayer() { return m_current_player; }
+    // ------------------------------------------------------------------------
+    /** Returns the guest player. */
+    PlayerProfile* getGuestPlayer();
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------
