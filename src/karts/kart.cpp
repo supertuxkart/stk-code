@@ -1748,15 +1748,22 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         // Restrict impule to plane defined by gravity (i.e. X/Z plane).
         // This avoids the problem that karts can be pushed up, e.g. above
         // a fence.
+        m_body->translate(0.15f * normal);
         btVector3 gravity = m_body->getGravity();
         gravity.normalize();
+        btVector3 kartvelocity = m_body->getLinearVelocity();
+        btScalar VdotN = btDot(kartvelocity.normalized(),normal);
         // Cast necessary since otherwise to operator- (vec3/btvector) exists
-        Vec3 impulse =  (btVector3)normal - gravity* btDot(normal, gravity);
-        if(impulse.getX() || impulse.getZ())
-            impulse.normalize();
-        else
-            impulse = Vec3(0, 0, -1); // Arbitrary
-        impulse *= m_kart_properties->getCollisionTerrainImpulse();
+        float alpha=0.5f,beta=0.9f;
+        btVector3 impulse_parallel = (kartvelocity.length()*(1+alpha)*VdotN)*normal;
+        btVector3 perpendicular_direction = (btCross(normal , btCross( kartvelocity, normal))).normalized();
+        btVector3 impulse_perpendicular = kartvelocity.length() * (1.0f-beta) * btSqrt(1 - VdotN * VdotN) * perpendicular_direction;
+        btVector3 impulse = impulse_parallel + impulse_perpendicular;
+        
+        impulse = impulse - btDot(impulse,gravity) * gravity;
+        if(!impulse.getX() && !impulse.getZ())
+            impulse = btVector3(0,0,-1);
+      
         m_bounce_back_time = 0.2f;
         m_vehicle->setTimedCentralImpulse(0.1f, impulse);
     }
