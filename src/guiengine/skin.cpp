@@ -1197,29 +1197,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
  * FIXME: ugly to pass some focuses through parameter and others not xD
  */
 
-/*
-void Skin::setBackground(const core::recti &rect, Widget* widget,BoxRenderParams& params)
-{
-	SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
-	if(q->getBackgroundColor())
-	{
-		core::recti rect3 = rect;
-		rect3.UpperLeftCorner.X -= 2;
-        	rect3.UpperLeftCorner.Y += 3;
-        	rect3.LowerRightCorner.X += 2;
-        	rect3.LowerRightCorner.Y -= 5;
-		int player_id=q->getSpinnerWidgetPlayerID();
-		if(player_id==0)
-		params=SkinConfig::m_render_params["spinner0::neutral"];
-		if(player_id==1)
-		params=SkinConfig::m_render_params["spinner1::neutral"];
-		if(player_id==2)
-		params=SkinConfig::m_render_params["spinner2::neutral"];
-		if(player_id==3)
-		params=SkinConfig::m_render_params["spinner3::neutral"];
-	}
-	return params;
-}*/
+
 void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                            const bool pressed, bool focused)
 {
@@ -1250,23 +1228,24 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 	// defining params and spinner widget to use spinner widget functions
 	SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
 	BoxRenderParams params;
-	if (focused|| pressed)
-	{
-		params=SkinConfig::m_render_params["spinner::focused"];
-	}
-	else if(q->getBackgroundColor()==1)
+	
+	if(q->getBackgroundColor()==1)
 	{
 		
 		int player_id=q->getSpinnerWidgetPlayerID();
 //		printf("player id=%d",player_idd);
 		if(player_id==0)
-		params=SkinConfig::m_render_params["spinner0::neutral"];
-		if(player_id==1)
 		params=SkinConfig::m_render_params["spinner1::neutral"];
-		if(player_id==2)
+		if(player_id==1)
 		params=SkinConfig::m_render_params["spinner2::neutral"];
-		if(player_id==3)
+		if(player_id==2)
 		params=SkinConfig::m_render_params["spinner3::neutral"];
+		if(player_id==3)
+		params=SkinConfig::m_render_params["spinner4::neutral"];
+	}
+	else if (focused|| pressed)
+	{
+		params=SkinConfig::m_render_params["spinner::focused"];
 	}
 	else
 	{
@@ -1274,8 +1253,21 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 	}
 
     
-    
-    if (widget->isFocusedForPlayer(1))
+    if (widget->isFocusedForPlayer(0))
+    {
+	core::recti rect2 = rect;
+//	printf(" here ");
+        rect2.UpperLeftCorner.X += 2;
+        rect2.UpperLeftCorner.Y -= 3;
+        rect2.LowerRightCorner.X -= 2;
+        rect2.LowerRightCorner.Y += 5;
+	//setBackground(rect,widget,pressed,focused,1);
+        drawBoxFromStretchableTexture(widget, rect2,
+                     SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+        
+
+    }
+    else if (widget->isFocusedForPlayer(1))
     {
 	core::recti rect2 = rect;
         rect2.UpperLeftCorner.X += 2;
