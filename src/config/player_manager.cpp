@@ -91,22 +91,6 @@ void PlayerManager::load()
     }
     m_all_players.insertionSort(/*start*/0, /*desc*/true);
 
-    if(!m_current_player)
-    {
-        PlayerProfile *player;
-        for_in(player, m_all_players)
-        {
-            if(!player->isGuestAccount())
-            {
-                m_current_player = player;
-                player->setDefault(true);
-                break;
-            }
-        }
-    }
-    if(!m_current_player)
-        Log::fatal("PlayerManager", "Can't find a default player.");
-
     delete players;
 }   // load
 
@@ -213,14 +197,17 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
     return NULL;
 }   // getPlayer
 // ----------------------------------------------------------------------------
-void PlayerManager::setCurrentPlayer(PlayerProfile *player)
+void PlayerManager::setCurrentPlayer(PlayerProfile *player, bool remember_me)
 {
     // Reset current default player
     if(m_current_player)
         m_current_player->setDefault(false);
     m_current_player = player;
-    m_current_player->setDefault(true);
-    m_current_player->computeActive();
+    if(m_current_player)
+    {
+        m_current_player->setDefault(remember_me);
+        m_current_player->computeActive();
+    }
 }   // setCurrentPlayer
 
 // ----------------------------------------------------------------------------

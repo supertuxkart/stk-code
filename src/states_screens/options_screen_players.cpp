@@ -184,8 +184,8 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     }
     else if (name == "playername")
     {
-        UserConfigParams::m_default_player = L"";
         race_manager->clearKartLastPositionOnOverworld();
+        PlayerManager::get()->setCurrentPlayer(NULL,false);
         StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
 

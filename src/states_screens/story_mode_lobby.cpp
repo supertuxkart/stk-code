@@ -55,18 +55,11 @@ void StoryModeLobbyScreen::init()
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
 
-    core::stringw name = UserConfigParams::m_default_player.toString();
-
-
-    if (UserConfigParams::m_default_player.toString().size() > 0)
+    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    if(player)
     {
-        PlayerProfile *player = PlayerManager::get()->getPlayer(name);
-        if(player)
-        {
-            PlayerManager::get()->setCurrentPlayer(player);
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            return;
-        }
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
     }
 
     for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
@@ -114,13 +107,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
                               ->getPlayer(list->getSelectionLabel());
         if(player)
         {
-            PlayerManager::get()->setCurrentPlayer(player);
             player->computeActive();
             CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-            if (cb->getState())
-            {
-                UserConfigParams::m_default_player = list->getSelectionLabel();
-            }
+            PlayerManager::get()->setCurrentPlayer(player,cb->getState());
         }
         else
         {
@@ -146,7 +135,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& new_name)
     PlayerProfile *player = PlayerManager::get()->getPlayer(new_name);
     if(player)
     {
-        PlayerManager::get()->setCurrentPlayer(player);
+        PlayerManager::get()->setCurrentPlayer(player,false);
         player->computeActive();
     }
     else
