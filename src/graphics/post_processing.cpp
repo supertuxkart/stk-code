@@ -826,9 +826,9 @@ void PostProcessing::render()
             PROFILER_POP_CPU_MARKER();
         }
 
-        m_material.MaterialType = irr_driver->getShader(ES_RAIN);
+/*        m_material.MaterialType = irr_driver->getShader(ES_RAIN);
         drv->setMaterial(m_material);
-        static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
+        static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();*/
 
         if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
         {

@@ -143,8 +143,6 @@ void IrrDriver::renderGLSL(float dt)
 
     // Clear normal and depth to zero
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH), true, false, video::SColor(0,0,0,0));
-    // Clear specular map to zero
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SPECULARMAP), true, false, video::SColor(0,0,0,0));
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     RaceGUIBase *rg = world->getRaceGUI();
@@ -199,6 +197,7 @@ void IrrDriver::renderGLSL(float dt)
 		glDisable(GL_ALPHA_TEST);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
         m_scene_manager->drawAll(m_renderpass);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));

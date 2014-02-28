@@ -33,7 +33,6 @@ enum TypeRTT
     RTT_TMP4,
     RTT_NORMAL_AND_DEPTH,
     RTT_COLOR,
-    RTT_SPECULARMAP,
 
     RTT_HALF1,
     RTT_HALF2,
