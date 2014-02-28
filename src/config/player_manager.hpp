@@ -76,7 +76,7 @@ public:
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
     void deletePlayer(PlayerProfile *player);
-    void setCurrentPlayer(PlayerProfile *player);
+    void setCurrentPlayer(PlayerProfile *player, bool remember_me);
     const PlayerProfile *getPlayerById(unsigned int id);
     // ------------------------------------------------------------------------
     /** Returns the current player. */
