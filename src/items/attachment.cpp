@@ -405,17 +405,22 @@ void Attachment::update(float dt)
     switch (m_type)
     {
     case ATTACH_PARACHUTE:
+        {
         // Partly handled in Kart::updatePhysics
         // Otherwise: disable if a certain percantage of
         // initial speed was lost
-	// This percentage is based on the ratio of
-	// initial_speed / initial_max_speed
+        // This percentage is based on the ratio of
+        // initial_speed / initial_max_speed
 
-        if(m_kart->getSpeed() <= m_initial_speed * (stk_config->m_parachute_lbound_fraction +
-		((m_initial_speed / stk_config->m_parachute_max_speed) * (stk_config->m_parachute_ubound_fraction -
-				stk_config->m_parachute_lbound_fraction))))
+        float f = m_initial_speed / stk_config->m_parachute_max_speed;
+        if (f > 1.0f) f = 1.0f;   // cap fraction
+        if (m_kart->getSpeed() <= m_initial_speed *
+                                 (stk_config->m_parachute_lbound_fraction +
+                                  f * (  stk_config->m_parachute_ubound_fraction 
+                                       - stk_config->m_parachute_lbound_fraction)))
         {
             m_time_left = -1;
+        }
         }
         break;
     case ATTACH_ANVIL:     // handled in Kart::updatePhysics
