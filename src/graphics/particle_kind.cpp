@@ -164,12 +164,16 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     {
         size->get("min", &m_min_size);
         size->get("max", &m_max_size);
+
+        bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x) == 1;
+        bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y) == 1;
+        m_has_scale_affector = (has_x || has_y);
     }
     
-    bool has_x = size->get("x-increase-factor", &m_scale_affector_factor_x)==1;
-    bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y)==1;
-    m_has_scale_affector = (has_x || has_y);
-
+    else
+    {
+        m_has_scale_affector = false;
+    }
     //std::cout << "m_particle_size = " << m_particle_size << "\n";
     //std::cout << "m_min_size = " << m_min_size << "\n";
     //std::cout << "m_max_size = " << m_max_size << "\n";

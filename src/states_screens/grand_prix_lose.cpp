@@ -22,6 +22,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -199,7 +200,7 @@ void GrandPrixLose::tearDown()
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixLose::onUpdate(float dt, irr::video::IVideoDriver* driver)
+void GrandPrixLose::onUpdate(float dt)
 {
     m_global_time += dt;
 
@@ -276,20 +277,19 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
         // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
 
-        if (unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size() > 0)
+        std::vector<const ChallengeData*> unlocked = 
+            PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
+        if (unlocked.size() > 0)
         {
-            std::vector<const ChallengeData*> unlocked =
-                unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges();
-            unlock_manager->getCurrentSlot()->clearUnlocked();
 
             FeatureUnlockedCutScene* scene =
                 FeatureUnlockedCutScene::getInstance();
 
-            assert(unlocked.size() > 0);
             scene->addTrophy(race_manager->getDifficulty());
             scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
             StateManager::get()->replaceTopMostScreen(scene);
+            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
         }
         else
         {

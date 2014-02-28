@@ -20,7 +20,7 @@
 #include "audio/sfx_manager.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/glwrap.hpp"
-#include "graphics/gpuparticles.h"
+#include "graphics/gpuparticles.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
@@ -42,7 +42,7 @@ using namespace core;
 
 // The rain manager
 
-Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
+Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent) : m_thunder_sound(0)
 {
     m_lightning = camera->getIndex()==0;
 
@@ -55,17 +55,17 @@ Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent)
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
 
-    RainNode *node = new RainNode(irr_driver->getSceneManager(), m->getTexture());
-    m_node = irr_driver->addPerCameraNode(node, camera->getCameraSceneNode(), parent);
-    m_node->setAutomaticCulling(0);
+//    RainNode *node = new RainNode(irr_driver->getSceneManager(), m->getTexture());
+//    m_node = irr_driver->addPerCameraNode(node, camera->getCameraSceneNode(), parent);
+//    m_node->setAutomaticCulling(0);
 }   // Rain
 
 // ----------------------------------------------------------------------------
 
 Rain::~Rain()
 {
-    m_node->drop();      // drop STK's reference
-    m_node->remove();    // Then remove it from the scene graph.
+//    m_node->drop();      // drop STK's reference
+//    m_node->remove();    // Then remove it from the scene graph.
 
     if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
 }
@@ -98,12 +98,12 @@ void Rain::update(float dt)
 
 void Rain::setPosition(const core::vector3df& position)
 {
-    m_node->getChild()->setPosition(position);
+//    m_node->getChild()->setPosition(position);
 }   // setPosition
 
 // ----------------------------------------------------------------------------
 
 void Rain::setCamera(scene::ICameraSceneNode* camera)
 {
-    m_node->setCamera(camera);
+//    m_node->setCamera(camera);
 }

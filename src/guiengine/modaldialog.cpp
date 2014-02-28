@@ -47,20 +47,23 @@ using namespace GUIEngine;
 
 // ----------------------------------------------------------------------------
 
-ModalDialog::ModalDialog(const float percentWidth, const float percentHeight, ModalDialogLocation location)
+ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
+                         ModalDialogLocation location)
 {
     m_dialog_location = location;
-    m_init = false;
-    m_percent_width = percentWidth;
-    m_percent_height = percentHeight;
-}
+    m_init            = false;
+    m_percent_width   = percentWidth;
+    m_percent_height  = percentHeight;
+    m_irrlicht_window = NULL;
+}   // ModalDialog
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::loadFromFile(const char* xmlFile)
 {
     doInit();
-    std::string path = file_manager->getAssetChecked(FileManager::GUI,xmlFile, true);
+    std::string path = file_manager->getAssetChecked(FileManager::GUI,xmlFile,
+                                                     true);
     IXMLReader* xml = file_manager->createXMLReader(path);
 
     Screen::parseScreenFileDiv(xml, m_widgets, m_irrlicht_window);
@@ -75,7 +78,7 @@ void ModalDialog::loadFromFile(const char* xmlFile)
     addWidgetsRecursively(m_widgets);
 
     init();
-}
+}   // loadFromFile
 
 // ----------------------------------------------------------------------------
 
@@ -86,7 +89,8 @@ void ModalDialog::doInit()
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
-    const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
+    const core::dimension2d<u32>& frame_size = 
+        GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
     const int w = (int)(frame_size.Width* m_percent_width);
     const int h = (int)(frame_size.Height* m_percent_height);
@@ -122,18 +126,20 @@ void ModalDialog::doInit()
     if (modalWindow != NULL)
     {
         delete modalWindow;
-        Log::warn("GUIEngine", "Showing a modal dialog while the previous one is still open. Destroying the previous dialog.");
+        Log::warn("GUIEngine", "Showing a modal dialog while the previous one "
+                  "is still open. Destroying the previous dialog.");
     }
     modalWindow = this;
 
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, true /* modal */);
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, 
+                                                          true /* modal */);
 
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;
 
     m_previous_mode=input_manager->getMode();
     input_manager->setMode(InputManager::MENU);
-}
+}   // doInit
 
 // ----------------------------------------------------------------------------
 
@@ -162,7 +168,7 @@ ModalDialog::~ModalDialog()
     // to the deleted widgets will be gone, but some widgets
     // may want to perform additional cleanup at this time
     elementsWereDeleted();
-}
+}   // ~ModalDialog
 
 // ----------------------------------------------------------------------------
 
@@ -176,9 +182,10 @@ void ModalDialog::clearWindow()
     elementsWereDeleted();
     m_widgets.clearAndDeleteAll();
 
-    m_irrlicht_window->remove();
+    if(m_irrlicht_window)
+        m_irrlicht_window->remove();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
-}
+}   // clearWindow
 
 // ----------------------------------------------------------------------------
 
@@ -188,34 +195,34 @@ void ModalDialog::dismiss()
     modalWindow = NULL;
     if(GUIEngine::getCurrentScreen() != NULL)
         GUIEngine::getCurrentScreen()->onDialogClose();
-}
+}   // dismiss
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::onEnterPressed()
 {
     if(modalWindow != NULL) modalWindow->onEnterPressedInternal();
-}
+}   // onEnterPressed
 
 // ----------------------------------------------------------------------------
 
 bool ModalDialog::isADialogActive()
 {
     return modalWindow != NULL;
-}
+}   // isADialogActive
 
 // ----------------------------------------------------------------------------
 
 ModalDialog* ModalDialog::getCurrent()
 {
     return modalWindow;
-}
+}   // getCurrent
 
 // ----------------------------------------------------------------------------
 
 void ModalDialog::onEnterPressedInternal()
 {
-}
+}   // onEnterPressedInternal
 
 // ----------------------------------------------------------------------------
 

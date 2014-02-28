@@ -21,7 +21,6 @@
 // The actual boost amount (which linearly scales the blur to be shown).
 // should be in the range [0.0, 1.0], though a larger value might make
 // the blurring too string. Atm we are using [0, 0.5].
-#version 130
 uniform float boost_amount;
 
 // The color buffer to use.
@@ -41,15 +40,23 @@ uniform float mask_radius;
 // Maximum height of texture used
 uniform float max_tex_height;
 
+#if __VERSION__ >= 130
+in vec2 uv;
+out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
+
 // Number of samples used for blurring
 #define NB_SAMPLES 8
 
 void main()
 {
-	vec2 texcoords = gl_TexCoord[0].st;
+	vec2 texcoords = uv;
 
 	// Sample the color buffer
-	vec3 color = texture2D(color_buffer, texcoords).rgb;
+	vec3 color = texture(color_buffer, texcoords).rgb;
 
 	// Compute the blur direction.
 	// IMPORTANT: we don't normalize it so that it avoids a glitch around 'center',
@@ -74,12 +81,12 @@ void main()
 	vec2 blur_texcoords = texcoords + inc_vec;
 	for(int i=1 ; i < NB_SAMPLES ; i++)
 	{
-		color += texture2D(color_buffer, blur_texcoords).rgb;
+		color += texture(color_buffer, blur_texcoords).rgb;
 		blur_texcoords += inc_vec;
 	}
 	color /= vec3(NB_SAMPLES);
-	gl_FragColor = vec4(color, 1.0);
+	FragColor = vec4(color, 1.0);
 
 	// Keep this commented line for debugging:
-	//gl_FragColor = vec4(blur_factor, blur_factor, blur_factor, 0.0);
+	//FragColor = vec4(blur_factor, blur_factor, blur_factor, 0.0);
 }

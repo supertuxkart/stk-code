@@ -29,37 +29,6 @@ using namespace core;
 
 //-------------------------------------
 
-void NormalMapProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 texture = 0;
-        srv->setPixelShaderConstant("texture", &texture, 1);
-
-        s32 normaltex = 1;
-        srv->setPixelShaderConstant("normalMap", &normaltex, 1);
-
-        // We could calculate light direction as coming from the sun (then we'd need to
-        // transform it into camera space). But I find that pretending light
-        // comes from the camera gives good results
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
 void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -179,42 +148,6 @@ void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void SplattingProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 tex_layout = 1;
-        srv->setPixelShaderConstant("tex_layout", &tex_layout, 1);
-
-        s32 tex_detail0 = 2;
-        srv->setPixelShaderConstant("tex_detail0", &tex_detail0, 1);
-
-        s32 tex_detail1 = 3;
-        srv->setPixelShaderConstant("tex_detail1", &tex_detail1, 1);
-
-        s32 tex_detail2 = 4;
-        srv->setPixelShaderConstant("tex_detail2", &tex_detail2, 1);
-
-        s32 tex_detail3 = 5;
-        srv->setPixelShaderConstant("tex_detail3", &tex_detail3, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
 void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     const float start = fabsf(mat.MaterialTypeParam2);
@@ -321,13 +254,6 @@ void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void GlowProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setVertexShaderConstant("res", m_res, 2);
-}
-
-//-------------------------------------
-
 void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
     core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
@@ -409,8 +335,8 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
         tex = 5;
         srv->setVertexShaderConstant("warpy", &tex, 1);
 
-        const float shadowoffset = 1.0f / irr_driver->getRTT(RTT_SHADOW)->getSize().Width;
-        srv->setVertexShaderConstant("shadowoffset", &shadowoffset, 1);
+//        const float shadowoffset = 1.0f / irr_driver->getRTT(RTT_SHADOW)->getSize().Width;
+//        srv->setVertexShaderConstant("shadowoffset", &shadowoffset, 1);
 
         firstdone = true;
     }
@@ -492,13 +418,6 @@ void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
 
         firstdone = true;
     }
-}
-
-//-------------------------------------
-
-void GodRayProvider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    srv->setPixelShaderConstant("sunpos", m_sunpos, 2);
 }
 
 //-------------------------------------
@@ -668,26 +587,29 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     srv->setVertexShaderConstant("ProjectionMatrix", ProjectionMatrix.pointer(), 16);
     srv->setVertexShaderConstant("ModelViewMatrix", ModelViewMatrix.pointer(), 16);
 
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
-
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
-
-    vector3df wind = irr_driver->getWind() * strength * speed;
-    m_dir[0] += wind.X;
-    m_dir[1] += wind.Z;
-
-    strength = time * 0.56f + sinf(time);
-    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
-
-    wind = irr_driver->getWind() * strength * speed;
-    wind.rotateXZBy(cosf(time));
-    m_dir2[0] += wind.X;
-    m_dir2[1] += wind.Z;
-
     srv->setVertexShaderConstant("dir", m_dir, 2);
     srv->setVertexShaderConstant("dir2", m_dir2, 2);
 
     srv->setVertexShaderConstant("screen", m_screen, 2);
+}
+
+void DisplaceProvider::update()
+{
+	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+	const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
+
+	float strength = time;
+	strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
+
+	vector3df wind = irr_driver->getWind() * strength * speed;
+	m_dir[0] += wind.X;
+	m_dir[1] += wind.Z;
+
+	strength = time * 0.56f + sinf(time);
+	strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
+
+	wind = irr_driver->getWind() * strength * speed;
+	wind.rotateXZBy(cosf(time));
+	m_dir2[0] += wind.X;
+	m_dir2[1] += wind.Z;
 }

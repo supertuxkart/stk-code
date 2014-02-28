@@ -19,17 +19,11 @@
 
 #include "tracks/track.hpp"
 
-#include <iostream>
-#include <stdexcept>
-#include <sstream>
-#include <IBillboardTextSceneNode.h>
-
-using namespace irr;
-
 #include "addons/addon.hpp"
 #include "audio/music_manager.hpp"
-#include "challenges/challenge.hpp"
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -68,11 +62,19 @@ using namespace irr;
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
-#include <ISceneManager.h>
-#include <IMeshSceneNode.h>
-#include <IMeshManipulator.h>
+#include <IBillboardTextSceneNode.h>
 #include <ILightSceneNode.h>
 #include <IMeshCache.h>
+#include <IMeshManipulator.h>
+#include <IMeshSceneNode.h>
+#include <ISceneManager.h>
+
+#include <iostream>
+#include <stdexcept>
+#include <sstream>
+
+using namespace irr;
+
 
 const float Track::NOHIT           = -99999.9f;
 
@@ -148,6 +150,29 @@ Track::~Track()
     m_magic_number = 0xDEADBEEF;
 #endif
 }   // ~Track
+
+//-----------------------------------------------------------------------------
+/** Returns number of completed challenges */
+unsigned int Track::getNumOfCompletedChallenges()
+{
+    unsigned int unlocked_challenges = 0;
+    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    for (unsigned int i=0; i<m_challenges.size(); i++)
+    {
+        if (m_challenges[i].m_challenge_id == "tutorial")
+        {
+            unlocked_challenges++;
+            continue;
+        }
+        if (player->getChallengeStatus(m_challenges[i].m_challenge_id)
+                ->isSolvedAtAnyDifficulty())
+        {
+            unlocked_challenges++;
+        }
+    }
+
+    return unlocked_challenges;
+}   // getNumOfCompletedChallenges
 
 //-----------------------------------------------------------------------------
 /** Removes all cached data structures. This is called before the resolution
@@ -476,8 +501,8 @@ void Track::getMusicInformation(std::vector<std::string>&       filenames,
             m_music.push_back(mi);
         else
             Log::warn("track",
-                      "Music information file '%s' not found - ignored.\n",
-                      filenames[i].c_str());
+                      "Music information file '%s' not found for track '%s' - ignored.\n",
+                      filenames[i].c_str(), m_name.c_str());
 
     }   // for i in filenames
 
@@ -922,7 +947,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             assert(closest_challenge_id < (int)m_challenges.size());
 
             const std::string &s = m_challenges[closest_challenge_id].m_challenge_id;
-            const ChallengeData* challenge = unlock_manager->getChallenge(s);
+            const ChallengeData* challenge = unlock_manager->getChallengeData(s);
             if (challenge == NULL)
             {
                 if (s != "tutorial")
@@ -931,8 +956,8 @@ bool Track::loadMainTrack(const XMLNode &root)
                 continue;
             }
 
-            const int val = challenge->getNumTrophies();
-            bool shown = (unlock_manager->getCurrentSlot()->getPoints() < val);
+            const unsigned int val = challenge->getNumTrophies();
+            bool shown = (PlayerManager::get()->getCurrentPlayer()->getPoints() < val);
             m_force_fields.push_back(OverworldForceField(xyz, shown, val));
 
             m_challenges[closest_challenge_id].setForceField(
@@ -941,10 +966,11 @@ bool Track::loadMainTrack(const XMLNode &root)
             core::stringw msg = StringUtils::toWString(val);
             core::dimension2d<u32> textsize = GUIEngine::getHighresDigitFont()
                                                    ->getDimension(msg.c_str());
-            scene::ISceneManager* sm = irr_driver->getSceneManager();
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
+			// TODO: Add support in the engine for BillboardText or find a replacement
+/*          scene::ISceneManager* sm = irr_driver->getSceneManager();
             scene::ISceneNode* sn =
                 sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
                                               msg.c_str(),
@@ -952,32 +978,17 @@ bool Track::loadMainTrack(const XMLNode &root)
                                               core::dimension2df(textsize.Width/45.0f,
                                                                  textsize.Height/45.0f),
                                               xyz,
-                                              -1 /* id */,
+                                              -1, // id 
                                               video::SColor(255, 255, 225, 0),
                                               video::SColor(255, 255, 89, 0));
-            m_all_nodes.push_back(sn);
+            m_all_nodes.push_back(sn);*/
             if (!shown) continue;
         }
         else if (condition == "allchallenges")
         {
-            unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-                if (m_challenges[c].m_challenge_id == "tutorial")
-                {
-                    unlocked_challenges++;
-                    continue;
-                }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
-                        ->isSolvedAtAnyDifficulty())
-                {
-                    unlocked_challenges++;
-                }
-            }
-
             // allow ONE unsolved challenge : the last one
-            if (unlocked_challenges < m_challenges.size() - 1) continue;
+            if (getNumOfCompletedChallenges() < m_challenges.size() - 1)
+                continue;
         }
         else if (condition.size() > 0)
         {
@@ -992,24 +1003,9 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (neg_condition == "allchallenges")
         {
-            unsigned int unlocked_challenges = 0;
-            GameSlot* slot = unlock_manager->getCurrentSlot();
-            for (unsigned int c=0; c<m_challenges.size(); c++)
-            {
-                if (m_challenges[c].m_challenge_id == "tutorial")
-                {
-                    unlocked_challenges++;
-                    continue;
-                }
-                if (slot->getChallenge(m_challenges[c].m_challenge_id)
-                        ->isSolvedAtAnyDifficulty())
-                {
-                    unlocked_challenges++;
-                }
-            }
-
             // allow ONE unsolved challenge : the last one
-            if (unlocked_challenges >= m_challenges.size() - 1) continue;
+            if (getNumOfCompletedChallenges() >= m_challenges.size() - 1)
+                continue;
         }
         else if (neg_condition.size() > 0)
         {
@@ -1130,7 +1126,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
                 if (challenge != "tutorial")
                 {
-                    c = unlock_manager->getChallenge(challenge);
+                    c = unlock_manager->getChallengeData(challenge);
                     if (c == NULL)
                     {
                         Log::error("track", "Cannot find challenge named <%s>\n",
@@ -1341,7 +1337,7 @@ void Track::createWater(const XMLNode &node)
 
     if (UserConfigParams::m_graphical_effects)
     {
-        scene::IMesh *welded;
+        /*scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
                                               wave_height,
                                               wave_speed,
@@ -1351,7 +1347,7 @@ void Track::createWater(const XMLNode &node)
         irr_driver->grabAllTextures(mesh);
         m_all_cached_meshes.push_back(mesh);
 
-        mesh = welded;
+        mesh = welded;*/
     }
     else
     {
@@ -1585,6 +1581,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Sky dome and boxes support
     // --------------------------
+	irr_driver->suppressSkyBox();
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],

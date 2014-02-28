@@ -19,21 +19,22 @@
 
 #include "states_screens/create_server_screen.hpp"
 
-#include <string>
-#include <iostream>
-
-#include "challenges/game_slot.hpp"
-#include "challenges/unlock_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "modes/demo_world.hpp"
+#include "online/servers_manager.hpp"
+#include "online/messages.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "modes/demo_world.hpp"
-#include "utils/translation.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/dialogs/server_info_dialog.hpp"
-#include "online/servers_manager.hpp"
-#include "online/messages.hpp"
+#include "utils/translation.hpp"
+
+#include <irrString.h>
+
+#include <string>
+#include <iostream>
 
 
 using namespace GUIEngine;
@@ -90,7 +91,7 @@ void CreateServerScreen::init()
     m_info_widget->setText("", false);
 }
 // ----------------------------------------------------------------------------
-void CreateServerScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void CreateServerScreen::onUpdate(float delta)
 {
     if(m_server_creation_request != NULL)
     {
@@ -122,7 +123,7 @@ void CreateServerScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver
 // ----------------------------------------------------------------------------
 void CreateServerScreen::serverCreationRequest()
 {
-    const stringw name = m_name_widget->getText().trim();
+    const irr::core::stringw name = m_name_widget->getText().trim();
     const int max_players = m_max_players_widget->getValue();
     m_info_widget->setErrorColor();
     if (name.size() < 4 || name.size() > 30)

@@ -17,21 +17,26 @@
 
 #include "profiler.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "utils/vs.hpp"
+
 #include <assert.h>
 #include <stack>
 #include <sstream>
+#include <algorithm>
+#include <fstream>
 
 Profiler profiler;
 
 // Unit is in pencentage of the screen dimensions
 #define MARGIN_X    0.02f    // left and right margin
 #define MARGIN_Y    0.02f    // top margin
-#define LINE_HEIGHT 0.015f   // height of a line representing a thread
+#define LINE_HEIGHT 0.030f   // height of a line representing a thread
 
-#define MARKERS_NAMES_POS      core::rect<s32>(50,50,150,150)
+#define MARKERS_NAMES_POS      core::rect<s32>(50,100,150,200)
 
 #define TIME_DRAWN_MS 30.0f // the width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 
@@ -69,11 +74,40 @@ Profiler::Profiler()
     m_time_last_sync = _getTimeMilliseconds();
     m_time_between_sync = 0.0;
     m_freeze_state = UNFROZEN;
+    m_capture_report = false;
+    m_first_capture_sweep = true;
+    m_capture_report_buffer = NULL;
 }
 
 //-----------------------------------------------------------------------------
 Profiler::~Profiler()
 {
+}
+
+//-----------------------------------------------------------------------------
+
+void Profiler::setCaptureReport(bool captureReport)
+{
+    if (!m_capture_report && captureReport)
+    {
+        m_capture_report = true;
+        m_first_capture_sweep = true;
+        // TODO: a 20 MB hardcoded buffer for now. That should amply suffice for
+        // all reasonable purposes. But it's not too clean to hardcode
+        m_capture_report_buffer = new StringBuffer(20 * 1024 * 1024);
+    }
+    else if (m_capture_report && !captureReport)
+    {
+        // when disabling capture to file, flush captured data to a file
+        {
+            std::ofstream filewriter(file_manager->getUserConfigFile("profiling.csv").c_str(), std::ios::out | std::ios::binary);
+            const char* str = m_capture_report_buffer->getRawBuffer();
+            filewriter.write(str, strlen(str));
+        }
+        m_capture_report = false;
+        delete m_capture_report_buffer;
+        m_capture_report_buffer = NULL;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -192,7 +226,7 @@ void Profiler::draw()
     // Force to show the pointer
     irr_driver->showPointer();
 
-    int read_id = !m_write_id;
+    int read_id = (m_freeze_state == FROZEN ? !m_write_id : m_write_id);
 
     // Compute some values for drawing (unit: pixels, but we keep floats for reducing errors accumulation)
     core::dimension2d<u32>    screen_size    = driver->getScreenSize();
@@ -203,39 +237,81 @@ void Profiler::draw()
 
     size_t nb_thread_infos = m_thread_infos.size();
 
-    const double factor = profiler_width / TIME_DRAWN_MS;
+
+    double start = -1.0f;
+    double end = -1.0f;
+    for (size_t i = 0; i < nb_thread_infos; i++)
+    {
+        MarkerList& markers = m_thread_infos[i].markers_done[read_id];
+
+        MarkerList::const_iterator it_end = markers.end();
+        for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
+        {
+            const Marker& m = *it;
+
+            if (start < 0.0) start = m.start;
+            else start = std::min(start, m.start);
+
+            if (end < 0.0) end = m.end;
+            else end = std::max(end, m.end);
+        }
+    }
+
+    const double duration = end - start;
+    const double factor = profiler_width / duration;
 
     // Get the mouse pos
     core::vector2di mouse_pos = GUIEngine::EventHandler::get()->getMousePos();
 
     // For each thread:
-    for(size_t i=0 ; i < nb_thread_infos ; i++)
+    for (size_t i = 0; i < nb_thread_infos; i++)
     {
         // Draw all markers
         MarkerList& markers = m_thread_infos[i].markers_done[read_id];
 
-        if(markers.empty())
+        if (markers.empty())
             continue;
 
+        if (m_capture_report)
+        {
+            if (m_first_capture_sweep)
+                m_capture_report_buffer->getStdStream() << "\"Thread\";";
+            else
+                m_capture_report_buffer->getStdStream() << i << ";";
+        }
         MarkerList::const_iterator it_end = markers.end();
-        for(MarkerList::const_iterator it = markers.begin() ; it != it_end ; it++)
+        for (MarkerList::const_iterator it = markers.begin(); it != it_end; it++)
         {
             const Marker&    m = *it;
             assert(m.end >= 0.0);
+
+            if (m_capture_report)
+            {
+                if (m_first_capture_sweep)
+                    m_capture_report_buffer->getStdStream() << "\"" << m.name << "\";";
+                else
+                    m_capture_report_buffer->getStdStream() << (int)round((m.end - m.start) * 1000) << ";";
+            }
             core::rect<s32>    pos((s32)( x_offset + factor*m.start ),
                                    (s32)( y_offset + i*line_height ),
                                    (s32)( x_offset + factor*m.end ),
                                    (s32)( y_offset + (i+1)*line_height ));
 
             // Reduce vertically the size of the markers according to their layer
-            pos.UpperLeftCorner.Y  += m.layer;
-            pos.LowerRightCorner.Y -= m.layer;
+            pos.UpperLeftCorner.Y  += m.layer*2;
+            pos.LowerRightCorner.Y -= m.layer*2;
 
-            driver->draw2DRectangle(m.color, pos);
+            GL32_draw2DRectangle(m.color, pos);
 
             // If the mouse cursor is over the marker, get its information
             if(pos.isPointInside(mouse_pos))
                 hovered_markers.push(m);
+        }
+
+        if (m_capture_report)
+        {
+            m_capture_report_buffer->getStdStream() << "\n";
+            m_first_capture_sweep = false;
         }
     }
 
@@ -259,11 +335,19 @@ void Profiler::draw()
         {
             Marker& m = hovered_markers.top();
             std::ostringstream oss;
-            oss << m.name << " [" << (m.end-m.start) << " ms]" << std::endl;
+            oss.precision(4);
+            oss << m.name << " [" << (m.end - m.start) << " ms / ";
+            oss.precision(3);
+            oss << (m.end - m.start)*100.0 / duration << "%]" << std::endl;
             text += oss.str().c_str();
             hovered_markers.pop();
         }
         font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+    }
+
+    if (m_capture_report)
+    {
+        font->draw("Capturing profiler report...", MARKERS_NAMES_POS, video::SColor(0xFF, 0x00, 0x90, 0x00));
     }
 }
 
@@ -309,10 +393,10 @@ void Profiler::drawBackground()
     const core::dimension2d<u32>&   screen_size = driver->getScreenSize();
 
     core::rect<s32>background_rect((int)(MARGIN_X                      * screen_size.Width),
-                                   (int)(MARGIN_Y                      * screen_size.Height),
+                                   (int)((MARGIN_Y + 0.25f)             * screen_size.Height),
                                    (int)((1.0-MARGIN_X)                * screen_size.Width),
-                                   (int)((MARGIN_Y + 3.0f*LINE_HEIGHT) * screen_size.Height));
+                                   (int)((MARGIN_Y + 1.75f*LINE_HEIGHT) * screen_size.Height));
 
     video::SColor   color(0xFF, 0xFF, 0xFF, 0xFF);
-    driver->draw2DRectangle(color, background_rect);
+    GL32_draw2DRectangle(color, background_rect);
 }

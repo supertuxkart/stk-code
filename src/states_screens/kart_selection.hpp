@@ -149,7 +149,7 @@ public:
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    virtual void onUpdate(float dt) OVERRIDE;
 
     /** \brief implement optional callback from parent
      *  class GUIEngine::Screen */
@@ -199,7 +199,7 @@ public:
  *  management or badging */
 class PlayerNameSpinner : public GUIEngine::SpinnerWidget
 {
-    int m_playerID;
+    int m_player_id;
     bool m_incorrect;
     irr::gui::IGUIImage* m_red_mark_widget;
     KartSelectionScreen* m_parent;
@@ -235,16 +235,19 @@ class PlayerKartWidget : public GUIEngine::Widget,
 
     /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is
      *  reserved, widget will not be in the regular tabbing order */
-    int m_irrlicht_widget_ID;
+    int m_irrlicht_widget_id;
 
     /** For animation purposes (see method 'move') */
     int target_x, target_y, target_w, target_h;
     float x_speed, y_speed, w_speed, h_speed;
 
     /** Object representing this player */
-    StateManager::ActivePlayer* m_associatedPlayer; // local info
-    int m_playerID;
-    Online::Profile* m_associated_user; // network info
+    /** Local info about the player. */
+    StateManager::ActivePlayer* m_associated_player;
+    int m_player_id;
+
+    /** Network info about the user. */
+    Online::Profile* m_associated_user;
 
     /** Internal name of the spinner; useful to interpret spinner events,
      *  which contain the name of the activated object */
@@ -259,7 +262,6 @@ public:
     LEAK_CHECK()
 
     /** Sub-widgets created by this widget */
-    //LabelWidget* m_player_ID_label;
     PlayerNameSpinner* m_player_ident_spinner;
     GUIEngine::ModelViewWidget* m_model_view;
     GUIEngine::LabelWidget* m_kart_name;
@@ -275,11 +277,11 @@ public:
     bool m_not_updated_yet;
 
     PlayerKartWidget(KartSelectionScreen* parent,
-                     StateManager::ActivePlayer* associatedPlayer,
-                     Online::Profile* associatedUser,
-                     core::recti area, const int playerID,
-                     std::string kartGroup,
-                     const int irrlichtWidgetID=-1);
+                     StateManager::ActivePlayer* associated_player,
+                     Online::Profile* associated_user,
+                     core::recti area, const int player_id,
+                     std::string kart_group,
+                     const int irrlicht_idget_id=-1);
     // ------------------------------------------------------------------------
 
     ~PlayerKartWidget();
@@ -322,7 +324,7 @@ public:
     virtual GUIEngine::EventPropagation transmitEvent(
         GUIEngine::Widget* w,
         const std::string& originator,
-        const int m_playerID);
+        const int m_player_id);
 
     // -------------------------------------------------------------------------
     /** Sets the size of the widget as a whole, and placed children widgets

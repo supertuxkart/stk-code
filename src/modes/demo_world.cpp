@@ -18,6 +18,8 @@
 
 #include "modes/demo_world.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
@@ -119,7 +121,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
             && m_demo_tracks.size() > 0)
     {
         if(!track)
-            printf("Invalid demo track identifier '%s'.\n",
+            Log::warn("[DemoWorld]", "Invalid demo track identifier '%s'.",
                    m_demo_tracks[0].c_str());
         m_demo_tracks.erase(m_demo_tracks.begin());
         track = track_manager->getTrack(m_demo_tracks[0]);
@@ -129,7 +131,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     // be filled up with all the tracks.
     if(m_demo_tracks.size()==0)
     {
-        printf("No valid tracks found, no demo started.\n");
+        Log::warn("[DemoWorld]", "No valid tracks found, no demo started.");
         return false;
     }
 
@@ -140,7 +142,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     // Use keyboard 0 by default in --no-start-screen
     device = input_manager->getDeviceList()->getKeyboard(0);
     StateManager::get()->createActivePlayer(
-        UserConfigParams::m_all_players.get(0), device , NULL);
+                           PlayerManager::get()->getPlayer(0), device , NULL);
     // ASSIGN should make sure that only input from assigned devices
     // is read.
     input_manager->getDeviceList()->setAssignMode(ASSIGN);

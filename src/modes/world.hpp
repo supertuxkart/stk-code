@@ -202,7 +202,7 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the number of rescue positions on a given track and game
      *  mode. */
-    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE = 0;
+    virtual unsigned int getNumberOfRescuePositions() const = 0;
     // ------------------------------------------------------------------------
     /** Determines the rescue position index of the specified kart. */
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) = 0;

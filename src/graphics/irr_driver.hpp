@@ -63,6 +63,17 @@ class PostProcessing;
 class LightNode;
 class ShadowImportance;
 
+enum STKRenderingPass
+{
+	SOLID_NORMAL_AND_DEPTH_PASS,
+	SOLID_LIT_PASS,
+	TRANSPARENT_PASS,
+	GLOW_PASS,
+	DISPLACEMENT_PASS,
+	SHADOW_PASS,
+	PASS_COUNT,
+};
+
 /**
   * \brief class that creates the irrLicht device and offers higher-level
   *  ways to manage the 3D scene
@@ -91,6 +102,7 @@ private:
     RTT                *m_rtts;
     /** Shadow importance. */
     ShadowImportance   *m_shadow_importance;
+    std::vector<core::matrix4> sun_ortho_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -100,7 +112,11 @@ private:
     core::array<video::IRenderTarget> m_mrt;
 
     /** Matrixes used in several places stored here to avoid recomputation. */
-    core::matrix4 m_ViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
+    core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
+
+	std::vector<video::ITexture *> SkyboxTextures;
+    GLuint SkyboxCubeMap;
+
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -152,10 +168,13 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
+	/** Performance stats */
     unsigned             m_last_light_bucket_distance;
+	unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
-    scene::IMeshSceneNode *m_sun_interposer;
+    bool                 m_query_issued;
+    class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
 
@@ -174,7 +193,7 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
-    unsigned phase;
+	STKRenderingPass m_phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -188,9 +207,9 @@ private:
 
     void renderFixed(float dt);
     void renderGLSL(float dt);
-    void renderShadows(ShadowImportanceProvider * const sicb,
+    void renderShadows(//ShadowImportanceProvider * const sicb,
                        scene::ICameraSceneNode * const camnode,
-                       video::SOverrideMaterial &overridemat,
+                       //video::SOverrideMaterial &overridemat,
                        Camera * const camera);
     void renderGlow(video::SOverrideMaterial &overridemat,
                     std::vector<GlowData>& glows,
@@ -208,8 +227,15 @@ public:
         ~IrrDriver();
     void initDevice();
     void reset();
-    void setPhase(unsigned);
-    unsigned getPhase() const;
+    void generateSkyboxCubemap();
+    void renderSkybox();
+	void setPhase(STKRenderingPass);
+	STKRenderingPass getPhase() const;
+    const std::vector<core::matrix4> &getShadowViewProj() const
+    {
+        return sun_ortho_matrix;
+    }
+	void IncreaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
@@ -243,9 +269,6 @@ public:
                  const video::SColor &color=video::SColor(128, 255, 255, 255));
     scene::IMeshSceneNode*addMesh(scene::IMesh *mesh,
                                   scene::ISceneNode *parent=NULL);
-    PerCameraNode        *addPerCameraMesh(scene::IMesh* mesh,
-                                           scene::ICameraSceneNode* node,
-                                           scene::ISceneNode *parent = NULL);
     PerCameraNode        *addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* cam,
                                            scene::ISceneNode *parent = NULL);
@@ -259,6 +282,7 @@ public:
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
+	void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
@@ -390,6 +414,10 @@ public:
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
+    /** Called when the driver pretends to support it, but fails at some
+     *  operations. */
+    void disableGLSL() { m_glsl = false; }
+    // ------------------------------------------------------------------------
     void resetDebugModes()
     {
         m_wireframe = false;
@@ -412,6 +440,8 @@ public:
     void toggleSSAOViz() { m_ssaoviz = !m_ssaoviz; }
     // ------------------------------------------------------------------------
     void toggleLightViz() { m_lightviz = !m_lightviz; }
+    // ------------------------------------------------------------------------
+    bool getLightViz() { return m_lightviz; }
     // ------------------------------------------------------------------------
     bool getSSAOViz() { return m_ssaoviz; }
     // ------------------------------------------------------------------------
@@ -469,10 +499,11 @@ public:
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
-    scene::IMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
+    class STKMeshSceneNode *getSunInterposer() { return m_sun_interposer; }
     // ------------------------------------------------------------------------
-    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; }
+    void setViewMatrix(core::matrix4 matrix) { m_ViewMatrix = matrix; matrix.getInverse(m_InvViewMatrix); }
     const core::matrix4 &getViewMatrix() const { return m_ViewMatrix; }
+    const core::matrix4 &getInvViewMatrix() const { return m_InvViewMatrix; }
     void setProjMatrix(core::matrix4 matrix) { m_ProjMatrix = matrix; matrix.getInverse(m_InvProjMatrix); }
     const core::matrix4 &getProjMatrix() const { return m_ProjMatrix; }
     const core::matrix4 &getInvProjMatrix() const { return m_InvProjMatrix; }

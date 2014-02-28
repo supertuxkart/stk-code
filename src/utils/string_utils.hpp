@@ -61,9 +61,6 @@ namespace StringUtils
 
     std::string encodeToHtmlEntities(const irr::core::stringw &output);
 
-    /** Compute a simple hash of a string */
-    unsigned int simpleHash(const char* input);
-
     // ------------------------------------------------------------------------
     template <class T>
     std::string toString (const T& any)
@@ -75,7 +72,7 @@ namespace StringUtils
 
     // ------------------------------------------------------------------------
     /** Specialisiation for bools to return 'true' or 'false'*/
-    inline std::string toString(bool &b)
+    inline std::string toString(const bool& b)
     {
         return (b ? "true" : "false");
     }    // toString(bool)

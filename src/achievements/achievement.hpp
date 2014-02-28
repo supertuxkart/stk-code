@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -22,80 +23,69 @@
 #include "utils/types.hpp"
 
 #include <irrString.h>
+#include <map>
 #include <string>
-#include "io/xml_node.hpp"
 
+class UTFWriter;
+class XMLNode;
 
 // ============================================================================
-
-/**
-  * \brief
-  * \ingroup
-  */
+/** This is the base class for any achievement. It allows achievement status
+ *  to be saved, and detects when an achievement is fulfilled. It provides
+ *  storage for state information by a generic key-value mapping. The values
+ *  are stored as strings, but can be used to store numerical values. E.g.
+ *  you can call increase("key", 10) for an achievement, which will convert
+ *  the string to int, add 10, then convert the result back to string for 
+ *  storage.
+ * \ingroup achievements
+ */
 class AchievementInfo;
 
 class Achievement
 {
-protected:
-    uint32_t                            m_id;
-    bool                                m_achieved;
-    const AchievementInfo *             m_achievement_info;
-    void                check           ();
+private:
+    /** The id of this achievement. */
+    uint32_t               m_id;
 
-public:
-    Achievement                         (const AchievementInfo * info);
-    virtual ~Achievement                ();
-    uint32_t getID                      () const { return m_id; }
-    const AchievementInfo * getInfo     () const { return m_achievement_info;}
-    virtual void load                   (XMLNode * input) = 0;
-    virtual void save                   (std::ofstream & out) = 0;
-    virtual void reset                  () = 0;
-    void onRaceEnd                      ();
-    void setAchieved                    () {m_achieved = true; };
-    virtual irr::core::stringw          getProgressAsString () = 0;
+    /** True if this achievement has been achieved. */
+    bool                   m_achieved;
 
-    enum AchievementType
-    {
-        AT_SINGLE,
-        AT_MAP
-    };
-
-};   // class Achievement
-
-class SingleAchievement : public Achievement
-{
-protected:
-    int m_progress;
-
-public:
-    SingleAchievement                   (const AchievementInfo * info);
-    virtual ~SingleAchievement          () {};
-
-    void load                           (XMLNode * input);
-    int getValue                        () const { return m_progress; }
-    void save                           (std::ofstream & out);
-    void increase                       (int increase = 1);
-    void reset                          ();
-    virtual irr::core::stringw          getProgressAsString ();
-};   // class SingleAchievement
-
-class MapAchievement : public Achievement
-{
-protected:
+    /** The map of key-value pairs. */
     std::map<std::string, int> m_progress_map;
 
+    /** A pointer to the corresponding AchievementInfo instance. */
+    const AchievementInfo *m_achievement_info;
+
+    void check();
+
 public:
-    MapAchievement                      (const AchievementInfo * info);
-    virtual ~MapAchievement             () {};
 
-    void load                           (XMLNode * input);
-    int getValue                        (const std::string & key);
-    void increase                       (const std::string & key, int increase = 1);
-    void save                           (std::ofstream & out);
-    void reset                          ();
-    virtual irr::core::stringw          getProgressAsString ();
-};   // class MapAchievement
+             Achievement(const AchievementInfo * info);
+    virtual ~Achievement();
+    virtual void load(const XMLNode *node);
+    virtual void save(UTFWriter &out);
+    virtual int getValue(const std::string & key);
+    void increase(const std::string & key, int increase = 1);
 
+    virtual void reset();
+    virtual irr::core::stringw getProgressAsString();
+    void onRaceEnd();
+    // ------------------------------------------------------------------------
+    /** Returns the id of this achievement. */
+    uint32_t getID() const { return m_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the AchievementInfo for this achievement. */
+    const AchievementInfo * getInfo() const { return m_achievement_info; }
+    // ------------------------------------------------------------------------
+    /** Sets this achievement to be fulfilled. */
+    void setAchieved() { m_achieved = true; };
+    // ------------------------------------------------------------------------
+    /** Returns if this achievement has been fulfilled. */
+    bool isAchieved() const { return m_achieved;  }
+    // ------------------------------------------------------------------------
+    const std::map<std::string, int>& getProgress() const
+    {
+        return m_progress_map;
+    }   // getProgress
+};   // class Achievement
 #endif
-
-/*EOF*/

@@ -55,7 +55,7 @@ private:
 
 public:
 
-    virtual void onUpdate(float delta,  irr::video::IVideoDriver* driver) OVERRIDE;
+    virtual void onUpdate(float delta) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

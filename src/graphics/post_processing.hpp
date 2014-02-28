@@ -73,12 +73,11 @@ public:
     void         update(float dt);
 
 	/** Generate diffuse and specular map */
-	void         renderPointlight(video::ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
+	void         renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
+	void         renderSunlight();
+    void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
-	/** Blend all light related map */
-	void renderLightbBlend(video::ITexture *diffuse, video::ITexture *specular, video::ITexture *ao, video::ITexture *specmap, bool debug);
-
-	void renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat);
+	void renderFog(const core::matrix4 &ipvmat);
 	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
 
 	/** Blur the in texture */
@@ -87,7 +86,9 @@ public:
 
 	/** Render tex. Used for blit/texture resize */
 	void renderPassThrough(video::ITexture *tex);
+    void renderPassThrough(unsigned tex);
 
+    void renderMotionBlur(unsigned cam, video::ITexture *in, video::ITexture *out);
 	void renderGlow(video::ITexture *tex);
 
     /** Render the post-processed scene */

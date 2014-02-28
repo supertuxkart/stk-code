@@ -18,16 +18,11 @@
 
 #include "modes/world.hpp"
 
-#include <assert.h>
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-#include <ctime>
-
-#include "achievements/achievements_manager.hpp"
+#include "achievements/achievement_info.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -64,6 +59,13 @@
 #include "utils/profiler.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
+
+#include <algorithm>
+#include <assert.h>
+#include <ctime>
+#include <sstream>
+#include <stdexcept>
+
 
 World* World::m_world = NULL;
 
@@ -332,7 +334,7 @@ Controller* World::loadAIController(AbstractKart *kart)
             controller = new SkiddingAI(kart);
             break;
         default:
-            Log::warn("World", "Unknown AI, using default.");
+            Log::warn("[World]", "Unknown AI, using default.");
             controller = new SkiddingAI(kart);
             break;
     }
@@ -441,12 +443,12 @@ void World::terminateRace()
     {
         updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
                      &best_player);
-        unlock_manager->getCurrentSlot()->raceFinished();
+        PlayerManager::get()->getCurrentPlayer()->raceFinished();
     }
 
-    unlock_manager->getCurrentSlot()->raceFinished();
-    ((MapAchievement *) AchievementsManager::get()->getActive()->getAchievement(1))->increase(getTrack()->getIdent(), 1);
-    AchievementsManager::get()->onRaceEnd();
+    PlayerManager::get()->getCurrentPlayer()->raceFinished();
+    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
+                                       getTrack()->getIdent(), 1);
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -529,12 +531,12 @@ void World::resetAllKarts()
 
         if (!kart_over_ground)
         {
-            Log::error("World",
+            Log::error("[World]",
                        "No valid starting position for kart %d on track %s.",
                         (int)(i-m_karts.begin()), m_track->getIdent().c_str());
             if (UserConfigParams::m_artist_debug_mode)
             {
-                Log::warn("World", "Activating fly mode.");
+                Log::warn("[World]", "Activating fly mode.");
                 (*i)->flyUp();
                 continue;
             }
@@ -580,14 +582,14 @@ void World::resetAllKarts()
                                                    &normal);
                 if(!material)
                 {
-                    Log::error("World",
+                    Log::error("[World]",
                                "No valid starting position for kart %d "
                                "on track %s.",
                                (int)(i-m_karts.begin()),
                                m_track->getIdent().c_str());
                     if (UserConfigParams::m_artist_debug_mode)
                     {
-                        Log::warn("World", "Activating fly mode.");
+                        Log::warn("[World]", "Activating fly mode.");
                         (*i)->flyUp();
                         continue;
                     }
@@ -750,12 +752,12 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
                                                         device, NULL);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
                 {
-                    Log::warn("World",
+                    Log::warn("[World]",
                               "Cannot find kart '%s', will revert to default.",
                               UserConfigParams::m_default_kart.c_str());
                     UserConfigParams::m_default_kart.revertToDefaults();
@@ -930,10 +932,10 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
             // the kart location data is wrong
 
 #ifdef DEBUG
-            Log::error("World", "Incorrect kart positions:");
+            Log::error("[World]", "Incorrect kart positions:");
             for (unsigned int i=0; i<m_karts.size(); i++ )
             {
-                Log::error("World", "i=%d position %d.",i,
+                Log::error("[World]", "i=%d position %d.",i,
                            m_karts[i]->getPosition());
             }
 #endif
@@ -946,7 +948,6 @@ void World::updateHighscores(int* best_highscore_rank, int* best_finish_time,
             continue;
         if (!m_karts[index[pos]]->hasFinishedRace()) continue;
 
-        assert(index[pos] >= 0);
         assert(index[pos] < m_karts.size());
         Kart *k = (Kart*)m_karts[index[pos]];
 

@@ -14,7 +14,6 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#version 130
 uniform sampler2D tex;
 uniform sampler2D glow_tex;
 uniform float transparency;
@@ -25,6 +24,7 @@ in vec2 uv;
 in vec2 uv_cl;
 in vec3 vertex;
 in vec2 uv_fast;
+out vec4 FragColor;
 
 void main()
 {
@@ -32,26 +32,26 @@ void main()
   vec3 V = normalize(vertex);
   vec3 L = normalize(vec3(sun_pos));
   
-  vec3 col = texture2D(tex, vec2((L.y + 1.0) / 2.0, V.y)).xyz;
+  vec3 col = texture(tex, vec2((L.y + 1.0) / 2.0, V.y)).xyz;
   
   float vl = clamp(dot(V, L), 0., 1.);
 
-	float paint = texture2D(tex, uv_temp * 3).a;
+	float paint = texture(tex, uv_temp * 3).a;
 	
 	uv_temp += 20;
-	//float paint2 = texture2D(tex, uv_temp * 5).a;
+	//float paint2 = texture(tex, uv_temp * 5).a;
 	
-	float paint2 = texture2D(tex, uv * 5.).a;
+	float paint2 = texture(tex, uv * 5.).a;
 	
 	// Get the general cloud mask
 	
 	
-	float hello = texture2D(glow_tex, (uv_cl + paint2 * 0.07) *2.).g;
+	float hello = texture(glow_tex, (uv_cl + paint2 * 0.07) *2.).g;
 	
-	float cld_mask = texture2D(glow_tex, (uv_anim + hello * 0.007 )).r;
+	float cld_mask = texture(glow_tex, (uv_anim + hello * 0.007 )).r;
 	
 	vec2 fast = vec2(-uv_fast.x, uv_fast.y);// + (hello * 0.007);
-	float cld_fast = texture2D(glow_tex, fast ).r;
+	float cld_fast = texture(glow_tex, fast ).r;
 
 
 
@@ -62,8 +62,8 @@ void main()
 	col = cld_mask + col*(1. - cld_mask);
 	col = cld_fast + col*(1. - cld_fast);
 	
-  gl_FragColor = vec4( vec3(col * paint * paint2), 1.0);
+  FragColor = vec4( vec3(col * paint * paint2), 1.0);
   
 
-  //gl_FragColor = vec4(vec3(ou), 1.0);
+  //FragColor = vec4(vec3(ou), 1.0);
 }

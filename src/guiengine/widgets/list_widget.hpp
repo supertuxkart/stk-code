@@ -132,7 +132,7 @@ namespace GUIEngine
                         bool center = false);
 
         void addItem(   const std::string& internal_name,
-                        PtrVector<ListCell> * contents);
+                        const std::vector<ListCell>& contents);
         
         /**
           * \brief erases all items in the list

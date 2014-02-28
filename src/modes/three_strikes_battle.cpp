@@ -61,7 +61,7 @@ void ThreeStrikesBattle::init()
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
-        Log::fatal("Three Strikes Battle", "No AI exists for this game mode");
+        Log::fatal("[Three Strikes Battle]", "No AI exists for this game mode");
     }
     m_kart_info.resize(m_karts.size());
 }   // ThreeStrikesBattle
@@ -349,7 +349,7 @@ void ThreeStrikesBattle::update(float dt)
         getTrack()->getTrackObjectManager()->insertObject(tire_obj);
 
         // FIXME: orient the force relative to kart orientation
-        tire_obj->getPhysics()->getBody()
+        tire_obj->getPhysicalObject()->getBody()
                 ->applyCentralForce(btVector3(60.0f, 0.0f, 0.0f));
 
         m_insert_tire--;

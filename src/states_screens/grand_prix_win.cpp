@@ -24,6 +24,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -97,7 +98,7 @@ void GrandPrixWin::loadedFromFile()
 void GrandPrixWin::init()
 {
     Screen::init();
-    if (unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size() > 0)
+    if (PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
@@ -269,7 +270,7 @@ void GrandPrixWin::tearDown()
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixWin::onUpdate(float dt, irr::video::IVideoDriver* driver)
+void GrandPrixWin::onUpdate(float dt)
 {
     m_global_time += dt;
 
@@ -405,11 +406,12 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
         // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
 
-        if (unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size() > 0)
+        if (PlayerManager::get()->getCurrentPlayer()
+                                ->getRecentlyCompletedChallenges().size() > 0)
         {
             std::vector<const ChallengeData*> unlocked =
-                unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges();
-            unlock_manager->getCurrentSlot()->clearUnlocked();
+                PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
+            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
 
             FeatureUnlockedCutScene* scene =
                 FeatureUnlockedCutScene::getInstance();

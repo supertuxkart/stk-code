@@ -16,9 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/glwrap.hpp"
 #include "states_screens/cutscene_gui.hpp"
 
 // -----------------------------------------------------------------------------
@@ -41,7 +43,7 @@ void CutsceneGUI::renderGlobal(float dt)
 {
     if (m_fade_level > 0.0f)
     {
-        irr_driver->getVideoDriver()->draw2DRectangle(
+        GL32_draw2DRectangle(
                                 video::SColor((int)(m_fade_level*255), 0,0,0),
                                 core::rect<s32>(0, 0,
                                                 UserConfigParams::m_width,

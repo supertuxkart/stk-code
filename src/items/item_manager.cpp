@@ -97,8 +97,8 @@ void ItemManager::loadDefaultItemMeshes()
         scene::IMesh *mesh = irr_driver->getAnimatedMesh(model_filename);
         if(!node || model_filename.size()==0 || !mesh)
         {
-            fprintf(stderr, "Item model '%s' in items.xml could not be loaded "
-                            "- aborting", name.c_str());
+            Log::fatal("[ItemManager]", "Item model '%s' in items.xml could not be loaded "
+                        "- aborting", name.c_str());
             exit(-1);
         }
         mesh->grab();

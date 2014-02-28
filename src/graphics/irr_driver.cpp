@@ -32,7 +32,9 @@
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/stkanimatedmesh.hpp"
+#include "graphics/stkbillboard.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/water.hpp"
@@ -99,6 +101,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
+    m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL);
     m_request_screenshot  = false;
     m_shaders             = NULL;
@@ -140,14 +143,19 @@ void IrrDriver::reset()
     if (m_glsl) m_post_processing->reset();
 }   // reset
 
-void IrrDriver::setPhase(unsigned p)
+void IrrDriver::setPhase(STKRenderingPass p)
 {
-  phase = p;
+    m_phase = p;
 }
 
-unsigned IrrDriver::getPhase() const
+STKRenderingPass IrrDriver::getPhase() const
 {
-  return phase;
+  return m_phase;
+}
+
+void IrrDriver::IncreaseObjectCount()
+{
+	object_count[m_phase]++;
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -414,10 +422,11 @@ void IrrDriver::initDevice()
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
 
-	int GLMajorVersion;
+	int GLMajorVersion = 0, GLMinorVersion = 0;
 	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
-	printf("OPENGL VERSION IS %d\n", GLMajorVersion);
-	m_glsl = (GLMajorVersion >= 3) && UserConfigParams::m_pixel_shaders;
+    glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+    Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
+	m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3)) && UserConfigParams::m_pixel_shaders;
                       
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
@@ -437,20 +446,24 @@ void IrrDriver::initDevice()
 
         // Order matters, create RTTs as soon as possible, as they are the largest blocks.
         m_rtts = new RTT();
+    }
+    // m_glsl might be reset in rtt if an error occurs.
+    if(m_glsl)
+    {
         m_shaders = new Shaders();
         m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
-        m_mrt.reallocate(3);
+        m_mrt.reallocate(2);
         m_mrt.push_back(m_rtts->getRTT(RTT_COLOR));
         m_mrt.push_back(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH));
-        m_mrt.push_back(m_rtts->getRTT(RTT_SPECULARMAP));
 
         irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
+        m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        m_sun_interposer = m_scene_manager->addMeshSceneNode(sphere);
+        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
         m_sun_interposer->setScale(core::vector3df(20));
@@ -458,7 +471,7 @@ void IrrDriver::initDevice()
         m_sun_interposer->getMaterial(0).Lighting = false;
         m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
         m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_PASSFAR);
+        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
 
         sphere->drop();
 
@@ -646,8 +659,8 @@ void IrrDriver::applyResolutionSettings()
     attachment_manager->removeTextures();
     projectile_manager->removeTextures();
     ItemManager::removeTextures();
-    kart_properties_manager -> unloadAllKarts();
-    powerup_manager-> unloadPowerups();
+    kart_properties_manager->unloadAllKarts();
+    powerup_manager->unloadPowerups();
     Referee::cleanup();
     ParticleKindManager::get()->cleanup();
     delete input_manager;
@@ -699,7 +712,6 @@ void IrrDriver::applyResolutionSettings()
 
     file_manager->popTextureSearchPath();
 
-    KartPropertiesManager::addKartSearchDir(file_manager->getAddonsFile("karts"));
     kart_properties_manager->loadAllKarts();
 
     attachment_manager->loadModels();
@@ -927,24 +939,13 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMesh(mesh, parent, m_scene_manager, -1);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1);
     node->drop();
 
     return node;
 }   // addMesh
 
 // ----------------------------------------------------------------------------
-
-PerCameraNode *IrrDriver::addPerCameraMesh(scene::IMesh* mesh,
-                                           scene::ICameraSceneNode* camera,
-                                           scene::ISceneNode *parent)
-{
-    scene::ISceneNode *node = m_scene_manager->addMeshSceneNode(mesh);
-
-    return new PerCameraNode((parent ? parent
-                                     : m_scene_manager->getRootSceneNode()),
-                             m_scene_manager, -1, camera, node);
-}   // addMesh
 
 PerCameraNode *IrrDriver::addPerCameraNode(scene::ISceneNode* node,
                                            scene::ICameraSceneNode* camera,
@@ -963,8 +964,17 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
                                            scene::ISceneNode* parent, bool alphaTesting)
 {
-    scene::IBillboardSceneNode* node =
-        m_scene_manager->addBillboardSceneNode(parent, size);
+	scene::IBillboardSceneNode* node;
+	if (isGLSL())
+	{
+		if (!parent)
+			parent = m_scene_manager->getRootSceneNode();
+
+		node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
+		node->drop();
+	}
+	else
+		node = m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
     if(alphaTesting)
@@ -1107,11 +1117,19 @@ void IrrDriver::removeTexture(video::ITexture *t)
  */
 scene::IAnimatedMeshSceneNode *IrrDriver::addAnimatedMesh(scene::IAnimatedMesh *mesh, scene::ISceneNode* parent)
 {
-    return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
+    if (!isGLSL())
+        return m_scene_manager->addAnimatedMeshSceneNode(mesh, parent, -1,
                                                      core::vector3df(0,0,0),
                                                      core::vector3df(0,0,0),
                                                      core::vector3df(1,1,1),
                                                      /*addIfMeshIsZero*/true);
+
+      if (!parent)
+         parent = m_scene_manager->getRootSceneNode();
+      scene::IAnimatedMeshSceneNode* node =
+         new STKAnimatedMesh(mesh, parent, m_scene_manager, -1, core::vector3df(0,0,0), core::vector3df(0,0,0), core::vector3df(1,1,1));
+      node->drop();
+      return node;
 }   // addAnimatedMesh
 
 // ----------------------------------------------------------------------------
@@ -1132,6 +1150,7 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
                                          float texture_percent,
                                          float sphere_percent)
 {
+	Log::error("skybox", "Using deprecated SkyDome");
     return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
                                                 texture_percent,
                                                 sphere_percent);
@@ -1151,10 +1170,20 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
 scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                         &texture)
 {
+    assert(texture.size() == 6);
+	SkyboxTextures = texture;
+    SkyboxCubeMap = 0;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
 }   // addSkyBox
+
+void IrrDriver::suppressSkyBox()
+{
+	SkyboxTextures.clear();
+    glDeleteTextures(1, &SkyboxCubeMap);
+    SkyboxCubeMap = 0;
+}
 
 // ----------------------------------------------------------------------------
 /** Adds a camera to the scene.
@@ -1423,15 +1452,15 @@ void IrrDriver::setAmbientLight(const video::SColor &light)
  */
 void IrrDriver::displayFPS()
 {
-    gui::IGUIFont* font = GUIEngine::getFont();
+    gui::IGUIFont* font = GUIEngine::getSmallFont();
 
     if(UserConfigParams::m_artist_debug_mode)
     {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,50),NULL);
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,1100,40),NULL);
     }
     else
     {
-        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,50),NULL);
+        GL32_draw2DRectangle(video::SColor(150, 96, 74, 196),core::rect< s32 >(75,0,900,40),NULL);
     }
     // We will let pass some time to let things settle before trusting FPS counter
     // even if we also ignore fps = 1, which tends to happen in first checks
@@ -1480,12 +1509,15 @@ void IrrDriver::displayFPS()
     if (low > kilotris) low = kilotris;
     if (high < kilotris) high = kilotris;
 
-    static char buffer[64];
+    static char buffer[128];
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - %.2f/%.2f/%.2f KTris - LightDst : ~%d",
-                min, fps, max, low, kilotris, high, m_last_light_bucket_distance);
+        sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
+                min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+		object_count[TRANSPARENT_PASS] = 0;
     }
     else
     {
@@ -2000,7 +2032,10 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera =  irr_driver->getSceneManager()->addCameraSceneNode();
 
     m_camera->setPosition( core::vector3df(0.0, 20.0f, 70.0f) );
-    m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
+    if (irr_driver->isGLSL())
+        m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
+    else
+        m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
     m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
     m_camera->setFOV( DEGREE_TO_RAD*50.0f );
     m_camera->updateAbsolutePosition();

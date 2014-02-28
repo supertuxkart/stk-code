@@ -19,10 +19,10 @@
 
 #include "states_screens/main_menu_screen.hpp"
 
-#include <string>
-
-#include "challenges/game_slot.hpp"
+#include "addons/news_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -37,32 +37,35 @@
 #include "modes/overworld.hpp"
 #include "modes/demo_world.hpp"
 #include "online/request_manager.hpp"
-#include "states_screens/online_screen.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/help_screen_1.hpp"
+#include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
-#include "states_screens/network_kart_selection.hpp" // FIXME : remove when not testing
+#include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
-
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #endif
-
 #include "states_screens/dialogs/message_dialog.hpp"
-
-#include "addons/news_manager.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
+
+
+
+#include <string>
+
 
 using namespace GUIEngine;
 using namespace Online;
 
 DEFINE_SCREEN_SINGLETON( MainMenuScreen );
+
+bool MainMenuScreen::m_enable_online = false;
 
 // ----------------------------------------------------------------------------
 
@@ -111,6 +114,10 @@ void MainMenuScreen::init()
         w->setBadge(LOADING_BADGE);
     }
 
+    m_online = getWidget<IconButtonWidget>("online");
+
+    if(!m_enable_online)
+        m_online->setDeactivated();
 
     LabelWidget* w = getWidget<LabelWidget>("info_addons");
     const core::stringw &news_text = NewsManager::get()->getNextNewsMessage();
@@ -135,8 +142,25 @@ void MainMenuScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void MainMenuScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void MainMenuScreen::onUpdate(float delta)
+
 {
+    if(CurrentUser::get()->getUserState()==CurrentUser::US_GUEST ||
+        CurrentUser::get()->getUserState()==CurrentUser::US_SIGNED_IN)
+    {
+        m_online->setActivated();
+        m_online->setLabel( _("Online"));
+    }
+    else if(CurrentUser::get()->getUserState()==CurrentUser::US_SIGNED_OUT)
+    {
+        m_online->setActivated();
+        m_online->setLabel( _("Login" ));
+    }
+    else // now must be either logging in or logging out
+        m_online->setDeactivated();
+            
+    m_online->setLabel(CurrentUser::get()->getID() ? _("Online")
+                                                   : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -316,7 +340,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
         // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+        StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
                                                 device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
@@ -339,8 +363,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        GameSlot* slot = unlock_manager->getCurrentSlot();
-        if (slot->isFirstTime())
+        PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        if (player->isFirstTime())
         {
             StateManager::get()->enterGameState();
             race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -359,7 +383,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             const std::string default_kart = UserConfigParams::m_default_kart;
-            if (slot->isLocked(default_kart))
+            if (player->isLocked(default_kart))
             {
                 KartSelectionScreen *next = OfflineKartSelectionScreen::getInstance();
                 next->setGoToOverworldNext();
@@ -380,7 +404,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Allow STK to connect to the Internet\"."));
             return;
         }
-        StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        if(CurrentUser::get()->getID())
+            StateManager::get()->pushScreen(OnlineScreen::getInstance());
+        else
+            StateManager::get()->pushScreen(LoginScreen::getInstance());
     }
     else if (selection == "addons")
     {

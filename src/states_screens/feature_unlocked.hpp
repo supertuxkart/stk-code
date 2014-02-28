@@ -126,7 +126,7 @@ class FeatureUnlockedCutScene : public GUIEngine::Screen, public GUIEngine::Scre
 public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt, irr::video::IVideoDriver*) OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

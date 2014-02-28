@@ -31,62 +31,10 @@
 class RegistrationDialog : public GUIEngine::ModalDialog
 {
 public:
-    enum Phase
-    {
-        Input = 1,
-        Terms = 2,
-        Info  = 4
-    };
     RegistrationDialog();
     ~RegistrationDialog();
 
-    void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual void onUpdate(float dt);
-    virtual bool onEscapePressed();
-
-private:
-    Phase m_phase;
-    bool m_self_destroy;
-    bool m_show_registration_input;
-    bool m_show_registration_terms;
-    bool m_show_registration_info;
-
-    const Online::XMLRequest * m_sign_up_request;
-
-    //Saved user input :
-    irr::core::stringw m_username;
-    irr::core::stringw m_password;
-    irr::core::stringw m_password_confirm;
-    irr::core::stringw m_email;
-    irr::core::stringw m_email_confirm;
-    irr::core::stringw m_registration_error;
-    bool m_agreement;
-
-    GUIEngine::TextBoxWidget * m_username_widget;
-    GUIEngine::TextBoxWidget * m_password_widget;
-    GUIEngine::TextBoxWidget * m_password_confirm_widget;
-    GUIEngine::TextBoxWidget * m_email_widget;
-    GUIEngine::TextBoxWidget * m_email_confirm_widget;
-
-    GUIEngine::LabelWidget * m_info_widget;
-
-    GUIEngine::RibbonWidget * m_options_widget;
-    GUIEngine::IconButtonWidget * m_previous_widget;
-    GUIEngine::IconButtonWidget * m_next_widget;
-    GUIEngine::IconButtonWidget * m_cancel_widget;
-
-    GUIEngine::CheckBoxWidget * m_accept_terms_widget;
-
-    void showRegistrationInput();
-    void showRegistrationTerms();
-    void showRegistrationInfo();
-    void processInput();
-    bool processInputEvent(const std::string& eventSource);
-    bool processTermsEvent(const std::string& eventSource);
-    bool processInfoEvent(const std::string& eventSource);
-
-};
+};   // class RegistrationDialog
 
 #endif

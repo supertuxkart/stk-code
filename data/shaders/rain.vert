@@ -1,4 +1,3 @@
-#version 130
 uniform float screenw;
 
 void main()

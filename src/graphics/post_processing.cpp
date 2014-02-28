@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -57,7 +58,11 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
                          "AreaMap33", false);
-    if (!areamap) Log::fatal("postprocessing", "Failed to load the areamap");
+	if (!areamap)
+	{
+		Log::fatal("postprocessing", "Failed to load the areamap");
+		return;
+	}
     m_areamap = irr_driver->getVideoDriver()->getTexture(areamap);
     areamap->drop();
 
@@ -208,7 +213,7 @@ void renderBloom(ITexture *in)
 	glUniform1f(FullScreenShader::BloomShader::uniform_low, threshold);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::BloomShader::uniform_texture, 0);
@@ -231,7 +236,7 @@ void renderBloomBlend(ITexture *in)
 	glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::BloomBlendShader::uniform_texture, 0);
@@ -257,11 +262,11 @@ void renderPPDisplace(ITexture *in)
 	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_viz, irr_driver->getDistortViz());
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_tex, 0);
 
 	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_DISPLACE))->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(irr_driver->getRTT(RTT_DISPLACE)));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_dtex, 1);
@@ -290,7 +295,7 @@ void renderColorLevel(ITexture *in)
 	glUniform2f(FullScreenShader::ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
@@ -302,7 +307,7 @@ void renderColorLevel(ITexture *in)
 	glEnable(GL_DEPTH_TEST);
 }
 
-void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
+void PostProcessing::renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
 {
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
@@ -312,18 +317,9 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glUseProgram(FullScreenShader::PointLightShader::Program);
 	glBindVertexArray(FullScreenShader::PointLightShader::vao);
 
-	glUniform4fv(FullScreenShader::PointLightShader::uniform_center, 16, positions.data());
-	glUniform4fv(FullScreenShader::PointLightShader::uniform_col, 16, colors.data());
-	glUniform1fv(FullScreenShader::PointLightShader::uniform_energy, 16, energy.data());
-	glUniform1f(FullScreenShader::PointLightShader::uniform_spec, 200);
-	glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_invproj, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-	glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_viewm, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::PointLightShader::uniform_ntex, 0);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0, 1);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -333,50 +329,48 @@ void PostProcessing::renderPointlight(ITexture *in, const std::vector<float> &po
 	glDisable(GL_BLEND);
 }
 
-void PostProcessing::renderLightbBlend(ITexture *diffuse, ITexture *specular, ITexture *ao, ITexture *specmap, bool debug)
+void PostProcessing::renderSunlight()
 {
-	const SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-	glStencilFunc(GL_EQUAL, 1, ~0);
-	glEnable(GL_STENCIL_TEST);
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	if (debug)
-		glBlendFunc(GL_ONE, GL_ZERO);
-	else
-		glBlendFunc(GL_DST_COLOR, GL_ZERO);
-	glDisable(GL_DEPTH_TEST);
+  SunLightProvider * const cb = (SunLightProvider *) irr_driver->getCallback(ES_SUNLIGHT);
 
-	glUseProgram(FullScreenShader::LightBlendShader::Program);
-	glBindVertexArray(FullScreenShader::LightBlendShader::vao);
+  glEnable(GL_BLEND);
+  glDisable(GL_DEPTH_TEST);
+  glBlendFunc(GL_ONE, GL_ONE);
+  glBlendEquation(GL_FUNC_ADD);
 
-	glUniform3f(FullScreenShader::LightBlendShader::uniform_ambient, s.r, s.g, s.b);
+  glUseProgram(FullScreenShader::SunLightShader::Program);
+  glBindVertexArray(FullScreenShader::SunLightShader::vao);
+  setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+  setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
+  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glBindVertexArray(0);
+}
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(diffuse)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_diffuse, 0);
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specular)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_specular, 1);
-	glActiveTexture(GL_TEXTURE2);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(ao)->getOpenGLTextureName());
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_ambient_occlusion, 2);
-	glActiveTexture(GL_TEXTURE3);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(specmap)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::LightBlendShader::uniform_specular_map, 3);
+void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, GLuint depthtex)
+{
+    SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_STENCIL_TEST);
+    glEnable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glBlendEquation(GL_FUNC_ADD);
+
+    glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
+    glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, depthtex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
 }
 
 
@@ -392,7 +386,7 @@ void PostProcessing::renderGaussian3Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
@@ -407,7 +401,7 @@ void PostProcessing::renderGaussian3Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(temprtt)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(temprtt));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
@@ -432,7 +426,7 @@ void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian6VBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(in)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
@@ -447,7 +441,7 @@ void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *t
 		glUniform2f(FullScreenShader::Gaussian6HBlurShader::uniform_pixel, inv_width, inv_height);
 
 		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(temprtt)->getOpenGLTextureName());
+        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(temprtt));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
@@ -468,7 +462,7 @@ void PostProcessing::renderPassThrough(ITexture *tex)
 	glBindVertexArray(FullScreenShader::PassThroughShader::vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
@@ -481,6 +475,27 @@ void PostProcessing::renderPassThrough(ITexture *tex)
 	glDisable(GL_BLEND);
 }
 
+void PostProcessing::renderPassThrough(GLuint tex)
+{
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(FullScreenShader::PassThroughShader::Program);
+    glBindVertexArray(FullScreenShader::PassThroughShader::vao);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}
+
 void PostProcessing::renderGlow(ITexture *tex)
 {
 	glDisable(GL_DEPTH_TEST);
@@ -489,9 +504,9 @@ void PostProcessing::renderGlow(ITexture *tex)
 	glBindVertexArray(FullScreenShader::GlowShader::vao);
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glUniform1i(FullScreenShader::GlowShader::uniform_tex, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -502,25 +517,24 @@ void PostProcessing::renderGlow(ITexture *tex)
 	glDisable(GL_BLEND);
 }
 
+ITexture *noise_tex = 0;
 
 void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm)
 {
 	glDisable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+	glDisable(GL_ALPHA_TEST);
+
+	if (!noise_tex)
+		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 
 	glUseProgram(FullScreenShader::SSAOShader::Program);
 	glBindVertexArray(FullScreenShader::SSAOShader::vao);
-	glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
-	glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
-	glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_LINEAR, GL_LINEAR);
+    setTexture(2, getTextureGLuint(noise_tex), GL_NEAREST, GL_NEAREST);
 
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glUniform1i(FullScreenShader::SSAOShader::uniform_normals_and_depth, 0);
+	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -529,7 +543,7 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 	glEnable(GL_DEPTH_TEST);
 }
 
-void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix4 &ipvmat)
+void PostProcessing::renderFog(const core::matrix4 &ipvmat)
 {
 	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
 	const Track * const track = World::getWorld()->getTrack();
@@ -542,9 +556,9 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	const float end = track->getFogEnd();
 	const SColor tmpcol = track->getFogColor();
 
-	const float col[3] = { tmpcol.getRed() / 255.0f,
+	core::vector3df col( tmpcol.getRed() / 255.0f,
 		tmpcol.getGreen() / 255.0f,
-		tmpcol.getBlue() / 255.0f };
+		tmpcol.getBlue() / 255.0f );
 
 	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
@@ -554,17 +568,8 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	glUseProgram(FullScreenShader::FogShader::Program);
 	glBindVertexArray(FullScreenShader::FogShader::vao);
 
-	glUniform1f(FullScreenShader::FogShader::uniform_fogmax, fogmax);
-	glUniform1f(FullScreenShader::FogShader::uniform_startH, startH);
-	glUniform1f(FullScreenShader::FogShader::uniform_endH, endH);
-	glUniform1f(FullScreenShader::FogShader::uniform_start, start);
-	glUniform1f(FullScreenShader::FogShader::uniform_end, end);
-	glUniform3f(FullScreenShader::FogShader::uniform_col, col[0], col[1], col[2]);
-	glUniform3f(FullScreenShader::FogShader::uniform_campos, campos.X, campos.Y, campos.Z);
-	glUniformMatrix4fv(FullScreenShader::FogShader::uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->getOpenGLTextureName());
-	glUniform1i(FullScreenShader::FogShader::uniform_tex, 0);
+    setTexture(0, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -572,6 +577,75 @@ void PostProcessing::renderFog(const core::vector3df &campos, const core::matrix
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glEnable(GL_DEPTH_TEST);
 	glDisable(GL_BLEND);
+}
+
+void PostProcessing::renderMotionBlur(unsigned cam, ITexture *in, ITexture *out)
+{
+
+    MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+        getCallback(ES_MOTIONBLUR);
+
+    scene::ICameraSceneNode * const camnode =
+        Camera::getCamera(cam)->getCameraSceneNode();
+    // Calculate the kart's Y position on screen
+    const core::vector3df pos =
+        Camera::getCamera(cam)->getKart()->getNode()->getPosition();
+    float ndc[4];
+    core::matrix4 trans = camnode->getProjectionMatrix();
+    trans *= camnode->getViewMatrix();
+
+    trans.transformVect(ndc, pos);
+    const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
+    setMotionBlurCenterY(cam, karty);
+
+    irr_driver->getVideoDriver()->setRenderTarget(out, true, false);
+
+    glUseProgram(FullScreenShader::MotionBlurShader::Program);
+    glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
+
+    setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MotionBlurShader::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam), cb->getDirection(cam), 0.15, cb->getMaxHeight(cam) * 0.7, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}
+
+static void renderGodFade(GLuint tex, const SColor &col)
+{
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(FullScreenShader::GodFadeShader::Program);
+    glBindVertexArray(FullScreenShader::GodFadeShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodFadeShader::setUniforms(col, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+}
+
+static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
+{
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+
+    glUseProgram(FullScreenShader::GodRayShader::Program);
+    glBindVertexArray(FullScreenShader::GodRayShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodRayShader::setUniforms(sunpos, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
 }
 
 // ----------------------------------------------------------------------------
@@ -649,9 +723,6 @@ void PostProcessing::render()
                 // Additively blend on top of tmp1
 				drv->setRenderTarget(out, false, false);
 				renderBloomBlend(irr_driver->getRTT(RTT_EIGHTH1));
-				m_material.MaterialType = irr_driver->getShader(ES_RAIN);
-				drv->setMaterial(m_material);
-				static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
             } // end if bloom
 
             in = irr_driver->getRTT(RTT_TMP1);
@@ -660,39 +731,41 @@ void PostProcessing::render()
         PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
-        if (World::getWorld()->getTrack()->hasGodRays() && m_sunpixels > 30) // god rays
+        if (m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
         {
             // Grab the sky
             drv->setRenderTarget(out, true, false);
-            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
+//            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
+            irr_driver->renderSkybox();
 
             // Set the sun's color
-            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
             const SColor col = World::getWorld()->getTrack()->getSunColor();
-            colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
+            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
+                colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
 
             // The sun interposer
-            IMeshSceneNode * const sun = irr_driver->getSunInterposer();
-            sun->getMaterial(0).ColorMask = ECP_ALL;
+            STKMeshSceneNode *sun = irr_driver->getSunInterposer();
+/*            sun->getMaterial(0).ColorMask = ECP_ALL;
+            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);*/
             irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
-            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);
-
+            irr_driver->setPhase(GLOW_PASS);
             sun->render();
 
-            sun->getMaterial(0).ColorMask = ECP_NONE;
+            //sun->getMaterial(0).ColorMask = ECP_NONE;
 
             // Fade to quarter
-            m_material.MaterialType = irr_driver->getShader(ES_GODFADE);
-            m_material.setTexture(0, out);
-            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), false, false);
 
-            drawQuad(cam, m_material);
+            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), false, false);
+            renderGodFade(getTextureGLuint(out), col);
+
 
             // Blur
 			renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER1),
                                 irr_driver->getRTT(RTT_QUARTER2),
                                 4.f / UserConfigParams::m_width,
                                 4.f / UserConfigParams::m_height);
+
+
 
             // Calculate the sun's position in texcoords
             const core::vector3df pos = sun->getPosition();
@@ -708,63 +781,33 @@ void PostProcessing::render()
             const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
             const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
 
-            ((GodRayProvider *) irr_driver->getCallback(ES_GODRAY))->
-                setSunPosition(sunx, suny);
+//            ((GodRayProvider *) irr_driver->getCallback(ES_GODRAY))->
+//                setSunPosition(sunx, suny);
 
             // Rays please
-            m_material.MaterialType = irr_driver->getShader(ES_GODRAY);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
             drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), true, false);
-
-            drawQuad(cam, m_material);
+            renderGodRay(getTextureGLuint(irr_driver->getRTT(RTT_QUARTER1)), core::vector2df(sunx, suny));
 
             // Blur
-            {
-                gacb->setResolution(UserConfigParams::m_width / 4,
-                                    UserConfigParams::m_height / 4);
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), true, false);
+            renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER2),
+                irr_driver->getRTT(RTT_QUARTER1),
+                4.f / UserConfigParams::m_width,
+                4.f / UserConfigParams::m_height);
 
-                drawQuad(cam, m_material);
+            // Blend
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
 
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), false, false);
-
-                drawQuad(cam, m_material);
-            }
-
-            // Overlay
-            m_material.MaterialType = EMT_TRANSPARENT_ADD_COLOR;
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
             drv->setRenderTarget(in, false, false);
-
-            drawQuad(cam, m_material);
+            renderPassThrough(irr_driver->getRTT(RTT_QUARTER2));
         }
         PROFILER_POP_CPU_MARKER();
 
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
             PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
-            // Calculate the kart's Y position on screen
-            const core::vector3df pos =
-                Camera::getCamera(cam)->getKart()->getNode()->getPosition();
-            float ndc[4];
-            core::matrix4 trans = camnode->getProjectionMatrix();
-            trans *= camnode->getViewMatrix();
-
-            trans.transformVect(ndc, pos);
-            const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-            setMotionBlurCenterY(cam, karty);
-
-
-            m_material.MaterialType = irr_driver->getShader(ES_MOTIONBLUR);
-            m_material.setTexture(0, in);
-            drv->setRenderTarget(out, true, false);
-
-            drawQuad(cam, m_material);
-
+            renderMotionBlur(cam, in, out);
             ITexture *tmp = in;
             in = out;
             out = tmp;
@@ -782,6 +825,10 @@ void PostProcessing::render()
             out = tmp;
             PROFILER_POP_CPU_MARKER();
         }
+
+/*        m_material.MaterialType = irr_driver->getShader(ES_RAIN);
+        drv->setMaterial(m_material);
+        static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();*/
 
         if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
         {
@@ -849,8 +896,6 @@ void PostProcessing::render()
 			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         else if (irr_driver->getSSAOViz())
 			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
-        else if (irr_driver->getShadowViz())
-			renderPassThrough(irr_driver->getRTT(RTT_SHADOW));
         else
 			renderColorLevel(in);
     }

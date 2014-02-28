@@ -1,5 +1,5 @@
-#version 130
 uniform sampler2D ntex;
+uniform sampler2D dtex;
 
 uniform vec4 center[16];
 uniform vec4 col[16];
@@ -8,15 +8,33 @@ uniform float spec;
 uniform mat4 invproj;
 uniform mat4 viewm;
 
+#if __VERSION__ >= 130
 in vec2 uv;
+out vec4 Diffuse;
+out vec4 Specular;
+#else
+varying vec2 uv;
+#define Diffuse gl_FragData[0]
+#define Specular gl_FragData[1]
+#endif
+
+
+vec3 DecodeNormal(vec2 n)
+{
+  float z = dot(n, n) * 2. - 1.;
+  vec2 xy = normalize(n) * sqrt(1. - z * z);
+  return vec3(xy,z);
+}
 
 void main() {
 	vec2 texc = uv;
-	float z = texture2D(ntex, texc).a;
+	float z = texture(dtex, texc).x;
+	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
 
 	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
 	xpos = invproj * xpos;
 	xpos /= xpos.w;
+	vec3 eyedir = normalize(xpos.xyz);
 
 	vec3 diffuse = vec3(0.), specular = vec3(0.);
 
@@ -29,9 +47,6 @@ void main() {
 		float att = energy[i] * 200. / (4. * 3.14 * d * d);
 		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
 
-		vec3 norm = texture2D(ntex, texc).xyz;
-		norm = (norm - 0.5) * 2.0;
-
 		// Light Direction
 		vec3 L = normalize(xpos.xyz - light_pos);
 
@@ -39,11 +54,10 @@ void main() {
 		diffuse += NdotL * light_col * att;
 		// Reflected light dir
 		vec3 R = reflect(-L, norm);
-		float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
-		float Specular = pow(RdotE, spec);
-		specular += Specular * light_col * spec_att;
+		float RdotE = max(0.0, dot(R, eyedir));
+		specular += pow(RdotE, spec) * light_col * spec_att;
 	}
 
-	gl_FragData[0] = vec4(diffuse, 1.);
-	gl_FragData[1] = vec4(specular , 1.);
+	Diffuse = vec4(diffuse, 1.);
+	Specular = vec4(specular , 1.);
 }

@@ -21,7 +21,6 @@
 #ifndef HEADER_PLAYERKART_HPP
 #define HEADER_PLAYERKART_HPP
 
-#include "config/player.hpp"
 #include "karts/controller/controller.hpp"
 
 class AbstractKart;

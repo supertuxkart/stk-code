@@ -20,6 +20,8 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
+#include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
@@ -71,7 +73,7 @@ const core::vector3df& TrackObjectPresentationSceneNode::getPosition() const
     return m_node->getPosition();
 }
 
-const core::vector3df& TrackObjectPresentationSceneNode::getAbsolutePosition() const
+const core::vector3df TrackObjectPresentationSceneNode::getAbsolutePosition() const
 {
     if (m_node == NULL) return m_init_xyz;
     m_node->updateAbsolutePosition();
@@ -186,7 +188,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
                      World::getWorld()->getIdent() == IDENT_CUSTSCENE);
-
+	bool displacing = false;
+	xml_node.get("displacing", &displacing);
+	animated &= !displacing;
 
     if (animated)
     {
@@ -251,6 +255,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+	bool displacing = false;
+	xml_node->get("displacing", &displacing);
+	animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
@@ -668,6 +675,21 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
         new RacePausedDialog(0.8f, 0.6f);
         //dynamic_cast<OverWorld*>(World::getWorld())->scheduleSelectKart();
+    }
+    //action trigger near big doors in the overword to notify players that they'll open once they finish all the challenges
+    else if (m_action == "big_door")
+    {
+        m_action_active = false;
+
+        Track* m_track = World::getWorld()->getTrack();
+        unsigned int unlocked_challenges = m_track->getNumOfCompletedChallenges();
+        std::vector<OverworldChallenge> m_challenges = m_track->getChallengeList();
+
+        // allow ONE unsolved challenge : the last one
+        if (unlocked_challenges < m_challenges.size() - 1)
+        {
+            new TutorialMessageDialog(_("Complete all challenges to unlock the big door!"), true);
+        }
     }
     else if (m_action == "tutorial_drive")
     {

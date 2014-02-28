@@ -1,15 +1,25 @@
-#version 130
+uniform mat4 ModelViewProjectionMatrix;
+uniform mat4 TransposeInverseModelView;
+uniform mat4 TextureMatrix;
 
-noperspective out vec3 nor;
-noperspective out vec3 eyenor;
-noperspective out vec3 viewpos;
+#if __VERSION__ >= 130
+in vec3 Position;
+in vec3 Normal;
+in vec2 Texcoord;
+in vec4 Color;
+out vec2 uv;
+out vec3 normal;
+#else
+attribute vec3 Position;
+attribute vec3 Normal;
+attribute vec2 Texcoord;
+attribute vec4 Color;
+varying vec2 uv;
+varying vec3 normal;
+#endif
 
 void main() {
-	nor = gl_NormalMatrix * gl_Normal;
-	eyenor = gl_NormalMatrix * gl_Normal;
-	viewpos = -normalize((gl_ModelViewMatrix * gl_Vertex).xyz);
-
-	gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
-	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
-	gl_FrontColor = gl_Color;
+	normal = (TransposeInverseModelView * vec4(Normal, 0)).xyz;
+    uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
+	gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
 }

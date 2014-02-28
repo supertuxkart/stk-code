@@ -76,7 +76,7 @@ void SoccerWorld::init()
     // check for possible problems if AI karts were incorrectly added
     if(getNumKarts() > race_manager->getNumPlayers())
     {
-        fprintf(stderr, "No AI exists for this game mode\n");
+        Log::error("[SoccerWorld]", "No AI exists for this game mode");
         exit(1);
     }
     m_goal_target = race_manager->getMaxGoal();
@@ -85,7 +85,7 @@ void SoccerWorld::init()
 }   // init
 
 //-----------------------------------------------------------------------------
-/** Called then a battle is restarted.
+/** Called when a battle is restarted.
  */
 void SoccerWorld::reset()
 {
@@ -116,7 +116,7 @@ void SoccerWorld::reset()
             continue;
 
         obj->reset();
-        obj->getPhysics()->reset();
+        obj->getPhysicalObject()->reset();
     }
 
     if (m_goal_sound != NULL &&
@@ -205,7 +205,7 @@ void SoccerWorld::onCheckGoalTriggered(bool first_goal)
             continue;
 
         obj->reset();
-        obj->getPhysics()->reset();
+        obj->getPhysicalObject()->reset();
     }
 
     //Resetting the ball triggers the goal check line one more time.
@@ -391,8 +391,8 @@ void SoccerWorld::moveKartAfterRescue(AbstractKart* kart)
     }
     else
     {
-        fprintf(stderr, "WARNING: invalid position after rescue for kart %s on track %s.\n",
-                (kart->getIdent().c_str()), m_track->getIdent().c_str());
+        Log::warn("[SoccerWorld]", " Invalid position after rescue for kart %s on track %s.",
+                kart->getIdent().c_str(), m_track->getIdent().c_str());
     }
 }   // moveKartAfterRescue
 

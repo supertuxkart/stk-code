@@ -82,7 +82,7 @@ void	btRigidBody::setupRigidBody(const btRigidBody::btRigidBodyConstructionInfo&
 
 	setCollisionShape( constructionInfo.m_collisionShape );
 	m_debugBodyId = uniqueId++;
-	
+	btAssert(constructionInfo.m_mass>=0);
 	setMassProps(constructionInfo.m_mass, constructionInfo.m_localInertia);
 	updateInertiaTensor();
 

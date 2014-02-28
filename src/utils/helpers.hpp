@@ -23,15 +23,9 @@
 
 using irr::video::ITexture;
 
-float smootherstep(float, float, float);
 float clampf(float, float, float);
 
-float mix(float x, float y, float a);
-
 unsigned ispow(const unsigned in);
-unsigned npow(unsigned in);
-
-void savetex(ITexture *tex, const char *name = NULL);
 
 float noise2d(float v1, float v2 = 0);
 

@@ -1,8 +1,7 @@
-#version 130
-
 uniform sampler2D tex;
 uniform vec2 texsize;
 uniform int notex;
+out vec4 FragColor;
 
 float miplevel(in vec2 texture_coordinate)
 {
@@ -19,7 +18,7 @@ float miplevel(in vec2 texture_coordinate)
 void main() {
 
 	if (notex != 0) {
-		gl_FragColor = gl_Color;
+		FragColor = gl_Color;
 		return;
 	}
 
@@ -44,9 +43,9 @@ void main() {
 	float mixer = fract(mip);
 
 	vec4 mixcol = mix(levels[lowmip], levels[highmip], mixer);
-	vec4 tcol = texture2D(tex, gl_TexCoord[0].xy);
+	vec4 tcol = texture(tex, gl_TexCoord[0].xy);
 
 	vec3 col = mix(tcol.xyz, mixcol.xyz, mixcol.a);
 
-	gl_FragColor = vec4(col, tcol.a);
+	FragColor = vec4(col, tcol.a);
 }

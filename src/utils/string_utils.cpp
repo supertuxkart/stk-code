@@ -666,19 +666,6 @@ namespace StringUtils
     }   // encodeToHtmlEntities
 
     // ------------------------------------------------------------------------
-
-    unsigned int simpleHash(const char* input)
-    {
-         int hash = 0;
-         for (int n=0; input[n] != 0; n++)
-         {
-            hash += (hash << (hash & 0xF)) ^ input[n];
-         }
-
-         return hash;
-    }
-
-    // ------------------------------------------------------------------------
     /** Converts a version string (in the form of 'X.Y.Za-rcU' into an
      *  integer number.
      *  \param s The version string to convert.

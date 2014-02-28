@@ -87,7 +87,7 @@ private:
         // --------------------------------------------------------------------
         const UserPointer *getUserPointer(unsigned int n) const
         {
-            assert(n>=0 && n<=1);
+            assert(n<=1);
             return m_up[n];
         }   // getUserPointer
         // --------------------------------------------------------------------

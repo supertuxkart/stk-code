@@ -102,11 +102,12 @@ void GetPublicAddress::asynchronousUpdate()
         bytes[20] = '\0';
 
         // time to pick a random stun server
-        std::vector<char*> stun_servers = UserConfigParams::m_stun_servers;
+        std::vector<std::string> stun_servers = UserConfigParams::m_stun_servers;
 
         RandomGenerator random_gen;
         int rand_result = random_gen.get(stun_servers.size());
-        Log::verbose("GetPublicAddress", "Using STUN server %s", stun_servers[rand_result]);
+        Log::verbose("GetPublicAddress", "Using STUN server %s", 
+                     stun_servers[rand_result].c_str());
 
         // resolve the name into an IP address
         struct addrinfo hints, *res, *p;
@@ -116,7 +117,7 @@ void GetPublicAddress::asynchronousUpdate()
         hints.ai_family = AF_UNSPEC; // AF_INET or AF_INET6 to force version
         hints.ai_socktype = SOCK_STREAM;
 
-        if ((status = getaddrinfo(stun_servers[rand_result], NULL, &hints, &res)) != 0) {
+        if ((status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res)) != 0) {
             fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
             return;
         }
@@ -196,7 +197,7 @@ void GetPublicAddress::asynchronousUpdate()
                         case 0:
                         case 1:
                             assert(size == 8);
-                            assert(attributes[5] = 0x01); // IPv4 only
+                            assert(attributes[5] == 0x01); // IPv4 only
                             port = attributes[6]*256+attributes[7];
                             address = (attributes[8]<<24 & 0xFF000000)+(attributes[9]<<16 & 0x00FF0000)+(attributes[10]<<8 & 0x0000FF00)+(attributes[11] & 0x000000FF);
                             finish = true;

@@ -21,6 +21,8 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
@@ -130,7 +132,7 @@ void RaceResultGUI::enableAllButtons()
 
     // If something was unlocked
     // -------------------------
-    int n = unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size();
+    int n = PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
         top->setText(n==1 ? _("You completed a challenge!")
@@ -185,7 +187,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // If something was unlocked, the 'continue' button was
     // actually used to display "Show unlocked feature(s)" text.
     // ---------------------------------------------------------
-    int n = unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges().size();
+    int n = PlayerManager::get()->getCurrentPlayer()
+                                ->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
         if(name=="top")
@@ -196,7 +199,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
 
             std::vector<const ChallengeData*> unlocked =
-                unlock_manager->getCurrentSlot()->getRecentlyCompletedChallenges();
+                PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
 
             bool gameCompleted = false;
             for (unsigned int n = 0; n < unlocked.size(); n++)
@@ -208,7 +211,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 }
             }
 
-            unlock_manager->getCurrentSlot()->clearUnlocked();
+            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
 
             if (gameCompleted)
             {
@@ -540,7 +543,7 @@ GUIEngine::EventPropagation RaceResultGUI::filterActions(PlayerAction action,
 /** Called once a frame, this now triggers the rendering of the actual
  *  race result gui.
  */
-void RaceResultGUI::onUpdate(float dt, irr::video::IVideoDriver*)
+void RaceResultGUI::onUpdate(float dt)
 {
     renderGlobal(dt);
 

@@ -73,7 +73,7 @@ void* STKHost::receive_data(void* self)
         }
     }
     myself->m_listening = false;
-    delete myself->m_listening_thread;
+    free(myself->m_listening_thread);
     myself->m_listening_thread = NULL;
     Log::info("STKHost", "Listening has been stopped");
     return NULL;
@@ -302,7 +302,7 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
 
 void STKHost::broadcastPacket(const NetworkString& data, bool reliable)
 {
-    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
+    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     enet_host_broadcast(m_host, 0, packet);
     STKHost::logPacket(data, false);

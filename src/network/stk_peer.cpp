@@ -51,7 +51,13 @@ STKPeer::~STKPeer()
         m_peer = NULL;
     if (m_player_profile)
         delete m_player_profile;
-    m_player_profile = NULL;
+    m_player_profile = NULL;    
+    if (m_client_server_token)
+        delete m_client_server_token;
+    m_client_server_token = NULL;
+    if (m_token_set)
+        delete m_token_set;
+    m_token_set = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -95,7 +101,7 @@ void STKPeer::sendPacket(NetworkString const& data, bool reliable)
                 data.size(), (m_peer->address.host>>0)&0xff,
                 (m_peer->address.host>>8)&0xff,(m_peer->address.host>>16)&0xff,
                 (m_peer->address.host>>24)&0xff,m_peer->address.port);
-    ENetPacket* packet = enet_packet_create(data.c_str(), data.size()+1,
+    ENetPacket* packet = enet_packet_create(data.getBytes(), data.size() + 1,
                 (reliable ? ENET_PACKET_FLAG_RELIABLE : ENET_PACKET_FLAG_UNSEQUENCED));
     /* to debug the packet output
     printf("STKPeer: ");
@@ -126,7 +132,7 @@ uint16_t STKPeer::getPort() const
 
 bool STKPeer::isConnected() const
 {
-    Log::info("STKPeer", "The peer state is %i\n", m_peer->state);
+    Log::info("STKPeer", "The peer state is %i", m_peer->state);
     return (m_peer->state == ENET_PEER_STATE_CONNECTED);
 }
 

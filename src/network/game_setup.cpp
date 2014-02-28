@@ -40,6 +40,7 @@ GameSetup::~GameSetup()
         delete m_players[i];
     };
     m_players.clear();
+    delete m_race_config;
 }
 
 //-----------------------------------------------------------------------------

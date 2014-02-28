@@ -180,14 +180,12 @@ float Skidding::getSteeringWhenSkidding(float steering) const
             float f = (steering - m_skid_reduce_turn_min)
                    /  m_skid_reduce_turn_delta;
             return f *2.0f-1.0f;
-            break;
         }
     case SKID_ACCUMULATE_LEFT:
         {
             float f = (steering + m_skid_reduce_turn_min)
                     / m_skid_reduce_turn_delta;
             return 2.0f * f +1.0f;
-            break;
         }
     }   // switch m_skid_state
     return 0;   // keep compiler quiet

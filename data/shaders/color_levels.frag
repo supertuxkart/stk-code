@@ -1,9 +1,16 @@
-#version 130
 uniform sampler2D tex;
 uniform vec3 inlevel;
 uniform vec2 outlevel;
 
+#if __VERSION__ >= 130
 in vec2 uv;
+out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
+
+
 
 void main()
 {
@@ -11,7 +18,7 @@ void main()
 	//texc.y = 1.0 - texc.y;
 
 
-	vec4 col = texture2D(tex, texc);
+	vec4 col = texture(tex, texc);
 
 	//col = col / (1 - col);
 
@@ -25,5 +32,5 @@ void main()
 	col.rgb = (pow(((col.rgb * 255.0) - inBlack) / (inWhite - inBlack),
                 vec3(1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
   
-	gl_FragColor = vec4(col.rgb, 1.0);
+	FragColor = vec4(col.rgb, 1.0);
 }

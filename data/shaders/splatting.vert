@@ -15,15 +15,23 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#version 130
 uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 TransposeInverseModelView;
 
+#if __VERSION__ >= 130
 in vec3 Position;
 in vec2 Texcoord;
 in vec2 SecondTexcoord;
 out vec2 uv;
 out vec2 uv_bis;
+#else
+attribute vec3 Position;
+attribute vec2 Texcoord;
+attribute vec2 SecondTexcoord;
+varying vec2 uv;
+varying vec2 uv_bis;
+#endif
+
 
 void main()
 {

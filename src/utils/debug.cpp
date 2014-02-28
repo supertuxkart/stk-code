@@ -22,12 +22,15 @@
 #include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/powerup_manager.hpp"
+#include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
+#include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
 #include "utils/log.hpp"
+#include "utils/profiler.hpp"
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
 using namespace irr;
@@ -56,6 +59,7 @@ enum DebugMenuCommand
     DEBUG_GRAPHICS_BULLET_1,
     DEBUG_GRAPHICS_BULLET_2,
     DEBUG_PROFILER,
+    DEBUG_PROFILER_GENERATE_REPORT,
     DEBUG_FPS,
     DEBUG_SAVE_REPLAY,
     DEBUG_SAVE_HISTORY,
@@ -69,7 +73,11 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_NITRO,
-    DEBUG_TOGGLE_GUI
+    DEBUG_ATTACHMENT_PARACHUTE,
+    DEBUG_ATTACHMENT_BOMB,
+    DEBUG_ATTACHMENT_ANVIL,
+    DEBUG_TOGGLE_GUI,
+    DEBUG_THROTTLE_FPS
 };
 
 // -----------------------------------------------------------------------------
@@ -84,6 +92,38 @@ void addPowerup(PowerupManager::PowerupType powerup)
         kart->setPowerup(powerup, 10000);
     }
 }
+
+
+void addAttachment(Attachment::AttachmentType type)
+{
+	World* world = World::getWorld();
+	    if (world == NULL) return;
+	    for(unsigned int i = 0; i < world->getNumKarts(); i++)
+	    {
+		AbstractKart *kart = world->getKart(i);
+		if (kart->getController()->isPlayerController()) {
+			if (type == Attachment::ATTACH_ANVIL)
+			{
+				kart->getAttachment()
+					->set(type, stk_config->m_anvil_time);
+				kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+				kart->updateWeight();
+			}
+			else if (type == Attachment::ATTACH_PARACHUTE)
+			{
+				kart->getAttachment()
+			            ->set(type, stk_config->m_parachute_time);
+			}
+			else if (type == Attachment::ATTACH_BOMB)
+			{
+				kart->getAttachment()
+						->set(type, stk_config->m_bomb_time);
+			}
+		}
+	    }
+
+}
+
 
 // -----------------------------------------------------------------------------
 // Debug menu handling
@@ -132,7 +172,16 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
             
+            mnu->addItem(L"Attachments >",-1,true, true);
+            sub = mnu->getSubMenu(2);
+            sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
+            sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
+            sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
+
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
+            if (UserConfigParams::m_profiler_enabled)
+                mnu->addItem(L"Toggle capture profiler report", DEBUG_PROFILER_GENERATE_REPORT);
+            mnu->addItem(L"Do not limit FPS", DEBUG_THROTTLE_FPS);
             mnu->addItem(L"FPS",DEBUG_FPS);
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
@@ -164,7 +213,7 @@ bool onEvent(const SEvent &event)
             {
                 if(cmdID == DEBUG_GRAPHICS_RELOAD_SHADERS)
                 {
-                    Log::info("Debug", "Reloading shaders...\n");
+                    Log::info("Debug", "Reloading shaders...");
                     irr_driver->updateShaders();
                 }
                 else if (cmdID == DEBUG_GRAPHICS_RESET)
@@ -251,6 +300,14 @@ bool onEvent(const SEvent &event)
                     UserConfigParams::m_profiler_enabled =
                                             !UserConfigParams::m_profiler_enabled;
                 }
+                else if (cmdID == DEBUG_PROFILER_GENERATE_REPORT)
+                {
+                    profiler.setCaptureReport(!profiler.getCaptureReport());
+                }
+                else if (cmdID == DEBUG_THROTTLE_FPS)
+                {
+                    main_loop->setThrottleFPS(false);
+                }
                 else if (cmdID == DEBUG_FPS)
                 {
                     UserConfigParams::m_display_fps =
@@ -309,6 +366,18 @@ bool onEvent(const SEvent &event)
                         AbstractKart* kart = world->getLocalPlayerKart(i);
                         kart->setEnergy(100.0f);
                     }
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_ANVIL)
+                {
+			addAttachment(Attachment::ATTACH_ANVIL);
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_BOMB)
+                {
+			addAttachment(Attachment::ATTACH_BOMB);
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_PARACHUTE)
+                {
+			addAttachment(Attachment::ATTACH_PARACHUTE);
                 }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {

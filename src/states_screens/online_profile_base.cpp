@@ -65,9 +65,9 @@ void OnlineProfileBase::loadedFromFile()
 void OnlineProfileBase::beforeAddingWidget()
 {
     m_visiting_profile = ProfileManager::get()->getVisitingProfile();
-    if (!m_visiting_profile->isCurrentUser())
+    if (!m_visiting_profile || !m_visiting_profile->isCurrentUser())
         m_settings_tab->setVisible(false);
-}
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 void OnlineProfileBase::init()
@@ -79,12 +79,14 @@ void OnlineProfileBase::init()
     m_achievements_tab->setTooltip( _("Achievements") );
     m_settings_tab->setTooltip( _("Account Settings") );
 
-    if (m_visiting_profile->isCurrentUser())
+    if (m_visiting_profile && m_visiting_profile->isCurrentUser())
         m_header->setText(_("Your profile"), false);
-    else
+    else if (m_visiting_profile)
     {
-        m_header->setText( m_visiting_profile->getUserName() +  _("'s profile"), false);
+        m_header->setText(m_visiting_profile->getUserName() + _("'s profile"), false);
     }
+    else
+        Log::error("OnlineProfileBase", "No visting profile");
 
 }   // init
 

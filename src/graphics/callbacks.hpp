@@ -50,22 +50,6 @@ protected:
 
 //
 
-class NormalMapProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    NormalMapProvider(bool withLightmap)
-    {
-        m_with_lightmap = withLightmap;
-    }
-
-private:
-    bool m_with_lightmap;
-};
-
-//
-
 class WaterShaderProvider: public CallBase
 {
 public:
@@ -86,6 +70,10 @@ public:
 
         m_water_shader_speed_1 =
         m_water_shader_speed_2 = 0.0f;
+        m_sunpos = core::vector3df(0., 0., 0.);
+        m_speed = 0.;
+        m_height = 0.;
+        m_length = 0.;
     }
 
     void setSunPosition(const core::vector3df &in)
@@ -133,6 +121,16 @@ public:
         m_amplitude = amp;
     }
 
+	float getSpeed() const
+	{
+		return m_speed;
+	}
+
+	float getAmplitude() const
+	{
+		return m_amplitude;
+	}
+
 private:
     float m_amplitude, m_speed;
 };
@@ -152,14 +150,6 @@ public:
 
 private:
     core::vector3df m_sunpos;
-};
-
-//
-
-class SplattingProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 };
 
 //
@@ -239,10 +229,20 @@ public:
         m_maxheight[who] = height;
     }
 
+    float getMaxHeight(u32 who) const
+    {
+        return m_maxheight[who];
+    }
+
     void setBoostTime(u32 who, float time)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_boost_time[who] = time;
+    }
+
+    float getBoostTime(u32 who) const
+    {
+        return m_boost_time[who];
     }
 
     void setCenter(u32 who, float X, float Y)
@@ -252,11 +252,21 @@ public:
         m_center[who].Y = Y;
     }
 
+    core::vector2df getCenter(u32 who) const
+    {
+        return core::vector2df(m_center[who].X, m_center[who].Y);
+    }
+
     void setDirection(u32 who, float X, float Y)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_direction[who].X = X;
         m_direction[who].Y = Y;
+    }
+
+    core::vector2df getDirection(u32 who) const
+    {
+        return core::vector2df(m_direction[who].X, m_direction[who].Y);
     }
 
     void setCurrentCamera(u32 who)
@@ -338,23 +348,6 @@ private:
 
 //
 
-class GlowProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    void setResolution(int x, int y)
-    {
-        m_res[0] = (float)x;
-        m_res[1] = (float)y;
-    }
-
-private:
-    float m_res[2];
-};
-
-//
-
 class ObjectPassProvider: public CallBase
 {
 public:
@@ -382,6 +375,21 @@ public:
         m_color[1] = g;
         m_color[2] = b;
     }
+    
+    float getRed() const
+    {
+      return m_color[0];
+    }
+
+    float getGreen() const
+    {
+      return m_color[1];
+    }
+    
+    float getBlue() const
+    {
+      return m_color[2];
+    }
 
     void setPosition(float x, float y, float z)
     {
@@ -396,6 +404,11 @@ public:
         m_pos[0] = pos.X;
         m_pos[1] = pos.Y;
         m_pos[2] = pos.Z;
+    }
+    
+    core::vector3df getPosition() const
+    {
+      return core::vector3df(m_pos[0], m_pos[1], m_pos[2]);
     }
 
     void setShadowMatrix(const core::matrix4 &mat)
@@ -433,20 +446,6 @@ class MLAANeigh3Provider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class GodRayProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    // In texcoords
-    void setSunPosition(float x, float y) { m_sunpos[0] = x; m_sunpos[1] = y; }
-
-private:
-    float m_sunpos[2];
 };
 
 //
@@ -568,6 +567,28 @@ public:
 
         m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0;
     }
+
+	void update();
+
+	float getDirX() const
+	{
+		return m_dir[0];
+	}
+
+	float getDirY() const
+	{
+		return m_dir[1];
+	}
+
+	float getDir2X() const
+	{
+		return m_dir2[0];
+	}
+
+	float getDir2Y() const
+	{
+		return m_dir2[1];
+	}
 
 private:
     float m_screen[2];

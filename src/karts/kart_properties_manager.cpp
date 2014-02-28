@@ -19,13 +19,9 @@
 
 #include "karts/kart_properties_manager.hpp"
 
-#include <algorithm>
-#include <ctime>
-#include <stdio.h>
-#include <stdexcept>
-#include <iostream>
-
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
@@ -34,6 +30,12 @@
 #include "karts/kart_properties.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
+
+#include <algorithm>
+#include <ctime>
+#include <stdio.h>
+#include <stdexcept>
+#include <iostream>
 
 KartPropertiesManager *kart_properties_manager=0;
 
@@ -64,6 +66,9 @@ void KartPropertiesManager::addKartSearchDir(const std::string &s)
 }   // addKartSearchDir
 
 //-----------------------------------------------------------------------------
+/** Removes all karts from the KartPropertiesManager, so that they can be
+ *  reloade. This is necessary after a change of the screen resolution.
+ */
 void KartPropertiesManager::unloadAllKarts()
 {
     m_karts_properties.clearAndDeleteAll();
@@ -71,22 +76,7 @@ void KartPropertiesManager::unloadAllKarts()
     m_kart_available.clear();
     m_groups_2_indices.clear();
     m_all_groups.clear();
-    m_kart_search_path.clear();
 }   // unloadAllKarts
-
-//-----------------------------------------------------------------------------
-/** Reloads all karts, i.e. reloads the meshes and textures. This is used
- *  when changing the screen resolution.
- */
-void KartPropertiesManager::reLoadAllKarts()
-{
-    m_karts_properties.clearAndDeleteAll();
-    m_selected_karts.clear();
-    m_kart_available.clear();
-    m_groups_2_indices.clear();
-    m_all_groups.clear();
-    loadAllKarts(false);
-}   // reLoadAllKarts
 
 //-----------------------------------------------------------------------------
 /** Remove a kart from the kart manager.
@@ -201,8 +191,8 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     }
     catch (std::runtime_error& err)
     {
-        std::cerr << "Giving up loading '" << config_filename.c_str()
-                  << "' : " << err.what() << std::endl;
+        Log::error("[Kart_Properties_Manager]","Giving up loading '%s': %s",
+                    config_filename.c_str(), err.what());
         return false;
     }
 
@@ -211,7 +201,7 @@ bool KartPropertiesManager::loadKart(const std::string &dir)
     if (kart_properties->getVersion() < stk_config->m_min_kart_version ||
         kart_properties->getVersion() > stk_config->m_max_kart_version)
     {
-        Log::warn("Kart_Properties_Manager", "Warning: kart '%s' is not "
+        Log::warn("[Kart_Properties_Manager]", "Warning: kart '%s' is not "
                   "supported by this binary, ignored.",
                   kart_properties->getIdent().c_str());
         delete kart_properties;
@@ -316,7 +306,7 @@ void KartPropertiesManager::setUnavailableKarts(std::vector<std::string> karts)
         {
             m_kart_available[i] = false;
 
-            Log::error("Kart_Properties_Manager",
+            Log::error("[Kart_Properties_Manager]",
                        "Kart '%s' not available on all clients, disabled.",
                        m_karts_properties[i].getIdent().c_str());
         }   // kart not in list
@@ -365,7 +355,8 @@ bool KartPropertiesManager::kartAvailable(int kartid)
         if ( kartid == *it) return false;
     }
     const KartProperties *kartprop = getKartById(kartid);
-    if(unlock_manager->getCurrentSlot()->isLocked(kartprop->getIdent())) return false;
+    if( PlayerManager::get()->getCurrentPlayer()->isLocked(kartprop->getIdent()) )
+        return false;
     return true;
 }   // kartAvailable
 
@@ -437,10 +428,8 @@ void KartPropertiesManager::getRandomKartList(int count,
         catch (std::runtime_error& ex)
         {
             (void)ex;
-            std::cerr <<
-                "[KartPropertiesManager] getRandomKartList : WARNING, "
-                "can't find kart '"
-                << existing_karts[i].getKartName() << "'\n";
+            Log::error("[KartPropertiesManager]", "getRandomKartList : WARNING, "
+                "can't find kart '%s'", existing_karts[i].getKartName().c_str());
         }
     }
     for(unsigned int i=0; i<ai_list->size(); i++)
@@ -453,10 +442,8 @@ void KartPropertiesManager::getRandomKartList(int count,
         catch (std::runtime_error &ex)
         {
             (void)ex;
-            std::cerr <<
-                "[KartPropertiesManager] getRandomKartList : WARNING, "
-                "can't find kart '"
-                << (*ai_list)[i] << "'\n";
+            Log::error("[KartPropertiesManager]", "getRandomKartList : WARNING, "
+                "can't find kart '%s'",(*ai_list)[i].c_str());
         }
     }
 
@@ -477,7 +464,7 @@ void KartPropertiesManager::getRandomKartList(int count,
                 const KartProperties &kp=m_karts_properties[karts_in_group[i]];
                 if (!used[karts_in_group[i]]                 &&
                     m_kart_available[karts_in_group[i]]      &&
-                    !unlock_manager->getCurrentSlot()->isLocked(kp.getIdent())   )
+                    !PlayerManager::get()->getCurrentPlayer()->isLocked(kp.getIdent())   )
                 {
                     random_kart_queue.push_back(kp.getIdent());
                 }

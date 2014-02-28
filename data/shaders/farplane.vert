@@ -1,4 +1,3 @@
-#version 130
 uniform mat4 ModelViewProjectionMatrix;
 
 void main() {

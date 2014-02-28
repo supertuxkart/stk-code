@@ -22,8 +22,8 @@
 
 #include "audio/music_manager.hpp"
 #include "challenges/challenge_data.hpp"
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
@@ -144,14 +144,15 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
 {
-    int pointsBefore = unlock_manager->getCurrentSlot()->getPoints();
-    int pointsNow = pointsBefore + CHALLENGE_POINTS[difficulty];
+    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    int points_before = player->getPoints();
+    int points_now = points_before + CHALLENGE_POINTS[difficulty];
 
     std::vector<std::string> tracks;
     std::vector<std::string> gps;
 
-    unlock_manager->updateActiveChallengeList();
-    unlock_manager->findWhatWasUnlocked(pointsBefore, pointsNow, tracks, gps);
+    player->computeActive();
+    unlock_manager->findWhatWasUnlocked(points_before, points_now, tracks, gps);
 
     for (unsigned int i = 0; i < tracks.size(); i++)
     {
@@ -409,7 +410,7 @@ void FeatureUnlockedCutScene::tearDown()
     m_all_kart_models.clearAndDeleteAll();
 
     // update point count and the list of locked/unlocked stuff
-    unlock_manager->updateActiveChallengeList();
+    PlayerManager::get()->getCurrentPlayer()->computeActive();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -430,8 +431,7 @@ const float ANIM_TO = 3.0f;
 const int GIFT_EXIT_FROM = (int)ANIM_TO;
 const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
-void FeatureUnlockedCutScene::onUpdate(float dt,
-                                       irr::video::IVideoDriver* driver)
+void FeatureUnlockedCutScene::onUpdate(float dt)
 {
     m_global_time += dt;
 
@@ -667,7 +667,7 @@ void FeatureUnlockedCutScene::continueButtonPressed()
         while (m_global_time < GIFT_EXIT_TO)
         {
             // simulate all the steps of the animation until we reach the end
-            onUpdate(0.4f, irr_driver->getVideoDriver());
+            onUpdate(0.4f);
         }
     }
     else

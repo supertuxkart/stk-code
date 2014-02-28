@@ -15,7 +15,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "states_screens/tracks_screen.hpp"
+
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -24,7 +28,6 @@
 #include "race/grand_prix_data.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/tracks_screen.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
@@ -190,7 +193,7 @@ void TracksScreen::beforeAddingWidget()
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert( tracks_widget != NULL );
-    tracks_widget->setItemCountHint( track_manager->getNumberOfTracks() );
+    tracks_widget->setItemCountHint( track_manager->getNumberOfTracks()+1 );
 }
 
 // -----------------------------------------------------------------------------
@@ -235,7 +238,7 @@ void TracksScreen::init()
             sshot_files.push_back("gui/main_help.png");
         }
 
-        if (unlock_manager->getCurrentSlot()->isLocked(gp->getId()))
+        if (PlayerManager::get()->getCurrentPlayer()->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem(_("Locked!"),
                                         "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
@@ -300,7 +303,7 @@ void TracksScreen::buildTrackList()
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
+            if(PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,
@@ -331,7 +334,7 @@ void TracksScreen::buildTrackList()
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (unlock_manager->getCurrentSlot()->isLocked(curr->getIdent()))
+            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,

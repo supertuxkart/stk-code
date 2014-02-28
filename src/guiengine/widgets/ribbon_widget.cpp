@@ -594,7 +594,7 @@ void RibbonWidget::unfocused(const int playerID, Widget* new_focus)
 {
     if (new_focus != NULL && new_focus != this && !m_active_children.contains(new_focus))
     {
-        if (m_selection[playerID] >= 0 && m_selection[playerID] < int(m_children.size()))
+        if (m_selection[playerID] >= 0 && m_selection[playerID] < int(m_active_children.size()))
         {
             m_active_children.get(m_selection[playerID])->unfocused(playerID, new_focus);
         }
@@ -730,7 +730,6 @@ void RibbonWidget::setLabel(const unsigned int id, irr::core::stringw new_name)
     // ignore this call for ribbons without labels
     if (m_labels.size() == 0) return;
 
-    assert(id >= 0);
     assert(id < m_labels.size());
     m_labels[id].setText( new_name.c_str() );
     m_text = new_name;

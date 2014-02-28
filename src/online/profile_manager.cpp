@@ -29,202 +29,225 @@
 
 using namespace Online;
 
-namespace Online{
-    static ProfileManager* profile_manager_singleton(NULL);
+namespace Online
+{
 
-    ProfileManager* ProfileManager::get()
-    {
-        if (profile_manager_singleton == NULL)
-            profile_manager_singleton = new ProfileManager();
-        return profile_manager_singleton;
+ProfileManager* ProfileManager::m_profile_manager = NULL;
+
+// ------------------------------------------------------------------------
+/** Private constructor, used by static create() function.
+ */
+ProfileManager::ProfileManager()
+{
+    assert(m_max_cache_size > 1);
+    m_currently_visiting = NULL;
+}   // ProfileManager
+
+// ------------------------------------------------------------------------
+/** Destructor, which frees the persistent and cached data.
+ */
+ProfileManager::~ProfileManager()
+{
+    clearPersistent();
+    ProfilesMap::iterator it;
+    for (it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it) {
+        delete it->second;
     }
+}   // ~ProfileManager
 
-    void ProfileManager::deallocate()
+// ------------------------------------------------------------------------
+/** Search for a given profile in the set of persistent and cached
+ *  entries. If the profile does not exist, a NULL is returned.
+ *  FIXME: This should be improved to download the profile is necessary.
+ *  \param id The id of the profile to find.
+ */
+Profile * ProfileManager::getProfileByID(const uint32_t id)
+{
+    if (inPersistent(id))
+        return m_profiles_persistent[id];
+    if (isInCache(id))
+        return m_profiles_cache[id];
+    //FIXME not able to get! Now this should actually fetch the info from the
+    // server, but I haven't come up with a good asynchronous idea yet.
+    return NULL;
+}   // getProfileByID
+
+// ------------------------------------------------------------------------
+/** Adds profile to the cache. If the profile is already persistent, then
+*  it merges any new information from this profile to the persistent one.
+*  If the entry is already in the cache, the cached entry will be updated
+*  with any new information from the given profile. Otherwise, the profile
+*  is just added to the cache.
+*/
+void ProfileManager::addToCache(Profile * profile)
+{
+    if (inPersistent(profile->getID()))
+        m_profiles_persistent[profile->getID()]->merge(profile);
+    else if (isInCache(profile->getID()))
+        m_profiles_cache[profile->getID()]->merge(profile);
+    else
+        addDirectToCache(profile);
+}   // addToCache
+
+// ------------------------------------------------------------------------
+/** Initialisation before the object is displayed. If necessary this function
+ *  will pause the race if it is running (i.e. world exists). While only some
+ *  of the screen can be shown during the race (via the in-game menu you
+ *  can get the options screen and the help screens only). This is used by
+ *  the RaceResultGUI to leave the race running (for the end animation) while
+ *  the results are being shown.
+ */
+void ProfileManager::addDirectToCache(Profile* profile)
+{
+    assert(profile != NULL);
+    if (m_profiles_cache.size() == m_max_cache_size)
     {
-        delete profile_manager_singleton;
-        profile_manager_singleton = NULL;
-    }   // deallocate
-
-    // ============================================================================
-    ProfileManager::ProfileManager()
-    {
-        assert(m_max_cache_size > 1);
-        m_currently_visiting = NULL;
-    }
-
-    // ============================================================================
-    ProfileManager::~ProfileManager()
-    {
-        clearPersistent();
-        ProfilesMap::iterator it;
-        for ( it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it ) {
-            delete it->second;
-        }
-    }
-
-    // ============================================================================
-
-    void ProfileManager::iterateCache(Profile * profile)
-    {
-        if(m_profiles_cache.size() == m_max_cache_size)
+        // We have to replace a cached entry, find one entry that 
+        // doesn't have its used bit set
+        ProfilesMap::iterator iter;
+        for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
         {
-            profile->setCacheBit(true);
-            ProfilesMap::iterator iter;
-            for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
+            if (!iter->second->getCacheBit())
             {
-               if (!iter->second->getCacheBit())
-                   return;
+                delete iter->second;
+                m_profiles_cache.erase(iter);
+                break;
             }
-            //All cache bits are one! Set them all to zero except the one currently being visited
-            for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end(); ++iter)
-            {
-               iter->second->setCacheBit(false);
-            }
-            profile->setCacheBit(true);
+            else
+                ++iter;
         }
-
     }
+    m_profiles_cache[profile->getID()] = profile;
+    assert(m_profiles_cache.size() <= m_max_cache_size);
 
-    // ============================================================================
-    /** Initialisation before the object is displayed. If necessary this function
-     *  will pause the race if it is running (i.e. world exists). While only some
-     *  of the screen can be shown during the race (via the in-game menu you
-     *  can get the options screen and the help screens only). This is used by
-     *  the RaceResultGUI to leave the race running (for the end animation) while
-     *  the results are being shown.
-     */
-    void ProfileManager::directToCache(Profile * profile)
+}   // addDirectToCache
+
+// ------------------------------------------------------------------------
+/** Checks if a profile is in cache. If so, it updates its usage bit.
+*  \param id Identifier for the profile to check.
+*/
+bool ProfileManager::isInCache(const uint32_t id)
+{
+    ProfilesMap::const_iterator i = m_profiles_cache.find(id);
+    if (i != m_profiles_cache.end())
     {
-        assert(profile != NULL);
-        if(m_profiles_cache.size() == m_max_cache_size)
+        updateCacheBits(i->second);
+        return true;
+    }
+    return false;
+}   // isInCache
+
+// ------------------------------------------------------------------------
+/** This function updates the cache bits of all cached entries. It will
+*  set the cache bit of the given profile. Then, if the cachen is full
+*  it will check if there are any entries that don't have the cache bit
+*  set (i.e. entries that can be discarded because they were not used).
+*  If no such entry is found, all usage flags will be reset, and only
+*  the one for the given entry will remain set. This results with high
+*  probability that most often used entries will remain in the cache,
+*  without adding much overhead.
+*/
+void ProfileManager::updateCacheBits(Profile * profile)
+{
+    profile->setCacheBit(true);
+    if (m_profiles_cache.size() == m_max_cache_size)
+    {
+        ProfilesMap::iterator iter;
+        for (iter = m_profiles_cache.begin();
+            iter != m_profiles_cache.end(); ++iter)
         {
-            ProfilesMap::iterator iter;
-            for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
-            {
-               if (!iter->second->getCacheBit())
-               {
-                   delete iter->second;
-                   m_profiles_cache.erase(iter);
-                   break;
-               }
-               else
-                   ++iter;
-            }
+            if (!iter->second->getCacheBit())
+                return;
         }
-        m_profiles_cache[profile->getID()] = profile;
-        assert(m_profiles_cache.size() <= m_max_cache_size);
-
-    }
-
-    // ============================================================================
-    /**
-     * Adds a profile to the persistent map.
-     * If a profile with the same id is already in there, the profiles are "merged" with as goal saving as much information.
-     * (i.e. one profile instance could have already fetched the friends, while the other could have fetched the achievements.)
-     */
-    void ProfileManager::addPersistent(Profile * profile)
-    {
-        if(inPersistent(profile->getID()))
+        // All cache bits are set! Set them all to zero except the one
+        // currently being visited
+        for (iter = m_profiles_cache.begin();
+            iter != m_profiles_cache.end(); ++iter)
         {
-            m_profiles_persistent[profile->getID()]->merge(profile);
+            iter->second->setCacheBit(false);
         }
-        else
-        {
-            m_profiles_persistent[profile->getID()] = profile;
-        }
+        profile->setCacheBit(true);
     }
-    // ============================================================================
-    /**
-     * Removes and deletes an entry from the persistent map.
-     */
-    void ProfileManager::deleteFromPersistent(const uint32_t id)
+
+}   // updateCacheBits
+
+// ------------------------------------------------------------------------
+/** True if the profile with the given id is persistent.
+*  \param id The id of the profile to test.
+*/
+bool ProfileManager::inPersistent(const uint32_t id)
+{
+    return m_profiles_persistent.find(id) != m_profiles_persistent.end();
+}   // inPersistent
+
+// ------------------------------------------------------------------------
+/** Adds a profile to the persistent map. If a profile with the same id 
+ *  is already in there, the profiles are "merged" with the goal to save as
+ *  much information (i.e. one profile instance could have already fetched
+ *  the friends, while the other could have fetched the achievements.)
+ *  \param profile The profile to make persistent.
+ */
+void ProfileManager::addPersistent(Profile * profile)
+{
+    if (inPersistent(profile->getID()))
     {
-        if (inPersistent(id))
-        {
-            delete m_profiles_persistent[id];
-            m_profiles_persistent.erase(id);
-        }
-        else
-            Log::warn("ProfileManager::removePersistent", "Tried to remove profile with id %d from persistent while not present", id);
+        m_profiles_persistent[profile->getID()]->merge(profile);
     }
-
-    // ============================================================================
-
-    void ProfileManager::clearPersistent()
+    else
     {
-        ProfilesMap::iterator it;
-        for ( it = m_profiles_persistent.begin(); it != m_profiles_persistent.end(); ++it ) {
-            delete it->second;
-        }
-        m_profiles_persistent.clear();
+        m_profiles_persistent[profile->getID()] = profile;
     }
+}   // addPersistent
 
-    // ============================================================================
-
-    void ProfileManager::moveToCache(const uint32_t id)
+// ------------------------------------------------------------------------
+/** Removes and deletes an entry from the persistent map.
+ *  \param id the id of the profile to be removed.
+ */
+void ProfileManager::deleteFromPersistent(const uint32_t id)
+{
+    if (inPersistent(id))
     {
-        if (inPersistent(id))
-        {
-            Profile * profile = getProfileByID(id);
-            m_profiles_persistent.erase(id);
-            addToCache(profile);
-        }
-        else
-            Log::warn("ProfileManager::moveToCache", "Tried to move profile with id %d from persistent to cache while not present", id);
+        delete m_profiles_persistent[id];
+        m_profiles_persistent.erase(id);
     }
+    else
+        Log::warn("ProfileManager",
+                  "Tried to remove profile with id %d from persistent while "
+                  "not present", id);
+}   // deleteFromPersistent
 
-    // ============================================================================
-
-    void ProfileManager::addToCache(Profile * profile)
+// ------------------------------------------------------------------------
+/** Deletes all persistent profiles.
+ */
+void ProfileManager::clearPersistent()
+{
+    ProfilesMap::iterator it;
+    for (it  = m_profiles_persistent.begin(); 
+         it != m_profiles_persistent.end(); ++it)
     {
-        if(inPersistent(profile->getID()))
-            m_profiles_persistent[profile->getID()]->merge(profile);
-        else if(cacheHit(profile->getID()))
-            m_profiles_cache[profile->getID()]->merge(profile);
-        else
-            directToCache(profile);
+        delete it->second;
     }
+    m_profiles_persistent.clear();
+}   // clearPersistent
 
-    // ============================================================================
-
-    bool ProfileManager::inPersistent(const uint32_t id)
+// ------------------------------------------------------------------------
+/** Removes a currently persistent profile to the cache (where it can
+ *  be deleted later).
+ *  \param id The the id of the profile to be moved.
+ */
+void ProfileManager::moveToCache(const uint32_t id)
+{
+    if (inPersistent(id))
     {
-        if (m_profiles_persistent.find(id) != m_profiles_persistent.end())
-            return true;
-        return false;
+        Profile * profile = getProfileByID(id);
+        m_profiles_persistent.erase(id);
+        addToCache(profile);
     }
-
-    // ============================================================================
-
-    bool ProfileManager::cacheHit(const uint32_t id)
-    {
-        if (m_profiles_cache.find(id) != m_profiles_cache.end())
-        {
-            iterateCache(m_profiles_cache[id]);
-            return true;
-        }
-        return false;
-    }
-
-    // ============================================================================
-    void ProfileManager::setVisiting(const uint32_t id)
-    {
-        m_currently_visiting = getProfileByID(id);
-    }
-
-    // ============================================================================
-
-    Profile * ProfileManager::getProfileByID(const uint32_t id)
-    {
-
-        if(inPersistent(id))
-            return m_profiles_persistent[id];
-        if(cacheHit(id))
-            return m_profiles_cache[id];
-        //FIXME not able to get! Now this should actually fetch the info from the server, but I haven't come up with a good asynchronous idea yet.
-        return NULL;
-    }
-
+    else
+        Log::warn("ProfileManager", 
+                  "Tried to move profile with id %d from persistent to "
+                  "cache while not present", id);
+}   // moveToCache
 
 
 } // namespace Online

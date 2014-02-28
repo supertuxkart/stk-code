@@ -49,6 +49,7 @@
 	#define NO_SDL_GLEXT
 	#include <SDL/SDL_video.h>
 	#include <SDL/SDL_opengl.h>
+        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
 	#include "glext.h"
 #else
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
@@ -61,9 +62,10 @@
 	#include <GL/gl.h>
 	#include <GL/glx.h>
 	#if defined(_IRR_OPENGL_USE_EXTPOINTER_)
-	#include "glext.h"
+        typedef void (APIENTRYP PFNGLBLENDEQUATIONPROC) (GLenum mode);
+	#include <GL/glext.h>
 	#undef GLX_ARB_get_proc_address // avoid problems with local glxext.h
-	#include "glxext.h"
+	#include <GL/glxext.h>
 	#endif
 #endif
 
@@ -930,6 +932,8 @@ class COpenGLExtensionHandler
 	//! queries the features of the driver, returns true if feature is available
 	bool queryOpenGLFeature(EOpenGLFeatures feature) const
 	{
+	  if (COpenGLExtensionHandler::IRR_EXT_packed_depth_stencil)
+		 return true;
 		return FeatureAvailable[feature];
 	}
 

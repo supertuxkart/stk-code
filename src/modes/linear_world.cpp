@@ -17,11 +17,10 @@
 
 #include "modes/linear_world.hpp"
 
-#include <iostream>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -33,6 +32,8 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 /** Constructs the linear world. Note that here no functions can be called
@@ -208,10 +209,10 @@ void LinearWorld::update(float dt)
     {
         if(pos_used[m_karts[i]->getPosition()]!=-99)
         {
-            for(unsigned int j =0; j<kart_amount; j++)
+            for(unsigned int j=0; j<kart_amount; j++)
             {
-                printf("kart id=%d, position=%d, finished=%d, laps=%d, "
-                       "distanceDownTrack=%f overallDistance=%f %s\n",
+                Log::verbose("[LinearWorld]", "kart id=%u, position=%d, finished=%d, laps=%d, "
+                       "distanceDownTrack=%f overallDistance=%f %s",
                     j, m_karts[j]->getPosition(),
                     m_karts[j]->hasFinishedRace(),
                     m_kart_info[j].m_race_lap,
@@ -553,9 +554,9 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 #ifdef DEBUG
     if(kart_info.m_overall_distance > full_distance)
     {
-        printf("WARNING: full distance < distance covered for kart '%s':\n",
+        Log::debug("[LinearWorld]", "Full distance < distance covered for kart '%s':",
                kart->getIdent().c_str());
-        printf("%f < %f\n", full_distance, kart_info.m_overall_distance);
+        Log::debug("[LinearWorld]", "%f < %f", full_distance, kart_info.m_overall_distance);
     }
 #endif
     // Avoid potential problems (floating point issues, coding bug?) if a
@@ -699,29 +700,29 @@ void LinearWorld::updateRacePosition()
         rank_changed |= kart->getPosition()!=p;
         if (!setKartPosition(i,p))
         {
-            std::cerr << "ERROR, same rank used twice!!\n";
+            Log::error("[LinearWorld]", "Same rank used twice!!");
 
-            std::cerr <<  "Info used to decide ranking :\n";
+            Log::debug("[LinearWorld]", "Info used to decide ranking :");
             for (unsigned int d=0; d<kart_amount; d++)
             {
-                std::cerr << "   kart " << m_karts[d]->getIdent()
-                          << " has finished(" << m_karts[d]->hasFinishedRace()
-                          << "), is at lap (" << getLapForKart(d)
-                          << "), is at distance("
-                          << m_kart_info[d].m_overall_distance
-                          << "), is eliminated(" << m_karts[d]->isEliminated()
-                          << ")" << std::endl;
+                Log::debug("[LinearWorld]", "Kart %s has finished (%d), is at lap (%u),"
+                            "is at distance (%u), is eliminated(%d)",
+                            m_karts[d]->getIdent().c_str(),
+                            m_karts[d]->hasFinishedRace(),
+                            getLapForKart(d),
+                            m_kart_info[d].m_overall_distance,
+                            m_karts[d]->isEliminated());
             }
 
-            std::cerr <<  "Who has each ranking so far :\n";
+            Log::debug("[LinearWorld]", "Who has each ranking so far :");
             for (unsigned int d=0; d<i; d++)
             {
-                std::cerr << "    " << m_karts[d]->getIdent() << " has rank "
-                          << m_karts[d]->getPosition() << std::endl;
+                Log::debug("[LinearWorld]", "%s has rank %d", m_karts[d]->getIdent().c_str(),
+                            m_karts[d]->getPosition());
             }
 
-            std::cerr << "    --> And " << kart->getIdent()
-                      << " is being set at rank " << p << std::endl;
+            Log::debug("[LinearWorld]", "    --> And %s is being set at rank %d",
+                        kart->getIdent().c_str(), p);
             history->Save();
             assert(false);
         }
@@ -749,17 +750,18 @@ void LinearWorld::updateRacePosition()
 #ifdef DEBUG_KART_RANK
     if(rank_changed)
     {
-        std::cout << "Counting laps at "<<getTime()<<" seconds.\n";
+        Log::debug("[LinearWorld]", "Counting laps at %u seconds.", getTime());
         for (unsigned int i=0; i<kart_amount; i++)
         {
             AbstractKart* kart = m_karts[i];
-            std::cout << "counting karts ahead of " << kart->getIdent()
-                << " (laps "           << m_kart_info[i].m_race_lap
-                << ", progress "       << m_kart_info[i].m_overall_distance
-                << " finished "        << kart->hasFinishedRace()
-                << " eliminated "      << kart->isEliminated()
-                << " initial position "<< kart->getInitialPosition()
-                << ").\n";
+            Log::debug("[LinearWorld]", "counting karts ahead of %s (laps %u,"
+                        " progress %u, finished %d, eliminated %d, initial position %u.",
+                        kart->getIdent().c_str(),
+                        m_kart_info[i].m_race_lap,
+                        m_kart_info[i].m_overall_distance,
+                        kart->hasFinishedRace(),
+                        kart->isEliminated(),
+                        kart->getInitialPosition());
             // Karts that are either eliminated or have finished the
             // race already have their (final) position assigned. If
             // these karts would get their rank updated, it could happen
@@ -776,36 +778,36 @@ void LinearWorld::updateRacePosition()
                 if(j == my_id) continue;
                 if(m_karts[j]->isEliminated())
                 {
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
-                              << " because it is eliminated.\n";
+                    Log::debug("[LinearWorld]", " %u: %s because it is eliminated.",
+                                p, m_karts[j]->getIdent().c_str());
                     continue;
                 }
                 if(!kart->hasFinishedRace() && m_karts[j]->hasFinishedRace())
                 {
                     p++;
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
-                              << " because it has finished the race.\n";
+                    Log::debug("[LinearWorld]", " %u: %s because it has finished the race.",
+                                p, m_karts[j]->getIdent().c_str());
                     continue;
                 }
                 if(m_kart_info[j].m_overall_distance > my_distance)
                 {
                     p++;
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
-                        << " because it is ahead "
-                        << m_kart_info[j].m_overall_distance <<".\n";
+                    Log::debug("[LinearWorld]", " %u: %s because it is ahead %u.",
+                                p, m_karts[j]->getIdent().c_str(),
+                                m_kart_info[j].m_overall_distance);
                     continue;
                 }
                 if(m_kart_info[j].m_overall_distance == my_distance &&
                    m_karts[j]->getInitialPosition()<kart->getInitialPosition())
                 {
                     p++;
-                    std::cout << "    " << p << " : " << m_karts[j]->getIdent()
-                        << " has same distance, but started ahead "
-                        << m_karts[j]->getInitialPosition()<<".\n";
+                    Log::debug("[LinearWorld]"," %u: %s has same distance, but started ahead %d",
+                                p, m_karts[j]->getIdent().c_str(),
+                                m_karts[j]->getInitialPosition());
                 }
             }   // next kart j
         }   // for i<kart_amount
-        std::cout << "-------------------------------------------\n";
+        Log::debug("LinearWorld]", "-------------------------------------------");
     }   // if rank_changed
 #endif
 #endif

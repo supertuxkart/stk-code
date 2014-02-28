@@ -60,37 +60,40 @@ public:
           m_same_powerup_mode;
 
     static float UNDEFINED;
-    float m_anvil_weight;            /**<Additional kart weight if anvil is
-                                         attached.                           */
-    float m_anvil_speed_factor;      /**<Speed decrease when attached first. */
-    float m_parachute_friction;      /**<Increased parachute air friction.   */
-    float m_parachute_done_fraction; /**<Fraction of speed when lost will
-                                         detach parachute.                   */
-    float m_parachute_time;          /**<Time a parachute is active.         */
-    float m_parachute_time_other;    /**<Time a parachute attached to other
-                                         karts is active.                    */
-    float m_bomb_time;               /**<Time before a bomb explodes.        */
-    float m_bomb_time_increase;      /**<Time added to bomb timer when it's
-                                         passed on.                          */
-    float m_anvil_time;              /**<Time an anvil is active.            */
-    float m_item_switch_time;        /**< Time items will be switched.       */
-    int   m_bubblegum_counter;       /**< How many times bubble gums must be
-                                          driven over before they disappear. */
-    float m_bubblegum_shield_time;   /**<How long a bubble gum shield lasts. */
-    bool  m_shield_restrict_weapos;  /**<Wether weapon usage is punished. */
-    float m_explosion_impulse_objects;/**<Impulse of explosion on moving
-                                          objects, e.g. road cones, ...      */
-    float m_penalty_time;            /**< Penalty time when starting too
-                                          early.                             */
-    float m_delay_finish_time;       /**<Delay after a race finished before
-                                         the results are displayed.          */
-    float m_music_credit_time;       /**<Time the music credits are
-                                         displayed.                          */
-    int   m_max_karts;               /**<Maximum number of karts.            */
-    int   m_max_history;             /**<Maximum number of frames to save in
-                                         a history files.                    */
-    bool  m_smooth_normals;          /**< If normals for raycasts for wheels
-                                         should be interpolated.             */
+    float m_anvil_weight;              /**<Additional kart weight if anvil is
+                                           attached.                           */
+    float m_anvil_speed_factor;        /**<Speed decrease when attached first. */
+    float m_parachute_friction;        /**<Increased parachute air friction.   */
+    float m_parachute_ubound_fraction; /**<Upper bound fraction of speed when
+                                           lost will detach parachute.         */
+    float m_parachute_lbound_fraction; /**<Lower bound fraction of speed when
+                                           lost will detach parachute.	       */
+    float m_parachute_max_speed;       /**<Max speed to rate current speed     */
+    float m_parachute_time;            /**<Time a parachute is active.         */
+    float m_parachute_time_other;      /**<Time a parachute attached to other
+                                           karts is active.                    */
+    float m_bomb_time;                 /**<Time before a bomb explodes.        */
+    float m_bomb_time_increase;        /**<Time added to bomb timer when it's
+                                           passed on.                          */
+    float m_anvil_time;                /**<Time an anvil is active.            */
+    float m_item_switch_time;          /**< Time items will be switched.       */
+    int   m_bubblegum_counter;         /**< How many times bubble gums must be
+                                            driven over before they disappear. */
+    float m_bubblegum_shield_time;     /**<How long a bubble gum shield lasts. */
+    bool  m_shield_restrict_weapos;    /**<Wether weapon usage is punished. */
+    float m_explosion_impulse_objects; /**<Impulse of explosion on moving
+                                            objects, e.g. road cones, ...      */
+    float m_penalty_time;              /**< Penalty time when starting too
+                                            early.                             */
+    float m_delay_finish_time;         /**<Delay after a race finished before
+                                           the results are displayed.          */
+    float m_music_credit_time;         /**<Time the music credits are
+                                           displayed.                          */
+    int   m_max_karts;                 /**<Maximum number of karts.            */
+    int   m_max_history;               /**<Maximum number of frames to save in
+                                           a history files.                    */
+    bool  m_smooth_normals;            /**< If normals for raycasts for wheels
+                                           should be interpolated.             */
     /** If the angle between a normal on a vertex and the normal of the
      *  triangle are more than this value, the physics will use the normal
      *  of the triangle in smoothing normal. */

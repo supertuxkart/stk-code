@@ -1,5 +1,11 @@
-#version 130
+#if __VERSION__ >= 130
+out vec4 FragColor;
+#else
+#define FragColor gl_FragColor
+#endif
+
+
 void main()
 {
-	gl_FragColor = vec4(1.0);
+	FragColor = vec4(1.0);
 }

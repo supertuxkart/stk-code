@@ -17,19 +17,19 @@
 
 #include "states_screens/dialogs/change_password_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
-#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "online/messages.hpp"
 
+#include <IGUIEnvironment.h>
+#include <irrString.h>
 
 using namespace GUIEngine;
 using namespace irr;
+using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 

@@ -17,11 +17,7 @@
 
 #include "guiengine/event_handler.hpp"
 
-#include <iostream>
-
-#include <IGUIEnvironment.h>
-#include <IGUIListBox.h>
-
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -36,6 +32,12 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/profiler.hpp"
+
+
+#include <IGUIEnvironment.h>
+#include <IGUIListBox.h>
+
+#include <iostream>
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;

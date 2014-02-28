@@ -187,9 +187,6 @@ private:
     /** A 'ping' sound effect to be played when the ball hits the ground. */
     SFXBase     *m_ping_sfx;
 
-    /** Sound effect to be played when a ball hits a kart. */
-    SFXBase     *m_hit_sfx;
-
     void         computeTarget();
     void         updateDistanceToTarget();
     unsigned int getSuccessorToHitTarget(unsigned int node_index,

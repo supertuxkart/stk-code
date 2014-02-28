@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <stdexcept>
 
-#include "challenges/challenge.hpp"
+
 #include "race/race_manager.hpp"
 
 /**

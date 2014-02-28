@@ -1,4 +1,4 @@
-#version 130
+#version 330 compatibility
 #define MAX_SEARCH_STEPS 8.0
 #define MAX_DISTANCE 33.0
 
@@ -8,6 +8,8 @@ uniform sampler2D edgesMap;
 uniform sampler2D areaMap;
 
 uniform vec2 PIXEL_SIZE;
+
+out vec4 FragColor;
 
 /**
  * This one just returns the first level of a mip map chain, which allow us to
@@ -77,7 +79,7 @@ vec2 Area(vec2 distance, float e1, float e2) {
 void main() {
 	vec4 areas = vec4(0.0);
 
-	vec2 e = texture2D(edgesMap, gl_TexCoord[0].xy).rg;
+	vec2 e = texture(edgesMap, gl_TexCoord[0].xy).rg;
 
 	if (e.g != 0.0) { // Edge at north
 
@@ -109,5 +111,5 @@ void main() {
 		areas.ba = Area(abs(d), e1, e2);
 	}
 
-	gl_FragColor = areas;
+	FragColor = areas;
 }

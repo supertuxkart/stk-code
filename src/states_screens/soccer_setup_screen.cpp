@@ -17,20 +17,22 @@
 
 #include "states_screens/soccer_setup_screen.hpp"
 
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/arenas_screen.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "karts/kart_properties.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "states_screens/arenas_screen.hpp"
+#include "states_screens/state_manager.hpp"
+
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );
@@ -51,8 +53,9 @@ void SoccerSetupScreen::loadedFromFile()
 {
 }
 
-// -----------------------------------------------------------------------------
-void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+// ----------------------------------------------------------------------------
+void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, 
+                                      const int playerID)
 {
     if(m_schedule_continue)
         return;
@@ -118,7 +121,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, c
             getWidget<SpinnerWidget>("goalamount")->setActivated();
         }
     }
-}
+}   // eventCallback
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::beforeAddingWidget()
@@ -187,7 +190,7 @@ void SoccerSetupScreen::beforeAddingWidget()
 
     // Update layout
     updateKartViewsLayout();
-}
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::init()
@@ -224,7 +227,7 @@ void SoccerSetupScreen::init()
     // 'fire' is not assigned to a GUI event). This is done to support the old
     // way of player joining by pressing 'fire' instead of 'select'.
     input_manager->getDeviceList()->mapFireToSelect(true);
-}
+}   // init
 
 // -----------------------------------------------------------------------------
 void SoccerSetupScreen::tearDown()
@@ -247,14 +250,14 @@ void SoccerSetupScreen::tearDown()
     m_kart_view_info.clear();
 
     Screen::tearDown();
-}
+}   // tearDown
 
 // -----------------------------------------------------------------------------
-GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction action,
-                                                               int deviceID,
-                                                               const unsigned int value,
-                                                               Input::InputType type,
-                                                               int playerId)
+GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action,
+                                                             int deviceID,
+                                                             const unsigned int value,
+                                                             Input::InputType type,
+                                                             int playerId)
 {
     if(m_schedule_continue)
         return EVENT_BLOCK;
@@ -329,7 +332,6 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
             sfx_manager->quickSound( "wee" );
         }
         return EVENT_BLOCK;
-        break;
     }
     case PA_MENU_CANCEL:
     {
@@ -350,7 +352,6 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
         }
 
         return EVENT_BLOCK;
-        break;
     }
     default:
         break;
@@ -366,11 +367,10 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(  PlayerAction acti
 
 
     return result;
-}
-
+}   // filterActions
 
 // -----------------------------------------------------------------------------
-void SoccerSetupScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void SoccerSetupScreen::onUpdate(float delta)
 {
     int nb_players = m_kart_view_info.size();
     
@@ -384,8 +384,9 @@ void SoccerSetupScreen::onUpdate(float delta,  irr::video::IVideoDriver* driver)
         m_schedule_continue = false;
         StateManager::get()->pushScreen( ArenasScreen::getInstance() );
     }
-}
+}   // onUPdate
 
+// ----------------------------------------------------------------------------
 bool SoccerSetupScreen::areAllKartsConfirmed() const
 {
     bool all_confirmed = true;
@@ -399,8 +400,9 @@ bool SoccerSetupScreen::areAllKartsConfirmed() const
         }
     }
     return all_confirmed;
-}
+}   // areAllKartsConfirmed
 
+// ----------------------------------------------------------------------------
 int SoccerSetupScreen::getNumKartsInTeam(int team)
 {
     int karts_in_team = 0;
@@ -411,8 +413,9 @@ int SoccerSetupScreen::getNumKartsInTeam(int team)
             karts_in_team++;
     }
     return karts_in_team;
-}
+}   // getNumKartsInTeam
 
+// -----------------------------------------------------------------------------
 int SoccerSetupScreen::getNumConfirmedKarts()
 {
     int confirmed_karts = 0;
@@ -425,6 +428,7 @@ int SoccerSetupScreen::getNumConfirmedKarts()
     return confirmed_karts;
 }
 
+// -----------------------------------------------------------------------------
 void SoccerSetupScreen::updateKartViewsLayout()
 {
     Widget* central_div = getWidget<Widget>("central_div");
@@ -476,4 +480,5 @@ void SoccerSetupScreen::updateKartViewsLayout()
         // Move the view
         view_info.view->move(pos_x, pos_y, kart_view_size, kart_view_size);
     }
-}
+}   // updateKartViewsLayout
+

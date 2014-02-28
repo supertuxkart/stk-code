@@ -46,7 +46,6 @@
 using irr::core::stringc;
 using irr::core::stringw;
 
-#include "io/xml_writer.hpp"
 #include "utils/constants.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/ptr_vector.hpp"
@@ -55,7 +54,7 @@ using irr::core::stringw;
 class PlayerProfile;
 class SavedGrandPrix;
 class XMLNode;
-class XMLWriter;
+class UTFWriter;
 
 /**
  *  The base of a set of small utilities to enable quickly adding/removing
@@ -69,8 +68,8 @@ protected:
     std::string m_comment;
 public:
     virtual     ~UserConfigParam();
-    virtual void write(XMLWriter& stream) const = 0;
-    virtual void writeInner(XMLWriter& stream, int level = 0) const;
+    virtual void write(UTFWriter& stream) const = 0;
+    virtual void writeInner(UTFWriter& stream, int level = 0) const;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
     virtual irr::core::stringw toString() const = 0;
@@ -86,8 +85,8 @@ public:
     GroupUserConfigParam(const char* param_name,
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
-    void write(XMLWriter& stream) const;
-    void writeInner(XMLWriter& stream, int level = 0) const;
+    void write(UTFWriter& stream) const;
+    void writeInner(UTFWriter& stream, int level = 0) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -99,7 +98,7 @@ public:
 };   // GroupUserConfigParam
 
 // ============================================================================
-template<typename T>
+template<typename T, typename U>
 class ListUserConfigParam : public UserConfigParam
 {
     std::vector<T> m_elements;
@@ -120,7 +119,7 @@ public:
                          int nb_elts,
                          ...);
 
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -135,7 +134,7 @@ public:
     float& operator=(const ListUserConfigParam& v)
             { m_elements = std::vector<T>(v); return m_elements; }
 };   // ListUserConfigParam
-typedef ListUserConfigParam<char*>    StringListUserConfigParam;
+typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
 
 // ============================================================================
 class IntUserConfigParam : public UserConfigParam
@@ -151,7 +150,7 @@ public:
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
 
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -178,7 +177,7 @@ public:
     TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         GroupUserConfigParam* group, const char* comment=NULL);
 
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -205,7 +204,7 @@ public:
                           GroupUserConfigParam* group,
                           const char* comment = NULL);
 
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -240,7 +239,7 @@ public:
                            GroupUserConfigParam* group,
                            const char* comment = NULL);
 
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -267,7 +266,7 @@ public:
     BoolUserConfigParam(bool default_value, const char* param_name,
                         GroupUserConfigParam* group,
                         const char* comment = NULL);
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -293,7 +292,7 @@ public:
                          GroupUserConfigParam* group,
                          const char* comment = NULL);
 
-    void write(XMLWriter& stream) const;
+    void write(UTFWriter& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -544,7 +543,7 @@ namespace UserConfigParams
                             "stun.counterpath.net",
                             "stun.endigovoip.com",
                             "stun.ekiga.net",
-                            "stun.ideasip.com" ,
+                            "stun.ideasip.com",
                             "stun.internetcalls.com",
                             "stun.ipns.com",
                             "stun.noc.ams-ix.net",
@@ -619,7 +618,7 @@ namespace UserConfigParams
                            &m_graphics_quality,
                            "Whether vertical sync is enabled") );
     PARAM_PREFIX BoolUserConfigParam         m_pixel_shaders
-    PARAM_DEFAULT( BoolUserConfigParam(true, "pixel_shaders",
+    PARAM_DEFAULT( BoolUserConfigParam(false, "pixel_shaders",
                                        &m_graphics_quality,
                                        "Whether to enable pixel shaders (splatting, normal maps, ...)") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
@@ -770,8 +769,6 @@ namespace UserConfigParams
     // TODO? implement blacklist for new irrlicht device and GUI
     PARAM_PREFIX std::vector<std::string>   m_blacklist_res;
 
-    PARAM_PREFIX PtrVector<PlayerProfile>   m_all_players;
-
     /** List of all saved GPs. */
     PARAM_PREFIX PtrVector<SavedGrandPrix>   m_saved_grand_prix_list;
 
@@ -826,8 +823,6 @@ public:
     const irr::core::stringw& getWarning()        { return m_warning;  }
     void  resetWarning()                          { m_warning="";      }
     void  setWarning(irr::core::stringw& warning) { m_warning=warning; }
-    void  postLoadInit();
-    void  addDefaultPlayer();
 
 };   // UserConfig
 

@@ -23,6 +23,10 @@
 #include <vector>
 #include <stack>
 #include <string>
+#include <streambuf>
+#include <ostream>
+#include <iostream>
+
 
 class Profiler;
 extern Profiler profiler;
@@ -49,6 +53,42 @@ extern Profiler profiler;
 #endif
 
 using namespace irr;
+
+/** For profiling reports, we need a custom strijng stream that writes to a large
+    pre-allocated buffer, to avoid allocating as much as possible durign profiling */
+template <typename char_type>
+struct ostreambuf : public std::basic_streambuf<char_type, std::char_traits<char_type> >
+{
+    ostreambuf(char_type* buffer, std::streamsize bufferLength)
+    {
+        // set the "put" pointer the start of the buffer and record it's length.
+        this->setp(buffer, buffer + bufferLength);
+    }
+};
+
+
+class StringBuffer
+{
+private:
+    char* m_buffer;
+    ostreambuf<char> ostreamBuffer;
+    std::ostream messageStream;
+
+public:
+
+    StringBuffer(unsigned int size) : m_buffer((char*)calloc(size, 1)), ostreamBuffer(m_buffer, size), messageStream(&ostreamBuffer)
+    {
+    }
+
+    ~StringBuffer()
+    {
+        free(m_buffer);
+    }
+
+    std::ostream& getStdStream() { return messageStream; }
+
+    char* getRawBuffer() { return m_buffer; }
+};
 
 /**
   * \brief class that allows run-time graphical profiling through the use of markers
@@ -104,6 +144,10 @@ private:
 
     FreezeState     m_freeze_state;
 
+    bool m_capture_report;
+    bool m_first_capture_sweep;
+    StringBuffer* m_capture_report_buffer;
+
 public:
     Profiler();
     virtual ~Profiler();
@@ -116,10 +160,13 @@ public:
 
     void    onClick(const core::vector2di& mouse_pos);
 
+    bool getCaptureReport() const { return m_capture_report; }
+    void setCaptureReport(bool captureReport);
 protected:
     // TODO: detect on which thread this is called to support multithreading
     ThreadInfo& getThreadInfo() { return m_thread_infos[0]; }
     void        drawBackground();
+
 };
 
 #endif // PROFILER_HPP

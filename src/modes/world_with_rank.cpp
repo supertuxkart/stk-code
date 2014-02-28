@@ -21,6 +21,7 @@
 #include "karts/kart_properties.hpp"
 #include "race/history.hpp"
 #include "tracks/track.hpp"
+#include "utils/log.hpp"
 
 #include <iostream>
 
@@ -85,22 +86,22 @@ bool WorldWithRank::setKartPosition(unsigned int kart_id,
     assert(m_position_setting_initialised);
     if(m_position_used[position-1])
     {
-        std::cerr << "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==\n";
+        Log::error("[WorldWithRank]", "== TWO KARTS ARE BEING GIVEN THE SAME POSITION!! ==");
         for (unsigned int j=0; j < m_position_index.size(); j++)
         {
             if (!m_position_used[j])
             {
-                std::cout << "    No kart is yet set at position " << j+1
-                          << std::endl;
+                Log::warn("WorldWithRank]", "No kart is yet set at position %u", j+1);
             }
             else
             {
-                std::cout << "    Kart " << m_position_index[j]
-                          << " is at position " << j << std::endl;
+                Log::warn("WorldWithRank]", "Kart %u is at position %u",
+                            m_position_index[j], j);
             }
         }
-        std::cout << "Kart " << kart_id << " is being given position "
-                  << position << ", but this position is already taken\n";
+        Log::warn("WorldWithRank]", "Kart %u is being given position %u,"
+                    "but this position is already taken",
+                    kart_id, position);
         return false;
     }
     m_position_used[position-1] = true;

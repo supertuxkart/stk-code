@@ -17,7 +17,9 @@
 
 #include "states_screens/online_profile_achievements.hpp"
 
+#include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -64,11 +66,11 @@ void OnlineProfileAchievements::beforeAddingWidget()
     OnlineProfileBase::beforeAddingWidget();
     m_achievements_list_widget->clearColumns();
     m_achievements_list_widget->addColumn( _("Name"), 2 );
-    if(m_visiting_profile->isCurrentUser())
+    if(m_visiting_profile && m_visiting_profile->isCurrentUser())
     {
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
     }
-}
+}   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
 
@@ -81,12 +83,15 @@ void OnlineProfileAchievements::init()
     {
         m_waiting_for_achievements = false;
         m_achievements_list_widget->clear();
-        const std::map<uint32_t, Achievement *> & all_achievements = AchievementsManager::get()->getActive()->getAllAchievements();
+        const std::map<uint32_t, Achievement *> & all_achievements =
+            PlayerManager::get()->getCurrentPlayer()->getAchievementsStatus()
+                                                    ->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
-        for ( it = all_achievements.begin(); it != all_achievements.end(); ++it ) {
-            PtrVector<GUIEngine::ListWidget::ListCell> * row = new PtrVector<GUIEngine::ListWidget::ListCell>;
-            row->push_back(new GUIEngine::ListWidget::ListCell(it->second->getInfo()->getTitle(),-1,2));
-            row->push_back(new GUIEngine::ListWidget::ListCell(it->second->getProgressAsString(),-1,1, true));
+        for (it = all_achievements.begin(); it != all_achievements.end(); ++it )
+        {
+            std::vector<GUIEngine::ListWidget::ListCell> row;
+            row.push_back(GUIEngine::ListWidget::ListCell(it->second->getInfo()->getTitle(),-1,2));
+            row.push_back(GUIEngine::ListWidget::ListCell(it->second->getProgressAsString(),-1,1, true));
             m_achievements_list_widget->addItem(StringUtils::toString(it->second->getInfo()->getID()), row);
         }
     }
@@ -107,12 +112,14 @@ void OnlineProfileAchievements::eventCallback(Widget* widget, const std::string&
     {
         m_selected_achievement_index = m_achievements_list_widget->getSelectionID();
 
-        new MessageDialog(AchievementsManager::get()->getAchievementInfo(atoi(m_achievements_list_widget->getSelectionInternalName().c_str()))->getDescription());
+        int id;
+        StringUtils::fromString(m_achievements_list_widget->getSelectionInternalName(), id);
+        new MessageDialog(AchievementsManager::get()->getAchievementInfo(id)->getDescription());
     }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-void OnlineProfileAchievements::onUpdate(float delta,  irr::video::IVideoDriver* driver)
+void OnlineProfileAchievements::onUpdate(float delta)
 {
     if(m_waiting_for_achievements)
     {

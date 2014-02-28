@@ -64,7 +64,7 @@ std::vector<std::string> FileManager::m_root_dirs;
 
 bool macSetBundlePathIfRelevant(std::string& data_dir)
 {
-    Log::debug("FileManager", "Checking whether we are using an app bundle... ");
+    Log::debug("[FileManager]", "Checking whether we are using an app bundle... ");
     // the following code will enable STK to find its data when placed in an
     // app bundle on mac OS X.
     // returns true if path is set, returns false if path was not set
@@ -82,14 +82,14 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
     std::string contents = std::string(path) + std::string("/Contents");
     if(contents.find(".app") != std::string::npos)
     {
-        Log::debug("FileManager", "yes\n");
+        Log::debug("[FileManager]", "yes");
         // executable is inside an app bundle, use app bundle-relative paths
         data_dir = contents + std::string("/Resources/");
         return true;
     }
     else
     {
-        Log::debug("FileManager", "no\n");
+        Log::debug("[FileManager]", "no");
         return false;
     }
 }
@@ -158,6 +158,8 @@ FileManager::FileManager()
         root_dir = "data/" ;
     else if(m_file_system->existFile("../data"))
         root_dir = "../data/" ;
+    else if(m_file_system->existFile("../../data"))
+        root_dir = "../../data/" ;
     else if(m_file_system->existFile(exe_path+"data"))
         root_dir = (exe_path+"data/").c_str();
     else if(m_file_system->existFile(exe_path+"/../data"))
@@ -195,13 +197,13 @@ FileManager::FileManager()
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
     for(unsigned int i=0; i<m_root_dirs.size(); i++)
-        Log::info("FileManager", "Data files will be fetched from: '%s'",
+        Log::info("[FileManager]", "Data files will be fetched from: '%s'",
                    m_root_dirs[i].c_str());
-    Log::info("FileManager", "User directory is '%s'.", 
+    Log::info("[FileManager]", "User directory is '%s'.", 
               m_user_config_dir.c_str());
-    Log::info("FileManager", "Addons files will be stored in '%s'.",
+    Log::info("[FileManager]", "Addons files will be stored in '%s'.",
                m_addons_dir.c_str());
-    Log::info("FileManager", "Screenshots will be stored in '%s'.",
+    Log::info("[FileManager]", "Screenshots will be stored in '%s'.",
                m_screenshot_dir.c_str());
 
     /** Now search for the path to all needed subdirectories. */
@@ -230,16 +232,16 @@ FileManager::FileManager()
     {
         if(!dir_found[i])
         {
-            Log::warn("FileManager", "Directory '%s' not found, aborting.",
+            Log::warn("[FileManager]", "Directory '%s' not found, aborting.",
                       m_subdir_name[i].c_str());
             was_error = true;
         }
         else
-            Log::info("FileManager", "Asset %d will be loaded from '%s'.",
+            Log::info("[FileManager]", "Asset %d will be loaded from '%s'.",
                       i, m_subdir_name[i].c_str());
     }
     if(was_error)
-        Log::fatal("FileManager", "Not all assets found - aborting.");
+        Log::fatal("[FileManager]", "Not all assets found - aborting.");
 
 
 }  // FileManager
@@ -305,14 +307,14 @@ FileManager::~FileManager()
         if(StringUtils::getExtension(*i)!="zip" &&
            StringUtils::getExtension(*i)!="part"    )
         {
-            Log::warn("FileManager", "Unexpected tmp file '%s' found.",
+            Log::warn("[FileManager]", "Unexpected tmp file '%s' found.",
                        full_path.c_str());
             continue;
         }
         if(isDirectory(full_path))
         {
             // Gee, a .zip file which is a directory - stay away from it
-            Log::warn("FileManager", "'%s' is a directory and will not be deleted.",
+            Log::warn("[FileManager]", "'%s' is a directory and will not be deleted.",
                       full_path.c_str());
             continue;
         }
@@ -322,13 +324,13 @@ FileManager::~FileManager()
         if(current - mystat.st_ctime <24*3600)
         {
             if(UserConfigParams::logAddons())
-                Log::verbose("FileManager", "'%s' is less than 24h old "
+                Log::verbose("[FileManager]", "'%s' is less than 24h old "
                              "and will not be deleted.",
                              full_path.c_str());
             continue;
         }
         if(UserConfigParams::logAddons())
-            Log::verbose("FileManager", "Deleting tmp file'%s'.",full_path.c_str());
+            Log::verbose("[FileManager]", "Deleting tmp file'%s'.",full_path.c_str());
         removeFile(full_path);
 
     }   // for i in all files in tmp
@@ -378,7 +380,7 @@ XMLNode *FileManager::createXMLTree(const std::string &filename)
     {
         if (UserConfigParams::logMisc())
         {
-            Log::error("FileManager", "createXMLTree: %s\n", e.what());
+            Log::error("[FileManager]", "createXMLTree: %s", e.what());
         }
         return NULL;
     }
@@ -404,7 +406,7 @@ XMLNode *FileManager::createXMLTreeFromString(const std::string & content)
     {
         if (UserConfigParams::logMisc())
         {
-            Log::error("FileManager", "createXMLTreeFromString: %s\n", e.what());
+            Log::error("[FileManager]", "createXMLTreeFromString: %s", e.what());
         }
         return NULL;
     }
@@ -530,7 +532,7 @@ std::string FileManager::getAssetChecked(FileManager::AssetType type,
 
     if(abort_on_error)
     {
-        Log::fatal("FileManager", "Can not find file '%s' in '%s'",
+        Log::fatal("[FileManager]", "Can not find file '%s' in '%s'",
                    name.c_str(), m_subdir_name[type].c_str());
     }
     return "";
@@ -634,20 +636,20 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
     if(m_file_system->existFile(io::path(path.c_str())))
         return true;
 
-    std::cout << "[FileManager] Creating directory(ies) '" << path << "'.\n";
+    Log::info("[FileManager]", "Creating directory(ies) '%s'", path.c_str());
 
     std::vector<std::string> split = StringUtils::split(path,'/');
     std::string current_path = "";
     for (unsigned int i=0; i<split.size(); i++)
     {
         current_path += split[i] + "/";
-        std::cout << "[FileManager]   Checking for: '"
-                  << current_path << "'.\n";
+        Log::info("[FileManager]", "Checking for: '%s",
+                    current_path.c_str());
         if (!m_file_system->existFile(io::path(current_path.c_str())))
         {
             if (!checkAndCreateDirectory(current_path))
             {
-                Log::error("FileManager", "Can't create dir '%s'",
+                Log::error("[FileManager]", "Can't create dir '%s'",
                         current_path.c_str());
                 break;
             }
@@ -682,8 +684,8 @@ void FileManager::checkAndCreateConfigDir()
             m_user_config_dir  = getenv("APPDATA");
             if(!checkAndCreateDirectory(m_user_config_dir))
             {
-                std::cerr << "[FileManager] Can't create config dir '"
-                          << m_user_config_dir << "', falling back to '.'.\n";
+                Log::error("[FileManager]", "Can't create config dir '%s"
+                            ", falling back to '.'.", m_user_config_dir);
                 m_user_config_dir = ".";
             }
         }
@@ -700,8 +702,8 @@ void FileManager::checkAndCreateConfigDir()
         }
         else
         {
-            std::cerr <<
-                "[FileManager] No home directory, this should NOT happen!\n";
+            Log::error("[FileManager]",
+                        "No home directory, this should NOT happen!");
             // Fall back to system-wide app data (rather than
             // user-specific data), but should not happen anyway.
             m_user_config_dir = "";
@@ -719,9 +721,9 @@ void FileManager::checkAndCreateConfigDir()
         }
         else if (!getenv("HOME"))
         {
-            std::cerr
-                << "[FileManager] No home directory, this should NOT happen "
-                << "- trying '.' for config files!\n";
+            Log::error("[FileManager]", 
+                        "No home directory, this should NOT happen "
+                        "- trying '.' for config files!");
             m_user_config_dir = ".";
         }
         else
@@ -731,9 +733,9 @@ void FileManager::checkAndCreateConfigDir()
             if(!checkAndCreateDirectory(m_user_config_dir))
             {
                 // If $HOME/.config can not be created:
-                std::cerr << "[FileManager] Cannot create directory '"
-                          << m_user_config_dir <<"', falling back to use '"
-                          << getenv("HOME")<< "'.\n";
+                Log::error("[FileManager]", 
+                            "Cannot create directory '%s', falling back to use '%s'",
+                            m_user_config_dir.c_str(), getenv("HOME"));
                 m_user_config_dir = getenv("HOME");
             }
         }

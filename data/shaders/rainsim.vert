@@ -1,4 +1,3 @@
-#version 130
 uniform float time;
 uniform vec3 campos;
 uniform mat4 viewm;
