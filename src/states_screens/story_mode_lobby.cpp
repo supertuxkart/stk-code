@@ -56,7 +56,7 @@ void StoryModeLobbyScreen::init()
     list->clear();
 
     PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
-    if(!player->isGuestAccount())
+    if(player)
     {
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         return;
