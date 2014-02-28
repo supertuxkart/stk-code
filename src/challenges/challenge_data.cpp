@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "challenges/challenge_data.hpp"
 
+#include <memory>
 #include <stdexcept>
 #include <sstream>
 
@@ -54,9 +55,9 @@ ChallengeData::ChallengeData(const std::string& filename)
         m_ai_superpower[d] = RaceManager::SUPERPOWER_NONE;
     }
 
-    // we are using auto_ptr to make sure the XML node is released when leaving
+    // we are using unique_ptr to make sure the XML node is released when leaving
     // the scope
-    std::auto_ptr<XMLNode> root(new XMLNode( filename ));
+    std::unique_ptr<XMLNode> root(new XMLNode( filename ));
 
     if(root.get() == NULL || root->getName()!="challenge")
     {
