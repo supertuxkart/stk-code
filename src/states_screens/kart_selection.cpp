@@ -134,11 +134,18 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
     m_incorrect       = false;
     m_red_mark_widget = NULL;
     m_parent          = parent;
+    m_backgroundcolor = true;
+//	printf("m_player_id=%d",m_player_id);
+    setBackgroundColor();
+    setSpinnerWidgetPlayerID(m_player_id);
 }   // PlayerNameSpinner
 // ------------------------------------------------------------------------
 void PlayerNameSpinner::setID(const int m_player_id)
 {
     PlayerNameSpinner::m_player_id = m_player_id;
+//    printf("m_player_id=%d",m_player_id);
+    	
+
 }   // setID
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
@@ -229,6 +236,8 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_y = player_name_y;
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
+    //m_player_ident_spinner->setBgimage(m_player_id);
+    
 
     if (parent->m_multiplayer && associated_player)
     {
@@ -270,6 +279,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
+    
 
 
     // ----- Kart model view
@@ -410,12 +420,14 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
 
     // Change the player ID
     m_player_id = newPlayerID;
-
+//    m_player_ident_spinner->setBgimage(m_player_id);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
-    if (m_player_ident_spinner != NULL)
+    if (m_player_ident_spinner != NULL){
         m_player_ident_spinner->setID(m_player_id);
+	//m_player_ident_spinner->setBgimage(m_player_id);
+    }
 }   // setPlayerID
 
 // ------------------------------------------------------------------------
@@ -482,6 +494,7 @@ void PlayerKartWidget::add()
         for (int n=0; n<player_amount; n++)
         {
             core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
+	    	
             m_player_ident_spinner->addLabel( translations->fribidize(name) );
         }
 
@@ -1829,6 +1842,7 @@ bool KartSelectionScreen::validateIdentChoices()
     // perform actual checking
     for (int n=0; n<amount; n++)
     {
+	
         // skip players that took a guest account, they can be many on the
         // same identity in this case
         if (m_kart_widgets[n].getAssociatedPlayer()->getProfile()
@@ -2090,6 +2104,8 @@ EventPropagation FocusDispatcher::focused(const int playerID)
     const int amount = m_parent->m_kart_widgets.size();
     for (int n=0; n<amount; n++)
     {
+	          
+
         if (m_parent->m_kart_widgets[n].getPlayerID() == playerID)
         {
             // If player is done, don't do anything with focus

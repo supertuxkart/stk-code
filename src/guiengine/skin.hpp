@@ -132,7 +132,6 @@ using namespace irr;
  */
 namespace GUIEngine
 {
-
     /**
       * In order to avoid calculating render information every frame, it's
       * stored in a SkinWidgetContainer for each widget (or each widget part
@@ -269,11 +268,8 @@ namespace GUIEngine
 
 
         video::ITexture* bg_image;
-
-
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
-
 #ifdef USE_PER_LINE_BACKGROUND
     public:
 #endif
@@ -322,13 +318,14 @@ namespace GUIEngine
                                  const bool pressed, const bool bottomArrow);
 
         void drawTooltip(Widget* widget, bool atMouse);
+	
 
     public:
 
         // dirty way to have dialogs that zoom in
         bool m_dialog;
         float m_dialog_size;
-
+	
         /**
           * \brief load a skin from the file specified in the user configuration file
           * \throw std::runtime_error if file cannot be read
@@ -408,6 +405,9 @@ namespace GUIEngine
         virtual void setIcon (gui::EGUI_DEFAULT_ICON icon, u32 index);
         virtual void setSize (gui::EGUI_DEFAULT_SIZE which, s32 size);
         virtual void setSpriteBank (gui::IGUISpriteBank *bank);
+
+//	BoxRenderParams& setBackground(const core::recti &rect, Widget* widget,BoxRenderParams& params);
+	
 
         void drawTooltips();
 

@@ -1196,6 +1196,30 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
  *  the widget is focused for other players is automatically determined)
  * FIXME: ugly to pass some focuses through parameter and others not xD
  */
+
+/*
+void Skin::setBackground(const core::recti &rect, Widget* widget,BoxRenderParams& params)
+{
+	SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
+	if(q->getBackgroundColor())
+	{
+		core::recti rect3 = rect;
+		rect3.UpperLeftCorner.X -= 2;
+        	rect3.UpperLeftCorner.Y += 3;
+        	rect3.LowerRightCorner.X += 2;
+        	rect3.LowerRightCorner.Y -= 5;
+		int player_id=q->getSpinnerWidgetPlayerID();
+		if(player_id==0)
+		params=SkinConfig::m_render_params["spinner0::neutral"];
+		if(player_id==1)
+		params=SkinConfig::m_render_params["spinner1::neutral"];
+		if(player_id==2)
+		params=SkinConfig::m_render_params["spinner2::neutral"];
+		if(player_id==3)
+		params=SkinConfig::m_render_params["spinner3::neutral"];
+	}
+	return params;
+}*/
 void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                            const bool pressed, bool focused)
 {
@@ -1221,20 +1245,48 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
             }
         }
     }
+     
+   
+	// defining params and spinner widget to use spinner widget functions
+	SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
+	BoxRenderParams params;
+	if (focused|| pressed)
+	{
+		params=SkinConfig::m_render_params["spinner::focused"];
+	}
+	else if(q->getBackgroundColor()==1)
+	{
+		
+		int player_id=q->getSpinnerWidgetPlayerID();
+//		printf("player id=%d",player_idd);
+		if(player_id==0)
+		params=SkinConfig::m_render_params["spinner0::neutral"];
+		if(player_id==1)
+		params=SkinConfig::m_render_params["spinner1::neutral"];
+		if(player_id==2)
+		params=SkinConfig::m_render_params["spinner2::neutral"];
+		if(player_id==3)
+		params=SkinConfig::m_render_params["spinner3::neutral"];
+	}
+	else
+	{
+		params=SkinConfig::m_render_params["spinner::neutral"];
+	}
 
-    BoxRenderParams& params = (focused || pressed)
-                            ? SkinConfig::m_render_params["spinner::focused"]
-                            : SkinConfig::m_render_params["spinner::neutral"];
-
+    
+    
     if (widget->isFocusedForPlayer(1))
     {
-        core::recti rect2 = rect;
+	core::recti rect2 = rect;
         rect2.UpperLeftCorner.X += 2;
         rect2.UpperLeftCorner.Y -= 3;
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
+	//setBackground(rect,widget,pressed,focused,1);
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+        
+
     }
     else if (widget->isFocusedForPlayer(2))
     {
@@ -1256,7 +1308,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
     }
-
+    
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
         widget->m_parent->getType() == gui::EGUIET_WINDOW)
@@ -1281,9 +1333,10 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     drawBoxFromStretchableTexture(widget, sized_rect, params,
                                   widget->m_deactivated);
 
-
+   
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
+    
     if (w->isGauge() && !w->m_deactivated)
     {
         const int handle_size = (int)( widget->m_h*params.m_left_border

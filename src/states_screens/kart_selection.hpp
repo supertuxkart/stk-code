@@ -21,6 +21,7 @@
 
 #include <string>
 #include "guiengine/screen.hpp"
+#include "guiengine/skin.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
@@ -33,6 +34,7 @@ namespace GUIEngine
     class Widget;
     class BubbleWidget;
     enum EventPropagation;
+   
 }
 namespace Online
 {
@@ -202,6 +204,8 @@ class PlayerNameSpinner : public GUIEngine::SpinnerWidget
     int m_player_id;
     bool m_incorrect;
     irr::gui::IGUIImage* m_red_mark_widget;
+    irr::gui::IGUIImage* m_red_image;
+    //Skin* m_background;
     KartSelectionScreen* m_parent;
 
     //virtual EventPropagation focused(const int m_playerID) ;
@@ -217,6 +221,8 @@ public:
     // ------------------------------------------------------------------------
     /** Remove any red mark set with 'markAsIncorrect' */
     void markAsCorrect();
+	//-- me --
+    
 };
 
 /** A widget representing the kart selection for a player (i.e. the player's
