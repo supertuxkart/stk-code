@@ -22,6 +22,7 @@
 #include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/powerup_manager.hpp"
+#include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
@@ -72,6 +73,9 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_NITRO,
+    DEBUG_ATTACHMENT_PARACHUTE,
+    DEBUG_ATTACHMENT_BOMB,
+    DEBUG_ATTACHMENT_ANVIL,
     DEBUG_TOGGLE_GUI,
     DEBUG_THROTTLE_FPS
 };
@@ -88,6 +92,38 @@ void addPowerup(PowerupManager::PowerupType powerup)
         kart->setPowerup(powerup, 10000);
     }
 }
+
+
+void addAttachment(Attachment::AttachmentType type)
+{
+	World* world = World::getWorld();
+	    if (world == NULL) return;
+	    for(unsigned int i = 0; i < world->getNumKarts(); i++)
+	    {
+		AbstractKart *kart = world->getKart(i);
+		if (kart->getController()->isPlayerController()) {
+			if (type == Attachment::ATTACH_ANVIL)
+			{
+				kart->getAttachment()
+					->set(type, stk_config->m_anvil_time);
+				kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+				kart->updateWeight();
+			}
+			else if (type == Attachment::ATTACH_PARACHUTE)
+			{
+				kart->getAttachment()
+			            ->set(type, stk_config->m_parachute_time);
+			}
+			else if (type == Attachment::ATTACH_BOMB)
+			{
+				kart->getAttachment()
+						->set(type, stk_config->m_bomb_time);
+			}
+		}
+	    }
+
+}
+
 
 // -----------------------------------------------------------------------------
 // Debug menu handling
@@ -136,6 +172,12 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
             
+            mnu->addItem(L"Attachments >",-1,true, true);
+            sub = mnu->getSubMenu(2);
+            sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
+            sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
+            sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
+
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
                 mnu->addItem(L"Toggle capture profiler report", DEBUG_PROFILER_GENERATE_REPORT);
@@ -324,6 +366,18 @@ bool onEvent(const SEvent &event)
                         AbstractKart* kart = world->getLocalPlayerKart(i);
                         kart->setEnergy(100.0f);
                     }
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_ANVIL)
+                {
+			addAttachment(Attachment::ATTACH_ANVIL);
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_BOMB)
+                {
+			addAttachment(Attachment::ATTACH_BOMB);
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_PARACHUTE)
+                {
+			addAttachment(Attachment::ATTACH_PARACHUTE);
                 }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {
