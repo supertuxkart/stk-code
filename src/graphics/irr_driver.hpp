@@ -115,7 +115,10 @@ private:
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
 	std::vector<video::ITexture *> SkyboxTextures;
-    GLuint SkyboxCubeMap;
+    GLuint SkyboxCubeMap, ConvolutedSkyboxCubeMap;
+    float blueSHCoeff[9];
+    float greenSHCoeff[9];
+    float redSHCoeff[9];
 
 
     /** Flag to indicate if a resolution change is pending (which will be

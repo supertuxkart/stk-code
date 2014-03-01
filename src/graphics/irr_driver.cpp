@@ -1173,6 +1173,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
     assert(texture.size() == 6);
 	SkyboxTextures = texture;
     SkyboxCubeMap = 0;
+    ConvolutedSkyboxCubeMap = 0;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -1182,7 +1183,9 @@ void IrrDriver::suppressSkyBox()
 {
 	SkyboxTextures.clear();
     glDeleteTextures(1, &SkyboxCubeMap);
+    glDeleteTextures(1, &ConvolutedSkyboxCubeMap);
     SkyboxCubeMap = 0;
+    ConvolutedSkyboxCubeMap = 0;
 }
 
 // ----------------------------------------------------------------------------

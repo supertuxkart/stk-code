@@ -230,6 +230,7 @@ void Shaders::loadShaders()
 	FullScreenShader::PointLightShader::init();
 	FullScreenShader::SSAOShader::init();
 	FullScreenShader::SunLightShader::init();
+    FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
@@ -1399,6 +1400,31 @@ namespace FullScreenShader
 		glUniform1i(uniform_ntex, TU_ntex);
 		glUniform1i(uniform_dtex, TU_dtex);
 	}
+
+    GLuint DiffuseEnvMapShader::Program;
+    GLuint DiffuseEnvMapShader::uniform_ntex;
+    GLuint DiffuseEnvMapShader::uniform_blueLmn;
+    GLuint DiffuseEnvMapShader::uniform_greenLmn;
+    GLuint DiffuseEnvMapShader::uniform_redLmn;
+    GLuint DiffuseEnvMapShader::vao;
+
+    void DiffuseEnvMapShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
+        uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
+        uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
+        vao = createVAO(Program);
+    }
+
+    void DiffuseEnvMapShader::setUniforms(const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
+    {
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1fv(uniform_blueLmn, 9, blueSHCoeff);
+        glUniform1fv(uniform_greenLmn, 9, greenSHCoeff);
+        glUniform1fv(uniform_redLmn, 9, redSHCoeff);
+    }
 
     GLuint ShadowedSunLightShader::Program;
     GLuint ShadowedSunLightShader::uniform_ntex;

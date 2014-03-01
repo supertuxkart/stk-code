@@ -408,6 +408,17 @@ public:
 	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
+class DiffuseEnvMapShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_ntex, uniform_blueLmn, uniform_greenLmn, uniform_redLmn;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
+};
+
 class ShadowedSunLightShader
 {
 public:
