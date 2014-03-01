@@ -60,7 +60,6 @@ PlayerInfoDialog::~PlayerInfoDialog()
 // -----------------------------------------------------------------------------
 void PlayerInfoDialog::showRegularDialog()
 {
-    //clearWindow();
     doInit();
 
     const int y1 = m_area.getHeight()/6;
@@ -145,7 +144,6 @@ void PlayerInfoDialog::showRegularDialog()
 
 void PlayerInfoDialog::showConfirmDialog()
 {
-    //clearWindow();
     doInit();
 
     IGUIFont* font = GUIEngine::getFont();
