@@ -63,7 +63,10 @@ PlayerManager::~PlayerManager()
 }   // ~PlayerManager
 
 // ----------------------------------------------------------------------------
-
+/** Manages the loading of saved player data from the players.xml file.
+ *  This function create the XML tree from the file, and then creates the
+ *  instances of PlayerProfile which read each node.
+ */
 void PlayerManager::load()
 {
     std::string filename = file_manager->getUserConfigFile("players.xml");
@@ -95,6 +98,8 @@ void PlayerManager::load()
 }   // load
 
 // ----------------------------------------------------------------------------
+/** Saves all player profiles to players.xml.
+ */
 void PlayerManager::save()
 {
     std::string filename = file_manager->getUserConfigFile("players.xml");
@@ -132,12 +137,18 @@ void PlayerManager::addNewPlayer(const core::stringw& name)
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
+/** Deletes a player profile from the list of all profiles. 
+ */
 void PlayerManager::deletePlayer(PlayerProfile *player)
 {
     m_all_players.erase(player);
 }   // deletePlayer
 
 // ----------------------------------------------------------------------------
+/** Called when no player profiles exists. It creates two players: one
+ *  guest player, and one non-guest player for whic hit tries to guess a
+ *  mame based on environment variables.
+ */
 void PlayerManager::addDefaultPlayer()
 {
     std::string username = "unnamed player";
@@ -159,7 +170,7 @@ void PlayerManager::addDefaultPlayer()
 }   // addDefaultPlayer
 
 // ----------------------------------------------------------------------------
-/** This returns a unique id. This is 1 + larger id so far used.
+/** This returns a unique id. This is 1 + largest id used so far.
  */
 unsigned int PlayerManager::getUniqueId() const
 {
@@ -174,6 +185,11 @@ unsigned int PlayerManager::getUniqueId() const
 }   // getUniqueId
 
 // ----------------------------------------------------------------------------
+/** Returns a PlayerProfile with a given id. It searches linearly through
+ *  the list of all players.
+ *  \returns The profile, or NULL if no such profile exists.
+ *  \param id The id of the player to look for.
+ */
 const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
 {
     const PlayerProfile *player;
@@ -186,6 +202,10 @@ const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
 }   // getPlayerById
 
 // ----------------------------------------------------------------------------
+/** Returns a player with a given name.
+ *  \return The player profile or NULL if the name was not found.
+ *  \param name The name to search for.
+ */
 PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
     PlayerProfile *player;
@@ -197,6 +217,14 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
     return NULL;
 }   // getPlayer
 // ----------------------------------------------------------------------------
+/** Sets the current player. This is the player that is used for story mode
+ *  and achievements. If 'remember_me' is set, this information will be
+ *  stored in the players.xml file, and automatically loaded next time
+ *  STK is started.
+ *  \param Player profile to be the current player.
+ *  \param remember_me If this player should be marked as default
+ *         player in players.xml
+ */
 void PlayerManager::setCurrentPlayer(PlayerProfile *player, bool remember_me)
 {
     // Reset current default player
