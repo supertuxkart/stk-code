@@ -48,6 +48,7 @@ using namespace GUIEngine;
 
 GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
 {
+    doInit();
     m_curr_time = 0.0f;
 
     const int y1 = m_area.getHeight()/7;
