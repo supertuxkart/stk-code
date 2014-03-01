@@ -1748,24 +1748,30 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         // Restrict impule to plane defined by gravity (i.e. X/Z plane).
         // This avoids the problem that karts can be pushed up, e.g. above
         // a fence.
-        m_body->translate(0.15f * normal);
+        //m_body->translate(0.1f * normal);
         btVector3 gravity = m_body->getGravity();
         gravity.normalize();
         btVector3 kartvelocity = m_body->getLinearVelocity();
-        btScalar VdotN = btDot(kartvelocity.normalized(),normal);
+        btScalar VdotN = -btDot(kartvelocity.normalized(),normal);
+        printf("vdn : %f\n",VdotN);
+        printf("velocity : %f %f %f\n",kartvelocity.getX(), kartvelocity.getY(), kartvelocity.getZ());
+        printf("normal   : %f %f %f\n",normal.getX(), normal.getY(), normal.getZ());
+        if(VdotN < 0)
+            return;
         // Cast necessary since otherwise to operator- (vec3/btvector) exists
-        float alpha=0.5f,beta=0.9f;
+        float alpha=5.0f,beta=1.0f;
         btVector3 impulse_parallel = (kartvelocity.length()*(1+alpha)*VdotN)*normal;
         btVector3 perpendicular_direction = (btCross(normal , btCross( kartvelocity, normal))).normalized();
         btVector3 impulse_perpendicular = kartvelocity.length() * (1.0f-beta) * btSqrt(1 - VdotN * VdotN) * perpendicular_direction;
-        btVector3 impulse = impulse_parallel + impulse_perpendicular;
+        btVector3 impulse = impulse_parallel - impulse_perpendicular + 10.0f *(btVector3)normal;
+        printf("impulse   : %f %f %f\n",impulse.getX(), impulse.getY(), impulse.getZ());
         
         impulse = impulse - btDot(impulse,gravity) * gravity;
         if(!impulse.getX() && !impulse.getZ())
             impulse = btVector3(0,0,-1);
       
         m_bounce_back_time = 0.2f;
-        m_vehicle->setTimedCentralImpulse(0.1f, impulse);
+        m_vehicle->setTimedCentralImpulse(0.3f, impulse);
     }
     // If there is a quad graph, push the kart towards the previous
     // graph node center (we have to use the previous point since the
