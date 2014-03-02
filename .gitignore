@@ -18,6 +18,9 @@ data/textures
 data/tracks
 data/.svn
 
+# Ignore doxygen output
+src/html
+
 *.o
 *.d
 *.a
