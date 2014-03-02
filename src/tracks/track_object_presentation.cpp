@@ -187,7 +187,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
-                     World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+                     World::getWorld()->getIdent() == IDENT_CUTSCENE);
 	bool displacing = false;
 	xml_node.get("displacing", &displacing);
 	animated &= !displacing;
@@ -226,7 +226,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node       = NULL;
 
     bool animated = (UserConfigParams::m_graphical_effects ||
-             World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+             World::getWorld()->getIdent() == IDENT_CUTSCENE);
 
     if (file_manager->fileExists(model_file))
     {
@@ -254,7 +254,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
     xml_node->get("skeletal-animation", &skeletal_animation);
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
-             World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+             World::getWorld()->getIdent() == IDENT_CUTSCENE);
 	bool displacing = false;
 	xml_node->get("displacing", &displacing);
 	animated &= !displacing;
