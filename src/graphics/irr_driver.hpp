@@ -115,7 +115,7 @@ private:
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
 	std::vector<video::ITexture *> SkyboxTextures;
-    GLuint SkyboxCubeMap, ConvolutedSkyboxCubeMap;
+
     float blueSHCoeff[9];
     float greenSHCoeff[9];
     float redSHCoeff[9];
@@ -130,6 +130,7 @@ private:
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
 public:
+    GLuint SkyboxCubeMap, ConvolutedSkyboxCubeMap;
     /** A simple class to store video resolutions. */
     class VideoMode
     {

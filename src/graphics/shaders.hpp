@@ -152,10 +152,10 @@ class SphereMapShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_normal;
-	static GLuint uniform_MVP, uniform_TIMV, uniform_tex;
+    static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_invproj, uniform_screen;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen, unsigned TU_tex);
 };
 
 class SplattingShader

@@ -678,6 +678,8 @@ namespace MeshShader
 	GLuint SphereMapShader::uniform_MVP;
 	GLuint SphereMapShader::uniform_TIMV;
 	GLuint SphereMapShader::uniform_tex;
+    GLuint SphereMapShader::uniform_invproj;
+    GLuint SphereMapShader::uniform_screen;
 
 	void SphereMapShader::init()
 	{
@@ -687,12 +689,16 @@ namespace MeshShader
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        uniform_screen = glGetUniformLocation(Program, "screen");
 	}
 
-	void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen, unsigned TU_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProj.pointer());
+        glUniform2f(uniform_screen, screen.X, screen.Y);
 		glUniform1i(uniform_tex, TU_tex);
 	}
 
