@@ -608,6 +608,8 @@ void PostProcessing::renderMotionBlur(unsigned cam, ITexture *in, ITexture *out)
     glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
 
     setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     FullScreenShader::MotionBlurShader::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam), cb->getDirection(cam), 0.15, cb->getMaxHeight(cam) * 0.7, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
