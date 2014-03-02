@@ -47,7 +47,7 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
     node.get("explode", &m_explode_kart);
     node.get("flatten", &m_flatten_kart);
 
-    m_important_animation = (World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+    m_important_animation = (World::getWorld()->getIdent() == IDENT_CUTSCENE);
     node.get("important", &m_important_animation);
 
     /** Save the initial position and rotation in the base animation object. */
