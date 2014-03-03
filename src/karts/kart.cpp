@@ -355,8 +355,9 @@ void Kart::reset()
 
     // In case that the kart was in the air, in which case its
     // linear damping is 0
-    m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
-                       m_kart_properties->getChassisAngularDamping() );
+    if(m_body) 
+        m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
+                           m_kart_properties->getChassisAngularDamping() );
 
     if(m_terrain_sound)
     {
