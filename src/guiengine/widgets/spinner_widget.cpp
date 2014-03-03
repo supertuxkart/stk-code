@@ -184,7 +184,7 @@ void SpinnerWidget::add()
 void SpinnerWidget::setBackgroundColor()
 {
 	
-	m_use_background_color=1;
+	m_use_background_color=true;
 }
 int SpinnerWidget::getBackgroundColor()
 {

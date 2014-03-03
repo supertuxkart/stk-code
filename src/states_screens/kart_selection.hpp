@@ -21,7 +21,6 @@
 
 #include <string>
 #include "guiengine/screen.hpp"
-#include "guiengine/skin.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"

@@ -97,8 +97,7 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
-	// to set the background image
-//	irr::video::ITexture* getBackgroundColor();
+
         
     public:
         
@@ -112,7 +111,7 @@ namespace GUIEngine
         void clearLabels();
 	// next four functions are for background colour behind playername in multikart screen selection
         void setBackgroundColor();
-	int getBackgroundColor();
+	bool getBackgroundColor();
 	void setSpinnerWidgetPlayerID(int playerID);
 	int getSpinnerWidgetPlayerID();
 
