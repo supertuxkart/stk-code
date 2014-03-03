@@ -20,7 +20,7 @@ void main()
     vec2 inside = uv - 0.5;
     float vignette = 1 - dot(inside, inside);    
     vignette = clamp(pow(vignette, 0.8), 0, 1);
-    vignette = vignette + vignette - 0.5;
+    vignette = clamp(vignette + vignette - 0.5, 0, 1.15);
 
 	float inBlack = inlevel.x;
 	float inWhite = inlevel.z;
