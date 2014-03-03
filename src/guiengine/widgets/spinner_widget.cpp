@@ -186,7 +186,7 @@ void SpinnerWidget::setBackgroundColor()
 	
 	m_use_background_color=true;
 }
-int SpinnerWidget::getBackgroundColor()
+bool SpinnerWidget::getBackgroundColor()
 {
 	return m_use_background_color;
 }

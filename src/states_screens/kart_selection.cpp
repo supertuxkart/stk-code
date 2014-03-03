@@ -134,7 +134,7 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
     m_incorrect       = false;
     m_red_mark_widget = NULL;
     m_parent          = parent;
-    m_backgroundcolor = true;
+    m_use_background_color = true;
 
     setBackgroundColor();//already a_use_background_color is false
     setSpinnerWidgetPlayerID(m_player_id);
