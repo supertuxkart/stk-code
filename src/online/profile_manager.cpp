@@ -64,8 +64,6 @@ ProfileManager::~ProfileManager()
  */
 int  ProfileManager::guaranteeCacheSize(unsigned int min_num)
 {
-    return m_max_cache_size;
-
     if (m_max_cache_size < min_num)
     {
         // Avoid that the cache can grow too big by setting an
