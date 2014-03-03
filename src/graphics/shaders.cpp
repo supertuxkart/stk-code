@@ -1264,12 +1264,16 @@ namespace FullScreenShader
 	GLuint ColorLevelShader::uniform_inlevel;
 	GLuint ColorLevelShader::uniform_outlevel;
 	GLuint ColorLevelShader::vao;
+    GLuint ColorLevelShader::uniform_invprojm;
+    GLuint ColorLevelShader::uniform_dtex;
 	void ColorLevelShader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
+        uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		vao = createVAO(Program);
 	}
 

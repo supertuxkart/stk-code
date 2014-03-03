@@ -296,9 +296,13 @@ void renderColorLevel(ITexture *in)
 
 	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
+    glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);

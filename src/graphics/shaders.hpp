@@ -368,7 +368,7 @@ class ColorLevelShader
 {
 public:
 	static GLuint Program;
-	static GLuint uniform_tex, uniform_inlevel, uniform_outlevel;
+    static GLuint uniform_tex, uniform_invprojm,  uniform_dtex, uniform_inlevel, uniform_outlevel;
 	static GLuint vao;
 
 	static void init();
