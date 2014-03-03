@@ -39,22 +39,28 @@ private:
     OnlineUserSearch();
     ~OnlineUserSearch();
 
+    /** Pointer to the back widget. */
     GUIEngine::IconButtonWidget *               m_back_widget;
+    /** Pointer to the search button. */
     GUIEngine::ButtonWidget *                   m_search_button_widget;
+    /** Pointer to the search box. */
     GUIEngine::TextBoxWidget *                  m_search_box_widget;
+    /** Pointer to the result list. */
     GUIEngine::ListWidget *                     m_user_list_widget;
 
     /** The currently selected index, used to re-select this item after
      *  addons_loading is being displayed. */
     int                                         m_selected_index;
+    /** Seach string entered in the search widget. */
     irr::core::stringw                          m_search_string;
+    /** Last search string, used to avoid doing the same search again. */
     irr::core::stringw                          m_last_search_string;
 
     /** The list of all IDs found. */
     Online::Profile::IDList                     m_users;
 
+    /** The online request to search for users. */
     const Online::XMLRequest *                  m_search_request;
-    bool                                        m_fake_refresh;
 
     void parseResult(const XMLNode * input);
     void showList();
@@ -81,7 +87,11 @@ public:
     virtual void onUpdate(float dt) OVERRIDE;
 
     void setLastSelected();
-    void setSearchString(const irr::core::stringw & search_string) {m_search_string = search_string;}
+    /** Sets the search string to an initial value. */
+    void setSearchString(const irr::core::stringw & search_string)
+    {
+        m_search_string = search_string;
+    }
 
 };
 

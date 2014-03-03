@@ -51,7 +51,41 @@ OnlineUserSearch::~OnlineUserSearch()
 }   // OnlineUserSearch
 
 // ----------------------------------------------------------------------------
+/** Callback when the xml file was loaded.
+ */
+void OnlineUserSearch::loadedFromFile()
+{
+    m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
+    assert(m_back_widget != NULL);
+    m_search_button_widget = getWidget<GUIEngine::ButtonWidget>("search_button");
+    assert(m_search_button_widget != NULL);
+    m_search_box_widget = getWidget<GUIEngine::TextBoxWidget>("search_box");
+    assert(m_search_box_widget != NULL);
+    m_user_list_widget = getWidget<GUIEngine::ListWidget>("user_list");
+    assert(m_user_list_widget != NULL);
+}   // loadedFromFile
 
+// ----------------------------------------------------------------------------
+/** Callback before widgets are added. Clears all widgets.
+ */
+void OnlineUserSearch::beforeAddingWidget()
+{
+    m_user_list_widget->clearColumns();
+    m_user_list_widget->addColumn(_("Username"), 3);
+}
+// ----------------------------------------------------------------------------
+/** Called when entering this menu (before widgets are added).
+ */
+void OnlineUserSearch::init()
+{
+    Screen::init();
+    search();
+    m_search_box_widget->setText(m_search_string);
+}   // init
+
+// ----------------------------------------------------------------------------
+/** Callback before the screen is removed.
+ */
 void OnlineUserSearch::tearDown()
 {
     delete m_search_request;
@@ -89,6 +123,8 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
 }   // parseResult
 
 // ----------------------------------------------------------------------------
+/** Takes the list of user ids from a query and shows it in the list gui.
+ */
 void OnlineUserSearch::showList()
 {
     m_user_list_widget->clear();
@@ -115,52 +151,25 @@ void OnlineUserSearch::showList()
  */
 void OnlineUserSearch::search()
 {
-    if ( m_search_string != "" && m_last_search_string != m_search_string )
+    if (m_search_string != "" && m_last_search_string != m_search_string)
+    {
         m_search_request = CurrentUser::get()->requestUserSearch(m_search_string);
-    else
-        m_fake_refresh = true;
-    m_user_list_widget->clear();
-    m_user_list_widget->addItem("spacer", L"");
-    m_user_list_widget->addItem("loading", Messages::searching());
-    m_back_widget->setDeactivated();
-    m_search_box_widget->setDeactivated();
-    m_search_button_widget->setDeactivated();
+        m_user_list_widget->clear();
+        m_user_list_widget->addItem("spacer", L"");
+        m_user_list_widget->addItem("loading", Messages::searching());
+        m_back_widget->setDeactivated();
+        m_search_box_widget->setDeactivated();
+        m_search_button_widget->setDeactivated();
+    }
 }   // sarch
 
-// ----------------------------------------------------------------------------
-
-void OnlineUserSearch::loadedFromFile()
-{
-    m_back_widget = getWidget<GUIEngine::IconButtonWidget>("back");
-    assert(m_back_widget != NULL);
-    m_search_button_widget = getWidget<GUIEngine::ButtonWidget>("search_button");
-    assert(m_search_button_widget != NULL);
-    m_search_box_widget = getWidget<GUIEngine::TextBoxWidget>("search_box");
-    assert(m_search_box_widget != NULL);
-    m_user_list_widget = getWidget<GUIEngine::ListWidget>("user_list");
-    assert(m_user_list_widget != NULL);
-}   // loadedFromFile
-
 
 // ----------------------------------------------------------------------------
-
-void OnlineUserSearch::beforeAddingWidget()
-{
-    m_user_list_widget->clearColumns();
-    m_user_list_widget->addColumn( _("Username"), 3 );
-}
-// ----------------------------------------------------------------------------
-
-void OnlineUserSearch::init()
-{
-    Screen::init();
-    search();
-    m_fake_refresh = false;
-    m_search_box_widget->setText(m_search_string);
-}   // init
-
-// ----------------------------------------------------------------------------
-void OnlineUserSearch::eventCallback( GUIEngine::Widget* widget, const std::string& name, const int playerID)
+/** Called when an event occurs (i.e. user clicks on something).
+ */
+void OnlineUserSearch::eventCallback(GUIEngine::Widget* widget,
+                                     const std::string& name,
+                                     const int player_id)
 {
     if (name == m_back_widget->m_properties[GUIEngine::PROP_ID])
     {
@@ -197,7 +206,9 @@ void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in s
 }   // setLastSelected
 
 // ----------------------------------------------------------------------------
-
+/** Called every frame. It queries the search request for results and 
+ *  displays them if necessary.
+ */
 void OnlineUserSearch::onUpdate(float dt)
 {
     if(m_search_request != NULL)
@@ -224,13 +235,5 @@ void OnlineUserSearch::onUpdate(float dt)
         {
             m_user_list_widget->renameItem("loading", Messages::searching());
         }
-    }
-    else if(m_fake_refresh)
-    {
-        showList();
-        m_fake_refresh = false;
-        m_back_widget->setActivated();
-        m_search_box_widget->setActivated();
-        m_search_button_widget->setActivated();
     }
 }   // onUpdate
