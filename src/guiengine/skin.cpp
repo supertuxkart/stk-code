@@ -1233,7 +1233,6 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 	{
 		
 		int player_id=q->getSpinnerWidgetPlayerID();
-//		printf("player id=%d",player_idd);
 		if(player_id==0)
 		params=SkinConfig::m_render_params["spinner1::neutral"];
 		if(player_id==1)
@@ -1256,12 +1255,10 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     if (widget->isFocusedForPlayer(0))
     {
 	core::recti rect2 = rect;
-//	printf(" here ");
         rect2.UpperLeftCorner.X += 2;
         rect2.UpperLeftCorner.Y -= 3;
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
-	//setBackground(rect,widget,pressed,focused,1);
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo::neutral"]);
         
@@ -1274,7 +1271,6 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.UpperLeftCorner.Y -= 3;
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
-	//setBackground(rect,widget,pressed,focused,1);
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
         

@@ -135,17 +135,14 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
     m_red_mark_widget = NULL;
     m_parent          = parent;
     m_backgroundcolor = true;
-//	printf("m_player_id=%d",m_player_id);
-    setBackgroundColor();
+
+    setBackgroundColor();//already a_use_background_color is false
     setSpinnerWidgetPlayerID(m_player_id);
-}   // PlayerNameSpinner
+}
 // ------------------------------------------------------------------------
 void PlayerNameSpinner::setID(const int m_player_id)
 {
     PlayerNameSpinner::m_player_id = m_player_id;
-//    printf("m_player_id=%d",m_player_id);
-    	
-
 }   // setID
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
@@ -236,7 +233,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_y = player_name_y;
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
-    //m_player_ident_spinner->setBgimage(m_player_id);
     
 
     if (parent->m_multiplayer && associated_player)
@@ -420,13 +416,12 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
 
     // Change the player ID
     m_player_id = newPlayerID;
-//    m_player_ident_spinner->setBgimage(m_player_id);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
     if (m_player_ident_spinner != NULL){
         m_player_ident_spinner->setID(m_player_id);
-	//m_player_ident_spinner->setBgimage(m_player_id);
+	
     }
 }   // setPlayerID
 

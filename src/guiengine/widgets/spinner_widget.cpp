@@ -45,8 +45,7 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_check_inside_me = true; //FIXME: not sure this is necessary
     m_supports_multiplayer = true;
     m_value = -1;
-    m_backgroundcolor=0;
-//    background_color_image="glass_square.jpg";
+    m_use_background_color=false;
     m_spinner_widget_player_id=-1;
 
     m_min = 0;
@@ -124,7 +123,7 @@ void SpinnerWidget::add()
     m_children[0].m_id = m_children[0].m_element->getID();
     
     m_badge_x_shift = subsize_left_arrow.getWidth();
-//    setBackgroundColor(); // setting background
+
     // label
     if (m_graphical)
     {
@@ -185,11 +184,11 @@ void SpinnerWidget::add()
 void SpinnerWidget::setBackgroundColor()
 {
 	
-	m_backgroundcolor=1;
+	m_use_background_color=1;
 }
 int SpinnerWidget::getBackgroundColor()
 {
-	return m_backgroundcolor;
+	return m_use_background_color;
 }
 void SpinnerWidget::setSpinnerWidgetPlayerID(int playerID)
 {

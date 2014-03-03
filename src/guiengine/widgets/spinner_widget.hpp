@@ -70,7 +70,7 @@ namespace GUIEngine
         bool m_gauge;
 	
 	//for setting background
-	int m_backgroundcolor;
+	bool m_use_background_color;
 	int m_spinner_widget_player_id;
         
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */

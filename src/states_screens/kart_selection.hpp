@@ -204,10 +204,7 @@ class PlayerNameSpinner : public GUIEngine::SpinnerWidget
     int m_player_id;
     bool m_incorrect;
     irr::gui::IGUIImage* m_red_mark_widget;
-    irr::gui::IGUIImage* m_red_image;
-    //Skin* m_background;
     KartSelectionScreen* m_parent;
-
     //virtual EventPropagation focused(const int m_playerID) ;
 
 public:
