@@ -258,15 +258,26 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex);
 };
 
+class DisplaceMaskShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position;
+    static GLuint uniform_MVP;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
+};
+
 class DisplaceShader
 {
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
-	static GLuint uniform_MVP, uniform_MV, uniform_tex, uniform_dir, uniform_dir2;
+    static GLuint uniform_MVP, uniform_MV, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_screen, uniform_dir, uniform_dir2;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex);
 };
 
 class SkyboxShader
@@ -349,16 +360,6 @@ class BloomBlendShader
 public:
 	static GLuint Program;
 	static GLuint uniform_texture, uniform_low;
-	static GLuint vao;
-
-	static void init();
-};
-
-class PPDisplaceShader
-{
-public:
-	static GLuint Program;
-	static GLuint uniform_tex, uniform_dtex, uniform_viz;
 	static GLuint vao;
 
 	static void init();

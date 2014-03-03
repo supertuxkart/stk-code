@@ -738,6 +738,7 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case DISPLACEMENT_PASS:
 		if (mesh.vao_displace_pass)
 			return;
+        mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position,-1, -1, -1, -1, -1, -1, mesh.Stride);
 		mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
 		return;
     case SHADOW_PASS:

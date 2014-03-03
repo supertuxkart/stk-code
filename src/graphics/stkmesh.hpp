@@ -13,6 +13,7 @@ struct GLMesh {
 	GLuint vao_second_pass;
 	GLuint vao_glow_pass;
 	GLuint vao_displace_pass;
+    GLuint vao_displace_mask_pass;
     GLuint vao_shadow_pass;
 	GLuint vertex_buffer;
 	GLuint index_buffer;

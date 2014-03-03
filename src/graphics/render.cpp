@@ -995,9 +995,8 @@ void IrrDriver::renderSkybox()
 void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
                                    int cam)
 {
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), false, false);
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_TMP4), true, false);
+    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_DISPLACE), true, false);
 
 	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
 	cb->update();
@@ -1008,6 +1007,10 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_BLEND);
+    glClear(GL_STENCIL_BITS);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     for (int i = 0; i < displacingcount; i++)
     {
@@ -1018,8 +1021,8 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
         m_displacing[i]->render();
     }
 
-    // Blur it
-	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
-
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_DISPLACE));
+    glDisable(GL_STENCIL_TEST);
 }
