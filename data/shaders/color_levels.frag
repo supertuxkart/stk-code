@@ -14,13 +14,13 @@ varying vec2 uv;
 
 void main()
 {
-	vec2 texc = uv;
-	//texc.y = 1.0 - texc.y;
+	vec4 col = texture(tex, uv);
 
-
-	vec4 col = texture(tex, texc);
-
-	//col = col / (1 - col);
+    // Compute the vignette
+    vec2 inside = uv - 0.5;
+    float vignette = 1 - dot(inside, inside);    
+    vignette = clamp(pow(vignette, 0.8), 0, 1);
+    vignette = vignette + vignette - 0.5;
 
 	float inBlack = inlevel.x;
 	float inWhite = inlevel.z;
@@ -32,5 +32,5 @@ void main()
 	col.rgb = (pow(((col.rgb * 255.0) - inBlack) / (inWhite - inBlack),
                 vec3(1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
   
-	FragColor = vec4(col.rgb, 1.0);
+	FragColor = vec4(col.rgb * vignette, 1.0);
 }
