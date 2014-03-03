@@ -39,7 +39,7 @@ ProfileManager* ProfileManager::m_profile_manager = NULL;
  */
 ProfileManager::ProfileManager()
 {
-    assert(m_max_cache_size > 1);
+    m_max_cache_size = 2;
     m_currently_visiting = NULL;
 }   // ProfileManager
 
@@ -54,6 +54,27 @@ ProfileManager::~ProfileManager()
         delete it->second;
     }
 }   // ~ProfileManager
+
+// ------------------------------------------------------------------------
+/** Makes sure that the cache can store at least max_num entries. This is
+ *  used by the online search screen to make sure all results found can
+ *  be cached at the same time.
+ *  \param min_num Minimum number of entries the chache should be able to
+ *         store.
+ */
+int  ProfileManager::guaranteeCacheSize(unsigned int min_num)
+{
+    if (m_max_cache_size < min_num)
+    {
+        // Avoid that the cache can grow too big by setting an
+        // upper limit.
+        if (min_num > 100)
+            min_num = 100;
+        m_max_cache_size = min_num;
+    }
+    return m_max_cache_size;
+
+}   // guaranteeCacheSize
 
 // ------------------------------------------------------------------------
 /** Search for a given profile in the set of persistent and cached

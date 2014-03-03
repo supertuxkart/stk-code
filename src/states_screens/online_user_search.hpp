@@ -49,7 +49,10 @@ private:
     int                                         m_selected_index;
     irr::core::stringw                          m_search_string;
     irr::core::stringw                          m_last_search_string;
+
+    /** The list of all IDs found. */
     Online::Profile::IDList                     m_users;
+
     const Online::XMLRequest *                  m_search_request;
     bool                                        m_fake_refresh;
 

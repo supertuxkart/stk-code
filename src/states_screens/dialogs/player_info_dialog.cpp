@@ -43,6 +43,7 @@ using namespace irr::core;
 PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
 {
     m_player = player;
+    doInit();
 
     showRegularDialog();
 }
@@ -145,7 +146,6 @@ void PlayerInfoDialog::showRegularDialog()
 void PlayerInfoDialog::showConfirmDialog()
 {
     clearWindow();
-
 
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();

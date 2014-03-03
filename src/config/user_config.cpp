@@ -62,11 +62,11 @@ UserConfigParam::~UserConfigParam()
  *  \param stream the xml writer.
  *  \param level determines indentation level.
  */
-void UserConfigParam::writeInner(UTFWriter& stream, int level) const
+void UserConfigParam::writeInner(std::ofstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
-    stream << L"    " << tab.c_str() << m_param_name.c_str() << L"=\""
-           << toString() << L"\"\n";
+    stream << "    " << tab.c_str() << m_param_name.c_str() << "=\""
+           << toString().c_str() << "\"\n";
 }   // writeInner
 
 // ============================================================================
@@ -89,7 +89,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
 }   // GroupUserConfigParam
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::write(UTFWriter& stream) const
+void GroupUserConfigParam::write(std::ofstream& stream) const
 {
     const int attr_amount = m_attributes.size();
 
@@ -98,41 +98,41 @@ void GroupUserConfigParam::write(UTFWriter& stream) const
     for(int n=0; n<attr_amount; n++)
     {
         if(m_attributes[n]->m_comment.size() > 0)
-            stream << L"\n             " << m_attributes[n]->m_param_name.c_str()
-                   << L" : " << m_attributes[n]->m_comment.c_str();
+            stream << "\n             " << m_attributes[n]->m_param_name.c_str()
+                   << " : " << m_attributes[n]->m_comment.c_str();
     }
 
-    stream << L" -->\n    <" << m_param_name.c_str() << "\n";
+    stream << " -->\n    <" << m_param_name.c_str() << "\n";
 
     // actual values
     for (int n=0; n<attr_amount; n++)
     {
         m_attributes[n]->writeInner(stream, 1);
     }
-    stream << L"    >\n";
+    stream << "    >\n";
     const int children_amount = m_children.size();
     for (int n=0; n<children_amount; n++)
     {
         m_children[n]->writeInner(stream, 1);
     }
-    stream << L"    </" << m_param_name.c_str() << ">\n\n";
+    stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::writeInner(UTFWriter& stream, int level) const
+void GroupUserConfigParam::writeInner(std::ofstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
     const int children_amount = m_attributes.size();
 
-    stream << L"    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
+    stream << "    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
 
     // actual values
     for (int n=0; n<children_amount; n++)
     {
         m_attributes[n]->writeInner(stream, level+1);
     }
-    stream << L"    " << tab.c_str() << "/>\n";
+    stream << "    " << tab.c_str() << "/>\n";
 }   // writeInner
 
 // ----------------------------------------------------------------------------
@@ -160,7 +160,7 @@ void GroupUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-irr::core::stringw GroupUserConfigParam::toString() const
+irr::core::stringc GroupUserConfigParam::toString() const
 {
     return "";
 }   // toString
@@ -246,22 +246,22 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-void ListUserConfigParam<T, U>::write(UTFWriter& stream) const
+void ListUserConfigParam<T, U>::write(std::ofstream& stream) const
 {
     const int elts_amount = m_elements.size();
 
     // comment
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
-    stream << L" -->\n    <" << m_param_name.c_str() << "\n";
+    stream << " -->\n    <" << m_param_name.c_str() << "\n";
 
-    stream << L"        Size=\"" << elts_amount << "\"\n";
+    stream << "        Size=\"" << elts_amount << "\"\n";
     // actual elements
     for (int n=0; n<elts_amount; n++)
     {
-        stream << L"        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
+        stream << "        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
     }
-    stream << L"    >\n";
-    stream << L"    </" << m_param_name.c_str() << ">\n\n";
+    stream << "    >\n";
+    stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -319,7 +319,7 @@ void ListUserConfigParam<T,U>::addElement(T element)
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-irr::core::stringw ListUserConfigParam<T,U>::toString() const
+core::stringc ListUserConfigParam<T, U>::toString() const
 {
     return "";
 }   // toString
@@ -352,19 +352,20 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 }   // IntUserConfigParam
 
 // ----------------------------------------------------------------------------
-void IntUserConfigParam::write(UTFWriter& stream) const
+void IntUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\"" << m_value
+           << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-irr::core::stringw IntUserConfigParam::toString() const
+irr::core::stringc IntUserConfigParam::toString() const
 {
-    irr::core::stringw tmp;
+    irr::core::stringc tmp;
     tmp += m_value;
+
     return tmp;
 }   // toString
 
@@ -414,18 +415,18 @@ TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-void TimeUserConfigParam::write(UTFWriter& stream) const
+void TimeUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
     std::ostringstream o;
     o<<m_value;
-    stream << L"    <" << m_param_name.c_str() << L" value=\""
-           << core::stringw(o.str().c_str()) << L"\" />\n\n";
+    stream << "    <" << m_param_name.c_str() << " value=\""
+           << o.str().c_str() << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-irr::core::stringw TimeUserConfigParam::toString() const
+irr::core::stringc TimeUserConfigParam::toString() const
 {
     // irrString does not have a += with a 64-bit int type, so
     // we can't use an irrlicht's stringw directly. Since it's only a
@@ -433,7 +434,7 @@ irr::core::stringw TimeUserConfigParam::toString() const
 
     std::ostringstream o;
     o<<m_value;
-    return core::stringw(o.str().c_str());
+    return o.str().c_str();
 }   // toString
 
 // ----------------------------------------------------------------------------
@@ -485,12 +486,12 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 }   // StringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void StringUserConfigParam::write(UTFWriter& stream) const
+void StringUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\""
-           << m_value.c_str() << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\""
+           << m_value.c_str() << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -504,57 +505,6 @@ void StringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 
 // ----------------------------------------------------------------------------
 void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
-{
-    node->get( m_param_name, &m_value );
-}   // findYourDataInAnAttributeOf
-
-// ============================================================================
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
-                                               const char* param_name,
-                                               const char* comment)
-{
-
-    m_value         = default_value;
-    m_default_value = default_value;
-
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if(comment != NULL) m_comment = comment;
-}   // WStringUserConfigParam
-
-// ----------------------------------------------------------------------------
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
-                                               const char* param_name,
-                                               GroupUserConfigParam* group,
-                                               const char* comment)
-{
-    m_value         = default_value;
-    m_default_value = default_value;
-
-    m_param_name = param_name;
-    group->addChild(this);
-    if(comment != NULL) m_comment = comment;
-}   // WStringUserConfigParam
-
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::write(UTFWriter& stream) const
-{
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
-}   // write
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
-{
-    const XMLNode* child = node->getNode( m_param_name );
-    if(child == NULL) return;
-
-    child->get( "value", &m_value );
-}   // findYourDataInAChildOf
-
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     node->get( m_param_name, &m_value );
 }   // findYourDataInAnAttributeOf
@@ -588,12 +538,12 @@ BoolUserConfigParam::BoolUserConfigParam(bool default_value,
 
 
 // ----------------------------------------------------------------------------
-void BoolUserConfigParam::write(UTFWriter& stream) const
+void BoolUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\""
-           << (m_value ? L"true" : L"false" ) << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\""
+           << (m_value ? "true" : "false" ) << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -642,9 +592,9 @@ void BoolUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-irr::core::stringw BoolUserConfigParam::toString() const
+irr::core::stringc BoolUserConfigParam::toString() const
 {
-    return (m_value ? L"true" : L"false" );
+    return (m_value ? "true" : "false" );
 }   // toString
 
 // ============================================================================
@@ -675,12 +625,12 @@ FloatUserConfigParam::FloatUserConfigParam(float default_value,
 }   // FloatUserConfigParam
 
 // ----------------------------------------------------------------------------
-void FloatUserConfigParam::write(UTFWriter& stream) const
+void FloatUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\"" << m_value
+           << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -699,9 +649,9 @@ void FloatUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-irr::core::stringw FloatUserConfigParam::toString() const
+core::stringc FloatUserConfigParam::toString() const
 {
-    irr::core::stringw tmp;
+    irr::core::stringc tmp;
     tmp += m_value;
     return tmp;
 }   // toString
@@ -802,11 +752,11 @@ void UserConfig::saveConfig()
 
     try
     {
-        UTFWriter configfile(filename.c_str());
+        std::ofstream configfile (filename.c_str(), std::ofstream::out);
 
-        configfile << L"<?xml version=\"1.0\"?>\n";
-        configfile << L"<stkconfig version=\"" << m_current_config_version
-                   << L"\" >\n\n";
+        configfile << "<?xml version=\"1.0\"?>\n";
+        configfile << "<stkconfig version=\"" << m_current_config_version
+                   << "\" >\n\n";
 
         const int paramAmount = all_params.size();
         for(int i=0; i<paramAmount; i++)
@@ -815,7 +765,7 @@ void UserConfig::saveConfig()
             all_params[i].write(configfile);
         }
 
-        configfile << L"</stkconfig>\n";
+        configfile << "</stkconfig>\n";
         configfile.close();
     }
     catch (std::runtime_error& e)

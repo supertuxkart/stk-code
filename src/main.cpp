@@ -681,7 +681,7 @@ int handleCmdLine()
     {
         const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
 
-        if(!player->isLocked(s))
+        if(player && !player->isLocked(s))
         {
             const KartProperties *prop =
                 kart_properties_manager->getKart(s);
@@ -707,9 +707,12 @@ int handleCmdLine()
         }
         else   // kart locked
         {
-            Log::warn("main", "Kart '%s' has not been unlocked yet.",
-                       s.c_str());
-            return 0;
+            if (player)
+                Log::warn("main", "Kart '%s' has not been unlocked yet.",
+                          s.c_str());
+            else
+                Log::warn("main",
+                        "A default player must exist in order to use --kart.");
         }   // if kart locked
     }   // if --kart
 
@@ -749,7 +752,7 @@ int handleCmdLine()
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
         const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
-        if (!player->isLocked(s))
+        if (player && !player->isLocked(s))
         {
             race_manager->setTrack(s);
             Log::verbose("main", "You choose to start in track '%s'.",
@@ -781,9 +784,12 @@ int handleCmdLine()
         }
         else
         {
-            Log::warn("main", "Track '%s' has not been unlocked yet.",
-                      s.c_str());
-            return 0;
+            if (player)
+                Log::warn("main", "Track '%s' has not been unlocked yet.",
+                          s.c_str());
+            else
+                Log::warn("main",
+                       "A default player must exist in order to use --track.");
         }
     }   // --track
 

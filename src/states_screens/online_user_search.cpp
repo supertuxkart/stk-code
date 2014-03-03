@@ -17,20 +17,20 @@
 
 #include "states_screens/online_user_search.hpp"
 
-#include <iostream>
-#include <assert.h>
-
+#include "audio/sfx_manager.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "online/current_user.hpp"
+#include "online/messages.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
-#include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/messages.hpp"
-#include "online/current_user.hpp"
-#include "audio/sfx_manager.hpp"
 
 using namespace Online;
+
+#include <assert.h>
+#include <iostream>
 
 DEFINE_SCREEN_SINGLETON( OnlineUserSearch );
 
@@ -38,9 +38,9 @@ DEFINE_SCREEN_SINGLETON( OnlineUserSearch );
 
 OnlineUserSearch::OnlineUserSearch() : Screen("online/user_search.stkgui")
 {
-    m_selected_index = -1;
-    m_search_request = NULL;
-    m_search_string = "";
+    m_selected_index     = -1;
+    m_search_request     = NULL;
+    m_search_string      = "";
     m_last_search_string = "";
 }   // OnlineUserSearch
 
@@ -60,19 +60,35 @@ void OnlineUserSearch::tearDown()
 
 
 // ----------------------------------------------------------------------------
-
+/** Adds the results of the query to the ProfileManager cache.
+ *  \param input The XML node with all user data.
+ */
 void OnlineUserSearch::parseResult(const XMLNode * input)
 {
     m_users.clear();
     const XMLNode * users_xml = input->getNode("users");
-    for (unsigned int i = 0; i < users_xml->getNumNodes(); i++)
+    // Try to reserve enough cache space for all found entries.
+    unsigned int n = ProfileManager::get()
+                   ->guaranteeCacheSize(users_xml->getNumNodes());
+
+    if (n >= users_xml->getNumNodes())
+        n = users_xml->getNumNodes();
+    else
+    {
+        Log::warn("OnlineSearch",
+            "Too many results found, only %d will be displayed.", n);
+    }
+    for (unsigned int i = 0; i < n; i++)
     {
         Profile * profile = new Profile(users_xml->getNode(i));
-        ProfileManager::get()->addToCache(profile);
+        // The id must be pushed before adding it to the cache, since
+        // the cache might merge the new data with an existing entry
         m_users.push_back(profile->getID());
+        ProfileManager::get()->addToCache(profile);
     }
-}
+}   // parseResult
 
+// ----------------------------------------------------------------------------
 void OnlineUserSearch::showList()
 {
     m_user_list_widget->clear();
@@ -80,11 +96,17 @@ void OnlineUserSearch::showList()
     {
         std::vector<GUIEngine::ListWidget::ListCell> row;
         Profile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
-        assert(profile != NULL);
+        // This could still happen if something pushed results out of the cache.
+        if (!profile)
+        {
+            Log::warn("OnlineSearch", "User %d not in cache anymore, ignored.",
+                      m_users[i]);
+            continue;
+        }
         row.push_back(GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
         m_user_list_widget->addItem("user", row);
     }
-}
+}   // showList
 
 // ----------------------------------------------------------------------------
 

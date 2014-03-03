@@ -64,8 +64,10 @@ private:
      *  e.g. its data is shown in a gui. */
     Profile* m_currently_visiting;
 
-    /** The max size of the m_profiles cache.  */
-    static const unsigned int  m_max_cache_size = 20;
+    /** The max size of the m_profiles cache. Its default size can be 
+     *  inrceased when necessary (e.g. when too many search results are
+     *  loaded, to make sure they can be all stored). */
+    unsigned int  m_max_cache_size;
 
     void updateCacheBits(Profile * profile);
     void addDirectToCache(Profile * profile);
@@ -101,7 +103,7 @@ public:
     void deleteFromPersistent(const uint32_t id);
     void clearPersistent();
     void moveToCache(const uint32_t id);
-
+    int  guaranteeCacheSize(unsigned int max_num);
     bool isInCache(const uint32_t id);
     bool inPersistent(const uint32_t id);
     Profile* getProfileByID(const uint32_t id);

@@ -44,6 +44,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
     m_story_mode_status   = unlock_manager->createStoryModeStatus();
+    m_is_default          = false;
     m_achievements_status = 
                         AchievementsManager::get()->createAchievementsStatus();
 }   // PlayerProfile

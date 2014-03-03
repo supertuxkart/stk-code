@@ -168,7 +168,7 @@ CutsceneWorld::~CutsceneWorld()
  */
 const std::string& CutsceneWorld::getIdent() const
 {
-    return IDENT_CUSTSCENE;
+    return IDENT_CUTSCENE;
 }   // getIdent
 
 //-----------------------------------------------------------------------------
