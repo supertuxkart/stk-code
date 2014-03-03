@@ -109,7 +109,10 @@ void OnlineUserSearch::showList()
 }   // showList
 
 // ----------------------------------------------------------------------------
-
+/** Called when a search is triggered. When it is a new search (and not just
+ *  searching for the same string again), a request will be queued to 
+ *  receive the search results
+ */
 void OnlineUserSearch::search()
 {
     if ( m_search_string != "" && m_last_search_string != m_search_string )
@@ -122,8 +125,7 @@ void OnlineUserSearch::search()
     m_back_widget->setDeactivated();
     m_search_box_widget->setDeactivated();
     m_search_button_widget->setDeactivated();
-}
-
+}   // sarch
 
 // ----------------------------------------------------------------------------
 
