@@ -1745,27 +1745,26 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
                              ==KartProperties::IMPULSE_NORMAL &&
         m_vehicle->getCentralImpulseTime()<=0                     )
     {
-        // Restrict impule to plane defined by gravity (i.e. X/Z plane).
-        // This avoids the problem that karts can be pushed up, e.g. above
-        // a fence.
-        //m_body->translate(0.1f * normal);
         btVector3 gravity = m_body->getGravity();
         gravity.normalize();
         btVector3 kartvelocity = m_body->getLinearVelocity();
         btScalar VdotN = -btDot(kartvelocity.normalized(),normal);
-        printf("vdn : %f\n",VdotN);
-        printf("velocity : %f %f %f\n",kartvelocity.getX(), kartvelocity.getY(), kartvelocity.getZ());
-        printf("normal   : %f %f %f\n",normal.getX(), normal.getY(), normal.getZ());
+        //if VdotN < 0 , this means the kart is going away from track after a collision
+        //No need to give another impulse
         if(VdotN < 0)
             return;
-        // Cast necessary since otherwise to operator- (vec3/btvector) exists
+        //alpha controls the component of impulse parallel to the normal
+        //beta controls the component of impulse perpendicular to normal
         float alpha=5.0f,beta=1.0f;
         btVector3 impulse_parallel = (kartvelocity.length()*(1+alpha)*VdotN)*normal;
         btVector3 perpendicular_direction = (btCross(normal , btCross( kartvelocity, normal))).normalized();
         btVector3 impulse_perpendicular = kartvelocity.length() * (1.0f-beta) * btSqrt(1 - VdotN * VdotN) * perpendicular_direction;
+        //add a constant impulse in direction of normal incase velocity is too low
         btVector3 impulse = impulse_parallel - impulse_perpendicular + 10.0f *(btVector3)normal;
-        printf("impulse   : %f %f %f\n",impulse.getX(), impulse.getY(), impulse.getZ());
         
+        // Restrict impulse to plane defined by gravity (i.e. X/Z plane).
+        // This avoids the problem that karts can be pushed up, e.g. above
+        // a fence.
         impulse = impulse - btDot(impulse,gravity) * gravity;
         if(!impulse.getX() && !impulse.getZ())
             impulse = btVector3(0,0,-1);
