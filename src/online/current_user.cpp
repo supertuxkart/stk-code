@@ -366,7 +366,7 @@ namespace Online
      *  search term.
      *  \param search_string the string to search for.
      */
-    const XMLRequest*
+    XMLRequest*
         CurrentUser::requestUserSearch(const core::stringw &search_string) const
     {
         assert(m_state == US_SIGNED_IN);

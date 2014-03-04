@@ -263,7 +263,7 @@ namespace Online
             else
                 request->setDone();
         }
-    }
+    }   // handleResultQueue
 
     // ------------------------------------------------------------------------
     /** Should be called every frame and takes care of processing the result

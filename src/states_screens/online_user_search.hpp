@@ -60,7 +60,7 @@ private:
     Online::Profile::IDList                     m_users;
 
     /** The online request to search for users. */
-    const Online::XMLRequest *                  m_search_request;
+    Online::XMLRequest *m_search_request;
 
     void parseResult(const XMLNode * input);
     void showList();

@@ -66,15 +66,17 @@ namespace Online
         LEAK_CHECK()
 
         /** Type of the request. Has 0 as default value. */
-        const int              m_type;
+        const int m_type;
+
         /** True if the memory for this Request should be managed by
         *  http connector (i.e. this object is freed once the request
         *  is handled). Otherwise the memory is not freed, so it must
         *  be freed by the calling function. */
-        const bool             m_manage_memory;
+        bool m_manage_memory;
+
         /** The priority of this request. The higher the value the more
         important this request is. */
-        const int              m_priority;
+        const int m_priority;
 
         /** The different state of the requst:
          *  - S_PREPARING:\n The request is created and can be configured, it
@@ -139,6 +141,11 @@ namespace Online
         /** Returns if the memory for this object should be managed by
         *  by network_http (i.e. freed once the request is handled). */
         bool manageMemory() const   { return m_manage_memory; }
+        // --------------------------------------------------------------------
+        /** Sets the memory management flag of this request. This function
+         *  must only be called by the main thread, since it is only tested by
+         *  the main thread. */
+        void setManageMemory(bool m) { m_manage_memory = m;  }
         // --------------------------------------------------------------------
         /** Returns the priority of this request. */
         int getPriority() const   { return m_priority; }

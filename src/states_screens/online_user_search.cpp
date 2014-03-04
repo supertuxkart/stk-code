@@ -88,8 +88,46 @@ void OnlineUserSearch::init()
  */
 void OnlineUserSearch::tearDown()
 {
-    delete m_search_request;
-    m_search_request = NULL;
+    // The search request can be in one of three states:
+    // 1. It does not exist, nothing more to do.
+    // 2. It has been executed by the request manager, had its callback done
+    //    and waits for this widget to collect the results. In this case, the
+    //    requests state is 'isDone', and the memory of this object need to be
+    //    freed here.
+    // 3. It is being executed by the request manager thread. In this case the
+    //    request can not be freed (since the request manager might still
+    //    write to it). In this case we set the flag that the request manager
+    //    should manage the memory for the request, i.e. the request will be
+    //    deleted once it is in the request manager's ready queue.
+    // Note that there is no race condition here: setting a request to be
+    // 'done', and checking if its memory need to be freed is done by the
+    // main thread (i.e. the same thread that executes this function ). So it
+    // is not possible that the thread stage changes to be 'isDone' while
+    // this function executes, or that the request is checked if it should
+    // be freed.
+
+    if (m_search_request)
+    {
+        // Check if the request is ready (but its result have not been
+        // received here ... otherwise it would have been deleted).
+        if (m_search_request->isDone())
+        {
+            delete m_search_request;
+        }
+        else
+        {
+            // This request is currently being handled by the request manager.
+            // We can set the memory management flag, since the separate
+            // request manager thread does not read or write this flag.
+            // The actual deletion of the request is done by the main
+            // thread, so there is no risk that the request is deleted
+            // between the next two calls!!
+            m_search_request->setManageMemory(true);
+
+            // Set cancel flag to speed up cancellation of this request
+            m_search_request->cancel();
+        }
+    }   // if m_search_request
 }   // tearDown
 
 
