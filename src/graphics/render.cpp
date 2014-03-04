@@ -1007,7 +1007,7 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_BLEND);
-    glClear(GL_STENCIL_BITS);
+    glClear(GL_STENCIL_BUFFER_BIT);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
