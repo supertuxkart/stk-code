@@ -183,7 +183,7 @@ void Shaders::loadShaders()
                                     m_callbacks[ES_SHADOWGEN], EMT_SOLID);
 
     m_shaders[ES_CAUSTICS] = glslmat(dir + "pass.vert", dir + "pass.frag",
-                                    m_callbacks[ES_CAUSTICS], EMT_TRANSPARENT_ALPHA_CHANNEL);
+        m_callbacks[ES_CAUSTICS], EMT_SOLID);
 
     m_shaders[ES_DISPLACE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_DISPLACE]);
@@ -249,6 +249,7 @@ void Shaders::loadShaders()
 	MeshShader::SplattingShader::init();
 	MeshShader::GrassPass1Shader::init();
 	MeshShader::GrassPass2Shader::init();
+    MeshShader::CausticsShader::init();
 	MeshShader::BubbleShader::init();
 	MeshShader::TransparentShader::init();
     MeshShader::TransparentFogShader::init();
@@ -745,6 +746,36 @@ namespace MeshShader
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
+
+    GLuint CausticsShader::Program;
+    GLuint CausticsShader::attrib_position;
+    GLuint CausticsShader::attrib_texcoord;
+    GLuint CausticsShader::uniform_MVP;
+    GLuint CausticsShader::uniform_dir;
+    GLuint CausticsShader::uniform_dir2;
+    GLuint CausticsShader::uniform_tex;
+    GLuint CausticsShader::uniform_caustictex;
+
+    void CausticsShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/caustics.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_dir = glGetUniformLocation(Program, "dir");
+        uniform_dir2 = glGetUniformLocation(Program, "dir2");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_caustictex = glGetUniformLocation(Program, "caustictex");
+    }
+
+    void CausticsShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, unsigned TU_tex, unsigned TU_caustictex)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniform2f(uniform_dir, dir.X, dir.Y);
+        glUniform2f(uniform_dir2, dir2.X, dir2.Y);
+        glUniform1i(uniform_tex, TU_tex);
+        glUniform1i(uniform_caustictex, TU_caustictex);
+    }
 
 	GLuint BubbleShader::Program;
 	GLuint BubbleShader::attrib_position;

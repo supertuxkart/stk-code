@@ -9,6 +9,7 @@ protected:
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix;
     core::vector3df windDir;
+    core::vector2df caustic_dir, caustic_dir2;
     void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
     void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 
