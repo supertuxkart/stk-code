@@ -1803,18 +1803,7 @@ void IrrDriver::update(float dt)
 
     World *world = World::getWorld();
 
-    // Handle cut scenes (which do not have any karts in it)
-    // =====================================================
-    if (world && world->getNumKarts() == 0)
-    {
-        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
-                                   world->getClearColor());
-        m_scene_manager->drawAll();
-        GUIEngine::render(dt);
-        m_video_driver->endScene();
-        return;
-    }
-    else if (GUIEngine::getCurrentScreen() != NULL &&
+    if (GUIEngine::getCurrentScreen() != NULL &&
              GUIEngine::getCurrentScreen()->needs3D())
     {
         //printf("Screen that needs 3D\n");
@@ -1827,10 +1816,10 @@ void IrrDriver::update(float dt)
     }
     else if (!world)
     {
-    m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
+        m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-    GUIEngine::render(dt);
+        GUIEngine::render(dt);
 
         m_video_driver->endScene();
         return;

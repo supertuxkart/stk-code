@@ -54,12 +54,22 @@ Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
     m_camera        = irr_driver->addCameraSceneNode();
 
 #ifdef DEBUG
-    m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
+    if (kart != NULL)
+        m_camera->setName(core::stringc("Camera for ") + kart->getKartProperties()->getName());
+    else
+        m_camera->setName("Camera");
 #endif
 
     setupCamera();
-    m_distance = kart->getKartProperties()->getCameraDistance();
-    setKart(kart);
+    if (kart != NULL)
+    {
+        m_distance = kart->getKartProperties()->getCameraDistance();
+        setKart(kart);
+    }
+    else
+    {
+        m_distance = 1000.0f;
+    }
     m_ambient_light = World::getWorld()->getTrack()->getDefaultAmbientColor();
 
     // TODO: Put these values into a config file
@@ -264,7 +274,9 @@ void Camera::reset()
 {
     m_kart = m_original_kart;
     setMode(CM_NORMAL);
-    setInitialTransform();
+
+    if (m_kart != NULL)
+        setInitialTransform();
 }   // reset
 
 //-----------------------------------------------------------------------------
@@ -273,6 +285,8 @@ void Camera::reset()
  */
 void Camera::setInitialTransform()
 {
+    if (m_kart == NULL) return;
+
     Vec3 start_offset(0, 25, -50);
     Vec3 xx = m_kart->getTrans()(start_offset);
     m_camera->setPosition(  xx.toIrrVector());
@@ -431,6 +445,8 @@ void Camera::getCameraSettings(float *above_kart, float *cam_angle,
  */
 void Camera::update(float dt)
 {
+    if (m_kart == NULL) return; // cameras not attached to kart must be positioned manually
+
     float above_kart, cam_angle, side_way, distance;
     bool  smoothing;
 
@@ -472,7 +488,6 @@ void Camera::update(float dt)
 
         m_camera->setTarget(current_target);
     }
-
     else
     {
         getCameraSettings(&above_kart, &cam_angle, &side_way, &distance, &smoothing);

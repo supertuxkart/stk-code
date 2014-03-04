@@ -229,7 +229,6 @@ void Shaders::loadShaders()
 	FullScreenShader::GlowShader::init();
 	FullScreenShader::PassThroughShader::init();
 	FullScreenShader::PointLightShader::init();
-	FullScreenShader::PPDisplaceShader::init();
 	FullScreenShader::SSAOShader::init();
 	FullScreenShader::SunLightShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
@@ -255,6 +254,7 @@ void Shaders::loadShaders()
     MeshShader::TransparentFogShader::init();
 	MeshShader::BillboardShader::init();
 	MeshShader::DisplaceShader::init();
+    MeshShader::DisplaceMaskShader::init();
     MeshShader::ShadowShader::init();
     MeshShader::RefShadowShader::init();
     MeshShader::GrassShadowShader::init();
@@ -968,15 +968,34 @@ namespace MeshShader
         glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
     }
 
+    GLuint DisplaceMaskShader::Program;
+    GLuint DisplaceMaskShader::attrib_position;
+    GLuint DisplaceMaskShader::uniform_MVP;
+
+    void DisplaceMaskShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/displace.vert").c_str(), file_manager->getAsset("shaders/white.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+    }
+
+    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+    }
+
 	GLuint DisplaceShader::Program;
 	GLuint DisplaceShader::attrib_position;
 	GLuint DisplaceShader::attrib_texcoord;
 	GLuint DisplaceShader::attrib_second_texcoord;
 	GLuint DisplaceShader::uniform_MVP;
 	GLuint DisplaceShader::uniform_MV;
-	GLuint DisplaceShader::uniform_tex;
+	GLuint DisplaceShader::uniform_displacement_tex;
+    GLuint DisplaceShader::uniform_mask_tex;
+    GLuint DisplaceShader::uniform_color_tex;
 	GLuint DisplaceShader::uniform_dir;
 	GLuint DisplaceShader::uniform_dir2;
+    GLuint DisplaceShader::uniform_screen;
 
 	void DisplaceShader::init()
 	{
@@ -986,18 +1005,24 @@ namespace MeshShader
 		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
-		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_displacement_tex = glGetUniformLocation(Program, "displacement_tex");
+        uniform_color_tex = glGetUniformLocation(Program, "color_tex");
+        uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
 		uniform_dir = glGetUniformLocation(Program, "dir");
 		uniform_dir2 = glGetUniformLocation(Program, "dir2");
+        uniform_screen = glGetUniformLocation(Program, "screen");
 	}
 
-	void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex)
+	void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
-		glUniform2f(uniform_dir, dirX, dirY);
-		glUniform2f(uniform_dir2, dir2X, dir2Y);
-		glUniform1i(uniform_tex, TU_tex);
+		glUniform2f(uniform_dir, dir.X, dir.Y);
+		glUniform2f(uniform_dir2, dir2.X, dir2.Y);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+		glUniform1i(uniform_displacement_tex, TU_displacement_tex);
+        glUniform1i(uniform_mask_tex, TU_mask_tex);
+        glUniform1i(uniform_color_tex, TU_color_tex);
 	}
 
     GLuint SkyboxShader::Program;
@@ -1245,31 +1270,21 @@ namespace FullScreenShader
 		vao = createVAO(Program);
 	}
 
-	GLuint PPDisplaceShader::Program;
-	GLuint PPDisplaceShader::uniform_tex;
-	GLuint PPDisplaceShader::uniform_dtex;
-	GLuint PPDisplaceShader::uniform_viz;
-	GLuint PPDisplaceShader::vao;
-	void PPDisplaceShader::init()
-	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ppdisplace.frag").c_str());
-		uniform_tex = glGetUniformLocation(Program, "tex");
-		uniform_dtex = glGetUniformLocation(Program, "dtex");
-		uniform_viz = glGetUniformLocation(Program, "viz");
-		vao = createVAO(Program);
-	}
-
 	GLuint ColorLevelShader::Program;
 	GLuint ColorLevelShader::uniform_tex;
 	GLuint ColorLevelShader::uniform_inlevel;
 	GLuint ColorLevelShader::uniform_outlevel;
 	GLuint ColorLevelShader::vao;
+    GLuint ColorLevelShader::uniform_invprojm;
+    GLuint ColorLevelShader::uniform_dtex;
 	void ColorLevelShader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
+        uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		vao = createVAO(Program);
 	}
 

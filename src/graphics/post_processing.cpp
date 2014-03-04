@@ -250,37 +250,6 @@ void renderBloomBlend(ITexture *in)
 }
 
 static
-void renderPPDisplace(ITexture *in)
-{
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_ONE, GL_ONE);
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(FullScreenShader::PPDisplaceShader::Program);
-	glBindVertexArray(FullScreenShader::PPDisplaceShader::vao);
-	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_viz, irr_driver->getDistortViz());
-
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_tex, 0);
-
-	glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(irr_driver->getRTT(RTT_DISPLACE)));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_dtex, 1);
-	
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-}
-
-static
 void renderColorLevel(ITexture *in)
 {
 	core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
@@ -296,9 +265,13 @@ void renderColorLevel(ITexture *in)
 
 	glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)));
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
+    glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindVertexArray(0);
@@ -604,6 +577,8 @@ void PostProcessing::renderMotionBlur(unsigned cam, ITexture *in, ITexture *out)
     glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
 
     setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     FullScreenShader::MotionBlurShader::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam), cb->getDirection(cam), 0.15, cb->getMaxHeight(cam) * 0.7, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -808,18 +783,6 @@ void PostProcessing::render()
         {
             PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
             renderMotionBlur(cam, in, out);
-            ITexture *tmp = in;
-            in = out;
-            out = tmp;
-            PROFILER_POP_CPU_MARKER();
-        }
-
-        if (irr_driver->getDisplacingNodes().size()) // Displacement
-        {
-            PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
-			drv->setRenderTarget(out, true, false);
-			renderPPDisplace(in);
-
             ITexture *tmp = in;
             in = out;
             out = tmp;
