@@ -355,6 +355,41 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
   glDrawElements(ptype, count, itype, 0);
 }
 
+void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector2df dir, core::vector2df dir2)
+{
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    setTexture(1, getTextureGLuint(irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str())), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
+    setTexture(3, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
+    setTexture(4, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
+    if (!UserConfigParams::m_ssao)
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+
+
+    glUseProgram(MeshShader::CausticsShader::Program);
+    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 2, 3, 4, 1);
+
+    glBindVertexArray(mesh.vao_second_pass);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
 {
 	GLenum ptype = mesh.PrimitiveType;
@@ -625,6 +660,8 @@ bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 		return true;
+    if (type == irr_driver->getShader(ES_CAUSTICS))
+        return true;
 	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		return true;
 	if (type == video::EMT_ONETEXTURE_BLEND)
@@ -695,6 +732,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::ObjectUnlitShader::attrib_position, MeshShader::ObjectUnlitShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
+        else if (type == irr_driver->getShader(ES_CAUSTICS))
+        {
+            mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+                MeshShader::CausticsShader::attrib_position, MeshShader::CausticsShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        }
 		else if (mesh.textures[1])
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,

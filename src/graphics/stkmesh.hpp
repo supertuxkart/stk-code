@@ -44,6 +44,7 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProj
 void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
+void drawCaustics(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, core::vector2df dir, core::vector2df dir2);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
 void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
 void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);

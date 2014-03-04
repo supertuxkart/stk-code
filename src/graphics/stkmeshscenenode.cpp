@@ -210,6 +210,27 @@ void STKMeshSceneNode::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type
             drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
         else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
             drawObjectUnlit(mesh, ModelViewProjectionMatrix);
+        else if (type == irr_driver->getShader(ES_CAUSTICS))
+        {
+            const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+            const float speed = World::getWorld()->getTrack()->getCausticsSpeed();
+
+            float strength = time;
+            strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.001f;
+
+            vector3df wind = irr_driver->getWind() * strength * speed;
+            caustic_dir.X += wind.X;
+            caustic_dir.Y += wind.Z;
+
+            strength = time * 0.56f + sinf(time);
+            strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.001f;
+
+            wind = irr_driver->getWind() * strength * speed;
+            wind.rotateXZBy(cosf(time));
+            caustic_dir2.X += wind.X;
+            caustic_dir2.Y += wind.Z;
+            drawCaustics(mesh, ModelViewProjectionMatrix, caustic_dir, caustic_dir2);
+        }
         else if (mesh.textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))
             drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
         else if (!mesh.textures[0])
