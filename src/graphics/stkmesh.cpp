@@ -361,8 +361,8 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    setTexture(1, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR, true);
+    setTexture(1, getTextureGLuint(irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str())), GL_LINEAR, GL_LINEAR, true);
 
 
     glUseProgram(MeshShader::CausticsShader::Program);
