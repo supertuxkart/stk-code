@@ -49,7 +49,6 @@ Shaders::Shaders()
     m_callbacks[ES_COLLAPSE] = new CollapseProvider();
     m_callbacks[ES_MULTIPLY_ADD] = new MultiplyProvider();
     m_callbacks[ES_SHADOWGEN] = new ShadowGenProvider();
-    m_callbacks[ES_CAUSTICS] = new CausticsProvider();
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
 
     for(s32 i=0 ; i < ES_COUNT ; i++)
