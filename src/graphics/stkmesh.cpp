@@ -361,12 +361,30 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR, true);
-    setTexture(1, getTextureGLuint(irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str())), GL_LINEAR, GL_LINEAR, true);
+    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    setTexture(1, getTextureGLuint(irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str())), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
+    setTexture(3, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
+    setTexture(4, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
+    if (!UserConfigParams::m_ssao)
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
 
 
     glUseProgram(MeshShader::CausticsShader::Program);
-    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, 0, 1);
+    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 2, 3, 4, 1);
 
     glBindVertexArray(mesh.vao_second_pass);
     glDrawElements(ptype, count, itype, 0);

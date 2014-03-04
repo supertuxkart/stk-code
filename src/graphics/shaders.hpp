@@ -174,10 +174,10 @@ class CausticsShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_MVP, uniform_dir, uniform_dir2, uniform_tex, uniform_caustictex;
+    static GLuint uniform_MVP, uniform_dir, uniform_dir2, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient, uniform_caustictex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, unsigned TU_tex, unsigned TU_caustictex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_albedo, unsigned TU_DiffuseMap, unsigned TU_Specmap, unsigned TU_SSAO, unsigned TU_caustictex);
 };
 
 class BubbleShader

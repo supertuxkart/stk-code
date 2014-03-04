@@ -752,8 +752,13 @@ namespace MeshShader
     GLuint CausticsShader::uniform_MVP;
     GLuint CausticsShader::uniform_dir;
     GLuint CausticsShader::uniform_dir2;
-    GLuint CausticsShader::uniform_tex;
+    GLuint CausticsShader::uniform_Albedo;
     GLuint CausticsShader::uniform_caustictex;
+    GLuint CausticsShader::uniform_DiffuseMap;
+    GLuint CausticsShader::uniform_SpecularMap;
+    GLuint CausticsShader::uniform_SSAO;
+    GLuint CausticsShader::uniform_screen;
+    GLuint CausticsShader::uniform_ambient;
 
     void CausticsShader::init()
     {
@@ -763,17 +768,28 @@ namespace MeshShader
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_dir = glGetUniformLocation(Program, "dir");
         uniform_dir2 = glGetUniformLocation(Program, "dir2");
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         uniform_caustictex = glGetUniformLocation(Program, "caustictex");
+        uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
     }
 
-    void CausticsShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, unsigned TU_tex, unsigned TU_caustictex)
+    void CausticsShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_albedo, unsigned TU_DiffuseMap, unsigned TU_Specmap, unsigned TU_SSAO, unsigned TU_caustictex)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
         glUniform2f(uniform_dir, dir.X, dir.Y);
         glUniform2f(uniform_dir2, dir2.X, dir2.Y);
-        glUniform1i(uniform_tex, TU_tex);
+        glUniform1i(uniform_Albedo, TU_albedo);
         glUniform1i(uniform_caustictex, TU_caustictex);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+        glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+        glUniform1i(uniform_SpecularMap, TU_Specmap);
+        glUniform1i(uniform_SSAO, TU_SSAO);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
 
 	GLuint BubbleShader::Program;
