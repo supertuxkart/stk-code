@@ -396,45 +396,48 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "player_last",
             &m_gp_start_order,
             "Always put the player at the back or not (Bully mode).") );
+    PARAM_PREFIX StringUserConfigParam       m_additional_gp_directory
+        PARAM_DEFAULT( StringUserConfigParam("", "additional_gp_directory",
+                                             "Directory with additional GP's."));
 
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
         PARAM_DEFAULT( GroupUserConfigParam("Video", "Video Settings") );
 
-    PARAM_PREFIX IntUserConfigParam         m_width
+    PARAM_PREFIX IntUserConfigParam          m_width
             PARAM_DEFAULT(  IntUserConfigParam(1024, "width", &m_video_group,
                                             "Screen/window width in pixels") );
-    PARAM_PREFIX IntUserConfigParam         m_height
+    PARAM_PREFIX IntUserConfigParam          m_height
             PARAM_DEFAULT(  IntUserConfigParam(768, "height", &m_video_group,
                                            "Screen/window height in pixels") );
-    PARAM_PREFIX BoolUserConfigParam        m_fullscreen
+    PARAM_PREFIX BoolUserConfigParam         m_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "fullscreen",
                                                 &m_video_group) );
-    PARAM_PREFIX IntUserConfigParam         m_prev_width
+    PARAM_PREFIX IntUserConfigParam          m_prev_width
             PARAM_DEFAULT(  IntUserConfigParam(1024, "prev_width",
                             &m_video_group, "Previous screen/window width") );
-    PARAM_PREFIX IntUserConfigParam         m_prev_height
+    PARAM_PREFIX IntUserConfigParam          m_prev_height
             PARAM_DEFAULT(  IntUserConfigParam(768, "prev_height",
                             &m_video_group,"Previous screen/window height") );
-    PARAM_PREFIX BoolUserConfigParam        m_prev_fullscreen
+    PARAM_PREFIX BoolUserConfigParam         m_prev_fullscreen
             PARAM_DEFAULT(  BoolUserConfigParam(false, "prev_fullscreen",
                             &m_video_group) );
 
 
-    PARAM_PREFIX BoolUserConfigParam        m_remember_window_location
+    PARAM_PREFIX BoolUserConfigParam         m_remember_window_location
             PARAM_DEFAULT(  BoolUserConfigParam(false, "remember_window_location",
                             &m_video_group) );
-    PARAM_PREFIX IntUserConfigParam         m_window_x
+    PARAM_PREFIX IntUserConfigParam          m_window_x
             PARAM_DEFAULT(  IntUserConfigParam(-1, "window_x",
                             &m_video_group,"If remember_window_location is true") );
-    PARAM_PREFIX IntUserConfigParam         m_window_y
+    PARAM_PREFIX IntUserConfigParam          m_window_y
             PARAM_DEFAULT(  IntUserConfigParam(-1, "window_y",
                             &m_video_group,"If remember_window_location is true") );
 
-    PARAM_PREFIX BoolUserConfigParam        m_display_fps
+    PARAM_PREFIX BoolUserConfigParam         m_display_fps
             PARAM_DEFAULT(  BoolUserConfigParam(false, "show_fps",
                             &m_video_group, "Display frame per seconds") );
-    PARAM_PREFIX IntUserConfigParam         m_max_fps
+    PARAM_PREFIX IntUserConfigParam          m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
 

@@ -34,10 +34,9 @@ private:
 public:
                          GrandPrixManager();
                         ~GrandPrixManager();
-    void                 load(const std::string &filename);
-    const GrandPrixData* getGrandPrix(int i)    const { return m_gp_data[i];     }
+    const GrandPrixData* getGrandPrix(int i)    const {return m_gp_data[i];    }
     const GrandPrixData* getGrandPrix(const std::string& s) const;
-    unsigned int         getNumberOfGrandPrix() const { return m_gp_data.size(); }
+    unsigned int         getNumberOfGrandPrix() const {return m_gp_data.size();}
     void                 checkConsistency();
 
 };   // GrandPrixManager

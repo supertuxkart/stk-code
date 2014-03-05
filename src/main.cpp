@@ -392,17 +392,21 @@ void cmdLineHelp()
 {
     Log::info("main",
     "Usage: %s [OPTIONS]\n\n"
+
     "Run SuperTuxKart, a racing game with go-kart that features"
     " the Tux and friends.\n\n"
+
     "Options:\n"
     "  -N,  --no-start-screen  Immediately start race without showing a "
                               "menu.\n"
-    "  -R,  --race-now         Same as -N but also skip the ready-set-go phase"
-                              " and the music.\n"
+    "  -R,  --race-now         Same as -N but also skip the ready-set-go phase "
+                              "and the music.\n"
     "  -t,  --track=NAME       Start at track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
+    "       --add-gp-dir=DIR   Load Grand Prixs in DIR. Setting will be saved "
+                              "in config.xml\n"
     "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
     "       --kart=NAME        Use kart number NAME.\n"
     "       --ai=a,b,...       Use the karts a, b, ... for the AI.\n"
@@ -467,8 +471,7 @@ int handleCmdLinePreliminary()
         cmdLineHelp();
         exit(0);
     }
-    if( CommandLine::has("--gamepad-visualisation") ||
-        CommandLine::has("--gamepad-visualization")    )
+    if( CommandLine::has("--gamepad-visualisation") )
         UserConfigParams::m_gamepad_visualisation=true;
     if( CommandLine::has("--debug=memory"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
@@ -498,15 +501,15 @@ int handleCmdLinePreliminary()
     if( CommandLine::has( "--stk-config", &s))
     {
         stk_config->load(file_manager->getAsset(s));
-        Log::info("main", "STK config will be read from %s.",s.c_str());
+        Log::info("main", "STK config will be read from %s.", s.c_str());
     }
     if( CommandLine::has( "--trackdir", &s))
         TrackManager::addTrackSearchDir(s);
     if( CommandLine::has( "--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
-    if( CommandLine::has( "--no-graphics") ||
-        CommandLine::has("-l"            )    )
+    if( CommandLine::has("--no-graphics") ||
+        CommandLine::has("-l"           )    )
     {
         ProfileWorld::disableGraphics();
         UserConfigParams::m_log_errors_to_console=true;
@@ -539,13 +542,14 @@ int handleCmdLinePreliminary()
             }
             else
                 Log::warn("main", "Resolution %s has been blacklisted, so "
-                "it is not available!", res.c_str());
+                          "it is not available!", res.c_str());
         }
         else
         {
-            Log::fatal("main", "Error: --screensize argument must be "
-                "given as WIDTHxHEIGHT");
+            Log::fatal("main", "Error: --screensize argument must be given as "
+                               "WIDTHxHEIGHT");
         }
+
     }
 
 
@@ -588,6 +592,19 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_xmas_mode = n;
     if(CommandLine::has("--log", &n))
         Log::setLogLevel(n);
+
+    // Enable loading GP's from local directory
+    if(CommandLine::has("--add-gp-dir", &s))
+    {
+        // Ensure that the path ends with a /
+        if (s[s.size()] == '/')
+            UserConfigParams::m_additional_gp_directory = s;
+        else
+            UserConfigParams::m_additional_gp_directory = s + "/";
+
+        Log::info("main", "Additional Grand Prix will be loaded from %s",
+                          UserConfigParams::m_additional_gp_directory.c_str());
+    }
 
     return 0;
 }   // handleCmdLinePreliminary
@@ -1144,7 +1161,8 @@ int main(int argc, char *argv[] )
         // Both item_manager and powerup_manager load models and therefore
         // textures from the model directory. To avoid reading the
         // materials.xml twice, we do this here once for both:
-        file_manager->pushTextureSearchPath(file_manager->getAsset(FileManager::MODEL,""));
+        file_manager->pushTextureSearchPath(file_manager->getAsset(
+                                                        FileManager::MODEL,""));
         const std::string materials_file =
             file_manager->getAsset(FileManager::MODEL,"materials.xml");
         if(materials_file!="")

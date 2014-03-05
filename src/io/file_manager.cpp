@@ -507,8 +507,8 @@ void FileManager::popModelSearchPath()
  *  \return True if the file is found, false otherwise.
  */
 bool FileManager::findFile(std::string& full_path,
-                      const std::string& file_name,
-                      const std::vector<std::string>& search_path) const
+                           const std::string& file_name,
+                           const std::vector<std::string>& search_path) const
 {
     for(std::vector<std::string>::const_reverse_iterator
         i = search_path.rbegin();
@@ -517,7 +517,7 @@ bool FileManager::findFile(std::string& full_path,
         full_path = *i + file_name;
         if(m_file_system->existFile(full_path.c_str())) return true;
     }
-    full_path="";
+    full_path = "";
     return false;
 }   // findFile
 

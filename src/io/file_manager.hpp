@@ -47,7 +47,7 @@ public:
     /** The various asset types (and directories) STK might request.
      *  The last entry ASSET_COUNT specifies the number of entries. */
     enum AssetType {ASSET_MIN, 
-                    CHALLENGE=ASSET_MIN, 
+                    CHALLENGE = ASSET_MIN,
                     FONT, GFX, GRANDPRIX, GUI, MODEL, MUSIC,
                     SFX, SHADER, SKIN, TEXTURE, TRANSLATION, 
                     ASSET_MAX = TRANSLATION,
@@ -55,7 +55,7 @@ public:
 private:
 
     /** The names of the various subdirectories of the asset types. */
-    std::vector< std::string > m_subdir_name;
+    std::vector<std::string> m_subdir_name;
 
     /** Handle to irrlicht's file systems. */
     io::IFileSystem  *m_file_system;
@@ -73,64 +73,65 @@ private:
     std::string       m_screenshot_dir;
 
     std::vector<std::string>
-                      m_texture_search_path,
-                      m_model_search_path,
-                      m_music_search_path;
-    bool              findFile(std::string& full_path,
-                               const std::string& fname,
-                               const std::vector<std::string>& search_path)
-                               const;
-    void              makePath(std::string& path, const std::string& dir,
-                               const std::string& fname) const;
-    bool              checkAndCreateDirectory(const std::string &path);
-    io::path          createAbsoluteFilename(const std::string &f);
-    void              checkAndCreateConfigDir();
-    bool              isDirectory(const std::string &path) const;
-    void              checkAndCreateAddonsDir();
-    void              checkAndCreateScreenshotDir();
+                       m_texture_search_path,
+                       m_model_search_path,
+                       m_music_search_path;
+    bool               findFile(std::string& full_path,
+                                const std::string& fname,
+                                const std::vector<std::string>& search_path)
+                                const;
+    void               makePath(std::string& path, const std::string& dir,
+                                const std::string& fname) const;
+    bool               checkAndCreateDirectory(const std::string &path);
+    io::path           createAbsoluteFilename(const std::string &f);
+    void               checkAndCreateConfigDir();
+    bool               isDirectory(const std::string &path) const;
+    void               checkAndCreateAddonsDir();
+    void               checkAndCreateScreenshotDir();
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
-    std::string       checkAndCreateLinuxDir(const char *env_name,
-                                             const char *dir_name,
-                                             const char *fallback1,
-                                             const char *fallback2=NULL);
+    std::string        checkAndCreateLinuxDir(const char *env_name,
+                                              const char *dir_name,
+                                              const char *fallback1,
+                                              const char *fallback2=NULL);
 #endif
 
 public:
-                      FileManager();
-                     ~FileManager();
-    void              reInit();
-    void              dropFileSystem();
-    static void       addRootDirs(const std::string &roots);
-    io::IXMLReader   *createXMLReader(const std::string &filename);
-    XMLNode          *createXMLTree(const std::string &filename);
-    XMLNode          *createXMLTreeFromString(const std::string & content);
+                       FileManager();
+                      ~FileManager();
+    void               reInit();
+    void               dropFileSystem();
+    static void        addRootDirs(const std::string &roots);
+    io::IXMLReader    *createXMLReader(const std::string &filename);
+    XMLNode           *createXMLTree(const std::string &filename);
+    XMLNode           *createXMLTreeFromString(const std::string & content);
 
-    std::string       getScreenshotDir() const;
-    bool              checkAndCreateDirectoryP(const std::string &path);
+    std::string        getScreenshotDir() const;
+    bool               checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
-    void checkAndCreateDirForAddons(const std::string &dir);
-    bool removeFile(const std::string &name) const;
-    bool removeDirectory(const std::string &name) const;
-    std::vector<std::string>getMusicDirs() const;
-    std::string getAssetChecked(AssetType type, const std::string& name,
-                                bool abort_on_error=false) const;
-    std::string getAsset(AssetType type, const std::string &name) const;
-    std::string getAsset(const std::string &name) const;
+    void               checkAndCreateDirForAddons(const std::string &dir);
+    bool               removeFile(const std::string &name) const;
+    bool               removeDirectory(const std::string &name) const;
+    std::vector<std::string>
+                       getMusicDirs() const;
+    std::string        getAssetChecked(AssetType type, const std::string& name,
+                                       bool abort_on_error=false) const;
+    std::string        getAsset(AssetType type, const std::string &name) const;
+    std::string        getAsset(const std::string &name) const;
 
-    std::string searchMusic(const std::string& file_name) const;
-    std::string searchTexture(const std::string& fname) const;
-    std::string getUserConfigFile(const std::string& fname) const;
-    void        listFiles        (std::set<std::string>& result,
-                                  const std::string& dir,
-                                  bool make_full_path=false) const;
+    std::string        searchMusic(const std::string& file_name) const;
+    std::string        searchTexture(const std::string& fname) const;
+    std::string        getUserConfigFile(const std::string& fname) const;
+    void               listFiles(std::set<std::string>& result,
+                                 const std::string& dir,
+                                 bool make_full_path=false) const;
 
 
-    void       pushTextureSearchPath(const std::string& path);
-    void       pushModelSearchPath  (const std::string& path);
-    void       popTextureSearchPath ();
-    void       popModelSearchPath   ();
-    void       redirectOutput();
+    void               pushTextureSearchPath (const std::string& path);
+    void               pushModelSearchPath   (const std::string& path);
+    void               popTextureSearchPath  ();
+    void               popModelSearchPath    ();
+    void               redirectOutput        ();
     // ------------------------------------------------------------------------
     /** Adds a directory to the music search path (or stack).
      */

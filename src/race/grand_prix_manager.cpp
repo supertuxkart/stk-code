@@ -21,6 +21,7 @@
 #include <set>
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
+#include "config/user_config.hpp"
 
 GrandPrixManager *grand_prix_manager = NULL;
 
@@ -33,10 +34,34 @@ GrandPrixManager::GrandPrixManager()
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
     {
-        if (StringUtils::hasSuffix(*i, ".grandprix")) load(*i);
-    }   // for i
-}   // GrandPrixManager
+        if (StringUtils::hasSuffix(*i, ".grandprix"))
+        {
+            try
+                { m_gp_data.push_back(new GrandPrixData(*i)); }
+            catch (std::logic_error& er)
+                { Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
+                                                  i->c_str(), er.what()); }
+        }
+    }
 
+    // Load additional Grand Prixs
+    const std::string dir = UserConfigParams::m_additional_gp_directory;
+    if(dir != "") {
+        file_manager->listFiles(result, dir);
+        for(std::set<std::string>::iterator i  = result.begin();
+                                            i != result.end()  ; i++)
+        {
+            if (StringUtils::hasSuffix(*i, ".grandprix"))
+            {
+                try
+                    { m_gp_data.push_back(new GrandPrixData(dir, *i)); }
+                catch (std::logic_error& er)
+                    { Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
+                                                      i->c_str(), er.what()); }
+            }
+        }
+    }
+}   // GrandPrixManager
 // ----------------------------------------------------------------------------
 GrandPrixManager::~GrandPrixManager()
 {
@@ -50,22 +75,11 @@ GrandPrixManager::~GrandPrixManager()
 const GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
-        if(m_gp_data[i]->getId()==s) return m_gp_data[i];
+        if(m_gp_data[i]->getId() == s)
+            return m_gp_data[i];
+
     return NULL;
 }   // getGrandPrix
-// ----------------------------------------------------------------------------
-void GrandPrixManager::load(const std::string& filename)
-{
-    try
-    {
-        m_gp_data.push_back(new GrandPrixData(filename));
-    }
-    catch (std::logic_error& er)
-    {
-        Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n", filename.c_str(), er.what());
-    }
-}   // load
-
 // ----------------------------------------------------------------------------
 void GrandPrixManager::checkConsistency()
 {
