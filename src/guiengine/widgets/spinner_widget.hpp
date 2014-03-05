@@ -97,9 +97,7 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
-	// to set the background image
-//	irr::video::ITexture* getBackgroundColor();
-        
+       
     public:
         
         LEAK_CHECK()
@@ -179,9 +177,8 @@ namespace GUIEngine
 
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
-
     };
-    
+
 }
 
 #endif

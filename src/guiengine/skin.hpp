@@ -318,7 +318,7 @@ namespace GUIEngine
                                  const bool pressed, const bool bottomArrow);
 
         void drawTooltip(Widget* widget, bool atMouse);
-	
+
 
     public:
 

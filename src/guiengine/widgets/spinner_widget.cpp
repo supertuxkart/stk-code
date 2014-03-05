@@ -108,9 +108,8 @@ void SpinnerWidget::add()
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, widgetID, L"");
     m_element = btn;
-    
-    m_element->setTabOrder( m_element->getID() );
 
+    m_element->setTabOrder( m_element->getID() );
 	
     // left arrow
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
@@ -120,7 +119,7 @@ void SpinnerWidget::add()
     m_children[0].m_event_handler = this;
     m_children[0].m_properties[PROP_ID] = "left";
     m_children[0].m_id = m_children[0].m_element->getID();
-    
+
     m_badge_x_shift = subsize_left_arrow.getWidth();
 
     // label
@@ -164,7 +163,7 @@ void SpinnerWidget::add()
         }
 	
     }
-   
+
 
     // right arrow
     rect<s32> subsize_right_arrow = rect<s32>(m_w - m_h, 0, m_w, m_h);
@@ -180,6 +179,7 @@ void SpinnerWidget::add()
 
     setValue(m_value);
 }
+// -----------------------------------------------------------------------------
 
 ITexture* SpinnerWidget::getTexture()
 {
@@ -367,8 +367,6 @@ stringw SpinnerWidget::getStringValue() const
     /** To avoid compiler warnings about missing return statements. */
     return "";
 }
-
-
 
 // -----------------------------------------------------------------------------
 

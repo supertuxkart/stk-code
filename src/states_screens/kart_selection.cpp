@@ -138,7 +138,7 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
 
     setUseBackgroundColor();//except for multiplayer kart selection, this is false
     setSpinnerWidgetPlayerID(m_player_id);
-}
+}   // PlayerNameSpinner
 // ------------------------------------------------------------------------
 void PlayerNameSpinner::setID(const int m_player_id)
 {
@@ -233,7 +233,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_y = player_name_y;
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
-    
 
     if (parent->m_multiplayer && associated_player)
     {
@@ -488,8 +487,7 @@ void PlayerKartWidget::add()
         const int player_amount = PlayerManager::get()->getNumPlayers();
         for (int n=0; n<player_amount; n++)
         {
-            core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
-	    	
+            core::stringw name = PlayerManager::get()->getPlayer(n)->getName(); 	
             m_player_ident_spinner->addLabel( translations->fribidize(name) );
         }
 
@@ -1837,7 +1835,6 @@ bool KartSelectionScreen::validateIdentChoices()
     // perform actual checking
     for (int n=0; n<amount; n++)
     {
-	
         // skip players that took a guest account, they can be many on the
         // same identity in this case
         if (m_kart_widgets[n].getAssociatedPlayer()->getProfile()
@@ -2099,8 +2096,6 @@ EventPropagation FocusDispatcher::focused(const int playerID)
     const int amount = m_parent->m_kart_widgets.size();
     for (int n=0; n<amount; n++)
     {
-	          
-
         if (m_parent->m_kart_widgets[n].getPlayerID() == playerID)
         {
             // If player is done, don't do anything with focus

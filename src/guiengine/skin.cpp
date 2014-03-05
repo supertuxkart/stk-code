@@ -1270,8 +1270,6 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
-        
-
     }
     else if (widget->isFocusedForPlayer(2))
     {
@@ -1293,7 +1291,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
     }
-    
+
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
         widget->m_parent->getType() == gui::EGUIET_WINDOW)
@@ -1318,7 +1316,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     drawBoxFromStretchableTexture(widget, sized_rect, params,
                                   widget->m_deactivated);
 
-   
+
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
     
