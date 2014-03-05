@@ -63,17 +63,17 @@ void SpinnerWidget::add()
 
     if (min_s.size() > 0)
     {
-        if (!StringUtils::parseString<int>(min_s, &m_min))
+		if (!StringUtils::parseString<int>(min_s, &m_min))
         {
-            Log::warn("invalid value for spinner widget minimum value : %s", min_s.c_str());
+			Log::warn("invalid value for spinner widget minimum value : %s", min_s.c_str());
         }
     }
 
     if (max_s.size() > 0)
     {
-        if (!StringUtils::parseString<int>(max_s, &m_max))
-        {
-            Log::warn("invalid value for spinner widget maximum value : %s", max_s.c_str());
+		if (!StringUtils::parseString<int>(max_s, &m_max))
+		{
+			Log::warn("invalid value for spinner widget maximum value : %s", max_s.c_str());
         }
     }
 
@@ -108,10 +108,10 @@ void SpinnerWidget::add()
     rect<s32> widget_size = rect<s32>(m_x, m_y, m_x + m_w, m_y + m_h);
     IGUIButton * btn = GUIEngine::getGUIEnv()->addButton(widget_size, m_parent, widgetID, L"");
     m_element = btn;
-
+    
     m_element->setTabOrder( m_element->getID() );
 
-
+	
     // left arrow
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
     IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, getNewNoFocusID(), L" ");
@@ -120,7 +120,7 @@ void SpinnerWidget::add()
     m_children[0].m_event_handler = this;
     m_children[0].m_properties[PROP_ID] = "left";
     m_children[0].m_id = m_children[0].m_element->getID();
-
+    
     m_badge_x_shift = subsize_left_arrow.getWidth();
 
     // label
@@ -147,8 +147,8 @@ void SpinnerWidget::add()
     {
         rect<s32> subsize_label = rect<s32>(m_h, 0, m_w - m_h, m_h);
         IGUIStaticText* label = GUIEngine::getGUIEnv()->addStaticText(stringw(m_value).c_str(), subsize_label,
-                false /* border */, true /* word wrap */,
-                btn, getNewNoFocusID());
+                                                                      false /* border */, true /* word wrap */,
+                                                                      btn, getNewNoFocusID());
         m_children[1].m_element = label;
         m_children[1].m_event_handler = this;
         m_children[1].m_id = label->getID();
@@ -162,9 +162,9 @@ void SpinnerWidget::add()
         {
             label->setText(m_labels[m_value].c_str() );
         }
-
+	
     }
-
+   
 
     // right arrow
     rect<s32> subsize_right_arrow = rect<s32>(m_w - m_h, 0, m_w, m_h);
@@ -176,7 +176,7 @@ void SpinnerWidget::add()
     m_children[2].m_id = m_children[2].m_element->getID();
 
     // refresh display
-
+	
 
     setValue(m_value);
 }
@@ -267,8 +267,8 @@ EventPropagation SpinnerWidget::leftPressed(const int playerID)
 // -----------------------------------------------------------------------------
 
 EventPropagation SpinnerWidget::transmitEvent(Widget* w,
-        const std::string& originator,
-        const int playerID)
+                                              const std::string& originator,
+                                              const int playerID)
 {
     assert(m_magic_number == 0xCAFEC001);
 
@@ -385,7 +385,7 @@ void SpinnerWidget::setValue(irr::core::stringw new_value)
     }
 
     std::cerr << "ERROR [SpinnerWidget::setValue] : cannot find element named '"
-        <<  irr::core::stringc(new_value.c_str()).c_str() << "'\n";
+              <<  irr::core::stringc(new_value.c_str()).c_str() << "'\n";
     assert(false);
 }
 

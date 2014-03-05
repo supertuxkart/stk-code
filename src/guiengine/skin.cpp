@@ -146,16 +146,16 @@ namespace SkinConfig
     }   // parseColor
     // ------------------------------------------------------------------------
     /**
-     * \brief loads skin information from a STK skin file
-     * \throw std::runtime_error if file cannot be read
-     */
+      * \brief loads skin information from a STK skin file
+      * \throw std::runtime_error if file cannot be read
+      */
     static void loadFromFile(std::string file)
     {
         XMLNode* root = file_manager->createXMLTree(file);
         if(!root)
         {
             Log::error("skin", "Could not read XML file '%s'.",
-                    file.c_str());
+                       file.c_str());
             throw std::runtime_error("Invalid skin file");
         }
 
@@ -175,7 +175,7 @@ namespace SkinConfig
             else
             {
                 Log::error("skin", "Unknown node in XML file '%s'.",
-                        node->getName().c_str());
+                           node->getName().c_str());
             }
         }// nend for
 
@@ -216,17 +216,17 @@ void BoxRenderParams::setTexture(ITexture* image)
 
     m_image = image;
     /*
-       The source texture is split this way to allow for a stretchable center
-       and borders that don't stretch :
+     The source texture is split this way to allow for a stretchable center
+     and borders that don't stretch :
 
-       +----+--------------------+----+
-       |    |                    |    |
-       +----a--------------------b----+ <-- top_border
-       |    |                    |    |
-       |    |                    |    |
-       +----c--------------------d----+ <-- height - bottom-border
-       |    |                    |    |
-       +----+--------------------+----+
+     +----+--------------------+----+
+     |    |                    |    |
+     +----a--------------------b----+ <-- top_border
+     |    |                    |    |
+     |    |                    |    |
+     +----c--------------------d----+ <-- height - bottom-border
+     |    |                    |    |
+     +----+--------------------+----+
      */
 
     const int texture_w = image->getSize().Width;
@@ -260,26 +260,26 @@ void BoxRenderParams::calculateYFlipIfNeeded()
     if (m_y_flip_set) return;
 
 #define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y; \
-    const int y2 = X.LowerRightCorner.Y; \
-    X##_yflip = X; \
-    X##_yflip.UpperLeftCorner.Y =  y2;\
-    X##_yflip.LowerRightCorner.Y =  y1;}
+const int y2 = X.LowerRightCorner.Y; \
+X##_yflip = X; \
+X##_yflip.UpperLeftCorner.Y =  y2;\
+X##_yflip.LowerRightCorner.Y =  y1;}
 
     FLIP_Y(m_source_area_left)
-        FLIP_Y(m_source_area_center)
-        FLIP_Y(m_source_area_right)
+    FLIP_Y(m_source_area_center)
+    FLIP_Y(m_source_area_right)
 
-        FLIP_Y(m_source_area_top)
-        FLIP_Y(m_source_area_bottom)
+    FLIP_Y(m_source_area_top)
+    FLIP_Y(m_source_area_bottom)
 
-        FLIP_Y(m_source_area_top_left)
-        FLIP_Y(m_source_area_top_right)
-        FLIP_Y(m_source_area_bottom_left)
-        FLIP_Y(m_source_area_bottom_right)
+    FLIP_Y(m_source_area_top_left)
+    FLIP_Y(m_source_area_top_right)
+    FLIP_Y(m_source_area_bottom_left)
+    FLIP_Y(m_source_area_bottom_right)
 #undef FLIP_Y
 
 
-        m_y_flip_set = true;
+    m_y_flip_set = true;
 }   // calculateYFlipIfNeeded
 
 // ----------------------------------------------------------------------------
@@ -290,7 +290,7 @@ void BoxRenderParams::calculateYFlipIfNeeded()
 Skin::Skin(IGUISkin* fallback_skin)
 {
     std::string skin_name = file_manager->getAsset(FileManager::SKIN,
-            UserConfigParams::m_skin_file);
+                                                   UserConfigParams::m_skin_file);
 
     try
     {
@@ -303,7 +303,7 @@ Skin::Skin(IGUISkin* fallback_skin)
         UserConfigParams::m_skin_file.revertToDefaults();
 
         skin_name = file_manager->getAsset(FileManager::SKIN,
-                UserConfigParams::m_skin_file);
+                                           UserConfigParams::m_skin_file);
         SkinConfig::loadFromFile( skin_name );
     }
 
@@ -363,28 +363,28 @@ void Skin::drawBgImage()
         const int clipped_x_space = (texture_w - screen_w);
 
         dest = core::recti(-clipped_x_space/2, 0,
-                screen_w+clipped_x_space/2, texture_h);
+                               screen_w+clipped_x_space/2, texture_h);
     }
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     draw2DImage(bg_image, dest, source_area,
-            /* no clipping */0, /*color*/ 0,
-            /*alpha*/false);
+                                        /* no clipping */0, /*color*/ 0,
+                                        /*alpha*/false);
     irr_driver->getVideoDriver()->enableMaterial2D(false);
 }   // drawBgImage
 
 // ----------------------------------------------------------------------------
 void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
-        const core::recti &dest,
-        BoxRenderParams& params,
-        bool deactivated,
-        const core::recti* clipRect)
+                                         const core::recti &dest,
+                                         BoxRenderParams& params,
+                                         bool deactivated,
+                                         const core::recti* clipRect)
 {
     // check if widget moved. if so, recalculate coords
     if (w->m_skin_x != dest.UpperLeftCorner.X ||
-            w->m_skin_y != dest.UpperLeftCorner.Y ||
-            w->m_skin_w != dest.getWidth()        ||
-            w->m_skin_h != dest.getHeight()            )
+        w->m_skin_y != dest.UpperLeftCorner.Y ||
+        w->m_skin_w != dest.getWidth()        ||
+        w->m_skin_h != dest.getHeight()            )
     {
         w->m_skin_dest_areas_inited = false;
         w->m_skin_dest_areas_yflip_inited = false;
@@ -408,20 +408,20 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
     const int texture_h = source->getSize().Height;
 
     /*
-       The dest area is split this way. Borders can go a bit beyond the given
-       area so components inside don't go over the borders
-       (how much it exceeds horizontally is specified in 'hborder_out_portion'.
-       vertically is always the totality)
+     The dest area is split this way. Borders can go a bit beyond the given
+     area so components inside don't go over the borders
+     (how much it exceeds horizontally is specified in 'hborder_out_portion'.
+     vertically is always the totality)
 
-       a----b--------------------c----+
-       |    |                    |    |
-       d----e--------------------f----g  <-- top_border
-       |    |                    |    |
-       |    |                    |    |
-       |    |                    |    |
-       h----i--------------------j----k  <-- height - bottom-border
-       |    |                    |    |
-       +----l--------------------m----n
+     a----b--------------------c----+
+     |    |                    |    |
+     d----e--------------------f----g  <-- top_border
+     |    |                    |    |
+     |    |                    |    |
+     |    |                    |    |
+     h----i--------------------j----k  <-- height - bottom-border
+     |    |                    |    |
+     +----l--------------------m----n
      */
 
     if (!w->m_skin_dest_areas_inited)
@@ -440,11 +440,11 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
         if (preserve_h_aspect_ratios)
         {
             dest_left_border   = (int)(  left_border
-                    * (w->m_skin_dest_y2 - w->m_skin_dest_y)
-                    / texture_h);
+                                       * (w->m_skin_dest_y2 - w->m_skin_dest_y)
+                                       / texture_h);
             dest_right_border  = (int)(right_border
-                    * (w->m_skin_dest_y2 - w->m_skin_dest_y)
-                    / texture_h);
+                                       * (w->m_skin_dest_y2 - w->m_skin_dest_y)
+                                       / texture_h);
         }
         else
         {
@@ -463,21 +463,21 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
         const float vborder_in_portion = 1 - vborder_out_portion;
 
         const int ax = (int)(w->m_skin_dest_x
-                - dest_left_border * hborder_out_portion);
+                             - dest_left_border * hborder_out_portion);
         const int ay = (int)(w->m_skin_dest_y
-                - dest_top_border  * vborder_out_portion);
+                             - dest_top_border  * vborder_out_portion);
 
         const int bx = (int)(w->m_skin_dest_x
-                + dest_left_border*hborder_in_portion);
+                             + dest_left_border*hborder_in_portion);
         const int by = ay;
 
         const int cx = (int)(w->m_skin_dest_x2
-                - dest_right_border*hborder_in_portion);
+                             - dest_right_border*hborder_in_portion);
         const int cy = ay;
 
         const int dx = ax;
         const int dy = (int)(w->m_skin_dest_y
-                + dest_top_border*vborder_in_portion);
+                             + dest_top_border*vborder_in_portion);
 
         const int ex = bx;
         const int ey = dy;
@@ -486,12 +486,12 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
         const int fy = dy;
 
         const int gx = (int)(w->m_skin_dest_x2
-                + dest_right_border*hborder_out_portion);
+                             + dest_right_border*hborder_out_portion);
         const int gy = dy;
 
         const int hx = ax;
         const int hy = (int)(w->m_skin_dest_y2
-                - dest_bottom_border*vborder_in_portion);
+                             - dest_bottom_border*vborder_in_portion);
 
         const int ix = bx;
         const int iy = hy;
@@ -504,7 +504,7 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
 
         const int lx = bx;
         const int ly = (int)(w->m_skin_dest_y2
-                + dest_bottom_border*vborder_out_portion);
+                            + dest_bottom_border*vborder_out_portion);
 
         const int mx = cx;
         const int my = ly;
@@ -532,25 +532,25 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
         if (!w->m_skin_dest_areas_yflip_inited)
         {
 #define FLIP_Y( X ) {     const int y1 = X.UpperLeftCorner.Y \
-    - w->m_skin_dest_y; \
-    const int y2 = X.LowerRightCorner.Y - w->m_skin_dest_y; \
-    X##_yflip = X; \
-    X##_yflip.UpperLeftCorner.Y = w->m_skin_dest_y + \
+                                       - w->m_skin_dest_y; \
+const int y2 = X.LowerRightCorner.Y - w->m_skin_dest_y; \
+X##_yflip = X; \
+X##_yflip.UpperLeftCorner.Y = w->m_skin_dest_y + \
     (w->m_skin_dest_y2 - w->m_skin_dest_y) - y2;\
-    X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
+X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
     (w->m_skin_dest_y2 - w->m_skin_dest_y) - y1;}
 
-            FLIP_Y(w->m_skin_dest_area_left)
-                FLIP_Y(w->m_skin_dest_area_center)
-                FLIP_Y(w->m_skin_dest_area_right)
+        FLIP_Y(w->m_skin_dest_area_left)
+        FLIP_Y(w->m_skin_dest_area_center)
+        FLIP_Y(w->m_skin_dest_area_right)
 
-                FLIP_Y(w->m_skin_dest_area_top)
-                FLIP_Y(w->m_skin_dest_area_bottom)
+        FLIP_Y(w->m_skin_dest_area_top)
+        FLIP_Y(w->m_skin_dest_area_bottom)
 
-                FLIP_Y(w->m_skin_dest_area_top_left)
-                FLIP_Y(w->m_skin_dest_area_top_right)
-                FLIP_Y(w->m_skin_dest_area_bottom_left)
-                FLIP_Y(w->m_skin_dest_area_bottom_right)
+        FLIP_Y(w->m_skin_dest_area_top_left)
+        FLIP_Y(w->m_skin_dest_area_top_right)
+        FLIP_Y(w->m_skin_dest_area_bottom_left)
+        FLIP_Y(w->m_skin_dest_area_bottom_right)
 
 #undef FLIP_Y
         }
@@ -574,7 +574,7 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
 #undef GET_AREA
 
 #define GET_AREA( X ) X = (vertical_flip ? w->m_skin_##X##_yflip \
-        : w->m_skin_##X)
+                                         : w->m_skin_##X)
     core::recti& GET_AREA(dest_area_left);
     core::recti& GET_AREA(dest_area_center);
     core::recti& GET_AREA(dest_area_right);
@@ -592,7 +592,7 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
 
     // create a color object
     if ( (w->m_skin_r != -1 && w->m_skin_g != -1 && w->m_skin_b != -1) ||
-            ID_DEBUG || deactivated)
+         ID_DEBUG || deactivated)
     {
         SColor thecolor(255, w->m_skin_r, w->m_skin_g, w->m_skin_b);
         colorptr = new SColor[4]();
@@ -614,66 +614,66 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
     if ((areas & BoxRenderParams::LEFT) != 0)
     {
         draw2DImage(source, dest_area_left,
-                m_source_area_left, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_left, clipRect,
+                                            colorptr, true /* alpha */);
     }
 
     if ((areas & BoxRenderParams::BODY) != 0)
     {
         draw2DImage(source, dest_area_center,
-                m_source_area_center, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_center, clipRect,
+                                            colorptr, true /* alpha */);
     }
 
     if ((areas & BoxRenderParams::RIGHT) != 0)
     {
         draw2DImage(source, dest_area_right,
-                m_source_area_right, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_right, clipRect,
+                                            colorptr, true /* alpha */);
     }
 
     if ((areas & BoxRenderParams::TOP) != 0)
     {
         draw2DImage(source, dest_area_top,
-                m_source_area_top, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_top, clipRect,
+                                            colorptr, true /* alpha */);
     }
     if ((areas & BoxRenderParams::BOTTOM) != 0)
     {
         draw2DImage(source, dest_area_bottom,
-                m_source_area_bottom, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_bottom, clipRect,
+                                            colorptr, true /* alpha */);
     }
 
     if ( ((areas & BoxRenderParams::LEFT) != 0) &&
-            ((areas & BoxRenderParams::TOP ) != 0)     )
+         ((areas & BoxRenderParams::TOP ) != 0)     )
     {
         draw2DImage(source, dest_area_top_left,
-                m_source_area_top_left, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_top_left, clipRect,
+                                            colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::RIGHT) != 0) &&
-            ((areas & BoxRenderParams::TOP  ) != 0)    )
+         ((areas & BoxRenderParams::TOP  ) != 0)    )
     {
         draw2DImage(source, dest_area_top_right,
-                m_source_area_top_right, clipRect,
-                colorptr, true /* alpha */);
+                                            m_source_area_top_right, clipRect,
+                                            colorptr, true /* alpha */);
     }
     if ( ((areas & BoxRenderParams::LEFT  ) != 0) &&
-            ((areas & BoxRenderParams::BOTTOM) != 0)    )
+         ((areas & BoxRenderParams::BOTTOM) != 0)    )
     {
         draw2DImage(source, dest_area_bottom_left,
-                m_source_area_bottom_left,
-                clipRect, colorptr,
-                /*alpha*/true );
+                                            m_source_area_bottom_left,
+                                            clipRect, colorptr,
+                                            /*alpha*/true );
     }
     if ( ((areas & BoxRenderParams::RIGHT ) != 0) &&
-            ((areas & BoxRenderParams::BOTTOM) != 0)    )
+         ((areas & BoxRenderParams::BOTTOM) != 0)    )
     {
         draw2DImage(source, dest_area_bottom_right,
-                m_source_area_bottom_right,
-                clipRect, colorptr,
-                /*alpha*/true );
+                                            m_source_area_bottom_right,
+                                            clipRect, colorptr,
+                                            /*alpha*/true );
     }
 
     if (colorptr != NULL)
@@ -689,12 +689,12 @@ void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
  *  for other players is not supported)
  */
 void Skin::drawButton(Widget* w, const core::recti &rect,
-        const bool pressed, const bool focused)
+                      const bool pressed, const bool focused)
 {
 
     // if within an appearing dialog, grow
     if (m_dialog && m_dialog_size < 1.0f && w->m_parent != NULL &&
-            w->m_parent->getType() == gui::EGUIET_WINDOW)
+        w->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::recti sized_rect = rect;
         core::position2d<u32> center =
@@ -703,28 +703,28 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
 
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.UpperLeftCorner.Y  =
             center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
         sized_rect.LowerRightCorner.X =
             center.X + (int)(((int)rect.LowerRightCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.LowerRightCorner.Y =
             center.Y + (int)(((int)rect.LowerRightCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
 
         if (focused)
         {
             drawBoxFromStretchableTexture(w, sized_rect,
-                    SkinConfig::m_render_params["button::focused"],
-                    w->m_deactivated);
+                                SkinConfig::m_render_params["button::focused"],
+                                w->m_deactivated);
         }
         else
         {
             drawBoxFromStretchableTexture(w, sized_rect,
-                    SkinConfig::m_render_params["button::neutral"],
-                    w->m_deactivated);
+                                SkinConfig::m_render_params["button::neutral"],
+                                w->m_deactivated);
         }
     }
     else   // not within an appearing dialog
@@ -732,14 +732,14 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
         if (focused)
         {
             drawBoxFromStretchableTexture(w, rect,
-                    SkinConfig::m_render_params["button::focused"],
-                    w->m_deactivated);
+                                SkinConfig::m_render_params["button::focused"],
+                                w->m_deactivated);
         }
         else
         {
             drawBoxFromStretchableTexture(w, rect,
-                    SkinConfig::m_render_params["button::neutral"],
-                    w->m_deactivated);
+                                SkinConfig::m_render_params["button::neutral"],
+                                w->m_deactivated);
         }   // if not focused
     }   // not within an appearing dialog
 }   // drawButton
@@ -750,12 +750,12 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
  * for other players is not supported)
  */
 void Skin::drawProgress(Widget* w, const core::recti &rect,
-        const bool pressed, const bool focused)
+                        const bool pressed, const bool focused)
 {
     core::recti sized_rect = rect;
     // if within an appearing dialog, grow
     if (m_dialog && m_dialog_size < 1.0f && w->m_parent != NULL &&
-            w->m_parent->getType() == gui::EGUIET_WINDOW                 )
+        w->m_parent->getType() == gui::EGUIET_WINDOW                 )
     {
         core::position2d<u32> center =
             core::position2d<u32>(irr_driver->getFrameSize()/2);
@@ -763,42 +763,42 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
 
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.UpperLeftCorner.Y  =
             center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
         sized_rect.LowerRightCorner.X =
             center.X + (int)(((int)rect.LowerRightCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.LowerRightCorner.Y =
             center.Y + (int)(((int)rect.LowerRightCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
 
         drawBoxFromStretchableTexture(w, sized_rect,
-                SkinConfig::m_render_params["progress::neutral"],
-                w->m_deactivated);
+                              SkinConfig::m_render_params["progress::neutral"],
+                              w->m_deactivated);
     }
     else
     {
         ProgressBarWidget * progress = (ProgressBarWidget*)w;
         drawBoxFromStretchableTexture(w, rect,
-                SkinConfig::m_render_params["progress::neutral"],
-                w->m_deactivated);
+                              SkinConfig::m_render_params["progress::neutral"],
+                              w->m_deactivated);
         //the " - 10" is a dirty hack to avoid to have the right arrow
         // before the left one
         //FIXME
         core::recti rect2 = rect;
         rect2.LowerRightCorner.X -= (rect.getWidth() - 10)
-            - progress->getValue()*rect.getWidth()/100;
+                                  - progress->getValue()*rect.getWidth()/100;
 
         drawBoxFromStretchableTexture(w, rect2,
-                SkinConfig::m_render_params["progress::fill"],
-                w->m_deactivated);
+                                 SkinConfig::m_render_params["progress::fill"],
+                                 w->m_deactivated);
 #if 0
-        draw2DImage(
-                SkinConfig::m_render_params["progress::fill"].getImage(),
-                sized_rect, core::recti(0,0,progress->m_w, progress->m_h),
-                0 /* no clipping */, colors, true);
+          draw2DImage(
+              SkinConfig::m_render_params["progress::fill"].getImage(),
+              sized_rect, core::recti(0,0,progress->m_w, progress->m_h),
+              0 /* no clipping */, colors, true);
 #endif
 
     }
@@ -810,7 +810,7 @@ void Skin::drawProgress(Widget* w, const core::recti &rect,
  * for other players is not supported)
  */
 void Skin::drawRatingBar(Widget *w, const core::recti &rect,
-        const bool pressed, const bool focused)
+                        const bool pressed, const bool focused)
 {
     RatingBarWidget *ratingBar = (RatingBarWidget*)w;
 
@@ -818,7 +818,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
-
+    
     const int star_number = ratingBar->getStarNumber();
 
     int star_h = rect.getHeight();
@@ -830,7 +830,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_w = (int)(star_w * scale_factor);
         star_h = (int)(star_h * scale_factor);
     }
-
+    
     // center horizontally and vertically
     const int x_from = rect.UpperLeftCorner.X;
     const int y_from = rect.UpperLeftCorner.Y;
@@ -841,9 +841,9 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         ratingBar->setStepValuesByMouse(irr_driver->getDevice()->getCursorControl()->getPosition(), stars_rect);
 
     SColor colors[] =  { SColor(100,255,255,255),
-        SColor(100,255,255,255),
-        SColor(100,255,255,255),
-        SColor(100,255,255,255) };
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255),
+                         SColor(100,255,255,255) };
 
     for (int i = 0; i < star_number; i++)
     {
@@ -853,17 +853,17 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.UpperLeftCorner.Y  = y_from;
         star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
         star_rect.LowerRightCorner.Y = y_from + star_h;
-
+        
         int step = ratingBar->getStepsOfStar(i);
-
+        
         const core::recti source_area(texture_w * step, 0, 
-                texture_w * (step + 1), texture_h);
+                                      texture_w * (step + 1), texture_h);
 
         draw2DImage(texture,
-                star_rect, source_area,
-                0 /* no clipping */,
-                (w->m_deactivated || ID_DEBUG) ? colors : 0,
-                true /* alpha */);
+                                            star_rect, source_area,
+                                            0 /* no clipping */,
+                                           (w->m_deactivated || ID_DEBUG) ? colors : 0,
+                                            true /* alpha */);
     }
 
 }   // drawRatingBar
@@ -876,18 +876,18 @@ SColor Skin::getColor(const std::string &name)
 
 // ----------------------------------------------------------------------------
 void Skin::drawRibbon(const core::recti &rect, Widget* widget,
-        const bool pressed, bool focused)
+                      const bool pressed, bool focused)
 {
 }   // drawRibbon
 
 // ----------------------------------------------------------------------------
 /**
- * @param focused whether this element is focus by the master player (whether
- * the widget is focused for other players is automatically determined)
- * FIXME: ugly to pass some focuses through parameter and others not xD
- */
+  * @param focused whether this element is focus by the master player (whether
+  * the widget is focused for other players is automatically determined)
+  * FIXME: ugly to pass some focuses through parameter and others not xD
+  */
 void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
-        const bool pressed, bool focused)
+                           const bool pressed, bool focused)
 {
     // for now, when this kind of widget is disabled, just hide it. we can
     // change that behaviour if we ever need to...
@@ -900,7 +900,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
         focusedElem = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER)
-            ->getIrrlichtElement();
+                      ->getIrrlichtElement();
     }
 
     const bool parent_focused =
@@ -920,8 +920,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
         const bool mouseIn = rect.isPointInside(irr_driver->getDevice()
-                ->getCursorControl()
-                ->getPosition()        );
+                                                ->getCursorControl()
+                                                ->getPosition()        );
 
         BoxRenderParams* params;
 
@@ -938,7 +938,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         // automatically guess from position on-screen if tabs go up or down
         const bool vertical_flip =
             (unsigned int)rect.UpperLeftCorner.Y <
-            GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
+              GUIEngine::getDriver()->getCurrentRenderTargetSize().Height/2;
         params->m_vertical_flip = vertical_flip;
 
         core::recti rect2 = rect;
@@ -950,8 +950,8 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         }
 
         drawBoxFromStretchableTexture(widget, rect2, *params,
-                parentRibbon->m_deactivated ||
-                widget->m_deactivated);
+                                      parentRibbon->m_deactivated ||
+                                        widget->m_deactivated);
 
         for (unsigned int n=0; n<MATERIAL_MAX_TEXTURES; n++)
         {
@@ -964,19 +964,19 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
         bool use_glow = true;
 
         if (widget->m_event_handler != NULL &&
-                widget->m_event_handler->m_properties[PROP_SQUARE] == "true")
+            widget->m_event_handler->m_properties[PROP_SQUARE] == "true")
             use_glow = false;
         if (widget->m_event_handler != NULL &&
-                widget->m_event_handler->m_event_handler != NULL &&
-                widget->m_event_handler->m_event_handler
-                ->m_properties[PROP_SQUARE] == "true")
+            widget->m_event_handler->m_event_handler != NULL &&
+            widget->m_event_handler->m_event_handler
+                    ->m_properties[PROP_SQUARE] == "true")
             use_glow = false;
 
         /* in combo ribbons, always show selection */
         RibbonWidget* parentRibbonWidget = NULL;
 
         if (widget->m_event_handler != NULL &&
-                widget->m_event_handler->m_type == WTYPE_RIBBON)
+            widget->m_event_handler->m_type == WTYPE_RIBBON)
         {
             parentRibbonWidget =
                 dynamic_cast<RibbonWidget*>(widget->m_event_handler);
@@ -986,23 +986,23 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
         const bool mark_focused =
             focused || (parent_focused && parentRibbonWidget != NULL &&
-                    parentRibbonWidget->m_mouse_focus == widget) ||
-            (mark_selected && !always_show_selection &&
-             parent_focused);
+                          parentRibbonWidget->m_mouse_focus == widget) ||
+                       (mark_selected && !always_show_selection &&
+                          parent_focused);
 
         /* draw "selection bubble" if relevant */
         if (always_show_selection && mark_selected)
         {
             ITexture* tex_bubble =
                 SkinConfig::m_render_params["selectionHalo::neutral"]
-                .getImage();
+                           .getImage();
 
             const int texture_w = tex_bubble->getSize().Width;
             const int texture_h = tex_bubble->getSize().Height;
             const float aspectRatio = (float)texture_w / (float)texture_h;
 
             core::recti source_area = core::recti(0, 0,
-                    texture_w,texture_h);
+                                                          texture_w,texture_h);
 
             const float outgrow = 0.35f; // make slightly bigger than the
             // icon it's on
@@ -1012,27 +1012,27 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
             const int y_shift_up = int((rectHeight - rect.getHeight()) / 2.0f);
 
             core::position2di pos(rect.UpperLeftCorner.X + x_gap,
-                    rect.UpperLeftCorner.Y - y_shift_up);
+                                  rect.UpperLeftCorner.Y - y_shift_up);
             core::recti rect2(pos,
-                    core::dimension2di(rectWidth, rectHeight) );
+                              core::dimension2di(rectWidth, rectHeight) );
 
             if (widget->m_deactivated || ID_DEBUG)
             {
                 SColor colors[] =  { SColor(100,255,255,255),
-                    SColor(100,255,255,255),
-                    SColor(100,255,255,255),
-                    SColor(100,255,255,255) };
+                                     SColor(100,255,255,255),
+                                     SColor(100,255,255,255),
+                                     SColor(100,255,255,255) };
                 draw2DImage(tex_bubble, rect2,
-                        source_area,
-                        0 /* no clipping */,
-                        colors, true /* alpha */);
+                                                    source_area,
+                                                    0 /* no clipping */,
+                                                    colors, true /* alpha */);
             }
             else
             {
                 draw2DImage(tex_bubble, rect2,
-                        source_area,
-                        0 /* no clipping */, 0,
-                        true /* alpha */);
+                                                    source_area,
+                                                    0 /* no clipping */, 0,
+                                                    true /* alpha */);
             }
         }
 
@@ -1060,13 +1060,13 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
 
                 const int glow_center_x = rect.UpperLeftCorner.X
-                    + rect.getWidth()/2;
+                                        + rect.getWidth()/2;
                 const int glow_center_y = rect.UpperLeftCorner.Y
-                    + rect.getHeight() - 5;
+                                        + rect.getHeight() - 5;
 
                 ITexture* tex_ficonhighlight =
                     SkinConfig::m_render_params["focusHalo::neutral"]
-                    .getImage();
+                               .getImage();
                 const int texture_w = tex_ficonhighlight->getSize().Width;
                 const int texture_h = tex_ficonhighlight->getSize().Height;
 
@@ -1074,15 +1074,15 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
 
                 const core::recti rect2(glow_center_x - 45 - grow,
-                        glow_center_y - 25 - grow/2,
-                        glow_center_x + 45 + grow,
-                        glow_center_y + 25 + grow/2);
+                                        glow_center_y - 25 - grow/2,
+                                        glow_center_x + 45 + grow,
+                                        glow_center_y + 25 + grow/2);
 
                 draw2DImage(tex_ficonhighlight, rect2,
-                        source_area,
-                        /*clipping*/ 0,
-                        /*color*/ 0,
-                        /*alpha*/true );
+                                                    source_area,
+                                                    /*clipping*/ 0,
+                                                    /*color*/ 0,
+                                                    /*alpha*/true );
             }
             // if we're not using glow, draw square focus instead
             else
@@ -1096,15 +1096,15 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                     return;
 
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                        SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+                      SkinConfig::m_render_params["squareFocusHalo::neutral"]);
                 nPlayersOnThisItem++;
             }
         } // end if mark_focused
 
         // ---- Draw selection for other players than player 1
         if (parentRibbon->isFocusedForPlayer(1) &&
-                parentRibbon->getSelectionIDString(1) ==
-                widget->m_properties[PROP_ID])
+            parentRibbon->getSelectionIDString(1) ==
+                                            widget->m_properties[PROP_ID])
         {
             if (nPlayersOnThisItem > 0)
             {
@@ -1115,20 +1115,20 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 rect2.LowerRightCorner.X += enlarge;
                 rect2.LowerRightCorner.Y += enlarge;
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
-                        SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
             else
             {
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                        SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
             }
 
             nPlayersOnThisItem++;
         }
 
         if (parentRibbon->isFocusedForPlayer(2) &&
-                parentRibbon->getSelectionIDString(2) ==
-                widget->m_properties[PROP_ID])
+            parentRibbon->getSelectionIDString(2) ==
+                                                 widget->m_properties[PROP_ID])
         {
             if (nPlayersOnThisItem > 0)
             {
@@ -1139,19 +1139,19 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 rect2.LowerRightCorner.X += enlarge;
                 rect2.LowerRightCorner.Y += enlarge;
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
-                        SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
             }
             else
             {
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                        SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
             }
             nPlayersOnThisItem++;
         }
 
         if (parentRibbon->isFocusedForPlayer(3) &&
-                parentRibbon->getSelectionIDString(3) ==
-                widget->m_properties[PROP_ID])
+            parentRibbon->getSelectionIDString(3) ==
+                                                 widget->m_properties[PROP_ID])
         {
             if (nPlayersOnThisItem > 0)
             {
@@ -1162,12 +1162,12 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
                 rect2.LowerRightCorner.X += enlarge;
                 rect2.LowerRightCorner.Y += enlarge;
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect2,
-                        SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
             }
             else
             {
                 drawBoxFromStretchableTexture(parentRibbonWidget, rect,
-                        SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
             }
             nPlayersOnThisItem++;
         }
@@ -1178,11 +1178,11 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
 
 
     if (/*mark_selected && widget->hasTooltip() &&
-          (focused || parent_focused) &&*/
-            parentRibbon->m_mouse_focus == widget)
+        (focused || parent_focused) &&*/
+        parentRibbon->m_mouse_focus == widget)
     {
         if (rect.isPointInside(irr_driver->getDevice()->getCursorControl()
-                    ->getPosition()))
+                                                      ->getPosition()))
         {
             m_tooltip_at_mouse.push_back(true);
             m_tooltips.push_back(widget);
@@ -1197,7 +1197,7 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
  * FIXME: ugly to pass some focuses through parameter and others not xD
  */
 void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
-        const bool pressed, bool focused)
+                           const bool pressed, bool focused)
 {
     if (!widget->isVisible()) return;
 
@@ -1214,8 +1214,8 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         if (focused_widget != NULL && widget->m_children.size()>2)
         {
             if (widget->m_children[0].getID() == focused_widget->getID() ||
-                    widget->m_children[1].getID() == focused_widget->getID() ||
-                    widget->m_children[2].getID() == focused_widget->getID())
+                widget->m_children[1].getID() == focused_widget->getID() ||
+                widget->m_children[2].getID() == focused_widget->getID())
             {
                 focused = true;
             }
@@ -1223,14 +1223,13 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     }
 
     BoxRenderParams& params = (focused || pressed)
-        ? SkinConfig::m_render_params["spinner::focused"]
-        : SkinConfig::m_render_params["spinner::neutral"];
+                            ? SkinConfig::m_render_params["spinner::focused"]
+                            : SkinConfig::m_render_params["spinner::neutral"];
 
     // defining a spinner widget to use the spinner widget class property(getBackgroundColor)
     SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
     if(q->getUseBackgroundColor())
     {
-
         int player_id=q->getSpinnerWidgetPlayerID();
         if(player_id==0)
             params=SkinConfig::m_render_params["spinner1::neutral"];
@@ -1258,8 +1257,8 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
-                SkinConfig::m_render_params["squareFocusHalo::neutral"]);
-
+                     SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+        
 
     }
     else if (widget->isFocusedForPlayer(1))
@@ -1270,8 +1269,8 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
-                SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
-
+                     SkinConfig::m_render_params["squareFocusHalo2::neutral"]);
+        
 
     }
     else if (widget->isFocusedForPlayer(2))
@@ -1282,7 +1281,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
-                SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo3::neutral"]);
     }
     else if (widget->isFocusedForPlayer(3))
     {
@@ -1292,51 +1291,51 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.X -= 2;
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
-                SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
+                     SkinConfig::m_render_params["squareFocusHalo4::neutral"]);
     }
-
+    
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
-            widget->m_parent->getType() == gui::EGUIET_WINDOW)
+        widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center(irr_driver->getFrameSize()/2);
         const float texture_size = sin(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.UpperLeftCorner.Y  =
             center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
 
         sized_rect.LowerRightCorner.X =
             center.X + (int)(((int)rect.LowerRightCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.LowerRightCorner.Y =
             center.Y + (int)(((int)rect.LowerRightCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
     }
 
     drawBoxFromStretchableTexture(widget, sized_rect, params,
-            widget->m_deactivated);
+                                  widget->m_deactivated);
 
-
+   
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
-
+    
     if (w->isGauge() && !w->m_deactivated)
     {
         const int handle_size = (int)( widget->m_h*params.m_left_border
-                /(float)params.getImage()->getSize().Height );
+                                 /(float)params.getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin())
-            / (w->getMax() - w->getMin());
+                          / (w->getMax() - w->getMin());
 
 
         const core::recti dest_area(rect.UpperLeftCorner.X + handle_size,
-                rect.UpperLeftCorner.Y,
-                rect.UpperLeftCorner.X + handle_size +
-                (int)((widget->m_w
-                        - 2*handle_size)*value),
-                rect.UpperLeftCorner.Y + widget->m_h);
+                                    rect.UpperLeftCorner.Y,
+                                    rect.UpperLeftCorner.X + handle_size +
+                                           (int)((widget->m_w
+                                                  - 2*handle_size)*value),
+                                    rect.UpperLeftCorner.Y + widget->m_h);
 
         const ITexture* texture =
             SkinConfig::m_render_params["gaugefill::neutral"].getImage();
@@ -1346,9 +1345,9 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         const core::recti source_area(0, 0, texture_w, texture_h);
 
         draw2DImage(texture,
-                dest_area, source_area,
-                0 /* no clipping */, 0,
-                true /* alpha */);
+                                            dest_area, source_area,
+                                            0 /* no clipping */, 0,
+                                            true /* alpha */);
 
     }
 
@@ -1365,7 +1364,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
  *   other players is not supported)
  */
 void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
-        const bool pressed, bool focused)
+                            const bool pressed, bool focused)
 {
     if (!widget->isVisible()) return;
 
@@ -1382,13 +1381,13 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
             return;
 
         core::recti rect2(spinner->m_x, spinner->m_y,
-                spinner->m_x + spinner->m_w,
-                spinner->m_y + spinner->m_h  );
+                          spinner->m_x + spinner->m_w,
+                          spinner->m_y + spinner->m_h  );
 
         BoxRenderParams& params = SkinConfig::m_render_params["spinner::down"];
         params.areas = areas;
         drawBoxFromStretchableTexture(widget, rect, params,
-                widget->m_deactivated);
+                                      widget->m_deactivated);
     }
 
 }
@@ -1396,23 +1395,23 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
 // ----------------------------------------------------------------------------
 /**
  * @param focused whether this element is focus by the master player (focus for
- *   other players is not supported)
+*   other players is not supported)
  */
 void Skin::drawIconButton(const core::recti &rect, Widget* widget,
-        const bool pressed, bool focused)
+                          const bool pressed, bool focused)
 {
     RibbonWidget* parentRibbon = dynamic_cast<RibbonWidget*>(widget->m_event_handler);
     IGUIElement* focusedElem = NULL;
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
         focusedElem = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER)
-            ->getIrrlichtElement();
+                                    ->getIrrlichtElement();
     }
     const bool parent_focused = (widget->m_event_handler == NULL ? false :
-            (focusedElem == widget->m_event_handler->m_element));
+        (focusedElem == widget->m_event_handler->m_element));
     const bool mark_focused =
         focused || (parent_focused && parentRibbon != NULL &&
-                parentRibbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == widget->m_properties[PROP_ID]);
+                    parentRibbon->getSelectionIDString(PLAYER_ID_GAME_MASTER) == widget->m_properties[PROP_ID]);
 
     if (focused)
     {
@@ -1436,35 +1435,35 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
 
         const core::recti rect2(glow_center_x - 45 - grow,
-                glow_center_y - 25 - grow/2,
-                glow_center_x + 45 + grow,
-                glow_center_y + 25 + grow/2);
+                                glow_center_y - 25 - grow/2,
+                                glow_center_x + 45 + grow,
+                                glow_center_y + 25 + grow/2);
 
         draw2DImage(tex_ficonhighlight, rect2,
-                source_area,
-                0 /* no clipping */, 0,
-                true /* alpha */);
+                                            source_area,
+                                            0 /* no clipping */, 0,
+                                            true /* alpha */);
     }
 
     core::recti sized_rect = rect;
     if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
-            widget->m_parent->getType() == gui::EGUIET_WINDOW)
+        widget->m_parent->getType() == gui::EGUIET_WINDOW)
     {
         core::position2d<u32> center(irr_driver->getFrameSize()/2);
         const float texture_size = sin(m_dialog_size*M_PI*0.5f);
         sized_rect.UpperLeftCorner.X  =
             center.X + (int)(((int)rect.UpperLeftCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.UpperLeftCorner.Y  =
             center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
 
         sized_rect.LowerRightCorner.X =
             center.X + (int)(((int)rect.LowerRightCorner.X
-                        - (int)center.X)*texture_size);
+                            - (int)center.X)*texture_size);
         sized_rect.LowerRightCorner.Y =
             center.Y + (int)(((int)rect.LowerRightCorner.Y
-                        - (int)center.Y)*texture_size);
+                            - (int)center.Y)*texture_size);
     }
 
     IconButtonWidget* icon_widget = (IconButtonWidget*) widget;
@@ -1479,13 +1478,13 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
     if (widget->m_deactivated || ID_DEBUG)
     {
         SColor colors[] =  { SColor(100,255,255,255),
-            SColor(100,255,255,255),
-            SColor(100,255,255,255),
-            SColor(100,255,255,255) };
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255) };
         core::recti r(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h);
         draw2DImage(icon_widget->m_texture, sized_rect,
-                r, 0 /* no clipping */, colors,
-                true /* alpha */);
+                                            r, 0 /* no clipping */, colors,
+                                            true /* alpha */);
     }
     else
     {
@@ -1493,16 +1492,16 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 
         const bool mouseInside =
             rect.isPointInside(irr_driver->getDevice()->getCursorControl()
-                    ->getPosition());
+                                                      ->getPosition());
         if (icon_widget->m_highlight_texture != NULL &&
-                (mark_focused || mouseInside)                   )
+            (mark_focused || mouseInside)                   )
         {
             t = icon_widget->m_highlight_texture;
         }
         core::recti r(0,0,icon_widget->m_texture_w, icon_widget->m_texture_h);
         draw2DImage(t, sized_rect, r,0
-                /* no clipping */, 0,
-                true /* alpha */);
+                                            /* no clipping */, 0,
+                                            true /* alpha */);
     }
 
     if (widget->m_type == WTYPE_MODEL_VIEW)
@@ -1514,7 +1513,7 @@ void Skin::drawIconButton(const core::recti &rect, Widget* widget,
 // ----------------------------------------------------------------------------
 /**
  * @param focused whether this element is focus by the master player (focus
- *   for other players is not supported)
+*   for other players is not supported)
  */
 void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
 {
@@ -1525,18 +1524,18 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
     if (w->getState() == true)
     {
         texture = focused
-            ? SkinConfig::m_render_params["checkbox::focused+checked"]
-            .getImage()
-            : SkinConfig::m_render_params["checkbox::neutral+checked"]
-            .getImage();
+                ? SkinConfig::m_render_params["checkbox::focused+checked"]
+                             .getImage()
+                : SkinConfig::m_render_params["checkbox::neutral+checked"]
+                             .getImage();
     }
     else
     {
         texture = focused
-            ? SkinConfig::m_render_params["checkbox::focused+unchecked"]
-            .getImage()
-            : SkinConfig::m_render_params["checkbox::neutral+unchecked"]
-            .getImage();
+                ? SkinConfig::m_render_params["checkbox::focused+unchecked"]
+                             .getImage()
+                : SkinConfig::m_render_params["checkbox::neutral+unchecked"]
+                             .getImage();
     }
 
     const int texture_w = texture->getSize().Width;
@@ -1547,18 +1546,18 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
     if (widget->m_deactivated)
     {
         SColor colors[] =  { SColor(100,255,255,255),
-            SColor(100,255,255,255),
-            SColor(100,255,255,255),
-            SColor(100,255,255,255) };
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255),
+                             SColor(100,255,255,255) };
         draw2DImage( texture, rect, source_area,
-                0 /* no clipping */, colors,
-                true /* alpha */);
+                                            0 /* no clipping */, colors,
+                                            true /* alpha */);
     }
     else
     {
         draw2DImage( texture, rect, source_area,
-                0 /* no clipping */, 0,
-                true /* alpha */);
+                                             0 /* no clipping */, 0,
+                                             true /* alpha */);
     }
 }   // drawCheckBox
 
@@ -1578,30 +1577,30 @@ void Skin::drawList(const core::recti &rect, Widget* widget, bool focused)
 // ----------------------------------------------------------------------------
 /**
  * @param focused whether this element is focus by the master player (focus for
- *   other players is not supported)
+*   other players is not supported)
  */
 void Skin::drawListSelection(const core::recti &rect, Widget* widget,
-        bool focused, const core::recti *clip)
+                             bool focused, const core::recti *clip)
 {
     ListWidget* list = dynamic_cast<ListWidget*>(widget);
     assert(list != NULL);
 
     drawBoxFromStretchableTexture(&list->m_selection_skin_info, rect,
-            SkinConfig::m_render_params["listitem::focused"],
-            list->m_deactivated, clip);
+                                  SkinConfig::m_render_params["listitem::focused"],
+                                  list->m_deactivated, clip);
 }   // drawListSelection
 
 // ----------------------------------------------------------------------------
 void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
-        Widget* widget)
+                          Widget* widget)
 {
     bool isSelected =
-        (((ListWidget*)widget->m_event_handler)->m_selected_column == widget &&
+         (((ListWidget*)widget->m_event_handler)->m_selected_column == widget &&
          ((ListWidget*)widget->m_event_handler)->m_sort_default == false);
 
     drawBoxFromStretchableTexture(widget, rect,
             (isSelected ? SkinConfig::m_render_params["list_header::down"]
-             : SkinConfig::m_render_params["list_header::neutral"]),
+                        : SkinConfig::m_render_params["list_header::neutral"]),
             false, NULL /* clip */);
 
     if (isSelected)
@@ -1616,11 +1615,11 @@ void Skin::drawListHeader(const irr::core::rect< irr::s32 > &rect,
                 SkinConfig::m_render_params["list_sort_down::neutral"].getImage();
 
         core::recti destRect(rect.UpperLeftCorner,
-                core::dimension2di(rect.getHeight(),
-                    rect.getHeight()));
+                             core::dimension2di(rect.getHeight(),
+                                                rect.getHeight()));
         core::recti srcRect(core::position2d<s32>(0,0), img->getSize());
         draw2DImage(img, destRect, srcRect,
-                NULL, NULL, /* alpha */true);
+                                                  NULL, NULL, /* alpha */true);
     }
 
 }   // drawListHeader
@@ -1646,26 +1645,26 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                 if (widget.m_is_bounding_box_round)
                 {
                     core::recti rect(widget.m_x, widget.m_y,
-                            widget.m_x + widget.m_w,
-                            widget.m_y + widget.m_h );
+                                     widget.m_x + widget.m_w,
+                                     widget.m_y + widget.m_h );
                     drawBoxFromStretchableTexture(&widget, rect,
-                            SkinConfig::m_render_params["rounded_section::neutral"]);
+                      SkinConfig::m_render_params["rounded_section::neutral"]);
                 }
                 else
                 {
                     core::recti rect(widget.m_x, widget.m_y,
-                            widget.m_x + widget.m_w,
-                            widget.m_y + widget.m_h );
+                                     widget.m_x + widget.m_w,
+                                     widget.m_y + widget.m_h );
                     drawBoxFromStretchableTexture(&widget, rect,
-                            SkinConfig::m_render_params["section::neutral"]);
+                              SkinConfig::m_render_params["section::neutral"]);
                 }
-
+                
                 renderSections( &widget.m_children );
             }
             else if (widget.isBottomBar())
             {
                 const core::dimension2du &framesize =
-                    irr_driver->getFrameSize();
+                                                   irr_driver->getFrameSize();
 
                 // bar.png is 128 pixels high
                 const float y_size = (framesize.Height - widget.m_y) / 128.0f;
@@ -1678,13 +1677,13 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     tex = irr_driver->getTexture(FileManager::GUI, "main_help.png");
                     if(!tex)
                         Log::fatal("Skin",
-                                "Can't find fallback texture 'main_help.png, aborting.");
+                        "Can't find fallback texture 'main_help.png, aborting.");
                 }
                 core::recti r1(0, (int)(widget.m_y - 40*y_size),
-                        framesize.Width, framesize.Height);
+                               framesize.Width, framesize.Height);
                 core::recti r2(core::dimension2di(0,0), tex->getSize());
                 draw2DImage(tex, r1, r2,
-                        0, 0, /*alpha*/true);
+                                                          0, 0, /*alpha*/true);
             }
             else if (widget.isTopBar())
             {
@@ -1692,10 +1691,10 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     irr_driver->getTexture(FileManager::GUI, "top_bar.png");
 
                 core::recti r1(0,               0,
-                        (int)widget.m_w, (int)widget.m_h);
+                               (int)widget.m_w, (int)widget.m_h);
                 core::recti r2(core::dimension2di(0,0), tex->getSize());
                 draw2DImage(tex, r1, r2,
-                        0, 0, /*alpha*/false);
+                                                          0, 0, /*alpha*/false);
             }
             else
             {
@@ -1719,9 +1718,9 @@ void Skin::drawScrollbarBackground(const irr::core::rect< irr::s32 > &rect)
         SkinConfig::m_render_params["scrollbar_background::neutral"];
 
     draw2DImage(p.getImage(), rect2,
-            p.m_source_area_center,
-            0 /* no clipping */, 0,
-            true /* alpha */);
+                                        p.m_source_area_center,
+                                        0 /* no clipping */, 0,
+                                        true /* alpha */);
 
 }   // drawScrollbarBackground
 
@@ -1732,26 +1731,26 @@ void Skin::drawScrollbarThumb(const irr::core::rect< irr::s32 > &rect)
         SkinConfig::m_render_params["scrollbar_thumb::neutral"];
 
     draw2DImage(p.getImage(), rect,
-            p.m_source_area_center,
-            0 /* no clipping */, 0,
-            true /* alpha */);
+                                        p.m_source_area_center,
+                                        0 /* no clipping */, 0,
+                                        true /* alpha */);
 
 }   // drawScrollbarThumb
 
 // ----------------------------------------------------------------------------
 void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect,
-        const bool pressed, const bool bottomArrow)
+                               const bool pressed, const bool bottomArrow)
 {
     BoxRenderParams& p = (pressed)
-        ? SkinConfig::m_render_params["scrollbar_button::down"]
-        : SkinConfig::m_render_params["scrollbar_button::neutral"];
+                    ? SkinConfig::m_render_params["scrollbar_button::down"]
+                    : SkinConfig::m_render_params["scrollbar_button::neutral"];
 
     if (!bottomArrow)
     {
         draw2DImage(p.getImage(), rect,
-                p.m_source_area_center,
-                0 /* no clipping */, 0,
-                true /* alpha */);
+                                            p.m_source_area_center,
+                                            0 /* no clipping */, 0,
+                                            true /* alpha */);
     }
     else
     {
@@ -1763,9 +1762,9 @@ void Skin::drawScrollbarButton(const irr::core::rect< irr::s32 > &rect,
         const int y1 = source_area.LowerRightCorner.Y;
 
         draw2DImage(p.getImage(), rect,
-                core::recti(x0, y1, x1, y0),
-                0 /* no clipping */, 0,
-                true /* alpha */);
+                                            core::recti(x0, y1, x1, y0),
+                                            0 /* no clipping */, 0,
+                                            true /* alpha */);
     }
 
 }   // drawScrollbarButton
@@ -1799,9 +1798,9 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
 
     core::recti r(pos, size);
     drawBoxFromStretchableTexture(widget, r,
-            SkinConfig::m_render_params["tooltip::neutral"]);
+                              SkinConfig::m_render_params["tooltip::neutral"]);
     font->draw(widget->getTooltipText(), r, video::SColor(255, 0, 0, 0),
-            false, false);
+               false, false);
 }   // drawTooltip
 
 #if 0
@@ -1811,7 +1810,7 @@ void Skin::drawTooltip(Widget* widget, bool atMouse)
 
 // ----------------------------------------------------------------------------
 void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color,
-        const core::recti &rect, const core::recti *clip)
+                            const core::recti &rect, const core::recti *clip)
 {
     if (GUIEngine::getStateManager()->getGameState() == GUIEngine::GAME)
         return; // ignore in game mode
@@ -1840,7 +1839,7 @@ void Skin::draw2DRectangle (IGUIElement *element, const video::SColor &color,
 
 // -----------------------------------------------------------------------------
 void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
-        const bool pressed)
+                         const bool pressed)
 {
     const int id = element->getID();
 
@@ -1850,8 +1849,8 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     if (widget == NULL)
     {
         if (element->getType() == gui::EGUIET_BUTTON &&
-                element->getParent() != NULL &&
-                element->getParent()->getType() == EGUIET_SCROLL_BAR)
+            element->getParent() != NULL &&
+            element->getParent()->getType() == EGUIET_SCROLL_BAR)
         {
             const int parentHeight =
                 element->getParent()->getRelativePosition().getHeight();
@@ -1878,12 +1877,12 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     // accordingly
 
     if (widget->m_event_handler != NULL &&
-            widget->m_event_handler->m_type == WTYPE_RIBBON)
+        widget->m_event_handler->m_type == WTYPE_RIBBON)
     {
         drawRibbonChild(rect, widget, pressed, focused);
     }
     else if (widget->m_event_handler != NULL &&
-            widget->m_event_handler->m_type == WTYPE_SPINNER)
+        widget->m_event_handler->m_type == WTYPE_SPINNER)
     {
         if (!widget->m_event_handler->m_deactivated)
             drawSpinnerChild(rect, widget, pressed, focused);
@@ -1895,7 +1894,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
     else if (type == WTYPE_BUTTON)
     {
         if (widget->m_event_handler != NULL &&
-                widget->m_event_handler->getType() == WTYPE_LIST)
+            widget->m_event_handler->getType() == WTYPE_LIST)
         {
             drawListHeader(rect, widget);
         }
@@ -1942,33 +1941,33 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
 
 // -----------------------------------------------------------------------------
 void doDrawBadge(ITexture* texture, const core::recti& rect,
-        float max_icon_size, bool badge_at_left)
+                 float max_icon_size, bool badge_at_left)
 {
     // In case of a problem
     if(!texture) return;
 
     const core::dimension2d<u32>& texture_size = texture->getSize();
     const float aspectRatio = (float)texture_size.Width
-        / (float)texture_size.Height;
+                            / (float)texture_size.Height;
     const int h = rect.getHeight() <= 50
-        ? rect.getHeight()
-        : std::min( (int)(rect.getHeight()*max_icon_size),
-                (int)(texture_size.Height)             );
+                ? rect.getHeight()
+                : std::min( (int)(rect.getHeight()*max_icon_size),
+                            (int)(texture_size.Height)             );
     int w = (int)(aspectRatio*h);
 
     const core::recti source_area(0, 0, texture_size.Width,
-            texture_size.Height);
+                                  texture_size.Height);
 
     const core::recti rect2(badge_at_left ? rect.UpperLeftCorner.X
-            : rect.LowerRightCorner.X - w,
-            rect.LowerRightCorner.Y - h,
-            badge_at_left ? rect.UpperLeftCorner.X + w
-            : rect.LowerRightCorner.X,
-            rect.LowerRightCorner.Y                     );
+                                          : rect.LowerRightCorner.X - w,
+                            rect.LowerRightCorner.Y - h,
+                            badge_at_left ? rect.UpperLeftCorner.X + w
+                                          : rect.LowerRightCorner.X,
+                            rect.LowerRightCorner.Y                     );
 
     draw2DImage(texture, rect2, source_area,
-            0 /* no clipping */, 0,
-            true /* alpha */);
+                                        0 /* no clipping */, 0,
+                                        true /* alpha */);
 }  // doDrawBadge
 
 // ----------------------------------------------------------------------------
@@ -1977,21 +1976,21 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     if (widget->m_badges & LOCKED_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "gui_lock.png");
+                                                          "gui_lock.png");
         float max_icon_size = 0.5f; // Lock badge can be quite big
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & OK_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "green_check.png");
+                                                          "green_check.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & BAD_BADGE)
     {
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "red_mark.png");
+                                                          "red_mark.png");
         float max_icon_size = 0.35f;
         doDrawBadge(texture, rect, max_icon_size, false);
     }
@@ -1999,44 +1998,44 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "cup_bronze.png");
+                                                          "cup_bronze.png");
         doDrawBadge(texture, rect, max_icon_size, false);
     }
     if (widget->m_badges & KEYBOARD_BADGE)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "keyboard.png");
+                                                          "keyboard.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & GAMEPAD_BADGE)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "gamepad.png");
+                                                          "gamepad.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
     if (widget->m_badges & LOADING_BADGE)
     {
         float max_icon_size = 0.43f;
         video::ITexture* texture = irr_driver->getTexture(FileManager::GUI,
-                "hourglass.png");
+                                                          "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
 }   // drawBadgeOn
 
 // -----------------------------------------------------------------------------
 void Skin::draw3DButtonPanePressed (IGUIElement *element,
-        const core::recti &rect,
-        const core::recti *clip)
+                                    const core::recti &rect,
+                                    const core::recti *clip)
 {
     process3DPane(element, rect, true /* pressed */ );
 }   // draw3DButtonPanePressed
 
 // -----------------------------------------------------------------------------
 void Skin::draw3DButtonPaneStandard (IGUIElement *element,
-        const core::recti &rect,
-        const core::recti *clip)
+                                     const core::recti &rect,
+                                     const core::recti *clip)
 {
     if (element->getType()==gui::EGUIET_SCROLL_BAR)
     {
@@ -2050,8 +2049,8 @@ void Skin::draw3DButtonPaneStandard (IGUIElement *element,
 
 // -----------------------------------------------------------------------------
 void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
-        bool flat, bool fillBackGround,
-        const core::recti &rect, const core::recti *clip)
+                             bool flat, bool fillBackGround,
+                             const core::recti &rect, const core::recti *clip)
 {
     const int id = element->getID();
     Widget* widget = GUIEngine::getWidget(id);
@@ -2064,7 +2063,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
     if (GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER) != NULL)
     {
         focusedElem = GUIEngine::getFocusForPlayer(PLAYER_ID_GAME_MASTER)
-            ->getIrrlichtElement();
+                                 ->getIrrlichtElement();
     }
 
     const bool focused = (focusedElem == element);
@@ -2082,30 +2081,30 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
 
         // if within an appearing dialog, grow
         if (m_dialog && m_dialog_size < 1.0f && widget->m_parent != NULL &&
-                widget->m_parent->getType() == gui::EGUIET_WINDOW)
+            widget->m_parent->getType() == gui::EGUIET_WINDOW)
         {
             core::position2d<u32> center(irr_driver->getFrameSize()/2);
             const float texture_size = sin(m_dialog_size*M_PI*0.5f);
 
             borderArea.UpperLeftCorner.X  =
                 center.X + (int)(((int)rect.UpperLeftCorner.X
-                            - (int)center.X)*texture_size);
+                                - (int)center.X)*texture_size);
             borderArea.UpperLeftCorner.Y  =
                 center.Y + (int)(((int)rect.UpperLeftCorner.Y
-                            - (int)center.Y)*texture_size);
+                                - (int)center.Y)*texture_size);
             borderArea.LowerRightCorner.X =
                 center.X + (int)(((int)rect.LowerRightCorner.X
-                            - (int)center.X)*texture_size);
+                                - (int)center.X)*texture_size);
             borderArea.LowerRightCorner.Y =
                 center.Y + (int)(((int)rect.LowerRightCorner.Y
-                            - (int)center.Y)*texture_size);
+                                - (int)center.Y)*texture_size);
         }
         GL32_draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
 
         core::recti innerArea = borderArea;
         innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
         innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
-        GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
+		GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)
@@ -2113,9 +2112,9 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         //drawList(rect, widget, focused);
 
         drawList(core::recti(widget->m_x, widget->m_y,
-                    widget->m_x + widget->m_w,
-                    widget->m_y + widget->m_h),
-                widget, focused);
+                             widget->m_x + widget->m_w,
+                             widget->m_y + widget->m_h),
+                 widget, focused);
     }
     else if (type == WTYPE_BUBBLE)
     {
@@ -2152,10 +2151,10 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
 
         if (bubble->isFocusedForPlayer(PLAYER_ID_GAME_MASTER))
             drawBoxFromStretchableTexture(widget, rect2,
-                    SkinConfig::m_render_params["textbubble::focused"]);
+                           SkinConfig::m_render_params["textbubble::focused"]);
         else
             drawBoxFromStretchableTexture(widget, rect2,
-                    SkinConfig::m_render_params["textbubble::neutral"]);
+                           SkinConfig::m_render_params["textbubble::neutral"]);
 
         return;
     }
@@ -2169,19 +2168,19 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-    GL32_draw2DRectangle(color,
-            core::recti(position2d< s32 >(0,0),
-                GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
+	GL32_draw2DRectangle(color,
+                                            core::recti(position2d< s32 >(0,0),
+                       GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }   // drawBGFadeColor
 
 // -----------------------------------------------------------------------------
 
 core::recti Skin::draw3DWindowBackground(IGUIElement *element,
-        bool drawTitleBar,
-        video::SColor titleBarColor,
-        const core::recti &rect,
-        const core::recti *clip,
-        core::recti* checkClientArea)
+                                         bool drawTitleBar,
+                                         video::SColor titleBarColor,
+                                         const core::recti &rect,
+                                         const core::recti *clip,
+                                         core::recti* checkClientArea)
 {
     if (ModalDialog::getCurrent() == NULL) return rect;
 
@@ -2200,14 +2199,14 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
         sized_rect.LowerRightCorner.X = (int)(center.X +(w/2.0f)*texture_size);
         sized_rect.LowerRightCorner.Y = (int)(center.Y +(h/2.0f)*texture_size);
         drawBoxFromStretchableTexture( ModalDialog::getCurrent(), sized_rect,
-                SkinConfig::m_render_params["window::neutral"]);
+                               SkinConfig::m_render_params["window::neutral"]);
 
         m_dialog_size += GUIEngine::getLatestDt()*5;
     }
     else
     {
         drawBoxFromStretchableTexture( ModalDialog::getCurrent(), rect,
-                SkinConfig::m_render_params["window::neutral"]);
+                               SkinConfig::m_render_params["window::neutral"]);
     }
 
     return rect;
@@ -2216,32 +2215,32 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 // -----------------------------------------------------------------------------
 
 void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
-        const core::recti *clip)
+                           const core::recti *clip)
 {
     SColor color = SColor(150, 96, 74, 196);
-    GL32_draw2DRectangle(color, rect);
+	GL32_draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------
 
 void Skin::draw3DTabBody (IGUIElement *element, bool border, bool background,
-        const core::recti &rect, const core::recti *clip,
-        s32 tabHeight, gui::EGUI_ALIGNMENT alignment)
+                          const core::recti &rect, const core::recti *clip,
+                          s32 tabHeight, gui::EGUI_ALIGNMENT alignment)
 {
 }   // draw3DTabBody
 
 // -----------------------------------------------------------------------------
 
 void Skin::draw3DTabButton (IGUIElement *element, bool active,
-        const core::recti &rect, const core::recti *clip,
-        gui::EGUI_ALIGNMENT alignment)
+                            const core::recti &rect, const core::recti *clip,
+                            gui::EGUI_ALIGNMENT alignment)
 {
 }   // draw3DTabButton
 
 // -----------------------------------------------------------------------------
 
 void Skin::draw3DToolBar (IGUIElement *element, const core::recti &rect,
-        const core::recti *clip)
+                          const core::recti *clip)
 {
 }   // draw3DToolBar
 
@@ -2250,7 +2249,7 @@ void Skin::draw3DToolBar (IGUIElement *element, const core::recti &rect,
 ITexture* Skin::getImage(const char* name)
 {
     if (SkinConfig::m_render_params.find(name)
-            != SkinConfig::m_render_params.end())
+        != SkinConfig::m_render_params.end())
     {
         BoxRenderParams& p = SkinConfig::m_render_params[name];
         return p.getImage();
@@ -2264,12 +2263,12 @@ ITexture* Skin::getImage(const char* name)
 // -----------------------------------------------------------------------------
 
 void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon,
-        const core::position2di position, u32 starttime,
-        u32 currenttime, bool loop, const core::recti *clip)
+                     const core::position2di position, u32 starttime,
+                     u32 currenttime, bool loop, const core::recti *clip)
 {
     // we won't let irrLicht decide when to call this, we draw them ourselves.
     /* m_fallback_skin->drawIcon(element, icon, position, starttime,
-       currenttime, loop, clip); */
+                                 currenttime, loop, clip); */
 }
 
 // -----------------------------------------------------------------------------
@@ -2277,33 +2276,33 @@ void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon,
 video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
 {
     /*
-       EGDC_3D_DARK_SHADOW    Dark shadow for three-dimensional display elements.
-       EGDC_3D_SHADOW     Shadow color for three-dimensional display elements
-       (for edges facing away from the light source).
-       EGDC_3D_FACE   Face color for three-dimensional display elements and for
-       dialog box backgrounds.
-       EGDC_3D_HIGH_LIGHT     Highlight color for three-dimensional display
-       elements (for edges facing the light source.).
-       EGDC_3D_LIGHT  Light color for three-dimensional display elements (for
-       edges facing the light source.).
-       EGDC_ACTIVE_BORDER     Active window border.
-       EGDC_ACTIVE_CAPTION    Active window title bar text.
-       EGDC_APP_WORKSPACE     Background color of multiple document interface
-       (MDI) applications.
-       EGDC_BUTTON_TEXT   Text on a button.
-       EGDC_GRAY_TEXT     Grayed (disabled) text.
-       EGDC_HIGH_LIGHT    Item(s) selected in a control.
-       EGDC_HIGH_LIGHT_TEXT   Text of item(s) selected in a control.
-       EGDC_INACTIVE_BORDER   Inactive window border.
-       EGDC_INACTIVE_CAPTION  Inactive window caption.
-       EGDC_TOOLTIP   Tool tip text color.
-       EGDC_TOOLTIP_BACKGROUND    Tool tip background color.
-       EGDC_SCROLLBAR     Scrollbar gray area.
-       EGDC_WINDOW    Window background.
-       EGDC_WINDOW_SYMBOL     Window symbols like on close buttons, scroll bars
-       and check boxes.
-       EGDC_ICON  Icons in a list or tree.
-       EGDC_ICON_HIGH_LIGHT   Selected icons in a list or tree.
+     EGDC_3D_DARK_SHADOW    Dark shadow for three-dimensional display elements.
+     EGDC_3D_SHADOW     Shadow color for three-dimensional display elements
+                        (for edges facing away from the light source).
+     EGDC_3D_FACE   Face color for three-dimensional display elements and for
+                    dialog box backgrounds.
+     EGDC_3D_HIGH_LIGHT     Highlight color for three-dimensional display
+                            elements (for edges facing the light source.).
+     EGDC_3D_LIGHT  Light color for three-dimensional display elements (for
+                    edges facing the light source.).
+     EGDC_ACTIVE_BORDER     Active window border.
+     EGDC_ACTIVE_CAPTION    Active window title bar text.
+     EGDC_APP_WORKSPACE     Background color of multiple document interface
+                            (MDI) applications.
+     EGDC_BUTTON_TEXT   Text on a button.
+     EGDC_GRAY_TEXT     Grayed (disabled) text.
+     EGDC_HIGH_LIGHT    Item(s) selected in a control.
+     EGDC_HIGH_LIGHT_TEXT   Text of item(s) selected in a control.
+     EGDC_INACTIVE_BORDER   Inactive window border.
+     EGDC_INACTIVE_CAPTION  Inactive window caption.
+     EGDC_TOOLTIP   Tool tip text color.
+     EGDC_TOOLTIP_BACKGROUND    Tool tip background color.
+     EGDC_SCROLLBAR     Scrollbar gray area.
+     EGDC_WINDOW    Window background.
+     EGDC_WINDOW_SYMBOL     Window symbols like on close buttons, scroll bars
+                             and check boxes.
+     EGDC_ICON  Icons in a list or tree.
+     EGDC_ICON_HIGH_LIGHT   Selected icons in a list or tree.
      */
 
     switch(color)
