@@ -27,6 +27,8 @@
 
 
 class Navmesh;
+class Item;
+class ItemManager;
 
 namespace irr
 {
@@ -66,12 +68,14 @@ private:
 	/** Stores the name of the file containing the NavMesh data */
     std::string             m_navmesh_file;
 
+	std::vector< std::pair<Item*, int> > m_items_on_graph;
 
     void buildGraph(NavMesh*);
     void computeFloydWarshall();
     void createMesh(bool enable_transparency=false,
                     const video::SColor *track_color=NULL);
-    
+	void findItemsOnGraphNodes(ItemManager*);
+
     BattleGraph(const std::string &navmesh_file_name);
     ~BattleGraph(void);
 
@@ -100,20 +104,26 @@ public:
             m_battle_graph = NULL;
         }
     } // destroy
+	
 	// ----------------------------------------------------------------------
 	/** Returns the number of nodes in the BattleGraph (equal to the number of 
 	*	polygons in the NavMesh */
     unsigned int    getNumNodes() const { return m_distance_matrix.size(); }
+	
 	// ----------------------------------------------------------------------
 	/** Returns the NavPoly corresponding to the i-th node of the BattleGraph */
 	const NavPoly&    getPolyOfNode(int i) const 
                                         { return NavMesh::get()->getNavPoly(i); }
+	
 	// ----------------------------------------------------------------------
     /** Returns the next polygon on the shortest path from i to j.
 	 *	Note: m_parent_poly[j][i] contains the parent of i on path from j to i, 
 	 *	which is the next node on the path from i to j (undirected graph) */
     const int & getNextShortestPathPoly(int i, int j) const 
                                         { return m_parent_poly[j][i]; }
+
+	const std::vector< std::pair<Item*, int> >& getItemList()
+										{ return m_items_on_graph; }
 
     void            createDebugMesh();
     void            cleanupDebugMesh();

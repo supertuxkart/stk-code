@@ -32,6 +32,7 @@ class ThreeStrikesBattle;
 class BattleGraph;
 class Track;
 class Vec3;
+class Item;
 
 namespace irr
 {
@@ -76,13 +77,17 @@ private:
      *  counting down. */
     bool m_currently_reversing;
 
+	const Item *m_item_to_collect;
+
     float determineTurnRadius(std::vector<Vec3>& points);
     void findPortals(int start, int end);
     void stringPull(const Vec3&, const Vec3&);
     void handleAcceleration(const float dt) ;
     void handleSteering(const float dt);
     void handleBraking();
-    void handleGetUnstuck(const float dt);    
+    void handleGetUnstuck(const float dt);   
+	void handleItems(const float dt);
+	void handleItemCollection(Vec3*, int*);
 
 protected:
 

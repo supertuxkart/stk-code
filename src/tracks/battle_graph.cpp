@@ -24,6 +24,7 @@
 
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
+#include "items/item_manager.hpp"
 #include "tracks/navmesh.hpp"
 #include "utils/vec3.hpp"
 
@@ -41,6 +42,7 @@ BattleGraph::BattleGraph(const std::string &navmesh_file_name)
     m_navmesh_file = navmesh_file_name;
     buildGraph(NavMesh::get());
     computeFloydWarshall();
+	findItemsOnGraphNodes(ItemManager::get());
 
 } // BattleGraph
 
@@ -241,4 +243,36 @@ void BattleGraph::cleanupDebugMesh()
     // was manually made and so never added to the mesh cache.
     m_mesh->drop();
     m_mesh = NULL;
+}
+
+
+void BattleGraph::findItemsOnGraphNodes(ItemManager * item_manager)
+{
+	unsigned int item_count = item_manager->getNumberOfItems();
+	
+	for (unsigned int i = 0; i < item_count; ++i)
+	{
+		Item* item = item_manager->getItem(i);
+		Vec3 xyz = item->getXYZ();
+		int polygon = BattleGraph::UNKNOWN_POLY;
+		float min_dist = 999999.9f;
+		
+		for (unsigned int j = 0; j < this->getNumNodes(); ++j)
+		{
+			if (NavMesh::get()->getNavPoly(j).pointInPoly(xyz))
+			{
+				float dist = xyz.getY() - NavMesh::get()->getCenterOfPoly(j).getY();
+				if (dist < min_dist && dist>-1.0f)
+				{
+					polygon = j;
+					min_dist = dist;
+				}
+				
+			}
+		}
+
+		m_items_on_graph.push_back(std::make_pair(item, polygon));
+
+	}
+
 }

@@ -26,6 +26,8 @@
 #  include "graphics/irr_driver.hpp"
 #endif
 
+#include "items/item_manager.hpp"
+#include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/kart_control.hpp"
 #include "karts/controller/player_controller.hpp"
@@ -118,6 +120,7 @@ void BattleAI::update(float dt)
 {
     handleAcceleration(dt);
     handleSteering(dt);
+	handleItems(dt);
     handleBraking();
     handleGetUnstuck(dt);
     AIBaseController::update(dt);
@@ -168,30 +171,34 @@ void BattleAI::handleSteering(const float dt)
 {
     const AbstractKart* kart = m_world->getPlayerKart(0);
     PlayerController* pcontroller = (PlayerController*)kart->getController();
-
-    int player_node = pcontroller->getCurrentNode();    
+	
+	int player_node = pcontroller->getCurrentNode();    
      std::cout<<"PLayer node " << player_node<<" This cpu kart node" << m_current_node<<std::endl;
     
     if(player_node == BattleGraph::UNKNOWN_POLY || m_current_node == BattleGraph::UNKNOWN_POLY) return;
     m_target_node   =   player_node;
-    if(player_node == m_current_node)
+	m_target_point = kart->getXYZ();
+
+	handleItemCollection(&m_target_point, &m_target_node);
+	m_debug_sphere->setPosition(m_target_point.toIrrVector());
+    if(m_target_node == m_current_node)
     {
         m_target_point=kart->getXYZ();  
     //  std::cout<<"Aiming at sire nixt\n";
     }
     else
     {    
-        m_next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, player_node);
+        m_next_node = BattleGraph::get()->getNextShortestPathPoly(m_current_node, m_target_node);
   
         // std::cout<<"Aiming at "<<next_node<<"\n";
         if(m_next_node == -1) return;
         //target_point = NavMesh::get()->getCenterOfPoly(m_next_node);
       
         findPortals(m_current_node, m_target_node);
-        stringPull(m_kart->getXYZ(),kart->getXYZ());
+        stringPull(m_kart->getXYZ(),m_target_point);
         if(m_path_corners.size()>0)  
         {
-                m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
+              //  m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
                 m_target_point = m_path_corners.front();
         }
         else 
@@ -423,7 +430,12 @@ void BattleAI::handleBraking()
     points.push_back((m_path_corners.size()>=2)?m_path_corners[1]:m_path_corners[0]);
     
     float current_curve_radius = BattleAI::determineTurnRadius(points);
-    std::cout<<"\n Radius: " << current_curve_radius;
+
+	Vec3 d1 = m_kart->getXYZ() - m_target_point; Vec3 d2 = m_kart->getXYZ() - m_path_corners[0];
+	if (d1.length2_2d() < d2.length2_2d())
+		current_curve_radius = d1.length_2d() / 2.0f;
+
+    //std::cout<<"\n Radius: " << current_curve_radius;
     float max_turn_speed =
             m_kart->getKartProperties()
                    ->getSpeedForTurnRadius(current_curve_radius);
@@ -532,3 +544,44 @@ float BattleAI::isStuck(const float dt)
 
 */
 
+void BattleAI::handleItems(const float dt)
+{
+	m_controls->m_fire = true;
+}
+
+
+void BattleAI::handleItemCollection(Vec3 *aim_point, int* target_node)
+{
+	if (m_kart->getPowerup()->getType() == PowerupManager::PowerupType::POWERUP_BOWLING) return;
+	Vec3 old_aim_point = *aim_point;
+
+	float distance = 30.0f;
+	bool found_suitable_item = false;
+	const std::vector< std::pair<Item*, int> >& item_list =
+		BattleGraph::get()->getItemList();
+	int items_count = item_list.size();
+
+	
+	for (int j = 0; j < 50; j++)
+		{
+			for (unsigned int i = 0; i < items_count; ++i)
+			{
+				Item* item = item_list[i].first;
+				Vec3 d = item->getXYZ() - m_kart->getXYZ();
+				if (d.length_2d() <= distance)
+				{
+					if (item->getType() == Item::ITEM_BONUS_BOX && !item->wasCollected())
+					{
+						m_item_to_collect = item;
+						found_suitable_item = true;
+						*aim_point = item->getXYZ();
+						*target_node = item_list[i].second;
+						break;
+					}
+				}
+			}
+			distance = 2.0f * distance;
+		}
+	
+
+}

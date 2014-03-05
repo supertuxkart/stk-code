@@ -1467,10 +1467,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     // the information about the size of the texture to render the mini
     // map to.
     if (!m_is_arena && !m_is_soccer && !m_is_cutscene) loadQuadGraph(mode_id, reverse_track);
-    if (m_is_arena && !m_is_soccer && !m_is_cutscene) loadBattleGraph();
+    
 
     ItemManager::create();
-
+	
     // Set the default start positions. Node that later the default
     // positions can still be overwritten.
     float forwards_distance  = 1.5f;
@@ -1672,6 +1672,16 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     delete root;
 
+	// ItemManager assumes the existence of a QuadGraph, that is why the 
+	// quad graph is loaded before ItemManager::create(). This is undesirable
+	// but requires signifcant code overhaul to fix. The new battle graph
+	// performs its own computatoins separate from ItemManager. But
+	// Battle Graph needs ItemManager to be created, and all items to be
+	// added to ItemManager. Loading battle graph here is therefore a workaround
+	// to the main problem.
+	if (m_is_arena && !m_is_soccer && !m_is_cutscene) loadBattleGraph();
+
+
     if (UserConfigParams::m_track_debug &&
         race_manager->getMinorMode()!=RaceManager::MINOR_MODE_3_STRIKES &&
         !m_is_cutscene)
@@ -1718,6 +1728,8 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     irr_driver->unsetTextureErrorMessage();
+
+	
 }   // loadTrackModel
 
 //-----------------------------------------------------------------------------
