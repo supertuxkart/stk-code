@@ -119,7 +119,6 @@ when the border that intersect at this corner are enabled.
 <element type="squareFocusHalo4" image="peach/glass_square_focused4.png"
       left_border="6" right_border ="6" top_border="6" bottom_border="6"
       hborder_out_portion="1.0" />
-
       
 <!-- Stateless. No splitting into 9 areas is done; the image is just resized. -->
 <element type="selectionHalo" image="peach/bubble.png"  />

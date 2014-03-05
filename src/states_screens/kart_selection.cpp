@@ -132,6 +132,7 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
 {
     m_player_id       = player_id;
     m_incorrect       = false;
+    m_red_mark_widget = NULL;
     m_parent          = parent;
     m_use_background_color = true;
 
