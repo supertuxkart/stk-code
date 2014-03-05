@@ -42,7 +42,6 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
 OnlineProfileFriends::OnlineProfileFriends() 
                     : OnlineProfileBase("online/profile_friends.stkgui")
 {
-    m_selected_friend_index = -1;
 }   // OnlineProfileFriends
 
 // -----------------------------------------------------------------------------
@@ -105,9 +104,8 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
     }
     else if (name == m_friends_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_friend_index = m_friends_list_widget->getSelectionID();
-        const Profile::IDList &friends = m_visiting_profile->getFriends();
-        new UserInfoDialog(friends[m_selected_friend_index]);
+        int index = m_friends_list_widget->getSelectionID();
+        new UserInfoDialog(m_visiting_profile->getFriends()[index]);
     }
 }   // eventCallback
 
@@ -158,6 +156,9 @@ void OnlineProfileFriends::displayResults()
 }   // displayResults
 
 // ----------------------------------------------------------------------------
+/** Called each frame to check if results have arrived.
+ *  \param delta Time step size.
+ */
 void OnlineProfileFriends::onUpdate(float delta)
 {
     if(m_waiting_for_friends)

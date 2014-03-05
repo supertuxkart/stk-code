@@ -44,7 +44,6 @@ private:
     GUIEngine::ButtonWidget  *m_search_button_widget;
     GUIEngine::TextBoxWidget *m_search_box_widget;
 
-    int                         m_selected_friend_index;
     bool                        m_waiting_for_friends;
 
     void displayResults();
