@@ -179,7 +179,7 @@ void BattleAI::handleSteering(const float dt)
     m_target_node   =   player_node;
 	m_target_point = kart->getXYZ();
 
-	handleItemCollection(&m_target_point, &m_target_node);
+	//handleItemCollection(&m_target_point, &m_target_node);
 	m_debug_sphere->setPosition(m_target_point.toIrrVector());
     if(m_target_node == m_current_node)
     {
@@ -198,7 +198,7 @@ void BattleAI::handleSteering(const float dt)
         stringPull(m_kart->getXYZ(),m_target_point);
         if(m_path_corners.size()>0)  
         {
-              //  m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
+                m_debug_sphere->setPosition(m_path_corners[0].toIrrVector());
                 m_target_point = m_path_corners.front();
         }
         else 
