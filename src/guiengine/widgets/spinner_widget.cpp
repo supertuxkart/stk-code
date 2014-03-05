@@ -47,7 +47,6 @@ SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
     m_value = -1;
     m_use_background_color=false;
     m_spinner_widget_player_id=-1;
-
     m_min = 0;
     m_max = 999;
 }
@@ -181,25 +180,7 @@ void SpinnerWidget::add()
 
     setValue(m_value);
 }
-void SpinnerWidget::setBackgroundColor()
-{
-	
-	m_use_background_color=true;
-}
-bool SpinnerWidget::getBackgroundColor()
-{
-	return m_use_background_color;
-}
-void SpinnerWidget::setSpinnerWidgetPlayerID(int playerID)
-{
-	
-	m_spinner_widget_player_id=playerID;
-	printf("spinnerwidgetplayerid=%d",m_spinner_widget_player_id);
-}
-int SpinnerWidget::getSpinnerWidgetPlayerID()
-{
-	return m_spinner_widget_player_id;
-}
+
 ITexture* SpinnerWidget::getTexture()
 {
     assert(m_graphical);

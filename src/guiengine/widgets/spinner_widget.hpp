@@ -69,7 +69,7 @@ namespace GUIEngine
           */
         bool m_gauge;
 	
-	//for setting background
+	//for setting background in multiplayer kart selection screen
 	bool m_use_background_color;
 	int m_spinner_widget_player_id;
         
@@ -109,11 +109,12 @@ namespace GUIEngine
                 
         void addLabel(irr::core::stringw label);
         void clearLabels();
+
 	// next four functions are for background colour behind playername in multikart screen selection
-        void setBackgroundColor();
-	bool getBackgroundColor();
-	void setSpinnerWidgetPlayerID(int playerID);
-	int getSpinnerWidgetPlayerID();
+        void setUseBackgroundColor() {m_use_background_color=true;}
+	bool getUseBackgroundColor() {return m_use_background_color;}
+	void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
+	int getSpinnerWidgetPlayerID() {return m_spinner_widget_player_id;}
 
 
         void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }

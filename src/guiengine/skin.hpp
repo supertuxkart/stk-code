@@ -406,9 +406,6 @@ namespace GUIEngine
         virtual void setSize (gui::EGUI_DEFAULT_SIZE which, s32 size);
         virtual void setSpriteBank (gui::IGUISpriteBank *bank);
 
-//	BoxRenderParams& setBackground(const core::recti &rect, Widget* widget,BoxRenderParams& params);
-	
-
         void drawTooltips();
 
         video::ITexture* getImage(const char* name);

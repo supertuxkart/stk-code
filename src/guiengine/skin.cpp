@@ -1196,8 +1196,6 @@ void Skin::drawRibbonChild(const core::recti &rect, Widget* widget,
  *  the widget is focused for other players is automatically determined)
  * FIXME: ugly to pass some focuses through parameter and others not xD
  */
-
-
 void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                            const bool pressed, bool focused)
 {
@@ -1223,35 +1221,35 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
             }
         }
     }
-     
-   
-	// defining params and spinner widget to use spinner widget functions
-	SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
-	BoxRenderParams params;
-	
-	if(q->getBackgroundColor()==1)
-	{
+
+    BoxRenderParams& params = (focused || pressed)
+                            ? SkinConfig::m_render_params["spinner::focused"]
+                            : SkinConfig::m_render_params["spinner::neutral"];
+
+    // defining a spinner widget to use the spinner widget class property(getBackgroundColor)
+    SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
+    if(q->getUseBackgroundColor())
+    {
 		
 		int player_id=q->getSpinnerWidgetPlayerID();
 		if(player_id==0)
-		params=SkinConfig::m_render_params["spinner1::neutral"];
-		if(player_id==1)
-		params=SkinConfig::m_render_params["spinner2::neutral"];
-		if(player_id==2)
-		params=SkinConfig::m_render_params["spinner3::neutral"];
-		if(player_id==3)
-		params=SkinConfig::m_render_params["spinner4::neutral"];
-	}
-	else if (focused|| pressed)
-	{
+			params=SkinConfig::m_render_params["spinner1::neutral"];
+		else if(player_id==1)
+			params=SkinConfig::m_render_params["spinner2::neutral"];
+		else if(player_id==2)
+			params=SkinConfig::m_render_params["spinner3::neutral"];
+		else if(player_id==3)
+			params=SkinConfig::m_render_params["spinner4::neutral"];
+    }
+    else if (focused|| pressed)
+    {
 		params=SkinConfig::m_render_params["spinner::focused"];
-	}
-	else
-	{
+    }
+    else
+    {
 		params=SkinConfig::m_render_params["spinner::neutral"];
-	}
+    }
 
-    
     if (widget->isFocusedForPlayer(0))
     {
 	core::recti rect2 = rect;

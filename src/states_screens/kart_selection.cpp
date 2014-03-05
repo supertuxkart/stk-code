@@ -132,11 +132,10 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
 {
     m_player_id       = player_id;
     m_incorrect       = false;
-    m_red_mark_widget = NULL;
     m_parent          = parent;
     m_use_background_color = true;
 
-    setBackgroundColor();//already a_use_background_color is false
+    setUseBackgroundColor();//except for multiplayer kart selection, this is false
     setSpinnerWidgetPlayerID(m_player_id);
 }
 // ------------------------------------------------------------------------
@@ -419,9 +418,9 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
-    if (m_player_ident_spinner != NULL){
+    if (m_player_ident_spinner != NULL)
+    {
         m_player_ident_spinner->setID(m_player_id);
-	
     }
 }   // setPlayerID
 
