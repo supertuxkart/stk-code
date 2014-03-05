@@ -302,6 +302,27 @@ void PostProcessing::renderPointlight(const std::vector<float> &positions, const
 	glDisable(GL_BLEND);
 }
 
+void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff)
+{
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+
+    glUseProgram(FullScreenShader::DiffuseEnvMapShader::Program);
+    glBindVertexArray(FullScreenShader::DiffuseEnvMapShader::vao);
+
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::DiffuseEnvMapShader::setUniforms(bSHCoeff, gSHCoeff, rSHCoeff, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}
+
 void PostProcessing::renderSunlight()
 {
   SunLightProvider * const cb = (SunLightProvider *) irr_driver->getCallback(ES_SUNLIGHT);

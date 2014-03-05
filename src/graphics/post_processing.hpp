@@ -79,6 +79,7 @@ public:
 
 	void renderFog(const core::matrix4 &ipvmat);
 	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
+    void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
 
 	/** Blur the in texture */
 	void renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);

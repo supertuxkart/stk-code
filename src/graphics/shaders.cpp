@@ -230,6 +230,7 @@ void Shaders::loadShaders()
 	FullScreenShader::PointLightShader::init();
 	FullScreenShader::SSAOShader::init();
 	FullScreenShader::SunLightShader::init();
+    FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
@@ -677,6 +678,8 @@ namespace MeshShader
 	GLuint SphereMapShader::uniform_MVP;
 	GLuint SphereMapShader::uniform_TIMV;
 	GLuint SphereMapShader::uniform_tex;
+    GLuint SphereMapShader::uniform_invproj;
+    GLuint SphereMapShader::uniform_screen;
 
 	void SphereMapShader::init()
 	{
@@ -686,12 +689,16 @@ namespace MeshShader
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        uniform_screen = glGetUniformLocation(Program, "screen");
 	}
 
-	void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen, unsigned TU_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProj.pointer());
+        glUniform2f(uniform_screen, screen.X, screen.Y);
 		glUniform1i(uniform_tex, TU_tex);
 	}
 
@@ -1399,6 +1406,31 @@ namespace FullScreenShader
 		glUniform1i(uniform_ntex, TU_ntex);
 		glUniform1i(uniform_dtex, TU_dtex);
 	}
+
+    GLuint DiffuseEnvMapShader::Program;
+    GLuint DiffuseEnvMapShader::uniform_ntex;
+    GLuint DiffuseEnvMapShader::uniform_blueLmn;
+    GLuint DiffuseEnvMapShader::uniform_greenLmn;
+    GLuint DiffuseEnvMapShader::uniform_redLmn;
+    GLuint DiffuseEnvMapShader::vao;
+
+    void DiffuseEnvMapShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
+        uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
+        uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
+        vao = createVAO(Program);
+    }
+
+    void DiffuseEnvMapShader::setUniforms(const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
+    {
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1fv(uniform_blueLmn, 9, blueSHCoeff);
+        glUniform1fv(uniform_greenLmn, 9, greenSHCoeff);
+        glUniform1fv(uniform_redLmn, 9, redSHCoeff);
+    }
 
     GLuint ShadowedSunLightShader::Program;
     GLuint ShadowedSunLightShader::uniform_ntex;

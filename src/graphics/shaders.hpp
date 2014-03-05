@@ -152,10 +152,10 @@ class SphereMapShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_normal;
-	static GLuint uniform_MVP, uniform_TIMV, uniform_tex;
+    static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_invproj, uniform_screen;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen, unsigned TU_tex);
 };
 
 class SplattingShader
@@ -406,6 +406,17 @@ public:
 
 	static void init();
 	static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
+};
+
+class DiffuseEnvMapShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_ntex, uniform_blueLmn, uniform_greenLmn, uniform_redLmn;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
 };
 
 class ShadowedSunLightShader
