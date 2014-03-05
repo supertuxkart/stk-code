@@ -123,12 +123,21 @@ void OnlineProfileFriends::displayResults()
         std::vector<ListWidget::ListCell> row;
         Profile* friend_profile = 
             ProfileManager::get()->getProfileByID(friends[i]);
+
+        // When looking at friends of a friend those profiles are not
+        // guaranteed to be persistent, so they might not be found in cache.
+        if (!friend_profile)
+        {
+            Log::warn("OnlineProfileFriends",
+                      "Profile for %d not found - ignored.", friends[i]);
+            continue;
+        }
         row.push_back(ListWidget::ListCell(friend_profile->getUserName(),
                                            -1, 2)                         );
         if (m_visiting_profile->isCurrentUser())
         {
             Profile::RelationInfo * relation_info = 
-                friend_profile->getRelationInfo();
+                                             friend_profile->getRelationInfo();
             row.push_back(ListWidget::ListCell(relation_info->getDate(),
                                                -1, 1, true)             );
             irr::core::stringw status("");
