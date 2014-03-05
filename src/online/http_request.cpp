@@ -203,7 +203,8 @@ namespace Online
             std::string param = m_parameters;
             for (unsigned int j = 0; j < 2; j++)
             {
-                std::string s = j == 0 ? "&password=" : "&token=";
+                // Get the string that should be replaced.
+                std::string s = (j == 0 ? "&password=" : "&token=");
                 std::size_t pos = param.find(s);
                 if (pos != std::string::npos)
                 {
