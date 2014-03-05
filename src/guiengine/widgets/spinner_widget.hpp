@@ -32,154 +32,154 @@ namespace irr
 
 namespace GUIEngine
 {
-    
+
     /** \brief A spinner or gauge widget (to select numbers / percentages).
-      * \ingroup widgetsgroup
-      */
+     * \ingroup widgetsgroup
+     */
     class SpinnerWidget : public Widget
     {
-    public:
-        class ISpinnerConfirmListener
-        {
         public:
-            virtual ~ISpinnerConfirmListener() {}
-            
+            class ISpinnerConfirmListener
+            {
+                public:
+                    virtual ~ISpinnerConfirmListener() {}
+
+                    /**
+                     * \brief Invoked when the spinner is selected and "fire" is pressed
+                     * \return whether to block the event from further processing
+                     */
+                    virtual EventPropagation onSpinnerConfirmed() = 0;
+            };
+
+        protected:
+
+            ISpinnerConfirmListener* m_listener;
+
+            int m_value, m_min, m_max;
+
+            /** If each value the spinner can take has an associated text, this vector will be non-empty */
+            std::vector<irr::core::stringw> m_labels;
+
+            /** Whether the value of this spinner is displayed using an icon rather than with a plain label */
+            bool m_graphical;
+
+            /** \brief Whether this widget is a gauge
+             * the behaviour is the same but the look is a bit different, instead of displaying a number,
+             * it displays how close the value is to the maximum by filling a line
+             */
+            bool m_gauge;
+
+            //for setting background in multiplayer kart selection screen
+            bool m_use_background_color;
+            int m_spinner_widget_player_id;
+
+            /** \brief Whether to wrap back to the first value when going "beyond" the last value */
+            bool m_wrap_around;
+
+            /** \brief implementing method from base class Widget */
+            virtual EventPropagation transmitEvent(Widget* w, 
+                    const std::string& originator, 
+                    const int playerID);
+
+            /** \brief implementing method from base class Widget */
+            virtual EventPropagation rightPressed(const int playerID);
+
+            /** \brief implementing method from base class Widget */
+            virtual EventPropagation leftPressed(const int playerID);
+
+            /** When inferring widget size from its label length, this method will be called to
+             * if/how much space must be added to the raw label's size for the widget to be large enough */
+            virtual int getWidthNeededAroundLabel()  const { return 25; }
+
+            /** When inferring widget size from its label length, this method will be called to
+             * if/how much space must be added to the raw label's size for the widget to be large enough */
+            virtual int getHeightNeededAroundLabel() const { return 8; }
+
+            /** Call only if this spinner is graphical. Returns the current texture to display */
+            irr::video::ITexture* getTexture();
+
+
+        public:
+
+            LEAK_CHECK()
+
+                SpinnerWidget(const bool gauge=false);
+            virtual ~SpinnerWidget() {}
+            virtual void move(const int x, const int y, const int w, const int h);
+
+            void addLabel(irr::core::stringw label);
+            void clearLabels();
+
+            // next four functions are for background colour behind playername in multikart screen selection
+            void setUseBackgroundColor() {m_use_background_color=true;}
+            bool getUseBackgroundColor() {return m_use_background_color;}
+            void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
+            int getSpinnerWidgetPlayerID() {return m_spinner_widget_player_id;}
+
+
+            void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }
+
+            /** \brief implement method from base class Widget */
+            virtual void add();
+
             /**
-              * \brief Invoked when the spinner is selected and "fire" is pressed
-              * \return whether to block the event from further processing
-              */
-            virtual EventPropagation onSpinnerConfirmed() = 0;
-        };
-        
-    protected:
-        
-        ISpinnerConfirmListener* m_listener;
-        
-        int m_value, m_min, m_max;
-        
-        /** If each value the spinner can take has an associated text, this vector will be non-empty */
-        std::vector<irr::core::stringw> m_labels;
-        
-        /** Whether the value of this spinner is displayed using an icon rather than with a plain label */
-        bool m_graphical;
-        
-        /** \brief Whether this widget is a gauge
-          * the behaviour is the same but the look is a bit different, instead of displaying a number,
-          * it displays how close the value is to the maximum by filling a line
-          */
-        bool m_gauge;
-	
-	//for setting background in multiplayer kart selection screen
-	bool m_use_background_color;
-	int m_spinner_widget_player_id;
-        
-        /** \brief Whether to wrap back to the first value when going "beyond" the last value */
-        bool m_wrap_around;
-        
-        /** \brief implementing method from base class Widget */
-        virtual EventPropagation transmitEvent(Widget* w, 
-                                               const std::string& originator, 
-                                               const int playerID);
-        
-        /** \brief implementing method from base class Widget */
-        virtual EventPropagation rightPressed(const int playerID);
-        
-        /** \brief implementing method from base class Widget */
-        virtual EventPropagation leftPressed(const int playerID);
-        
-        /** When inferring widget size from its label length, this method will be called to
-         * if/how much space must be added to the raw label's size for the widget to be large enough */
-        virtual int getWidthNeededAroundLabel()  const { return 25; }
-        
-        /** When inferring widget size from its label length, this method will be called to
-         * if/how much space must be added to the raw label's size for the widget to be large enough */
-        virtual int getHeightNeededAroundLabel() const { return 8; }
-        
-        /** Call only if this spinner is graphical. Returns the current texture to display */
-        irr::video::ITexture* getTexture();
+             * \brief            sets the current value of the spinner
+             * \param new_value  the new value that will be become the current value of this spinner.
+             */
+            void setValue(const int new_value);
 
-        
-    public:
-        
-        LEAK_CHECK()
-        
-        SpinnerWidget(const bool gauge=false);
-        virtual ~SpinnerWidget() {}
-        virtual void move(const int x, const int y, const int w, const int h);
-                
-        void addLabel(irr::core::stringw label);
-        void clearLabels();
+            /**
+             * \brief        sets the current value of the spinner
+             * \pre the 'new_value' string passed must be the name of an item
+             *               (added through SpinnerWidget::addLabel)in the spinner
+             */
+            void setValue(irr::core::stringw new_value);
 
-	// next four functions are for background colour behind playername in multikart screen selection
-        void setUseBackgroundColor() {m_use_background_color=true;}
-	bool getUseBackgroundColor() {return m_use_background_color;}
-	void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
-	int getSpinnerWidgetPlayerID() {return m_spinner_widget_player_id;}
+            /**
+             * \return whether this spinner is of "gauge" type
+             */
+            bool isGauge()  const { return m_gauge; }
 
+            /** 
+             * \brief retrieve the current value of the spinner
+             * \return the current value of the spinner, in a int form
+             */
+            int  getValue() const { return m_value; }
 
-        void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }
+            /** 
+             * \brief retrieve the current value of the spinner
+             * \return the current value of the spinner, in a string form
+             */
+            irr::core::stringw getStringValue() const;
 
-        /** \brief implement method from base class Widget */
-        virtual void add();
+            /**
+             * \return the maximum value the spinner can take
+             */
+            int  getMax()   const { return m_max;   }
+            /**
+             * \brief Sets the maximum value for a spinner.
+             */
+            void setMax(int n) {m_max = n; }
+            /**
+             * \return the minimum value the spinner can take
+             */
+            int  getMin()   const { return m_min;   }
 
-        /**
-         * \brief            sets the current value of the spinner
-         * \param new_value  the new value that will be become the current value of this spinner.
-         */
-        void setValue(const int new_value);
-        
-        /**
-          * \brief        sets the current value of the spinner
-          * \pre the 'new_value' string passed must be the name of an item
-          *               (added through SpinnerWidget::addLabel)in the spinner
-          */
-        void setValue(irr::core::stringw new_value);
-        
-        /**
-          * \return whether this spinner is of "gauge" type
-          */
-        bool isGauge()  const { return m_gauge; }
-        
-        /** 
-         * \brief retrieve the current value of the spinner
-         * \return the current value of the spinner, in a int form
-         */
-        int  getValue() const { return m_value; }
-        
-        /** 
-          * \brief retrieve the current value of the spinner
-          * \return the current value of the spinner, in a string form
-          */
-        irr::core::stringw getStringValue() const;
+            void setMin(int n) { m_min = n; }
 
-        /**
-          * \return the maximum value the spinner can take
-          */
-        int  getMax()   const { return m_max;   }
-        /**
-          * \brief Sets the maximum value for a spinner.
-          */
-        void setMax(int n) {m_max = n; }
-        /**
-          * \return the minimum value the spinner can take
-          */
-        int  getMin()   const { return m_min;   }
-        
-        void setMin(int n) { m_min = n; }
-        
-        /** Override method from base class Widget */
-        virtual void setActivated();
-        
-        /** Override method from base class Widget */
-        virtual void setDeactivated();
-        
-        bool isActivated() { return !m_deactivated; }
+            /** Override method from base class Widget */
+            virtual void setActivated();
 
-        /** Display custom text in spinner */
-        void setCustomText(const core::stringw& text);
+            /** Override method from base class Widget */
+            virtual void setDeactivated();
+
+            bool isActivated() { return !m_deactivated; }
+
+            /** Display custom text in spinner */
+            void setCustomText(const core::stringw& text);
 
     };
-    
+
 }
 
 #endif

@@ -33,7 +33,7 @@ namespace GUIEngine
     class Widget;
     class BubbleWidget;
     enum EventPropagation;
-   
+
 }
 namespace Online
 {
@@ -44,15 +44,15 @@ class PlayerKartWidget;
 class KartHoverListener;
 
 /**
-  * \brief screen where players can choose their kart
-  * \ingroup states_screens
-  */
+ * \brief screen where players can choose their kart
+ * \ingroup states_screens
+ */
 class KartSelectionScreen : public GUIEngine::Screen
 {
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
-protected:
+    protected:
     /** Contains the custom widget shown for every player. (ref only since
      *  we're adding them to a Screen, and the Screen will take ownership
      *  of these widgets)
@@ -74,8 +74,8 @@ protected:
     KartSelectionScreen(const char* filename);
 
     /** Stores whether any player confirmed their choice; then, some things
-      * are "frozen", for instance the selected kart group tab
-      */
+     * are "frozen", for instance the selected kart group tab
+     */
     bool m_game_master_confirmed;
 
     PlayerKartWidget* m_removed_widget;
@@ -91,14 +91,14 @@ protected:
     void renumberKarts();
 
     /** Checks identities chosen by players, making sure no duplicates are
-      * used.
-      * \return Whether all choices are ok
-      */
+     * used.
+     * \return Whether all choices are ok
+     */
     bool validateIdentChoices();
 
     /** Checks karts chosen by players, making sure no duplicates are used.
-      * \return Whether all choices are ok
-      */
+     * \return Whether all choices are ok
+     */
     bool validateKartChoices();
 
     /** Fill the ribbon with the karts from the currently selected group */
@@ -107,12 +107,12 @@ protected:
     virtual void playerConfirm(const int playerID);
     /** updates model of a kart widget, to have the good selection when the user validates */
     void updateKartWidgetModel(uint8_t widget_id,
-                const std::string& selection,
-                const irr::core::stringw& selectionText);
+            const std::string& selection,
+            const irr::core::stringw& selectionText);
 
     /** Stores a pointer to the current selection screen */
     static KartSelectionScreen* m_instance_ptr;
-public:
+    public:
     /** Returns the current instance */
     static KartSelectionScreen* getRunningInstance();
 
@@ -131,23 +131,23 @@ public:
     bool playerJoin(InputDevice* device, bool firstPlayer);
 
     /**
-      * \brief Called when a player hits 'rescue'/'cancel' on his device
-      *  to leave the game
-      * \return true if event was handled succesfully
-      */
+     * \brief Called when a player hits 'rescue'/'cancel' on his device
+     *  to leave the game
+     * \return true if event was handled succesfully
+     */
     bool playerQuit(StateManager::ActivePlayer* player);
 
-     /** \brief implement callback from parent class GUIEngine::Screen */
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
     virtual void beforeAddingWidget() OVERRIDE;
 
-     /** \brief implement callback from parent class GUIEngine::Screen */
+    /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void tearDown() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                               const int playerID) OVERRIDE;
+            const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void onUpdate(float dt) OVERRIDE;
@@ -165,11 +165,11 @@ public:
 //!----------------------------------------------------------------------------
 //! FocusDispatcher :
 /** Currently, navigation for multiple players at the same time is implemented
-    in a somewhat clunky way. An invisible "dispatcher" widget is added above
-    kart icons. When a player moves up, he focuses the dispatcher, which in
-    turn moves the selection to the appropriate spinner. "tabbing roots" are
-    used to make navigation back down possible. (FIXME: maybe find a cleaner
-    way?) */
+  in a somewhat clunky way. An invisible "dispatcher" widget is added above
+  kart icons. When a player moves up, he focuses the dispatcher, which in
+  turn moves the selection to the appropriate spinner. "tabbing roots" are
+  used to make navigation back down possible. (FIXME: maybe find a cleaner
+  way?) */
 class FocusDispatcher : public GUIEngine::Widget
 {
     KartSelectionScreen* m_parent;
@@ -177,12 +177,12 @@ class FocusDispatcher : public GUIEngine::Widget
 
     bool m_is_initialised;
 
-public:
+    public:
 
     LEAK_CHECK()
 
-    // ------------------------------------------------------------------------
-    FocusDispatcher(KartSelectionScreen* parent);
+        // ------------------------------------------------------------------------
+        FocusDispatcher(KartSelectionScreen* parent);
     // ------------------------------------------------------------------------
     void setRootID(const int reservedID);
 
@@ -206,7 +206,7 @@ class PlayerNameSpinner : public GUIEngine::SpinnerWidget
     KartSelectionScreen* m_parent;
     //virtual EventPropagation focused(const int m_playerID) ;
 
-public:
+    public:
     PlayerNameSpinner(KartSelectionScreen* parent, const int playerID);
     // ------------------------------------------------------------------------
     void setID(const int m_playerID);
@@ -217,7 +217,7 @@ public:
     // ------------------------------------------------------------------------
     /** Remove any red mark set with 'markAsIncorrect' */
     void markAsCorrect();
-    
+
 };
 
 /** A widget representing the kart selection for a player (i.e. the player's
@@ -258,12 +258,12 @@ class PlayerKartWidget : public GUIEngine::Widget,
     long m_magic_number;
 #endif
 
-public:
+    public:
 
     LEAK_CHECK()
 
-    /** Sub-widgets created by this widget */
-    PlayerNameSpinner* m_player_ident_spinner;
+        /** Sub-widgets created by this widget */
+        PlayerNameSpinner* m_player_ident_spinner;
     GUIEngine::ModelViewWidget* m_model_view;
     GUIEngine::LabelWidget* m_kart_name;
 
@@ -278,11 +278,11 @@ public:
     bool m_not_updated_yet;
 
     PlayerKartWidget(KartSelectionScreen* parent,
-                     StateManager::ActivePlayer* associated_player,
-                     Online::Profile* associated_user,
-                     core::recti area, const int player_id,
-                     std::string kart_group,
-                     const int irrlicht_idget_id=-1);
+            StateManager::ActivePlayer* associated_player,
+            Online::Profile* associated_user,
+            core::recti area, const int player_id,
+            std::string kart_group,
+            const int irrlicht_idget_id=-1);
     // ------------------------------------------------------------------------
 
     ~PlayerKartWidget();
@@ -323,9 +323,9 @@ public:
     // -------------------------------------------------------------------------
     /** Event callback */
     virtual GUIEngine::EventPropagation transmitEvent(
-        GUIEngine::Widget* w,
-        const std::string& originator,
-        const int m_player_id);
+            GUIEngine::Widget* w,
+            const std::string& originator,
+            const int m_player_id);
 
     // -------------------------------------------------------------------------
     /** Sets the size of the widget as a whole, and placed children widgets
@@ -353,7 +353,7 @@ public:
 class KartHoverListener : public GUIEngine::DynamicRibbonHoverListener
 {
     KartSelectionScreen* m_parent;
-public:
+    public:
     unsigned int m_magic_number;
 
     KartHoverListener(KartSelectionScreen* parent);
@@ -363,9 +363,9 @@ public:
 
     // ------------------------------------------------------------------------
     void onSelectionChanged(GUIEngine::DynamicRibbonWidget* theWidget,
-                            const std::string& selectionID,
-                            const irr::core::stringw& selectionText,
-                            const int playerID);
+            const std::string& selectionID,
+            const irr::core::stringw& selectionText,
+            const int playerID);
 };   // KartHoverListener
 
 #endif
