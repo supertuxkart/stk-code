@@ -110,7 +110,7 @@ void SpinnerWidget::add()
     m_element = btn;
 
     m_element->setTabOrder( m_element->getID() );
-	
+
     // left arrow
     rect<s32> subsize_left_arrow = rect<s32>(0 ,0, m_h, m_h);
     IGUIButton * left_arrow = GUIEngine::getGUIEnv()->addButton(subsize_left_arrow, btn, getNewNoFocusID(), L" ");
