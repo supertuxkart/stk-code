@@ -217,7 +217,6 @@ public:
     // ------------------------------------------------------------------------
     /** Remove any red mark set with 'markAsIncorrect' */
     void markAsCorrect();
-	//-- me --
     
 };
 
