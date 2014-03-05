@@ -15,8 +15,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "modes/overworld.hpp"
+
 #include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
@@ -25,7 +29,6 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
-#include "modes/overworld.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
 #include "states_screens/offline_kart_selection.hpp"
@@ -63,7 +66,7 @@ void OverWorld::enterOverWorld()
     InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
     // Create player and associate player with keyboard
-    StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+    StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
                                             device, NULL);
 
     if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))

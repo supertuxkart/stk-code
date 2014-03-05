@@ -20,7 +20,6 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
-#include "config/player.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"

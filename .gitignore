@@ -1,4 +1,4 @@
-bld/
+bld*/
 build/
 build-32/
 build-64/
@@ -18,6 +18,9 @@ data/textures
 data/tracks
 data/.svn
 
+# Ignore doxygen output
+src/html
+
 *.o
 *.d
 *.a
@@ -35,6 +38,7 @@ data/.svn
 *.vcxproj
 *.vcxproj.filters
 *.vcxproj.user
+*~
 
 packets_log.txt
 history.dat

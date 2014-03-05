@@ -34,7 +34,7 @@
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
-#include "graphics/stkmesh.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/sun.hpp"
 #include "graphics/rtts.hpp"
 #include "graphics/water.hpp"
@@ -101,6 +101,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
 IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
+    m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
     m_device              = createDevice(video::EDT_NULL);
     m_request_screenshot  = false;
     m_shaders             = NULL;
@@ -144,17 +145,17 @@ void IrrDriver::reset()
 
 void IrrDriver::setPhase(STKRenderingPass p)
 {
-  phase = p;
+    m_phase = p;
 }
 
 STKRenderingPass IrrDriver::getPhase() const
 {
-  return phase;
+  return m_phase;
 }
 
 void IrrDriver::IncreaseObjectCount()
 {
-	object_count[phase]++;
+	object_count[m_phase]++;
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -421,10 +422,11 @@ void IrrDriver::initDevice()
     m_gui_env       = m_device->getGUIEnvironment();
     m_video_driver  = m_device->getVideoDriver();
 
-	int GLMajorVersion;
+	int GLMajorVersion = 0, GLMinorVersion = 0;
 	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
-	printf("OPENGL VERSION IS %d\n", GLMajorVersion);
-	m_glsl = (GLMajorVersion >= 3) && UserConfigParams::m_pixel_shaders;
+    glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+    Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
+	m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3)) && UserConfigParams::m_pixel_shaders;
                       
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
@@ -452,16 +454,16 @@ void IrrDriver::initDevice()
         m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
-        m_mrt.reallocate(3);
+        m_mrt.reallocate(2);
         m_mrt.push_back(m_rtts->getRTT(RTT_COLOR));
         m_mrt.push_back(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH));
-        m_mrt.push_back(m_rtts->getRTT(RTT_SPECULARMAP));
 
         irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
+        m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
-        m_sun_interposer = m_scene_manager->addMeshSceneNode(sphere);
+        m_sun_interposer = new STKMeshSceneNode(sphere, m_scene_manager->getRootSceneNode(), NULL, -1);
         m_sun_interposer->grab();
         m_sun_interposer->setParent(NULL);
         m_sun_interposer->setScale(core::vector3df(20));
@@ -469,7 +471,7 @@ void IrrDriver::initDevice()
         m_sun_interposer->getMaterial(0).Lighting = false;
         m_sun_interposer->getMaterial(0).ColorMask = video::ECP_NONE;
         m_sun_interposer->getMaterial(0).ZWriteEnable = false;
-        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_PASSFAR);
+        m_sun_interposer->getMaterial(0).MaterialType = m_shaders->getShader(ES_OBJECTPASS);
 
         sphere->drop();
 
@@ -937,7 +939,7 @@ scene::IMeshSceneNode *IrrDriver::addMesh(scene::IMesh *mesh,
     if (!parent)
       parent = m_scene_manager->getRootSceneNode();
 
-    scene::IMeshSceneNode* node = new STKMesh(mesh, parent, m_scene_manager, -1);
+    scene::IMeshSceneNode* node = new STKMeshSceneNode(mesh, parent, m_scene_manager, -1);
     node->drop();
 
     return node;
@@ -1168,7 +1170,10 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
 scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                         &texture)
 {
+    assert(texture.size() == 6);
 	SkyboxTextures = texture;
+    SkyboxCubeMap = 0;
+    ConvolutedSkyboxCubeMap = 0;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -1177,6 +1182,10 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
 void IrrDriver::suppressSkyBox()
 {
 	SkyboxTextures.clear();
+    glDeleteTextures(1, &SkyboxCubeMap);
+    glDeleteTextures(1, &ConvolutedSkyboxCubeMap);
+    SkyboxCubeMap = 0;
+    ConvolutedSkyboxCubeMap = 0;
 }
 
 // ----------------------------------------------------------------------------
@@ -1797,18 +1806,7 @@ void IrrDriver::update(float dt)
 
     World *world = World::getWorld();
 
-    // Handle cut scenes (which do not have any karts in it)
-    // =====================================================
-    if (world && world->getNumKarts() == 0)
-    {
-        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
-                                   world->getClearColor());
-        m_scene_manager->drawAll();
-        GUIEngine::render(dt);
-        m_video_driver->endScene();
-        return;
-    }
-    else if (GUIEngine::getCurrentScreen() != NULL &&
+    if (GUIEngine::getCurrentScreen() != NULL &&
              GUIEngine::getCurrentScreen()->needs3D())
     {
         //printf("Screen that needs 3D\n");
@@ -1821,10 +1819,10 @@ void IrrDriver::update(float dt)
     }
     else if (!world)
     {
-    m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
+        m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
                                    video::SColor(255,100,101,140));
 
-    GUIEngine::render(dt);
+        GUIEngine::render(dt);
 
         m_video_driver->endScene();
         return;

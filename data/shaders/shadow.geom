@@ -1,4 +1,3 @@
-#version 330
 uniform mat4 ModelViewProjectionMatrix[4];
 
 layout(triangles) in;

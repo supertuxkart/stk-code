@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,19 +27,23 @@
 
 #include <irrString.h>
 #include <string>
-#include "io/xml_node.hpp"
 
+class UTFWriter;
+class XMLNode;
 
-class AchievementsSlot
+/** This class keeps tracks of all achievements of one player. One instance
+ *  of this class is stored in each PlayerProfile. It stores a map of
+ *  achievements ids to instances of Achievement. Each achievement in
+ *  turn stores either fulfilled achievements, or the current state of
+ *  an achievement (e.g. an achievement to race every track in STK needs
+ *  to keep information about which tracks have already been used.)
+*/
+class AchievementsStatus
 {
 private:
     std::map<uint32_t, Achievement *> m_achievements;
-    bool m_online;
-    bool m_valid;
-    std::string m_id;
-
-    void createFreshSlot();
-    void deleteAchievements();
+    bool         m_online;
+    bool         m_valid;
 
     class SyncAchievementsRequest : public Online::XMLRequest {
         virtual void callback ();
@@ -47,18 +52,25 @@ private:
     };
 
 public :
-    AchievementsSlot(const XMLNode * input);
-    AchievementsSlot(std::string id, bool online);
-    ~AchievementsSlot();
-    bool isValid() const { return m_valid;}
-    void save(std::ofstream & out);
-    bool isOnline() const {return m_online;}
+    AchievementsStatus();
+    ~AchievementsStatus();
+    Achievement * getAchievement(uint32_t id);
+    void load(const XMLNode * input);
+    void save(UTFWriter &out);
+    void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
-    const std::string & getID() const {return m_id;}
-    const std::map<uint32_t, Achievement *> & getAllAchievements() {return m_achievements;}
-    Achievement * getAchievement(uint32_t id);
-};
+    // ------------------------------------------------------------------------
+    const std::map<uint32_t, Achievement *>& getAllAchievements() 
+    {
+        return m_achievements;
+    }
+    // ------------------------------------------------------------------------
+    bool isOnline() const { return m_online; }
+    // ------------------------------------------------------------------------
+    bool isValid() const { return m_valid; }
+    // ------------------------------------------------------------------------
+};   // class AchievementsStatus
 
 #endif
 

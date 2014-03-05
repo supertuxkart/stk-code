@@ -3,7 +3,7 @@ set(STK_SOURCES
 src/achievements/achievement.cpp
 src/achievements/achievement_info.cpp
 src/achievements/achievements_manager.cpp
-src/achievements/achievements_slot.cpp
+src/achievements/achievements_status.cpp
 src/addons/addon.cpp
 src/addons/addons_manager.cpp
 src/addons/news_manager.cpp
@@ -17,12 +17,13 @@ src/audio/music_ogg.cpp
 src/audio/sfx_buffer.cpp
 src/audio/sfx_manager.cpp
 src/audio/sfx_openal.cpp
-src/challenges/challenge.cpp
 src/challenges/challenge_data.cpp
-src/challenges/game_slot.cpp
+src/challenges/challenge_status.cpp
+src/challenges/story_mode_status.cpp
 src/challenges/unlock_manager.cpp
 src/config/device_config.cpp
-src/config/player.cpp
+src/config/player_manager.cpp
+src/config/player_profile.cpp
 src/config/saved_grand_prix.cpp
 src/config/stk_config.cpp
 src/config/user_config.cpp
@@ -63,6 +64,7 @@ src/graphics/stars.cpp
 src/graphics/stkanimatedmesh.cpp
 src/graphics/stkbillboard.cpp
 src/graphics/stkmesh.cpp
+src/graphics/stkmeshscenenode.cpp
 src/graphics/sun.cpp
 src/graphics/water.cpp
 src/graphics/wind.cpp
@@ -101,8 +103,8 @@ src/input/input_manager.cpp
 src/input/wiimote.cpp
 src/input/wiimote_manager.cpp
 src/io/file_manager.cpp
+src/io/utf_writer.cpp
 src/io/xml_node.cpp
-src/io/xml_writer.cpp
 src/items/attachment.cpp
 src/items/attachment_manager.cpp
 src/items/bowling.cpp
@@ -332,7 +334,7 @@ set(STK_HEADERS
 src/achievements/achievement.hpp
 src/achievements/achievement_info.hpp
 src/achievements/achievements_manager.hpp
-src/achievements/achievements_slot.hpp
+src/achievements/achievements_status.hpp
 src/addons/addon.hpp
 src/addons/addons_manager.hpp
 src/addons/news_manager.hpp
@@ -350,12 +352,13 @@ src/audio/sfx_base.hpp
 src/audio/sfx_buffer.hpp
 src/audio/sfx_manager.hpp
 src/audio/sfx_openal.hpp
-src/challenges/challenge.hpp
 src/challenges/challenge_data.hpp
-src/challenges/game_slot.hpp
+src/challenges/challenge_status.hpp
+src/challenges/story_mode_status.hpp
 src/challenges/unlock_manager.hpp
 src/config/device_config.hpp
-src/config/player.hpp
+src/config/player_manager.hpp
+src/config/player_profile.hpp
 src/config/saved_grand_prix.hpp
 src/config/stk_config.hpp
 src/config/user_config.hpp
@@ -398,6 +401,7 @@ src/graphics/stars.hpp
 src/graphics/stkanimatedmesh.hpp
 src/graphics/stkbillboard.hpp
 src/graphics/stkmesh.hpp
+src/graphics/stkmeshscenenode.hpp
 src/graphics/sun.hpp
 src/graphics/water.hpp
 src/graphics/wind.hpp
@@ -434,8 +438,8 @@ src/input/input_manager.hpp
 src/input/wiimote.hpp
 src/input/wiimote_manager.hpp
 src/io/file_manager.hpp
+src/io/utf_writer.hpp
 src/io/xml_node.hpp
-src/io/xml_writer.hpp
 src/items/attachment.hpp
 src/items/attachment_manager.hpp
 src/items/attachment_plugin.hpp

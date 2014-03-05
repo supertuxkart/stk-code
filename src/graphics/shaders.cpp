@@ -44,13 +44,11 @@ Shaders::Shaders()
     m_callbacks[ES_MLAA_COLOR1] = new MLAAColor1Provider();
     m_callbacks[ES_MLAA_BLEND2] = new MLAABlend2Provider();
     m_callbacks[ES_MLAA_NEIGH3] = new MLAANeigh3Provider();
-    m_callbacks[ES_GODRAY] = new GodRayProvider();
     m_callbacks[ES_SHADOWPASS] = new ShadowPassProvider();
     m_callbacks[ES_SHADOW_IMPORTANCE] = new ShadowImportanceProvider();
     m_callbacks[ES_COLLAPSE] = new CollapseProvider();
     m_callbacks[ES_MULTIPLY_ADD] = new MultiplyProvider();
     m_callbacks[ES_SHADOWGEN] = new ShadowGenProvider();
-    m_callbacks[ES_CAUSTICS] = new CausticsProvider();
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
 
     for(s32 i=0 ; i < ES_COUNT ; i++)
@@ -106,52 +104,52 @@ void Shaders::loadShaders()
     memcpy(saved_shaders, m_shaders, sizeof(m_shaders));
 
     // Ok, go
-	m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + "normalmap.vert", dir + "normalmap.frag");
-	m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + "normalmap.vert", dir + "normalmap.frag");
+    m_shaders[ES_NORMAL_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_NORMAL_MAP_LIGHTMAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_SKYBOX] = glslmat(dir + "skybox.vert", dir + "skybox.frag",
+    m_shaders[ES_SKYBOX] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                    m_callbacks[ES_SKYBOX], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-	m_shaders[ES_SPLATTING] = glsl_noinput(dir + "splatting.vert", dir + "splatting.frag");
+    m_shaders[ES_SPLATTING] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_WATER] = glslmat(dir + "water.vert", dir + "water.frag",
+    m_shaders[ES_WATER] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_WATER], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_WATER_SURFACE] = glsl(dir + "water.vert", dir + "pass.frag",
+    m_shaders[ES_WATER_SURFACE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_WATER]);
 
-	m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass_spheremap.frag");
+    m_shaders[ES_SPHERE_MAP] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_GRASS] = glslmat(std::string(""), dir + "pass.frag",
+    m_shaders[ES_GRASS] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL);
-    m_shaders[ES_GRASS_REF] = glslmat(std::string(""), dir + "pass.frag",
+    m_shaders[ES_GRASS_REF] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_GRASS], EMT_TRANSPARENT_ALPHA_CHANNEL_REF);
 
-    m_shaders[ES_BUBBLES] = glslmat(dir + "bubble.vert", dir + "bubble.frag",
+    m_shaders[ES_BUBBLES] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_BUBBLES], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_RAIN] = glslmat(dir + "rain.vert", dir + "rain.frag",
+    m_shaders[ES_RAIN] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_RAIN], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_MOTIONBLUR] = glsl(std::string(""), dir + "motion_blur.frag",
+    m_shaders[ES_MOTIONBLUR] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MOTIONBLUR]);
 
-	m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "gaussian3h.frag",
+    m_shaders[ES_GAUSSIAN3H] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-	m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "gaussian3v.frag",
+    m_shaders[ES_GAUSSIAN3V] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3V], EMT_SOLID);
 
-    m_shaders[ES_MIPVIZ] = glslmat(std::string(""), dir + "mipviz.frag",
+    m_shaders[ES_MIPVIZ] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MIPVIZ], EMT_SOLID);
 
-    m_shaders[ES_COLORIZE] = glslmat(std::string(""), dir + "colorize.frag",
+    m_shaders[ES_COLORIZE] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLORIZE], EMT_SOLID);
 
-	m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
-	m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass.frag");
-	m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "objectpass.vert", dir + "objectpass_ref.frag");
-	m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "objectpass_rimlit.vert", dir + "objectpass_rimlit.frag");
+    m_shaders[ES_OBJECTPASS] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECT_UNLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS_REF] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
+    m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-	m_shaders[ES_SUNLIGHT] = glsl_noinput(std::string(""), dir + "sunlight.frag");
+    m_shaders[ES_SUNLIGHT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
     m_shaders[ES_MLAA_COLOR1] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_color1.frag",
                                     m_callbacks[ES_MLAA_COLOR1]);
@@ -160,40 +158,36 @@ void Shaders::loadShaders()
     m_shaders[ES_MLAA_NEIGH3] = glsl(dir + "mlaa_offset.vert", dir + "mlaa_neigh3.frag",
                                     m_callbacks[ES_MLAA_NEIGH3]);
 
-    m_shaders[ES_GODFADE] = glsl(std::string(""), dir + "godfade.frag", m_callbacks[ES_COLORIZE]);
-    m_shaders[ES_GODRAY] = glsl(std::string(""), dir + "godray.frag", m_callbacks[ES_GODRAY]);
-
-    m_shaders[ES_SHADOWPASS] = glsl(dir + "shadowpass.vert", dir + "shadowpass.frag",
+    m_shaders[ES_SHADOWPASS] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOWPASS]);
 
-    m_shaders[ES_SHADOW_IMPORTANCE] = glsl(dir + "shadowimportance.vert",
-                                           dir + "shadowimportance.frag",
+    m_shaders[ES_SHADOW_IMPORTANCE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOW_IMPORTANCE]);
 
-    m_shaders[ES_COLLAPSE] = glsl(std::string(""), dir + "collapse.frag",
+    m_shaders[ES_COLLAPSE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLLAPSE]);
-    m_shaders[ES_SHADOW_WARPH] = glsl(std::string(""), dir + "shadowwarph.frag",
+    m_shaders[ES_SHADOW_WARPH] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLLAPSE]);
-    m_shaders[ES_SHADOW_WARPV] = glsl(std::string(""), dir + "shadowwarpv.frag",
+    m_shaders[ES_SHADOW_WARPV] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_COLLAPSE]);
 
-    m_shaders[ES_MULTIPLY_ADD] = glslmat(std::string(""), dir + "multiply.frag",
+    m_shaders[ES_MULTIPLY_ADD] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_MULTIPLY_ADD], EMT_ONETEXTURE_BLEND);
 
-    m_shaders[ES_PENUMBRAH] = glslmat(std::string(""), dir + "penumbrah.frag",
+    m_shaders[ES_PENUMBRAH] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_PENUMBRAV] = glslmat(std::string(""), dir + "penumbrav.frag",
+    m_shaders[ES_PENUMBRAV] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_SHADOWGEN] = glslmat(std::string(""), dir + "shadowgen.frag",
+    m_shaders[ES_SHADOWGEN] = glslmat(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOWGEN], EMT_SOLID);
 
-    m_shaders[ES_CAUSTICS] = glslmat(std::string(""), dir + "caustics.frag",
-                                    m_callbacks[ES_CAUSTICS], EMT_TRANSPARENT_ALPHA_CHANNEL);
+    m_shaders[ES_CAUSTICS] = glslmat(dir + "pass.vert", dir + "pass.frag",
+        m_callbacks[ES_CAUSTICS], EMT_SOLID);
 
-    m_shaders[ES_DISPLACE] = glsl(dir + "displace.vert", dir + "displace.frag",
+    m_shaders[ES_DISPLACE] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_DISPLACE]);
 
-    m_shaders[ES_PASSFAR] = glsl(dir + "farplane.vert", dir + "colorize.frag",
+    m_shaders[ES_PASSFAR] = glsl(dir + "pass.vert", dir + "pass.frag",
                                   m_callbacks[ES_COLORIZE]);
 
     // Check that all successfully loaded
@@ -234,10 +228,13 @@ void Shaders::loadShaders()
 	FullScreenShader::GlowShader::init();
 	FullScreenShader::PassThroughShader::init();
 	FullScreenShader::PointLightShader::init();
-	FullScreenShader::PPDisplaceShader::init();
 	FullScreenShader::SSAOShader::init();
 	FullScreenShader::SunLightShader::init();
+    FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
+    FullScreenShader::MotionBlurShader::init();
+    FullScreenShader::GodFadeShader::init();
+    FullScreenShader::GodRayShader::init();
 	MeshShader::ColorizeShader::init();
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
@@ -252,14 +249,17 @@ void Shaders::loadShaders()
 	MeshShader::SplattingShader::init();
 	MeshShader::GrassPass1Shader::init();
 	MeshShader::GrassPass2Shader::init();
+    MeshShader::CausticsShader::init();
 	MeshShader::BubbleShader::init();
 	MeshShader::TransparentShader::init();
     MeshShader::TransparentFogShader::init();
 	MeshShader::BillboardShader::init();
 	MeshShader::DisplaceShader::init();
+    MeshShader::DisplaceMaskShader::init();
     MeshShader::ShadowShader::init();
     MeshShader::RefShadowShader::init();
     MeshShader::GrassShadowShader::init();
+    MeshShader::SkyboxShader::init();
 	ParticleShader::FlipParticleRender::init();
 	ParticleShader::HeightmapSimulationShader::init();
 	ParticleShader::SimpleParticleRender::init();
@@ -324,6 +324,7 @@ namespace MeshShader
 	GLuint ObjectRefPass1Shader::attrib_texcoord;
 	GLuint ObjectRefPass1Shader::uniform_MVP;
 	GLuint ObjectRefPass1Shader::uniform_TIMV;
+    GLuint ObjectRefPass1Shader::uniform_TM;
 	GLuint ObjectRefPass1Shader::uniform_tex;
 
 	void ObjectRefPass1Shader::init()
@@ -334,12 +335,14 @@ namespace MeshShader
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 	}
 
-	void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+    void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix, unsigned TU_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
 		glUniform1i(uniform_tex, TU_tex);
 	}
@@ -348,6 +351,7 @@ namespace MeshShader
 	GLuint ObjectPass2Shader::attrib_position;
 	GLuint ObjectPass2Shader::attrib_texcoord;
 	GLuint ObjectPass2Shader::uniform_MVP;
+    GLuint ObjectPass2Shader::uniform_TM;
 	GLuint ObjectPass2Shader::uniform_Albedo;
 	GLuint ObjectPass2Shader::uniform_DiffuseMap;
 	GLuint ObjectPass2Shader::uniform_SpecularMap;
@@ -361,6 +365,7 @@ namespace MeshShader
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
 		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
 		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
@@ -369,9 +374,10 @@ namespace MeshShader
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
 	}
 
-	void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+    void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
 		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
 		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
@@ -450,6 +456,7 @@ namespace MeshShader
 	GLuint ObjectRimLimitShader::attrib_normal;
 	GLuint ObjectRimLimitShader::uniform_MVP;
 	GLuint ObjectRimLimitShader::uniform_TIMV;
+    GLuint ObjectRimLimitShader::uniform_TM;
 	GLuint ObjectRimLimitShader::uniform_Albedo;
 	GLuint ObjectRimLimitShader::uniform_DiffuseMap;
 	GLuint ObjectRimLimitShader::uniform_SpecularMap;
@@ -465,6 +472,7 @@ namespace MeshShader
 		attrib_normal = glGetAttribLocation(Program, "Normal");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
 		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
 		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
@@ -473,10 +481,11 @@ namespace MeshShader
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
 	}
 
-	void ObjectRimLimitShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+    void ObjectRimLimitShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
 		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
 		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
@@ -525,6 +534,7 @@ namespace MeshShader
 	GLuint ObjectRefPass2Shader::attrib_position;
 	GLuint ObjectRefPass2Shader::attrib_texcoord;
 	GLuint ObjectRefPass2Shader::uniform_MVP;
+    GLuint ObjectRefPass2Shader::uniform_TM;
 	GLuint ObjectRefPass2Shader::uniform_Albedo;
 	GLuint ObjectRefPass2Shader::uniform_DiffuseMap;
 	GLuint ObjectRefPass2Shader::uniform_SpecularMap;
@@ -539,6 +549,7 @@ namespace MeshShader
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_Albedo = glGetUniformLocation(Program, "Albedo");
 		uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
 		uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
@@ -547,9 +558,10 @@ namespace MeshShader
 		uniform_ambient = glGetUniformLocation(Program, "ambient");
 	}
 
-	void ObjectRefPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
+	void ObjectRefPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
 		glUniform1i(uniform_Albedo, TU_Albedo);
 		glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
 		glUniform1i(uniform_SpecularMap, TU_SpecularMap);
@@ -666,6 +678,8 @@ namespace MeshShader
 	GLuint SphereMapShader::uniform_MVP;
 	GLuint SphereMapShader::uniform_TIMV;
 	GLuint SphereMapShader::uniform_tex;
+    GLuint SphereMapShader::uniform_invproj;
+    GLuint SphereMapShader::uniform_screen;
 
 	void SphereMapShader::init()
 	{
@@ -675,12 +689,16 @@ namespace MeshShader
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        uniform_screen = glGetUniformLocation(Program, "screen");
 	}
 
-	void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen, unsigned TU_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProj.pointer());
+        glUniform2f(uniform_screen, screen.X, screen.Y);
 		glUniform1i(uniform_tex, TU_tex);
 	}
 
@@ -735,6 +753,52 @@ namespace MeshShader
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
 
+    GLuint CausticsShader::Program;
+    GLuint CausticsShader::attrib_position;
+    GLuint CausticsShader::attrib_texcoord;
+    GLuint CausticsShader::uniform_MVP;
+    GLuint CausticsShader::uniform_dir;
+    GLuint CausticsShader::uniform_dir2;
+    GLuint CausticsShader::uniform_Albedo;
+    GLuint CausticsShader::uniform_caustictex;
+    GLuint CausticsShader::uniform_DiffuseMap;
+    GLuint CausticsShader::uniform_SpecularMap;
+    GLuint CausticsShader::uniform_SSAO;
+    GLuint CausticsShader::uniform_screen;
+    GLuint CausticsShader::uniform_ambient;
+
+    void CausticsShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/caustics.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_dir = glGetUniformLocation(Program, "dir");
+        uniform_dir2 = glGetUniformLocation(Program, "dir2");
+        uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+        uniform_caustictex = glGetUniformLocation(Program, "caustictex");
+        uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
+    }
+
+    void CausticsShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_albedo, unsigned TU_DiffuseMap, unsigned TU_Specmap, unsigned TU_SSAO, unsigned TU_caustictex)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniform2f(uniform_dir, dir.X, dir.Y);
+        glUniform2f(uniform_dir2, dir2.X, dir2.Y);
+        glUniform1i(uniform_Albedo, TU_albedo);
+        glUniform1i(uniform_caustictex, TU_caustictex);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+        glUniform1i(uniform_DiffuseMap, TU_DiffuseMap);
+        glUniform1i(uniform_SpecularMap, TU_Specmap);
+        glUniform1i(uniform_SSAO, TU_SSAO);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
+    }
+
 	GLuint BubbleShader::Program;
 	GLuint BubbleShader::attrib_position;
 	GLuint BubbleShader::attrib_texcoord;
@@ -753,7 +817,7 @@ namespace MeshShader
 		uniform_time = glGetUniformLocation(Program, "time");
 		uniform_transparency = glGetUniformLocation(Program, "transparency");
 	}
-	void BubbleShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency)
+    void BubbleShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniform1i(uniform_tex, TU_tex);
@@ -765,6 +829,7 @@ namespace MeshShader
 	GLuint TransparentShader::attrib_position;
 	GLuint TransparentShader::attrib_texcoord;
 	GLuint TransparentShader::uniform_MVP;
+    GLuint TransparentShader::uniform_TM;
 	GLuint TransparentShader::uniform_tex;
 
 	void TransparentShader::init()
@@ -773,12 +838,14 @@ namespace MeshShader
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_tex = glGetUniformLocation(Program, "tex");
 	}
 
-	void TransparentShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex)
+    void TransparentShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
 		glUniform1i(uniform_tex, TU_tex);
 	}
 
@@ -786,6 +853,7 @@ namespace MeshShader
     GLuint TransparentFogShader::attrib_position;
     GLuint TransparentFogShader::attrib_texcoord;
     GLuint TransparentFogShader::uniform_MVP;
+    GLuint TransparentFogShader::uniform_TM;
     GLuint TransparentFogShader::uniform_tex;
     GLuint TransparentFogShader::uniform_fogmax;
     GLuint TransparentFogShader::uniform_startH;
@@ -802,6 +870,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_fogmax = glGetUniformLocation(Program, "fogmax");
         uniform_startH = glGetUniformLocation(Program, "startH");
@@ -813,9 +882,10 @@ namespace MeshShader
         uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
     }
 
-    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
+    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform1f(uniform_fogmax, fogmax);
         glUniform1f(uniform_startH, startH);
         glUniform1f(uniform_endH, endH);
@@ -951,15 +1021,34 @@ namespace MeshShader
         glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
     }
 
+    GLuint DisplaceMaskShader::Program;
+    GLuint DisplaceMaskShader::attrib_position;
+    GLuint DisplaceMaskShader::uniform_MVP;
+
+    void DisplaceMaskShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/displace.vert").c_str(), file_manager->getAsset("shaders/white.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+    }
+
+    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+    }
+
 	GLuint DisplaceShader::Program;
 	GLuint DisplaceShader::attrib_position;
 	GLuint DisplaceShader::attrib_texcoord;
 	GLuint DisplaceShader::attrib_second_texcoord;
 	GLuint DisplaceShader::uniform_MVP;
 	GLuint DisplaceShader::uniform_MV;
-	GLuint DisplaceShader::uniform_tex;
+	GLuint DisplaceShader::uniform_displacement_tex;
+    GLuint DisplaceShader::uniform_mask_tex;
+    GLuint DisplaceShader::uniform_color_tex;
 	GLuint DisplaceShader::uniform_dir;
 	GLuint DisplaceShader::uniform_dir2;
+    GLuint DisplaceShader::uniform_screen;
 
 	void DisplaceShader::init()
 	{
@@ -969,19 +1058,50 @@ namespace MeshShader
 		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
-		uniform_tex = glGetUniformLocation(Program, "tex");
+		uniform_displacement_tex = glGetUniformLocation(Program, "displacement_tex");
+        uniform_color_tex = glGetUniformLocation(Program, "color_tex");
+        uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
 		uniform_dir = glGetUniformLocation(Program, "dir");
 		uniform_dir2 = glGetUniformLocation(Program, "dir2");
+        uniform_screen = glGetUniformLocation(Program, "screen");
 	}
 
-	void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, float dirX, float dirY, float dir2X, float dir2Y, unsigned TU_tex)
+	void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
-		glUniform2f(uniform_dir, dirX, dirY);
-		glUniform2f(uniform_dir2, dir2X, dir2Y);
-		glUniform1i(uniform_tex, TU_tex);
+		glUniform2f(uniform_dir, dir.X, dir.Y);
+		glUniform2f(uniform_dir2, dir2.X, dir2.Y);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+		glUniform1i(uniform_displacement_tex, TU_displacement_tex);
+        glUniform1i(uniform_mask_tex, TU_mask_tex);
+        glUniform1i(uniform_color_tex, TU_color_tex);
 	}
+
+    GLuint SkyboxShader::Program;
+    GLuint SkyboxShader::attrib_position;
+    GLuint SkyboxShader::uniform_MVP;
+    GLuint SkyboxShader::uniform_tex;
+    GLuint SkyboxShader::uniform_screen;
+    GLuint SkyboxShader::uniform_InvProjView;
+
+    void SkyboxShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/sky.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_InvProjView = glGetUniformLocation(Program, "InvProjView");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+    }
+
+    void SkyboxShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InvProjView, const core::vector2df &screen, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_InvProjView, 1, GL_FALSE, InvProjView.pointer());
+        glUniform1i(uniform_tex, TU_tex);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+    }
 }
 
 
@@ -1203,31 +1323,21 @@ namespace FullScreenShader
 		vao = createVAO(Program);
 	}
 
-	GLuint PPDisplaceShader::Program;
-	GLuint PPDisplaceShader::uniform_tex;
-	GLuint PPDisplaceShader::uniform_dtex;
-	GLuint PPDisplaceShader::uniform_viz;
-	GLuint PPDisplaceShader::vao;
-	void PPDisplaceShader::init()
-	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ppdisplace.frag").c_str());
-		uniform_tex = glGetUniformLocation(Program, "tex");
-		uniform_dtex = glGetUniformLocation(Program, "dtex");
-		uniform_viz = glGetUniformLocation(Program, "viz");
-		vao = createVAO(Program);
-	}
-
 	GLuint ColorLevelShader::Program;
 	GLuint ColorLevelShader::uniform_tex;
 	GLuint ColorLevelShader::uniform_inlevel;
 	GLuint ColorLevelShader::uniform_outlevel;
 	GLuint ColorLevelShader::vao;
+    GLuint ColorLevelShader::uniform_invprojm;
+    GLuint ColorLevelShader::uniform_dtex;
 	void ColorLevelShader::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
+        uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		vao = createVAO(Program);
 	}
 
@@ -1296,6 +1406,31 @@ namespace FullScreenShader
 		glUniform1i(uniform_ntex, TU_ntex);
 		glUniform1i(uniform_dtex, TU_dtex);
 	}
+
+    GLuint DiffuseEnvMapShader::Program;
+    GLuint DiffuseEnvMapShader::uniform_ntex;
+    GLuint DiffuseEnvMapShader::uniform_blueLmn;
+    GLuint DiffuseEnvMapShader::uniform_greenLmn;
+    GLuint DiffuseEnvMapShader::uniform_redLmn;
+    GLuint DiffuseEnvMapShader::vao;
+
+    void DiffuseEnvMapShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
+        uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
+        uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
+        vao = createVAO(Program);
+    }
+
+    void DiffuseEnvMapShader::setUniforms(const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
+    {
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1fv(uniform_blueLmn, 9, blueSHCoeff);
+        glUniform1fv(uniform_greenLmn, 9, greenSHCoeff);
+        glUniform1fv(uniform_redLmn, 9, redSHCoeff);
+    }
 
     GLuint ShadowedSunLightShader::Program;
     GLuint ShadowedSunLightShader::uniform_ntex;
@@ -1645,6 +1780,75 @@ namespace FullScreenShader
 		glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
 		glUniform1i(uniform_tex, TU_ntex);
 	}
+
+    GLuint MotionBlurShader::Program;
+    GLuint MotionBlurShader::uniform_boost_amount;
+    GLuint MotionBlurShader::uniform_center;
+    GLuint MotionBlurShader::uniform_color_buffer;
+    GLuint MotionBlurShader::uniform_direction;
+    GLuint MotionBlurShader::uniform_mask_radius;
+    GLuint MotionBlurShader::uniform_max_tex_height;
+    GLuint MotionBlurShader::vao;
+
+    void MotionBlurShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/motion_blur.frag").c_str());
+        uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
+        uniform_center = glGetUniformLocation(Program, "center");
+        uniform_color_buffer = glGetUniformLocation(Program, "color_buffer");
+        uniform_direction = glGetUniformLocation(Program, "direction");
+        uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
+        uniform_max_tex_height = glGetUniformLocation(Program, "max_tex_height");
+        vao = createVAO(Program);
+    }
+
+    void MotionBlurShader::setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb)
+    {
+        glUniform1f(uniform_boost_amount, boost_amount);
+        glUniform2f(uniform_center, center.X, center.Y);
+        glUniform2f(uniform_direction, direction.X, direction.Y);
+        glUniform1f(uniform_mask_radius, mask_radius);
+        glUniform1f(uniform_max_tex_height, max_tex_height);
+        glUniform1i(uniform_color_buffer, TU_cb);
+    }
+
+    GLuint GodFadeShader::Program;
+    GLuint GodFadeShader::uniform_tex;
+    GLuint GodFadeShader::uniform_col;
+    GLuint GodFadeShader::vao;
+
+    void GodFadeShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/godfade.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_col = glGetUniformLocation(Program, "col");
+        vao = createVAO(Program);
+    }
+
+    void GodFadeShader::setUniforms(const SColor &col, unsigned TU_tex)
+    {
+        glUniform3f(uniform_col, col.getRed() / 255., col.getGreen() / 255., col.getBlue() / 255.);
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
+    GLuint GodRayShader::Program;
+    GLuint GodRayShader::uniform_tex;
+    GLuint GodRayShader::uniform_sunpos;
+    GLuint GodRayShader::vao;
+
+    void GodRayShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/godray.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_sunpos = glGetUniformLocation(Program, "sunpos");
+        vao = createVAO(Program);
+    }
+
+    void GodRayShader::setUniforms(const core::vector2df &sunpos, unsigned TU_tex)
+    {
+        glUniform2f(uniform_sunpos, sunpos.X, sunpos.Y);
+        glUniform1i(uniform_tex, TU_tex);
+    }
 }
 
 namespace UIShader

@@ -196,7 +196,7 @@ namespace Online
                                                                     const irr::core::stringw &new_password,
                                                                     const irr::core::stringw &new_password_ver) const;
 
-            const XMLRequest *              requestUserSearch(const irr::core::stringw & search_string) const;
+            XMLRequest *                    requestUserSearch(const irr::core::stringw & search_string) const;
 
             void                            onSTKQuit() const;
             void                            onAchieving(uint32_t achievement_id) const;

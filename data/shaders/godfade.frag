@@ -1,11 +1,17 @@
-#version 330 compatibility
 uniform sampler2D tex;
 uniform vec3 col;
+
+#if __VERSION__ >= 130
+in vec2 uv;
 out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
 
 void main()
 {
-	vec4 res = texture(tex, gl_TexCoord[0].xy);
+	vec4 res = texture(tex, uv);
 
 	// Keep the sun fully bright, but fade the sky
 	float mul = distance(res.xyz, col);

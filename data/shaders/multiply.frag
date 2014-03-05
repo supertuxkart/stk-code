@@ -1,4 +1,3 @@
-#version 330 compatibility
 uniform sampler2D tex1;
 uniform sampler2D tex2;
 

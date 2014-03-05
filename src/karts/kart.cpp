@@ -19,17 +19,12 @@
 
 #include "karts/kart.hpp"
 
-#include <math.h>
-#include <iostream>
-#include <algorithm> // for min and max
-
-#include <ICameraSceneNode.h>
-#include <ISceneManager.h>
-
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "audio/sfx_base.hpp"
+#include "challenges/challenge_status.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/explosion.hpp"
@@ -72,6 +67,12 @@
 #include "utils/log.hpp" //TODO: remove after debugging is done
 #include "utils/vs.hpp"
 
+#include <ICameraSceneNode.h>
+#include <ISceneManager.h>
+
+#include <algorithm> // for min and max
+#include <iostream>
+#include <math.h>
 
 
 #if defined(WIN32) && !defined(__CYGWIN__)  && !defined(__MINGW32__)
@@ -354,8 +355,9 @@ void Kart::reset()
 
     // In case that the kart was in the air, in which case its
     // linear damping is 0
-    m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
-                       m_kart_properties->getChassisAngularDamping() );
+    if(m_body) 
+        m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
+                           m_kart_properties->getChassisAngularDamping() );
 
     if(m_terrain_sound)
     {
@@ -804,8 +806,8 @@ void Kart::finishedRace(float time)
                                         m_controller));
         if (m_controller->isPlayerController()) // if player is on this computer
         {
-            GameSlot *slot = unlock_manager->getCurrentSlot();
-            const Challenge *challenge = slot->getCurrentChallenge();
+            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+            const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend
             // on if the challenge is fulfilled
             if(challenge && !challenge->getData()->isGrandPrix())
@@ -1221,10 +1223,13 @@ void Kart::update(float dt)
     const Material* material=m_terrain_info->getMaterial();
     if (!material)   // kart falling off the track
     {
-        Vec3 gravity(0, -9.8f, 0);
-        btRigidBody *body = getVehicle()->getRigidBody();
-        body->setGravity(gravity);
-
+        if (!m_flying)
+        {
+            float g = World::getWorld()->getTrack()->getGravity();
+            Vec3 gravity(0, -g, 0);
+            btRigidBody *body = getVehicle()->getRigidBody();
+            body->setGravity(gravity);
+        }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
@@ -1234,16 +1239,19 @@ void Kart::update(float dt)
     }
     else
     {
-        Vec3 gravity(0.0f, -9.8f, 0.0f);
-        btRigidBody *body = getVehicle()->getRigidBody();
-        // If the material should overwrite the gravity, 
-        if(material->hasGravity())
+        if (!m_flying)
         {
-            Vec3 normal = m_terrain_info->getNormal();
-            gravity = normal * -9.8f;
-        }
-        body->setGravity(gravity);
-
+            float g = World::getWorld()->getTrack()->getGravity();
+            Vec3 gravity(0.0f, -g, 0.0f);
+            btRigidBody *body = getVehicle()->getRigidBody();
+            // If the material should overwrite the gravity, 
+            if (material->hasGravity())
+            {
+                Vec3 normal = m_terrain_info->getNormal();
+                gravity = normal * -g;
+            }
+            body->setGravity(gravity);
+        }   // if !flying
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
             new RescueAnimation(this);
@@ -2584,12 +2592,12 @@ btQuaternion Kart::getVisualRotation() const
 void Kart::setOnScreenText(const wchar_t *text)
 {
     core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
-    scene::ISceneManager* sm = irr_driver->getSceneManager();
     // FIXME: Titlefont is the only font guaranteed to be loaded if STK
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
 	// TODO: Add support in the engine for BillboardText or find a replacement
-    /*sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
+    /*scene::ISceneManager* sm = irr_driver->getSceneManager();
+    sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
                                                   : GUIEngine::getTitleFont(),
                                   text,
                                   getNode(),

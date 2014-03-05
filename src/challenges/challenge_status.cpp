@@ -16,13 +16,11 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "challenges/challenge.hpp"
-
-#include <fstream>
+#include "challenges/challenge_status.hpp"
 
 #include "challenges/challenge_data.hpp"
+#include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
-#include "io/xml_writer.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -35,50 +33,44 @@
 //-----------------------------------------------------------------------------
 /** Loads the state for a challenge object (esp. m_state)
  */
-void Challenge::load(const XMLNode* challengesNode)
+void ChallengeStatus::load(const XMLNode* challenges_node)
 {
-    const XMLNode* node = challengesNode->getNode( m_data->getId() );
+    const XMLNode* node = challenges_node->getNode( m_data->getId() );
     if(node == NULL)
     {
-        Log::info("Challenge", "Couldn't find node <%s> in challenge list."
+        Log::info("ChallengeStatus", "Couldn't find node <%s> in challenge list."
                 "(If this is the first time you play this is normal)\n",
                 m_data->getId().c_str());
         return;
     }
-    const XMLNode* easy   = node->getNode("easy");
-    const XMLNode* medium = node->getNode("medium");
-    const XMLNode* hard   = node->getNode("hard");
 
     m_state[0] = CH_INACTIVE;
     m_state[1] = CH_INACTIVE;
     m_state[2] = CH_INACTIVE;
 
-    if (easy != NULL)
+    std::string solved;
+    if (node->get("solved", &solved))
     {
-        bool finished = false;
-        easy->get("solved", &finished);
+        if (solved == "easy")
+            m_state[0] = CH_SOLVED;
+        else if (solved == "medium")
+        {
+            m_state[0] = CH_SOLVED;
+            m_state[1] = CH_SOLVED;
+        }
+        else if (solved == "hard")
+        {
+            m_state[0] = CH_SOLVED;
+            m_state[1] = CH_SOLVED;
+            m_state[2] = CH_SOLVED;
+        }
+    }   // if has 'solved' attribute
 
-        if (finished) m_state[0] = CH_SOLVED;
-    }
-    if (medium != NULL)
-    {
-        bool finished = false;
-        medium->get("solved", &finished);
-
-        if (finished) m_state[1] = CH_SOLVED;
-    }
-    if (hard != NULL)
-    {
-        bool finished = false;
-        hard->get("solved", &finished);
-
-        if (finished) m_state[2] = CH_SOLVED;
-    }
 }   // load
 
 //-----------------------------------------------------------------------------
 
-void Challenge::setSolved(RaceManager::Difficulty d)
+void ChallengeStatus::setSolved(RaceManager::Difficulty d)
 {
     // solve not only the current difficulty but all those before
     // e.g. if you solved hard then you also get easy
@@ -90,17 +82,15 @@ void Challenge::setSolved(RaceManager::Difficulty d)
 
 //-----------------------------------------------------------------------------
 
-void Challenge::save(std::ofstream& writer)
+void ChallengeStatus::save(UTFWriter& writer)
 {
-    writer << "        <" << m_data->getId().c_str() << ">\n"
-           << "            <easy   solved=\"" 
-           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_EASY))
-           << "\"/>\n"
-           << "            <medium solved=\"" 
-           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_MEDIUM))
-           << "\"/>\n"
-           << "            <hard   solved=\"" 
-           << StringUtils::toString(isSolved(RaceManager::DIFFICULTY_HARD)) 
-           << "\"/>\n"
-           << "        </" << m_data->getId().c_str() << ">\n";
+    writer << L"        <" << m_data->getId();
+    if (isSolved(RaceManager::DIFFICULTY_HARD))
+        writer << L" solved=\"hard\"/>\n";
+    else if (isSolved(RaceManager::DIFFICULTY_MEDIUM))
+        writer << L" solved=\"medium\"/>\n";
+    else if (isSolved(RaceManager::DIFFICULTY_EASY))
+        writer << L" solved=\"easy\"/>\n";
+    else
+        writer << L" solved=\"none\"/>\n";
 }   // save

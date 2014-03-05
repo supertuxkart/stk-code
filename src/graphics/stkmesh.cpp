@@ -144,56 +144,6 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	return result;
 }
 
-STKMesh::STKMesh(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr,	irr::s32 id,
-	const irr::core::vector3df& position,
-	const irr::core::vector3df& rotation,
-	const irr::core::vector3df& scale) :
-		CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
-{
-	createGLMeshes();
-}
-
-void STKMesh::createGLMeshes()
-{
-	for (u32 i = 0; i<Mesh->getMeshBufferCount(); ++i)
-	{
-		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-		GLmeshes.push_back(allocateMeshBuffer(mb));
-	}
-}
-
-void STKMesh::cleanGLMeshes()
-{
-	for (u32 i = 0; i < GLmeshes.size(); ++i)
-	{
-		GLMesh mesh = GLmeshes[i];
-		if (!mesh.vertex_buffer)
-			continue;
-		if (mesh.vao_first_pass)
-			glDeleteVertexArrays(1, &(mesh.vao_first_pass));
-		if (mesh.vao_second_pass)
-			glDeleteVertexArrays(1, &(mesh.vao_second_pass));
-		if (mesh.vao_glow_pass)
-			glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
-		if (mesh.vao_displace_pass)
-			glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
-		glDeleteBuffers(1, &(mesh.vertex_buffer));
-		glDeleteBuffers(1, &(mesh.index_buffer));
-	}
-	GLmeshes.clear();
-}
-
-void STKMesh::setMesh(irr::scene::IMesh* mesh)
-{
-	CMeshSceneNode::setMesh(mesh);
-	cleanGLMeshes();
-	createGLMeshes();
-}
-
-STKMesh::~STKMesh()
-{
-	cleanGLMeshes();
-}
 
 void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
 {
@@ -223,9 +173,8 @@ void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjecti
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix)
 {
-	glDisable(GL_CULL_FACE);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -234,27 +183,10 @@ void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProje
   setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
-  MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+  MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
-  glEnable(GL_CULL_FACE);
-}
-
-static
-core::vector3df getWind()
-{
-	const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
-	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-	GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
-	float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
-
-	float strength = (pos.X + pos.Y + pos.Z) * 1.2f + time * m_speed;
-	strength = noise2d(strength / 10.0f) * m_amplitude * 5;
-	// * 5 is to work with the existing amplitude values.
-
-	// Pre-multiply on the cpu
-	return irr_driver->getWind() * strength;
 }
 
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir)
@@ -294,13 +226,29 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  glActiveTexture(GL_TEXTURE0);
+  if (!irr_driver->SkyboxCubeMap)
+  {
+      GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+      glTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
+  else
+  {
+      glBindBuffer(GL_TEXTURE_CUBE_MAP, irr_driver->SkyboxCubeMap);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  }
 
   glUseProgram(MeshShader::SphereMapShader::Program);
-  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
+  if (!irr_driver->SkyboxCubeMap)
+  {
+      GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+      glTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
 }
 
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
@@ -390,9 +338,8 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
-	glDisable(GL_CULL_FACE);
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
@@ -418,11 +365,45 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
   }
 
   glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
-  MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
+  MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0, 1, 2, 3);
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
-  glEnable(GL_CULL_FACE);
+}
+
+void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector2df dir, core::vector2df dir2)
+{
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    setTexture(1, getTextureGLuint(irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str())), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
+    setTexture(3, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
+    setTexture(4, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
+    if (!UserConfigParams::m_ssao)
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+
+
+    glUseProgram(MeshShader::CausticsShader::Program);
+    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 2, 3, 4, 1);
+
+    glBindVertexArray(mesh.vao_second_pass);
+    glDrawElements(ptype, count, itype, 0);
 }
 
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
@@ -481,7 +462,7 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProj
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -509,7 +490,7 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 	}
 
 	glUseProgram(MeshShader::ObjectRimLimitShader::Program);
-	MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0, 1, 2, 3);
+	MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0, 1, 2, 3);
 
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
@@ -577,7 +558,7 @@ void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelView
   glDrawElements(ptype, count, itype, 0);
 }
 
-void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -605,13 +586,13 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 	}
 
 	glUseProgram(MeshShader::ObjectPass2Shader::Program);
-	MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, 0, 1, 2, 3);
+	MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0, 1, 2, 3);
 
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
 	GLenum ptype = mesh.PrimitiveType;
 	GLenum itype = mesh.IndexType;
@@ -620,13 +601,13 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 	setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
 	glUseProgram(MeshShader::TransparentShader::Program);
-	MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, 0);
+    MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
 
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
 {
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
@@ -649,7 +630,7 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     glUseProgram(MeshShader::TransparentFogShader::Program);
-    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvProjMatrix(), fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, irr_driver->getInvProjMatrix(), fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElements(ptype, count, itype, 0);
@@ -673,140 +654,7 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void STKMesh::drawGlow(const GLMesh &mesh)
-{
-	ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
-
-	GLenum ptype = mesh.PrimitiveType;
-	GLenum itype = mesh.IndexType;
-	size_t count = mesh.IndexCount;
-
-	computeMVP(ModelViewProjectionMatrix);
-	glUseProgram(MeshShader::ColorizeShader::Program);
-	MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
-
-	glBindVertexArray(mesh.vao_glow_pass);
-	glDrawElements(ptype, count, itype, 0);
-}
-
-void STKMesh::drawDisplace(const GLMesh &mesh)
-{
-	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-
-	GLenum ptype = mesh.PrimitiveType;
-	GLenum itype = mesh.IndexType;
-	size_t count = mesh.IndexCount;
-
-	computeMVP(ModelViewProjectionMatrix);
-	core::matrix4 ModelViewMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	ModelViewMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-    setTexture(0, getTextureGLuint(irr_driver->getTexture(FileManager::TEXTURE, "displace.png")), GL_LINEAR, GL_LINEAR, true);
-	glUseProgram(MeshShader::DisplaceShader::Program);
-	MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix, cb->getDirX(), cb->getDirY(), cb->getDir2X(), cb->getDir2Y(), 0);
-
-	glBindVertexArray(mesh.vao_displace_pass);
-	glDrawElements(ptype, count, itype, 0);
-}
-
-void STKMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-	assert(irr_driver->getPhase() == TRANSPARENT_PASS);
-
-	computeMVP(ModelViewProjectionMatrix);
-
-    if (type == irr_driver->getShader(ES_BUBBLES))
-        drawBubble(mesh, ModelViewProjectionMatrix);
-    else if (World::getWorld()->getTrack()->isFogEnabled())
-        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
-	else
-		drawTransparentObject(mesh, ModelViewProjectionMatrix);
-	return;
-}
-
-void STKMesh::drawShadow(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    for (unsigned i = 0; i < ShadowMVP.size(); i++)
-        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-
-    if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-    {
-        setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        glUseProgram(MeshShader::RefShadowShader::Program);
-        MeshShader::RefShadowShader::setUniforms(ShadowMVP, 0);
-    }
-/*    else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-    {
-        setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        glUseProgram(MeshShader::GrassShadowShader::Program);
-        MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
-    }*/
-    else
-    {
-        glUseProgram(MeshShader::ShadowShader::Program);
-        MeshShader::ShadowShader::setUniforms(ShadowMVP);
-    }
-    glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void STKMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-	switch (irr_driver->getPhase())
-	{
-	case SOLID_NORMAL_AND_DEPTH_PASS:
-	{
-        windDir = getWind();
-
-		computeMVP(ModelViewProjectionMatrix);
-		computeTIMV(TransposeInverseModelView);
-
-		if (type == irr_driver->getShader(ES_NORMAL_MAP))
-			drawNormalPass(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-			drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-			drawGrassPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
-		else
-			drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-		break;
-	}
-	case SOLID_LIT_PASS:
-	{
-		if (type == irr_driver->getShader(ES_SPHERE_MAP))
-			drawSphereMap(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-		else if (type == irr_driver->getShader(ES_SPLATTING))
-			drawSplatting(mesh, ModelViewProjectionMatrix);
-		else if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-			drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
-		else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-			drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
-		else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-			drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-		else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-			drawObjectUnlit(mesh, ModelViewProjectionMatrix);
-		else if (mesh.textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))
-			drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
-		else if (!mesh.textures[0])
-			drawUntexturedObject(mesh, ModelViewProjectionMatrix);
-		else
-			drawObjectPass2(mesh, ModelViewProjectionMatrix);
-		break;
-	}
-	default:
-	{
-		assert(0 && "wrong pass");
-	}
-	}
-}
-
-static bool isObject(video::E_MATERIAL_TYPE type)
+bool isObject(video::E_MATERIAL_TYPE type)
 {
 	if (type == irr_driver->getShader(ES_OBJECTPASS))
 		return true;
@@ -828,6 +676,8 @@ static bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 		return true;
+    if (type == irr_driver->getShader(ES_CAUSTICS))
+        return true;
 	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		return true;
 	if (type == video::EMT_ONETEXTURE_BLEND)
@@ -898,6 +748,11 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
 				MeshShader::ObjectUnlitShader::attrib_position, MeshShader::ObjectUnlitShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
 		}
+        else if (type == irr_driver->getShader(ES_CAUSTICS))
+        {
+            mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
+                MeshShader::CausticsShader::attrib_position, MeshShader::CausticsShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        }
 		else if (mesh.textures[1])
 		{
 			mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -941,6 +796,7 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case DISPLACEMENT_PASS:
 		if (mesh.vao_displace_pass)
 			return;
+        mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position,-1, -1, -1, -1, -1, -1, mesh.Stride);
 		mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
 		return;
     case SHADOW_PASS:
@@ -962,68 +818,3 @@ void initvaostate(GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	}
 }
 
-void STKMesh::render()
-{
-	irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
-
-	if (!Mesh || !driver)
-		return;
-
-	bool isTransparentPass =
-		SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
-
-	++PassCount;
-
-	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-	Box = Mesh->getBoundingBox();
-
-	for (u32 i=0; i<Mesh->getMeshBufferCount(); ++i)
-	{
-		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-		if (mb)
-		{
-			const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];				
-
-			video::IMaterialRenderer* rnd = driver->getMaterialRenderer(material.MaterialType);
-			bool transparent = (rnd && rnd->isTransparent());
-
-			if (isTransparentPass != transparent)
-				continue;
-			if (irr_driver->getPhase() == DISPLACEMENT_PASS)
-			{
-				initvaostate(GLmeshes[i], material.MaterialType);
-				drawDisplace(GLmeshes[i]);
-				continue;
-			}
-			if (!isObject(material.MaterialType))
-			{
-#ifdef DEBUG
-				Log::warn("material", "Unhandled (static) material type : %d", material.MaterialType);
-#endif
-				continue;
-			}
-
-			// only render transparent buffer if this is the transparent render pass
-			// and solid only in solid pass
-			if (irr_driver->getPhase() == GLOW_PASS)
-			{
-				initvaostate(GLmeshes[i], material.MaterialType);
-				drawGlow(GLmeshes[i]);
-			}
-            else if (irr_driver->getPhase() == SHADOW_PASS)
-            {
-                initvaostate(GLmeshes[i], material.MaterialType);
-                drawShadow(GLmeshes[i], material.MaterialType);
-            }
-			else
-			{
-				irr_driver->IncreaseObjectCount();
-				initvaostate(GLmeshes[i], material.MaterialType);
-				if (transparent)
-					drawTransparent(GLmeshes[i], material.MaterialType);
-				else
-					drawSolid(GLmeshes[i], material.MaterialType);
-			}
-		}
-	}
-}

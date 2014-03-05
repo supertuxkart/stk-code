@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D Albedo;
 uniform sampler2D DiffuseMap;
 uniform sampler2D SpecularMap;
@@ -6,10 +5,15 @@ uniform sampler2D SSAO;
 uniform vec2 screen;
 uniform vec3 ambient;
 
-noperspective in vec3 normal;
+#if __VERSION__ >= 130
+in vec3 normal;
 in vec2 uv;
-
 out vec4 FragColor;
+#else
+varying vec3 normal;
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
 
 void main() {
 	float rim = 1.0 - dot(normal, vec3(0., 0., -1));

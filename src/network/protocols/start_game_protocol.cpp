@@ -1,5 +1,6 @@
 #include "network/protocols/start_game_protocol.hpp"
 
+#include "config/player_manager.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -113,14 +114,14 @@ void StartGameProtocol::update()
                 rki.setGlobalPlayerId(profile->race_id);
                 rki.setLocalPlayerId(is_me?0:1);
                 rki.setHostId(profile->race_id);
-                PlayerProfile* profileToUse = unlock_manager->getCurrentPlayer();
-                assert(profileToUse);
+                PlayerProfile* profile_to_use = PlayerManager::get()->getCurrentPlayer();
+                assert(profile_to_use);
                 InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
                 int new_player_id = 0;
                 if (StateManager::get()->getActivePlayers().size() >= 1) // more than one player, we're the first
                     new_player_id = 0;
                 else
-                    new_player_id = StateManager::get()->createActivePlayer( profileToUse, device , players[i]->user_profile);
+                    new_player_id = StateManager::get()->createActivePlayer( profile_to_use, device , players[i]->user_profile);
                 device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
                 input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
 

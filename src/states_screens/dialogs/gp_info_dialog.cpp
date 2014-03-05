@@ -19,6 +19,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/saved_grand_prix.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
@@ -47,6 +48,7 @@ using namespace GUIEngine;
 
 GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
 {
+    doInit();
     m_curr_time = 0.0f;
 
     const int y1 = m_area.getHeight()/7;
@@ -219,7 +221,7 @@ void GPInfoDialog::onEnterPressedInternal()
     std::string gp_id = m_gp_ident;
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
-    unlock_manager->getCurrentSlot()->setCurrentChallenge("");
+    PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge("");
     race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 

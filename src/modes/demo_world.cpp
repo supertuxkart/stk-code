@@ -18,6 +18,8 @@
 
 #include "modes/demo_world.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"
@@ -140,7 +142,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     // Use keyboard 0 by default in --no-start-screen
     device = input_manager->getDeviceList()->getKeyboard(0);
     StateManager::get()->createActivePlayer(
-        UserConfigParams::m_all_players.get(0), device , NULL);
+                           PlayerManager::get()->getPlayer(0), device , NULL);
     // ASSIGN should make sure that only input from assigned devices
     // is read.
     input_manager->getDeviceList()->setAssignMode(ASSIGN);

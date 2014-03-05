@@ -1,4 +1,3 @@
-#version 330 compatibility
 uniform sampler2D warpx;
 uniform sampler2D warpy;
 

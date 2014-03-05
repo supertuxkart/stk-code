@@ -17,13 +17,21 @@
 
 
 // Creates a bubble (wave) effect by distorting the texture depending on time
-#version 330
+
 uniform mat4 ModelViewProjectionMatrix;
 uniform float time;
 
+#if __VERSION__ >= 130
 in vec3 Position;
 in vec2 Texcoord;
 out vec2 uv;
+#else
+attribute vec3 Position;
+attribute vec2 Texcoord;
+varying vec2 uv;
+#endif
+
+
 
 void main()
 {

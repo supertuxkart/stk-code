@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2DArrayShadow shadowtex;
@@ -13,9 +12,16 @@ uniform mat4 shadowmat[4];
 //uniform vec2 wind;
 //uniform float shadowoffset;
 
+#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
+#else
+varying vec2 uv;
+#define Diff gl_FragData[0]
+#define Spec gl_FragData[1]
+#endif
+
 
 vec3 DecodeNormal(vec2 n)
 {
@@ -24,13 +30,20 @@ vec3 DecodeNormal(vec2 n)
   return vec3(xy,z);
 }
 
-float getShadowFactor(vec3 pos, float bias)
+float getShadowFactor(vec3 pos, float bias, int index)
 {
-	if (pos.z < 5.)
-	{
-		vec4 shadowcoord = (shadowmat[0] * vec4(pos, 1.0));
-		shadowcoord /= shadowcoord.w;
-		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
+  //float a[5] = float[](3.4, 4.2, 5.0, 5.2, 1.1);
+  
+	const vec2 shadowoffset[4] = vec2[](
+		vec2(-1., -1.),
+		vec2(-1., 1.),
+		vec2(1., -1.),
+		vec2(1., 1.)
+	);
+
+	vec4 shadowcoord = (shadowmat[index] * vec4(pos, 1.0));
+	shadowcoord /= shadowcoord.w;
+	vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
 //	shadowcoord = (shadowcoord * 0.5) + vec3(0.5);
 
 //	float movex = decdepth(texture(warpx, shadowcoord.xy));
@@ -39,31 +52,14 @@ float getShadowFactor(vec3 pos, float bias)
 //	float dy = movey * 2.0 - 1.0;
 //	shadowcoord.xy += vec2(dx, dy);*/
 
-	//float shadowmapz = 2. * texture(shadowtex, vec3(shadowtexcoord, shadowcoord.z).x - 1.;
-	//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
-		return texture(shadowtex, vec4(shadowtexcoord, 0., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
-	}
-	else if (pos.z < 10.)
+//float shadowmapz = 2. * texture(shadowtex, vec3(shadowtexcoord, shadowcoord.z).x - 1.;
+//	bias += smoothstep(0.001, 0.1, moved) * 0.014; // According to the warping
+	float sum = 0.;
+	for (int i = 0; i < 4; i++)
 	{
-		vec4 shadowcoord = (shadowmat[1] * vec4(pos, 1.0));
-		shadowcoord /= shadowcoord.w;
-		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex, vec4(shadowtexcoord, 1., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+		sum += texture(shadowtex, vec4(shadowtexcoord + 0.0005 * shadowoffset[i], float(index), 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
-	else if (pos.z < 75.)
-	{
-		vec4 shadowcoord = (shadowmat[2] * vec4(pos, 1.0));
-		shadowcoord /= shadowcoord.w;
-		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex, vec4(shadowtexcoord, 2., 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
-	}
-	else
-	{
-		vec4 shadowcoord = (shadowmat[3] * vec4(pos, 1.0));
-		shadowcoord /= shadowcoord.w;
-		vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
-		return texture(shadowtex, vec4(shadowtexcoord, 3., 0.5 * (shadowcoord.z + bias) + 0.5));
-	}
+	return sum / 4.;
 }
 
 void main() {
@@ -96,7 +92,30 @@ void main() {
 	// Shadows
 	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
 	bias = clamp(bias, 0.001, 0.014);
-	float factor = getShadowFactor(xpos.xyz, bias);
+	float factor;
+	if (xpos.z < 20.)
+		factor = getShadowFactor(xpos.xyz, bias, 0);
+	else if (xpos.z < 25.)
+	{
+		float a = getShadowFactor(xpos.xyz, bias, 0), b = getShadowFactor(xpos.xyz, bias, 1);
+		factor = mix(a, b, (xpos.z - 20.) / 5.);
+	}
+	else if (xpos.z < 50.)
+		factor = getShadowFactor(xpos.xyz, bias, 1);
+	else if (xpos.z < 60.)
+	{
+		float a = getShadowFactor(xpos.xyz, bias, 1), b = getShadowFactor(xpos.xyz, bias, 2);
+		factor = mix(a, b, (xpos.z - 50.) / 10.);
+	}
+	else if (xpos.z < 100.)
+		factor = getShadowFactor(xpos.xyz, bias, 2);
+	else if (xpos.z < 120.)
+	{
+		float a = getShadowFactor(xpos.xyz, bias, 2), b = getShadowFactor(xpos.xyz, bias, 3);
+		factor = mix(a, b, (xpos.z - 100.) / 20.);
+	}
+	else
+		factor = getShadowFactor(xpos.xyz, bias, 3);
 	Diff = vec4(factor * NdotL * col, 1.);
 	Spec = vec4(factor * Specular * col, 1.);
 	return;

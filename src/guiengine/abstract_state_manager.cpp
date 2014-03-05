@@ -18,13 +18,15 @@
 
 #include "guiengine/abstract_state_manager.hpp"
 
-#include <vector>
-#include <iostream>
-
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
 #include "input/device_manager.hpp"
+
+#include <vector>
+#include <iostream>
+
 
 using namespace GUIEngine;
 

@@ -1,6 +1,8 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
+
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -21,66 +23,85 @@
 
 #include "utils/types.hpp"
 
-#include <irrString.h>
-#include <string>
 #include "io/xml_node.hpp"
 #include "achievements/achievement.hpp"
 
+#include <irrString.h>
+#include <string>
 
 // ============================================================================
 
 class Achievement;
 
-/**
-  * \brief
-  * \ingroup
+/** This is the base class for storing the definition of an achievement, e.g. 
+ *  title, description (which is common for all achievements), but also how
+ *  to achieve this achievement.
+  * \ingroup achievements
   */
 class AchievementInfo
 {
-protected:
-    uint32_t m_id;
+public:
+    /** Some handy names for the various achievements. */
+    enum { ACHIEVE_COLUMBUS   = 1,
+           ACHIEVE_FIRST      = ACHIEVE_COLUMBUS,
+           ACHIEVE_STRIKE     = 2,
+           ACHIEVE_ARCH_ENEMY = 3,
+           ACHIEVE_LAST       = ACHIEVE_ARCH_ENEMY
+    };
+    /** Achievement check type: 
+     *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
+     *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
+     */
+    enum AchievementCheckType 
+    {
+        AC_ALL_AT_LEAST,
+        AC_ONE_AT_LEAST
+    };
+
+private:
+    /** The id of this Achievement. */
+    uint32_t           m_id;
+
+    /** The title of this achievement. */
     irr::core::stringw m_title;
+
+    /** The description of this achievement. */
     irr::core::stringw m_description;
+
+    /** Determines how this achievement is checked if it is successful. */
+    AchievementCheckType  m_check_type;
+
+    /** The target values needed to be reached. */
+    std::map<std::string, int> m_goal_values;
+
+    /** True if the achievement needs to be reset after each race. */
     bool m_reset_after_race;
 
 public:
-    AchievementInfo                     (const XMLNode * input);
-    virtual ~AchievementInfo            () {};
-    uint32_t getID                      () const { return m_id; }
-    irr::core::stringw getDescription   () const { return m_description; }
-    irr::core::stringw getTitle         () const { return m_title; }
-    virtual Achievement::AchievementType getType () const = 0;
-    virtual bool checkCompletion        (Achievement * achievement) const = 0;
-    bool needsResetAfterRace() const {return m_reset_after_race; }
+             AchievementInfo(const XMLNode * input);
+    virtual ~AchievementInfo() {};
+
+    virtual irr::core::stringw toString() const;
+    virtual bool checkCompletion(Achievement * achievement) const;
+    int getGoalValue(const std::string &key) const;
+
+    // ------------------------------------------------------------------------
+    /** Returns the id of this achievement. */
+    uint32_t getID() const { return m_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the description of this achievement. */
+    irr::core::stringw getDescription() const { return m_description; }
+    // ------------------------------------------------------------------------
+    /** Returns the title of this achievement. */
+    irr::core::stringw getTitle() const { return m_title; }
+    // ------------------------------------------------------------------------
+    bool needsResetAfterRace() const { return m_reset_after_race; }
+    // ------------------------------------------------------------------------
+    /** Returns the check type for this achievement. */
+    AchievementCheckType getCheckType() const { return m_check_type; }
+    // ------------------------------------------------------------------------
 };   // class AchievementInfo
 
-class SingleAchievementInfo : public AchievementInfo
-{
-protected:
-    int m_goal_value;
-
-public:
-    SingleAchievementInfo               (const XMLNode * input);
-    virtual ~SingleAchievementInfo      () {};
-    int getGoalValue                    () const { return m_goal_value; }
-    virtual bool checkCompletion        (Achievement * achievement) const;
-
-    virtual Achievement::AchievementType getType() const { return Achievement::AT_SINGLE; };
-};   // class SingleAchievementInfo
-
-class MapAchievementInfo : public AchievementInfo
-{
-protected:
-    std::map<std::string, int> m_goal_values;
-
-public:
-    MapAchievementInfo                  (const XMLNode * input);
-    virtual ~MapAchievementInfo         () {};
-    int getGoalValue                    (const std::string & key) { return m_goal_values[key];}
-    const std::map<std::string, int> & getGoalValues() const {return m_goal_values;}
-    virtual bool checkCompletion        (Achievement * achievement) const;
-    virtual Achievement::AchievementType  getType() const { return Achievement::AT_MAP; };
-};   // class MapAchievementInfo
 
 #endif
 

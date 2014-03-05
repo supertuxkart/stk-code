@@ -1,6 +1,12 @@
-#version 330
-noperspective in vec3 nor;
+#if __VERSION__ >= 130
+in vec3 nor;
 out vec2 EncodedNormal;
+#else
+varying vec3 nor;
+#define EncodedNormal gl_FragColor.xy
+#endif
+
+
 
 // from Crytek "a bit more deferred CryEngine"
 vec2 EncodeNormal(vec3 n)

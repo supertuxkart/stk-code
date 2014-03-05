@@ -18,33 +18,35 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <fstream>
-#include <vector>
-#include "io/xml_writer.hpp"
 #include "utils/ptr_vector.hpp"
 
+// The order here is important. If all_params is declared later (e.g. after
+// the #includes), all elements will be added to all_params, and then
+// all_params will be initialised, i.e. cleared!
 class UserConfigParam;
 static PtrVector<UserConfigParam, REF> all_params;
-
 
 // X-macros
 #define PARAM_PREFIX
 #define PARAM_DEFAULT(X) = X
 #include "config/user_config.hpp"
 
+#include "config/player_profile.hpp"
 #include "config/saved_grand_prix.hpp"
-#include "config/player.hpp"
 #include "config/stk_config.hpp"
 #include "guiengine/engine.hpp"
 #include "io/file_manager.hpp"
+#include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
 #include "race/race_manager.hpp"
-#include "utils/ptr_vector.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <fstream>
+#include <iostream>
+#include <stdlib.h>
+#include <string>
+#include <vector>
 
 const int UserConfig::m_current_config_version = 8;
 
@@ -60,11 +62,11 @@ UserConfigParam::~UserConfigParam()
  *  \param stream the xml writer.
  *  \param level determines indentation level.
  */
-void UserConfigParam::writeInner(XMLWriter& stream, int level) const
+void UserConfigParam::writeInner(std::ofstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
-    stream << L"    " << tab.c_str() << m_param_name.c_str() << L"=\""
-           << toString() << L"\"\n";
+    stream << "    " << tab.c_str() << m_param_name.c_str() << "=\""
+           << toString().c_str() << "\"\n";
 }   // writeInner
 
 // ============================================================================
@@ -87,7 +89,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
 }   // GroupUserConfigParam
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::write(XMLWriter& stream) const
+void GroupUserConfigParam::write(std::ofstream& stream) const
 {
     const int attr_amount = m_attributes.size();
 
@@ -96,41 +98,41 @@ void GroupUserConfigParam::write(XMLWriter& stream) const
     for(int n=0; n<attr_amount; n++)
     {
         if(m_attributes[n]->m_comment.size() > 0)
-            stream << L"\n             " << m_attributes[n]->m_param_name.c_str()
-                   << L" : " << m_attributes[n]->m_comment.c_str();
+            stream << "\n             " << m_attributes[n]->m_param_name.c_str()
+                   << " : " << m_attributes[n]->m_comment.c_str();
     }
 
-    stream << L" -->\n    <" << m_param_name.c_str() << "\n";
+    stream << " -->\n    <" << m_param_name.c_str() << "\n";
 
     // actual values
     for (int n=0; n<attr_amount; n++)
     {
         m_attributes[n]->writeInner(stream, 1);
     }
-    stream << L"    >\n";
+    stream << "    >\n";
     const int children_amount = m_children.size();
     for (int n=0; n<children_amount; n++)
     {
         m_children[n]->writeInner(stream, 1);
     }
-    stream << L"    </" << m_param_name.c_str() << ">\n\n";
+    stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-void GroupUserConfigParam::writeInner(XMLWriter& stream, int level) const
+void GroupUserConfigParam::writeInner(std::ofstream& stream, int level) const
 {
     std::string tab(level * 4,' ');
     for(int i = 0; i < level; i++) tab =+ "    ";
     const int children_amount = m_attributes.size();
 
-    stream << L"    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
+    stream << "    " << tab.c_str() << "<" << m_param_name.c_str() << "\n";
 
     // actual values
     for (int n=0; n<children_amount; n++)
     {
         m_attributes[n]->writeInner(stream, level+1);
     }
-    stream << L"    " << tab.c_str() << "/>\n";
+    stream << "    " << tab.c_str() << "/>\n";
 }   // writeInner
 
 // ----------------------------------------------------------------------------
@@ -158,7 +160,7 @@ void GroupUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-irr::core::stringw GroupUserConfigParam::toString() const
+irr::core::stringc GroupUserConfigParam::toString() const
 {
     return "";
 }   // toString
@@ -244,22 +246,22 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-void ListUserConfigParam<T, U>::write(XMLWriter& stream) const
+void ListUserConfigParam<T, U>::write(std::ofstream& stream) const
 {
     const int elts_amount = m_elements.size();
 
     // comment
     if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str();
-    stream << L" -->\n    <" << m_param_name.c_str() << "\n";
+    stream << " -->\n    <" << m_param_name.c_str() << "\n";
 
-    stream << L"        Size=\"" << elts_amount << "\"\n";
+    stream << "        Size=\"" << elts_amount << "\"\n";
     // actual elements
     for (int n=0; n<elts_amount; n++)
     {
-        stream << L"        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
+        stream << "        " << n << "=\"" << m_elements[n].c_str() << "\"\n";
     }
-    stream << L"    >\n";
-    stream << L"    </" << m_param_name.c_str() << ">\n\n";
+    stream << "    >\n";
+    stream << "    </" << m_param_name.c_str() << ">\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -317,7 +319,7 @@ void ListUserConfigParam<T,U>::addElement(T element)
 
 // ----------------------------------------------------------------------------
 template<typename T, typename U>
-irr::core::stringw ListUserConfigParam<T,U>::toString() const
+core::stringc ListUserConfigParam<T, U>::toString() const
 {
     return "";
 }   // toString
@@ -350,19 +352,20 @@ IntUserConfigParam::IntUserConfigParam(int default_value,
 }   // IntUserConfigParam
 
 // ----------------------------------------------------------------------------
-void IntUserConfigParam::write(XMLWriter& stream) const
+void IntUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\"" << m_value
+           << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-irr::core::stringw IntUserConfigParam::toString() const
+irr::core::stringc IntUserConfigParam::toString() const
 {
-    irr::core::stringw tmp;
+    irr::core::stringc tmp;
     tmp += m_value;
+
     return tmp;
 }   // toString
 
@@ -412,18 +415,18 @@ TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
 }   // TimeUserConfigParam
 
 // ----------------------------------------------------------------------------
-void TimeUserConfigParam::write(XMLWriter& stream) const
+void TimeUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
     std::ostringstream o;
     o<<m_value;
-    stream << L"    <" << m_param_name.c_str() << L" value=\""
-           << core::stringw(o.str().c_str()) << L"\" />\n\n";
+    stream << "    <" << m_param_name.c_str() << " value=\""
+           << o.str().c_str() << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
-irr::core::stringw TimeUserConfigParam::toString() const
+irr::core::stringc TimeUserConfigParam::toString() const
 {
     // irrString does not have a += with a 64-bit int type, so
     // we can't use an irrlicht's stringw directly. Since it's only a
@@ -431,7 +434,7 @@ irr::core::stringw TimeUserConfigParam::toString() const
 
     std::ostringstream o;
     o<<m_value;
-    return core::stringw(o.str().c_str());
+    return o.str().c_str();
 }   // toString
 
 // ----------------------------------------------------------------------------
@@ -483,12 +486,12 @@ StringUserConfigParam::StringUserConfigParam(const char* default_value,
 }   // StringUserConfigParam
 
 // ----------------------------------------------------------------------------
-void StringUserConfigParam::write(XMLWriter& stream) const
+void StringUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\""
-           << m_value.c_str() << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\""
+           << m_value.c_str() << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -502,57 +505,6 @@ void StringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
 
 // ----------------------------------------------------------------------------
 void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
-{
-    node->get( m_param_name, &m_value );
-}   // findYourDataInAnAttributeOf
-
-// ============================================================================
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
-                                               const char* param_name,
-                                               const char* comment)
-{
-
-    m_value         = default_value;
-    m_default_value = default_value;
-
-    m_param_name = param_name;
-    all_params.push_back(this);
-    if(comment != NULL) m_comment = comment;
-}   // WStringUserConfigParam
-
-// ----------------------------------------------------------------------------
-WStringUserConfigParam::WStringUserConfigParam(const core::stringw& default_value,
-                                               const char* param_name,
-                                               GroupUserConfigParam* group,
-                                               const char* comment)
-{
-    m_value         = default_value;
-    m_default_value = default_value;
-
-    m_param_name = param_name;
-    group->addChild(this);
-    if(comment != NULL) m_comment = comment;
-}   // WStringUserConfigParam
-
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::write(XMLWriter& stream) const
-{
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
-}   // write
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::findYourDataInAChildOf(const XMLNode* node)
-{
-    const XMLNode* child = node->getNode( m_param_name );
-    if(child == NULL) return;
-
-    child->get( "value", &m_value );
-}   // findYourDataInAChildOf
-
-// ----------------------------------------------------------------------------
-void WStringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 {
     node->get( m_param_name, &m_value );
 }   // findYourDataInAnAttributeOf
@@ -586,12 +538,12 @@ BoolUserConfigParam::BoolUserConfigParam(bool default_value,
 
 
 // ----------------------------------------------------------------------------
-void BoolUserConfigParam::write(XMLWriter& stream) const
+void BoolUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\""
-           << (m_value ? L"true" : L"false" ) << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\""
+           << (m_value ? "true" : "false" ) << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -640,9 +592,9 @@ void BoolUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-irr::core::stringw BoolUserConfigParam::toString() const
+irr::core::stringc BoolUserConfigParam::toString() const
 {
-    return (m_value ? L"true" : L"false" );
+    return (m_value ? "true" : "false" );
 }   // toString
 
 // ============================================================================
@@ -673,12 +625,12 @@ FloatUserConfigParam::FloatUserConfigParam(float default_value,
 }   // FloatUserConfigParam
 
 // ----------------------------------------------------------------------------
-void FloatUserConfigParam::write(XMLWriter& stream) const
+void FloatUserConfigParam::write(std::ofstream& stream) const
 {
-    if(m_comment.size() > 0) stream << L"    <!-- " << m_comment.c_str()
-                                    << L" -->\n";
-    stream << L"    <" << m_param_name.c_str() << L" value=\"" << m_value
-           << L"\" />\n\n";
+    if(m_comment.size() > 0) stream << "    <!-- " << m_comment.c_str()
+                                    << " -->\n";
+    stream << "    <" << m_param_name.c_str() << " value=\"" << m_value
+           << "\" />\n\n";
 }   // write
 
 // ----------------------------------------------------------------------------
@@ -697,9 +649,9 @@ void FloatUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
 }   // findYourDataInAnAttributeOf
 
 // ----------------------------------------------------------------------------
-irr::core::stringw FloatUserConfigParam::toString() const
+core::stringc FloatUserConfigParam::toString() const
 {
-    irr::core::stringw tmp;
+    irr::core::stringc tmp;
     tmp += m_value;
     return tmp;
 }   // toString
@@ -725,60 +677,8 @@ UserConfig::UserConfig()
 // -----------------------------------------------------------------------------
 UserConfig::~UserConfig()
 {
-    UserConfigParams::m_all_players.clearAndDeleteAll();
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
 }   // ~UserConfig
-
-// -----------------------------------------------------------------------------
-void UserConfig::addDefaultPlayer()
-{
-
-    std::string username = "unnamed player";
-
-    if(getenv("USERNAME")!=NULL)        // for windows
-        username = getenv("USERNAME");
-    else if(getenv("USER")!=NULL)       // Linux, Macs
-        username = getenv("USER");
-    else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
-        username = getenv("LOGNAME");
-
-
-    class GuestPlayerProfile : public PlayerProfile
-    {
-    public:
-        GuestPlayerProfile() : PlayerProfile(_LTR("Guest"))
-        {
-            m_is_guest_account = true;
-        }
-    };
-
-    // add default guest player
-    UserConfigParams::m_all_players.push_back( new GuestPlayerProfile() );
-
-    // Set the name as the default name for all players.
-    UserConfigParams::m_all_players.push_back(
-                                         new PlayerProfile(username.c_str()) );
-
-}   // addDefaultPlayer
-
-// -----------------------------------------------------------------------------
-
-/** Comparison used to sort players. Most frequent players should be
- *  listed first, so a<b actually means that
- *  a.m_use_frequency > b.m_use_frequency
- *  This way we get a reversed sorted list.
- */
-bool operator<(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() > b.getUseFrequency();
-}   // operator<
-
-// -----------------------------------------------------------------------------
-/** \brief Needed for toggling sort order **/
-bool operator>(const PlayerProfile &a, const PlayerProfile &b)
-{
-    return a.getUseFrequency() < b.getUseFrequency();
-}   // operator>
 
 // -----------------------------------------------------------------------------
 /** Load configuration values from file. */
@@ -788,8 +688,13 @@ bool UserConfig::loadConfig()
     XMLNode* root = file_manager->createXMLTree(filename);
     if(!root || root->getName() != "stkconfig")
     {
-        std::cerr << "Could not read user config file file " << filename << std::endl;
+        Log::error("UserConfig",
+                   "Could not read user config file '%s'.", filename.c_str());
         if(root) delete root;
+        // Create a default config file - just in case that stk crashes later
+        // there is a config file that can be modified (to e.g. disable 
+        // shaders)
+        saveConfig();
         return false;
     }
 
@@ -824,26 +729,6 @@ bool UserConfig::loadConfig()
     }
 
 
-    // ---- Read players
-    // we create those AFTER other values are being read simply because we have many Player
-    // nodes that all bear the same name, so the generic loading code won't work here
-    UserConfigParams::m_all_players.clearAndDeleteAll();
-
-    std::vector<XMLNode*> players;
-    root->getNodes("Player", players);
-    const int amount = players.size();
-    for (int i=0; i<amount; i++)
-    {
-        //std::string name;
-        //players[i]->get("name", &name);
-        UserConfigParams::m_all_players.push_back(
-                                               new PlayerProfile(players[i]) );
-    }
-
-    // sort players by frequency of use
-    UserConfigParams::m_all_players.insertionSort();
-
-
     // ---- Read Saved GP's
     UserConfigParams::m_saved_grand_prix_list.clearAndDeleteAll();
     std::vector<XMLNode*> saved_gps;
@@ -860,17 +745,6 @@ bool UserConfig::loadConfig()
 }   // loadConfig
 
 // ----------------------------------------------------------------------------
-
-void UserConfig::postLoadInit()
-{
-    for (unsigned int i = 0; i < UserConfigParams::m_all_players.size(); i++)
-    {
-        PlayerProfile* player = UserConfigParams::m_all_players.get(i);
-        if (player->isGuestAccount()) player->setName(_LTR("Guest"));
-    }
-}
-
-// ----------------------------------------------------------------------------
 /** Write settings to config file. */
 void UserConfig::saveConfig()
 {
@@ -878,11 +752,11 @@ void UserConfig::saveConfig()
 
     try
     {
-        XMLWriter configfile(filename.c_str());
+        std::ofstream configfile (filename.c_str(), std::ofstream::out);
 
-        configfile << L"<?xml version=\"1.0\"?>\n";
-        configfile << L"<stkconfig version=\"" << m_current_config_version
-                   << L"\" >\n\n";
+        configfile << "<?xml version=\"1.0\"?>\n";
+        configfile << "<stkconfig version=\"" << m_current_config_version
+                   << "\" >\n\n";
 
         const int paramAmount = all_params.size();
         for(int i=0; i<paramAmount; i++)
@@ -891,7 +765,7 @@ void UserConfig::saveConfig()
             all_params[i].write(configfile);
         }
 
-        configfile << L"</stkconfig>\n";
+        configfile << "</stkconfig>\n";
         configfile.close();
     }
     catch (std::runtime_error& e)

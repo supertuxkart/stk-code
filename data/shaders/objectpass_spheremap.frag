@@ -1,22 +1,23 @@
-#version 330
-uniform sampler2D tex;
+uniform samplerCube tex;
+uniform mat4 invproj;
+uniform vec2 screen;
 
-noperspective in vec3 nor;
+#if __VERSION__ >= 130
+in vec3 nor;
 out vec4 FragColor;
+#else
+varying vec3 nor;
+#define FragColor gl_FragColor
+#endif
+
 
 void main() {
-	// Calculate the spherical UV
-	const vec3 forward = vec3(0.0, 0.0, 1.0);
+    vec3 fpos = gl_FragCoord.xyz / vec3(screen, 1.);
+    vec4 xpos = 2.0 * vec4(fpos, 1.0) - 1.0;
+    xpos = invproj * xpos;
 
-	// get the angle between the forward vector and the horizontal portion of the normal
-	vec3 normal_x = normalize(vec3(nor.x, 0.0, nor.z));
-	float sin_theta_x = length(cross( forward, normal_x )) * nor.x / abs(nor.x);
+    xpos.xyz /= xpos.w;
+    vec4 detail0 = texture(tex, reflect(xpos.xyz, nor));
 
-	// get the angle between the forward vector and the vertical portion of the normal
-	vec3 normal_y = normalize(vec3(0.0, nor.y, nor.z));
-	float sin_theta_y = length(cross( forward, normal_y )) * nor.y / abs(nor.y);
-
-	vec4 detail0 = texture(tex, 0.5 * vec2(sin_theta_x, sin_theta_y) + 0.5);
-
-	FragColor = vec4(detail0.xyz, 1.);
+    FragColor = vec4(detail0.xyz, 1.);
 }

@@ -33,9 +33,9 @@ void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE
 	computeMVP(ModelViewProjectionMatrix);
 
     if (World::getWorld()->getTrack()->isFogEnabled())
-        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentFogObject(mesh, ModelViewProjectionMatrix, TextureMatrix);
     else
-        drawTransparentObject(mesh, ModelViewProjectionMatrix);
+        drawTransparentObject(mesh, ModelViewProjectionMatrix, TextureMatrix);
 
 	return;
 }
@@ -50,7 +50,7 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			  computeTIMV(TransposeInverseModelView);
 
 			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-				  drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+                  drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
 			  else
 				  drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
 			  break;
@@ -58,15 +58,15 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 	case SOLID_LIT_PASS:
 	{
 			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-				  drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
+                  drawObjectRefPass2(mesh, ModelViewProjectionMatrix, TextureMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
+				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
 			  else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 				  drawObjectUnlit(mesh, ModelViewProjectionMatrix);
 			  else if (mesh.textures[1])
 				  drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
 			  else
-				  drawObjectPass2(mesh, ModelViewProjectionMatrix);
+				  drawObjectPass2(mesh, ModelViewProjectionMatrix, TextureMatrix);
 			  break;
 	}
 	default:
@@ -74,24 +74,6 @@ void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
 			   assert(0 && "wrong pass");
 	}
 	}
-}
-
-static bool
-isObjectPass(video::E_MATERIAL_TYPE type)
-{
-	if (type == irr_driver->getShader(ES_OBJECTPASS))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-		return true;
-	if (type == video::EMT_ONETEXTURE_BLEND)
-		return true;
-	if (type == video::EMT_TRANSPARENT_ADD_COLOR)
-		return true;
-	return false;
 }
 
 void STKAnimatedMesh::drawShadow(const GLMesh &mesh)
@@ -151,12 +133,13 @@ void STKAnimatedMesh::render()
 		if (transparent != isTransparentPass)
 			continue;
 		scene::IMeshBuffer* mb = m->getMeshBuffer(i);
+        TextureMatrix = getMaterial(i).getTextureMatrix(0);
 		const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
 		if (RenderFromIdentity)
 			driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
 		else if (Mesh->getMeshType() == scene::EAMT_SKINNED)
 			driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
-		if (isObjectPass(material.MaterialType))
+        if (isObject(material.MaterialType))
 		{
 			irr_driver->IncreaseObjectCount();
 			initvaostate(GLmeshes[i], material.MaterialType);

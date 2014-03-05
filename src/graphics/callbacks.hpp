@@ -229,10 +229,20 @@ public:
         m_maxheight[who] = height;
     }
 
+    float getMaxHeight(u32 who) const
+    {
+        return m_maxheight[who];
+    }
+
     void setBoostTime(u32 who, float time)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_boost_time[who] = time;
+    }
+
+    float getBoostTime(u32 who) const
+    {
+        return m_boost_time[who];
     }
 
     void setCenter(u32 who, float X, float Y)
@@ -242,11 +252,21 @@ public:
         m_center[who].Y = Y;
     }
 
+    core::vector2df getCenter(u32 who) const
+    {
+        return core::vector2df(m_center[who].X, m_center[who].Y);
+    }
+
     void setDirection(u32 who, float X, float Y)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_direction[who].X = X;
         m_direction[who].Y = Y;
+    }
+
+    core::vector2df getDirection(u32 who) const
+    {
+        return core::vector2df(m_direction[who].X, m_direction[who].Y);
     }
 
     void setCurrentCamera(u32 who)
@@ -430,20 +450,6 @@ public:
 
 //
 
-class GodRayProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    // In texcoords
-    void setSunPosition(float x, float y) { m_sunpos[0] = x; m_sunpos[1] = y; }
-
-private:
-    float m_sunpos[2];
-};
-
-//
-
 class ShadowPassProvider: public CallBase
 {
 public:
@@ -532,19 +538,6 @@ class ShadowGenProvider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class CausticsProvider: public CallBase
-{
-public:
-    CausticsProvider() { m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0; }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-private:
-    float m_dir[2], m_dir2[2];
 };
 
 //

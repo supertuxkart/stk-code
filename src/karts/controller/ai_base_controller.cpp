@@ -19,8 +19,7 @@
 
 #include "karts/controller/ai_base_controller.hpp"
 
-#include <assert.h>
-
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/skidding_properties.hpp"
@@ -28,6 +27,8 @@
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
+
+#include <assert.h>
 
 bool AIBaseController::m_ai_debug = false;
 

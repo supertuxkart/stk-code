@@ -200,7 +200,7 @@ void initGL()
 static
 GLuint LoadShader(const char * file, unsigned type) {
 	GLuint Id = glCreateShader(type);
-	std::string Code;
+    std::string Code = "#version 330\n";
 	std::ifstream Stream(file, std::ios::in);
 	if (Stream.is_open())
 	{
@@ -211,7 +211,7 @@ GLuint LoadShader(const char * file, unsigned type) {
 	}
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
-	printf("Compiling shader : %s\n", file);
+	Log::info("GLWrap", "Compiling shader : %s", file);
 	char const * SourcePointer = Code.c_str();
 	int length = strlen(SourcePointer);
 	glShaderSource(Id, 1, &SourcePointer, &length);
@@ -424,12 +424,24 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 	{
 		glDisable(GL_BLEND);
 	}
+    if (clipRect)
+    {
+        if (!clipRect->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
+            clipRect->getWidth(), clipRect->getHeight());
+    }
 	if (colors)
 	  drawTexColoredQuad(texture, colors, width, height, center_pos_x, center_pos_y,
 	      tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
 	else
 	  drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
 	      tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
+    if (clipRect)
+        glDisable(GL_SCISSOR_TEST);
 	glUseProgram(0);
 }
 
@@ -468,6 +480,17 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 		glDisable(GL_BLEND);
 	}
 
+    if (clip)
+    {
+        if (!clip->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        glScissor(clip->UpperLeftCorner.X, renderTargetSize.Height - clip->LowerRightCorner.Y,
+            clip->getWidth(), clip->getHeight());
+    }
+
 	glUseProgram(UIShader::ColoredRectShader::Program);
 	glBindVertexArray(UIShader::ColoredRectShader::vao);
 	UIShader::ColoredRectShader::setUniforms(center_pos_x, center_pos_y, width, height, color);
@@ -475,5 +498,7 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+    if (clip)
+        glDisable(GL_SCISSOR_TEST);
 	glUseProgram(0);
 }

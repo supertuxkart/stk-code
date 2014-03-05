@@ -35,6 +35,7 @@
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -142,8 +143,6 @@ void IrrDriver::renderGLSL(float dt)
 
     // Clear normal and depth to zero
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH), true, false, video::SColor(0,0,0,0));
-    // Clear specular map to zero
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_SPECULARMAP), true, false, video::SColor(0,0,0,0));
 
     irr_driver->getVideoDriver()->enableMaterial2D();
     RaceGUIBase *rg = world->getRaceGUI();
@@ -198,6 +197,7 @@ void IrrDriver::renderGLSL(float dt)
 		glDisable(GL_ALPHA_TEST);
 		glDepthMask(GL_TRUE);
 		glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
         m_scene_manager->drawAll(m_renderpass);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
@@ -214,13 +214,14 @@ void IrrDriver::renderGLSL(float dt)
         // Used to cull glowing items & lights
         const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
 
+        PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
         // Shadows
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows)
            //&& World::getWorld()->getTrack()->hasShadows())
         {
             renderShadows(camnode, camera);
         }
-
+        PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
 
@@ -257,31 +258,32 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_POP_CPU_MARKER();
 
-		if (!SkyboxTextures.empty())
-		{
-			PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-			renderSkybox();
-			PROFILER_POP_CPU_MARKER();
-		}
+		PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+		renderSkybox();
+		PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-        if (hasflare || hasgodrays)
+        if (true)//hasflare || hasgodrays)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
-            GLuint res;
-            gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
+            GLuint res = 0;
+            if (m_query_issued)
+                gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
             m_post_processing->setSunPixels(res);
 
             // Prepare the query for the next frame.
+            glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
             gl_driver->extGlBeginQuery(GL_SAMPLES_PASSED_ARB, m_lensflare_query);
             m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
             m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+            irr_driver->setPhase(GLOW_PASS);
             m_sun_interposer->render();
             gl_driver->extGlEndQuery(GL_SAMPLES_PASSED_ARB);
+            m_query_issued = true;
 
             m_lensflare->setStrength(res / 4000.0f);
 
@@ -478,17 +480,17 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
     {
-        5.,
-        10.,
-        75.,
+        20.,
+        50.,
+        100.,
         oldfar,
     };
     float NearValues[] =
     {
         oldnear,
-        5.,
-        10.,
-        75.,
+        20.,
+        50.,
+        100.,
     };
 
     const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
@@ -739,6 +741,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam, float dt)
 {
+    if (SkyboxCubeMap)
+        irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
     core::array<video::IRenderTarget> rtts;
@@ -829,6 +833,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 		accumulatedLightEnergy.push_back(0.);
 	}
 	m_post_processing->renderPointlight(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
+    if (SkyboxCubeMap)
+        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     // Handle SSAO
     m_video_driver->setRenderTarget(irr_driver->getRTT(RTT_SSAO), true, false,
                          SColor(255, 255, 255, 255));
@@ -852,44 +858,44 @@ static GLuint cubeidx;
 
 static void createcubevao()
 {
-	// From CSkyBoxSceneNode. Not optimal at all
+	// From CSkyBoxSceneNode
 	float corners[] = 
 	{
 		// top side
-		1., 1., -1.,       1., 1.,
-		1., 1., 1.,        0., 1.,
-		-1., 1., 1.,       0., 0.,
-		-1., 1., -1.,      1., 0.,
+		1., 1., -1.,
+		1., 1., 1.,
+		-1., 1., 1.,
+		-1., 1., -1.,
 
 		// Bottom side
-		1., -1., 1.,       0., 0.,
-		1., -1., -1.,      1., 0.,
-		-1., -1., -1.,     1., 1.,
-		-1., -1., 1.,      0., 1.,
+		1., -1., 1.,
+		1., -1., -1.,
+		-1., -1., -1.,
+		-1., -1., 1.,
 
 		// right side
-		1., -1, -1,        1., 1.,
-		1., -1, 1,         0., 1.,
-		1., 1., 1.,        0., 0.,
-		1., 1., -1.,       1., 0.,
+		1., -1, -1,
+		1., -1, 1,
+		1., 1., 1.,
+		1., 1., -1.,
 
 		// left side
-		-1., -1., 1.,      1., 1.,
-		-1., -1., -1.,     0., 1.,
-		-1., 1., -1.,      0., 0.,
-		-1., 1., 1.,       1., 0.,
+		-1., -1., 1.,
+		-1., -1., -1.,
+		-1., 1., -1.,
+		-1., 1., 1.,
 
 		// back side
-		-1., -1., -1.,     1., 1.,
-		1., -1, -1.,       0., 1.,
-		1, 1, -1.,         0., 0.,
-		-1, 1, -1.,        1., 0.,
+		-1., -1., -1.,
+		1., -1, -1.,
+		1, 1, -1.,
+		-1, 1, -1.,
 		
 		// front side
-		1., -1., 1.,       1., 1.,
-		-1., -1., 1.,      0., 1.,
-		-1, 1., 1.,        0., 0.,
-		1., 1., 1.,        1., 0.,
+		1., -1., 1.,
+		-1., -1., 1.,
+		-1, 1., 1.,
+		1., 1., 1.,
 	};
 	int indices[] = {
 		0, 1, 2, 2, 3, 0,
@@ -906,20 +912,412 @@ static void createcubevao()
 
 	glBindVertexArray(cubevao);
 	glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 5 * 4 * sizeof(float), corners, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_position);
-	glEnableVertexAttribArray(MeshShader::ObjectUnlitShader::attrib_texcoord);
-	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_position, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), 0);
-	glVertexAttribPointer(MeshShader::ObjectUnlitShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+	glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
 
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+
+static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
+{
+    switch (face)
+    {
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_X:
+        x = 1.;
+        y = -i;
+        z = -j;
+        break;
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_X:
+        x = -1.;
+        y = -i;
+        z = j;
+        break;
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_Y:
+        x = j;
+        y = 1.;
+        z = i;
+        break;
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_Y:
+        x = j;
+        y = -1;
+        z = -i;
+        break;
+    case GL_TEXTURE_CUBE_MAP_POSITIVE_Z:
+        x = j;
+        y = -i;
+        z = 1;
+        break;
+    case GL_TEXTURE_CUBE_MAP_NEGATIVE_Z:
+        x = -j;
+        y = -i;
+        z = -1;
+        break;
+    }
+
+    float norm = sqrt(x * x + y * y + z * z);
+    x /= norm, y /= norm, z /= norm;
+    return;
+}
+
+static void getYml(GLenum face, size_t width, size_t height,
+    float *Y00,
+    float *Y1minus1, float *Y10, float *Y11,
+    float *Y2minus2, float *Y2minus1, float *Y20, float *Y21, float *Y22)
+{
+    for (unsigned i = 0; i < width; i++)
+    {
+        for (unsigned j = 0; j < height; j++)
+        {
+            float x, y, z;
+            float fi = i, fj = j;
+            fi /= width, fj /= height;
+            fi = 2 * fi - 1, fj = 2 * fj - 1;
+            getXYZ(face, fi, fj, x, y, z);
+
+            // constant part of Ylm
+            float c00 = 0.282095;
+            float c1minus1 = 0.488603;
+            float c10 = 0.488603;
+            float c11 = 0.488603;
+            float c2minus2 = 1.092548;
+            float c2minus1 = 1.092548;
+            float c21 = 1.092548;
+            float c20 = 0.315392;
+            float c22 = 0.546274;
+
+            size_t idx = i * height + j;
+
+            Y00[idx] = c00;
+            Y1minus1[idx] = c1minus1 * y;
+            Y10[idx] = c10 * z;
+            Y11[idx] = c11 * x;
+            Y2minus2[idx] = c2minus2 * x * y;
+            Y2minus1[idx] = c2minus1 * y * z;
+            Y21[idx] = c21 * x * z;
+            Y20[idx] = c20 * (3 * z * z - 1);
+            Y22[idx] = c22 * (x * x - y * y);
+        }
+    }
+}
+
+static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
+    float *Y2minus2, float * Y2minus1, float * Y20, float *Y21, float *Y22)
+{
+    float d = sqrt(i * i + j * j + 1);
+    float solidangle = 1.;
+    size_t idx = i * height + j;
+    float reconstructedVal = Y00[idx] * Coeff[0];
+    reconstructedVal += Y1minus1[i * height + j] * Coeff[1] + Y10[i * height + j] * Coeff[2] +  Y11[i * height + j] * Coeff[3];
+    reconstructedVal += Y2minus2[idx] * Coeff[4] + Y2minus1[idx] * Coeff[5] + Y20[idx] * Coeff[6] + Y21[idx] * Coeff[7] + Y22[idx] * Coeff[8];
+    reconstructedVal /= solidangle;
+    return MAX2(255 * reconstructedVal, 0.);
+}
+
+static void unprojectSH(float *output[], size_t width, size_t height,
+    float *Y00[],
+    float *Y1minus1[], float *Y10[], float *Y11[],
+    float *Y2minus2[], float *Y2minus1[], float * Y20[],float *Y21[], float *Y22[],
+    float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff)
+{
+    for (unsigned face = 0; face < 6; face++)
+    {
+        for (unsigned i = 0; i < width; i++)
+        {
+            for (unsigned j = 0; j < height; j++)
+            {
+                float fi = i, fj = j;
+                fi /= width, fj /= height;
+                fi = 2 * fi - 1, fj = 2 * fj - 1;
+
+                output[face][4 * height * i + 4 * j + 2] = getTexelValue(i, j, width, height,
+                    redSHCoeff,
+                    Y00[face], Y1minus1[face], Y10[face], Y11[face], Y2minus2[face], Y2minus1[face], Y20[face], Y21[face], Y22[face]);
+                output[face][4 * height * i + 4 * j + 1] = getTexelValue(i, j, width, height,
+                    greenSHCoeff,
+                    Y00[face], Y1minus1[face], Y10[face], Y11[face], Y2minus2[face], Y2minus1[face], Y20[face], Y21[face], Y22[face]);
+                output[face][4 * height * i + 4 * j] = getTexelValue(i, j, width, height,
+                    blueSHCoeff,
+                    Y00[face], Y1minus1[face], Y10[face], Y11[face], Y2minus2[face], Y2minus1[face], Y20[face], Y21[face], Y22[face]);
+            }
+        }
+    }
+}
+
+static void projectSH(float *color[], size_t width, size_t height,
+    float *Y00[],
+    float *Y1minus1[], float *Y10[], float *Y11[],
+    float *Y2minus2[], float *Y2minus1[], float * Y20[], float *Y21[], float *Y22[],
+    float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff
+    )
+{
+    for (unsigned i = 0; i < 9; i++)
+    {
+        blueSHCoeff[i] = 0;
+        greenSHCoeff[i] = 0;
+        redSHCoeff[i] = 0;
+    }
+    float wh = width * height;
+    for (unsigned face = 0; face < 6; face++)
+    {
+        for (unsigned i = 0; i < width; i++)
+        {
+            for (unsigned j = 0; j < height; j++)
+            {
+                size_t idx = i * height + j;
+                float fi = i, fj = j;
+                fi /= width, fj /= height;
+                fi = 2 * fi - 1, fj = 2 * fj - 1;
+
+
+                float d = sqrt(fi * fi + fj * fj + 1);
+
+                // Constant obtained by projecting unprojected ref values
+                float solidangle = 2.75 / (wh * pow(d, 1.5));
+                float b = color[face][4 * height * i + 4 * j] / 255.;
+                float g = color[face][4 * height * i + 4 * j + 1] / 255.;
+                float r = color[face][4 * height * i + 4 * j + 2] / 255.;
+
+                assert(b >= 0.);
+
+                blueSHCoeff[0] += b * Y00[face][idx] * solidangle;
+                blueSHCoeff[1] += b * Y1minus1[face][idx] * solidangle;
+                blueSHCoeff[2] += b * Y10[face][idx] * solidangle;
+                blueSHCoeff[3] += b * Y11[face][idx] * solidangle;
+                blueSHCoeff[4] += b * Y2minus2[face][idx] * solidangle;
+                blueSHCoeff[5] += b * Y2minus1[face][idx] * solidangle;
+                blueSHCoeff[6] += b * Y20[face][idx] * solidangle;
+                blueSHCoeff[7] += b * Y21[face][idx] * solidangle;
+                blueSHCoeff[8] += b * Y22[face][idx] * solidangle;
+
+                greenSHCoeff[0] += g * Y00[face][idx] * solidangle;
+                greenSHCoeff[1] += g * Y1minus1[face][idx] * solidangle;
+                greenSHCoeff[2] += g * Y10[face][idx] * solidangle;
+                greenSHCoeff[3] += g * Y11[face][idx] * solidangle;
+                greenSHCoeff[4] += g * Y2minus2[face][idx] * solidangle;
+                greenSHCoeff[5] += g * Y2minus1[face][idx] * solidangle;
+                greenSHCoeff[6] += g * Y20[face][idx] * solidangle;
+                greenSHCoeff[7] += g * Y21[face][idx] * solidangle;
+                greenSHCoeff[8] += g * Y22[face][idx] * solidangle;
+
+
+                redSHCoeff[0] += r * Y00[face][idx] * solidangle;
+                redSHCoeff[1] += r * Y1minus1[face][idx] * solidangle;
+                redSHCoeff[2] += r * Y10[face][idx] * solidangle;
+                redSHCoeff[3] += r * Y11[face][idx] * solidangle;
+                redSHCoeff[4] += r * Y2minus2[face][idx] * solidangle;
+                redSHCoeff[5] += r * Y2minus1[face][idx] * solidangle;
+                redSHCoeff[6] += r * Y20[face][idx] * solidangle;
+                redSHCoeff[7] += r * Y21[face][idx] * solidangle;
+                redSHCoeff[8] += r * Y22[face][idx] * solidangle;
+            }
+        }
+    }
+}
+
+static void displayCoeff(float *SHCoeff)
+{
+    printf("L00:%f\n", SHCoeff[0]);
+    printf("L1-1:%f, L10:%f, L11:%f\n", SHCoeff[1], SHCoeff[2], SHCoeff[3]);
+    printf("L2-2:%f, L2-1:%f, L20:%f, L21:%f, L22:%f\n", SHCoeff[4], SHCoeff[5], SHCoeff[6], SHCoeff[7], SHCoeff[8]);
+}
+
+// Only for 9 coefficients
+static void testSH(char *color[6], size_t width, size_t height,
+    float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff)
+{
+    float *Y00[6];
+    float *Y1minus1[6];
+    float *Y10[6];
+    float *Y11[6];
+    float *Y2minus2[6];
+    float *Y2minus1[6];
+    float *Y20[6];
+    float *Y21[6];
+    float *Y22[6];
+
+    float *testoutput[6];
+    for (unsigned i = 0; i < 6; i++)
+    {
+        testoutput[i] = new float[width * height * 4];
+        for (unsigned j = 0; j < width * height; j++)
+        {
+            testoutput[i][4 * j] = 0xFF & color[i][4 * j];
+            testoutput[i][4 * j + 1] = 0xFF & color[i][4 * j + 1];
+            testoutput[i][4 * j + 2] = 0xFF & color[i][4 * j + 2];
+        }
+    }
+
+    for (unsigned face = 0; face < 6; face++)
+    {
+        Y00[face] = new float[width * height];
+        Y1minus1[face] = new float[width * height];
+        Y10[face] = new float[width * height];
+        Y11[face] = new float[width * height];
+        Y2minus2[face] = new float[width * height];
+        Y2minus1[face] = new float[width * height];
+        Y20[face] = new float[width * height];
+        Y21[face] = new float[width * height];
+        Y22[face] = new float[width * height];
+
+        getYml(GL_TEXTURE_CUBE_MAP_POSITIVE_X + face, width, height, Y00[face], Y1minus1[face], Y10[face], Y11[face], Y2minus2[face], Y2minus1[face], Y20[face], Y21[face], Y22[face]);
+    }
+
+/*    blueSHCoeff[0] = 0.54,
+    blueSHCoeff[1] = .6, blueSHCoeff[2] = -.27, blueSHCoeff[3] = .01,
+    blueSHCoeff[4] = -.12, blueSHCoeff[5] = -.47, blueSHCoeff[6] = -.15, blueSHCoeff[7] = .14, blueSHCoeff[8] = -.3;
+    greenSHCoeff[0] = .44,
+    greenSHCoeff[1] = .35, greenSHCoeff[2] = -.18, greenSHCoeff[3] = -.06,
+    greenSHCoeff[4] = -.05, greenSHCoeff[5] = -.22, greenSHCoeff[6] = -.09, greenSHCoeff[7] = .21, greenSHCoeff[8] = -.05;
+    redSHCoeff[0] = .79,
+    redSHCoeff[1] = .39, redSHCoeff[2] = -.34, redSHCoeff[3] = -.29,
+    redSHCoeff[4] = -.11, redSHCoeff[5] = -.26, redSHCoeff[6] = -.16, redSHCoeff[7] = .56, redSHCoeff[8] = .21;
+
+    printf("Blue:\n");
+    displayCoeff(blueSHCoeff);
+    printf("Green:\n");
+    displayCoeff(greenSHCoeff);
+    printf("Red:\n");
+    displayCoeff(redSHCoeff);*/
+
+    projectSH(testoutput, width, height,
+        Y00,
+        Y1minus1, Y10, Y11,
+        Y2minus2, Y2minus1, Y20, Y21, Y22,
+        blueSHCoeff, greenSHCoeff, redSHCoeff
+        );
+
+    printf("Blue:\n");
+    displayCoeff(blueSHCoeff);
+    printf("Green:\n");
+    displayCoeff(greenSHCoeff);
+    printf("Red:\n");
+    displayCoeff(redSHCoeff);
+
+
+
+    // Convolute in frequency space
+/*    float A0 = 3.141593;
+    float A1 = 2.094395;
+    float A2 = 0.785398;
+    blueSHCoeff[0] *= A0;
+    greenSHCoeff[0] *= A0;
+    redSHCoeff[0] *= A0;
+    for (unsigned i = 0; i < 3; i++)
+    {
+        blueSHCoeff[1 + i] *= A1;
+        greenSHCoeff[1 + i] *= A1;
+        redSHCoeff[1 + i] *= A1;
+    }
+    for (unsigned i = 0; i < 5; i++)
+    {
+        blueSHCoeff[4 + i] *= A2;
+        greenSHCoeff[4 + i] *= A2;
+        redSHCoeff[4 + i] *= A2;
+    }
+
+
+    unprojectSH(testoutput, width, height,
+        Y00,
+        Y1minus1, Y10, Y11,
+        Y2minus2, Y2minus1, Y20, Y21, Y22,
+        blueSHCoeff, greenSHCoeff, redSHCoeff
+        );*/
+
+
+/*    printf("Blue:\n");
+    displayCoeff(blueSHCoeff);
+    printf("Green:\n");
+    displayCoeff(greenSHCoeff);
+    printf("Red:\n");
+    displayCoeff(redSHCoeff);
+
+    printf("\nAfter projection\n\n");*/
+
+
+
+    for (unsigned i = 0; i < 6; i++)
+    {
+        for (unsigned j = 0; j < width * height; j++)
+        {
+            color[i][4 * j] = MIN2(testoutput[i][4 * j], 255);
+            color[i][4 * j + 1] = MIN2(testoutput[i][4 * j + 1], 255);
+            color[i][4 * j + 2] = MIN2(testoutput[i][4 * j + 2], 255);
+        }
+    }
+
+    for (unsigned face = 0; face < 6; face++)
+    {
+        delete[] testoutput[face];
+        delete[] Y00[face];
+        delete[] Y1minus1[face];
+        delete[] Y10[face];
+        delete[] Y11[face];
+    }
+}
+
+void IrrDriver::generateSkyboxCubemap()
+{
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    glGenTextures(1, &SkyboxCubeMap);
+    glGenTextures(1, &ConvolutedSkyboxCubeMap);
+
+    GLint w = 0, h = 0;
+    for (unsigned i = 0; i < 6; i++)
+    {
+        w = MAX2(w, SkyboxTextures[i]->getOriginalSize().Width);
+        h = MAX2(h, SkyboxTextures[i]->getOriginalSize().Height);
+    }
+
+    const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
+    char *rgba[6];
+    for (unsigned i = 0; i < 6; i++)
+        rgba[i] = new char[w * h * 4];
+    for (unsigned i = 0; i < 6; i++)
+    {
+        unsigned idx = texture_permutation[i];
+
+        video::IImage* image = getVideoDriver()->createImageFromData(
+            SkyboxTextures[idx]->getColorFormat(),
+            SkyboxTextures[idx]->getSize(),
+            SkyboxTextures[idx]->lock(),
+            false
+            );
+        SkyboxTextures[idx]->unlock();
+
+        image->copyToScaling(rgba[i], w, h);
+        image->drop();
+
+        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+    }
+
+    testSH(rgba, w, h, blueSHCoeff, greenSHCoeff, redSHCoeff);
+
+    for (unsigned i = 0; i < 6; i++)
+    {
+        glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+    }
+    for (unsigned i = 0; i < 6; i++)
+        delete[] rgba[i];
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+}
+
+
 void IrrDriver::renderSkybox()
 {
+    if (SkyboxTextures.empty()) return;
+
     scene::ICameraSceneNode *camera = m_scene_manager->getActiveCamera();
 	if (!cubevao)
 		createcubevao();
+    if (!SkyboxCubeMap)
+        generateSkyboxCubemap();
 	glBindVertexArray(cubevao);
 	glDisable(GL_CULL_FACE);
 	assert(SkyboxTextures.size() == 6);
@@ -932,16 +1330,17 @@ void IrrDriver::renderSkybox()
 	core::matrix4 scale;
 	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
 	transform *= translate * scale;
-	
-	for (unsigned i = 0; i < 6; i++)
-	{
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, static_cast<irr::video::COpenGLTexture*>(SkyboxTextures[i])->getOpenGLTextureName());
-		glUseProgram(MeshShader::ObjectUnlitShader::Program);
-		MeshShader::ObjectUnlitShader::setUniforms(transform, 0);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, (GLvoid*) (6 * i * sizeof(int)));
-	}
-	glBindVertexArray(0);
+    core::matrix4 invtransform;
+    transform.getInverse(invtransform);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glUseProgram(MeshShader::SkyboxShader::Program);
+        MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
+    glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
+    glBindVertexArray(0);
 }
 
 // ----------------------------------------------------------------------------
@@ -949,9 +1348,8 @@ void IrrDriver::renderSkybox()
 void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
                                    int cam)
 {
-    m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_DISPLACE), false, false);
-    glClearColor(0, 0, 0, 0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_TMP4), true, false);
+    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_DISPLACE), true, false);
 
 	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
 	cb->update();
@@ -962,6 +1360,10 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
 	glDisable(GL_ALPHA_TEST);
 	glDepthMask(GL_FALSE);
 	glDisable(GL_BLEND);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     for (int i = 0; i < displacingcount; i++)
     {
@@ -972,8 +1374,8 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
         m_displacing[i]->render();
     }
 
-    // Blur it
-	m_post_processing->renderGaussian3Blur(m_rtts->getRTT(RTT_DISPLACE), m_rtts->getRTT(RTT_TMP2), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
-
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_DISPLACE));
+    glDisable(GL_STENCIL_TEST);
 }

@@ -42,10 +42,10 @@ static const std::string IDENT_STD      ("STANDARD"        );
 static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
 static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
-static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT");
+static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT" );
 static const std::string IDENT_SOCCER   ("SOCCER"          );
-static const std::string IDENT_OVERWORLD("OVERWORLD"   );
-static const std::string IDENT_CUSTSCENE("CUTSCENE"   );
+static const std::string IDENT_OVERWORLD("OVERWORLD"       );
+static const std::string IDENT_CUTSCENE ("CUTSCENE"        );
 
 /**
  * The race manager has two functions:

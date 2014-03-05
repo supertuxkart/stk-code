@@ -417,8 +417,15 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
             WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, //WGL_CONTEXT_CORE_PROFILE_BIT_ARB
 			0
 		};
-		hrc=wglCreateContextAttribs_ARB(HDc, 0, iAttribs);
-	}
+        // hd3000 only provides 3.1, so try all minor versions backwards, to find one that works.
+        for (int minor = 3; minor >= 0; minor--)
+        {
+            iAttribs[3] = minor;
+            hrc = wglCreateContextAttribs_ARB(HDc, 0, iAttribs);
+            if (hrc)
+                break;
+        }
+    }
 	else
 #endif
 		hrc=wglCreateContext(HDc);

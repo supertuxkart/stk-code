@@ -17,20 +17,22 @@
 
 #include "states_screens/soccer_setup_screen.hpp"
 
-#include "input/device_manager.hpp"
-#include "input/input_manager.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/arenas_screen.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
-#include "karts/kart_properties_manager.hpp"
-#include "karts/kart_properties.hpp"
 #include "karts/kart_model.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
+#include "states_screens/arenas_screen.hpp"
+#include "states_screens/state_manager.hpp"
+
 
 using namespace GUIEngine;
 DEFINE_SCREEN_SINGLETON( SoccerSetupScreen );

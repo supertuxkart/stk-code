@@ -1,10 +1,17 @@
-#version 330
 uniform sampler2D normalMap;
 
-noperspective in vec3 tangent;
-noperspective in vec3 bitangent;
+#if __VERSION__ >= 130
+in vec3 tangent;
+in vec3 bitangent;
 in vec2 uv;
 out vec2 EncodedNormal;
+#else
+varying vec3 tangent;
+varying vec3 bitangent;
+varying vec2 uv;
+#define EncodedNormal gl_FragColor.xy
+#endif
+
 
 // from Crytek "a bit more deferred CryEngine"
 vec2 EncodeNormal(vec3 n)

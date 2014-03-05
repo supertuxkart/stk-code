@@ -110,6 +110,11 @@ public:
     }    // setLogLevel
 
     // ------------------------------------------------------------------------
+    /** Returns the log level. This is useful if some work is necessary to
+     *  preprate output strings, which might not be used at all (example:
+     *  replacing the cleartext password in an http request). */
+    static LogLevel getLogLevel() { return m_min_log_level;  }
+    // ------------------------------------------------------------------------
     /** Disable coloring of log messages. */
     static void disableColor()
     {

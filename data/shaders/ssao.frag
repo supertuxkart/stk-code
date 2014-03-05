@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2D noise_texture;
@@ -6,8 +5,13 @@ uniform mat4 invprojm;
 uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
+#if __VERSION__ >= 130
 in vec2 uv;
-out float ao;
+out float AO;
+#else
+varying vec2 uv;
+#define AO gl_FragColor.x
+#endif
 
 const float strengh = 4.;
 const float radius = .4f;
@@ -39,7 +43,7 @@ void main(void)
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
 	// Workaround for nvidia and skyboxes
 	float len = dot(vec3(1.0), abs(cur.xyz));
-	if (len < 0.2 || curdepth > 0.999) discard;
+	if (len < 0.2 || curdepth > 0.9955) discard;
 	// Make a tangent as random as possible
 	vec3 randvect = rand(uv);
 	vec3 tangent = normalize(cross(norm, randvect));
@@ -65,5 +69,5 @@ void main(void)
 		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) : 0.;
 	}
 
-	ao = 1.0 - bl * invSamples;
+	AO = 1.0 - bl * invSamples;
 }

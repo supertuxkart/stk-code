@@ -26,7 +26,6 @@
 #include <irrString.h>
 using namespace irr;
 
-#include "config/player.hpp"
 #include "states_screens/race_gui_base.hpp"
 
 class AbstractKart;

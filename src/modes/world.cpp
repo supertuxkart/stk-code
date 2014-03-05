@@ -18,16 +18,11 @@
 
 #include "modes/world.hpp"
 
-#include <assert.h>
-#include <sstream>
-#include <stdexcept>
-#include <algorithm>
-#include <ctime>
-
-#include "achievements/achievements_manager.hpp"
+#include "achievements/achievement_info.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
@@ -65,6 +60,13 @@
 #include "utils/profiler.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
+
+#include <algorithm>
+#include <assert.h>
+#include <ctime>
+#include <sstream>
+#include <stdexcept>
+
 
 World* World::m_world = NULL;
 
@@ -448,12 +450,12 @@ void World::terminateRace()
     {
         updateHighscores(&best_highscore_rank, &best_finish_time, &highscore_who,
                      &best_player);
-        unlock_manager->getCurrentSlot()->raceFinished();
+        PlayerManager::get()->getCurrentPlayer()->raceFinished();
     }
 
-    unlock_manager->getCurrentSlot()->raceFinished();
-    ((MapAchievement *) AchievementsManager::get()->getActive()->getAchievement(1))->increase(getTrack()->getIdent(), 1);
-    AchievementsManager::get()->onRaceEnd();
+    PlayerManager::get()->getCurrentPlayer()->raceFinished();
+    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
+                                       getTrack()->getIdent(), 1);
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -757,7 +759,7 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(unlock_manager->getCurrentPlayer(),
+                StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
                                                         device, NULL);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
