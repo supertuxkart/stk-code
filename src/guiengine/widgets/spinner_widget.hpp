@@ -40,7 +40,7 @@ namespace GUIEngine
     {
     public:
         class ISpinnerConfirmListener
-        {	
+        {
         public:
             virtual ~ISpinnerConfirmListener() {}
             
@@ -69,8 +69,6 @@ namespace GUIEngine
           */
         bool m_gauge;
 	
-	//for setting background
-//	bool m_use_background_color;
 	
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
