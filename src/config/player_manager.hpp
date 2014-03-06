@@ -78,6 +78,7 @@ public:
     void deletePlayer(PlayerProfile *player);
     void setCurrentPlayer(PlayerProfile *player, bool remember_me);
     const PlayerProfile *getPlayerById(unsigned int id);
+    void enforceCurrentPlayer();
     // ------------------------------------------------------------------------
     /** Returns the current player. */
     PlayerProfile* getCurrentPlayer() { return m_current_player; }

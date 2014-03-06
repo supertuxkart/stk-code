@@ -37,10 +37,14 @@ GrandPrixManager::GrandPrixManager()
         if (StringUtils::hasSuffix(*i, ".grandprix"))
         {
             try
-                { m_gp_data.push_back(new GrandPrixData(*i)); }
-            catch (std::logic_error& er)
-                { Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
-                                                  i->c_str(), er.what()); }
+            {
+                m_gp_data.push_back(new GrandPrixData(*i));
+            }
+            catch (std::logic_error& e)
+            {
+                Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
+                                                          i->c_str(), e.what());
+            }
         }
     }
 
@@ -54,10 +58,14 @@ GrandPrixManager::GrandPrixManager()
             if (StringUtils::hasSuffix(*i, ".grandprix"))
             {
                 try
-                    { m_gp_data.push_back(new GrandPrixData(dir, *i)); }
-                catch (std::logic_error& er)
-                    { Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
-                                                      i->c_str(), er.what()); }
+                {
+                    m_gp_data.push_back(new GrandPrixData(dir, *i)); 
+                }
+                catch (std::logic_error& e)
+                {
+                    Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
+                                                         i->c_str(), e.what());
+                }
             }
         }
     }

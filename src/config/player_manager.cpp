@@ -145,6 +145,48 @@ void PlayerManager::deletePlayer(PlayerProfile *player)
 }   // deletePlayer
 
 // ----------------------------------------------------------------------------
+/** This function makes sure that a current player is defined. This is called
+ *  when a screen skipping command line option is given (-N, -R, ...), in 
+ *  which case there might not be a current player (if no default player is
+ *  set in players.xml, i.e. the 'remember be' option was not picked ). Since
+ *  a lot of code depends on having a local player, just set the most
+ *   frequently used non-guest to be the current player.
+ */
+void PlayerManager::enforceCurrentPlayer()
+{
+    if (m_current_player) return;
+
+    PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if (!player->isGuestAccount())
+        {
+            Log::info("PlayerManager", "Enfocring current player '%ls'.",
+                      player->getName().c_str()           );
+            m_current_player = player;
+            return;
+        }
+    }   // for player in m_all_players
+
+    // This shouldn't happen - but just in case: add the default players
+    // again, and search again for a non-guest player.
+    addDefaultPlayer();
+    for_in(player, m_all_players)
+    {
+        if (!player->isGuestAccount())
+        {
+            Log::info("PlayerManager", "Enfocring current player '%s'.",
+                player->getName().c_str());
+            m_current_player = player;
+            return;
+        }
+    }   // for player in m_all_players
+
+    // Now this really really should not happen.
+    Log::fatal("PlayerManager", "Failed to find a non-guest player.");
+}   // enforceCurrentPlayer
+
+// ----------------------------------------------------------------------------
 /** Called when no player profiles exists. It creates two players: one
  *  guest player, and one non-guest player for whic hit tries to guess a
  *  mame based on environment variables.
