@@ -179,7 +179,7 @@ void BattleAI::handleSteering(const float dt)
     m_target_node   =   player_node;
 	m_target_point = kart->getXYZ();
 
-	//handleItemCollection(&m_target_point, &m_target_node);
+	handleItemCollection(&m_target_point, &m_target_node);
 	m_debug_sphere->setPosition(m_target_point.toIrrVector());
     if(m_target_node == m_current_node)
     {
@@ -555,7 +555,7 @@ void BattleAI::handleItemCollection(Vec3 *aim_point, int* target_node)
 	if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_BOWLING) return;
 	Vec3 old_aim_point = *aim_point;
 
-	float distance = 30.0f;
+	float distance = 5.0f;
 	bool found_suitable_item = false;
 	const std::vector< std::pair<Item*, int> >& item_list =
 		BattleGraph::get()->getItemList();
