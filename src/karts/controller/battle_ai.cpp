@@ -261,7 +261,7 @@ void BattleAI::findPortals(int start, int end)
        std::reverse(next_node_verts.begin(),next_node_verts.end());
 
        Vec3 portalLeft, portalRight;
-       bool flag = 0;
+       //bool flag = 0;
        for(unsigned int n_i=0; n_i<next_node_verts.size(); n_i++)
        {
            for(unsigned int t_i=0; t_i< this_node_verts.size(); t_i++)
@@ -314,7 +314,7 @@ void BattleAI::stringPull(const Vec3& start_pos, const Vec3& end_pos)
     m_path_corners.clear();
     const float eps=0.0001f;
     
-    for(int i=0; i<m_portals.size(); i++)
+    for(unsigned int i=0; i<m_portals.size(); i++)
     {
         Vec3 portal_left = m_portals[i].first;
         Vec3 portal_right = m_portals[i].second;
@@ -552,7 +552,7 @@ void BattleAI::handleItems(const float dt)
 
 void BattleAI::handleItemCollection(Vec3 *aim_point, int* target_node)
 {
-	if (m_kart->getPowerup()->getType() == PowerupManager::PowerupType::POWERUP_BOWLING) return;
+	if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_BOWLING) return;
 	Vec3 old_aim_point = *aim_point;
 
 	float distance = 30.0f;
@@ -562,7 +562,7 @@ void BattleAI::handleItemCollection(Vec3 *aim_point, int* target_node)
 	int items_count = item_list.size();
 
 	
-	for (int j = 0; j < 50; j++)
+	for (unsigned int j = 0; j < 50; j++)
 		{
 			for (unsigned int i = 0; i < items_count; ++i)
 			{
