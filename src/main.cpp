@@ -1061,18 +1061,43 @@ void initRest()
 }   // initRest
 
 //=============================================================================
-#ifdef BREAKPAD
-bool ShowDumpResults(const wchar_t* dump_path,
-                     const wchar_t* minidump_id,
-                     void* context,
-                     EXCEPTION_POINTERS* exinfo,
-                     MDRawAssertionInfo* assertion,
-                     bool succeeded)
+void askForInternetPermission()
 {
-    wprintf(L"Path: %s id %s.\n", dump_path, minidump_id);
-    return succeeded;
-}
-#endif
+    if (UserConfigParams::m_internet_status ==
+        Online::RequestManager::IPERM_NOT_ASKED)
+    {
+        class ConfirmServer :
+            public MessageDialog::IConfirmDialogListener
+        {
+        public:
+            virtual void onConfirm()
+            {
+                UserConfigParams::m_internet_status =
+                    Online::RequestManager::IPERM_ALLOWED;
+                GUIEngine::ModalDialog::dismiss();
+            }   // onConfirm
+            // --------------------------------------------------------
+            virtual void onCancel()
+            {
+                UserConfigParams::m_internet_status =
+                    Online::RequestManager::IPERM_NOT_ALLOWED;
+                GUIEngine::ModalDialog::dismiss();
+            }   // onCancel
+        };   // ConfirmServer
+
+        new MessageDialog(_("SuperTuxKart may connect to a server "
+            "to download add-ons and notify you of updates. Would you "
+            "like this feature to be enabled? (To change this setting "
+            "at a later time, go to options, select tab "
+            "'User Interface', and edit \"Allow STK to connect to the "
+            "Internet\")."),
+            MessageDialog::MESSAGE_DIALOG_CONFIRM,
+            new ConfirmServer(), true);
+    }
+
+}   // askForInternetPermission
+
+//=============================================================================
 
 #if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
 #pragma comment(linker, "/SUBSYSTEM:console")
@@ -1081,10 +1106,6 @@ bool ShowDumpResults(const wchar_t* dump_path,
 // ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
-#ifdef BREAKPAD
-    google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
-                                         NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
-#endif
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
@@ -1209,40 +1230,15 @@ int main(int argc, char *argv[] )
                 wiimote_manager->askUserToConnectWiimotes();
             }
 #endif
-            if(UserConfigParams::m_internet_status ==
-                Online::RequestManager::IPERM_NOT_ASKED)
-            {
-                class ConfirmServer :
-                      public MessageDialog::IConfirmDialogListener
-                {
-                public:
-                    virtual void onConfirm()
-                    {
-                        UserConfigParams::m_internet_status =
-                                 Online::RequestManager::IPERM_ALLOWED;
-                        GUIEngine::ModalDialog::dismiss();
-                    }   // onConfirm
-                    // --------------------------------------------------------
-                    virtual void onCancel()
-                    {
-                        UserConfigParams::m_internet_status =
-                            Online::RequestManager::IPERM_NOT_ALLOWED;
-                        GUIEngine::ModalDialog::dismiss();
-                    }   // onCancel
-                };   // ConfirmServer
-
-                new MessageDialog(_("SuperTuxKart may connect to a server "
-                    "to download add-ons and notify you of updates. Would you "
-                    "like this feature to be enabled? (To change this setting "
-                    "at a later time, go to options, select tab "
-                    "'User Interface', and edit \"Allow STK to connect to the "
-                    "Internet\")."),
-                    MessageDialog::MESSAGE_DIALOG_CONFIRM,
-                    new ConfirmServer(), true);
-            }
+            askForInternetPermission();
         }
         else
         {
+            // Skip the start screen. This esp. means that no login screen is
+            // displayed (if necessary), so we have to make sure there is
+            // a current player
+            PlayerManager::get()->enforceCurrentPlayer();
+            
             InputDevice *device;
 
             // Use keyboard 0 by default in --no-start-screen
