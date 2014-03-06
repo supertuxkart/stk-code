@@ -28,8 +28,9 @@ GrandPrixManager *grand_prix_manager = NULL;
 GrandPrixManager::GrandPrixManager()
 {
     // Findout which grand prixs are available and load them
+    // Grand Prix in the standart directory
     std::set<std::string> result;
-    std::string gp_dir = file_manager->getAsset(FileManager::GRANDPRIX,"");
+    std::string gp_dir = file_manager->getAsset(FileManager::GRANDPRIX, "");
     file_manager->listFiles(result, gp_dir);
     for(std::set<std::string>::iterator i  = result.begin();
                                         i != result.end()  ; i++)
@@ -39,6 +40,8 @@ GrandPrixManager::GrandPrixManager()
             try
             {
                 m_gp_data.push_back(new GrandPrixData(*i));
+                Log::debug("GrandPrixManager", "Grand Prix %s loaded.",
+                                               i->c_str());
             }
             catch (std::logic_error& e)
             {
@@ -48,9 +51,11 @@ GrandPrixManager::GrandPrixManager()
         }
     }
 
-    // Load additional Grand Prixs
+    // Load additional Grand Prix
     const std::string dir = UserConfigParams::m_additional_gp_directory;
     if(dir != "") {
+        Log::info("GrandPrixManager", "Loading additional Grand Prix from "
+                                      "%s ...", dir.c_str());
         file_manager->listFiles(result, dir);
         for(std::set<std::string>::iterator i  = result.begin();
                                             i != result.end()  ; i++)
@@ -59,16 +64,19 @@ GrandPrixManager::GrandPrixManager()
             {
                 try
                 {
-                    m_gp_data.push_back(new GrandPrixData(dir, *i)); 
+                    m_gp_data.push_back(new GrandPrixData(dir, *i));
+                    Log::debug("GrandPrixManager", "Grand Prix %s loaded from "
+                                                   "%s", i->c_str(),
+                                                   dir.c_str());
                 }
                 catch (std::logic_error& e)
                 {
                     Log::error("GrandPrixManager", "Ignoring GP %s ( %s ) \n",
-                                                         i->c_str(), e.what());
+                                                   i->c_str(), e.what());
                 }
             }
-        }
-    }
+        }   // end for
+    }   // end if
 }   // GrandPrixManager
 // ----------------------------------------------------------------------------
 GrandPrixManager::~GrandPrixManager()
