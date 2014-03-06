@@ -197,9 +197,28 @@ namespace Online
 
         if(m_parameters.size()==0)
             Log::info("HTTPRequest", "Downloading %s", m_url.c_str());
-        else
+        else if (Log::getLogLevel()<=Log::LL_INFO)
+        {
+            // Avoid printing the password or token, just replace them with *s
+            std::string param = m_parameters;
+            for (unsigned int j = 0; j < 2; j++)
+            {
+                // Get the string that should be replaced.
+                std::string s = (j == 0 ? "&password=" : "&token=");
+                std::size_t pos = param.find(s);
+                if (pos != std::string::npos)
+                {
+                    pos += s.size();
+                    while (pos < param.size() && param[pos] != '&')
+                    {
+                        param[pos] = '*';
+                        pos++;
+                    }   // while not end
+                }   // if string found
+            }   // for j < 2
             Log::info("HTTPRequest", "Sending %s to %s",
-                       m_parameters.c_str(), m_url.c_str());
+                      param.c_str(), m_url.c_str());
+        }
         curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS,
                          m_parameters.c_str());
         std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );

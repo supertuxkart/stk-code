@@ -134,6 +134,10 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
     m_incorrect       = false;
     m_red_mark_widget = NULL;
     m_parent          = parent;
+    m_use_background_color = true;
+
+    setUseBackgroundColor();//except for multiplayer kart selection, this is false
+    setSpinnerWidgetPlayerID(m_player_id);
 }   // PlayerNameSpinner
 // ------------------------------------------------------------------------
 void PlayerNameSpinner::setID(const int m_player_id)
@@ -270,6 +274,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
+    
 
 
     // ----- Kart model view
@@ -410,12 +415,13 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
 
     // Change the player ID
     m_player_id = newPlayerID;
-
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
     if (m_player_ident_spinner != NULL)
+    {
         m_player_ident_spinner->setID(m_player_id);
+    }
 }   // setPlayerID
 
 // ------------------------------------------------------------------------
@@ -481,7 +487,7 @@ void PlayerKartWidget::add()
         const int player_amount = PlayerManager::get()->getNumPlayers();
         for (int n=0; n<player_amount; n++)
         {
-            core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
+            core::stringw name = PlayerManager::get()->getPlayer(n)->getName(); 	
             m_player_ident_spinner->addLabel( translations->fribidize(name) );
         }
 

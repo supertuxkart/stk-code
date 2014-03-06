@@ -33,6 +33,7 @@ namespace GUIEngine
     class Widget;
     class BubbleWidget;
     enum EventPropagation;
+   
 }
 namespace Online
 {
@@ -203,7 +204,6 @@ class PlayerNameSpinner : public GUIEngine::SpinnerWidget
     bool m_incorrect;
     irr::gui::IGUIImage* m_red_mark_widget;
     KartSelectionScreen* m_parent;
-
     //virtual EventPropagation focused(const int m_playerID) ;
 
 public:

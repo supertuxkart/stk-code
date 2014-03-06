@@ -104,12 +104,12 @@ private:
     void storeAchievements(const XMLNode * input);
 
 public:
-    Profile(const uint32_t           & userid,
-            const irr::core::stringw & username,
-            bool is_current_user = false       );
-    Profile(const XMLNode * xml,
-            ConstructorType type = C_DEFAULT);
-    ~Profile();
+          Profile(const uint32_t           & userid,
+                  const irr::core::stringw & username,
+                  bool is_current_user = false       );
+          Profile(const XMLNode * xml,
+                 ConstructorType type = C_DEFAULT);
+         ~Profile();
     void fetchFriends();
     const IDList&   getFriends();
     void fetchAchievements();
@@ -117,6 +117,7 @@ public:
     void addFriend(const uint32_t id);
     void deleteRelationalInfo();
     const IDList&   getAchievements();
+    void merge(Profile * profile);
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */
     bool hasFetchedAchievements() const { return m_has_fetched_achievements; }
@@ -127,24 +128,34 @@ public:
     /** True if the profile is not fetching data atm. */
     bool isReady() const { return m_state == S_READY; }
     // ------------------------------------------------------------------------
+    /** Returns true if this item is the current user. */
     bool isCurrentUser() const { return m_is_current_user; }
     // ------------------------------------------------------------------------
-    bool isFriend() const                 { return m_is_friend; }
+    bool isFriend() const { return m_is_friend; }
     // ------------------------------------------------------------------------
-    void setFriend()                      { m_is_friend = true; }
+    void setFriend()  { m_is_friend = true; }
     // ------------------------------------------------------------------------
-    RelationInfo* getRelationInfo()                { return m_relation_info; }
+    RelationInfo* getRelationInfo() { return m_relation_info; }
     // ------------------------------------------------------------------------
-    void setRelationInfo(RelationInfo * r){ delete m_relation_info; m_relation_info = r; }
-
-    void setCacheBit(bool cache_bit)      { m_cache_bit = cache_bit; }
-    bool getCacheBit() const              { return m_cache_bit; }
-
-    uint32_t getID() const                    { return m_id; }
-    const irr::core::stringw &      getUserName() const              { return m_username; }
-
-    void                            merge(Profile * profile);
-
+    void setRelationInfo(RelationInfo * r)
+    {
+        delete m_relation_info; m_relation_info = r; 
+    }   // setRelationInfo
+    // ------------------------------------------------------------------------
+    /** Sets the cache bit of this profile. Used by the cache eviction
+     *  algorithm. */
+    void setCacheBit(bool cache_bit)  { m_cache_bit = cache_bit; }
+    // ------------------------------------------------------------------------
+    /** Returns the cache bit for this profile. Used by the cache eviction
+     *  algorithm. */
+    bool getCacheBit() const { return m_cache_bit; }
+    // ------------------------------------------------------------------------
+    /** Returns the online id of this profile. */
+    uint32_t getID() const { return m_id; }
+    // ------------------------------------------------------------------------
+    /** Returns the user name of this profile. */
+    const irr::core::stringw& getUserName() const { return m_username; }
+    // ------------------------------------------------------------------------
 
 };   // class Profile
 
