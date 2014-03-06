@@ -160,12 +160,16 @@ FileManager::FileManager()
         root_dir = "../data/" ;
     else if(m_file_system->existFile("../../data"))
         root_dir = "../../data/" ;
+    // Test for old style build environment, with executable in root of stk
     else if(m_file_system->existFile(exe_path+"data"))
         root_dir = (exe_path+"data/").c_str();
-    else if(m_file_system->existFile(exe_path+"/../data"))
+    // Check for windows cmake style: bld/Debug/bin/supertuxkart.exe
+    else if (m_file_system->existFile(exe_path + "../../../data"))
+        root_dir = (exe_path + "../../../data/").c_str();
+    else if (m_file_system->existFile(exe_path + "../data"))
     {
         root_dir = exe_path.c_str();
-        root_dir += "/../data/";
+        root_dir += "../data/";
     }
     else
     {
@@ -351,7 +355,7 @@ FileManager::~FileManager()
  */
 void FileManager::addRootDirs(const std::string &roots)
 {
-    std::vector<std::string> all = StringUtils::split(roots, ':');
+    std::vector<std::string> all = StringUtils::splitPath(roots);
     for(unsigned int i=0; i<all.size(); i++)
     {
         if(all[i].size()==0 || all[i][all[i].size()-1]!='/')
