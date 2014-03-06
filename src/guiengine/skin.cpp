@@ -1222,10 +1222,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         }
     }
 
-    BoxRenderParams& params = (focused || pressed)
-                            ? SkinConfig::m_render_params["spinner::focused"]
-                            : SkinConfig::m_render_params["spinner::neutral"];
-
+    BoxRenderParams params;
     // defining a spinner widget to use the spinner widget class property(getBackgroundColor)
     SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
     if(q->getUseBackgroundColor())

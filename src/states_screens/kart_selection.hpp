@@ -213,10 +213,11 @@ public:
     // ------------------------------------------------------------------------
     /** Add a red mark on the spinner to mean "invalid choice" */
     void markAsIncorrect();
+    ~PlayerNameSpinner();
 
     // ------------------------------------------------------------------------
     /** Remove any red mark set with 'markAsIncorrect' */
-    void markAsCorrect();
+    void markAsCorrect();  
 };
 
 /** A widget representing the kart selection for a player (i.e. the player's

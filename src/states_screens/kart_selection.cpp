@@ -134,8 +134,6 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
     m_incorrect       = false;
     m_red_mark_widget = NULL;
     m_parent          = parent;
-    m_use_background_color = true;
-
     setUseBackgroundColor();//except for multiplayer kart selection, this is false
     setSpinnerWidgetPlayerID(m_player_id);
 }   // PlayerNameSpinner
@@ -143,7 +141,7 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
 void PlayerNameSpinner::setID(const int m_player_id)
 {
     PlayerNameSpinner::m_player_id = m_player_id;
-}   // setID
+}   // setID 
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
 void PlayerNameSpinner::markAsIncorrect()
@@ -179,6 +177,10 @@ void PlayerNameSpinner::markAsCorrect()
     }
 }   // markAsCorrect
 
+PlayerNameSpinner::~PlayerNameSpinner()
+{
+    unsetUseBackgroundColor();
+}
 // ============================================================================
 
 #if 0
@@ -382,7 +384,6 @@ PlayerKartWidget::~PlayerKartWidget()
 
     if (m_kart_name->getIrrlichtElement() != NULL)
         m_kart_name->getIrrlichtElement()->remove();
-
     getCurrentScreen()->manualRemoveWidget(this);
 
 #ifdef DEBUG
