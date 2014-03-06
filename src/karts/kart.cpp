@@ -1751,13 +1751,31 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         // a fence.
         btVector3 gravity = m_body->getGravity();
         gravity.normalize();
-        // Cast necessary since otherwise to operator- (vec3/btvector) exists
-        Vec3 impulse =  (btVector3)normal - gravity* btDot(normal, gravity);
-        if(impulse.getX() || impulse.getZ())
-            impulse.normalize();
-        else
-            impulse = Vec3(0, 0, -1); // Arbitrary
-        impulse *= m_kart_properties->getCollisionTerrainImpulse();
+        btVector3 kartvelocity = m_body->getLinearVelocity();
+        
+        //VdotN = cos(theta) where theta is angle b/w velocity and normal
+        btScalar VdotN = btDot(kartvelocity.normalized(),normal);
+        //impulse will have 2 components, parallel to the normal and perpendicular to the normal.
+        //the perpendicular component has been ignored becuase that way the collision looked nicer
+        //the parallel component is controlled by alpha.
+        //alpha should IDEALLY depend on the material and 0 <= alpha <= 1
+        //magnitude of parallel impulse = (1+alpha) * kartvelocity * cos(theta)
+        float alpha=0.5f;
+        btVector3 impulse_parallel = (kartvelocity.length()*(1+alpha)*VdotN)*normal;
+        btVector3 impulse = impulse_parallel;
+        //take only that component of impulse into accout which is perpendicular to gravity
+        impulse = impulse - btDot(impulse,gravity) * gravity;
+        if(!impulse.getX() && !impulse.getZ())
+            impulse = btVector3(-1,0,0);//arbitary value
+        
+        //impulse and velocity should be in opposite directions.
+        if(impulse.getX() * kartvelocity.getX() >0)
+            impulse.setX(-impulse.getX());
+        if(impulse.getY() * kartvelocity.getY() >0)
+            impulse.setY(-impulse.getY());
+        if(impulse.getZ() * kartvelocity.getZ() >0)
+            impulse.setZ(-impulse.getZ());
+        
         m_bounce_back_time = 0.2f;
         m_vehicle->setTimedCentralImpulse(0.1f, impulse);
     }
