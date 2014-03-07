@@ -153,11 +153,9 @@ void OnlineProfile::fetchAchievements()
     };   // class AchievementsRequest
     // ------------------------------------------------------------------------
 
-    AchievementsRequest * request = new AchievementsRequest();
-    request->setServerURL("client-user.php");
+    AchievementsRequest * request =
+        CurrentUser::createHTMLRequest<AchievementsRequest>();
     request->addParameter("action", "get-achievements");
-    request->addParameter("token", CurrentUser::get()->getToken());
-    request->addParameter("userid", CurrentUser::get()->getID());
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);
 }   // fetchAchievements
@@ -207,12 +205,9 @@ void OnlineProfile::fetchFriends()
         }   // callback
     };   // class FriendsListRequest
     // ------------------------------------------------------------------------
-
-    FriendsListRequest * request = new FriendsListRequest();
-    request->setServerURL("client-user.php");
+    FriendsListRequest* request =
+        CurrentUser::createHTMLRequest<FriendsListRequest>();
     request->addParameter("action", "get-friends-list");
-    request->addParameter("token", CurrentUser::get()->getToken());
-    request->addParameter("userid", CurrentUser::get()->getID());
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);
 }   // fetchFriends

@@ -19,6 +19,7 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
+#include "online/http_request.hpp"
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/xml_request.hpp"
@@ -166,6 +167,18 @@ namespace Online
             /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
+            template <class C>
+            static C* createHTMLRequest()
+            {
+                CurrentUser *cu = CurrentUser::get();
+                assert(cu->m_state == US_SIGNED_IN);
+                assert(cu->m_profile);
+                C *request = new C();
+                request->setServerURL("client-user.php");
+                request->addParameter("token", cu->m_token);
+                request->addParameter("userid", cu->m_profile->getID());
+                return request;
+            }   // createRequest
 
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
@@ -205,14 +218,20 @@ namespace Online
 
             irr::core::stringw              getUserName()           const;
             uint32_t                        getID()                 const;
+            // ----------------------------------------------------------------
             /** Returns the user state. */
-            const UserState                 getUserState()          const { return m_state; }
+            const UserState getUserState() const { return m_state; }
+            // ----------------------------------------------------------------
             /** Returns whether a user is signed in or not. */
-            bool                            isRegisteredUser()      const { return m_state == US_SIGNED_IN; }
+            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
+            // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
-            const std::string &             getToken()              const { return m_token; }
-            /** Returns a pointer to the profile associated with the current user. */
-            OnlineProfile *                 getProfile()            const { return m_profile; }
+            const std::string& getToken() const { return m_token; }
+            // ----------------------------------------------------------------
+            /** Returns a pointer to the profile associated with the current
+             *  user. */
+            OnlineProfile* getProfile() const { return m_profile; }
+            // ----------------------------------------------------------------
 
     };   // class CurrentUser
 
