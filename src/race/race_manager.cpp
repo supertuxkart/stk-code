@@ -340,7 +340,8 @@ void RaceManager::startNew(bool from_overworld)
     }
 
     m_track_number = 0;
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && !NetworkWorld::getInstance()->isRunning()) // offline mode only
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && 
+        !NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // offline mode only
     {
         //We look if Player 1 has a saved version of this GP.
         // =================================================
