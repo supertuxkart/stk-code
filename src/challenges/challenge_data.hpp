@@ -111,11 +111,7 @@ private:
     irr::core::stringw m_challenge_description;
 
 public:
-#ifdef WIN32
                  ChallengeData(const std::string& filename);
-#else
-                 ChallengeData(const std::string& filename) throw(std::runtime_error);
-#endif
 
     virtual      ~ChallengeData() {}
 

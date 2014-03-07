@@ -400,6 +400,9 @@ void cmdLineHelp()
                               " and the music.\n"
     "  -t,  --track=NAME       Start at track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
+    "       --add-gp-dir=DIR   Load Grand Prix in DIR. Setting will be saved "
+                              "inconfig.xml under additional_gp_directory. Use "
+                              "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
     "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
@@ -581,6 +584,19 @@ int handleCmdLinePreliminary()
                           IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
     }   // --verbose or -v
+    
+    // Enable loading GP's from local directory
+    if(CommandLine::has("--add-gp-dir", &s))
+    {
+        // Ensure that the path ends with a /
+        if (s[s.size()] == '/')
+            UserConfigParams::m_additional_gp_directory = s;
+        else
+            UserConfigParams::m_additional_gp_directory = s + "/";
+
+        Log::info("main", "Additional Grand Prix's will be loaded from %s",
+                           UserConfigParams::m_additional_gp_directory.c_str());
+    }
 
     int n;
     if(CommandLine::has("--xmas", &n))
