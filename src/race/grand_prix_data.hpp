@@ -74,9 +74,8 @@ public:
 #pragma warning(disable:4290)
 #endif
     GrandPrixData () {}; // empty for initialising
-    GrandPrixData (const std::string filename) throw(std::logic_error);
-    GrandPrixData (const std::string dir, const std::string filename)
-                   throw(std::logic_error);
+    GrandPrixData(const std::string filename);
+    GrandPrixData (const std::string dir, const std::string filename);
 
 
     bool checkConsistency(bool chatty=true) const;

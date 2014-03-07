@@ -31,16 +31,15 @@
 #include <iostream>
 #include <stdexcept>
 
-GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
+GrandPrixData::GrandPrixData(const std::string filename)
 {
     load_from_file(file_manager->getAsset(FileManager::GRANDPRIX, filename),
                    filename);
 }
 // ----------------------------------------------------------------------------
 GrandPrixData::GrandPrixData(const std::string dir, const std::string filename)
-                             throw(std::logic_error)
 {
-    assert(dir[dir.size()] == '/');
+    assert(dir[dir.size() - 1] == '/');
     load_from_file(dir + filename, filename);
 }
 // ----------------------------------------------------------------------------
