@@ -105,7 +105,8 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
     else if (name == m_friends_list_widget->m_properties[GUIEngine::PROP_ID])
     {
         int index = m_friends_list_widget->getSelectionID();
-        new UserInfoDialog(m_visiting_profile->getFriends()[index]);
+        if (index>-1)
+            new UserInfoDialog(m_visiting_profile->getFriends()[index]);
     }
 }   // eventCallback
 
