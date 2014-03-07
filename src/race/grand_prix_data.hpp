@@ -27,6 +27,7 @@
 #include <stdexcept>
 
 #include "utils/translation.hpp"
+#include "io/file_manager.hpp"
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
@@ -34,6 +35,7 @@
   */
 class GrandPrixData
 {
+private:
     /** The name of the grand prix. */
     irr::core::stringw m_name;
 
@@ -63,6 +65,7 @@ class GrandPrixData
     /** Whether the track in question should be done in reverse mode */
     std::vector<bool> m_reversed;
 
+    void load_from_file(const std::string fullpath, const std::string filename);
     bool isTrackAvailable(const std::string &id) const;
 public:
 
@@ -70,8 +73,11 @@ public:
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #pragma warning(disable:4290)
 #endif
-                       GrandPrixData  (const std::string filename) throw(std::logic_error);
-                       GrandPrixData  ()       {}; // empty for initialising
+    GrandPrixData () {}; // empty for initialising
+    GrandPrixData (const std::string filename) throw(std::logic_error);
+    GrandPrixData (const std::string dir, const std::string filename)
+                   throw(std::logic_error);
+
 
     bool checkConsistency(bool chatty=true) const;
     const std::vector<std::string>& getTrackNames() const;

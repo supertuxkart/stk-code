@@ -396,6 +396,9 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "player_last",
             &m_gp_start_order,
             "Always put the player at the back or not (Bully mode).") );
+    PARAM_PREFIX StringUserConfigParam       m_additional_gp_directory
+        PARAM_DEFAULT( StringUserConfigParam("", "additional_gp_directory",
+                                            "Directory with additional GP's."));
 
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
