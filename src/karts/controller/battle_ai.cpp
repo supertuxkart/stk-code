@@ -179,7 +179,7 @@ void BattleAI::handleSteering(const float dt)
     m_target_node   =   player_node;
 	m_target_point = kart->getXYZ();
 
-	handleItemCollection(&m_target_point, &m_target_node);
+	//handleItemCollection(&m_target_point, &m_target_node);
 	m_debug_sphere->setPosition(m_target_point.toIrrVector());
     if(m_target_node == m_current_node)
     {
@@ -433,7 +433,7 @@ void BattleAI::handleBraking()
 
 	Vec3 d1 = m_kart->getXYZ() - m_target_point; Vec3 d2 = m_kart->getXYZ() - m_path_corners[0];
 	if (d1.length2_2d() < d2.length2_2d())
-		current_curve_radius = d1.length_2d() / 2.0f;
+		current_curve_radius = d1.length_2d();
 
     //std::cout<<"\n Radius: " << current_curve_radius;
     float max_turn_speed =
