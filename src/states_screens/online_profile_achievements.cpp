@@ -114,8 +114,13 @@ void OnlineProfileAchievements::eventCallback(Widget* widget, const std::string&
         m_selected_achievement_index = m_achievements_list_widget->getSelectionID();
 
         int id;
-        StringUtils::fromString(m_achievements_list_widget->getSelectionInternalName(), id);
-        new MessageDialog(AchievementsManager::get()->getAchievementInfo(id)->getDescription());
+        std::string achievement =
+            m_achievements_list_widget->getSelectionInternalName();
+        // Convert the achievement number into an integer, and if there 
+        // is no error, show the achievement (it can happen that the
+        // string is "" if no achievement exists)
+        if(StringUtils::fromString(achievement, id))
+            new MessageDialog(AchievementsManager::get()->getAchievementInfo(id)->getDescription());
     }
 }   // eventCallback
 
