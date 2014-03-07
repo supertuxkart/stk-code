@@ -40,7 +40,7 @@ GrandPrixData::GrandPrixData(const std::string filename) throw(std::logic_error)
 GrandPrixData::GrandPrixData(const std::string dir, const std::string filename)
                              throw(std::logic_error)
 {
-    assert(dir[dir.size()] == '/');
+    assert(dir[dir.size()-1] == '/');
     load_from_file(dir + filename, filename);
 }
 // ----------------------------------------------------------------------------
