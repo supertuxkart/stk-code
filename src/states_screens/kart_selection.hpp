@@ -19,14 +19,16 @@
 #ifndef KART_SELECTION_INCLUDED
 #define KART_SELECTION_INCLUDED
 
-#include <string>
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/state_manager.hpp"
+
 #include <IGUIImage.h>
+
+#include <string>
 
 namespace GUIEngine
 {
@@ -38,7 +40,9 @@ namespace GUIEngine
 namespace Online
 {
     class User;
+    class OnlineProfile;
 }
+
 class InputDevice;
 class PlayerKartWidget;
 class KartHoverListener;
@@ -247,7 +251,7 @@ class PlayerKartWidget : public GUIEngine::Widget,
     int m_player_id;
 
     /** Network info about the user. */
-    Online::Profile* m_associated_user;
+    Online::OnlineProfile* m_associated_user;
 
     /** Internal name of the spinner; useful to interpret spinner events,
      *  which contain the name of the activated object */
@@ -278,7 +282,7 @@ public:
 
     PlayerKartWidget(KartSelectionScreen* parent,
                      StateManager::ActivePlayer* associated_player,
-                     Online::Profile* associated_user,
+                     Online::OnlineProfile* associated_user,
                      core::recti area, const int player_id,
                      std::string kart_group,
                      const int irrlicht_idget_id=-1);

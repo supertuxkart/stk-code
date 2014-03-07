@@ -18,16 +18,16 @@
 
 #include "network/server_network_manager.hpp"
 
+#include "main_loop.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/get_peer_address.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/hide_public_address.hpp"
-#include "network/protocols/show_public_address.hpp"
-#include "network/protocols/get_peer_address.hpp"
-#include "network/protocols/connect_to_server.hpp"
-#include "network/protocols/stop_server.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
-
-#include "main_loop.hpp"
+#include "network/protocols/show_public_address.hpp"
+#include "network/protocols/stop_server.hpp"
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 #include <enet/enet.h>
 #include <pthread.h>

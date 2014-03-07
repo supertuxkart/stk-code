@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "online/profile.hpp"
+#include "online/online_profile.hpp"
 
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
@@ -35,7 +35,7 @@ using namespace Online;
 namespace Online
 {
 
-Profile::RelationInfo::RelationInfo(const irr::core::stringw & date, 
+OnlineProfile::RelationInfo::RelationInfo(const irr::core::stringw & date, 
                                     bool is_online, bool is_pending,
                                     bool is_asker)
 {
@@ -46,7 +46,7 @@ Profile::RelationInfo::RelationInfo(const irr::core::stringw & date,
 }   // RelationInfo::RelationInfo
 
 // ----------------------------------------------------------------------------
-void Profile::RelationInfo::setOnline(bool online)
+void OnlineProfile::RelationInfo::setOnline(bool online)
 {
     m_is_online = online;
     if (m_is_online)
@@ -57,9 +57,9 @@ void Profile::RelationInfo::setOnline(bool online)
 /** Constructor for a new profile.  It does only store the ID, a name, and
  *  if it is the current user.
  */
-Profile::Profile(const uint32_t  & userid,
-                 const irr::core::stringw & username,
-                  bool is_current_user)
+OnlineProfile::OnlineProfile(const uint32_t  & userid,
+                             const irr::core::stringw & username,
+                             bool is_current_user)
 {
     m_state                    = S_READY;
     m_cache_bit                = true;
@@ -81,7 +81,7 @@ Profile::Profile(const uint32_t  & userid,
  *  \param type Either C_DEFAULT (no relation), or C_RELATION_INFO
  *         if the XML node contains relation information.
  */
-Profile::Profile(const XMLNode * xml, ConstructorType type)
+OnlineProfile::OnlineProfile(const XMLNode * xml, ConstructorType type)
 {
     m_relation_info            = NULL;
     m_is_friend                = false;
@@ -115,20 +115,20 @@ Profile::Profile(const XMLNode * xml, ConstructorType type)
     xml->get("user_name", &m_username);
     m_is_current_user          = (m_id == CurrentUser::get()->getID());
     m_state = S_READY;
-}   // Profile(XMLNode)
+}   // OnlineProfile(XMLNode)
 
 // ----------------------------------------------------------------------------
-Profile::~Profile()
+OnlineProfile::~OnlineProfile()
 {
     delete m_relation_info;
-}   // ~Profile
+}   // ~OnlineProfile
 
 // ----------------------------------------------------------------------------
 /** Triggers an asynchronous request to get the achievements for this user
  *  from the server. The state of this profile is changed to be fetching,
  *  and will be reset to ready when the server request returns.
  */
-void Profile::fetchAchievements()
+void OnlineProfile::fetchAchievements()
 {
     assert(CurrentUser::get()->isRegisteredUser());
     if (m_has_fetched_achievements || m_is_current_user)
@@ -146,7 +146,7 @@ void Profile::fetchAchievements()
         {
             uint32_t user_id = 0;
             getXMLData()->get("visitingid", &user_id);
-            Profile *profile = ProfileManager::get()->getProfileByID(user_id);
+            OnlineProfile *profile = ProfileManager::get()->getProfileByID(user_id);
             if (profile)
                 profile->storeAchievements(getXMLData());
         }   // AchievementsRequest::callback
@@ -168,7 +168,7 @@ void Profile::fetchAchievements()
  *  READY again.
  *  \param input XML node with the achievements data.
  */
-void Profile::storeAchievements(const XMLNode * input)
+void OnlineProfile::storeAchievements(const XMLNode * input)
 {
     m_achievements.clear();
     std::string achieved_string("");
@@ -185,7 +185,7 @@ void Profile::storeAchievements(const XMLNode * input)
  *  The state of this profile is changed to be fetching,
  *  and will be reset to ready when the server request returns.
  */
-void Profile::fetchFriends()
+void OnlineProfile::fetchFriends()
 {
     assert(CurrentUser::get()->isRegisteredUser());
     if (m_has_fetched_friends)
@@ -201,7 +201,7 @@ void Profile::fetchFriends()
         {
             uint32_t user_id = 0;
             getXMLData()->get("visitingid", &user_id);
-            Profile *profile = ProfileManager::get()->getProfileByID(user_id);
+            OnlineProfile *profile = ProfileManager::get()->getProfileByID(user_id);
             if (profile)
                 profile->storeFriends(getXMLData());
         }   // callback
@@ -223,22 +223,23 @@ void Profile::fetchFriends()
  *  to be READY again.
  *  \param input XML node with the friends data.
  */
-void Profile::storeFriends(const XMLNode * input)
+void OnlineProfile::storeFriends(const XMLNode * input)
 {
     const XMLNode * friends_xml = input->getNode("friends");
     m_friends.clear();
     for (unsigned int i = 0; i < friends_xml->getNumNodes(); i++)
     {
-        Profile * profile;
+        OnlineProfile * profile;
         if (m_is_current_user)
         {
-            profile = new Profile(friends_xml->getNode(i), C_RELATION_INFO);
+            profile = new OnlineProfile(friends_xml->getNode(i), C_RELATION_INFO);
             m_friends.push_back(profile->getID());
             ProfileManager::get()->addPersistent(profile);
         }
         else
         {
-            profile = new Profile(friends_xml->getNode(i)->getNode("user"), C_DEFAULT);
+            profile = new OnlineProfile(friends_xml->getNode(i)->getNode("user"),
+                                        C_DEFAULT);
             m_friends.push_back(profile->getID());
             ProfileManager::get()->addToCache(profile);
         }
@@ -251,7 +252,7 @@ void Profile::storeFriends(const XMLNode * input)
 /** Removed a friend with a given id.
  *  \param id Friend id to remove.
  */
-void Profile::removeFriend(const uint32_t id)
+void OnlineProfile::removeFriend(const uint32_t id)
 {
     assert(m_has_fetched_friends);
     IDList::iterator iter;
@@ -271,7 +272,7 @@ void Profile::removeFriend(const uint32_t id)
 /** Adds a friend to the friend list.
  *  \param id The id of the profile to add.
  */
-void Profile::addFriend(const uint32_t id)
+void OnlineProfile::addFriend(const uint32_t id)
 {
     assert(m_has_fetched_friends);
     for (unsigned int i = 0; i < m_friends.size(); i++)
@@ -283,7 +284,7 @@ void Profile::addFriend(const uint32_t id)
 // ----------------------------------------------------------------------------
 /** Deletes the relational info for this profile.
  */
-void Profile::deleteRelationalInfo()
+void OnlineProfile::deleteRelationalInfo()
 {
     delete m_relation_info;
     m_relation_info = NULL;
@@ -292,7 +293,7 @@ void Profile::deleteRelationalInfo()
 // ----------------------------------------------------------------------------
 /** Returns the list of all friend ids.
  */
-const Profile::IDList& Profile::getFriends()
+const OnlineProfile::IDList& OnlineProfile::getFriends()
 {
     assert(m_has_fetched_friends && m_state == S_READY);
     return m_friends;
@@ -301,7 +302,7 @@ const Profile::IDList& Profile::getFriends()
 // ----------------------------------------------------------------------------
 /** Returns the list of all achievement ids.
  */
-const Profile::IDList& Profile::getAchievements()
+const OnlineProfile::IDList& OnlineProfile::getAchievements()
 {
     assert(m_has_fetched_achievements && m_state == S_READY && !m_is_current_user);
     return m_achievements;
@@ -312,7 +313,7 @@ const Profile::IDList& Profile::getAchievements()
  *  that is in the given profile that's not available in this profile will
  *  be copied over, then the given profile will be deleted.
  */
-void Profile::merge(Profile * profile)
+void OnlineProfile::merge(OnlineProfile *profile)
 {
     assert(profile != NULL);
     if (!this->m_has_fetched_friends && profile->m_has_fetched_friends)

@@ -48,7 +48,7 @@ protected:
     GUIEngine::IconButtonWidget * m_settings_tab;
 
     /** The profile that should be shown. */
-    Online::Profile *m_visiting_profile;
+    Online::OnlineProfile *m_visiting_profile;
 
 public:
 

@@ -20,8 +20,10 @@
 #define SHOW_PUBLIC_ADDRESS_HPP
 
 #include "network/protocol.hpp"
-#include "online/request.hpp"
+
 #include <string>
+
+namespace Online { class XMLRequest; }
 
 class ShowPublicAddress : public Protocol
 {

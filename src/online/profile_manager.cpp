@@ -20,6 +20,7 @@
 #include "online/profile_manager.hpp"
 
 #include "online/current_user.hpp"
+#include "online/online_profile.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -82,7 +83,7 @@ int  ProfileManager::guaranteeCacheSize(unsigned int min_num)
  *  FIXME: This should be improved to download the profile is necessary.
  *  \param id The id of the profile to find.
  */
-Profile * ProfileManager::getProfileByID(const uint32_t id)
+OnlineProfile* ProfileManager::getProfileByID(const uint32_t id)
 {
     if (inPersistent(id))
         return m_profiles_persistent[id];
@@ -100,7 +101,7 @@ Profile * ProfileManager::getProfileByID(const uint32_t id)
 *  with any new information from the given profile. Otherwise, the profile
 *  is just added to the cache.
 */
-void ProfileManager::addToCache(Profile * profile)
+void ProfileManager::addToCache(OnlineProfile * profile)
 {
     if (inPersistent(profile->getID()))
         m_profiles_persistent[profile->getID()]->merge(profile);
@@ -118,7 +119,7 @@ void ProfileManager::addToCache(Profile * profile)
  *  the RaceResultGUI to leave the race running (for the end animation) while
  *  the results are being shown.
  */
-void ProfileManager::addDirectToCache(Profile* profile)
+void ProfileManager::addDirectToCache(OnlineProfile* profile)
 {
     assert(profile != NULL);
     if (m_profiles_cache.size() == m_max_cache_size)
@@ -168,7 +169,7 @@ bool ProfileManager::isInCache(const uint32_t id)
 *  probability that most often used entries will remain in the cache,
 *  without adding much overhead.
 */
-void ProfileManager::updateCacheBits(Profile * profile)
+void ProfileManager::updateCacheBits(OnlineProfile * profile)
 {
     profile->setCacheBit(true);
     if (m_profiles_cache.size() == m_max_cache_size)
@@ -208,7 +209,7 @@ bool ProfileManager::inPersistent(const uint32_t id)
  *  the friends, while the other could have fetched the achievements.)
  *  \param profile The profile to make persistent.
  */
-void ProfileManager::addPersistent(Profile * profile)
+void ProfileManager::addPersistent(OnlineProfile * profile)
 {
     if (inPersistent(profile->getID()))
     {
@@ -260,7 +261,7 @@ void ProfileManager::moveToCache(const uint32_t id)
 {
     if (inPersistent(id))
     {
-        Profile * profile = getProfileByID(id);
+        OnlineProfile * profile = getProfileByID(id);
         m_profiles_persistent.erase(id);
         addToCache(profile);
     }

@@ -20,15 +20,17 @@
 #define HEADER_ONLINE_PROFILE_MANAGER_HPP
 
 #include "utils/types.hpp"
-#include "online/profile.hpp"
-
 
 #include <irrString.h>
 
+#include <assert.h>
+#include <map>
 #include <string>
 
 namespace Online
 {
+
+    class OnlineProfile;
 
 /** Class that manages all online profiles. Profiles are used for storing 
  *  online information from local users, but also to store information about
@@ -48,7 +50,7 @@ private:
     ~ProfileManager();
 
     /** The mapping of ids to profile. */
-    typedef std::map<uint32_t, Profile*>    ProfilesMap;
+    typedef std::map<uint32_t, OnlineProfile*>    ProfilesMap;
 
     /** A map of profiles that is persistent. (i.e. no automatic
      *  removing happens) Normally used for the current user's profile
@@ -62,15 +64,15 @@ private:
 
     /** A temporary profile that is currently being 'visited',
      *  e.g. its data is shown in a gui. */
-    Profile* m_currently_visiting;
+    OnlineProfile* m_currently_visiting;
 
     /** The max size of the m_profiles cache. Its default size can be 
      *  inrceased when necessary (e.g. when too many search results are
      *  loaded, to make sure they can be all stored). */
     unsigned int  m_max_cache_size;
 
-    void updateCacheBits(Profile * profile);
-    void addDirectToCache(Profile * profile);
+    void updateCacheBits(OnlineProfile * profile);
+    void addDirectToCache(OnlineProfile * profile);
 
 public:
     /** Create the singleton instance. */
@@ -98,15 +100,15 @@ public:
     }   // destroy
     // ----------------------------------------------------------------
 
-    void addToCache(Profile * profile);
-    void addPersistent(Profile * profile);
+    void addToCache(OnlineProfile *profile);
+    void addPersistent(OnlineProfile *profile);
     void deleteFromPersistent(const uint32_t id);
     void clearPersistent();
     void moveToCache(const uint32_t id);
     int  guaranteeCacheSize(unsigned int max_num);
     bool isInCache(const uint32_t id);
     bool inPersistent(const uint32_t id);
-    Profile* getProfileByID(const uint32_t id);
+    OnlineProfile* getProfileByID(const uint32_t id);
     // ----------------------------------------------------------------
     /** Marks a given profile to be the currently visited one. This
      *  is used to mark the profiles that ave its data display (e.g.
@@ -118,7 +120,7 @@ public:
     // ----------------------------------------------------------------
     /** \return the instance of the profile that's currently being
      *  visited */
-    Profile* getVisitingProfile() { return m_currently_visiting; }
+    OnlineProfile* getVisitingProfile() { return m_currently_visiting; }
 
 };   // class CurrentUser
 

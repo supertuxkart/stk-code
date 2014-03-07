@@ -20,7 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/profile.hpp"
+#include "online/online_profile.hpp"
 #include "online/request.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -57,7 +57,7 @@ private:
     irr::core::stringw                          m_last_search_string;
 
     /** The list of all IDs found. */
-    Online::Profile::IDList                     m_users;
+    Online::OnlineProfile::IDList               m_users;
 
     /** The online request to search for users. */
     Online::XMLRequest *m_search_request;

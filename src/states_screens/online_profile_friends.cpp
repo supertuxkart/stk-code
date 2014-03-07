@@ -115,11 +115,11 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
 void OnlineProfileFriends::displayResults()
 {
     m_friends_list_widget->clear();
-    const Profile::IDList &friends = m_visiting_profile->getFriends();
+    const OnlineProfile::IDList &friends = m_visiting_profile->getFriends();
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;
-        Profile* friend_profile = 
+        OnlineProfile* friend_profile = 
             ProfileManager::get()->getProfileByID(friends[i]);
 
         // When looking at friends of a friend those profiles are not
@@ -134,7 +134,7 @@ void OnlineProfileFriends::displayResults()
                                            -1, 2)                         );
         if (m_visiting_profile->isCurrentUser())
         {
-            Profile::RelationInfo * relation_info = 
+            OnlineProfile::RelationInfo * relation_info = 
                                              friend_profile->getRelationInfo();
             row.push_back(ListWidget::ListCell(relation_info->getDate(),
                                                -1, 1, true)             );

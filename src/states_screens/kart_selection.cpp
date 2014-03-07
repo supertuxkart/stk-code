@@ -40,7 +40,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
-#include "online/profile.hpp"
+#include "online/online_profile.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
@@ -191,7 +191,7 @@ void PlayerNameSpinner::markAsCorrect()
 
 PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                                    StateManager::ActivePlayer* associated_player,
-                                   Online::Profile* associated_user,
+                                   Online::OnlineProfile* associated_user,
                                    core::recti area, const int player_id,
                                    std::string kart_group,
                                    const int irrlicht_widget_id) : Widget(WTYPE_DIV)

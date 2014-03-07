@@ -18,21 +18,21 @@
 
 #include "network/protocols/server_lobby_room_protocol.hpp"
 
-#include "network/server_network_manager.hpp"
+#include "config/user_config.hpp"
+#include "modes/world.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/get_public_address.hpp"
 #include "network/protocols/show_public_address.hpp"
 #include "network/protocols/connect_to_peer.hpp"
 #include "network/protocols/start_server.hpp"
 #include "network/protocols/start_game_protocol.hpp"
-
+#include "network/server_network_manager.hpp"
 #include "online/current_user.hpp"
+#include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
-#include "config/user_config.hpp"
-#include "modes/world.hpp"
 #include "utils/log.hpp"
-#include "utils/time.hpp"
 #include "utils/random_generator.hpp"
+#include "utils/time.hpp"
 
 
 ServerLobbyRoomProtocol::ServerLobbyRoomProtocol() : LobbyRoomProtocol(NULL)
@@ -386,7 +386,7 @@ void ServerLobbyRoomProtocol::connectionRequested(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->race_id = m_next_id;
         profile->kart_name = "";
-        profile->user_profile = new Online::Profile(player_id, "");
+        profile->user_profile = new Online::OnlineProfile(player_id, "");
         m_setup->addPlayer(profile);
         peer->setPlayerProfile(profile);
         Log::verbose("ServerLobbyRoomProtocol", "New player.");

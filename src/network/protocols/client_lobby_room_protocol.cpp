@@ -18,14 +18,14 @@
 
 #include "network/protocols/client_lobby_room_protocol.hpp"
 
-#include "network/network_manager.hpp"
-#include "network/protocols/start_game_protocol.hpp"
-#include "network/network_world.hpp"
-
 #include "modes/world_with_rank.hpp"
+#include "network/network_manager.hpp"
+#include "network/network_world.hpp"
+#include "network/protocols/start_game_protocol.hpp"
 #include "online/current_user.hpp"
-#include "states_screens/state_manager.hpp"
+#include "online/online_profile.hpp"
 #include "states_screens/network_kart_selection.hpp"
+#include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
 
 ClientLobbyRoomProtocol::ClientLobbyRoomProtocol(const TransportAddress& server_address)
@@ -305,7 +305,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->kart_name = "";
         profile->race_id = race_id;
-        profile->user_profile = new Online::Profile(global_id, "");
+        profile->user_profile = new Online::OnlineProfile(global_id, "");
         m_setup->addPlayer(profile);
     }
     else
@@ -396,7 +396,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
 
             uint8_t race_id = data[1];
             uint32_t global_id = data.gui32(3);
-            Online::Profile* new_user = new Online::Profile(global_id, "");
+            Online::OnlineProfile* new_user = new Online::OnlineProfile(global_id, "");
 
             NetworkPlayerProfile* profile2 = new NetworkPlayerProfile();
             profile2->race_id = race_id;

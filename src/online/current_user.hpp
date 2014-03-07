@@ -21,7 +21,6 @@
 
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
-#include "online/profile.hpp"
 #include "online/xml_request.hpp"
 #include "utils/types.hpp"
 #include "utils/synchronised.hpp"
@@ -33,6 +32,8 @@
 
 namespace Online
 {
+
+    class OnlineProfile;
 
     // ============================================================================
 
@@ -152,7 +153,7 @@ namespace Online
             std::string                 m_token;
             bool                        m_save_session;
             UserState                   m_state;
-            Profile *                   m_profile;
+            OnlineProfile              *m_profile;
 
             bool saveSession()  const   { return m_save_session;      }
 
@@ -211,7 +212,7 @@ namespace Online
             /** Returns the session token of the signed in user. */
             const std::string &             getToken()              const { return m_token; }
             /** Returns a pointer to the profile associated with the current user. */
-            Profile *                       getProfile()            const { return m_profile; }
+            OnlineProfile *                 getProfile()            const { return m_profile; }
 
     };   // class CurrentUser
 

@@ -24,11 +24,12 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "online/messages.hpp"
+#include "online/online_profile.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "utils/translation.hpp"
-#include "online/messages.hpp"
 
 #include <IGUIButton.h>
 

@@ -21,6 +21,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
+#include "online/online_profile.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "states_screens/online_profile_overview.hpp"

@@ -26,8 +26,9 @@
 #include "config/user_config.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/screen.hpp"
-#include "online/servers_manager.hpp"
+#include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
+#include "online/servers_manager.hpp"
 #include "states_screens/login_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
@@ -188,7 +189,7 @@ namespace Online
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
-            m_profile = new Profile(userid, username, true);
+            m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_state = US_SIGNED_IN;
             if(saveSession())
@@ -409,8 +410,8 @@ namespace Online
         if(isSuccess())
         {
             CurrentUser::get()->getProfile()->addFriend(id);
-            Profile::RelationInfo *info = 
-                new Profile::RelationInfo(_("Today"), false, true, false);
+            OnlineProfile::RelationInfo *info = 
+                new OnlineProfile::RelationInfo(_("Today"), false, true, false);
             ProfileManager::get()->getProfileByID(id)->setRelationInfo(info);
             OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request send!");
@@ -452,10 +453,10 @@ namespace Online
         core::stringw info_text("");
         if(isSuccess())
         {
-            Profile * profile = ProfileManager::get()->getProfileByID(id);
+            OnlineProfile * profile = ProfileManager::get()->getProfileByID(id);
             profile->setFriend();
-            Profile::RelationInfo *info = 
-                     new Profile::RelationInfo(_("Today"), false, false, true);
+            OnlineProfile::RelationInfo *info = 
+                     new OnlineProfile::RelationInfo(_("Today"), false, false, true);
             profile->setRelationInfo(info);
             OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend request accepted!");
@@ -683,9 +684,9 @@ namespace Online
                              now_online = true;
                              online_friends.erase(iter);
                          }
-                         Profile * profile =
+                         OnlineProfile * profile =
                              ProfileManager::get()->getProfileByID(friends[i]);
-                         Profile::RelationInfo * relation_info = 
+                         OnlineProfile::RelationInfo * relation_info = 
                                                     profile->getRelationInfo();
                          if( relation_info->isOnline() )
                          {
@@ -755,9 +756,9 @@ namespace Online
                 const XMLNode * node = getXMLData()->getNode(i);
                 if(node->getName() == "new_friend_request")
                 {
-                    Profile::RelationInfo * ri = 
-                        new Profile::RelationInfo("New", false, true, true);
-                    Profile * p = new Profile(node);
+                    OnlineProfile::RelationInfo * ri = 
+                        new OnlineProfile::RelationInfo("New", false, true, true);
+                    OnlineProfile * p = new OnlineProfile(node);
                     p->setRelationInfo(ri);
                     ProfileManager::get()->addPersistent(p);
                     friend_request_count++;

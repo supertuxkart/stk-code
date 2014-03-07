@@ -37,7 +37,7 @@ namespace Online
  *  are managed by the ProfileManager.
  * \ingroup online
  */
-class Profile
+class OnlineProfile
 {
 public:
     enum ConstructorType
@@ -104,12 +104,12 @@ private:
     void storeAchievements(const XMLNode * input);
 
 public:
-          Profile(const uint32_t           & userid,
-                  const irr::core::stringw & username,
-                  bool is_current_user = false       );
-          Profile(const XMLNode * xml,
-                 ConstructorType type = C_DEFAULT);
-         ~Profile();
+          OnlineProfile(const uint32_t           & userid,
+                        const irr::core::stringw & username,
+                        bool is_current_user = false       );
+          OnlineProfile(const XMLNode * xml,
+                      ConstructorType type = C_DEFAULT);
+         ~OnlineProfile();
     void fetchFriends();
     const IDList&   getFriends();
     void fetchAchievements();
@@ -117,7 +117,7 @@ public:
     void addFriend(const uint32_t id);
     void deleteRelationalInfo();
     const IDList&   getAchievements();
-    void merge(Profile * profile);
+    void merge(OnlineProfile * profile);
     // ------------------------------------------------------------------------
     /** Returns true if the achievements for this profile have been fetched. */
     bool hasFetchedAchievements() const { return m_has_fetched_achievements; }
@@ -157,7 +157,7 @@ public:
     const irr::core::stringw& getUserName() const { return m_username; }
     // ------------------------------------------------------------------------
 
-};   // class Profile
+};   // class OnlineProfile
 
 } // namespace Online
 

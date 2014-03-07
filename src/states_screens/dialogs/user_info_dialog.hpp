@@ -19,14 +19,13 @@
 #ifndef HEADER_USER_INFO_DIALOG_HPP
 #define HEADER_USER_INFO_DIALOG_HPP
 
-#include <irrString.h>
-
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/profile_manager.hpp"
 #include "online/current_user.hpp"
+#include "online/profile_manager.hpp"
 #include "utils/types.hpp"
 
+#include <irrString.h>
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -45,7 +44,7 @@ private:
     irr::core::stringw m_info;
 
     const uint32_t m_showing_id;
-    Online::Profile * m_profile;
+    Online::OnlineProfile * m_profile;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;

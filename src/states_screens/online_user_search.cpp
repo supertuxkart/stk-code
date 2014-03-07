@@ -152,7 +152,7 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
     }
     for (unsigned int i = 0; i < n; i++)
     {
-        Profile * profile = new Profile(users_xml->getNode(i));
+        OnlineProfile * profile = new OnlineProfile(users_xml->getNode(i));
         // The id must be pushed before adding it to the cache, since
         // the cache might merge the new data with an existing entry
         m_users.push_back(profile->getID());
@@ -169,7 +169,7 @@ void OnlineUserSearch::showList()
     for (unsigned int i=0; i < m_users.size(); i++)
     {
         std::vector<GUIEngine::ListWidget::ListCell> row;
-        Profile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
+        OnlineProfile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
         // This could still happen if something pushed results out of the cache.
         if (!profile)
         {

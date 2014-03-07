@@ -17,15 +17,15 @@
 
 #include "states_screens/dialogs/user_info_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "states_screens/state_manager.hpp"
-#include "states_screens/online_profile_overview.hpp"
-#include "utils/translation.hpp"
+#include "online/online_profile.hpp"
 #include "online/messages.hpp"
+#include "states_screens/online_profile_overview.hpp"
+#include "states_screens/state_manager.hpp"
+#include "utils/translation.hpp"
 
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -93,7 +93,7 @@ void UserInfoDialog::beforeAddingWidgets()
         m_remove_widget->setVisible(true);
     }
 
-    Profile::RelationInfo * relation_info = m_profile->getRelationInfo();
+    OnlineProfile::RelationInfo * relation_info = m_profile->getRelationInfo();
     if(relation_info != NULL)
     {
         if(relation_info->isPending())
