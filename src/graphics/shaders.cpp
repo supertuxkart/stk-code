@@ -290,7 +290,7 @@ void Shaders::check(const int num) const
 {
     if (m_shaders[num] == -1)
     {
-        Log::fatal("shaders", "Shader %s failed to load. Update your drivers, if the issue "
+        Log::error("shaders", "Shader %s failed to load. Update your drivers, if the issue "
                               "persists, report a bug to us.", shader_names[num] + 3);
     }
 }
