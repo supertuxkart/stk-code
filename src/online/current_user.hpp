@@ -20,6 +20,7 @@
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
 #include "online/http_request.hpp"
+#include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/xml_request.hpp"
@@ -168,18 +169,7 @@ namespace Online
             static CurrentUser *            get();
             static void                     deallocate();
             template <class C>
-            static C* createHTMLRequest()
-            {
-                CurrentUser *cu = CurrentUser::get();
-                assert(cu->m_state == US_SIGNED_IN);
-                assert(cu->m_profile);
-                C *request = new C();
-                request->setServerURL("client-user.php");
-                request->addParameter("token", cu->m_token);
-                request->addParameter("userid", cu->m_profile->getID());
-                return request;
-            }   // createRequest
-
+            static C* createHTMLRequest();
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
@@ -234,6 +224,19 @@ namespace Online
             // ----------------------------------------------------------------
 
     };   // class CurrentUser
+
+    template <class C>
+    C* CurrentUser::createHTMLRequest()
+    {
+        CurrentUser *cu = CurrentUser::get();
+        assert(cu->m_state == US_SIGNED_IN);
+        assert(cu->m_profile);
+        C *request = new C();
+        request->setServerURL("client-user.php");
+        request->addParameter("token", cu->m_token);
+        request->addParameter("userid", cu->m_profile->getID());
+        return request;
+    }   // createRequest
 
 } // namespace Online
 
