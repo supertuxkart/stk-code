@@ -1222,30 +1222,28 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         }
     }
 
-    BoxRenderParams params;
-    // defining a spinner widget to use the spinner widget class property(getBackgroundColor)
+    BoxRenderParams* params;
     SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
     if(q->getUseBackgroundColor())
     {
         int player_id=q->getSpinnerWidgetPlayerID();
         if(player_id==0)
-            params=SkinConfig::m_render_params["spinner1::neutral"];
+            params=&SkinConfig::m_render_params["spinner1::neutral"];
         else if(player_id==1)
-            params=SkinConfig::m_render_params["spinner2::neutral"];
+            params=&SkinConfig::m_render_params["spinner2::neutral"];
         else if(player_id==2)
-            params=SkinConfig::m_render_params["spinner3::neutral"];
+            params=&SkinConfig::m_render_params["spinner3::neutral"];
         else if(player_id==3)
-            params=SkinConfig::m_render_params["spinner4::neutral"];
+            params=&SkinConfig::m_render_params["spinner4::neutral"];
     }
     else if (focused|| pressed)
     {
-        params=SkinConfig::m_render_params["spinner::focused"];
+        params=&SkinConfig::m_render_params["spinner::focused"];
     }
     else
     {
-        params=SkinConfig::m_render_params["spinner::neutral"];
+        params=&SkinConfig::m_render_params["spinner::neutral"];
     }
-
     if (widget->isFocusedForPlayer(0))
     {
         core::recti rect2 = rect;
@@ -1310,7 +1308,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                             - (int)center.Y)*texture_size);
     }
 
-    drawBoxFromStretchableTexture(widget, sized_rect, params,
+    drawBoxFromStretchableTexture(widget, sized_rect, *params,
                                   widget->m_deactivated);
 
 
@@ -1319,8 +1317,8 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
     
     if (w->isGauge() && !w->m_deactivated)
     {
-        const int handle_size = (int)( widget->m_h*params.m_left_border
-                                 /(float)params.getImage()->getSize().Height );
+        const int handle_size = (int)( widget->m_h*params->m_left_border
+                                 /(float)params->getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin())
                           / (w->getMax() - w->getMin());
 

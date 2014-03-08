@@ -141,6 +141,7 @@ PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
 void PlayerNameSpinner::setID(const int m_player_id)
 {
     PlayerNameSpinner::m_player_id = m_player_id;
+    setSpinnerWidgetPlayerID(m_player_id);
 }   // setID 
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
@@ -176,11 +177,6 @@ void PlayerNameSpinner::markAsCorrect()
         m_incorrect = false;
     }
 }   // markAsCorrect
-
-PlayerNameSpinner::~PlayerNameSpinner()
-{
-    unsetUseBackgroundColor();
-}
 // ============================================================================
 
 #if 0
@@ -416,6 +412,7 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
 
     // Change the player ID
     m_player_id = newPlayerID;
+    m_player_ident_spinner->setID(m_player_id);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 

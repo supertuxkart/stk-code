@@ -57,6 +57,9 @@ namespace GUIEngine
         
         int m_value, m_min, m_max;
         
+        int m_spinner_widget_player_id;
+        bool m_use_background_color;
+        
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
         std::vector<irr::core::stringw> m_labels;
         
@@ -96,8 +99,7 @@ namespace GUIEngine
         irr::video::ITexture* getTexture();
        
     public:
-        int m_spinner_widget_player_id;
-        bool m_use_background_color;
+
         LEAK_CHECK()
         
         SpinnerWidget(const bool gauge=false);
