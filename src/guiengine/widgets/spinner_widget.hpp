@@ -57,6 +57,9 @@ namespace GUIEngine
         
         int m_value, m_min, m_max;
         
+        int m_spinner_widget_player_id;
+        bool m_use_background_color;
+        
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
         std::vector<irr::core::stringw> m_labels;
         
@@ -69,10 +72,7 @@ namespace GUIEngine
           */
         bool m_gauge;
 	
-	//for setting background
-	bool m_use_background_color;
-	int m_spinner_widget_player_id;
-        
+	
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
         
@@ -99,7 +99,7 @@ namespace GUIEngine
         irr::video::ITexture* getTexture();
        
     public:
-        
+
         LEAK_CHECK()
         
         SpinnerWidget(const bool gauge=false);
@@ -110,10 +110,11 @@ namespace GUIEngine
         void clearLabels();
 
 	// next four functions are for background colour behind playername in multikart screen selection
-        void setUseBackgroundColor()                {m_use_background_color=true;}
-        bool getUseBackgroundColor()                {return m_use_background_color;}
+        void setUseBackgroundColor()                {m_use_background_color=true;        }
+        bool getUseBackgroundColor()                {return m_use_background_color;      }
         void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
-        int getSpinnerWidgetPlayerID()              {return m_spinner_widget_player_id;}
+        int getSpinnerWidgetPlayerID()              {return m_spinner_widget_player_id;  }
+        void unsetUseBackgroundColor()              {m_use_background_color=false;       }
 
 
 

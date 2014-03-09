@@ -39,7 +39,6 @@ using namespace irr::video;
 SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
 {
     m_gauge = gauge;
-
     m_listener = NULL;
     m_graphical = false;
     m_check_inside_me = true; //FIXME: not sure this is necessary
