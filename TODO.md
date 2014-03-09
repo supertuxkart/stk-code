@@ -20,7 +20,7 @@ no particular order):
    - Esp. different platforms
 6. Package creators
    - Create packages for 
-     - most common Linux Distributors
+     - most common Linux distributions
      - Windows
 7. Writers
    - Write documentation, ranging from man page, to
