@@ -1007,7 +1007,7 @@ static void getYml(GLenum face, size_t width, size_t height,
 static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, float *Coeff, float *Y00, float *Y1minus1, float *Y10, float *Y11,
     float *Y2minus2, float * Y2minus1, float * Y20, float *Y21, float *Y22)
 {
-    float d = sqrt(i * i + j * j + 1);
+    float d = sqrt((float)(i * i + j * j + 1));
     float solidangle = 1.;
     size_t idx = i * height + j;
     float reconstructedVal = Y00[idx] * Coeff[0];
@@ -1076,7 +1076,7 @@ static void projectSH(float *color[], size_t width, size_t height,
                 float d = sqrt(fi * fi + fj * fj + 1);
 
                 // Constant obtained by projecting unprojected ref values
-                float solidangle = 2.75 / (wh * pow(d, 1.5));
+                float solidangle = 2.75 / (wh * pow(d, 1.5f));
                 float b = color[face][4 * height * i + 4 * j] / 255.;
                 float g = color[face][4 * height * i + 4 * j + 1] / 255.;
                 float r = color[face][4 * height * i + 4 * j + 2] / 255.;
