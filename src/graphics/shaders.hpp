@@ -48,15 +48,38 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix, unsigned TU_texture);
 };
 
+class GrassPass1Shader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_normal, attrib_color;
+    static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_windDir;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::vector3df &windDirection, unsigned TU_tex);
+};
+
+class NormalMapShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_tangent, attrib_bitangent;
+    static GLuint uniform_MVP, uniform_TIMV, uniform_normalMap;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap);
+};
+
 class ObjectPass2Shader
 {
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_MVP, uniform_TM, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+    static GLuint uniform_MVP, uniform_TM, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo;
 
 	static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 };
 
 class DetailledObjectPass2Shader
@@ -64,10 +87,11 @@ class DetailledObjectPass2Shader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
-	static GLuint uniform_MVP, uniform_Albedo, uniform_Detail, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+	static GLuint uniform_MVP, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo, TU_detail;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_Albedo, unsigned TU_detail, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
 };
 
 class ObjectRimLimitShader
@@ -75,10 +99,11 @@ class ObjectRimLimitShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_normal, attrib_texcoord;
-	static GLuint uniform_MVP, uniform_TIMV, uniform_TM, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO,	uniform_screen,	uniform_ambient;
+	static GLuint uniform_MVP, uniform_TIMV, uniform_TM, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo;
 
 	static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
 };
 
 class UntexturedObjectShader
@@ -86,10 +111,10 @@ class UntexturedObjectShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_color;
-	static GLuint uniform_MVP, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+	static GLuint uniform_MVP, uniform_screen, uniform_ambient;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
 };
 
 class ObjectUnlitShader
@@ -97,10 +122,11 @@ class ObjectUnlitShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord;
-	static GLuint uniform_MVP, uniform_tex;
+    static GLuint uniform_MVP;
+    static GLuint TU_tex;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex);
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
 };
 
 class ObjectRefPass2Shader
@@ -108,21 +134,11 @@ class ObjectRefPass2Shader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord;
-	static GLuint uniform_MVP, uniform_TM, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+	static GLuint uniform_MVP, uniform_TM, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo;
 
 	static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
-};
-
-class GrassPass1Shader
-{
-public:
-	static GLuint Program;
-	static GLuint attrib_position, attrib_texcoord, attrib_normal, attrib_color;
-	static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_windDir;
-
-	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::vector3df &windDirection, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 };
 
 class GrassPass2Shader
@@ -130,21 +146,11 @@ class GrassPass2Shader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord, attrib_color;
-	static GLuint uniform_MVP, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient, uniform_windDir;
+	static GLuint uniform_MVP, uniform_screen, uniform_ambient, uniform_windDir;
+    static GLuint TU_Albedo;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_Albedo, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
-};
-
-class NormalMapShader
-{
-public:
-	static GLuint Program;
-	static GLuint attrib_position, attrib_texcoord, attrib_tangent, attrib_bitangent;
-	static GLuint uniform_MVP, uniform_TIMV, uniform_normalMap;
-
-	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap);
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection);
 };
 
 class SphereMapShader
@@ -152,10 +158,11 @@ class SphereMapShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_normal;
-    static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_invproj, uniform_screen;
+    static GLuint uniform_MVP, uniform_TIMV, uniform_invproj, uniform_screen;
+    static GLuint TU_tex;
 
 	static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen);
 };
 
 class SplattingShader
@@ -163,10 +170,11 @@ class SplattingShader
 public:
 	static GLuint Program;
 	static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
-	static GLuint uniform_MVP, uniform_tex_layout, uniform_tex_detail0, uniform_tex_detail1, uniform_tex_detail2, uniform_tex_detail3, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient;
+	static GLuint uniform_MVP, uniform_screen, uniform_ambient;
+    static GLuint TU_tex_layout, TU_tex_detail0, TU_tex_detail1, TU_tex_detail2, TU_tex_detail3;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex_layout, unsigned TU_tex_detail0, unsigned TU_tex_detail1, unsigned TU_tex_detail2, unsigned TU_tex_detail3, unsigned TU_DiffuseMap, unsigned TU_SpecularMap, unsigned TU_SSAO);
+	static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
 };
 
 class CausticsShader
@@ -174,10 +182,11 @@ class CausticsShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_MVP, uniform_dir, uniform_dir2, uniform_Albedo, uniform_DiffuseMap, uniform_SpecularMap, uniform_SSAO, uniform_screen, uniform_ambient, uniform_caustictex;
+    static GLuint uniform_MVP, uniform_dir, uniform_dir2, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo, TU_caustictex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_albedo, unsigned TU_DiffuseMap, unsigned TU_Specmap, unsigned TU_SSAO, unsigned TU_caustictex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen);
 };
 
 class BubbleShader

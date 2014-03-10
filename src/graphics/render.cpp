@@ -236,6 +236,14 @@ void IrrDriver::renderGLSL(float dt)
 		glDepthMask(GL_FALSE);
 		glDisable(GL_BLEND);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+        setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
+        setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
+        setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
+        if (!UserConfigParams::m_ssao)
+        {
+            GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+        }
         m_scene_manager->drawAll(m_renderpass);
 
         PROFILER_POP_CPU_MARKER();
