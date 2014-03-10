@@ -744,6 +744,73 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 
 // ----------------------------------------------------------------------------
 #define MAXLIGHT 16 // to be adjusted in pointlight.frag too
+
+
+static GLuint pointlightvbo = 0;
+static GLuint pointlightsvao = 0;
+
+struct PointLightInfo
+{
+    float posX;
+    float posY;
+    float posZ;
+    float energy;
+    float red;
+    float green;
+    float blue;
+    float padding;
+};
+
+void createPointLightVAO()
+{
+    glGenVertexArrays(1, &pointlightsvao);
+    glBindVertexArray(pointlightsvao);
+
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
+    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Corner);
+    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Corner, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+    glGenBuffers(1, &pointlightvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, pointlightvbo);
+    glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0, GL_DYNAMIC_DRAW);
+
+    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Position);
+    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
+    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Energy);
+    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Energy, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Color);
+    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Color, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(4 * sizeof(float)));
+
+    glVertexAttribDivisor(MeshShader::PointLightShader::attrib_Position, 1);
+    glVertexAttribDivisor(MeshShader::PointLightShader::attrib_Energy, 1);
+    glVertexAttribDivisor(MeshShader::PointLightShader::attrib_Color, 1);
+}
+
+static void renderPointLights()
+{
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthMask(GL_FALSE);
+
+    glUseProgram(MeshShader::PointLightShader::Program);
+    glBindVertexArray(pointlightsvao);
+
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    MeshShader::PointLightShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 200, 0, 1);
+
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MAXLIGHT);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+}
+
+PointLightInfo PointLightsInfo[MAXLIGHT];
+
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              scene::ICameraSceneNode * const camnode,
                              video::SOverrideMaterial &overridemat,
@@ -765,9 +832,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     const u32 lightcount = m_lights.size();
     const core::vector3df &campos =
         irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
-    std::vector<float> accumulatedLightPos;
-    std::vector<float> accumulatedLightColor;
-    std::vector<float> accumulatedLightEnergy;
+
     std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
     {
@@ -793,7 +858,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     {
         for (unsigned j = 0; j < BucketedLN[i].size(); j++)
         {
-            if (++lightnum > MAXLIGHT)
+            if (++lightnum >= MAXLIGHT)
             {
                 LightNode* light_node = BucketedLN[i].at(j);
                 light_node->setEnergyMultiplier(0.0f);
@@ -809,17 +874,16 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                 }
 
                 const core::vector3df &pos = light_node->getAbsolutePosition();
-                accumulatedLightPos.push_back(pos.X);
-                accumulatedLightPos.push_back(pos.Y);
-                accumulatedLightPos.push_back(pos.Z);
-                accumulatedLightPos.push_back(0.);
-                const core::vector3df &col = light_node->getColor();
+                PointLightsInfo[lightnum].posX = pos.X;
+                PointLightsInfo[lightnum].posY = pos.Y;
+                PointLightsInfo[lightnum].posZ = pos.Z;
 
-                accumulatedLightColor.push_back(col.X);
-                accumulatedLightColor.push_back(col.Y);
-                accumulatedLightColor.push_back(col.Z);
-                accumulatedLightColor.push_back(0.);
-                accumulatedLightEnergy.push_back(light_node->getEffectiveEnergy());
+                PointLightsInfo[lightnum].energy = light_node->getEffectiveEnergy();
+
+                const core::vector3df &col = light_node->getColor();
+                PointLightsInfo[lightnum].red = col.X;
+                PointLightsInfo[lightnum].green = col.Y;
+                PointLightsInfo[lightnum].blue = col.Z;
             }
         }
         if (lightnum > MAXLIGHT)
@@ -828,19 +892,20 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
           break;
         }
     }
+
+    lightnum++;
+
 	// Fill lights
 	for (; lightnum < MAXLIGHT; lightnum++) {
-		accumulatedLightPos.push_back(0.);
-		accumulatedLightPos.push_back(0.);
-		accumulatedLightPos.push_back(0.);
-		accumulatedLightPos.push_back(0.);
-		accumulatedLightColor.push_back(0.);
-		accumulatedLightColor.push_back(0.);
-		accumulatedLightColor.push_back(0.);
-		accumulatedLightColor.push_back(0.);
-		accumulatedLightEnergy.push_back(0.);
+        PointLightsInfo[lightnum].energy = 0;
 	}
-	m_post_processing->renderPointlight(accumulatedLightPos, accumulatedLightColor, accumulatedLightEnergy);
+
+    if (!pointlightsvao)
+        createPointLightVAO();
+    glBindVertexArray(pointlightsvao);
+    glBindBuffer(GL_ARRAY_BUFFER, pointlightvbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, MAXLIGHT * sizeof(PointLightInfo), PointLightsInfo);
+    renderPointLights();
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     // Handle SSAO

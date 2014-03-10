@@ -24,6 +24,11 @@
 typedef unsigned int	GLuint;
 using namespace irr;
 
+class SharedObject
+{
+public:
+    static GLuint billboardvbo;
+};
 namespace MeshShader
 {
 class ObjectPass1Shader
@@ -222,6 +227,18 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
 };
 
+class PointLightShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_Position, attrib_Energy, attrib_Color;
+    static GLuint attrib_Corner;
+    static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen, uniform_invproj, uniform_VM, uniform_PM;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
+};
+
 class BillboardShader
 {
 public:
@@ -393,17 +410,6 @@ public:
 	static GLuint vao;
 
 	static void init();
-};
-
-class PointLightShader
-{
-public:
-	static GLuint Program;
-	static GLuint uniform_ntex, uniform_dtex, uniform_center, uniform_col, uniform_energy, uniform_spec, uniform_invproj, uniform_viewm;
-	static GLuint vao;
-
-	static void init();
-	static void setUniforms(const core::matrix4 &InvProjMatrix, const core::matrix4 &ViewMatrix, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class SunLightShader

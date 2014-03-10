@@ -73,7 +73,6 @@ public:
     void         update(float dt);
 
 	/** Generate diffuse and specular map */
-	void         renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy);
 	void         renderSunlight();
     void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 

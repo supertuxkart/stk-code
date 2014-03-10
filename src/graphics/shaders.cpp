@@ -89,6 +89,21 @@ static void initQuadBuffer()
 	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
 }
 
+GLuint SharedObject::billboardvbo = 0;
+
+static void initBillboardVBO()
+{
+    float quad[] = {
+        -.5, -.5, 0., 1.,
+        -.5, .5, 0., 0.,
+        .5, -.5, 1., 1.,
+        .5, .5, 1., 0.,
+    };
+    glGenBuffers(1, &(SharedObject::billboardvbo));
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
+    glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad, GL_STATIC_DRAW);
+}
+
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -215,6 +230,7 @@ void Shaders::loadShaders()
 	initGL();
 	initQuadVBO();
 	initQuadBuffer();
+    initBillboardVBO();
 	FullScreenShader::BloomBlendShader::init();
 	FullScreenShader::BloomShader::init();
 	FullScreenShader::ColorLevelShader::init();
@@ -227,7 +243,6 @@ void Shaders::loadShaders()
     FullScreenShader::PenumbraVShader::init();
 	FullScreenShader::GlowShader::init();
 	FullScreenShader::PassThroughShader::init();
-	FullScreenShader::PointLightShader::init();
 	FullScreenShader::SSAOShader::init();
 	FullScreenShader::SunLightShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
@@ -254,6 +269,7 @@ void Shaders::loadShaders()
 	MeshShader::TransparentShader::init();
     MeshShader::TransparentFogShader::init();
 	MeshShader::BillboardShader::init();
+    MeshShader::PointLightShader::init();
 	MeshShader::DisplaceShader::init();
     MeshShader::DisplaceMaskShader::init();
     MeshShader::ShadowShader::init();
@@ -921,6 +937,47 @@ namespace MeshShader
         glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
+
+    GLuint PointLightShader::Program;
+    GLuint PointLightShader::attrib_Position;
+    GLuint PointLightShader::attrib_Color;
+    GLuint PointLightShader::attrib_Energy;
+    GLuint PointLightShader::attrib_Corner;
+    GLuint PointLightShader::uniform_ntex;
+    GLuint PointLightShader::uniform_dtex;
+    GLuint PointLightShader::uniform_spec;
+    GLuint PointLightShader::uniform_screen;
+    GLuint PointLightShader::uniform_invproj;
+    GLuint PointLightShader::uniform_VM;
+    GLuint PointLightShader::uniform_PM;
+
+    void PointLightShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/pointlight.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
+        attrib_Position = glGetAttribLocation(Program, "Position");
+        attrib_Color = glGetAttribLocation(Program, "Color");
+        attrib_Energy = glGetAttribLocation(Program, "Energy");
+        attrib_Corner = glGetAttribLocation(Program, "Corner");
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_spec = glGetUniformLocation(Program, "spec");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_VM = glGetUniformLocation(Program, "ViewMatrix");
+        uniform_PM = glGetUniformLocation(Program, "ProjectionMatrix");
+    }
+
+    void PointLightShader::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
+    {
+        glUniform1f(uniform_spec, 200);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+        glUniformMatrix4fv(uniform_PM, 1, GL_FALSE, ProjMatrix.pointer());
+
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1i(uniform_dtex, TU_dtex);
+    }
 	
 	GLuint BillboardShader::Program;
 	GLuint BillboardShader::attrib_corner;
@@ -1364,44 +1421,6 @@ namespace FullScreenShader
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");
         uniform_invprojm = glGetUniformLocation(Program, "invprojm");
 		vao = createVAO(Program);
-	}
-
-	GLuint PointLightShader::Program;
-	GLuint PointLightShader::uniform_ntex;
-	GLuint PointLightShader::uniform_dtex;
-	GLuint PointLightShader::uniform_center;
-	GLuint PointLightShader::uniform_col;
-	GLuint PointLightShader::uniform_energy;
-	GLuint PointLightShader::uniform_spec;
-	GLuint PointLightShader::uniform_invproj;
-	GLuint PointLightShader::uniform_viewm;
-	GLuint PointLightShader::vao;
-
-	void PointLightShader::init()
-	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
-		uniform_ntex = glGetUniformLocation(Program, "ntex");
-		uniform_dtex = glGetUniformLocation(Program, "dtex");
-		uniform_center = glGetUniformLocation(Program, "center[0]");
-		uniform_col = glGetUniformLocation(Program, "col[0]");
-		uniform_energy = glGetUniformLocation(Program, "energy[0]");
-		uniform_spec = glGetUniformLocation(Program, "spec");
-		uniform_invproj = glGetUniformLocation(Program, "invproj");
-		uniform_viewm = glGetUniformLocation(Program, "viewm");
-		vao = createVAO(Program);
-	}
-
-	void PointLightShader::setUniforms(const core::matrix4 &InvProjMatrix, const core::matrix4 &ViewMatrix, const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
-	{
-		glUniform4fv(FullScreenShader::PointLightShader::uniform_center, 16, positions.data());
-		glUniform4fv(FullScreenShader::PointLightShader::uniform_col, 16, colors.data());
-		glUniform1fv(FullScreenShader::PointLightShader::uniform_energy, 16, energy.data());
-		glUniform1f(FullScreenShader::PointLightShader::uniform_spec, 200);
-		glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-		glUniformMatrix4fv(FullScreenShader::PointLightShader::uniform_viewm, 1, GL_FALSE, ViewMatrix.pointer());
-
-		glUniform1i(FullScreenShader::PointLightShader::uniform_ntex, TU_ntex);
-		glUniform1i(FullScreenShader::PointLightShader::uniform_dtex, TU_dtex);
 	}
 
 	GLuint SunLightShader::Program;
