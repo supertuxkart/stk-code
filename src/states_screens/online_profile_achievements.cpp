@@ -44,29 +44,35 @@ using namespace Online;
 DEFINE_SCREEN_SINGLETON( OnlineProfileAchievements );
 
 // -----------------------------------------------------------------------------
-
-OnlineProfileAchievements::OnlineProfileAchievements() : OnlineProfileBase("online/profile_achievements.stkgui")
+/** Constructor.
+ */
+OnlineProfileAchievements::OnlineProfileAchievements() 
+                      : OnlineProfileBase("online/profile_achievements.stkgui")
 {
     m_selected_achievement_index = -1;
 }   // OnlineProfileAchievements
 
 // -----------------------------------------------------------------------------
-
+/** Callback when the xml file was loaded.
+ */
 void OnlineProfileAchievements::loadedFromFile()
 {
     OnlineProfileBase::loadedFromFile();
-    m_achievements_list_widget = getWidget<GUIEngine::ListWidget>("achievements_list");
+    m_achievements_list_widget = getWidget<ListWidget>("achievements_list");
     assert(m_achievements_list_widget != NULL);
 
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-
+/** Callback before widgets are added. Clears all widgets.
+ */
 void OnlineProfileAchievements::beforeAddingWidget()
 {
     OnlineProfileBase::beforeAddingWidget();
     m_achievements_list_widget->clearColumns();
     m_achievements_list_widget->addColumn( _("Name"), 2 );
+    // For the currently logged in user achievement progress will 
+    // also be displayed.
     if(m_visiting_profile && m_visiting_profile->isCurrentUser())
     {
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
@@ -74,74 +80,99 @@ void OnlineProfileAchievements::beforeAddingWidget()
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
-
+/** Called when entering this menu (after widgets have been added).
+*/
 void OnlineProfileAchievements::init()
 {
     OnlineProfileBase::init();
-    m_profile_tabs->select( m_achievements_tab->m_properties[PROP_ID], PLAYER_ID_GAME_MASTER );
+    m_profile_tabs->select( m_achievements_tab->m_properties[PROP_ID], 
+                            PLAYER_ID_GAME_MASTER                       );
     assert(m_visiting_profile != NULL);
+
+    // For current user add the progrss information.
     if(m_visiting_profile->isCurrentUser())
     {
+        // No need to wait for results, since they are local anyway
         m_waiting_for_achievements = false;
         m_achievements_list_widget->clear();
         const std::map<uint32_t, Achievement *> & all_achievements =
             PlayerManager::get()->getCurrentPlayer()->getAchievementsStatus()
                                                     ->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
-        for (it = all_achievements.begin(); it != all_achievements.end(); ++it )
+        for (it = all_achievements.begin(); it != all_achievements.end(); ++it)
         {
-            std::vector<GUIEngine::ListWidget::ListCell> row;
-            row.push_back(GUIEngine::ListWidget::ListCell(it->second->getInfo()->getTitle(),-1,2));
-            row.push_back(GUIEngine::ListWidget::ListCell(it->second->getProgressAsString(),-1,1, true));
-            m_achievements_list_widget->addItem(StringUtils::toString(it->second->getInfo()->getID()), row);
+            std::vector<ListWidget::ListCell> row;
+            const Achievement *a = it->second;
+            ListWidget::ListCell title(a->getInfo()->getTitle(), -1, 2);
+            ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
+            row.push_back(title);
+            row.push_back(progress);
+            m_achievements_list_widget->addItem(
+                          StringUtils::toString(a->getInfo()->getID()), row);
         }
     }
     else
     {
+        // Show achievements of a remote user. Set the waiting flag
+        // and submit a request to get the achievement data.
         m_waiting_for_achievements = true;
         m_visiting_profile->fetchAchievements();
         m_achievements_list_widget->clear();
-        m_achievements_list_widget->addItem("loading", Messages::fetchingAchievements());
+        m_achievements_list_widget->addItem("loading", 
+                                             Messages::fetchingAchievements());
     }
 }   // init
+
 // -----------------------------------------------------------------------------
 
-void OnlineProfileAchievements::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void OnlineProfileAchievements::eventCallback(Widget* widget, 
+                                              const std::string& name,
+                                              const int playerID)
 {
     OnlineProfileBase::eventCallback( widget, name, playerID);
     if (name == m_achievements_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_achievement_index = m_achievements_list_widget->getSelectionID();
+        m_selected_achievement_index = 
+                                  m_achievements_list_widget->getSelectionID();
 
         int id;
         std::string achievement =
             m_achievements_list_widget->getSelectionInternalName();
-        // Convert the achievement number into an integer, and if there 
+        // Convert the achievement number into an integer, and if there
         // is no error, show the achievement (it can happen that the
         // string is "" if no achievement exists)
         if(StringUtils::fromString(achievement, id))
-            new MessageDialog(AchievementsManager::get()->getAchievementInfo(id)->getDescription());
+            new MessageDialog(AchievementsManager::get()
+                                   ->getAchievementInfo(id)->getDescription());
     }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+/** Called every frame. It will check if results from an achievement request
+ *  have been received, and if so, display them.
+ */
 void OnlineProfileAchievements::onUpdate(float delta)
 {
-    if(m_waiting_for_achievements)
+    if (!m_waiting_for_achievements) return;
+
+    if (!m_visiting_profile->isReady())
     {
-        if(m_visiting_profile->isReady())
-        {
-            m_achievements_list_widget->clear();
-            for(unsigned int i = 0; i < m_visiting_profile->getAchievements().size(); i++)
-            {
-                AchievementInfo * info = AchievementsManager::get()->getAchievementInfo(m_visiting_profile->getAchievements()[i]);
-                m_achievements_list_widget->addItem(StringUtils::toString(info->getID()), info->getTitle());
-            }
-            m_waiting_for_achievements = false;
-        }
-        else
-        {
-                m_achievements_list_widget->renameItem("loading", Messages::fetchingFriends());
-        }
+        // This will display an increasing number of dots while waiting.
+        m_achievements_list_widget->renameItem("loading",
+                                             Messages::fetchingAchievements());
+        return;
     }
-}
+
+    // Now reesults are available, display them.
+    m_achievements_list_widget->clear();
+    const OnlineProfile::IDList &a = m_visiting_profile->getAchievements();
+    for (unsigned int i = 0; i < a.size(); i++)
+    {
+        AchievementInfo *info = 
+                          AchievementsManager::get()->getAchievementInfo(a[i]);
+        m_achievements_list_widget->addItem(StringUtils::toString(info->getID()),
+                                            info->getTitle()                   );
+    }
+    m_waiting_for_achievements = false;
+
+}   // onUpdate

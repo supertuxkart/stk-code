@@ -68,7 +68,7 @@ public:
     void increase(const std::string & key, int increase = 1);
 
     virtual void reset();
-    virtual irr::core::stringw getProgressAsString();
+    virtual irr::core::stringw getProgressAsString() const;
     void onRaceEnd();
     // ------------------------------------------------------------------------
     /** Returns the id of this achievement. */

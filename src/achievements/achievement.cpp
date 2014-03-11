@@ -113,7 +113,7 @@ void Achievement::reset()
  *  The AchievementInfo adds up all goal values to get 'm', and this
  *  this class end up all current key values for 'n'.
  */
-irr::core::stringw Achievement::getProgressAsString()
+irr::core::stringw Achievement::getProgressAsString() const
 {
     int progress = 0;
     std::map<std::string, int>::const_iterator iter;
