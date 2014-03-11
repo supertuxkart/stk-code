@@ -168,8 +168,8 @@ namespace Online
             /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
-            template <class C>
-            static C* createHTMLRequest();
+            static void setUserDetails(HTTPRequest *html);
+
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
@@ -224,19 +224,6 @@ namespace Online
             // ----------------------------------------------------------------
 
     };   // class CurrentUser
-
-    template <class C>
-    C* CurrentUser::createHTMLRequest()
-    {
-        CurrentUser *cu = CurrentUser::get();
-        assert(cu->m_state == US_SIGNED_IN);
-        assert(cu->m_profile);
-        C *request = new C();
-        request->setServerURL("client-user.php");
-        request->addParameter("token", cu->m_token);
-        request->addParameter("userid", cu->m_profile->getID());
-        return request;
-    }   // createRequest
 
 } // namespace Online
 
