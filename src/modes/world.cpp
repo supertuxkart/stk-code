@@ -447,6 +447,11 @@ void World::terminateRace()
 
     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
                                        getTrack()->getIdent(), 1);
+    if (raceHasLaps())
+    {
+        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
+                                           "laps", race_manager->getNumLaps());
+    }
     PlayerManager::get()->getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();
