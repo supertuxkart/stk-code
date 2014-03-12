@@ -47,9 +47,9 @@ OnlineProfileBase::OnlineProfileBase(const char* filename) : Screen(filename)
  */
 void OnlineProfileBase::loadedFromFile()
 {
-    m_profile_tabs = this->getWidget<RibbonWidget>("profile_tabs");
+    m_profile_tabs = getWidget<RibbonWidget>("profile_tabs");
     assert(m_profile_tabs != NULL);
-    m_header = this->getWidget<LabelWidget>("title");
+    m_header = getWidget<LabelWidget>("title");
     assert(m_header != NULL);
 
     m_overview_tab = 
@@ -75,6 +75,13 @@ void OnlineProfileBase::beforeAddingWidget()
     m_visiting_profile = ProfileManager::get()->getVisitingProfile();
     if (!m_visiting_profile || !m_visiting_profile->isCurrentUser())
         m_settings_tab->setVisible(false);
+
+    // If not logged in, don't show profile or friends
+    if (!m_visiting_profile)
+    {
+        m_friends_tab->setVisible(false);
+        m_profile_tabs->setVisible(false);
+    }
 }   // beforeAddingWidget
 
 // -----------------------------------------------------------------------------
@@ -89,7 +96,8 @@ void OnlineProfileBase::init()
     m_achievements_tab->setTooltip( _("Achievements") );
     m_settings_tab->setTooltip( _("Account Settings") );
 
-    if (m_visiting_profile && m_visiting_profile->isCurrentUser())
+    // If no visiting_profile is defined, use the data of the current player.
+    if (!m_visiting_profile || m_visiting_profile->isCurrentUser())
         m_header->setText(_("Your profile"), false);
     else if (m_visiting_profile)
     {

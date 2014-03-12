@@ -71,9 +71,10 @@ void OnlineProfileAchievements::beforeAddingWidget()
     OnlineProfileBase::beforeAddingWidget();
     m_achievements_list_widget->clearColumns();
     m_achievements_list_widget->addColumn( _("Name"), 2 );
-    // For the currently logged in user achievement progress will 
-    // also be displayed.
-    if(m_visiting_profile && m_visiting_profile->isCurrentUser())
+
+    // For the current player (even if not logged in, i.e. m_visiting_profile
+    // = NULL) user achievement progress will  also be displayed 
+    if(!m_visiting_profile || m_visiting_profile->isCurrentUser())
     {
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
     }
@@ -87,10 +88,10 @@ void OnlineProfileAchievements::init()
     OnlineProfileBase::init();
     m_profile_tabs->select( m_achievements_tab->m_properties[PROP_ID], 
                             PLAYER_ID_GAME_MASTER                       );
-    assert(m_visiting_profile != NULL);
 
     // For current user add the progrss information.
-    if(m_visiting_profile->isCurrentUser())
+    // m_visiting_profile is NULL if the user is not logged in.
+    if(!m_visiting_profile || m_visiting_profile->isCurrentUser())
     {
         // No need to wait for results, since they are local anyway
         m_waiting_for_achievements = false;
