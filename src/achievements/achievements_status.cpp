@@ -110,7 +110,7 @@ Achievement * AchievementsStatus::getAchievement(uint32_t id)
     if ( m_achievements.find(id) != m_achievements.end())
         return m_achievements[id];
     return NULL;
-}
+}   // getAchievement
 
 // ----------------------------------------------------------------------------
 void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
@@ -121,7 +121,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
         if(achievement != NULL)
             achievement->setAchieved();
     }
-}
+}   // sync
 
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onRaceEnd()
@@ -131,4 +131,4 @@ void AchievementsStatus::onRaceEnd()
     for ( iter = m_achievements.begin(); iter != m_achievements.end(); ++iter ) {
         iter->second->onRaceEnd();
     }
-}
+}   // onRaceEnd
