@@ -291,7 +291,8 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     glBindVertexArray(FullScreenShader::DiffuseEnvMapShader::vao);
 
     setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::DiffuseEnvMapShader::setUniforms(bSHCoeff, gSHCoeff, rSHCoeff, 0);
+    core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
+    FullScreenShader::DiffuseEnvMapShader::setUniforms(TVM, bSHCoeff, gSHCoeff, rSHCoeff, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);

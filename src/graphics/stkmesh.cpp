@@ -284,7 +284,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   }
 
-  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
+  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getViewMatrix().getTransposed(), TransposeInverseModelView, irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
 
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);

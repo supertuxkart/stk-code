@@ -707,6 +707,7 @@ namespace MeshShader
 	GLuint SphereMapShader::attrib_normal;
 	GLuint SphereMapShader::uniform_MVP;
 	GLuint SphereMapShader::uniform_TIMV;
+    GLuint SphereMapShader::uniform_TVM;
     GLuint SphereMapShader::uniform_invproj;
     GLuint SphereMapShader::uniform_screen;
     GLuint SphereMapShader::TU_tex;
@@ -718,6 +719,7 @@ namespace MeshShader
 		attrib_normal = glGetAttribLocation(Program, "Normal");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
+        uniform_TVM = glGetUniformLocation(Program, "TransposeViewMatrix");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_invproj = glGetUniformLocation(Program, "invproj");
         uniform_screen = glGetUniformLocation(Program, "screen");
@@ -728,10 +730,11 @@ namespace MeshShader
         glUseProgram(0);
 	}
 
-    void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeViewMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &InvProj, const core::vector2df& screen)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
+        glUniformMatrix4fv(uniform_TVM, 1, GL_FALSE, TransposeViewMatrix.pointer());
         glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProj.pointer());
         glUniform2f(uniform_screen, screen.X, screen.Y);
 	}
@@ -1456,6 +1459,7 @@ namespace FullScreenShader
     GLuint DiffuseEnvMapShader::uniform_blueLmn;
     GLuint DiffuseEnvMapShader::uniform_greenLmn;
     GLuint DiffuseEnvMapShader::uniform_redLmn;
+    GLuint DiffuseEnvMapShader::uniform_TVM;
     GLuint DiffuseEnvMapShader::vao;
 
     void DiffuseEnvMapShader::init()
@@ -1465,11 +1469,13 @@ namespace FullScreenShader
         uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
         uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
         uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
+        uniform_TVM = glGetUniformLocation(Program, "TransposeViewMatrix");
         vao = createVAO(Program);
     }
 
-    void DiffuseEnvMapShader::setUniforms(const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
+    void DiffuseEnvMapShader::setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
     {
+        glUniformMatrix4fv(uniform_TVM, 1, GL_FALSE, TransposeViewMatrix.pointer());
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1fv(uniform_blueLmn, 9, blueSHCoeff);
         glUniform1fv(uniform_greenLmn, 9, greenSHCoeff);
