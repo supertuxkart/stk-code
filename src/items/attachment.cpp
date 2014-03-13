@@ -19,7 +19,9 @@
 #include "items/attachment.hpp"
 
 #include <algorithm>
+#include "achievements/achievement_info.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/explosion.hpp"
@@ -223,6 +225,7 @@ void Attachment::clear()
 */
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
+    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,"banana",1);
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
