@@ -108,8 +108,10 @@ void OnlineProfileAchievements::init()
             ListWidget::ListCell progress(a->getProgressAsString(), -1, 1);
             row.push_back(title);
             row.push_back(progress);
-            m_achievements_list_widget->addItem(
-                          StringUtils::toString(a->getInfo()->getID()), row);
+            const std::string id = StringUtils::toString(a->getInfo()->getID());
+            m_achievements_list_widget->addItem(id, row);
+            if (a->isAchieved())
+                m_achievements_list_widget->markItemBlue(id);
         }
     }
     else
