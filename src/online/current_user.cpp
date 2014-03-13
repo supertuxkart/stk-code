@@ -63,6 +63,21 @@ namespace Online
         delete current_user_singleton;
         current_user_singleton = NULL;
     }   // deallocate
+    // ------------------------------------------------------------------------
+    /** Adds the login credential to a http request. A handy static function
+     *  to allow for shorter request creation code. It sets the name of
+     *  the script to invokce, token, and user id.
+     *  \param request The http request.
+     */
+    void CurrentUser::setUserDetails(HTTPRequest *request)
+    {
+        CurrentUser *cu = CurrentUser::get();
+        assert(cu && cu->m_state == US_SIGNED_IN);
+        assert(cu->m_profile);
+        request->setServerURL("client-user.php");
+        request->addParameter("token", cu->m_token);
+        request->addParameter("userid", cu->m_profile->getID());
+    }   // setUserDetails
 
     // ========================================================================
     CurrentUser::CurrentUser()

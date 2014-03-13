@@ -77,7 +77,7 @@ public:
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
     bool operator>(const PlayerProfile &other);
-
+    void raceFinished();
 
     // ------------------------------------------------------------------------
     ~PlayerProfile()
@@ -147,10 +147,6 @@ public:
     {
         m_story_mode_status->setCurrentChallenge(name);
     }   // setCurrentChallenge
-    // ------------------------------------------------------------------------
-    /** Notification of a finished race, which can trigger fulfilling 
-     *  challenges. */
-    void raceFinished() { m_story_mode_status->raceFinished(); }
     // ------------------------------------------------------------------------
     /** Callback when a GP is finished (to test if a challenge was
      *  fulfilled). */

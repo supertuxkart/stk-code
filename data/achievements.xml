@@ -22,8 +22,12 @@
     <hit goal="5"/>
   </achievement>
   <achievement id="4" check-type="all-at-least" reset-after-race="yes"
+               title="Marathoner" description="Make a race with 5 laps or more">
+    <laps goal="5"/>
+  <achievement id="5" check-type="all-at-least" reset-after-race="yes"
                title="Banana Lover" description="Take at least 5 bananas in one race">
     <banana goal="5"/>
+               
   </achievement>
 </achievements>
 

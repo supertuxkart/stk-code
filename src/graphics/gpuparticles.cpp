@@ -12,9 +12,8 @@ scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
     bool withDefaultEmitter, ISceneNode* parent, s32 id,
     const core::vector3df& position,
     const core::vector3df& rotation,
-    const core::vector3df& scale) {
-    if (!irr_driver->isGLSL())
-        return irr_driver->addParticleNode();
+    const core::vector3df& scale)
+{
     if (!parent)
         parent = irr_driver->getSceneManager()->getRootSceneNode();
 
@@ -31,7 +30,8 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
     const core::vector3df& position,
     const core::vector3df& rotation,
-    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false) {
+    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false)
+{
     glGenBuffers(1, &initial_values_buffer);
     glGenBuffers(2, tfb_buffers);
     glGenBuffers(1, &quaternionsbuffer);

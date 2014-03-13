@@ -46,7 +46,8 @@ public:
            ACHIEVE_FIRST      = ACHIEVE_COLUMBUS,
            ACHIEVE_STRIKE     = 2,
            ACHIEVE_ARCH_ENEMY = 3,
-           ACHIEVE_BANANA     = 4,
+           ACHIEVE_MARATHONER = 4,
+           ACHIEVE_BANANA     = 5,
            ACHIEVE_LAST       = ACHIEVE_BANANA
     };
     /** Achievement check type: 

@@ -218,6 +218,36 @@ public:
 
 };   // WindAffector
 
+// ============================================================================
+
+class ScaleAffector : public scene::IParticleAffector
+{
+public:
+    ScaleAffector(const core::vector2df& scaleFactor = core::vector2df(1.0f, 1.0f)) : ScaleFactor(scaleFactor)
+    {
+    }
+
+    virtual void affect(u32 now, scene::SParticle *particlearray, u32 count)
+    {
+        for (u32 i = 0; i<count; i++)
+        {
+            const u32 maxdiff = particlearray[i].endTime - particlearray[i].startTime;
+            const u32 curdiff = now - particlearray[i].startTime;
+            const f32 timefraction = (f32)curdiff / maxdiff;
+            core::dimension2df destsize = particlearray[i].startSize * ScaleFactor;
+            particlearray[i].size = particlearray[i].startSize + (destsize - particlearray[i].startSize) * timefraction;
+        }
+    }
+
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        return scene::EPAT_SCALE;
+    }
+
+protected:
+    core::vector2df ScaleFactor;
+};
+
 
 // ============================================================================
 
@@ -233,6 +263,8 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
+    m_is_glsl = irr_driver->isGLSL();
+
 
     setParticleType(type);
     assert(m_node != NULL);
@@ -381,8 +413,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node = ParticleSystemProxy::addParticleNode();
-            if (irr_driver->isGLSL())
+            if (m_is_glsl)
+                m_node = ParticleSystemProxy::addParticleNode(m_is_glsl);
+            else
+                m_node = irr_driver->addParticleNode();
+            
+            if (m_is_glsl)
                 static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(type->getMaterial()->isAlphaAdditive());
         }
 
@@ -550,14 +586,18 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
         if (type->hasScaleAffector())
         {
-            core::dimension2df factor = core::dimension2df(type->getScaleAffectorFactorX(),
-                                                           type->getScaleAffectorFactorY());
-            scene::IParticleAffector* scale_affector =
-                m_node->createScaleParticleAffector(factor);
-            m_node->addAffector(scale_affector);
-            scale_affector->drop();
-            if (irr_driver->isGLSL())
+            if (m_is_glsl)
+            {
                 static_cast<ParticleSystemProxy *>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
+            }
+            else
+            {
+                core::vector2df factor = core::vector2df(type->getScaleAffectorFactorX(),
+                    type->getScaleAffectorFactorY());
+                scene::IParticleAffector* scale_affector = new ScaleAffector(factor);
+                m_node->addAffector(scale_affector);
+                scale_affector->drop();
+            }
         }
 
         const float windspeed = type->getWindSpeed();
@@ -566,14 +606,15 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             WindAffector *waf = new WindAffector(windspeed);
             m_node->addAffector(waf);
             waf->drop();
-    }
+
+            // TODO: wind affector for GLSL particles
+        }
 
         const bool flips = type->getFlips();
         if (flips)
         {
-			if (irr_driver->isGLSL())
+            if (m_is_glsl)
 				static_cast<ParticleSystemProxy *>(m_node)->setFlip();
-            //m_node->getMaterial(0).BlendOperation = video::EBO_ADD;
         }
     }
 }   // setParticleType
@@ -582,10 +623,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
-    HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
-    m_node->addAffector(hmca);
-    hmca->drop();
-    if (irr_driver->isGLSL()) {
+    
+    if (m_is_glsl)
+    {
         const Vec3* aabb_min;
         const Vec3* aabb_max;
         t->getAABB(&aabb_min, &aabb_max);
@@ -595,6 +635,12 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
         const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
         static_cast<ParticleSystemProxy *>(m_node)->setHeightmap(t->buildHeightMap(),
             track_x, track_z, track_x_len, track_z_len);
+    }
+    else
+    {
+        HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
+        m_node->addAffector(hmca);
+        hmca->drop();
     }
 }
 

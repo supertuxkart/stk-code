@@ -101,6 +101,15 @@ void PlayerProfile::incrementUseFrequency()
     else m_use_frequency++;
 }   // incrementUseFrequency
 
+// ------------------------------------------------------------------------
+/** Notification of a finished race, which can trigger fulfilling
+*  challenges. */
+void PlayerProfile::raceFinished()
+{
+    m_story_mode_status->raceFinished();
+    m_achievements_status->onRaceEnd();
+}   // raceFinished
+
 //------------------------------------------------------------------------------
 /** Comparison used to sort players. 
  */
