@@ -30,10 +30,10 @@
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "states_screens/login_screen.hpp"
+#include "states_screens/online_profile_friends.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
-#include "states_screens/online_profile_friends.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -334,48 +334,6 @@ namespace Online
         request->queue();
         return request;
     }   // requestUserSearch
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to invite a user to be friends.
-     *  \param friend_id The id of the user which has to be friended.
-     */
-    void CurrentUser::requestFriendRequest(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::FriendRequest * request = new CurrentUser::FriendRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "friend-request");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestFriendRequest
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to send a friend invitation. Shows a
-     *  confirmation message and takes care of updating all the cached
-     *  information.
-     */
-    void CurrentUser::FriendRequest::callback()
-    {
-        uint32_t id(0);
-        getXMLData()->get("friendid", &id);
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            CurrentUser::get()->getProfile()->addFriend(id);
-            OnlineProfile::RelationInfo *info = 
-                new OnlineProfile::RelationInfo(_("Today"), false, true, false);
-            ProfileManager::get()->getProfileByID(id)->setRelationInfo(info);
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend request send!");
-        }
-        else
-            info_text = getInfo();
-        UserInfoDialog *dialog = new UserInfoDialog(id, info_text,
-                                                    !isSuccess(), true);
-        GUIEngine::DialogQueue::get()->pushDialog(dialog, true);
-    }   // FriendRequest::callback
 
     // ------------------------------------------------------------------------
     /** A request to the server, to accept a friend request.
