@@ -168,7 +168,7 @@ namespace Online
             /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
-            static void setUserDetails(HTTPRequest *html);
+            static void setUserDetails(HTTPRequest *request);
 
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
@@ -184,9 +184,6 @@ namespace Online
             const XMLRequest *              requestSignUp(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             const irr::core::stringw &password_ver,
-                                                            const irr::core::stringw &email);
-
-            const XMLRequest *              requestRecovery(const irr::core::stringw &username,
                                                             const irr::core::stringw &email);
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;

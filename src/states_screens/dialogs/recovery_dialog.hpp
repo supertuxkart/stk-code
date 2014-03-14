@@ -52,7 +52,7 @@ private:
     bool m_show_recovery_input;
     bool m_show_recovery_info;
 
-    const Online::XMLRequest * m_recovery_request;
+    Online::XMLRequest * m_recovery_request;
 
     GUIEngine::TextBoxWidget * m_username_widget;
     GUIEngine::TextBoxWidget * m_email_widget;

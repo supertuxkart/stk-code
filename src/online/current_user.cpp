@@ -88,19 +88,6 @@ namespace Online
         m_profile      = NULL;
     }   // CurrentUser
 
-    // ------------------------------------------------------------------------
-    const XMLRequest * CurrentUser::requestRecovery(const core::stringw &username,
-                                                    const core::stringw &email)
-    {
-        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
-        XMLRequest * request = new XMLRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "recovery");
-        request->addParameter("username", username);
-        request->addParameter("email", email);
-        request->queue();
-        return request;
-    }   // requestRecovery
 
     // ------------------------------------------------------------------------
     const XMLRequest * CurrentUser::requestSignUp(const core::stringw &username,
