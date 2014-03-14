@@ -25,5 +25,9 @@
                title="Marathoner" description="Make a race with 5 laps or more">
     <laps goal="5"/>
   </achievement>
+  <achievement id="5" check-type="all-at-least" reset-after-race="yes"
+               title="Skid-row" description="Make 5 skidding in a single race">
+    <skidding goal="5"/>
+  </achievement>
 </achievements>
 
