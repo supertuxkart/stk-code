@@ -124,8 +124,15 @@ void RegisterScreen::acceptTerms()
     core::stringw password_confirm= getWidget<TextBoxWidget>("password_confirm")->getText().trim();
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 
-    m_signup_request = CurrentUser::get()->requestSignUp(username, password, 
-                                                         password_confirm, email);
+     m_signup_request = new XMLRequest();
+    m_signup_request->setServerURL("client-user.php");
+    m_signup_request->addParameter("action",           "register"      );
+    m_signup_request->addParameter("username",         username        );
+    m_signup_request->addParameter("password",         password        );
+    m_signup_request->addParameter("password_confirm", password_confirm);
+    m_signup_request->addParameter("email",            email           );
+    m_signup_request->addParameter("terms",            "on"            );
+    m_signup_request->queue();
 }   // acceptTerms
 
 // -----------------------------------------------------------------------------

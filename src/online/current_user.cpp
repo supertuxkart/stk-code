@@ -88,26 +88,6 @@ namespace Online
         m_profile      = NULL;
     }   // CurrentUser
 
-
-    // ------------------------------------------------------------------------
-    const XMLRequest * CurrentUser::requestSignUp(const core::stringw &username,
-                                                  const core::stringw &password,
-                                                  const core::stringw &password_confirm,
-                                                  const core::stringw &email)
-    {
-        assert(m_state == US_SIGNED_OUT || m_state == US_GUEST);
-        XMLRequest * request = new XMLRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "register");
-        request->addParameter("username", username);
-        request->addParameter("password", password);
-        request->addParameter("password_confirm", password_confirm);
-        request->addParameter("email", email);
-        request->addParameter("terms", "on");
-        request->queue();
-        return request;
-    }   // requestSignUp
-
     // ------------------------------------------------------------------------
     /** Request a login using the saved credentials of the user.
      */
