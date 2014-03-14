@@ -21,6 +21,8 @@
 #ifdef SKID_DEBUG
 #  include "graphics/show_curve.hpp"
 #endif
+#include "achievements/achievement_info.hpp"
+#include "config\player_manager.hpp"
 #include "karts/kart.hpp"
 #include "karts/kart_gfx.hpp"
 #include "karts/kart_properties.hpp"
@@ -412,6 +414,7 @@ void Skidding::update(float dt, bool is_on_ground,
                                              bonus_speed, bonus_speed,
                                              bonus_force, bonus_time,
                                              /*fade-out-time*/ 1.0f);
+					PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_SKIDDING, "skidding");
                 }
                 else {
                     m_kart->getKartGFX()
