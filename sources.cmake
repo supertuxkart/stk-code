@@ -194,7 +194,7 @@ src/network/types.cpp
 src/online/current_user.cpp
 src/online/http_request.cpp
 src/online/messages.cpp
-src/online/profile.cpp
+src/online/online_profile.cpp
 src/online/profile_manager.cpp
 src/online/request.cpp
 src/online/request_manager.cpp
@@ -527,7 +527,7 @@ src/network/types.hpp
 src/online/current_user.hpp
 src/online/http_request.hpp
 src/online/messages.hpp
-src/online/profile.hpp
+src/online/online_profile.hpp
 src/online/profile_manager.hpp
 src/online/request.hpp
 src/online/request_manager.hpp

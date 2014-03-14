@@ -22,6 +22,7 @@
 #include "audio/music_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -73,9 +74,11 @@ void CutsceneWorld::init()
 
     //const btTransform &s = getTrack()->getStartTransform(0);
     //const Vec3 &v = s.getOrigin();
-    m_camera = irr_driver->getSceneManager()
-             ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
-                                  core::vector3df(0.0f, 0.0f, 0.0f));
+    Camera* stk_cam = Camera::createCamera(NULL);
+    m_camera = stk_cam->getCameraSceneNode();
+    //m_camera = irr_driver->getSceneManager()
+    //         ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
+    //                              core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
@@ -168,7 +171,7 @@ CutsceneWorld::~CutsceneWorld()
  */
 const std::string& CutsceneWorld::getIdent() const
 {
-    return IDENT_CUSTSCENE;
+    return IDENT_CUTSCENE;
 }   // getIdent
 
 //-----------------------------------------------------------------------------

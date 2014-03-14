@@ -20,7 +20,6 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
-#include "config/user_config.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -32,12 +31,13 @@ using namespace irr;
 class UTFWriter;
 class AchievementsStatus;
 
-/**
-  * \brief Class for managing player profiles (name, control configuration, etc.)
-  * A list of all possible players is stored as PlayerProfiles in the user config.
-  * A list of currently playing players will be stored somewhere else (FIXME : complete comment)
-  * \ingroup config
-  */
+/** Class for managing player profiles (name, usage frequency, 
+ *  etc.). All PlayerProfiles are managed by the PlayerManager.
+ *  A PlayerProfile keeps track of the story mode progress using an instance
+ *  of StoryModeStatus, and achievements with AchievementsStatus. All data
+ *  is saved in the players.xml file.
+ * \ingroup config
+ */
 class PlayerProfile : public NoCopy
 {
 private:
@@ -77,7 +77,7 @@ public:
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
     bool operator>(const PlayerProfile &other);
-
+    void raceFinished();
 
     // ------------------------------------------------------------------------
     ~PlayerProfile()
@@ -147,10 +147,6 @@ public:
     {
         m_story_mode_status->setCurrentChallenge(name);
     }   // setCurrentChallenge
-    // ------------------------------------------------------------------------
-    /** Notification of a finished race, which can trigger fulfilling 
-     *  challenges. */
-    void raceFinished() { m_story_mode_status->raceFinished(); }
     // ------------------------------------------------------------------------
     /** Callback when a GP is finished (to test if a challenge was
      *  fulfilled). */

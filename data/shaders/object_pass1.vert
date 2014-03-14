@@ -1,10 +1,16 @@
-#version 330
 uniform mat4 ModelViewProjectionMatrix;
 uniform mat4 TransposeInverseModelView;
 
+#if __VERSION__ >= 130
 in vec3 Position;
 in vec3 Normal;
-noperspective out vec3 nor;
+out vec3 nor;
+#else
+attribute vec3 Position;
+attribute vec3 Normal;
+varying vec3 nor;
+#endif
+
 
 void main(void)
 {

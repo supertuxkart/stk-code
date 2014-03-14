@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -30,14 +31,19 @@
 class UTFWriter;
 class XMLNode;
 
+/** This class keeps tracks of all achievements of one player. One instance
+ *  of this class is stored in each PlayerProfile. It stores a map of
+ *  achievements ids to instances of Achievement. Each achievement in
+ *  turn stores either fulfilled achievements, or the current state of
+ *  an achievement (e.g. an achievement to race every track in STK needs
+ *  to keep information about which tracks have already been used.)
+*/
 class AchievementsStatus
 {
 private:
     std::map<uint32_t, Achievement *> m_achievements;
     bool         m_online;
     bool         m_valid;
-
-    void deleteAchievements();
 
     class SyncAchievementsRequest : public Online::XMLRequest {
         virtual void callback ();

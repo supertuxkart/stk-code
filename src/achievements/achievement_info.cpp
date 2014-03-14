@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -25,7 +26,9 @@
 #include <stdlib.h>
 #include <assert.h>
 
-
+/** The constructor reads the dat from the xml information.
+ *  \param input XML node for this achievement info.
+ */
 AchievementInfo::AchievementInfo(const XMLNode * input)
 {
     m_reset_after_race = false;
@@ -45,68 +48,110 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
                                                         m_description.c_str());
     }
     input->get("reset-after-race", &m_reset_after_race);
-}   // AchievementInfo
 
-// ============================================================================
-SingleAchievementInfo::SingleAchievementInfo(const XMLNode * input)
-    : AchievementInfo(input)
-{
-    input->get("goal", &m_goal_value);
-}   // SingleAchievementInfo
+    m_check_type = AC_ALL_AT_LEAST;
+    std::string s;
+    input->get("check-type", &s);
+    if (s == "all-at-least")
+        m_check_type = AC_ALL_AT_LEAST;
+    else if (s == "one-at-least")
+        m_check_type = AC_ONE_AT_LEAST;
+    else
+        Log::warn("AchievementInfo", "Achievement check type '%s' unknown.",
+                  s.c_str());
 
-// ----------------------------------------------------------------------------
-irr::core::stringw SingleAchievementInfo::toString() const
-{
-    return StringUtils::toWString(m_goal_value);
-}   // toString
-
-// ----------------------------------------------------------------------------
-bool SingleAchievementInfo::checkCompletion(Achievement * achievement) const
-{
-    SingleAchievement * single_achievement = (SingleAchievement *) achievement;
-    if(single_achievement->getValue() >= m_goal_value)
-        return true;
-    return false;
-}
-
-// ============================================================================
-MapAchievementInfo::MapAchievementInfo(const XMLNode * input)
-    : AchievementInfo(input)
-{
-    std::vector<XMLNode*> xml_entries;
-    input->getNodes("entry", xml_entries);
-    for (unsigned int n=0; n < xml_entries.size(); n++)
+    // Now load the goal nodes
+    for (unsigned int n = 0; n < input->getNumNodes(); n++)
     {
-        std::string key("");
-        xml_entries[n]->get("key", &key);
-        int goal(0);
-        xml_entries[n]->get("goal", &goal);
+        const XMLNode *node = input->getNode(n);
+        std::string key = node->getName();
+        int goal = 0;
+        node->get("goal", &goal);
         m_goal_values[key] = goal;
     }
-    if(m_goal_values.size() != xml_entries.size())
-        Log::error("MapAchievementInfo","Duplicate keys for the entries of a MapAchievement found.");
-}
+    if (m_goal_values.size() != input->getNumNodes())
+        Log::fatal("AchievementInfo", 
+                  "Duplicate keys for the entries of a MapAchievement found.");
+
+    if (m_check_type == AC_ONE_AT_LEAST)
+    {
+        if (m_goal_values.size() != 1)
+            Log::fatal("AchievementInfo",
+                     "A one-at-least achievement must have exactly one goal.");
+    }
+}   // AchievementInfo
+
 // ----------------------------------------------------------------------------
-irr::core::stringw MapAchievementInfo::toString() const
+/** Returns a string with a numerical value to display the progress of
+ *  this achievement. It adds up all the goal values
+ */
+irr::core::stringw AchievementInfo::toString() const
 {
     int count = 0;
     std::map<std::string, int>::const_iterator iter;
-    for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+    switch (m_check_type)
     {
-        count += iter->second;
+    case AC_ALL_AT_LEAST:
+        // If all values need to be reached, add up all goal values
+        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+        {
+            count += iter->second;
+        }
+        break;
+    case AC_ONE_AT_LEAST:
+        // Only one goal is defined for a one-at-least
+        count = m_goal_values.begin()->second;
+        break;
+    default:
+        Log::fatal("AchievementInfo", "Missing toString for tpye %d.",
+                   m_check_type);
     }
     return StringUtils::toWString(count);
+
 }   // toString
 
 // ----------------------------------------------------------------------------
-bool MapAchievementInfo::checkCompletion(Achievement * achievement) const
+bool AchievementInfo::checkCompletion(Achievement * achievement) const
 {
-    MapAchievement * map_achievement = (MapAchievement *) achievement;
     std::map<std::string, int>::const_iterator iter;
-    for ( iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++ )
+
+    switch (m_check_type)
     {
-        if(map_achievement->getValue(iter->first) < iter->second)
-            return false;
+    case AC_ALL_AT_LEAST:
+        for (iter = m_goal_values.begin(); iter != m_goal_values.end(); iter++)
+        {
+            if (achievement->getValue(iter->first) < iter->second)
+                return false;
+        }
+        return true;
+    case AC_ONE_AT_LEAST:
+    {
+        // Test all progress values the kart has.
+        const std::map<std::string, int> &progress = achievement->getProgress();
+        for (iter = progress.begin(); iter != progress.end(); iter++)
+        {
+            // A one-at-least achievement has only one goal, so use it
+            if (iter->second >= m_goal_values.begin()->second)
+                return true;
+        }
+        return false;
     }
-    return true;
+    default:
+        Log::fatal("AchievementInfo", "Missing check for tpye %d.",
+                   m_check_type);
+    }   // switch
+
+    // Avoid compiler warning
+    return false;
 }
+// ----------------------------------------------------------------------------
+int AchievementInfo::getGoalValue(const std::string &key) const
+{ 
+    std::map<std::string, int>::const_iterator it;
+    it = m_goal_values.find(key);
+    if (it != m_goal_values.end())
+        return it->second;
+    else
+        return 0;
+}   // getGoalValue
+// ----------------------------------------------------------------------------

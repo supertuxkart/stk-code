@@ -18,7 +18,7 @@
 
 #include "physics/physics.hpp"
 
-#include "achievements/achievements_manager.hpp"
+#include "achievements/achievement_info.hpp"
 #include "animations/three_d_animation.hpp"
 #include "config/player_manager.hpp"
 #include "config/player_profile.hpp"
@@ -28,6 +28,7 @@
 #include "items/flyable.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/rescue_animation.hpp"
+#include "karts/controller/player_controller.hpp"
 #include "modes/soccer_world.hpp"
 #include "modes/world.hpp"
 #include "karts/explosion_animation.hpp"
@@ -258,13 +259,28 @@ void Physics::update(float dt)
             PowerupManager::PowerupType type = p->getUserPointer(0)->getPointerFlyable()->getType();
             if(type != PowerupManager::POWERUP_BOWLING || !target_kart->isInvulnerable())
             {
-                p->getUserPointer(0)->getPointerFlyable()->hit(target_kart);
-                if (type == PowerupManager::POWERUP_BOWLING)
+                Flyable *f = p->getUserPointer(0)->getPointerFlyable();
+                f->hit(target_kart);
+
+                // Check for achievements
+                AbstractKart * kart = World::getWorld()->getKart(f->getOwnerId());
+                PlayerController *c = dynamic_cast<PlayerController*>(kart->getController());
+
+                // Check that it's not a kart hitting itself (this can
+                // happen at the time a flyable is shot - release too close
+                // to the kart, and it's the current player. At this stage
+                // only the current player can get achievements.
+                if (target_kart != kart && c &&
+                    c->getPlayer()->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
                 {
-                    AchievementsStatus* status =
-                        PlayerManager::getCurrentAchievementsStatus();
-                    ((SingleAchievement *) status->getAchievement(2))->increase(1);
-                }
+                    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
+                                                       target_kart->getIdent(), 1);
+                    if (type == PowerupManager::POWERUP_BOWLING)
+                    {
+                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE, 
+                                                          "ball", 1);
+                    }   // is bowling ball
+                }   // if target_kart != kart && is a player kart and is current player
             }
 
         }

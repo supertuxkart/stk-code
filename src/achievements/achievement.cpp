@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -26,17 +27,15 @@
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
-
-#include <assert.h>
-#include <fstream>
-#include <sstream>
 #include <stdlib.h>
 
-
+/** Constructur, initialises this object with the data from the
+ *  corresponding AchievementInfo.
+ */
 Achievement::Achievement(const AchievementInfo * info)
-    :m_achievement_info(info)
+           : m_achievement_info(info)
 {
-    m_id = info->getID();
+    m_id       = info->getID();
     m_achieved = false;
 }   // Achievement
 
@@ -52,6 +51,15 @@ void Achievement::load(const XMLNode *node)
 {
     node->get("id",       &m_id      );
     node->get("achieved", &m_achieved);
+
+    for (unsigned int i = 0; i < node->getNumNodes(); i++)
+    {
+        const XMLNode *n = node->getNode(i);
+        std::string key = n->getName();
+        int value = 0;
+        n->get("value", &value);
+        m_progress_map[key] = value;
+    }
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -62,16 +70,118 @@ void Achievement::save(UTFWriter &out)
 {
     out << L"        <achievement id=\"" << m_id << L"\" "
         << L"achieved=\"" << m_achieved << "\"";
+    if (isAchieved())
+    {
+        out << "/>\n";
+        return;
+    }
+
+    out << ">\n";
+    std::map<std::string, int>::iterator i;
+    for (i = m_progress_map.begin(); i != m_progress_map.end(); ++i)
+    {
+        out << "          <" << i->first
+            << " value=\"" << i->second << "\"/>\n";
+    }
+    out << "        </achievement>\n";
 }   // save
 
 // ----------------------------------------------------------------------------
+/** Returns the value for a key.
+ */
+int Achievement::getValue(const std::string & key)
+{
+    if (m_progress_map.find(key) != m_progress_map.end())
+        return m_progress_map[key];
+    return 0;
+}
+// ----------------------------------------------------------------------------
+/** Resets all currently key values to 0. Called if the reset-after-race flag
+ *  is set for the corresponding AchievementInfo.
+ */
+void Achievement::reset()
+{
+    std::map<std::string, int>::iterator iter;
+    for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+    {
+        iter->second = 0;
+    }
+}   // reset
+
+// ----------------------------------------------------------------------------
+/** Returns how much of an achievement has been achieved in the form n/m.
+ *  The AchievementInfo adds up all goal values to get 'm', and this
+ *  this class end up all current key values for 'n'.
+ */
+irr::core::stringw Achievement::getProgressAsString() const
+{
+    int progress = 0;
+    std::map<std::string, int>::const_iterator iter;
+
+    // For now return N/N in case of an achieved achievement.
+    if (m_achieved)
+        return getInfo()->toString() +"/" + getInfo()->toString();
+
+    switch (m_achievement_info->getCheckType())
+    {
+    case AchievementInfo::AC_ALL_AT_LEAST:
+        for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+        {
+            progress += iter->second;
+        }
+        break;
+    case AchievementInfo::AC_ONE_AT_LEAST:
+        for (iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
+        {
+            if(iter->second>progress) progress = iter->second;
+        }
+        break;
+    default:
+        Log::fatal("Achievement", "Missing getProgressAsString for type %d.",
+                   m_achievement_info->getCheckType());
+    }
+    return StringUtils::toWString(progress) + "/" + getInfo()->toString();
+}   // getProgressAsString
+
+// ----------------------------------------------------------------------------
+/** Increases the value of a key by a specified amount, but make sure to not
+ *  increase the value above the goal (otherwise the achievement progress
+ *  could be 12/10 (e.g. if one track is used 12 times for the Christoffel
+ *  achievement), even though the achievement is not achieved.
+ *  \param key The key whose value is increased.
+ *  \param increase Amount to add to the value of this key.
+ */
+void Achievement::increase(const std::string & key, int increase)
+{
+    std::map<std::string, int>::iterator it;
+    it = m_progress_map.find(key);
+    if (it != m_progress_map.end())
+    {
+        it->second += increase;
+        if (it->second > m_achievement_info->getGoalValue(key))
+            it->second = m_achievement_info->getGoalValue(key);
+    }
+    else
+    {
+        if (increase>m_achievement_info->getGoalValue(key))
+            increase = m_achievement_info->getGoalValue(key);
+        m_progress_map[key] = increase;
+    }
+    check();
+}   // increase
+
+// ----------------------------------------------------------------------------
+/** Called at the end of a race to potentially reset values.
+ */
 void Achievement::onRaceEnd()
 {
     if(m_achievement_info->needsResetAfterRace())
-        this->reset();
-}
+        reset();
+}   // onRaceEnd
 
 // ----------------------------------------------------------------------------
+/** Checks if this achievement has been achieved.
+ */
 void Achievement::check()
 {
     if(m_achieved)
@@ -80,169 +190,14 @@ void Achievement::check()
     if(m_achievement_info->checkCompletion(this))
     {
         //show achievement
+        core::stringw s = StringUtils::insertValues(_("Completed achievement \"%s\"."),
+                                                    m_achievement_info->getTitle());
         GUIEngine::DialogQueue::get()->pushDialog(
-            new NotificationDialog(NotificationDialog::T_Achievements,
-            irr::core::stringw(_("Completed achievement")) + irr::core::stringw(" \"") + m_achievement_info->getTitle() + irr::core::stringw("\".")
-        ));
+            new NotificationDialog(NotificationDialog::T_Achievements, s));
+
         //send to server
         Online::CurrentUser::get()->onAchieving(m_id);
         m_achieved = true;
     }
-}
-
-// ----------------------------------------------------------------------------
-/** Constructor for a SingleAchievement.
- */
-SingleAchievement::SingleAchievement(const AchievementInfo * info)
-    : Achievement(info)
-{
-    m_progress = 0;
-    m_achieved = false;
-}   // SingleAchievement
-
-// ----------------------------------------------------------------------------
-/** Loads the state from an xml node. 
- *  \param node The XML data.
- */
-void SingleAchievement::load(const XMLNode *node)
-{
-    Achievement::load(node);
-    if (!isAchieved())
-        node->get("progress", &m_progress);
-}   // load
-
-// ----------------------------------------------------------------------------
-/** Save the state to a file. The progress is only saved if the achievement 
- *  has not been achieved yet.
- *  \param out The output file.
- */
-void SingleAchievement::save(UTFWriter &out)
-{
-    Achievement::save(out);
-    if (!m_achieved)
-    {
-        out << L" progress=\"" << m_progress << L"\"";
-    }
-    out << L"/>\n";
-}   // save
-
-// ----------------------------------------------------------------------------
-/** Resets the challenge. Calls if necessary (i.e. if a challenge needs to
- *  be fulfilled in a single race).
- */
-void SingleAchievement::reset()
-{
-    m_progress = 0;
-}   // reset
-
-// ----------------------------------------------------------------------------
-/** Adds a value to this counter.
- *  \param increase Value to add.
- */
-void SingleAchievement::increase(int increase)
-{
-    m_progress += increase;
-    check();
-}   // increase
-
-// ----------------------------------------------------------------------------
-/** Returns a "k/n" string indicating how much of an achievement was achieved.
- */
-irr::core::stringw SingleAchievement::getProgressAsString()
-{
-    // The info class returns the goal value
-    return StringUtils::toWString(m_progress) + "/"
-          +getInfo()->toString();
-}   // getProgressAsString
-
-// ============================================================================
-
-/** Constructor for a MapAchievement.
- */
-MapAchievement::MapAchievement(const AchievementInfo * info)
-    : Achievement(info)
-{
-}   // MapAchievement
-
-// ----------------------------------------------------------------------------
-/** Loads the status from an XML node.
- *  \param node The XML data to load the status from.
- */
-void MapAchievement::load(const XMLNode *node)
-{
-    Achievement::load(node);
-    for (unsigned int i = 0; i < node->getNumNodes(); i++)
-    {
-        const XMLNode *n = node->getNode(i);
-        std::string key = n->getName();
-        int value = 0;
-        n->get("value", &value);
-        m_progress_map[key] = value;
-    }
-}    // load
-
-// ----------------------------------------------------------------------------
-/** Saves the status of this achievement to a file.
- *  \param out The file to write the state to.
- */
-void MapAchievement::save(UTFWriter &out)
-{
-    Achievement::save(out);
-    if (isAchieved())
-    {
-        out << "/>\n";
-        return;
-    }
-    out << ">\n";
-    std::map<std::string, int>::iterator i;
-    for (i = m_progress_map.begin(); i != m_progress_map.end(); ++i)
-    {
-        out << "          <" << i->first 
-            << " value=\""     << i->second << "\"/>\n";
-    }
-    out << "        </achievement>\n";
-}   // save
-
-// ----------------------------------------------------------------------------
-
-int MapAchievement::getValue(const std::string & key)
-{
-    if ( m_progress_map.find(key) != m_progress_map.end())
-        return m_progress_map[key];
-    return 0;
-}
-
-// ----------------------------------------------------------------------------
-void MapAchievement::reset()
-{
-    std::map<std::string, int>::iterator iter;
-    for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter )
-    {
-        iter->second = 0;
-    }
-}   // reset
-
-// ----------------------------------------------------------------------------
-void MapAchievement::increase(const std::string & key, int increase)
-{
-    if (m_progress_map.find(key) != m_progress_map.end())
-    {
-        m_progress_map[key] += increase;
-        check();
-    }
-    else
-        m_progress_map[key] = increase;
-}
-
-// ----------------------------------------------------------------------------
-irr::core::stringw MapAchievement::getProgressAsString()
-{    
-    int progress = 0;
-    std::map<std::string, int>::const_iterator iter;
-    for ( iter = m_progress_map.begin(); iter != m_progress_map.end(); ++iter)
-    {
-        progress += iter->second;
-    }
-    return StringUtils::toWString(progress) + "/" + getInfo()->toString();
-}
+}   // check
 

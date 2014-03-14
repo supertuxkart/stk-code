@@ -450,20 +450,6 @@ public:
 
 //
 
-class GodRayProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    // In texcoords
-    void setSunPosition(float x, float y) { m_sunpos[0] = x; m_sunpos[1] = y; }
-
-private:
-    float m_sunpos[2];
-};
-
-//
-
 class ShadowPassProvider: public CallBase
 {
 public:
@@ -552,19 +538,6 @@ class ShadowGenProvider: public CallBase
 {
 public:
     virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class CausticsProvider: public CallBase
-{
-public:
-    CausticsProvider() { m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0; }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-private:
-    float m_dir[2], m_dir2[2];
 };
 
 //

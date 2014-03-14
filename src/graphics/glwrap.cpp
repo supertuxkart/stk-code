@@ -200,7 +200,7 @@ void initGL()
 static
 GLuint LoadShader(const char * file, unsigned type) {
 	GLuint Id = glCreateShader(type);
-	std::string Code;
+    std::string Code = "#version 330\n";
 	std::ifstream Stream(file, std::ios::in);
 	if (Stream.is_open())
 	{
@@ -211,7 +211,7 @@ GLuint LoadShader(const char * file, unsigned type) {
 	}
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
-	printf("Compiling shader : %s\n", file);
+	Log::info("GLWrap", "Compiling shader : %s", file);
 	char const * SourcePointer = Code.c_str();
 	int length = strlen(SourcePointer);
 	glShaderSource(Id, 1, &SourcePointer, &length);

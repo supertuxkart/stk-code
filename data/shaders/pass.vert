@@ -1,9 +1,11 @@
 // Passthrough shader for drawQuad()
-#version 330 compatibility
+#version 330
 
+in vec3 Position;
+in vec2 Texcoord;
 out vec2 uv;
 
 void main() {
-	uv = gl_MultiTexCoord0.xy;
-	gl_Position = gl_Vertex;
+	uv = Texcoord;
+	gl_Position = vec4(Position, 1.);
 }

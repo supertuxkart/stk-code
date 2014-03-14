@@ -2,7 +2,8 @@
 #define STOP_SERVER_HPP
 
 #include "network/protocol.hpp"
-#include "online/request.hpp"
+
+namespace Online { class XMLRequest;  }
 
 /*! \brief Removes the server info from the database
  */

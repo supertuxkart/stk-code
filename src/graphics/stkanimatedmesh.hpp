@@ -11,11 +11,13 @@ class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode
 {
 protected:
 	bool firstTime;
+    std::vector<GLMesh *> GeometricMesh[FPSM_COUNT];
+    std::vector<GLMesh *> ShadedMesh[SM_COUNT];
+    std::vector<GLMesh *> TransparentMesh[TM_COUNT];
 	std::vector<GLMesh> GLmeshes;
-	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
-	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-    void drawShadow(const GLMesh &mesh);
+    core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+    void drawSolidPass1(const GLMesh &mesh, GeometricMaterial type);
+    void drawSolidPass2(const GLMesh &mesh, ShadedMaterial type);
 public:
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
      irr::scene::ISceneManager* mgr, irr::s32 id,

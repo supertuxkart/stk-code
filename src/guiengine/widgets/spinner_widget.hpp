@@ -57,6 +57,9 @@ namespace GUIEngine
         
         int m_value, m_min, m_max;
         
+        int m_spinner_widget_player_id;
+        bool m_use_background_color;
+        
         /** If each value the spinner can take has an associated text, this vector will be non-empty */
         std::vector<irr::core::stringw> m_labels;
         
@@ -68,7 +71,8 @@ namespace GUIEngine
           * it displays how close the value is to the maximum by filling a line
           */
         bool m_gauge;
-        
+	
+	
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
         
@@ -93,9 +97,9 @@ namespace GUIEngine
         
         /** Call only if this spinner is graphical. Returns the current texture to display */
         irr::video::ITexture* getTexture();
-        
+       
     public:
-        
+
         LEAK_CHECK()
         
         SpinnerWidget(const bool gauge=false);
@@ -104,7 +108,16 @@ namespace GUIEngine
                 
         void addLabel(irr::core::stringw label);
         void clearLabels();
-        
+
+	// next four functions are for background colour behind playername in multikart screen selection
+        void setUseBackgroundColor()                {m_use_background_color=true;        }
+        bool getUseBackgroundColor()                {return m_use_background_color;      }
+        void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
+        int getSpinnerWidgetPlayerID()              {return m_spinner_widget_player_id;  }
+        void unsetUseBackgroundColor()              {m_use_background_color=false;       }
+
+
+
         void setListener(ISpinnerConfirmListener* listener) { m_listener = listener; }
 
         /** \brief implement method from base class Widget */
@@ -166,7 +179,7 @@ namespace GUIEngine
         /** Display custom text in spinner */
         void setCustomText(const core::stringw& text);
     };
-    
+
 }
 
 #endif

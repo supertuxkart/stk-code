@@ -1,17 +1,29 @@
 <?xml version="1.0"?>
 <achievements>
-  <achievement id="1" type="map" title="Christoffel Columbus" description="Play every official track at least once." >
-      <entry key="farm" goal="1"/>
-      <entry key="scotland" goal="1"/>
-      <entry key="lighthouse" goal="1"/>
-      <entry key="sandtrack" goal="1"/>
-      <entry key="olivermath" goal="1"/>
-      <entry key="subsea" goal="1"/>
-      <entry key="mansion" goal="1"/>
-      <entry key="minigolf" goal="1"/>
-      <entry key="hacienda" goal="1"/>
-      <entry key="jungle" goal="1"/>      
+  <achievement id="1" check-type="all-at-least" reset-after-race="no"
+               title="Christoffel Columbus" description="Play every official track at least once." >
+      <farm goal="1"/>
+      <scotland goal="1"/>
+      <lighthouse goal="1"/>
+      <sandtrack goal="1"/>
+      <olivermath goal="1"/>
+      <subsea goal="1"/>
+      <mansion goal="1"/>
+      <minigolf goal="1"/>
+      <hacienda goal="1"/>
+      <jungle goal="1"/>      
   </achievement>
-  <achievement id="2" type="single" goal="10" title="Strike!" description="Hit 10 karts with a bowling-ball." />
+  <achievement id="2" check-type="all-at-least" reset-after-race="no"
+               title="Strike!" description="Hit 10 karts with a bowling-ball.">
+    <ball goal="10"/>
+  </achievement>
+  <achievement id="3" check-type="one-at-least" reset-after-race="yes"
+               title="Arch Enemy" description="Hit the same kart at least 5 times in one race">
+    <hit goal="5"/>
+  </achievement>
+  <achievement id="4" check-type="all-at-least" reset-after-race="yes"
+               title="Marathoner" description="Make a race with 5 laps or more">
+    <laps goal="5"/>
+  </achievement>
 </achievements>
 

@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2DArrayShadow shadowtex;
@@ -13,9 +12,16 @@ uniform mat4 shadowmat[4];
 //uniform vec2 wind;
 //uniform float shadowoffset;
 
+#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
+#else
+varying vec2 uv;
+#define Diff gl_FragData[0]
+#define Spec gl_FragData[1]
+#endif
+
 
 vec3 DecodeNormal(vec2 n)
 {

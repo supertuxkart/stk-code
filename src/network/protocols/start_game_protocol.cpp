@@ -11,6 +11,7 @@
 #include "network/network_world.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
 #include "online/current_user.hpp"
+#include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/kart_selection.hpp"

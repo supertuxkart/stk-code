@@ -17,13 +17,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "input/input_manager.hpp"
-#include "main_loop.hpp"
+
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
-#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"

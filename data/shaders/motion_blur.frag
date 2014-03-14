@@ -17,7 +17,6 @@
 
 
 // motion_blur.frag
-#version 330
 
 // The actual boost amount (which linearly scales the blur to be shown).
 // should be in the range [0.0, 1.0], though a larger value might make
@@ -41,8 +40,13 @@ uniform float mask_radius;
 // Maximum height of texture used
 uniform float max_tex_height;
 
+#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
 
 // Number of samples used for blurring
 #define NB_SAMPLES 8

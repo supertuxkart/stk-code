@@ -1,4 +1,3 @@
-#version 330 compatibility
 uniform sampler2D tex;
 uniform int hastex;
 uniform int viz;

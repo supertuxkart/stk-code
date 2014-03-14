@@ -158,8 +158,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
-#include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -170,20 +170,17 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/client_network_manager.hpp"
 #include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
 #include "online/current_user.hpp"
-#include "online/request_manager.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
-#include "online/current_user.hpp"
-#include "online/request_manager.hpp"
 #include "online/profile_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
@@ -403,6 +400,9 @@ void cmdLineHelp()
                               " and the music.\n"
     "  -t,  --track=NAME       Start at track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
+    "       --add-gp-dir=DIR   Load Grand Prix in DIR. Setting will be saved "
+                              "inconfig.xml under additional_gp_directory. Use "
+                              "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
     "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
@@ -584,6 +584,19 @@ int handleCmdLinePreliminary()
                           IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
     }   // --verbose or -v
+    
+    // Enable loading GP's from local directory
+    if(CommandLine::has("--add-gp-dir", &s))
+    {
+        // Ensure that the path ends with a /
+        if (s[s.size()] == '/')
+            UserConfigParams::m_additional_gp_directory = s;
+        else
+            UserConfigParams::m_additional_gp_directory = s + "/";
+
+        Log::info("main", "Additional Grand Prix's will be loaded from %s",
+                           UserConfigParams::m_additional_gp_directory.c_str());
+    }
 
     int n;
     if(CommandLine::has("--xmas", &n))
@@ -683,7 +696,7 @@ int handleCmdLine()
     {
         const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
 
-        if(!player->isLocked(s))
+        if(player && !player->isLocked(s))
         {
             const KartProperties *prop =
                 kart_properties_manager->getKart(s);
@@ -709,9 +722,12 @@ int handleCmdLine()
         }
         else   // kart locked
         {
-            Log::warn("main", "Kart '%s' has not been unlocked yet.",
-                       s.c_str());
-            return 0;
+            if (player)
+                Log::warn("main", "Kart '%s' has not been unlocked yet.",
+                          s.c_str());
+            else
+                Log::warn("main",
+                        "A default player must exist in order to use --kart.");
         }   // if kart locked
     }   // if --kart
 
@@ -751,7 +767,7 @@ int handleCmdLine()
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
         const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
-        if (!player->isLocked(s))
+        if (player && !player->isLocked(s))
         {
             race_manager->setTrack(s);
             Log::verbose("main", "You choose to start in track '%s'.",
@@ -783,9 +799,12 @@ int handleCmdLine()
         }
         else
         {
-            Log::warn("main", "Track '%s' has not been unlocked yet.",
-                      s.c_str());
-            return 0;
+            if (player)
+                Log::warn("main", "Track '%s' has not been unlocked yet.",
+                          s.c_str());
+            else
+                Log::warn("main",
+                       "A default player must exist in order to use --track.");
         }
     }   // --track
 
@@ -1009,6 +1028,7 @@ void initRest()
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
     addons_manager          = new AddonsManager();
+    Online::ProfileManager::create();
 
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
@@ -1056,18 +1076,43 @@ void initRest()
 }   // initRest
 
 //=============================================================================
-#ifdef BREAKPAD
-bool ShowDumpResults(const wchar_t* dump_path,
-                     const wchar_t* minidump_id,
-                     void* context,
-                     EXCEPTION_POINTERS* exinfo,
-                     MDRawAssertionInfo* assertion,
-                     bool succeeded)
+void askForInternetPermission()
 {
-    wprintf(L"Path: %s id %s.\n", dump_path, minidump_id);
-    return succeeded;
-}
-#endif
+    if (UserConfigParams::m_internet_status ==
+        Online::RequestManager::IPERM_NOT_ASKED)
+    {
+        class ConfirmServer :
+            public MessageDialog::IConfirmDialogListener
+        {
+        public:
+            virtual void onConfirm()
+            {
+                UserConfigParams::m_internet_status =
+                    Online::RequestManager::IPERM_ALLOWED;
+                GUIEngine::ModalDialog::dismiss();
+            }   // onConfirm
+            // --------------------------------------------------------
+            virtual void onCancel()
+            {
+                UserConfigParams::m_internet_status =
+                    Online::RequestManager::IPERM_NOT_ALLOWED;
+                GUIEngine::ModalDialog::dismiss();
+            }   // onCancel
+        };   // ConfirmServer
+
+        new MessageDialog(_("SuperTuxKart may connect to a server "
+            "to download add-ons and notify you of updates. Would you "
+            "like this feature to be enabled? (To change this setting "
+            "at a later time, go to options, select tab "
+            "'User Interface', and edit \"Allow STK to connect to the "
+            "Internet\")."),
+            MessageDialog::MESSAGE_DIALOG_CONFIRM,
+            new ConfirmServer(), true);
+    }
+
+}   // askForInternetPermission
+
+//=============================================================================
 
 #if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
 #pragma comment(linker, "/SUBSYSTEM:console")
@@ -1076,10 +1121,6 @@ bool ShowDumpResults(const wchar_t* dump_path,
 // ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
-#ifdef BREAKPAD
-    google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
-                                         NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
-#endif
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
@@ -1204,40 +1245,15 @@ int main(int argc, char *argv[] )
                 wiimote_manager->askUserToConnectWiimotes();
             }
 #endif
-            if(UserConfigParams::m_internet_status ==
-                Online::RequestManager::IPERM_NOT_ASKED)
-            {
-                class ConfirmServer :
-                      public MessageDialog::IConfirmDialogListener
-                {
-                public:
-                    virtual void onConfirm()
-                    {
-                        UserConfigParams::m_internet_status =
-                                 Online::RequestManager::IPERM_ALLOWED;
-                        GUIEngine::ModalDialog::dismiss();
-                    }   // onConfirm
-                    // --------------------------------------------------------
-                    virtual void onCancel()
-                    {
-                        UserConfigParams::m_internet_status =
-                            Online::RequestManager::IPERM_NOT_ALLOWED;
-                        GUIEngine::ModalDialog::dismiss();
-                    }   // onCancel
-                };   // ConfirmServer
-
-                new MessageDialog(_("SuperTuxKart may connect to a server "
-                    "to download add-ons and notify you of updates. Would you "
-                    "like this feature to be enabled? (To change this setting "
-                    "at a later time, go to options, select tab "
-                    "'User Interface', and edit \"Allow STK to connect to the "
-                    "Internet\")."),
-                    MessageDialog::MESSAGE_DIALOG_CONFIRM,
-                    new ConfirmServer(), true);
-            }
+            askForInternetPermission();
         }
         else
         {
+            // Skip the start screen. This esp. means that no login screen is
+            // displayed (if necessary), so we have to make sure there is
+            // a current player
+            PlayerManager::get()->enforceCurrentPlayer();
+            
             InputDevice *device;
 
             // Use keyboard 0 by default in --no-start-screen
@@ -1393,7 +1409,7 @@ static void cleanSuperTuxKart()
     //see InitTuxkart()
     Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
-    Online::ProfileManager::deallocate();
+    Online::ProfileManager::destroy();
     Online::CurrentUser::deallocate();
     GUIEngine::DialogQueue::deallocate();
 

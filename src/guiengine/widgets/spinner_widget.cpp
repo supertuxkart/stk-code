@@ -39,13 +39,13 @@ using namespace irr::video;
 SpinnerWidget::SpinnerWidget(const bool gauge) : Widget(WTYPE_SPINNER)
 {
     m_gauge = gauge;
-
     m_listener = NULL;
     m_graphical = false;
     m_check_inside_me = true; //FIXME: not sure this is necessary
     m_supports_multiplayer = true;
     m_value = -1;
-
+    m_use_background_color=false;
+    m_spinner_widget_player_id=-1;
     m_min = 0;
     m_max = 999;
 }
@@ -160,6 +160,7 @@ void SpinnerWidget::add()
         {
             label->setText(m_labels[m_value].c_str() );
         }
+	
     }
 
 
@@ -173,9 +174,10 @@ void SpinnerWidget::add()
     m_children[2].m_id = m_children[2].m_element->getID();
 
     // refresh display
+	
+
     setValue(m_value);
 }
-
 // -----------------------------------------------------------------------------
 
 ITexture* SpinnerWidget::getTexture()

@@ -1,12 +1,18 @@
-#version 330
 uniform mat4 ModelViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform vec3 Position;
 uniform vec2 Size;
 
+#if __VERSION__ >= 130
 in vec2 Corner;
 in vec2 Texcoord;
 out vec2 uv;
+#else
+attribute vec2 Corner;
+attribute vec2 Texcoord;
+varying vec2 uv;
+#endif
+
 
 void main(void)
 {

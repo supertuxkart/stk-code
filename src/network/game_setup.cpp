@@ -20,6 +20,7 @@
 
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
+#include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
@@ -49,7 +50,7 @@ void GameSetup::addPlayer(NetworkPlayerProfile* profile)
 {
     m_players.push_back(profile);
     Log::info("GameSetup", "New player in the game setup. Global id : %u, "
-        "Race id : %d.", profile->user_profile->getID(), profile->race_id);
+             "Race id : %d.", profile->user_profile->getID(), profile->race_id);
 }
 
 //-----------------------------------------------------------------------------

@@ -17,10 +17,9 @@
 
 #include "states_screens/addons_screen.hpp"
 
-#include <iostream>
-
 #include "addons/addons_manager.hpp"
 #include "addons/news_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -33,6 +32,8 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <iostream>
 
 DEFINE_SCREEN_SINGLETON( AddonsScreen );
 

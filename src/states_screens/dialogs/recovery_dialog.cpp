@@ -17,8 +17,6 @@
 
 #include "states_screens/dialogs/recovery_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
@@ -26,6 +24,7 @@
 #include "utils/string_utils.hpp"
 #include "online/messages.hpp"
 
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -103,8 +102,8 @@ bool RecoveryDialog::onEscapePressed()
 
 void RecoveryDialog::processInput()
 {
-    const stringw username = m_username_widget->getText().trim();
-    const stringw email = m_email_widget->getText().trim();
+    const core::stringw username = m_username_widget->getText().trim();
+    const core::stringw email = m_email_widget->getText().trim();
     if (username.size() < 4 || username.size() > 30 || email.size() < 4 || email.size() > 50)
     {
         sfx_manager->quickSound("anvil");

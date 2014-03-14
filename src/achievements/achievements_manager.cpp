@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -35,11 +36,27 @@
 AchievementsManager* AchievementsManager::m_achievements_manager = NULL;
 
 // ----------------------------------------------------------------------------
-/** Constructor, which reads data/achievements.xml.
+/** Constructor, which reads data/achievements.xml and stores the information
+ *  in AchievementInfo objects.
  */
 AchievementsManager::AchievementsManager()
 {
-    parseAssetFile();
+    const std::string file_name = file_manager->getAsset("achievements.xml");
+    const XMLNode *root = file_manager->createXMLTree(file_name);
+    unsigned int num_nodes = root->getNumNodes();
+    for (unsigned int i = 0; i < num_nodes; i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        std::string type("");
+        node->get("type", &type);
+        AchievementInfo * achievement_info = new AchievementInfo(node);
+        m_achievements_info[achievement_info->getID()] = achievement_info;
+    }
+    if (num_nodes != m_achievements_info.size())
+        Log::error("AchievementsManager",
+                   "Multiple achievements with the same id!");
+
+    delete root;
 }   // AchievementsManager
 
 // ----------------------------------------------------------------------------
@@ -51,46 +68,6 @@ AchievementsManager::~AchievementsManager()
     }
     m_achievements_info.clear();
 }   // ~AchievementsManager
-
-// ----------------------------------------------------------------------------
-/** Parses the data/achievements.xml file and stores the information about
- *  all achievements in its internal map.
- */
-void AchievementsManager::parseAssetFile()
-{
-    const std::string file_name = file_manager->getAsset("achievements.xml");
-    const XMLNode *root         = file_manager->createXMLTree(file_name);
-    unsigned int num_nodes = root->getNumNodes();
-    for(unsigned int i = 0; i < num_nodes; i++)
-    {
-        const XMLNode *node = root->getNode(i);
-        std::string type("");
-        node->get("type", &type);
-        AchievementInfo * achievement_info;
-        if(type == "single")
-        {
-            achievement_info = new SingleAchievementInfo(node);
-        }
-        else if(type == "map")
-        {
-            achievement_info = new MapAchievementInfo(node);
-        }
-        else
-        {
-            Log::error("AchievementsManager",
-                       "Non-existent achievement type '%s'. Skipping - "
-                       "definitely results in unwanted behaviour.",
-                       type.c_str());
-            continue;
-        }
-        m_achievements_info[achievement_info->getID()] = achievement_info;
-    }
-    if(num_nodes != m_achievements_info.size())
-        Log::error("AchievementsManager::parseAchievements",
-                   "Multiple achievements with the same id!");
-
-    delete root;
-}   // parseAssetFile
 
 // ----------------------------------------------------------------------------
 /** Create a new AchievementStatus object that stores all achievement status
@@ -107,16 +84,8 @@ AchievementsStatus*
     for (it  = m_achievements_info.begin(); 
          it != m_achievements_info.end(); ++it)
     {
-        Achievement::AchievementType achievement_type = it->second->getType();
         Achievement * achievement;
-        if (achievement_type == Achievement::AT_SINGLE)
-        {
-            achievement = new SingleAchievement(it->second);
-        }
-        else if (achievement_type == Achievement::AT_MAP)
-        {
-            achievement = new MapAchievement(it->second);
-        }
+        achievement = new Achievement(it->second);
         status->add(achievement);
     }
 

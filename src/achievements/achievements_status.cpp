@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -34,6 +35,8 @@
 
 
 // ----------------------------------------------------------------------------
+/** Constructor for an Achievement.
+ */
 AchievementsStatus::AchievementsStatus()
 {
     m_valid  = true;
@@ -41,9 +44,15 @@ AchievementsStatus::AchievementsStatus()
 }   // AchievementsStatus
 
 // ----------------------------------------------------------------------------
+/** Removes all achievements.
+ */
 AchievementsStatus::~AchievementsStatus()
 {
-    deleteAchievements();
+    std::map<uint32_t, Achievement *>::iterator it;
+    for (it = m_achievements.begin(); it != m_achievements.end(); ++it) {
+        delete it->second;
+    }
+    m_achievements.clear();
 }   // ~AchievementsStatus
 
 // ----------------------------------------------------------------------------
@@ -77,15 +86,6 @@ void AchievementsStatus::add(Achievement *achievement)
     m_achievements[achievement->getID()] = achievement;
 }    // add
 
-// ----------------------------------------------------------------------------
-void AchievementsStatus::deleteAchievements()
-{
-    std::map<uint32_t, Achievement *>::iterator it;
-    for ( it = m_achievements.begin(); it != m_achievements.end(); ++it ) {
-        delete it->second;
-    }
-    m_achievements.clear();
-}   // deleteAchievements
 
 // ----------------------------------------------------------------------------
 /** Saves the achievement status to a file. Achievements are stored as part
@@ -110,7 +110,7 @@ Achievement * AchievementsStatus::getAchievement(uint32_t id)
     if ( m_achievements.find(id) != m_achievements.end())
         return m_achievements[id];
     return NULL;
-}
+}   // getAchievement
 
 // ----------------------------------------------------------------------------
 void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
@@ -121,7 +121,7 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
         if(achievement != NULL)
             achievement->setAchieved();
     }
-}
+}   // sync
 
 // ----------------------------------------------------------------------------
 void AchievementsStatus::onRaceEnd()
@@ -131,4 +131,4 @@ void AchievementsStatus::onRaceEnd()
     for ( iter = m_achievements.begin(); iter != m_achievements.end(); ++iter ) {
         iter->second->onRaceEnd();
     }
-}
+}   // onRaceEnd

@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D tex;
 uniform sampler2D dtex;
 uniform mat4 invproj;

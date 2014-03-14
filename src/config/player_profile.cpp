@@ -38,11 +38,13 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 #ifdef DEBUG
     m_magic_number = 0xABCD1234;
 #endif
-    m_name                =  name;
+    m_name                = name;
     m_is_guest_account    = is_guest;
+    m_is_default          = false;
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
     m_story_mode_status   = unlock_manager->createStoryModeStatus();
+    m_is_default          = false;
     m_achievements_status = 
                         AchievementsManager::get()->createAchievementsStatus();
 }   // PlayerProfile
@@ -98,6 +100,15 @@ void PlayerProfile::incrementUseFrequency()
     if (m_is_guest_account) m_use_frequency = -1;
     else m_use_frequency++;
 }   // incrementUseFrequency
+
+// ------------------------------------------------------------------------
+/** Notification of a finished race, which can trigger fulfilling
+*  challenges. */
+void PlayerProfile::raceFinished()
+{
+    m_story_mode_status->raceFinished();
+    m_achievements_status->onRaceEnd();
+}   // raceFinished
 
 //------------------------------------------------------------------------------
 /** Comparison used to sort players. 

@@ -1,4 +1,3 @@
-#version 330 compatibility
 uniform sampler2D ntex;
 uniform sampler2D ctex;
 uniform vec3 campos;

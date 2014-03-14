@@ -2,7 +2,8 @@
 #define QUICK_JOIN_PROTOCOL_HPP
 
 #include "network/protocol.hpp"
-#include "online/request.hpp"
+
+namespace Online { class XMLRequest; }
 
 class QuickJoinProtocol : public Protocol
 {

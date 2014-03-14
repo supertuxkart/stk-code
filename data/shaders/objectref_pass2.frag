@@ -1,12 +1,18 @@
-#version 330
 uniform sampler2D Albedo;
 uniform sampler2D DiffuseMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D SSAO;
 uniform vec2 screen;
 uniform vec3 ambient;
+
+#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
+
 
 void main(void)
 {

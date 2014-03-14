@@ -44,9 +44,9 @@ class XMLNode;
   *  the actual data about the challenge. The ChallengeStatus stores if the
   *  challenge is not possible yet (inactive), active (i.e. user can try to
   *  solve it), or solved. This status is stored for each difficulty level.
-  *  This data is saved to and loaded from the player.xml file.
-  *  A PlayerProfile will store an array of ChallengeStatuses, one for each
-  *  Challenge in STK.
+  *  This data is saved to and loaded from the players.xml file.
+  *  A StoryModeStatus instance will store an array of ChallengeStatuses, 
+  *  one for each Challenge in STK.
   *
   * \ingroup challenges
   */

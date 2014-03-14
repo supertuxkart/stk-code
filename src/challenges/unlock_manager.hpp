@@ -21,8 +21,6 @@
 
 #include <map>
 
-#include "config/user_config.hpp"
-
 #include "challenges/challenge_data.hpp"
 #include "challenges/story_mode_status.hpp"
 

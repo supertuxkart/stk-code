@@ -101,7 +101,9 @@ void StateManager::updateActivePlayerIDs()
 
 // ----------------------------------------------------------------------------
 
-int StateManager::createActivePlayer(PlayerProfile *profile, InputDevice *device, Online::Profile* user)
+int StateManager::createActivePlayer(PlayerProfile *profile,
+                                     InputDevice *device, 
+                                     Online::OnlineProfile* user)
 {
     ActivePlayer *p;
     int i;
@@ -253,7 +255,7 @@ void StateManager::onStackEmptied()
 
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
                                          InputDevice *device,
-                                         Online::Profile* user)
+                                         Online::OnlineProfile* user)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;

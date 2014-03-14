@@ -20,7 +20,8 @@
 #define GET_PEER_ADDRESS_HPP
 
 #include "network/protocol.hpp"
-#include "online/request.hpp"
+
+namespace Online { class XMLRequest; }
 
 class GetPeerAddress : public Protocol
 {

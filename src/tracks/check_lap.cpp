@@ -20,6 +20,7 @@
 
 #include <string>
 
+#include "config/user_config.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
 #include "modes/linear_world.hpp"

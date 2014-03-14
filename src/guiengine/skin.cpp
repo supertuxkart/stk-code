@@ -1222,11 +1222,41 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         }
     }
 
-    BoxRenderParams& params = (focused || pressed)
-                            ? SkinConfig::m_render_params["spinner::focused"]
-                            : SkinConfig::m_render_params["spinner::neutral"];
+    BoxRenderParams* params;
+    SpinnerWidget* q = dynamic_cast<SpinnerWidget*>(widget);
+    if(q->getUseBackgroundColor())
+    {
+        int player_id=q->getSpinnerWidgetPlayerID();
+        if(player_id==0)
+            params=&SkinConfig::m_render_params["spinner1::neutral"];
+        else if(player_id==1)
+            params=&SkinConfig::m_render_params["spinner2::neutral"];
+        else if(player_id==2)
+            params=&SkinConfig::m_render_params["spinner3::neutral"];
+        else if(player_id==3)
+            params=&SkinConfig::m_render_params["spinner4::neutral"];
+    }
+    else if (focused|| pressed)
+    {
+        params=&SkinConfig::m_render_params["spinner::focused"];
+    }
+    else
+    {
+        params=&SkinConfig::m_render_params["spinner::neutral"];
+    }
+    if (widget->isFocusedForPlayer(0))
+    {
+        core::recti rect2 = rect;
+        rect2.UpperLeftCorner.X += 2;
+        rect2.UpperLeftCorner.Y -= 3;
+        rect2.LowerRightCorner.X -= 2;
+        rect2.LowerRightCorner.Y += 5;
+        drawBoxFromStretchableTexture(widget, rect2,
+                     SkinConfig::m_render_params["squareFocusHalo::neutral"]);
+        
 
-    if (widget->isFocusedForPlayer(1))
+    }
+    else if (widget->isFocusedForPlayer(1))
     {
         core::recti rect2 = rect;
         rect2.UpperLeftCorner.X += 2;
@@ -1278,16 +1308,17 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
                             - (int)center.Y)*texture_size);
     }
 
-    drawBoxFromStretchableTexture(widget, sized_rect, params,
+    drawBoxFromStretchableTexture(widget, sized_rect, *params,
                                   widget->m_deactivated);
 
 
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
+    
     if (w->isGauge() && !w->m_deactivated)
     {
-        const int handle_size = (int)( widget->m_h*params.m_left_border
-                                 /(float)params.getImage()->getSize().Height );
+        const int handle_size = (int)( widget->m_h*params->m_left_border
+                                 /(float)params->getImage()->getSize().Height );
         const float value = (float)(w->getValue() - w->getMin())
                           / (w->getMax() - w->getMin());
 
