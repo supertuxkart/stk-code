@@ -5,23 +5,13 @@
 
 using namespace irr;
 
-static GLuint billboardvbo;
 static GLuint billboardvao = 0;
 
 static void createbillboardvao()
 {
-	float quad[] = {
-		-.5, -.5, 0., 1.,
-		-.5, .5, 0., 0.,
-		.5, -.5, 1., 1.,
-		.5, .5, 1., 0.,
-	};
-	
-	glGenBuffers(1, &billboardvbo);
 	glGenVertexArrays(1, &billboardvao);
 	glBindVertexArray(billboardvao);
-	glBindBuffer(GL_ARRAY_BUFFER, billboardvbo);
-	glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
 	glEnableVertexAttribArray(MeshShader::BillboardShader::attrib_corner);
 	glEnableVertexAttribArray(MeshShader::BillboardShader::attrib_texcoord);
 	glVertexAttribPointer(MeshShader::BillboardShader::attrib_corner, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);

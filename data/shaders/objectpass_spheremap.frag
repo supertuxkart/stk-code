@@ -1,6 +1,7 @@
 uniform samplerCube tex;
 uniform mat4 invproj;
 uniform vec2 screen;
+uniform mat4 TransposeViewMatrix;
 
 #if __VERSION__ >= 130
 in vec3 nor;
@@ -17,7 +18,10 @@ void main() {
     xpos = invproj * xpos;
 
     xpos.xyz /= xpos.w;
-    vec4 detail0 = texture(tex, reflect(xpos.xyz, nor));
+    vec3 viewSampleDir = reflect(xpos.xyz, nor);
+    // Convert sampleDir in world space (where tex was generated)
+    vec4 sampleDir = TransposeViewMatrix * vec4(viewSampleDir, 0.);
+    vec4 detail0 = texture(tex, sampleDir.xyz);
 
     FragColor = vec4(detail0.xyz, 1.);
 }
