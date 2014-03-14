@@ -61,6 +61,7 @@ private:
     void activate();
     void deactivate();
     void sendFriendRequest();
+    void acceptFriendRequest();
 
 public:
     UserInfoDialog(uint32_t showing_id, const core::stringw info = "", bool error = false, bool from_queue = false);

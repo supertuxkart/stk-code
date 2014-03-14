@@ -336,50 +336,6 @@ namespace Online
     }   // requestUserSearch
 
     // ------------------------------------------------------------------------
-    /** A request to the server, to accept a friend request.
-     *  \param friend_id The id of the user of which the request has to be
-     *         accepted.
-     */
-    void CurrentUser::requestAcceptFriend(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::AcceptFriendRequest * request =
-                                        new CurrentUser::AcceptFriendRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "accept-friend-request");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestAcceptFriend
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to accept a friend invitation. Shows a
-     *  confirmation message and takes care of updating all the cached
-     *  information.
-     */
-    void CurrentUser::AcceptFriendRequest::callback()
-    {
-        uint32_t id(0);
-        getXMLData()->get("friendid", &id);
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            OnlineProfile * profile = ProfileManager::get()->getProfileByID(id);
-            profile->setFriend();
-            OnlineProfile::RelationInfo *info = 
-                     new OnlineProfile::RelationInfo(_("Today"), false, false, true);
-            profile->setRelationInfo(info);
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend request accepted!");
-        }
-        else
-            info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog( 
-                   new UserInfoDialog(id, info_text,!isSuccess(), true), true);
-    }   // AcceptFriendRequest::callback
-
-    // ------------------------------------------------------------------------
     /** A request to the server, to decline a friend request.
      *  \param friend_id The id of the user of which the request has to be
      *         declined.

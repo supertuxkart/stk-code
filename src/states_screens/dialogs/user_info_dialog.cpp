@@ -123,6 +123,9 @@ UserInfoDialog::~UserInfoDialog()
 }
 
 // -----------------------------------------------------------------------------
+/** Sends a friend request to the server. When the request is finished, it
+ *  show a dialog with the result of this request.
+ */
 void UserInfoDialog::sendFriendRequest()
 {
     class FriendRequest : public XMLRequest
@@ -172,6 +175,53 @@ void UserInfoDialog::sendFriendRequest()
 }   // sendFriendRequest
 
 // -----------------------------------------------------------------------------
+void UserInfoDialog::acceptFriendRequest()
+{
+    // ----------------------------------------------------------------
+    class AcceptFriendRequest : public XMLRequest
+    {    
+        /** Callback for the request to accept a friend invitation. Shows a
+        *  confirmation message and takes care of updating all the cached
+        *  information.
+        */
+        virtual void callback()
+        {
+            uint32_t id(0);
+            getXMLData()->get("friendid", &id);
+            core::stringw info_text("");
+            if (isSuccess())
+            {
+                OnlineProfile * profile = 
+                                     ProfileManager::get()->getProfileByID(id);
+                profile->setFriend();
+                OnlineProfile::RelationInfo *info =
+                             new OnlineProfile::RelationInfo(_("Today"), false,
+                                                             false, true);
+                profile->setRelationInfo(info);
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+                info_text = _("Friend request accepted!");
+            }
+            else
+                info_text = getInfo();
+            GUIEngine::DialogQueue::get()->pushDialog(
+                new UserInfoDialog(id, info_text, !isSuccess(), true), true);
+
+        }   // callback
+    public:
+        AcceptFriendRequest() : XMLRequest(true) {}
+    };   // AcceptFriendRequest
+    // ------------------------------------------------------------------------
+
+    AcceptFriendRequest *request = new AcceptFriendRequest();
+    CurrentUser::setUserDetails(request);
+    request->addParameter("action", "accept-friend-request");
+    request->addParameter("friendid", m_profile->getID());
+    request->queue();
+    m_processing = true;
+    m_options_widget->setDeactivated();
+}   // acceptFriendRequest
+
+// -----------------------------------------------------------------------------
 GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& eventSource)
 {
 
@@ -207,9 +257,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_accept_widget->m_properties[PROP_ID])
         {
-            CurrentUser::get()->requestAcceptFriend(m_profile->getID());
-            m_processing = true;
-            m_options_widget->setDeactivated();
+            acceptFriendRequest();
             return GUIEngine::EVENT_BLOCK;
         }
         else if(selection == m_decline_widget->m_properties[PROP_ID])

@@ -88,13 +88,6 @@ namespace Online
             };   // SetAddonVoteRequest
 
             // ----------------------------------------------------------------
-            class AcceptFriendRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                AcceptFriendRequest() : XMLRequest(true) {}
-            };   // AcceptFriendRequest
-
-            // ----------------------------------------------------------------
             class DeclineFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
