@@ -254,34 +254,6 @@ namespace Online
     }   // signOut
 
     // ------------------------------------------------------------------------
-    const CurrentUser::ServerCreationRequest*
-                  CurrentUser::requestServerCreation(const core::stringw &name,
-                                                     int max_players)
-    {
-        assert(m_state == US_SIGNED_IN);
-        ServerCreationRequest * request = new ServerCreationRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action",           "create_server");
-        request->addParameter("token",            getToken());
-        request->addParameter("userid",           getID());
-        request->addParameter("name",             name);
-        request->addParameter("max_players",      max_players);
-        request->queue();
-        return request;
-    }   // requestServerCreation
-
-    // ------------------------------------------------------------------------
-    void CurrentUser::ServerCreationRequest::callback()
-    {
-        if(isSuccess())
-        {
-            Server * server = new Server(*getXMLData()->getNode("server"));
-            ServersManager::get()->addServer(server);
-            m_created_server_id = server->getServerId();
-        }
-    }   // ServerCreationRequest::callback
-
-    // ------------------------------------------------------------------------
     CurrentUser::ServerJoinRequest* 
                              CurrentUser::requestServerJoin(uint32_t server_id,
                                                             bool request_now)

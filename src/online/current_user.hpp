@@ -73,19 +73,6 @@ namespace Online
             };   // SignOutRequest
 
             // ----------------------------------------------------------------
-            class ServerCreationRequest : public XMLRequest {
-                virtual void callback ();
-                uint32_t m_created_server_id;
-            public:
-                ServerCreationRequest() : XMLRequest() {}
-                const uint32_t getCreatedServerID() const 
-                {
-                    assert(isDone());
-                    return m_created_server_id;
-                }   // getCreatedServerID
-            };   // ServerCreationRequest
-
-            // ----------------------------------------------------------------
 
             class ServerJoinRequest : public XMLRequest {
                 virtual void callback ();
@@ -176,7 +163,6 @@ namespace Online
                                                             bool save_session,
                                                             bool request_now = true);
             void                            requestSignOut();
-            const ServerCreationRequest *   requestServerCreation(const irr::core::stringw &name, int max_players);
             ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
 
