@@ -336,52 +336,6 @@ namespace Online
     }   // requestUserSearch
 
     // ------------------------------------------------------------------------
-    /** A request to the server, to decline a friend request.
-     *  \param friend_id The id of the user of which the request has to be
-     *         declined.
-     */
-    void CurrentUser::requestDeclineFriend(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::DeclineFriendRequest * request =
-                                       new CurrentUser::DeclineFriendRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "decline-friend-request");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestDeclineFriend
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to decline a friend invitation. Shows a
-     *  confirmation message and takes care of updating all the cached
-     *  information.
-     */
-    void CurrentUser::DeclineFriendRequest::callback()
-    {
-        uint32_t id(0);
-        getXMLData()->get("friendid", &id);
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            CurrentUser::get()->getProfile()->removeFriend(id);
-            ProfileManager::get()->moveToCache(id);
-            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend request declined!");
-        }
-        else
-            info_text = getInfo();
-        GUIEngine::DialogQueue::get()->pushDialog(
-                   new UserInfoDialog(id, info_text,!isSuccess(), true), true);
-    }   // DeclineFriendRequest::callback
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to cancel a pending friend request.
-     *  \param friend_id The id of the user of which the request has to be
-     *  canceled.
-     */
     void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -428,7 +382,7 @@ namespace Online
     {
         assert(m_state == US_SIGNED_IN);
         CurrentUser::RemoveFriendRequest * request = 
-                                        new CurrentUser::RemoveFriendRequest();
+                                  new CurrentUser::RemoveFriendRequest(friend_id);
         request->setServerURL("client-user.php");
         request->addParameter("action", "remove-friend");
         request->addParameter("token", getToken());
@@ -443,20 +397,18 @@ namespace Online
      */
     void CurrentUser::RemoveFriendRequest::callback()
     {
-        uint32_t id(0);
-        getXMLData()->get("friendid", &id);
         core::stringw info_text("");
         if(isSuccess())
         {
-            CurrentUser::get()->getProfile()->removeFriend(id);
-            ProfileManager::get()->moveToCache(id);
-            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
+            CurrentUser::get()->getProfile()->removeFriend(m_id);
+            ProfileManager::get()->moveToCache(m_id);
+            ProfileManager::get()->getProfileByID(m_id)->deleteRelationalInfo();
             OnlineProfileFriends::getInstance()->refreshFriendsList();
             info_text = _("Friend removed!");
         }
         else
             info_text = getInfo();
-        UserInfoDialog *info = new UserInfoDialog(id, info_text,!isSuccess(), 
+        UserInfoDialog *info = new UserInfoDialog(m_id, info_text,!isSuccess(), 
                                                   true);
         GUIEngine::DialogQueue::get()->pushDialog(info, true);
 

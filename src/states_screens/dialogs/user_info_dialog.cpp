@@ -58,6 +58,11 @@ void UserInfoDialog::load()
 void UserInfoDialog::beforeAddingWidgets()
 {
     m_profile = ProfileManager::get()->getProfileByID(m_showing_id);
+
+    // Avoid a crash in case that an invalid m_showing_id is given
+    // (which can only happen if there's a problem on the server).
+    if (!m_profile)
+        m_profile = CurrentUser::get()->getProfile();
     m_self_destroy = false;
     m_enter_profile = false;
     m_processing = false;
@@ -174,7 +179,10 @@ void UserInfoDialog::sendFriendRequest()
 
 }   // sendFriendRequest
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Sends an AcceptFriend request to the server. It will show a popup
+ *  menu with the result once the request has been processed.
+ */
 void UserInfoDialog::acceptFriendRequest()
 {
     // ----------------------------------------------------------------
@@ -222,6 +230,55 @@ void UserInfoDialog::acceptFriendRequest()
 }   // acceptFriendRequest
 
 // -----------------------------------------------------------------------------
+/** A request to the server, to decline a friend request.
+ *  \param friend_id The id of the user of which the request has to be
+ *         declined.
+ */
+void UserInfoDialog::declineFriendRequest()
+{
+    // ----------------------------------------------------------------
+    class DeclineFriendRequest : public XMLRequest
+    {
+        /** A request to the server, to cancel a pending friend request.
+         *  \param friend_id The id of the user of which the request has to be
+         *  canceled.
+         */
+        virtual void callback()
+        {
+            uint32_t id(0);
+            getXMLData()->get("friendid", &id);
+            core::stringw info_text("");
+            if (isSuccess())
+            {
+                CurrentUser::get()->getProfile()->removeFriend(id);
+                ProfileManager::get()->moveToCache(id);
+                ProfileManager::get()->getProfileByID(id)
+                                     ->deleteRelationalInfo();
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+                info_text = _("Friend request declined!");
+            }
+            else
+                info_text = getInfo();
+            GUIEngine::DialogQueue::get()->pushDialog(
+                                new UserInfoDialog(id, info_text, !isSuccess(),
+                                                   true), true);
+        }   // callback
+    public:
+        DeclineFriendRequest() : XMLRequest(true) {}
+    };   // DeclineFriendRequest
+    // ----------------------------------------------------------------
+    DeclineFriendRequest *request = new DeclineFriendRequest();
+    CurrentUser::setUserDetails(request);
+    request->addParameter("action", "decline-friend-request");
+    request->addParameter("friendid", m_profile->getID());
+    request->queue();
+
+    m_processing = true;
+    m_options_widget->setDeactivated();
+
+}   // declineFriendRequest
+
+// -----------------------------------------------------------------------------
 GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& eventSource)
 {
 
@@ -262,9 +319,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_decline_widget->m_properties[PROP_ID])
         {
-            CurrentUser::get()->requestDeclineFriend(m_profile->getID());
-            m_processing = true;
-            m_options_widget->setDeactivated();
+            declineFriendRequest();
             return GUIEngine::EVENT_BLOCK;
         }
     }
