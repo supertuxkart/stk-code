@@ -47,7 +47,7 @@ public:
            ACHIEVE_STRIKE     = 2,
            ACHIEVE_ARCH_ENEMY = 3,
            ACHIEVE_MARATHONER = 4,
-           ACHIEVE_LAST       = ACHIEVE_MARATHONER
+           ACHIEVE_SKIDDING   = 5
     };
     /** Achievement check type: 
      *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
