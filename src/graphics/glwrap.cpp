@@ -197,8 +197,8 @@ void initGL()
 }
 
 // Mostly from shader tutorial
-static
-GLuint LoadShader(const char * file, unsigned type) {
+static GLuint LoadShader(const char * file, unsigned type)
+{
 	GLuint Id = glCreateShader(type);
     std::string Code = "#version 330\n";
 	std::ifstream Stream(file, std::ios::in);
@@ -218,7 +218,8 @@ GLuint LoadShader(const char * file, unsigned type) {
 	glCompileShader(Id);
 
 	glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
-	if (Result == GL_FALSE) {
+	if (Result == GL_FALSE)
+    {
 		glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		char *ErrorMessage = new char[InfoLogLength];
 		glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
@@ -229,7 +230,8 @@ GLuint LoadShader(const char * file, unsigned type) {
 	return Id;
 }
 
-GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path) {
+GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path)
+{
 	GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
 	GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
 
@@ -255,7 +257,8 @@ GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_pat
 	return ProgramID;
 }
 
-GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path) {
+GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path)
+{
     GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
     GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
     GLuint GeometryShaderID = LoadShader(geometry_file_path, GL_GEOMETRY_SHADER);
@@ -284,7 +287,8 @@ GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_pat
     return ProgramID;
 }
 
-GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount) {
+GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount)
+{
 	GLuint Shader = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
 	GLuint Program = glCreateProgram();
 	glAttachShader(Program, Shader);
@@ -294,7 +298,8 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 	GLint Result = GL_FALSE;
 	int InfoLogLength;
 	glGetProgramiv(Program, GL_LINK_STATUS, &Result);
-	if (Result == GL_FALSE) {
+	if (Result == GL_FALSE)
+    {
 		glGetProgramiv(Program, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		char *ErrorMessage = new char[InfoLogLength];
 		glGetProgramInfoLog(Program, InfoLogLength, NULL, ErrorMessage);
@@ -305,11 +310,13 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 	return Program;
 }
 
-GLuint getTextureGLuint(irr::video::ITexture *tex) {
+GLuint getTextureGLuint(irr::video::ITexture *tex)
+{
     return static_cast<irr::video::COpenGLTexture*>(tex)->getOpenGLTextureName();
 }
 
-GLuint getDepthTexture(irr::video::ITexture *tex) {
+GLuint getDepthTexture(irr::video::ITexture *tex)
+{
     assert(tex->isRenderTarget());
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
 }

@@ -18,6 +18,7 @@
 
 #include "graphics/callbacks.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/gpuparticles.hpp"
 #include "graphics/shaders.hpp"
 #include "io/file_manager.hpp"
 #include "utils/log.hpp"
@@ -1293,7 +1294,9 @@ namespace ParticleShader
 	GLuint SimpleParticleRender::uniform_dtex;
 	GLuint SimpleParticleRender::uniform_screen;
 	GLuint SimpleParticleRender::uniform_invproj;
-	
+    GLuint SimpleParticleRender::uniform_color_from;
+    GLuint SimpleParticleRender::uniform_color_to;
+
 	void SimpleParticleRender::init()
 	{
 		Program = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
@@ -1310,9 +1313,15 @@ namespace ParticleShader
 		uniform_invproj = glGetUniformLocation(Program, "invproj");
 		uniform_screen = glGetUniformLocation(Program, "screen");
 		uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_color_from = glGetUniformLocation(Program, "color_from");
+        assert(uniform_color_from != -1);
+        uniform_color_to = glGetUniformLocation(Program, "color_to");
+        assert(uniform_color_to != -1);
 	}
 
-	void SimpleParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_dtex)
+	void SimpleParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix,
+        const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_dtex,
+        const ParticleSystemProxy* particle_system)
 	{
 		glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
 		glUniform2f(uniform_screen, width, height);
@@ -1320,6 +1329,11 @@ namespace ParticleShader
 		glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
 		glUniform1i(uniform_tex, TU_tex);
 		glUniform1i(uniform_dtex, TU_dtex);
+
+        const float* color_from = particle_system->getColorFrom();
+        const float* color_to = particle_system->getColorTo();
+        glUniform3f(uniform_color_from, color_from[0], color_from[1], color_from[2]);
+        glUniform3f(uniform_color_to, color_to[0], color_to[1], color_to[2]);
 	}
 
 	GLuint FlipParticleRender::Program;

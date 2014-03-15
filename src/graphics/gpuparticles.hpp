@@ -19,6 +19,8 @@ protected:
     GLuint current_rendering_flip_vao, non_current_rendering_flip_vao;
     bool m_alpha_additive, has_height_map, flip;
     float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
+    float m_color_from[3];
+    float m_color_to[3];
 
     static GLuint quad_vertex_buffer;
 
@@ -55,8 +57,12 @@ public:
     virtual void setEmitter(scene::IParticleEmitter* emitter);
     virtual void render();
     virtual void OnRegisterSceneNode();
-    void setAlphaAdditive(bool);
-    void setIncreaseFactor(float);
+    void setAlphaAdditive(bool val) { m_alpha_additive = val; }
+    void setIncreaseFactor(float val) { size_increase_factor = val; }
+    void setColorFrom(float r, float g, float b) { m_color_from[0] = r; m_color_from[1] = g; m_color_from[2] = b; }
+    void setColorTo(float r, float g, float b) { m_color_to[0] = r; m_color_to[1] = g; m_color_to[2] = b; }
+    const float* getColorFrom() const { return m_color_from; }
+    const float* getColorTo() const { return m_color_to; }
     void setHeightmap(const std::vector<std::vector<float> >&, float, float, float, float);
     void setFlip();
 };
