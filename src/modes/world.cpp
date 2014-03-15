@@ -445,6 +445,7 @@ void World::terminateRace()
                      &best_player);
     }
 
+    // Check achievements
     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
                                        getTrack()->getIdent(), 1);
     if (raceHasLaps())
@@ -452,6 +453,39 @@ void World::terminateRace()
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
                                            "laps", race_manager->getNumLaps());
     }
+    
+    Achievement *achiev = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
+    if (achiev)
+    {
+        std::string modeName = getIdent(); // Get the race mode name
+        int winnerPosition = 1;
+        int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
+        if (modeName == IDENT_FTL)
+        {
+            winnerPosition = 2;
+            opponents++;
+        }
+        for(unsigned int i = 0; i < kart_amount ; i++)
+        {
+            // Retrieve the current player
+            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
+            if (p && p->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+            {
+                // Check if the player has won
+                if (m_karts[i]->getPosition() == winnerPosition && kart_amount > opponents )
+                {
+                    // Update the achievement
+                    modeName = StringUtils::toLowerCase(modeName);
+                    if (achiev->getValue("opponents") <= 0)
+                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
+                                                            "opponents", opponents);
+                    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
+                                                        modeName, 1);
+                }
+            }
+	    } // for i < kart_amount
+    } // if (achiev)
+
     PlayerManager::get()->getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();
