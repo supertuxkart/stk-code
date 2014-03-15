@@ -25,6 +25,7 @@
   * battle, etc.)
   */
 
+#include <cctype>
 #include <vector>
 
 #include "modes/world_status.hpp"
