@@ -213,6 +213,7 @@ void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjecti
 
   MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView);
 
+  assert(mesh.vao_first_pass);
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
 }
@@ -229,6 +230,7 @@ void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProje
 
   MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0);
 
+  assert(mesh.vao_first_pass);
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElements(ptype, count, itype, 0);
 }
@@ -244,6 +246,7 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 
 	MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, windDir, 0);
 
+    assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -260,6 +263,7 @@ void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 
 	MeshShader::NormalMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
 
+    assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -286,6 +290,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
 
   MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getViewMatrix().getTransposed(), TransposeInverseModelView, irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
 
+  assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
   if (!irr_driver->SkyboxCubeMap)
@@ -365,6 +370,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
 
   MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix);
 
+  assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
 }
@@ -390,6 +396,7 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 
   MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix);
 
+  assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
 }
@@ -416,6 +423,7 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
 
     MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
 
+    assert(mesh.vao_second_pass);
     glBindVertexArray(mesh.vao_second_pass);
     glDrawElements(ptype, count, itype, 0);
 }
@@ -441,6 +449,7 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 
     MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir);
 
+    assert(mesh.vao_second_pass);
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -454,6 +463,7 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProj
 
   MeshShader::UntexturedObjectShader::setUniforms(ModelViewProjectionMatrix);
 
+  assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
 }
@@ -479,6 +489,7 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 
     MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
 
+    assert(mesh.vao_second_pass);
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -504,6 +515,7 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 
     MeshShader::ObjectUnlitShader::setUniforms(ModelViewProjectionMatrix);
 
+    assert(mesh.vao_second_pass);
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -531,6 +543,7 @@ void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelView
 
   MeshShader::DetailledObjectPass2Shader::setUniforms(ModelViewProjectionMatrix);
 
+  assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
 }
@@ -556,6 +569,7 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 
     MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix);
 
+    assert(mesh.vao_second_pass);
 	glBindVertexArray(mesh.vao_second_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -571,6 +585,7 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 
     MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
 
+    assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -601,6 +616,7 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
     glUseProgram(MeshShader::TransparentFogShader::Program);
     MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, irr_driver->getInvProjMatrix(), fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
 
+    assert(mesh.vao_first_pass);
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElements(ptype, count, itype, 0);
 }
@@ -619,6 +635,7 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 
 	MeshShader::BubbleShader::setUniforms(ModelViewProjectionMatrix, 0, time, transparency);
 
+    assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
@@ -637,6 +654,7 @@ void drawShadowRef(const GLMesh &mesh)
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::RefShadowShader::setUniforms(ShadowMVP, 0);
 
+    assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElements(ptype, count, itype, 0);
 }
@@ -661,6 +679,7 @@ void drawShadow(const GLMesh &mesh)
 
     MeshShader::ShadowShader::setUniforms(ShadowMVP);
 
+    assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElements(ptype, count, itype, 0);
 }
@@ -799,6 +818,7 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
             MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
         break;
     }
+    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
     mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
     if (mesh.Stride >= 44)
         mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);

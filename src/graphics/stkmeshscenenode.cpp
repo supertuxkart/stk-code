@@ -132,11 +132,9 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     computeMVP(ModelViewProjectionMatrix);
     MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
 
-    if (mesh.vao_glow_pass != 0)
-    {
-        glBindVertexArray(mesh.vao_glow_pass);
-        glDrawElements(ptype, count, itype, 0);
-    }
+    assert(mesh.vao_glow_pass);
+    glBindVertexArray(mesh.vao_glow_pass);
+    glDrawElements(ptype, count, itype, 0);
 }
 
 void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
@@ -158,6 +156,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
     MeshShader::DisplaceMaskShader::setUniforms(ModelViewProjectionMatrix);
 
+    assert(mesh.vao_displace_mask_pass);
     glBindVertexArray(mesh.vao_displace_mask_pass);
     glDrawElements(ptype, count, itype, 0);
 
@@ -169,6 +168,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     glUseProgram(MeshShader::DisplaceShader::Program);
     MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix, core::vector2df(cb->getDirX(), cb->getDirY()), core::vector2df(cb->getDir2X(), cb->getDir2Y()), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1, 2);
 
+    assert(mesh.vao_displace_pass);
     glBindVertexArray(mesh.vao_displace_pass);
     glDrawElements(ptype, count, itype, 0);
 }
