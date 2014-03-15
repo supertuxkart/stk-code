@@ -73,19 +73,6 @@ namespace Online
             };   // SignOutRequest
 
             // ----------------------------------------------------------------
-            class ServerCreationRequest : public XMLRequest {
-                virtual void callback ();
-                uint32_t m_created_server_id;
-            public:
-                ServerCreationRequest() : XMLRequest() {}
-                const uint32_t getCreatedServerID() const 
-                {
-                    assert(isDone());
-                    return m_created_server_id;
-                }   // getCreatedServerID
-            };   // ServerCreationRequest
-
-            // ----------------------------------------------------------------
 
             class ServerJoinRequest : public XMLRequest {
                 virtual void callback ();
@@ -101,31 +88,12 @@ namespace Online
             };   // SetAddonVoteRequest
 
             // ----------------------------------------------------------------
-            class FriendRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                FriendRequest() : XMLRequest(true) {}
-            };   // FriendRequest
-
-            // ----------------------------------------------------------------
-            class AcceptFriendRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                AcceptFriendRequest() : XMLRequest(true) {}
-            };   // AcceptFriendRequest
-
-            // ----------------------------------------------------------------
-            class DeclineFriendRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                DeclineFriendRequest() : XMLRequest(true) {}
-            };   // DeclineFriendRequest
-
-            // ----------------------------------------------------------------
             class RemoveFriendRequest : public XMLRequest {
+                unsigned int m_id;
                 virtual void callback ();
             public:
-                RemoveFriendRequest() : XMLRequest(true) {}
+                RemoveFriendRequest(unsigned int id)
+                    : XMLRequest(true), m_id(id) {}
             };   // RemoveFriendRequest
 
             // ----------------------------------------------------------------
@@ -168,7 +136,7 @@ namespace Online
             /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
-            static void setUserDetails(HTTPRequest *html);
+            static void setUserDetails(HTTPRequest *request);
 
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
@@ -176,24 +144,12 @@ namespace Online
                                                             bool save_session,
                                                             bool request_now = true);
             void                            requestSignOut();
-            const ServerCreationRequest *   requestServerCreation(const irr::core::stringw &name, int max_players);
             ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
-
-
-            /** Register */
-            const XMLRequest *              requestSignUp(  const irr::core::stringw &username,
-                                                            const irr::core::stringw &password,
-                                                            const irr::core::stringw &password_ver,
-                                                            const irr::core::stringw &email);
-
-            const XMLRequest *              requestRecovery(const irr::core::stringw &username,
-                                                            const irr::core::stringw &email);
 
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
             const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
             void                            requestFriendRequest(const uint32_t friend_id) const;
             void                            requestAcceptFriend(const uint32_t friend_id) const;
-            void                            requestDeclineFriend(const uint32_t friend_id) const;
             void                            requestRemoveFriend(const uint32_t friend_id) const;
             void                            requestCancelFriend(const uint32_t friend_id) const;
             void                            requestPasswordChange(  const irr::core::stringw &current_password,

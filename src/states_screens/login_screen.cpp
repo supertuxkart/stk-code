@@ -29,6 +29,7 @@
 #include "states_screens/online_screen.hpp"
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/dialogs/recovery_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -174,6 +175,7 @@ void LoginScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else if(button=="recovery")
         {
+            new RecoveryDialog();
         }
         else if(button=="cancel")
             StateManager::get()->escapePressed();
