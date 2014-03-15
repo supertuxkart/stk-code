@@ -132,8 +132,11 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     computeMVP(ModelViewProjectionMatrix);
     MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
 
-    glBindVertexArray(mesh.vao_glow_pass);
-    glDrawElements(ptype, count, itype, 0);
+    if (mesh.vao_glow_pass != 0)
+    {
+        glBindVertexArray(mesh.vao_glow_pass);
+        glDrawElements(ptype, count, itype, 0);
+    }
 }
 
 void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
