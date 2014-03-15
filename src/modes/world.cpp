@@ -475,7 +475,7 @@ void World::terminateRace()
                 if (m_karts[i]->getPosition() == winnerPosition && kart_amount > opponents )
                 {
                     // Update the achievement
-                    std::transform(modeName.begin(), modeName.end(), modeName.begin(), std::tolower);
+                    modeName = StringUtils::toLowerCase(modeName);
                     if (achiev->getValue("opponents") <= 0)
                         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
                                                             "opponents", opponents);
