@@ -60,8 +60,8 @@ if(USE_WIIUSE)
 endif()
 
 # Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript")
-include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/angelscript")
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
 
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
@@ -244,6 +244,7 @@ target_link_libraries(supertuxkart
     bulletmath
     enet
     stkirrlicht
+    angelscript
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
     ${IRRLICHT_XF86VM_LIBRARY}

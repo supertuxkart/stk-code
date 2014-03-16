@@ -13,7 +13,7 @@
 	//#include <windows.h> // timeGetTime()
 #endif
 
-#include "angelscript.h"
+#include <angelscript.h>
 #include "script_engine.hpp"
 #include "scriptstdstring.h"
 

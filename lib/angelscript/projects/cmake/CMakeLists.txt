@@ -103,17 +103,17 @@ if("${CMAKE_SYSTEM_PROCESSOR}" STREQUAL "x86_64" AND NOT APPLE)
         add_definitions(-fPIC)
 endif()
 
-add_library(Angelscript STATIC ${ANGELSCRIPT_SOURCE} ${ANGELSCRIPT_HEADERS})
-set(LIBRARY_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/../../lib)
+add_library(angelscript STATIC ${ANGELSCRIPT_SOURCE} ${ANGELSCRIPT_HEADERS})
 
-find_package(Threads)
-target_link_libraries(Angelscript ${CMAKE_THREAD_LIBS_INIT})
+#set(LIBRARY_OUTPUT_PATH  ${PROJECT_SOURCE_DIR}/../../lib)
 
-if(MSVC)
-        set_target_properties(Angelscript PROPERTIES COMPILE_FLAGS "/MP")
-endif(MSVC)
+#find_package(Threads)
+#target_link_libraries(Angelscript ${CMAKE_THREAD_LIBS_INIT})
 
-set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
+#if(MSVC)
+#        set_target_properties(Angelscript PROPERTIES COMPILE_FLAGS "/MP")
+#endif(MSVC)
 
-add_subdirectory(../../../samples/game/projects/cmake/ ./game)
+#set(RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/../../bin)
+
 
