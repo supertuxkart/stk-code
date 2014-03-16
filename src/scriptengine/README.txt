@@ -1,42 +1,17 @@
 This is currently only a tiny prototype to get an idea of what the scripting engine can do/ check it's performance.
 TODO:
-set up a build target for angelscript
 get file manager support for loading scripts
 move scripts to stk-data, etc.
 
 
 Steps to get this working.
-1)get AngelScript SDK 2.28.1
 
-http://www.angelcode.com/angelscript/downloads.html
-
-2)Build the AngelScript library
-IF LINUX{
-
-Build AngelScript by going to 
-
-cd ANGELSCRIPT_DIR\sdk\angelscript\projects\gnuc
-make
-
-==> angelscript.a
-==>change stk-code/cmakefilelists.txt (ctrl + f "angelscript)
 ==>change stk-code/src/scriptengine/scriptengine.cpp line 254 as appropriate
-}
-
-IF WINDOWS{
-
-Load the VS Project, Build the .lib
-
-==>angelscriptd.lib
-==>change stk/cmakefilelists.txt (ctrl + f "angelscript)
-==>change stk-code/src/scriptengine/scriptengine.cpp line 254 as appropriate
-}
-
-Copy the generated library file (.a or .lib) to stk-code/dependencies/lib
-Comment/Uncomment the lines in CMakeLists in stk-code as necessary (for Linux/Windows)
-
+(add the required directory)
 Build the game.
-Test by changing the strings in stk-code/src/tracks/
+Play the tutorial
+Test by changing the strings in stk-code/src/tracks/tutorial_bananas.as
+
 
 
 

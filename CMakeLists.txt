@@ -250,11 +250,7 @@ target_link_libraries(supertuxkart
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
-#LINUX
-#target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libangelscript.a)
-
-#WINDOWS
-target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/angelscriptd.lib)   
+ 
 
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
