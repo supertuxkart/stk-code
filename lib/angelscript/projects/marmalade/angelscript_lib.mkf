@@ -1,0 +1,24 @@
+#!/usr/bin/env mkb
+
+display_name "AngelScript_Lib"
+
+includepath
+{
+	../../include
+	../../sdk/add_on
+} 
+
+defines
+{
+}
+
+library
+{
+	".,angelscript_lib"
+}
+
+files
+{
+	(../../include)
+	angelscript.h
+}

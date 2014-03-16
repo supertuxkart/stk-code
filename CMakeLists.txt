@@ -59,6 +59,9 @@ if(USE_WIIUSE)
     include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
+# Build the angelscript library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript")
+include_directories("${PROJECT_SOURCE_DIR}/lib/irrlicht/angelscript")
 
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
@@ -90,6 +93,8 @@ else()
     find_package(OpenAL REQUIRED)
     include_directories(${OPENAL_INCLUDE_DIR})
 endif()
+
+
 
 # OggVorbis
 if(APPLE)
@@ -133,7 +138,6 @@ else()
 endif()
 
 
-    
 # Set some compiler options
 if(UNIX)
     add_definitions(-Wall)
@@ -185,6 +189,8 @@ if(APPLE)
     find_library(AUDIOUNIT_LIBRARY AudioUnit)
     find_library(COCOA_LIBRARY Cocoa)
 
+
+
     target_link_libraries(supertuxkart
          ${IOKIT_LIBRARY}
          ${QUICKTIME_LIBRARY}
@@ -220,6 +226,8 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
+
+
 # CURL
 if(WIN32)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurldll.a)
@@ -227,6 +235,7 @@ else()
     find_package(CURL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
 endif()
+
 
 # Common library dependencies
 target_link_libraries(supertuxkart
@@ -240,12 +249,11 @@ target_link_libraries(supertuxkart
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
-
 #LINUX
 #target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libangelscript.a)
 
 #WINDOWS
-target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/angelscriptd.lib)
+target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/angelscriptd.lib)   
 
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
@@ -255,6 +263,9 @@ if(APPLE)
     set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch i386 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
 endif()
+
+
+
 
 if(USE_FRIBIDI)
     target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
@@ -288,6 +299,9 @@ if(MSVC)
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
         $<TARGET_FILE_DIR:supertuxkart>) 
 endif()
+
+
+
 
 # Optional tools
 add_subdirectory(tools/font_tool)

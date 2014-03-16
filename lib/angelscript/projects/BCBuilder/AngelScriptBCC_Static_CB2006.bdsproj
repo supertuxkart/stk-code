@@ -1,0 +1,454 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<PersonalityInfo>
+		<Option>
+			<Option Name="Personality">CPlusPlusBuilder.Personality</Option>
+			<Option Name="ProjectType">CppStaticLibrary</Option>
+			<Option Name="Version">1.0</Option>
+			<Option Name="GUID">{8966BD6E-C137-42DF-9299-B2D0BDDD4DAC}</Option>
+		</Option>
+	</PersonalityInfo>
+	<CPlusPlusBuilder.Personality>
+		<BCBPROJECT>
+      <project version="10.0">
+        <property category="build.config" name="active" value="0"/>
+        <property category="build.config" name="count" value="1"/>
+        <property category="build.config" name="excludedefaultforzero" value="0"/>
+        <property category="build.config.0" name="builddir" value="Debug"/>
+        <property category="build.config.0" name="key" value="Debug_Build"/>
+        <property category="build.config.0" name="name" value="Debug-Build"/>
+        <property category="build.config.0" name="settings.win32b" value="default"/>
+        <property category="build.config.0" name="type" value="Toolset"/>
+        <property category="build.config.0" name="win32.win32b.builddir" value="Debug_Build"/>
+        <property category="build.config.1" name="key" value="Release_Build"/>
+        <property category="build.config.1" name="name" value="Release-Build"/>
+        <property category="build.config.1" name="settings.win32b" value="default"/>
+        <property category="build.config.1" name="type" value="Toolset"/>
+        <property category="build.config.1" name="win32.win32b.builddir" value="Release_Build"/>
+        <property category="build.node" name="name" value="AngelScriptBCC_Static_CB2006.lib"/>
+        <property category="build.node" name="use_packages" value="0"/>
+        <property category="build.platform" name="active" value="win32"/>
+        <property category="build.platform" name="win32.Debug_Build.toolset" value="win32b"/>
+        <property category="build.platform" name="win32.Release_Build.toolset" value="win32b"/>
+        <property category="build.platform" name="win32.default" value="win32b"/>
+        <property category="build.platform" name="win32.enabled" value="1"/>
+        <property category="build.platform" name="win32.win32b.enabled" value="1"/>
+        <property category="win32.*.win32b.dcc32" name="param.filenames.merge" value="1"/>
+        <property category="win32.*.win32b.tasm32" name="param.listfile.merge" value="1"/>
+        <property category="win32.*.win32b.tasm32" name="param.objfile.merge" value="1"/>
+        <property category="win32.*.win32b.tasm32" name="param.xreffile.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.D.arg.1" value="_DEBUG"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.D.arg.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.Od.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.k.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.n.arg.1" value="..\..\intermediate\Debug"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.n.arg.merge" value="0"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.n.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.r.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.v.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.vi.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.bcc32" name="option.y.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.$D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.$O.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.D.arg.1" value="DEBUG"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.D.arg.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.dcc32" name="option.V.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.D.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.Gn.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.L.arg.1" value="$(BDS)\lib\debug"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.L.arg.merge" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.L.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.ilink32" name="option.v.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="option.z.enabled" value="1"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="option.zd.enabled" value="0"/>
+        <property category="win32.Debug_Build.win32b.tasm32" name="option.zi.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.D.arg.1" value="NDEBUG"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.D.arg.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.D.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.n.arg.1" value="..\..\intermediate\Release"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.n.arg.merge" value="0"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.n.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.bcc32" name="option.r.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.dcc32" name="option.$D.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.dcc32" name="option.$O.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.dcc32" name="option.V.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.ilink32" name="option.L.arg.1" value="$(BDS)\lib\release"/>
+        <property category="win32.Release_Build.win32b.ilink32" name="option.L.arg.merge" value="1"/>
+        <property category="win32.Release_Build.win32b.ilink32" name="option.L.enabled" value="1"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.z.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.zd.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.zi.enabled" value="0"/>
+        <property category="win32.Release_Build.win32b.tasm32" name="option.zn.enabled" value="1"/>
+        <optionset name="all_configurations">
+          <property category="node" name="displayname" value="Alle Konfigurationen"/>
+          <property category="win32.*.win32b.bcc32" name="container.SelectedOptimizations.containerenabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="container.SelectedWarnings.containerenabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.4.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.5.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.6.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.A.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.AK.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.AU.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.D.arg.1" value="WIN32"/>
+          <property category="win32.*.win32b.bcc32" name="option.D.arg.2" value="AS_USE_NAMESPACE"/>
+          <property category="win32.*.win32b.bcc32" name="option.D.arg.merge" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.D.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.H.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.H=.arg.1" value="..\..\intermediate\angelscript_bcb100.pch"/>
+          <property category="win32.*.win32b.bcc32" name="option.H=.arg.merge" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.H=.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hc.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hh=.arg.1" value="pch1.h"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hh=.arg.merge" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hh=.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hi.arg.1" value="pch1.h"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hi.arg.merge" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Hi.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.1" value="..\..\include"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.10" value="..\..\..\add_on\scriptarray"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.11" value="..\..\..\add_on\scriptany"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.12" value="..\..\..\add_on\contextmgr"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.13" value="..\..\source"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.14" value="$(BDS)\include"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.15" value="$(BDS)\include\vcl"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.16" value="$(BDS)\include\dinkumware"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.2" value="..\..\..\add_on\scriptstring"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.3" value="..\..\..\add_on\scriptstdstring"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.4" value="..\..\..\add_on\scriptmath3d"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.5" value="..\..\..\add_on\scriptmath"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.6" value="..\..\..\add_on\scripthelper"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.7" value="..\..\..\add_on\scriptfile"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.8" value="..\..\..\add_on\scriptdictionary"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.9" value="..\..\..\add_on\scriptbuilder"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.arg.merge" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.I.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Jgi.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Jgx.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.O1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.O2.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Od.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.V0.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.V1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Ve.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vmd.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vmm.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vms.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.Vx.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.X.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-1.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-2.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-3.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.align-5.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.b.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.disablewarns.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.k.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.n.arg.1" value="..\..\intermediate\"/>
+          <property category="win32.*.win32b.bcc32" name="option.n.arg.merge" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.n.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.noregistervars.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.p.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.pm.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.pr.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.ps.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.rd.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.1" value="_RTLDLL"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.2" value="NO_STRICT"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.arg.merge" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.sysdefines.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.tW.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.tWM.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.vi.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.w.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.waus.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.wbbf.enabled" value="1"/>
+          <property category="win32.*.win32b.bcc32" name="option.wccc.enabled" value="0"/>
+          <property category="win32.*.win32b.bcc32" name="option.wrch.enabled" value="0"/>
+          <property category="win32.*.win32b.brcc32" name="option.D.arg.merge" value="1"/>
+          <property category="win32.*.win32b.brcc32" name="option.D.enabled" value="0"/>
+          <property category="win32.*.win32b.brcc32" name="option.INCLUDEPATH.arg.1" value="..\..\source"/>
+          <property category="win32.*.win32b.brcc32" name="option.INCLUDEPATH.arg.2" value="$(BDS)\include"/>
+          <property category="win32.*.win32b.brcc32" name="option.INCLUDEPATH.arg.3" value="$(BDS)\include\vcl"/>
+          <property category="win32.*.win32b.brcc32" name="option.INCLUDEPATH.arg.4" value="$(BDS)\include\dinkumware"/>
+          <property category="win32.*.win32b.brcc32" name="option.INCLUDEPATH.arg.merge" value="1"/>
+          <property category="win32.*.win32b.brcc32" name="option.INCLUDEPATH.enabled" value="1"/>
+          <property category="win32.*.win32b.brcc32" name="option.outputdir.arg.1" value="..\..\source\"/>
+          <property category="win32.*.win32b.brcc32" name="option.outputdir.arg.merge" value="1"/>
+          <property category="win32.*.win32b.brcc32" name="option.outputdir.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.$.arg.1" value="Y-"/>
+          <property category="win32.*.win32b.dcc32" name="option.$.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.$.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.$D.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.$L.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.1" value="..\..\..\add_on\scriptstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.10" value="..\..\..\add_on\scriptany"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.11" value="..\..\..\add_on\contextmgr"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.12" value="..\..\source"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.2" value="..\..\..\add_on\scriptstdstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.3" value="..\..\..\add_on\scriptmath3d"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.4" value="..\..\..\add_on\scriptmath"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.5" value="..\..\..\add_on\scripthelper"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.6" value="..\..\..\add_on\scriptfile"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.7" value="..\..\..\add_on\scriptdictionary"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.8" value="..\..\..\add_on\scriptbuilder"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.9" value="..\..\..\add_on\scriptarray"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.I.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.M.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.N0.arg.1" value="..\..\source\"/>
+          <property category="win32.*.win32b.dcc32" name="option.N0.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.N0.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.NO.arg.1" value="..\..\source\"/>
+          <property category="win32.*.win32b.dcc32" name="option.NO.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.NO.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.1" value="..\..\..\add_on\scriptstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.10" value="..\..\..\add_on\scriptany"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.11" value="..\..\..\add_on\contextmgr"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.12" value="..\..\source"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.2" value="..\..\..\add_on\scriptstdstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.3" value="..\..\..\add_on\scriptmath3d"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.4" value="..\..\..\add_on\scriptmath"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.5" value="..\..\..\add_on\scripthelper"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.6" value="..\..\..\add_on\scriptfile"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.7" value="..\..\..\add_on\scriptdictionary"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.8" value="..\..\..\add_on\scriptbuilder"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.9" value="..\..\..\add_on\scriptarray"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.O.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.1" value="..\..\..\add_on\scriptstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.10" value="..\..\..\add_on\scriptany"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.11" value="..\..\..\add_on\contextmgr"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.12" value="..\..\source"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.2" value="..\..\..\add_on\scriptstdstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.3" value="..\..\..\add_on\scriptmath3d"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.4" value="..\..\..\add_on\scriptmath"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.5" value="..\..\..\add_on\scripthelper"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.6" value="..\..\..\add_on\scriptfile"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.7" value="..\..\..\add_on\scriptdictionary"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.8" value="..\..\..\add_on\scriptbuilder"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.9" value="..\..\..\add_on\scriptarray"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.R.enabled" value="0"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.1" value="..\..\..\add_on\scriptstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.10" value="..\..\..\add_on\scriptany"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.11" value="..\..\..\add_on\contextmgr"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.12" value="..\..\source"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.13" value=".\"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.14" value="$(BDS)\lib"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.15" value="$(BDS)\lib\obj"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.2" value="..\..\..\add_on\scriptstdstring"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.3" value="..\..\..\add_on\scriptmath3d"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.4" value="..\..\..\add_on\scriptmath"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.5" value="..\..\..\add_on\scripthelper"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.6" value="..\..\..\add_on\scriptfile"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.7" value="..\..\..\add_on\scriptdictionary"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.8" value="..\..\..\add_on\scriptbuilder"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.9" value="..\..\..\add_on\scriptarray"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.arg.merge" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="option.U.enabled" value="1"/>
+          <property category="win32.*.win32b.dcc32" name="param.filenames.merge" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.1" value="..\..\..\add_on\scriptstring"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.10" value="..\..\..\add_on\scriptany"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.11" value="..\..\..\add_on\contextmgr"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.12" value="..\..\source"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.13" value="$(BDS)\include"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.14" value="$(BDS)\include\vcl"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.2" value="..\..\..\add_on\scriptstdstring"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.3" value="..\..\..\add_on\scriptmath3d"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.4" value="..\..\..\add_on\scriptmath"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.5" value="..\..\..\add_on\scripthelper"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.6" value="..\..\..\add_on\scriptfile"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.7" value="..\..\..\add_on\scriptdictionary"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.8" value="..\..\..\add_on\scriptbuilder"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.9" value="..\..\..\add_on\scriptarray"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.arg.merge" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.I.enabled" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.boa.enabled" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.srcsuffix.arg" value="cpp"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.srcsuffix.arg.merge" value="1"/>
+          <property category="win32.*.win32b.idl2cpp" name="option.srcsuffix.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.1" value="$(BDS)\lib"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.2" value="$(BDS)\lib\obj"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.3" value="$(BDS)\lib\psdk"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.arg.merge" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.L.enabled" value="1"/>
+          <property category="win32.*.win32b.ilink32" name="option.dynamicrtl.enabled" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="option.i.arg.1" value="..\..\source"/>
+          <property category="win32.*.win32b.tasm32" name="option.i.arg.2" value="$(BDS)\include"/>
+          <property category="win32.*.win32b.tasm32" name="option.i.arg.3" value="$(BDS)\include\vcl"/>
+          <property category="win32.*.win32b.tasm32" name="option.i.arg.4" value="$(BDS)\include\dinkumware"/>
+          <property category="win32.*.win32b.tasm32" name="option.i.arg.merge" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="option.i.enabled" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="option.outputdir.arg.1" value="..\..\source\"/>
+          <property category="win32.*.win32b.tasm32" name="option.outputdir.arg.merge" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="option.outputdir.enabled" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="option.w2.enabled" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="option.zn.enabled" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="param.listfile.merge" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="param.objfile.merge" value="1"/>
+          <property category="win32.*.win32b.tasm32" name="param.xreffile.merge" value="1"/>
+          <property category="win32.*.win32b.tlib" name="option.P.arg" value="256"/>
+          <property category="win32.*.win32b.tlib" name="option.P.arg.merge" value="1"/>
+          <property category="win32.*.win32b.tlib" name="option.P.enabled" value="1"/>
+          <property category="win32.*.win32b.tlib" name="option.outputdir.arg.1" value="..\..\lib\"/>
+          <property category="win32.*.win32b.tlib" name="option.outputdir.arg.merge" value="1"/>
+          <property category="win32.*.win32b.tlib" name="option.outputdir.enabled" value="1"/>
+        </optionset>
+      </project>
+      <FILELIST>
+        <FILE FILENAME="AngelScriptBCC_Static_CB2006.bpf" CONTAINERID="BPF" LOCALCOMMAND="" UNITNAME="AngelScriptBCC_Static_CB2006" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_atomic.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_atomic.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_builder.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_builder.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_bytecode.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_bytecode.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_arm.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_arm.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_mips.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_mips.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_ppc.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_ppc.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_ppc_64.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_ppc_64.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_sh4.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_sh4.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_x64_gcc.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_x64_gcc.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_x64_msvc.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_x64_msvc.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_x86.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_x86.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_callfunc_xenon.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_callfunc_xenon.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_compiler.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_compiler.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_configgroup.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_configgroup.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_context.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_context.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_datatype.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_datatype.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_gc.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_gc.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_generic.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_generic.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_globalproperty.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_globalproperty.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_memory.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_memory.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_module.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_module.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_objecttype.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_objecttype.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_outputbuffer.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_outputbuffer.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_parser.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_parser.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_restore.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_restore.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_scriptcode.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_scriptcode.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_scriptengine.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_scriptengine.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_scriptfunction.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_scriptfunction.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_scriptnode.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_scriptnode.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_scriptobject.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_scriptobject.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_string.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_string.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_string_util.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_string_util.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_thread.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_thread.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_tokenizer.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_tokenizer.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_typeinfo.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_typeinfo.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\source\as_variablescope.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="as_variablescope.cpp" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="pch1.h" CONTAINERID="" LOCALCOMMAND="" UNITNAME="" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\contextmgr\contextmgr.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="contextmgr" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\contextmgr\contextmgr.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptany\scriptany.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptany\scriptany.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptany" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptarray\scriptarray.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptarray\scriptarray.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptarray" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptbuilder\scriptbuilder.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptbuilder\scriptbuilder.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptbuilder" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptdictionary\scriptdictionary.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptdictionary\scriptdictionary.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptdictionary" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptfile\scriptfile.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptfile\scriptfile.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptfile" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scripthelper\scripthelper.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scripthelper\scripthelper.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scripthelper" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptmath\scriptmath.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptmath\scriptmath.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptmath" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptmath3d\scriptmath3d.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptmath3d\scriptmath3d.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptmath3d" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptstdstring\scriptstdstring.h" CONTAINERID="" LOCALCOMMAND=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptstdstring\scriptstdstring.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptstdstring" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptstring\scriptstring_utils.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptstring_utils" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptstring\scriptstring.cpp" CONTAINERID="CCompiler" LOCALCOMMAND="" UNITNAME="scriptstring" FORMNAME="" DESIGNCLASS=""/>
+        <FILE FILENAME="..\..\..\add_on\scriptstring\scriptstring.h" CONTAINERID="" LOCALCOMMAND=""/>
+      </FILELIST>
+      <IDEOPTIONS>
+        <VersionInfo>
+          <VersionInfo Name="IncludeVerInfo">False</VersionInfo>
+          <VersionInfo Name="AutoIncBuild">False</VersionInfo>
+          <VersionInfo Name="MajorVer">1</VersionInfo>
+          <VersionInfo Name="MinorVer">0</VersionInfo>
+          <VersionInfo Name="Release">0</VersionInfo>
+          <VersionInfo Name="Build">0</VersionInfo>
+          <VersionInfo Name="Debug">False</VersionInfo>
+          <VersionInfo Name="PreRelease">False</VersionInfo>
+          <VersionInfo Name="Special">False</VersionInfo>
+          <VersionInfo Name="Private">False</VersionInfo>
+          <VersionInfo Name="DLL">False</VersionInfo>
+          <VersionInfo Name="Locale">1026</VersionInfo>
+          <VersionInfo Name="CodePage">1251</VersionInfo>
+        </VersionInfo>
+        <VersionInfoKeys>
+          <VersionInfoKeys Name="CompanyName"></VersionInfoKeys>
+          <VersionInfoKeys Name="FileDescription"></VersionInfoKeys>
+          <VersionInfoKeys Name="FileVersion">1.0.0.0</VersionInfoKeys>
+          <VersionInfoKeys Name="InternalName"></VersionInfoKeys>
+          <VersionInfoKeys Name="LegalCopyright"></VersionInfoKeys>
+          <VersionInfoKeys Name="LegalTrademarks"></VersionInfoKeys>
+          <VersionInfoKeys Name="OriginalFilename"></VersionInfoKeys>
+          <VersionInfoKeys Name="ProductName"></VersionInfoKeys>
+          <VersionInfoKeys Name="ProductVersion">1.0.0.0</VersionInfoKeys>
+          <VersionInfoKeys Name="Comments"></VersionInfoKeys>
+        </VersionInfoKeys>
+        <HistoryLists_hlIncludePath>
+          <HistoryLists_hlIncludePath Name="Count">3</HistoryLists_hlIncludePath>
+          <HistoryLists_hlIncludePath Name="Item0">..\..\source;$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+          <HistoryLists_hlIncludePath Name="Item1">..\..\source;C:\angelscript_2.18.1\sdk\angelscript\source;$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+          <HistoryLists_hlIncludePath Name="Item2">C:\angelscript_2.18.1\sdk\angelscript\source;$(BCB)\include;$(BCB)\include\vcl</HistoryLists_hlIncludePath>
+        </HistoryLists_hlIncludePath>
+        <HistoryLists_hlLibraryPath>
+          <HistoryLists_hlLibraryPath Name="Count">3</HistoryLists_hlLibraryPath>
+          <HistoryLists_hlLibraryPath Name="Item0">..\..\source;$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+          <HistoryLists_hlLibraryPath Name="Item1">..\..\source;C:\angelscript_2.18.1\sdk\angelscript\source;$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+          <HistoryLists_hlLibraryPath Name="Item2">C:\angelscript_2.18.1\sdk\angelscript\source;$(BCB)\lib\obj;$(BCB)\lib</HistoryLists_hlLibraryPath>
+        </HistoryLists_hlLibraryPath>
+        <HistoryLists_hlDebugSourcePath>
+          <HistoryLists_hlDebugSourcePath Name="Count">1</HistoryLists_hlDebugSourcePath>
+          <HistoryLists_hlDebugSourcePath Name="Item0">$(BCB)\source\vcl</HistoryLists_hlDebugSourcePath>
+        </HistoryLists_hlDebugSourcePath>
+        <HistoryLists_hlFinalOutputDir>
+          <HistoryLists_hlFinalOutputDir Name="Count">2</HistoryLists_hlFinalOutputDir>
+          <HistoryLists_hlFinalOutputDir Name="Item0">..\..\lib\</HistoryLists_hlFinalOutputDir>
+          <HistoryLists_hlFinalOutputDir Name="Item1">..\..\lib</HistoryLists_hlFinalOutputDir>
+        </HistoryLists_hlFinalOutputDir>
+        <HistoryLists_hlTlibPageSize>
+          <HistoryLists_hlTlibPageSize Name="Count">2</HistoryLists_hlTlibPageSize>
+          <HistoryLists_hlTlibPageSize Name="Item0">0x0080</HistoryLists_hlTlibPageSize>
+          <HistoryLists_hlTlibPageSize Name="Item1">0x0010</HistoryLists_hlTlibPageSize>
+        </HistoryLists_hlTlibPageSize>
+        <Debugging>
+          <Debugging Name="DebugSourceDirs">$(BCB)\source\vcl</Debugging>
+        </Debugging>
+        <Parameters>
+          <Parameters Name="RunParams"></Parameters>
+          <Parameters Name="Launcher"></Parameters>
+          <Parameters Name="UseLauncher">False</Parameters>
+          <Parameters Name="DebugCWD"></Parameters>
+          <Parameters Name="HostApplication"></Parameters>
+          <Parameters Name="RemoteHost"></Parameters>
+          <Parameters Name="RemotePath"></Parameters>
+          <Parameters Name="RemoteParams"></Parameters>
+          <Parameters Name="RemoteLauncher"></Parameters>
+          <Parameters Name="UseRemoteLauncher">False</Parameters>
+          <Parameters Name="RemoteCWD"></Parameters>
+          <Parameters Name="RemoteDebug">False</Parameters>
+          <Parameters Name="Debug Symbols Search Path"></Parameters>
+          <Parameters Name="LoadAllSymbols">True</Parameters>
+          <Parameters Name="LoadUnspecifiedSymbols">False</Parameters>
+        </Parameters>
+        <Language>
+          <Language Name="ActiveLang"></Language>
+          <Language Name="ProjectLang">$00000000</Language>
+          <Language Name="RootDir"></Language>
+        </Language>
+        <Linker>
+          <Linker Name="LibPrefix"></Linker>
+          <Linker Name="LibSuffix"></Linker>
+          <Linker Name="LibVersion"></Linker>
+        </Linker>
+      </IDEOPTIONS>
+    </BCBPROJECT>
+		<Source>
+			<Source Name="MainSource">AngelScriptBCC_Static_CB2006.bpf</Source>
+		</Source>
+		<buildevents/>
+	</CPlusPlusBuilder.Personality>
+</BorlandProject>
