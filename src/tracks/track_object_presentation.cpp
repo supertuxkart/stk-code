@@ -36,7 +36,7 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/lod_node_loader.hpp"
 #include "tracks/track.hpp"
-
+#include "scriptengine/script_engine.hpp";
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 #include <ICameraSceneNode.h>
@@ -713,8 +713,8 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else if (m_action == "tutorial_bananas")
     {
         m_action_active = false;
-
-        new TutorialMessageDialog(_("Avoid bananas!"), true);
+		ScriptEngineOne* m_script_engine = new ScriptEngineOne();
+		m_script_engine->doit(m_action);
     }
     else if (m_action == "tutorial_giftboxes")
     {
