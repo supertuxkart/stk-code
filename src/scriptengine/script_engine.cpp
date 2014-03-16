@@ -145,7 +145,7 @@ int RunApplication(std::string scriptName)
 	asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
 	if( func == 0 )
 	{
-		std::cout << "The function 'float calc(float, float)' was not found." << std::endl;
+		std::cout << "The function 'void onTrigger()' was not found." << std::endl;
 		ctx->Release();
 		engine->Release();
 		return -1;

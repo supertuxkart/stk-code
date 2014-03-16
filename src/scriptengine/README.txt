@@ -19,6 +19,8 @@ cd ANGELSCRIPT_DIR\sdk\angelscript\projects\gnuc
 make
 
 ==> angelscript.a
+==>change stk-code/cmakefilelists.txt (ctrl + f "angelscript)
+==>change stk-code/src/scriptengine/scriptengine.cpp line 254 as appropriate
 }
 
 IF WINDOWS{
@@ -26,6 +28,8 @@ IF WINDOWS{
 Load the VS Project, Build the .lib
 
 ==>angelscriptd.lib
+==>change stk/cmakefilelists.txt (ctrl + f "angelscript)
+==>change stk-code/src/scriptengine/scriptengine.cpp line 254 as appropriate
 }
 
 Copy the generated library file (.a or .lib) to stk-code/dependencies/lib
