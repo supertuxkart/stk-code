@@ -76,6 +76,17 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_normalMap);
 };
 
+class InstancedObjectPass1Shader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_normal, attrib_origin;
+    static GLuint uniform_MP, uniform_VM;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &ViewMatrix);
+};
+
 class ObjectPass2Shader
 {
 public:
@@ -86,6 +97,18 @@ public:
 
 	static void init();
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+};
+
+class InstancedObjectPass2Shader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_origin;
+    static GLuint uniform_VP, uniform_TM, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 };
 
 class DetailledObjectPass2Shader

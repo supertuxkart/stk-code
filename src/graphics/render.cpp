@@ -36,6 +36,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -49,6 +50,8 @@
 #include "utils/profiler.hpp"
 
 #include <algorithm>
+
+STKInstancedSceneNode *InstancedBox = 0;
 
 void IrrDriver::renderGLSL(float dt)
 {
@@ -132,6 +135,15 @@ void IrrDriver::renderGLSL(float dt)
         transparent_glow_nodes.push_back(repnode);
     }
 
+    if (!InstancedBox)
+    {
+        InstancedBox = new STKInstancedSceneNode(items->getItemModel(items->getItem(0)->getType()), m_scene_manager->getRootSceneNode(), m_scene_manager, -1);
+        InstancedBox->addWorldMatrix(core::vector3df(0, 0, 0));
+        InstancedBox->addWorldMatrix(core::vector3df(1., 0, 0));
+        InstancedBox->addWorldMatrix(core::vector3df(0, 1., 0));
+        InstancedBox->addWorldMatrix(core::vector3df(0, 0, 1.));
+    }
+
     // Start the RTT for post-processing.
     // We do this before beginScene() because we want to capture the glClear()
     // because of tracks that do not have skyboxes (generally add-on tracks)
@@ -203,7 +215,7 @@ void IrrDriver::renderGLSL(float dt)
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
-
+        InstancedBox->render();
 		PROFILER_POP_CPU_MARKER();
 
         // Todo : reenable glow and shadows
@@ -245,7 +257,7 @@ void IrrDriver::renderGLSL(float dt)
             glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
         }
         m_scene_manager->drawAll(m_renderpass);
-
+        InstancedBox->render();
         PROFILER_POP_CPU_MARKER();
 
 		  if (World::getWorld()->getTrack()->isFogEnabled())

@@ -63,6 +63,7 @@ src/graphics/slip_stream.cpp
 src/graphics/stars.cpp
 src/graphics/stkanimatedmesh.cpp
 src/graphics/stkbillboard.cpp
+src/graphics/stkinstancedscenenode.cpp
 src/graphics/stkmesh.cpp
 src/graphics/stkmeshscenenode.cpp
 src/graphics/sun.cpp
@@ -395,6 +396,7 @@ src/graphics/slip_stream.hpp
 src/graphics/stars.hpp
 src/graphics/stkanimatedmesh.hpp
 src/graphics/stkbillboard.hpp
+src/graphics/stkinstancedscenenode.hpp
 src/graphics/stkmesh.hpp
 src/graphics/stkmeshscenenode.hpp
 src/graphics/sun.hpp

@@ -255,7 +255,9 @@ void Shaders::loadShaders()
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
+    MeshShader::InstancedObjectPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+    MeshShader::InstancedObjectPass2Shader::init();
 	MeshShader::DetailledObjectPass2Shader::init();
 	MeshShader::ObjectRimLimitShader::init();
 	MeshShader::UntexturedObjectShader::init();
@@ -425,6 +427,29 @@ namespace MeshShader
         glUniform1i(uniform_normalMap, TU_normalMap);
     }
 
+    GLuint InstancedObjectPass1Shader::Program;
+    GLuint InstancedObjectPass1Shader::attrib_position;
+    GLuint InstancedObjectPass1Shader::attrib_normal;
+    GLuint InstancedObjectPass1Shader::attrib_origin;
+    GLuint InstancedObjectPass1Shader::uniform_MP;
+    GLuint InstancedObjectPass1Shader::uniform_VM;
+
+    void InstancedObjectPass1Shader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/instanced_object_pass1.vert").c_str(), file_manager->getAsset("shaders/object_pass1.frag").c_str());
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_normal = glGetAttribLocation(Program, "Normal");
+        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_VM = glGetUniformLocation(Program, "ViewMatrix");
+    }
+
+    void InstancedObjectPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix)
+    {
+        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+    }
+
     // Solid Lit pass shaders
 
 	GLuint ObjectPass2Shader::Program;
@@ -467,6 +492,49 @@ namespace MeshShader
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
+
+    GLuint InstancedObjectPass2Shader::Program;
+    GLuint InstancedObjectPass2Shader::attrib_position;
+    GLuint InstancedObjectPass2Shader::attrib_texcoord;
+    GLuint InstancedObjectPass2Shader::attrib_origin;
+    GLuint InstancedObjectPass2Shader::uniform_VP;
+    GLuint InstancedObjectPass2Shader::uniform_TM;
+    GLuint InstancedObjectPass2Shader::uniform_screen;
+    GLuint InstancedObjectPass2Shader::uniform_ambient;
+    GLuint InstancedObjectPass2Shader::TU_Albedo;
+
+    void InstancedObjectPass2Shader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/instanced_object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_pass2.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
+        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        TU_Albedo = 3;
+
+        glUseProgram(Program);
+        glUniform1i(uniform_DiffuseMap, 0);
+        glUniform1i(uniform_SpecularMap, 1);
+        glUniform1i(uniform_SSAO, 2);
+        glUniform1i(uniform_Albedo, TU_Albedo);
+        glUseProgram(0);
+    }
+
+    void InstancedObjectPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
+    {
+        glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
+        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
+    }
 
 	GLuint DetailledObjectPass2Shader::Program;
 	GLuint DetailledObjectPass2Shader::attrib_position;
