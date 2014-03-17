@@ -243,7 +243,7 @@ void LinearWorld::newLap(unsigned int kart_index)
     PlayerProfile *p = PlayerManager::get()->getCurrentPlayer();
     if (c && c->getConstProfile() == p)
     {
-        PlayerManager::get()->getCurrentPlayer()->getAchievementsStatus()->onLapEnd();
+        p->getAchievementsStatus()->onLapEnd();
     }
 
     // Only update the kart controller if a kart that has already finished
