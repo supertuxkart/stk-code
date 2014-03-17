@@ -180,6 +180,15 @@ void Achievement::onRaceEnd()
 }   // onRaceEnd
 
 // ----------------------------------------------------------------------------
+/** Called at the end of a lap to potentially reset values.
+*/
+void Achievement::onLapEnd()
+{
+    if (m_achievement_info->needsResetAfterLap())
+        reset();
+}   // onLapEnd
+
+// ----------------------------------------------------------------------------
 /** Checks if this achievement has been achieved.
  */
 void Achievement::check()

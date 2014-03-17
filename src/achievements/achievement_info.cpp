@@ -31,7 +31,7 @@
  */
 AchievementInfo::AchievementInfo(const XMLNode * input)
 {
-    m_reset_after_race = false;
+    m_reset_type       = NEVER;
     m_id               = 0;
     m_title            = "";
     m_description      = "";
@@ -47,10 +47,22 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
                    "ID %d title '%s' description '%s'", m_id, m_title.c_str(),
                                                         m_description.c_str());
     }
-    input->get("reset-after-race", &m_reset_after_race);
 
-    m_check_type = AC_ALL_AT_LEAST;
+    // Load the reset-type
     std::string s;
+    input->get("reset-type", &s);
+    if (s == "race")
+        m_reset_type = AFTER_RACE;
+    else if (s == "lap")
+        m_reset_type = AFTER_LAP;
+    else if (s == "never")
+        m_reset_type = NEVER;
+    else
+        Log::warn("AchievementInfo", "Achievement check type '%s' unknown.",
+            s.c_str());
+
+    // Load check-type
+    m_check_type = AC_ALL_AT_LEAST;
     input->get("check-type", &s);
     if (s == "all-at-least")
         m_check_type = AC_ALL_AT_LEAST;
