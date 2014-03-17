@@ -16,9 +16,12 @@
 #include <angelscript.h>
 #include "script_engine.hpp"
 #include "scriptstdstring.h"
+#include "modes/world.hpp"
+#include "tracks/track_object_manager.hpp"
+#include "tracks/track.hpp"
 
-#define UINT unsigned int 
-typedef unsigned int DWORD;
+//#define UINT unsigned int 
+//typedef unsigned int DWORD;
 
 using namespace irr;
 
@@ -63,7 +66,10 @@ void dispmsg(asIScriptGeneric *gen){
 	irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
 	new TutorialMessageDialog((out),true); 
 }
-
+void disableAnimation(asIScriptGeneric *gen){
+		std::string *str = (std::string*)gen->GetArgAddress(0);
+		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+}
 std::string ScriptEngineOne::doit(std::string scriptName)
 {
 	//displaymsg();
@@ -237,7 +243,7 @@ void ConfigureEngine(asIScriptEngine *engine)
 		
 	}
 	r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(dispmsg), asCALL_GENERIC); assert(r>=0);
-
+	r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
 	// It is possible to register the functions, properties, and types in 
 	// configuration groups as well. When compiling the scripts it then
 	// be defined which configuration groups should be available for that

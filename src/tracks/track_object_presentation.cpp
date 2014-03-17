@@ -722,10 +722,11 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
 	else if (m_action == "haybail")
     {
-	if (World::getWorld()->getTrack()->getTrackObjectManager()->getStatus("hayBail.b3d"))
+	/*if (World::getWorld()->getTrack()->getTrackObjectManager()->getStatus("hayBail.b3d"))
 		World::getWorld()->getTrack()->getTrackObjectManager()->disable("hayBail.b3d");
 	else 
 		World::getWorld()->getTrack()->getTrackObjectManager()->enable("hayBail.b3d");
+		*/
 	//Check performance
 	/*
 	clock_t t1,t2;
@@ -739,7 +740,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 	*/
 	ScriptEngineOne* m_script_engine = new ScriptEngineOne();
 	m_script_engine->doit(m_action);
-	}
 
 
 	

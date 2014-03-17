@@ -6,4 +6,5 @@ void onTrigger()
 
 */
     displayMessage("Everything Disappeared!");
+    disableAnimation("hayBail.b3d");
 }
