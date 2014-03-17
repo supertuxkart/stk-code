@@ -36,8 +36,8 @@ class Achievement;
 /** This is the base class for storing the definition of an achievement, e.g.
  *  title, description (which is common for all achievements), but also how
  *  to achieve this achievement.
-  * \ingroup achievements
-  */
+ * \ingroup achievements
+ */
 class AchievementInfo
 {
 public:
