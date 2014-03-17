@@ -86,6 +86,36 @@ void TrackObjectManager::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+void TrackObjectManager::disable(std::string name){
+     TrackObject* curr;
+     for_in (curr,m_all_objects){
+            if (curr->getName() == (name)){
+            //OutputDebugString("came here2");
+             curr->setEnable(false);
+            
+            }
+     }
+}
+void TrackObjectManager::enable(std::string name){
+     TrackObject* curr;
+     for_in (curr,m_all_objects){
+            if (curr->getName() == (name)){
+            //OutputDebugString("came here2");
+             curr->setEnable(true);
+            
+            }
+     }
+}
+bool TrackObjectManager::getStatus(std::string name){
+     TrackObject* curr;
+     for_in (curr,m_all_objects){
+            if (curr->getName() == (name)){
+            //OutputDebugString("came here2");
+             return curr->isEnabled();
+            
+            }
+     }
+}
 /** Handles an explosion, i.e. it makes sure that all physical objects are
  *  affected accordingly.
  *  \param pos  Position of the explosion.

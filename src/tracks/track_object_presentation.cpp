@@ -36,6 +36,7 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/lod_node_loader.hpp"
 #include "tracks/track.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "scriptengine/script_engine.hpp";
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
@@ -45,6 +46,9 @@
 #include <ILightSceneNode.h>
 #include <IMeshManipulator.h>
 
+//for testing
+#include <time.h>
+#include <iostream>
 // ----------------------------------------------------------------------------
 
 TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
@@ -716,6 +720,30 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 		ScriptEngineOne* m_script_engine = new ScriptEngineOne();
 		m_script_engine->doit(m_action);
     }
+	else if (m_action == "haybail")
+    {
+	if (World::getWorld()->getTrack()->getTrackObjectManager()->getStatus("hayBail.b3d"))
+		World::getWorld()->getTrack()->getTrackObjectManager()->disable("hayBail.b3d");
+	else 
+		World::getWorld()->getTrack()->getTrackObjectManager()->enable("hayBail.b3d");
+	//Check performance
+	/*
+	clock_t t1,t2;
+	t1=clock();
+	for (int i=0;i<20;i++){
+	ScriptEngineOne* m_script_engine = new ScriptEngineOne();
+	m_script_engine->doit(m_action);
+	t2=clock();
+	float diff ((double)t2-(double)t1);
+	std::cout << "System Time in milliseconds is " << 1000*diff/CLOCKS_PER_SEC<<std::endl;
+	*/
+	ScriptEngineOne* m_script_engine = new ScriptEngineOne();
+	m_script_engine->doit(m_action);
+	}
+
+
+	
+	}
     else if (m_action == "tutorial_giftboxes")
     {
         m_action_active = false;

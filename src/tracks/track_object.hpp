@@ -53,6 +53,8 @@ private:
 
     TrackObjectPresentation* m_presentation;
 
+	std::string m_name;
+
 protected:
 
 
@@ -109,6 +111,9 @@ public:
 
     const std::string& getType() const { return m_type; }
 
+	const std::string getName() const { return m_name; }
+
+	bool isEnabled() const { return m_enabled; }
     bool isSoccerBall() const { return m_soccer_ball; }
     bool isGarage() const { return m_garage; }
     float getDistance() const { return m_distance; }
