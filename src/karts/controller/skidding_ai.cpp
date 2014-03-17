@@ -1242,12 +1242,11 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_CAKE:
         {
             // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a cake.
+            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
                 break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
-            // Do not fire if the kart is driving too slow
-            if (m_kart->getSpeed() < 0.5 * m_kart->getCurrentMaxSpeed()) break;
+            //TODO: do not fire if the kart is driving too slow
 
             // Since cakes can be fired all around, just use a sane distance
             // with a bit of extra for backwards, as enemy will go towards cake
@@ -1266,7 +1265,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_BOWLING:
         {
             // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a bowling ball.
+            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
                 break;
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
@@ -1296,7 +1295,7 @@ void SkiddingAI::handleItems(const float dt)
     case PowerupManager::POWERUP_PLUNGER:
         {
             // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a plunger.
+            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
                 break;
 
             // Leave more time after a plunger, since it will take some
