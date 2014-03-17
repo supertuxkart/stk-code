@@ -279,6 +279,24 @@ void UserInfoDialog::declineFriendRequest()
 }   // declineFriendRequest
 
 // -----------------------------------------------------------------------------
+/** Removes an existing friend.
+ */
+void UserInfoDialog::removeExistingFriend()
+{
+    CurrentUser::get()->requestRemoveFriend(m_profile->getID());
+
+}   // removeExistingFriend
+
+// -----------------------------------------------------------------------------
+/** Removes a pending friend request.
+ */
+void UserInfoDialog::removePendingFriend()
+{
+    CurrentUser::get()->requestCancelFriend(m_profile->getID());
+
+}   // removePendingFriend
+
+// -----------------------------------------------------------------------------
 GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& eventSource)
 {
 
@@ -304,10 +322,12 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_remove_widget->m_properties[PROP_ID])
         {
-            if(m_profile->getRelationInfo()->isPending())
-                CurrentUser::get()->requestCancelFriend(m_profile->getID());
+            if (m_profile->getRelationInfo() && 
+                m_profile->getRelationInfo()->isPending() )
+                removePendingFriend();
             else
-                CurrentUser::get()->requestRemoveFriend(m_profile->getID());
+                removeExistingFriend();
+
             m_processing = true;
             m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
