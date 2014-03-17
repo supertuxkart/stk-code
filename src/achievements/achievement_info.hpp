@@ -33,11 +33,11 @@
 
 class Achievement;
 
-/** This is the base class for storing the definition of an achievement, e.g. 
+/** This is the base class for storing the definition of an achievement, e.g.
  *  title, description (which is common for all achievements), but also how
  *  to achieve this achievement.
-  * \ingroup achievements
-  */
+ * \ingroup achievements
+ */
 class AchievementInfo
 {
 public:
@@ -47,13 +47,14 @@ public:
            ACHIEVE_STRIKE     = 2,
            ACHIEVE_ARCH_ENEMY = 3,
            ACHIEVE_MARATHONER = 4,
-           ACHIEVE_SKIDDING   = 5
+           ACHIEVE_SKIDDING   = 5,
+           ACHIEVE_POWERUP_LOVER = 6
     };
-    /** Achievement check type: 
+    /** Achievement check type:
      *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
      *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
      */
-    enum AchievementCheckType 
+    enum AchievementCheckType
     {
         AC_ALL_AT_LEAST,
         AC_ONE_AT_LEAST
