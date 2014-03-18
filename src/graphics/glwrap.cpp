@@ -200,7 +200,7 @@ void initGL()
 #endif
 #endif
 #ifdef ARB_DEBUG_OUTPUT
-	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
+// FIXME!!!	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 }
 
