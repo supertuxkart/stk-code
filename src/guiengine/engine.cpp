@@ -724,20 +724,6 @@ namespace GUIEngine
     std::vector<MenuMessage> gui_messages;
 
     // ------------------------------------------------------------------------
-    Screen* getScreenNamed(const char* name)
-    {
-        const int screenCount = g_loaded_screens.size();
-        for (int n=0; n<screenCount; n++)
-        {
-            if (g_loaded_screens[n].getName() == name)
-            {
-                return g_loaded_screens.get(n);
-            }
-        }
-        return NULL;
-    }   // getScreenNamed
-
-    // ------------------------------------------------------------------------
     void showMessage(const wchar_t* message, const float time)
     {
         // check for duplicates
@@ -800,13 +786,14 @@ namespace GUIEngine
     {
         return Private::small_font_height;
     }   // getSmallFontHeight
-
-    // ------------------------------------------------------------------------
+ 
+    // ------------------------------------------------------------------------    
     int getLargeFontHeight()
-    {
+   {
+
         return Private::large_font_height;
     }   // getSmallFontHeight
-
+        
     // ------------------------------------------------------------------------
     void clear()
     {
