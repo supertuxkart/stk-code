@@ -6,9 +6,7 @@
 language: cpp
 compiler:
   - gcc
-  #- clang
-git:
-  submodules: false
+# - clang
 #branches:
 #  only:
 #    - master
@@ -24,11 +22,10 @@ notifications:
   irc:
     channels:
       - "irc.freenode.org#stk"
-    skip_join: false
-    use_notice: true
     template:
       #- "[%{commit}: %{author}] %{message}"
       #- "%{build_url}"
-      - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
-      - "Diff: %{compare_url}"
+      - "[%{repository}#%{branch} @%{commit}] %{author}): %{message} diff: %{compare_url}"
       - "Build: %{build_url}"
+    skip_join: true
+    use_notice: true
