@@ -48,7 +48,7 @@ public:
            ACHIEVE_ARCH_ENEMY  = 3,
            ACHIEVE_MARATHONER  = 4,
            ACHIEVE_SKIDDING    = 5,
-           ACHIEVE_GOLD_DRIVER = 6
+           ACHIEVE_GOLD_DRIVER = 6,
            ACHIEVE_POWERUP_LOVER = 7
     };
     /** Achievement check type:
