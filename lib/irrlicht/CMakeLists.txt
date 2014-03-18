@@ -1,13 +1,13 @@
 # CMakeLists.txt for Irrlicht in STK
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/jpeglib
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/libpng
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/zlib
-                    ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/bzip2)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/jpeglib"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/libpng"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/zlib"
+                    "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/bzip2")
 
 if(APPLE)
-    include_directories(${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX ${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht)
+    include_directories("${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht/MacOSX" "${CMAKE_CURRENT_SOURCE_DIR}/source/Irrlicht")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -arch i386")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -arch i386 -F/Library/Frameworks")
 endif()
