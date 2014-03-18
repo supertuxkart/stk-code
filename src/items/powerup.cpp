@@ -174,8 +174,12 @@ void  Powerup::adjustSound()
 void Powerup::use()
 {
     // The player gets an achievement point for using a powerup
-    if (m_type != PowerupManager::POWERUP_NOTHING && m_owner->getController()->isPlayerController())
+    StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
+    if (m_type != PowerupManager::POWERUP_NOTHING &&
+        player != NULL && player->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+    {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
+    }
 
     // Play custom kart sound when collectible is used //TODO: what about the bubble gum?
     if (m_type != PowerupManager::POWERUP_NOTHING &&
