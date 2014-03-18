@@ -36,5 +36,9 @@
     <follow_leader goal="1"/>
     <opponents goal="3"/>
   </achievement>
+  <achievement id="7" check-type="all-at-least" reset-after-race="yes"
+               title="Powerup Love" description="Use 10 or more powerups in a race">
+    <poweruplover goal="10"/>
+  </achievement>
 </achievements>
 
