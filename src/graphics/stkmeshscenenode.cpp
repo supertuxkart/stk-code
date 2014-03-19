@@ -36,9 +36,9 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     createGLMeshes();
 }
 
-void STKMeshSceneNode::setReloadEachFrame()
+void STKMeshSceneNode::setReloadEachFrame(bool val)
 {
-    reload_each_frame = true;
+    reload_each_frame = val;
 }
 
 void STKMeshSceneNode::createGLMeshes()
