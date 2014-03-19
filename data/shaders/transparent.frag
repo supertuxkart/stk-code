@@ -2,6 +2,7 @@ uniform sampler2D tex;
 
 #if __VERSION__ >= 130
 in vec2 uv;
+in vec4 color;
 out vec4 FragColor;
 #else
 varying vec2 uv;
@@ -11,5 +12,5 @@ varying vec2 uv;
 
 void main()
 {
-	FragColor = texture(tex, uv);
+	FragColor = texture(tex, uv) * color;
 }

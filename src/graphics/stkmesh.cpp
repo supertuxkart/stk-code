@@ -815,7 +815,7 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
         break;
     case TM_DEFAULT:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+            MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentShader::attrib_color, mesh.Stride);
         break;
     }
     mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);

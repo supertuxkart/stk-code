@@ -210,7 +210,7 @@ class TransparentShader
 {
 public:
 	static GLuint Program;
-	static GLuint attrib_position, attrib_texcoord;
+	static GLuint attrib_position, attrib_texcoord, attrib_color;
 	static GLuint uniform_MVP, uniform_TM, uniform_tex;
 
 	static void init();
