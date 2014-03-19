@@ -276,6 +276,41 @@ void STKMeshSceneNode::drawSolidPass2(const GLMesh &mesh, ShadedMaterial type)
     }
 }
 
+void STKMeshSceneNode::updatevbo()
+{
+    for (unsigned i = 0; i < Mesh->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        GLMesh &mesh = GLmeshes[i];
+        glBindVertexArray(0);
+
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
+        const void* vertices = mb->getVertices();
+        const u32 vertexCount = mb->getVertexCount();
+        const c8* vbuf = static_cast<const c8*>(vertices);
+        glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
+        const void* indices = mb->getIndices();
+        mesh.IndexCount = mb->getIndexCount();
+        GLenum indexSize;
+        switch (mb->getIndexType())
+        {
+        case irr::video::EIT_16BIT:
+            indexSize = sizeof(u16);
+            break;
+        case irr::video::EIT_32BIT:
+            indexSize = sizeof(u32);
+            break;
+        default:
+            assert(0 && "Wrong index size");
+        }
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * indexSize, indices, GL_STATIC_DRAW);
+    }
+}
+
 void STKMeshSceneNode::render()
 {
     irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
@@ -284,7 +319,7 @@ void STKMeshSceneNode::render()
         return;
 
     if (reload_each_frame)
-        setMesh(Mesh);
+        updatevbo();
 
     bool isTransparentPass =
         SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;

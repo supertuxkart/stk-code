@@ -23,6 +23,7 @@ protected:
     void createGLMeshes();
     void cleanGLMeshes();
     void setFirstTimeMaterial();
+    void updatevbo();
     bool isMaterialInitialized;
     bool reload_each_frame;
 public:
