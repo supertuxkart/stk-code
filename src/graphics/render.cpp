@@ -743,9 +743,11 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 }
 
 // ----------------------------------------------------------------------------
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
 static LightShader::PointLightInfo PointLightsInfo[MAXLIGHT];
 
-static void renderPointLights()
+static void renderPointLights(unsigned count)
 {
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -756,18 +758,13 @@ static void renderPointLights()
     glUseProgram(LightShader::PointLightShader::Program);
     glBindVertexArray(LightShader::PointLightShader::vao);
     glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::vbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, MAXLIGHT * sizeof(LightShader::PointLightInfo), PointLightsInfo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
     setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
     setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
     LightShader::PointLightShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 200, 0, 1);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MAXLIGHT);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
 
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
@@ -807,7 +804,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
         unsigned idx = (unsigned)(lightpos.getLength() / 10);
         if (idx > 14)
-          continue;
+          idx = 14;
         BucketedLN[idx].push_back(m_lights[i]);
     }
 
@@ -854,12 +851,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
     lightnum++;
 
-	// Fill lights
-	for (; lightnum < MAXLIGHT; lightnum++) {
-        PointLightsInfo[lightnum].energy = 0;
-	}
-
-    renderPointLights();
+    renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     // Handle SSAO
@@ -945,9 +937,6 @@ static void createcubevao()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
-
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
 {
