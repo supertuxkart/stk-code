@@ -32,7 +32,13 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
+    reload_each_frame = false;
     createGLMeshes();
+}
+
+void STKMeshSceneNode::setReloadEachFrame()
+{
+    reload_each_frame = true;
 }
 
 void STKMeshSceneNode::createGLMeshes()
@@ -276,6 +282,9 @@ void STKMeshSceneNode::render()
 
     if (!Mesh || !driver)
         return;
+
+    if (reload_each_frame)
+        setMesh(Mesh);
 
     bool isTransparentPass =
         SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;

@@ -25,6 +25,7 @@
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
 #include "physics/btKart.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 
 #include <IMeshSceneNode.h>
 #include <SMesh.h>
@@ -188,6 +189,8 @@ void SkidMarks::update(float dt, bool force_skid_marks,
                           m_material, m_avoid_z_fighting, custom_color);
     new_mesh->addMeshBuffer(smq_right);
     scene::IMeshSceneNode *new_node = irr_driver->addMesh(new_mesh);
+    if (STKMeshSceneNode* stkm = dynamic_cast<STKMeshSceneNode*>(new_node))
+        stkm->setReloadEachFrame();
 #ifdef DEBUG
     std::string debug_name = m_kart.getIdent()+" (skid-mark)";
     new_node->setName(debug_name.c_str());
