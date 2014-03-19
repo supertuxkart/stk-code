@@ -309,19 +309,23 @@ void STKMeshSceneNode::render()
         computeMVP(ModelViewProjectionMatrix);
         computeTIMV(TransposeInverseModelView);
 
-        glUseProgram(MeshShader::ObjectPass1Shader::Program);
+        if (!GeometricMesh[FPSM_DEFAULT].empty())
+            glUseProgram(MeshShader::ObjectPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
             drawSolidPass1(*GeometricMesh[FPSM_DEFAULT][i], FPSM_DEFAULT);
 
-        glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
+        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
+            glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
             drawSolidPass1(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], FPSM_ALPHA_REF_TEXTURE);
 
-        glUseProgram(MeshShader::NormalMapShader::Program);
+        if (!GeometricMesh[FPSM_NORMAL_MAP].empty())
+            glUseProgram(MeshShader::NormalMapShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_NORMAL_MAP].size(); i++)
             drawSolidPass1(*GeometricMesh[FPSM_NORMAL_MAP][i], FPSM_NORMAL_MAP);
 
-        glUseProgram(MeshShader::GrassPass1Shader::Program);
+        if (!GeometricMesh[FPSM_GRASS].empty())
+            glUseProgram(MeshShader::GrassPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_GRASS].size(); i++)
             drawSolidPass1(*GeometricMesh[FPSM_GRASS][i], FPSM_GRASS);
 
@@ -330,56 +334,68 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
-      glUseProgram(MeshShader::ObjectPass2Shader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_DEFAULT][i], SM_DEFAULT);
+        if (!ShadedMesh[SM_DEFAULT].empty())
+          glUseProgram(MeshShader::ObjectPass2Shader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_DEFAULT][i], SM_DEFAULT);
 
-      glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_ALPHA_REF_TEXTURE].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_ALPHA_REF_TEXTURE][i], SM_ALPHA_REF_TEXTURE);
+        if (!ShadedMesh[SM_ALPHA_REF_TEXTURE].empty())
+            glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_ALPHA_REF_TEXTURE].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_ALPHA_REF_TEXTURE][i], SM_ALPHA_REF_TEXTURE);
 
-      glUseProgram(MeshShader::ObjectRimLimitShader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_RIMLIT].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_RIMLIT][i], SM_RIMLIT);
+        if (!ShadedMesh[SM_RIMLIT].empty())
+            glUseProgram(MeshShader::ObjectRimLimitShader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_RIMLIT].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_RIMLIT][i], SM_RIMLIT);
 
-      glUseProgram(MeshShader::SphereMapShader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_SPHEREMAP].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_SPHEREMAP][i], SM_SPHEREMAP);
+        if (!ShadedMesh[SM_SPHEREMAP].empty())
+            glUseProgram(MeshShader::SphereMapShader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_SPHEREMAP].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_SPHEREMAP][i], SM_SPHEREMAP);
 
-      glUseProgram(MeshShader::SplattingShader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_SPLATTING].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_SPLATTING][i], SM_SPLATTING);
+        if (!ShadedMesh[SM_SPLATTING].empty())
+            glUseProgram(MeshShader::SplattingShader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_SPLATTING].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_SPLATTING][i], SM_SPLATTING);
 
-      glUseProgram(MeshShader::GrassPass2Shader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_GRASS].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_GRASS][i], SM_GRASS);
+        if (!ShadedMesh[SM_GRASS].empty())
+            glUseProgram(MeshShader::GrassPass2Shader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_GRASS].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_GRASS][i], SM_GRASS);
 
-      glUseProgram(MeshShader::ObjectUnlitShader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_UNLIT].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_UNLIT][i], SM_UNLIT);
+        if (!ShadedMesh[SM_UNLIT].empty())
+            glUseProgram(MeshShader::ObjectUnlitShader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_UNLIT].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_UNLIT][i], SM_UNLIT);
 
-      glUseProgram(MeshShader::CausticsShader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_CAUSTICS].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_CAUSTICS][i], SM_CAUSTICS);
+        if (!ShadedMesh[SM_CAUSTICS].empty())
+            glUseProgram(MeshShader::CausticsShader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_CAUSTICS].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_CAUSTICS][i], SM_CAUSTICS);
 
-      glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_DETAILS].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_DETAILS][i], SM_DETAILS);
+        if (!ShadedMesh[SM_DETAILS].empty())
+            glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_DETAILS].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_DETAILS][i], SM_DETAILS);
 
-      glUseProgram(MeshShader::UntexturedObjectShader::Program);
-      for (unsigned i = 0; i < ShadedMesh[SM_UNTEXTURED].size(); i++)
-          drawSolidPass2(*ShadedMesh[SM_UNTEXTURED][i], SM_UNTEXTURED);
+        if (!ShadedMesh[SM_UNTEXTURED].empty())
+            glUseProgram(MeshShader::UntexturedObjectShader::Program);
+        for (unsigned i = 0; i < ShadedMesh[SM_UNTEXTURED].size(); i++)
+            drawSolidPass2(*ShadedMesh[SM_UNTEXTURED][i], SM_UNTEXTURED);
 
-      return;
+        return;
     }
 
     if (irr_driver->getPhase() == SHADOW_PASS)
     {
-        glUseProgram(MeshShader::ShadowShader::Program);
+        if (!GeometricMesh[FPSM_DEFAULT].empty())
+            glUseProgram(MeshShader::ShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
             drawShadow(*GeometricMesh[FPSM_DEFAULT][i]);
 
-        glUseProgram(MeshShader::RefShadowShader::Program);
+        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
+            glUseProgram(MeshShader::RefShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
             drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
         return;
@@ -401,11 +417,13 @@ void STKMeshSceneNode::render()
     {
         computeMVP(ModelViewProjectionMatrix);
 
-        glUseProgram(MeshShader::BubbleShader::Program);
+        if (!TransparentMesh[TM_BUBBLE].empty())
+            glUseProgram(MeshShader::BubbleShader::Program);
         for (unsigned i = 0; i < TransparentMesh[TM_BUBBLE].size(); i++)
             drawBubble(*TransparentMesh[TM_BUBBLE][i], ModelViewProjectionMatrix);
 
-        glUseProgram(MeshShader::TransparentShader::Program);
+        if (!TransparentMesh[TM_DEFAULT].empty())
+            glUseProgram(MeshShader::TransparentShader::Program);
         for (unsigned i = 0; i < TransparentMesh[TM_DEFAULT].size(); i++)
             drawTransparentObject(*TransparentMesh[TM_DEFAULT][i], ModelViewProjectionMatrix, (*TransparentMesh[TM_DEFAULT][i]).TextureMatrix);
         return;
