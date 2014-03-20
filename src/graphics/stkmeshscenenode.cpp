@@ -341,6 +341,8 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
+        if (reload_each_frame)
+            glDisable(GL_CULL_FACE);
         computeMVP(ModelViewProjectionMatrix);
         computeTIMV(TransposeInverseModelView);
 
@@ -364,11 +366,16 @@ void STKMeshSceneNode::render()
         for (unsigned i = 0; i < GeometricMesh[FPSM_GRASS].size(); i++)
             drawSolidPass1(*GeometricMesh[FPSM_GRASS][i], FPSM_GRASS);
 
+        if (reload_each_frame)
+            glEnable(GL_CULL_FACE);
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
+        if (reload_each_frame)
+            glDisable(GL_CULL_FACE);
+
         if (!ShadedMesh[SM_DEFAULT].empty())
           glUseProgram(MeshShader::ObjectPass2Shader::Program);
         for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT].size(); i++)
@@ -419,11 +426,16 @@ void STKMeshSceneNode::render()
         for (unsigned i = 0; i < ShadedMesh[SM_UNTEXTURED].size(); i++)
             drawSolidPass2(*ShadedMesh[SM_UNTEXTURED][i], SM_UNTEXTURED);
 
+        if (reload_each_frame)
+            glEnable(GL_CULL_FACE);
         return;
     }
 
     if (irr_driver->getPhase() == SHADOW_PASS)
     {
+        if (reload_each_frame)
+            glDisable(GL_CULL_FACE);
+
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::ShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
@@ -433,6 +445,9 @@ void STKMeshSceneNode::render()
             glUseProgram(MeshShader::RefShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
             drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
+
+        if (reload_each_frame)
+            glEnable(GL_CULL_FACE);
         return;
     }
 
