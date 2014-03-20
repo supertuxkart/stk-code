@@ -221,7 +221,7 @@ class TransparentFogShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
+    static GLuint attrib_position, attrib_texcoord, attrib_color;
     static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_screen, uniform_ipvmat;
 
     static void init();

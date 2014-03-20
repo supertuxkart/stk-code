@@ -472,10 +472,20 @@ void STKMeshSceneNode::render()
         for (unsigned i = 0; i < TransparentMesh[TM_BUBBLE].size(); i++)
             drawBubble(*TransparentMesh[TM_BUBBLE][i], ModelViewProjectionMatrix);
 
-        if (!TransparentMesh[TM_DEFAULT].empty())
-            glUseProgram(MeshShader::TransparentShader::Program);
-        for (unsigned i = 0; i < TransparentMesh[TM_DEFAULT].size(); i++)
-            drawTransparentObject(*TransparentMesh[TM_DEFAULT][i], ModelViewProjectionMatrix, (*TransparentMesh[TM_DEFAULT][i]).TextureMatrix);
+        if (World::getWorld()->getTrack()->isFogEnabled())
+        {
+            if (!TransparentMesh[TM_DEFAULT].empty())
+                glUseProgram(MeshShader::TransparentFogShader::Program);
+            for (unsigned i = 0; i < TransparentMesh[TM_DEFAULT].size(); i++)
+                drawTransparentFogObject(*TransparentMesh[TM_DEFAULT][i], ModelViewProjectionMatrix, (*TransparentMesh[TM_DEFAULT][i]).TextureMatrix);
+        }
+        else
+        {
+            if (!TransparentMesh[TM_DEFAULT].empty())
+                glUseProgram(MeshShader::TransparentShader::Program);
+            for (unsigned i = 0; i < TransparentMesh[TM_DEFAULT].size(); i++)
+                drawTransparentObject(*TransparentMesh[TM_DEFAULT][i], ModelViewProjectionMatrix, (*TransparentMesh[TM_DEFAULT][i]).TextureMatrix);
+        }
         return;
     }
 

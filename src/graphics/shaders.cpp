@@ -899,6 +899,7 @@ namespace MeshShader
     GLuint TransparentFogShader::Program;
     GLuint TransparentFogShader::attrib_position;
     GLuint TransparentFogShader::attrib_texcoord;
+    GLuint TransparentFogShader::attrib_color;
     GLuint TransparentFogShader::uniform_MVP;
     GLuint TransparentFogShader::uniform_TM;
     GLuint TransparentFogShader::uniform_tex;
@@ -916,6 +917,7 @@ namespace MeshShader
         Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparentfog.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
