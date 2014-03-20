@@ -257,8 +257,9 @@ int CompileScript(asIScriptEngine *engine, std::string scriptName)
 	int r;
 
 	// We will load the script from a file on the disk.
-	std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
 	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
+	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
+	std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
 	load_dir += scriptName + ".as";
 	FILE *f = fopen(load_dir.c_str(), "rb");
 	//FILE *f = fopen("D:\\Uni Torrents\\angelscript_2.28.1\\sdk\\samples\\tutorial\\bin\\script.as", "rb");
