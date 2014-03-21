@@ -166,7 +166,7 @@ bool GrandPrixData::writeToFile()
         if (file.is_open())
         {
             file << L"\n<supertuxkart_grand_prix name=\"" << m_name << L"\">\n\n";
-            for (unsigned int i = 0; i < getNumberOfTracks(); i++)
+            for (unsigned int i = 0; i < m_tracks.size(); i++)
             {
                 file <<
                     L"\t<track id=\""  << m_tracks[i] <<
@@ -194,7 +194,7 @@ bool GrandPrixData::writeToFile()
 // ----------------------------------------------------------------------------
 bool GrandPrixData::checkConsistency(bool chatty) const
 {
-    for(unsigned int i=0; i<getNumberOfTracks(); i++)
+    for (unsigned int i = 0; i<m_tracks.size(); i++)
     {
         Track* t = track_manager->getTrack(m_tracks[i]);
 
@@ -230,7 +230,7 @@ bool GrandPrixData::isTrackAvailable(const std::string &id) const
 void GrandPrixData::getLaps(std::vector<int> *laps) const
 {
     laps->clear();
-    for(unsigned int i=0; i< getNumberOfTracks(); i++)
+    for (unsigned int i = 0; i< m_tracks.size(); i++)
         if(isTrackAvailable(m_tracks[i]))
             laps->push_back(m_laps[i]);
 }   // getLaps
@@ -239,7 +239,7 @@ void GrandPrixData::getLaps(std::vector<int> *laps) const
 void GrandPrixData::getReverse(std::vector<bool> *reverse) const
 {
     reverse->clear();
-    for(unsigned int i=0; i< getNumberOfTracks(); i++)
+    for (unsigned int i = 0; i< m_tracks.size(); i++)
         if(isTrackAvailable(m_tracks[i]))
             reverse->push_back(m_reversed[i]);
 }   // getReverse
@@ -361,7 +361,7 @@ void GrandPrixData::remove(const unsigned int track)
 const std::vector<std::string>& GrandPrixData::getTrackNames() const
 {
     m_really_available_tracks.clear();
-    for(unsigned int i=0; i< getNumberOfTracks(); i++)
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
         if(isTrackAvailable(m_tracks[i]))
             m_really_available_tracks.push_back(m_tracks[i]);
