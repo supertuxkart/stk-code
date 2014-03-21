@@ -17,31 +17,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SCRIPT_ENGINE_ONE_HPP
-#define HEADER_SCRIPT_ENGINE_ONE_HPP
+#ifndef HEADER_SCRIPT_ENGINE_HPP
+#define HEADER_SCRIPT_ENGINE_HPP
 
 #include<string>
 
 class TrackObjectPresentation;
 
-class ScriptEngineOne
+class ScriptEngine
 {
 public:
 
-         ScriptEngineOne();
-		// ~ScriptEngine();
-    void displayMessage();
+         ScriptEngine();
+		 ~ScriptEngine();
 
-	int five(){
-		return 5;
-	}
-	std::string doit(std::string scriptName);
-	std::string getout(){
-		return outval;
-	}
+	void runScript(std::string scriptName);
 
-private:
-	std::string outval;
 };   // class ScriptEngine
 #endif
 

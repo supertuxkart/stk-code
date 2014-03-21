@@ -3,16 +3,6 @@
 #include <assert.h>  // assert()
 #include <string.h>  // strstr()
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#ifdef _LINUX_
-	#include <sys/time.h>
-	#include <stdio.h>
-	#include <termios.h>
-	#include <unistd.h>
-#else
-	//#include <conio.h>   // kbhit(), getch()
-	//#include <windows.h> // timeGetTime()
-#endif
-
 #include <angelscript.h>
 #include "script_engine.hpp"
 #include "scriptstdstring.h"
@@ -20,47 +10,35 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
 
-//#define UINT unsigned int 
-//typedef unsigned int DWORD;
-
 using namespace irr;
 
-// Linux does have a getch() function in the curses library, but it doesn't
-// work like it does on DOS. So this does the same thing, with out the need
-// of the curses library.
-/*int getch() 
-{
-	struct termios oldt, newt;
-	int ch;
 
-	tcgetattr(STDIN_FILENO, &oldt);
-	newt = oldt;
-	newt.c_lflag &= ~( ICANON | ECHO );
-	tcsetattr( STDIN_FILENO, TCSANOW, &newt );
+asIScriptEngine *m_engine;
+// Function prototypes for binding. TODO:put these in their right place
+void configureEngine(asIScriptEngine *engine);
+int  compileScript(asIScriptEngine *engine,std::string scriptName);
+void printString(std::string &str);
+void printString_Generic(asIScriptGeneric *gen);
 
-	ch = getchar();
+ScriptEngine::ScriptEngine(){
+	// Create the script engine
+	m_engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
+	if( m_engine == 0 )
+	{
+		std::cout << "Failed to create script engine." << std::endl;
+	}
 
-	tcsetattr( STDIN_FILENO, TCSANOW, &oldt );
-	return ch;
+
+	// Configure the script engine with all the functions, 
+	// and variables that the script should be able to use.
+	configureEngine(m_engine);
 }
-*/
-//#endif
-
-// Function prototypes
-int  RunApplication(std::string);
-void ConfigureEngine(asIScriptEngine *engine);
-int  CompileScript(asIScriptEngine *engine,std::string scriptName);
-void PrintString(std::string &str);
-void PrintString_Generic(asIScriptGeneric *gen);
-//void timeGetTime_Generic(asIScriptGeneric *gen);
-//void LineCallback(asIScriptContext *ctx, DWORD *timeOut);
-
-ScriptEngineOne::ScriptEngineOne(){
-
+ScriptEngine::~ScriptEngine(){
+	// Release the engine
+	m_engine->Release();
 }
-
 // Displays the message specified in displayMessage( string message ) within the script
-void dispmsg(asIScriptGeneric *gen){
+void displayMessage(asIScriptGeneric *gen){
 	std::string *input = (std::string*)gen->GetArgAddress(0);
 	irr::core::stringw msgtodisp;
 	irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
@@ -70,64 +48,27 @@ void disableAnimation(asIScriptGeneric *gen){
 		std::string *str = (std::string*)gen->GetArgAddress(0);
 		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
 }
-std::string ScriptEngineOne::doit(std::string scriptName)
+
+
+void ScriptEngine::runScript(std::string scriptName)
 {
-	//displaymsg();
-	fprintf(stderr, "inside engine");
-	RunApplication(scriptName);
 
-	// Wait until the user presses a key
-	//std::cout << std::endl << "Press any key to quit." << std::endl;
-	//while(!getch());
-
-	return "wot";
-}
-void MessageCallback(const asSMessageInfo *msg, void *param)
-{
-	const char *type = "ERR ";
-	if( msg->type == asMSGTYPE_WARNING ) 
-		type = "WARN";
-	else if( msg->type == asMSGTYPE_INFORMATION ) 
-		type = "INFO";
-
-	printf("%s (%d, %d) : %s : %s\n", msg->section, msg->row, msg->col, type, msg->message);
-}
-
-
-int RunApplication(std::string scriptName)
-{
 	int r;
-	std::cout<<scriptName;
-	// Create the script engine
-	asIScriptEngine *engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
-	if( engine == 0 )
-	{
-		std::cout << "Failed to create script engine." << std::endl;
-		return -1;
-	}
-
-	// The script compiler will write any compiler messages to the callback.
-	//engine->SetMessageCallback(asFUNCTION(MessageCallback), 0, asCALL_CDECL);
-
-	// Configure the script engine with all the functions, 
-	// and variables that the script should be able to use.
-	ConfigureEngine(engine);
-	
 	// Compile the script code
-	r = CompileScript(engine,scriptName);
+	r = compileScript(m_engine,scriptName);
 	if( r < 0 )
 	{
-		engine->Release();
-		return -1;
+		m_engine->Release();
+		return;
 	}
 
 	// Create a context that will execute the script.
-	asIScriptContext *ctx = engine->CreateContext();
+	asIScriptContext *ctx = m_engine->CreateContext();
 	if( ctx == 0 ) 
 	{
 		std::cout << "Failed to create the context." << std::endl;
-		engine->Release();
-		return -1;
+		m_engine->Release();
+		return;
 	}
 
 	// We don't want to allow the script to hang the application, e.g. with an
@@ -141,20 +82,20 @@ int RunApplication(std::string scriptName)
 	{
 		std::cout << "Failed to set the line callback function." << std::endl;
 		ctx->Release();
-		engine->Release();
-		return -1;
+		m_engine->Release();
+		return;
 	}
 
 	// Find the function for the function we want to execute.
 	//This is how you call a normal function with arguments
 	//asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger(float, float)");
-	asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
+	asIScriptFunction *func = m_engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
 	if( func == 0 )
 	{
 		std::cout << "The function 'void onTrigger()' was not found." << std::endl;
 		ctx->Release();
-		engine->Release();
-		return -1;
+		m_engine->Release();
+		return;
 	}
 
 	// Prepare the script context with the function we wish to execute. Prepare()
@@ -167,20 +108,17 @@ int RunApplication(std::string scriptName)
 	{
 		std::cout << "Failed to prepare the context." << std::endl;
 		ctx->Release();
-		engine->Release();
-		return -1;
+		m_engine->Release();
+		return;
 	}
 
-	// Now we need to pass the parameters to the script function. 
-	//ctx->SetArgFloat(0, 3.14159265359f);
-	//ctx->SetArgFloat(1, 2.71828182846f);
+	// Now we can pass parameters to the script function. 
+	//ctx->setArgType(index, value);
+	//for example : ctx->SetArgFloat(0, 3.14159265359f);
 
 
 	// Execute the function
-	std::cout << "Executing the script." << std::endl;
-	std::cout << "---" << std::endl;
 	r = ctx->Execute();
-	std::cout << "---" << std::endl;
 	if( r != asEXECUTION_FINISHED )
 	{
 		// The execution didn't finish as we had planned. Determine why.
@@ -203,26 +141,20 @@ int RunApplication(std::string scriptName)
 	}
 	else
 	{
-		// Retrieve the return value from the context
+		// Retrieve the return value from the context here (for scripts that return values)
+		// <type> returnValue = ctx->getReturnType(); for example
 		//float returnValue = ctx->GetReturnFloat();
-		//std::cout << "The script function returned: " << returnValue << std::endl;
 	}
 
 	// We must release the contexts when no longer using them
 	ctx->Release();
 
-	// Release the engine
-	engine->Release();
-
-	return 0;
 }
-void ConfigureEngine(asIScriptEngine *engine)
+void configureEngine(asIScriptEngine *engine)
 {
 	int r;
 
 	// Register the script string type
-	// Look at the implementation for this function for more information  
-	// on how to register a custom string type, and other object types.
 	RegisterStdString(engine);
 
 	if( !strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY") )
@@ -233,16 +165,16 @@ void ConfigureEngine(asIScriptEngine *engine)
 		// with a lot of if's. If an error occurs in release mode it will
 		// be caught when a script is being built, so it is not necessary
 		// to do the verification here as well.
-		r = engine->RegisterGlobalFunction("void Print(string &in)", asFUNCTION(PrintString), asCALL_CDECL); assert( r >= 0 );
+		r = engine->RegisterGlobalFunction("void Print(string &in)", asFUNCTION(printString), asCALL_CDECL); assert( r >= 0 );
 		
 	}
 	else
 	{
 		// Notice how the registration is almost identical to the above. 
-		r = engine->RegisterGlobalFunction("void Print(string &in)", asFUNCTION(PrintString_Generic), asCALL_GENERIC); assert( r >= 0 );
+		r = engine->RegisterGlobalFunction("void Print(string &in)", asFUNCTION(printString_Generic), asCALL_GENERIC); assert( r >= 0 );
 		
 	}
-	r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(dispmsg), asCALL_GENERIC); assert(r>=0);
+	r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r>=0);
 	r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
 	// It is possible to register the functions, properties, and types in 
 	// configuration groups as well. When compiling the scripts it then
@@ -252,21 +184,19 @@ void ConfigureEngine(asIScriptEngine *engine)
 	// without having to recompile all the scripts.
 }
 
-int CompileScript(asIScriptEngine *engine, std::string scriptName)
+int compileScript(asIScriptEngine *engine, std::string scriptName)
 {
 	int r;
 
-	// We will load the script from a file on the disk.
-	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
-	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
-	std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
+	// For now we will load the script directtly from a file on the disk.
+	//TODO use filemanager to do this.
+	std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
+	//std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
 	load_dir += scriptName + ".as";
 	FILE *f = fopen(load_dir.c_str(), "rb");
-	//FILE *f = fopen("D:\\Uni Torrents\\angelscript_2.28.1\\sdk\\samples\\tutorial\\bin\\script.as", "rb");
-	//FILE *f = fopen("//media//New Volume//Uni Torrents//angelscript_2.28.1//sdk//samples//tutorial//bin//script.as", "rb");
 	if( f == 0 )
 	{
-		std::cout << "Failed to open the script file 'script.as'." << std::endl;
+		std::cout << "Failed to open the script file " + scriptName + ".as" << std::endl;
 		return -1;
 	}
 
@@ -330,13 +260,13 @@ int CompileScript(asIScriptEngine *engine, std::string scriptName)
 
 
 // Function implementation with native calling convention
-void PrintString(std::string &str)
+void printString(std::string &str)
 {
 	std::cout << str;
 }
 
 // Function implementation with generic script interface
-void PrintString_Generic(asIScriptGeneric *gen)
+void printString_Generic(asIScriptGeneric *gen)
 {
 	std::string *str = (std::string*)gen->GetArgAddress(0);
 	std::cout << *str;

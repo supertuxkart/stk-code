@@ -41,7 +41,7 @@ class Controller;
 class PhysicalObject;
 class Physics;
 class Track;
-
+class ScriptEngine;
 namespace irr
 {
     namespace scene { class ISceneNode; }
@@ -114,6 +114,9 @@ protected:
                              RaceManager::KartType type);
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
+
+	/**Pointer to scripting engine  */
+	ScriptEngine* m_script_engine;
 
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
@@ -301,6 +304,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a pointer to the track. */
     Track          *getTrack() const { return m_track; }
+    // ------------------------------------------------------------------------
+	// ------------------------------------------------------------------------
+    /** Returns a pointer to the Scripting Engine. */
+    ScriptEngine   *getScriptEngine() const { return m_script_engine; }
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */

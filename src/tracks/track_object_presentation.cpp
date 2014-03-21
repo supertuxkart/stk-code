@@ -716,33 +716,20 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_bananas")
     {
+		ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
         m_action_active = false;
-		ScriptEngineOne* m_script_engine = new ScriptEngineOne();
-		m_script_engine->doit(m_action);
+		m_script_engine->runScript(m_action);
     }
 	else if (m_action == "haybail")
     {
-	/*if (World::getWorld()->getTrack()->getTrackObjectManager()->getStatus("hayBail.b3d"))
-		World::getWorld()->getTrack()->getTrackObjectManager()->disable("hayBail.b3d");
-	else 
-		World::getWorld()->getTrack()->getTrackObjectManager()->enable("hayBail.b3d");
+		/*to activate this add the following line to stk-assets/farm/scene.xml
+
+		<object type="action-trigger" action="haybail" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
+
 		*/
-	//Check performance
-	/*
-	clock_t t1,t2;
-	t1=clock();
-	for (int i=0;i<20;i++){
-	ScriptEngineOne* m_script_engine = new ScriptEngineOne();
-	m_script_engine->doit(m_action);
-	t2=clock();
-	float diff ((double)t2-(double)t1);
-	std::cout << "System Time in milliseconds is " << 1000*diff/CLOCKS_PER_SEC<<std::endl;
-	*/
-	ScriptEngineOne* m_script_engine = new ScriptEngineOne();
-	m_script_engine->doit(m_action);
-
-
-	
+		m_action_active=false;
+		ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+		m_script_engine->runScript(m_action);
 	}
     else if (m_action == "tutorial_giftboxes")
     {
