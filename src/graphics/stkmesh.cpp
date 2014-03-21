@@ -422,7 +422,7 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
         glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     }
     if (!CausticTex)
-        irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str());
+        CausticTex = irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str());
     setTexture(MeshShader::CausticsShader::TU_caustictex, getTextureGLuint(CausticTex), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
