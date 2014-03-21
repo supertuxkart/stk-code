@@ -143,6 +143,8 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     glDrawElements(ptype, count, itype, 0);
 }
 
+static video::ITexture *displaceTex = 0;
+
 void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
 {
     DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
@@ -167,8 +169,10 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     glDrawElements(ptype, count, itype, 0);
 
     // Render the effect
+    if (!displaceTex)
+        displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_DISPLACE), false, false);
-    setTexture(0, getTextureGLuint(irr_driver->getTexture(FileManager::TEXTURE, "displace.png")), GL_LINEAR, GL_LINEAR, true);
+    setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
     setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP4)), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_COLOR)), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);

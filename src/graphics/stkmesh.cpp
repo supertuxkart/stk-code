@@ -401,6 +401,8 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
   glDrawElements(ptype, count, itype, 0);
 }
 
+static video::ITexture *CausticTex = 0;
+
 void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector2df dir, core::vector2df dir2)
 {
     irr_driver->IncreaseObjectCount();
@@ -419,7 +421,9 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
         GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
         glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     }
-    setTexture(MeshShader::CausticsShader::TU_caustictex, getTextureGLuint(irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str())), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (!CausticTex)
+        irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str());
+    setTexture(MeshShader::CausticsShader::TU_caustictex, getTextureGLuint(CausticTex), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
 
