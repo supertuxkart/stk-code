@@ -82,6 +82,7 @@ enum STKRenderingPass
 class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
+    int GLMajorVersion, GLMinorVersion;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -147,6 +148,16 @@ public:
         scene::ISceneNode * node;
         float power;
     };
+
+    unsigned getGLSLVersion() const
+    {
+        if (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3))
+            return GLMajorVersion * 100 + GLMinorVersion * 10;
+        else if (GLMajorVersion == 3)
+            return 100 + (GLMinorVersion + 3) * 10;
+        else
+            return 120;
+    }
 
 private:
     std::vector<VideoMode> m_modes;
