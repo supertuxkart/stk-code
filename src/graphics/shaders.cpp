@@ -324,7 +324,9 @@ namespace MeshShader
 
 	void ObjectPass1Shader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/object_pass1.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass1.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_normal = glGetAttribLocation(Program, "Normal");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -348,7 +350,9 @@ namespace MeshShader
 
 	void ObjectRefPass1Shader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/objectref_pass1.vert").c_str(), file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/objectref_pass1.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_normal = glGetAttribLocation(Program, "Normal");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
@@ -378,7 +382,9 @@ namespace MeshShader
 
     void GrassPass1Shader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/grass_pass1.vert").c_str(), file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass1.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_normal = glGetAttribLocation(Program, "Normal");
@@ -408,7 +414,9 @@ namespace MeshShader
 
     void NormalMapShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/normalmap.vert").c_str(), file_manager->getAsset("shaders/normalmap.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/normalmap.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_tangent = glGetAttribLocation(Program, "Tangent");
@@ -438,7 +446,9 @@ namespace MeshShader
 
 	void ObjectPass2Shader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_pass2.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -480,7 +490,9 @@ namespace MeshShader
 
 	void DetailledObjectPass2Shader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
@@ -520,7 +532,9 @@ namespace MeshShader
 
 	void ObjectUnlitShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -550,7 +564,9 @@ namespace MeshShader
 
 	void ObjectRimLimitShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/objectpass_rimlit.vert").c_str(), file_manager->getAsset("shaders/objectpass_rimlit.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/objectpass_rimlit.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_rimlit.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		attrib_normal = glGetAttribLocation(Program, "Normal");
@@ -592,7 +608,9 @@ namespace MeshShader
 
 	void UntexturedObjectShader::init()
 	{
-	  Program = LoadProgram(file_manager->getAsset("shaders/untextured_object.vert").c_str(), file_manager->getAsset("shaders/untextured_object.frag").c_str());
+	  Program = LoadProgram(
+          GL_VERTEX_SHADER, file_manager->getAsset("shaders/untextured_object.vert").c_str(),
+          GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/untextured_object.frag").c_str());
 	  attrib_position = glGetAttribLocation(Program, "Position");
 	  attrib_color = glGetAttribLocation(Program, "Color");
 	  uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -630,7 +648,9 @@ namespace MeshShader
 	void ObjectRefPass2Shader::init()
 	{
 		initGL();
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -672,7 +692,9 @@ namespace MeshShader
 
 	void GrassPass2Shader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/grass_pass2.vert").c_str(), file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		attrib_color = glGetAttribLocation(Program, "Color");
@@ -715,7 +737,9 @@ namespace MeshShader
 
 	void SphereMapShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass1.vert").c_str(), file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass1.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_normal = glGetAttribLocation(Program, "Normal");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -755,7 +779,9 @@ namespace MeshShader
 
 	void SplattingShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/splatting.vert").c_str(), file_manager->getAsset("shaders/splatting.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/splatting.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
@@ -809,7 +835,9 @@ namespace MeshShader
 
     void CausticsShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/caustics.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/caustics.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -854,7 +882,9 @@ namespace MeshShader
 
 	void BubbleShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/bubble.vert").c_str(), file_manager->getAsset("shaders/bubble.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/bubble.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bubble.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -880,7 +910,9 @@ namespace MeshShader
 
 	void TransparentShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparent.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/transparent.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
@@ -914,7 +946,9 @@ namespace MeshShader
 
     void TransparentFogShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparentfog.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/transparent.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparentfog.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
@@ -957,7 +991,9 @@ namespace MeshShader
 
 	void BillboardShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/billboard.vert").c_str(), file_manager->getAsset("shaders/billboard.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/billboard.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/billboard.frag").c_str());
 		attrib_corner = glGetAttribLocation(Program, "Corner");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
@@ -983,7 +1019,9 @@ namespace MeshShader
 
 	void ColorizeShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/colorize.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
 		uniform_col = glGetUniformLocation(Program, "col");
@@ -1001,7 +1039,10 @@ namespace MeshShader
 
     void ShadowShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/shadow.vert").c_str(), file_manager->getAsset("shaders/shadow.geom").c_str(), file_manager->getAsset("shaders/white.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
+            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
     }
@@ -1025,7 +1066,10 @@ namespace MeshShader
 
     void RefShadowShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/shadow.vert").c_str(), file_manager->getAsset("shaders/shadow.geom").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
+            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -1054,7 +1098,9 @@ namespace MeshShader
 
     void GrassShadowShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/grass_pass2.vert").c_str(), file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -1076,7 +1122,9 @@ namespace MeshShader
 
     void DisplaceMaskShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/displace.vert").c_str(), file_manager->getAsset("shaders/white.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
     }
@@ -1101,7 +1149,9 @@ namespace MeshShader
 
 	void DisplaceShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/displace.vert").c_str(), file_manager->getAsset("shaders/displace.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/displace.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
 		attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
@@ -1136,7 +1186,9 @@ namespace MeshShader
 
     void SkyboxShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/object_pass2.vert").c_str(), file_manager->getAsset("shaders/sky.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_InvProjView = glGetUniformLocation(Program, "InvProjView");
@@ -1173,7 +1225,9 @@ namespace LightShader
 
     void PointLightShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/pointlight.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
         attrib_Position = glGetAttribLocation(Program, "Position");
         attrib_Color = glGetAttribLocation(Program, "Color");
         attrib_Energy = glGetAttribLocation(Program, "Energy");
@@ -1332,7 +1386,9 @@ namespace ParticleShader
 
 	void SimpleParticleRender::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/particle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/particle.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
 		attrib_pos = glGetAttribLocation(Program, "position");
 		attrib_sz = glGetAttribLocation(Program, "size");
 		attrib_lf = glGetAttribLocation(Program, "lifetime");
@@ -1386,7 +1442,9 @@ namespace ParticleShader
 
 	void FlipParticleRender::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/flipparticle.vert").c_str(), file_manager->getAsset("shaders/particle.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/flipparticle.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
 		attrib_pos = glGetAttribLocation(Program, "position");
 		attrib_sz = glGetAttribLocation(Program, "size");
 		attrib_lf = glGetAttribLocation(Program, "lifetime");
@@ -1438,7 +1496,9 @@ namespace FullScreenShader
 	GLuint BloomShader::vao;
 	void BloomShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloom.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloom.frag").c_str());
 		uniform_texture = glGetUniformLocation(Program, "tex");
 		uniform_low = glGetUniformLocation(Program, "low");
 		vao = createVAO(Program);
@@ -1450,7 +1510,9 @@ namespace FullScreenShader
 	GLuint BloomBlendShader::vao;
 	void BloomBlendShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/bloomblend.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(), 
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
 		uniform_texture = glGetUniformLocation(Program, "tex");
 		vao = createVAO(Program);
 	}
@@ -1464,7 +1526,9 @@ namespace FullScreenShader
     GLuint ColorLevelShader::uniform_dtex;
 	void ColorLevelShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/color_levels.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/color_levels.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
@@ -1483,7 +1547,9 @@ namespace FullScreenShader
 
 	void SunLightShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/sunlight.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
 		uniform_ntex = glGetUniformLocation(Program, "ntex");
 		uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_direction = glGetUniformLocation(Program, "direction");
@@ -1511,7 +1577,9 @@ namespace FullScreenShader
 
     void DiffuseEnvMapShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
         uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
@@ -1541,7 +1609,9 @@ namespace FullScreenShader
 
     void ShadowedSunLightShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
@@ -1576,7 +1646,9 @@ namespace FullScreenShader
 	GLuint Gaussian6HBlurShader::vao;
 	void Gaussian6HBlurShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6h.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
 		vao = createVAO(Program);
@@ -1588,7 +1660,9 @@ namespace FullScreenShader
 	GLuint Gaussian3HBlurShader::vao;
 	void Gaussian3HBlurShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3h.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3h.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
 		vao = createVAO(Program);
@@ -1600,7 +1674,9 @@ namespace FullScreenShader
 	GLuint Gaussian6VBlurShader::vao;
 	void Gaussian6VBlurShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian6v.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6v.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
 		vao = createVAO(Program);
@@ -1612,7 +1688,9 @@ namespace FullScreenShader
 	GLuint Gaussian3VBlurShader::vao;
 	void Gaussian3VBlurShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/gaussian3v.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3v.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_pixel = glGetUniformLocation(Program, "pixel");
 		vao = createVAO(Program);
@@ -1624,7 +1702,9 @@ namespace FullScreenShader
     GLuint PenumbraHShader::vao;
     void PenumbraHShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/penumbrah.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/penumbrah.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
         vao = createVAO(Program);
@@ -1642,7 +1722,9 @@ namespace FullScreenShader
     GLuint PenumbraVShader::vao;
     void PenumbraVShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/penumbrav.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/penumbrav.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
         vao = createVAO(Program);
@@ -1661,7 +1743,9 @@ namespace FullScreenShader
     GLuint ShadowGenShader::vao;
     void ShadowGenShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/shadowgen.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(), 
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowgen.frag").c_str());
         uniform_halft = glGetUniformLocation(Program, "halft");
         uniform_quarter = glGetUniformLocation(Program, "quarter");
         uniform_height = glGetUniformLocation(Program, "height");
@@ -1680,7 +1764,9 @@ namespace FullScreenShader
 	GLuint PassThroughShader::vao;
 	void PassThroughShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
 		uniform_texture = glGetUniformLocation(Program, "texture");
 		vao = createVAO(Program);
 	}
@@ -1690,7 +1776,9 @@ namespace FullScreenShader
 	GLuint GlowShader::vao;
 	void GlowShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/glow.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		vao = createVAO(Program);
 	}
@@ -1707,7 +1795,9 @@ namespace FullScreenShader
 
 	void SSAOShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/ssao.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/ssao.frag").c_str());
 		uniform_ntex = glGetUniformLocation(Program, "ntex");
 		uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_noise_texture = glGetUniformLocation(Program, "noise_texture");
@@ -1854,7 +1944,9 @@ namespace FullScreenShader
 
 	void FogShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/fog.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/fog.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
 		uniform_fogmax = glGetUniformLocation(Program, "fogmax");
 		uniform_startH = glGetUniformLocation(Program, "startH");
@@ -1889,7 +1981,9 @@ namespace FullScreenShader
 
     void MotionBlurShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/motion_blur.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
         uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
         uniform_center = glGetUniformLocation(Program, "center");
         uniform_color_buffer = glGetUniformLocation(Program, "color_buffer");
@@ -1916,7 +2010,9 @@ namespace FullScreenShader
 
     void GodFadeShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/godfade.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godfade.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_col = glGetUniformLocation(Program, "col");
         vao = createVAO(Program);
@@ -1935,7 +2031,9 @@ namespace FullScreenShader
 
     void GodRayShader::init()
     {
-        Program = LoadProgram(file_manager->getAsset("shaders/screenquad.vert").c_str(), file_manager->getAsset("shaders/godray.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godray.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_sunpos = glGetUniformLocation(Program, "sunpos");
         vao = createVAO(Program);
@@ -1962,7 +2060,9 @@ namespace UIShader
 
 	void TextureRectShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/texturedquad.vert").c_str(), file_manager->getAsset("shaders/texturedquad.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/texturedquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
 
 		attrib_position = glGetAttribLocation(Program, "position");
 		attrib_texcoord = glGetAttribLocation(Program, "texcoord");
@@ -2004,7 +2104,9 @@ namespace UIShader
 
 	void ColoredTextureRectShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/colortexturedquad.vert").c_str(), file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/colortexturedquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
 
 		attrib_position = glGetAttribLocation(Program, "position");
 		attrib_texcoord = glGetAttribLocation(Program, "texcoord");
@@ -2053,7 +2155,9 @@ namespace UIShader
 
 	void ColoredRectShader::init()
 	{
-		Program = LoadProgram(file_manager->getAsset("shaders/coloredquad.vert").c_str(), file_manager->getAsset("shaders/coloredquad.frag").c_str());
+		Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/coloredquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "position");
 		uniform_color = glGetUniformLocation(Program, "color");
 		uniform_center = glGetUniformLocation(Program, "center");
