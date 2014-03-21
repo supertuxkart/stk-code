@@ -63,6 +63,8 @@ private:
     void sendFriendRequest();
     void acceptFriendRequest();
     void declineFriendRequest();
+    void removeExistingFriend();
+    void removePendingFriend();
 
 public:
     UserInfoDialog(uint32_t showing_id, const core::stringw info = "", bool error = false, bool from_queue = false);

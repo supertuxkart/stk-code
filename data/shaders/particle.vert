@@ -1,5 +1,7 @@
 uniform mat4 ProjectionMatrix;
 uniform mat4 ViewMatrix;
+uniform vec3 color_from;
+uniform vec3 color_to;
 
 in vec2 quadcorner;
 in vec2 texcoord;
@@ -9,11 +11,13 @@ in float size;
 
 out float lf;
 out vec2 tc;
+out vec3 pc;
 
 void main(void)
 {
 	tc = texcoord;
 	lf = lifetime;
+    pc = color_from + (color_to - color_from) * lifetime;
 	vec3 newposition = position;
 
     vec4 viewpos = ViewMatrix * vec4(newposition, 1.0);

@@ -23,6 +23,7 @@
 
 typedef unsigned int	GLuint;
 using namespace irr;
+class ParticleSystemProxy;
 
 class SharedObject
 {
@@ -209,7 +210,7 @@ class TransparentShader
 {
 public:
 	static GLuint Program;
-	static GLuint attrib_position, attrib_texcoord;
+	static GLuint attrib_position, attrib_texcoord, attrib_color;
 	static GLuint uniform_MVP, uniform_TM, uniform_tex;
 
 	static void init();
@@ -225,18 +226,6 @@ public:
 
     static void init();
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
-};
-
-class PointLightShader
-{
-public:
-    static GLuint Program;
-    static GLuint attrib_Position, attrib_Energy, attrib_Color;
-    static GLuint attrib_Corner;
-    static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen, uniform_invproj, uniform_VM, uniform_PM;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class BillboardShader
@@ -330,6 +319,38 @@ public:
 
 }
 
+#define MAXLIGHT 16
+
+namespace LightShader
+{
+    struct PointLightInfo
+    {
+        float posX;
+        float posY;
+        float posZ;
+        float energy;
+        float red;
+        float green;
+        float blue;
+        float padding;
+    };
+
+
+    class PointLightShader
+    {
+    public:
+        static GLuint Program;
+        static GLuint attrib_Position, attrib_Energy, attrib_Color;
+        static GLuint attrib_Corner;
+        static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen, uniform_invproj, uniform_VM, uniform_PM;
+        static GLuint vbo;
+        static GLuint vao;
+
+        static void init();
+        static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
+    };
+}
+
 namespace ParticleShader
 {
 
@@ -361,10 +382,12 @@ class SimpleParticleRender
 public:
 	static GLuint Program;
 	static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
-	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_dtex, uniform_screen, uniform_invproj;
+	static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_dtex, uniform_screen, uniform_invproj, uniform_color_from, uniform_color_to;
 
 	static void init();
-	static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth);
+	static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix,
+                            const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex,
+                            unsigned TU_normal_and_depth, const ParticleSystemProxy* particle_system);
 };
 
 class FlipParticleRender
