@@ -1246,14 +1246,20 @@ void SkiddingAI::handleItems(const float dt)
                 break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
-            // Do not fire if the kart is driving too slow
-            if (m_kart->getSpeed() < 0.5 * m_kart->getCurrentMaxSpeed()) break;
 
+            // Do not fire if the kart is driving too slow
+            bool kart_behind_is_slow = (m_kart_behind && m_kart_behind->getSpeed() < 0.5 * m_kart_behind->getCurrentMaxSpeed());
+            bool kart_ahead_is_slow = (m_kart_ahead && m_kart_ahead->getSpeed() < 0.5 * m_kart_ahead->getCurrentMaxSpeed());
             // Since cakes can be fired all around, just use a sane distance
             // with a bit of extra for backwards, as enemy will go towards cake
-            bool fire_backwards = (m_kart_behind && m_kart_ahead &&
-                                   m_distance_behind < m_distance_ahead) ||
-                                  !m_kart_ahead;
+            bool fire_backwards = !m_kart_ahead ||
+                                  (m_kart_behind && m_kart_ahead && 
+                                    (m_distance_behind < m_distance_ahead || kart_ahead_is_slow) &&
+                                    !kart_behind_is_slow
+                                  );
+            if ((fire_backwards && kart_behind_is_slow) || (!fire_backwards && kart_ahead_is_slow))
+                break;
+
             float distance = fire_backwards ? m_distance_behind
                                             : m_distance_ahead;
             m_controls->m_fire = (fire_backwards && distance < 25.0f)  ||
