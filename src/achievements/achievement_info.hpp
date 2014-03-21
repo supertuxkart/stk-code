@@ -49,7 +49,8 @@ public:
            ACHIEVE_MARATHONER  = 4,
            ACHIEVE_SKIDDING    = 5,
            ACHIEVE_GOLD_DRIVER = 6,
-           ACHIEVE_POWERUP_LOVER = 7
+           ACHIEVE_POWERUP_LOVER = 7,
+           ACHIEVE_UNSTOPPABLE = 8
     };
     /** Achievement check type:
      *  ALL_AT_LEAST: All goal values must be reached (or exceeded).

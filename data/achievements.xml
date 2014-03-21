@@ -40,5 +40,9 @@
                title="Powerup Love" description="Use 10 or more powerups in a race">
     <poweruplover goal="10"/>
   </achievement>
+  <achievement id="8" check-type="all-at-least" reset-after-race="no"
+               title="Unstoppable" description="Win 5 single races in a row">
+    <wins goal="5"/>
+  </achievement>
 </achievements>
 

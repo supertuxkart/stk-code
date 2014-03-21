@@ -485,7 +485,32 @@ void World::terminateRace()
             }
 	    } // for i < kart_amount
     } // if (achiev)
-
+    
+    Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
+    //if achivement has been unlocked
+    if (win->getValue("wins") < 5 )
+    {
+        for(unsigned int i = 0; i < kart_amount; i++)
+        {
+            // Retrieve the current player
+            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
+            if (p && p->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+            {
+                // Check if the player has won
+                if (m_karts[i]->getPosition() == 1 )
+                {
+                    // Increase number of consecutive wins
+                       PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE,
+                                                            "wins", 1);
+                }
+                else
+                {     
+                      //Set number of consecutive wins to 0
+                      win->reset();
+                }
+            }
+         }
+    }
     PlayerManager::get()->getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();
