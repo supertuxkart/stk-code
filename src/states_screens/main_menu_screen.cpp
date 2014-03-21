@@ -39,6 +39,7 @@
 #include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
+#include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
@@ -158,7 +159,7 @@ void MainMenuScreen::onUpdate(float delta)
     }
     else // now must be either logging in or logging out
         m_online->setDeactivated();
-            
+
     m_online->setLabel(CurrentUser::get()->getID() ? _("Online")
                                                    : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
@@ -413,7 +414,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         // Don't go to addons if there is no internet, unless some addons are
         // already installed (so that you can delete addons without being online).
-        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED && 
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED &&
             !addons_manager->anyAddonsInstalled())
         {
             new MessageDialog(_("You can not download addons without internet access. "
@@ -423,6 +424,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
+    }
+    else if (selection == "gpEditor")
+    {
+        StateManager::get()->pushScreen(GrandPrixEditorScreen::getInstance());
     }
 }   // eventCallback
 

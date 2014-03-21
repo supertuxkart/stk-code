@@ -270,7 +270,7 @@ void Shaders::loadShaders()
 	MeshShader::TransparentShader::init();
     MeshShader::TransparentFogShader::init();
 	MeshShader::BillboardShader::init();
-    MeshShader::PointLightShader::init();
+    LightShader::PointLightShader::init();
 	MeshShader::DisplaceShader::init();
     MeshShader::DisplaceMaskShader::init();
     MeshShader::ShadowShader::init();
@@ -873,6 +873,7 @@ namespace MeshShader
 	GLuint TransparentShader::Program;
 	GLuint TransparentShader::attrib_position;
 	GLuint TransparentShader::attrib_texcoord;
+    GLuint TransparentShader::attrib_color;
 	GLuint TransparentShader::uniform_MVP;
     GLuint TransparentShader::uniform_TM;
 	GLuint TransparentShader::uniform_tex;
@@ -882,6 +883,7 @@ namespace MeshShader
 		Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparent.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_color = glGetAttribLocation(Program, "Color");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
 		uniform_tex = glGetUniformLocation(Program, "tex");
@@ -897,6 +899,7 @@ namespace MeshShader
     GLuint TransparentFogShader::Program;
     GLuint TransparentFogShader::attrib_position;
     GLuint TransparentFogShader::attrib_texcoord;
+    GLuint TransparentFogShader::attrib_color;
     GLuint TransparentFogShader::uniform_MVP;
     GLuint TransparentFogShader::uniform_TM;
     GLuint TransparentFogShader::uniform_tex;
@@ -914,6 +917,7 @@ namespace MeshShader
         Program = LoadProgram(file_manager->getAsset("shaders/transparent.vert").c_str(), file_manager->getAsset("shaders/transparentfog.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
@@ -940,47 +944,6 @@ namespace MeshShader
         glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
         glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
         glUniform1i(uniform_tex, TU_tex);
-    }
-
-    GLuint PointLightShader::Program;
-    GLuint PointLightShader::attrib_Position;
-    GLuint PointLightShader::attrib_Color;
-    GLuint PointLightShader::attrib_Energy;
-    GLuint PointLightShader::attrib_Corner;
-    GLuint PointLightShader::uniform_ntex;
-    GLuint PointLightShader::uniform_dtex;
-    GLuint PointLightShader::uniform_spec;
-    GLuint PointLightShader::uniform_screen;
-    GLuint PointLightShader::uniform_invproj;
-    GLuint PointLightShader::uniform_VM;
-    GLuint PointLightShader::uniform_PM;
-
-    void PointLightShader::init()
-    {
-        Program = LoadProgram(file_manager->getAsset("shaders/pointlight.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
-        attrib_Position = glGetAttribLocation(Program, "Position");
-        attrib_Color = glGetAttribLocation(Program, "Color");
-        attrib_Energy = glGetAttribLocation(Program, "Energy");
-        attrib_Corner = glGetAttribLocation(Program, "Corner");
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_spec = glGetUniformLocation(Program, "spec");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
-        uniform_screen = glGetUniformLocation(Program, "screen");
-        uniform_VM = glGetUniformLocation(Program, "ViewMatrix");
-        uniform_PM = glGetUniformLocation(Program, "ProjectionMatrix");
-    }
-
-    void PointLightShader::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
-    {
-        glUniform1f(uniform_spec, 200);
-        glUniform2f(uniform_screen, screen.X, screen.Y);
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
-        glUniformMatrix4fv(uniform_PM, 1, GL_FALSE, ProjMatrix.pointer());
-
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1i(uniform_dtex, TU_dtex);
     }
 	
 	GLuint BillboardShader::Program;
@@ -1188,6 +1151,76 @@ namespace MeshShader
         glUniform1i(uniform_tex, TU_tex);
         glUniform2f(uniform_screen, screen.X, screen.Y);
     }
+}
+
+namespace LightShader
+{
+
+    GLuint PointLightShader::Program;
+    GLuint PointLightShader::attrib_Position;
+    GLuint PointLightShader::attrib_Color;
+    GLuint PointLightShader::attrib_Energy;
+    GLuint PointLightShader::attrib_Corner;
+    GLuint PointLightShader::uniform_ntex;
+    GLuint PointLightShader::uniform_dtex;
+    GLuint PointLightShader::uniform_spec;
+    GLuint PointLightShader::uniform_screen;
+    GLuint PointLightShader::uniform_invproj;
+    GLuint PointLightShader::uniform_VM;
+    GLuint PointLightShader::uniform_PM;
+    GLuint PointLightShader::vbo;
+    GLuint PointLightShader::vao;
+
+    void PointLightShader::init()
+    {
+        Program = LoadProgram(file_manager->getAsset("shaders/pointlight.vert").c_str(), file_manager->getAsset("shaders/pointlight.frag").c_str());
+        attrib_Position = glGetAttribLocation(Program, "Position");
+        attrib_Color = glGetAttribLocation(Program, "Color");
+        attrib_Energy = glGetAttribLocation(Program, "Energy");
+        attrib_Corner = glGetAttribLocation(Program, "Corner");
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_spec = glGetUniformLocation(Program, "spec");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_VM = glGetUniformLocation(Program, "ViewMatrix");
+        uniform_PM = glGetUniformLocation(Program, "ProjectionMatrix");
+
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+
+        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
+        glEnableVertexAttribArray(attrib_Corner);
+        glVertexAttribPointer(attrib_Corner, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0, GL_DYNAMIC_DRAW);
+
+        glEnableVertexAttribArray(attrib_Position);
+        glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
+        glEnableVertexAttribArray(attrib_Energy);
+        glVertexAttribPointer(attrib_Energy, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(3 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_Color);
+        glVertexAttribPointer(attrib_Color, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(4 * sizeof(float)));
+
+        glVertexAttribDivisor(attrib_Position, 1);
+        glVertexAttribDivisor(attrib_Energy, 1);
+        glVertexAttribDivisor(attrib_Color, 1);
+    }
+
+    void PointLightShader::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
+    {
+        glUniform1f(uniform_spec, 200);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+        glUniformMatrix4fv(uniform_PM, 1, GL_FALSE, ProjMatrix.pointer());
+
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1i(uniform_dtex, TU_dtex);
+    }
+
 }
 
 

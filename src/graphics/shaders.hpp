@@ -210,7 +210,7 @@ class TransparentShader
 {
 public:
 	static GLuint Program;
-	static GLuint attrib_position, attrib_texcoord;
+	static GLuint attrib_position, attrib_texcoord, attrib_color;
 	static GLuint uniform_MVP, uniform_TM, uniform_tex;
 
 	static void init();
@@ -221,23 +221,11 @@ class TransparentFogShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
+    static GLuint attrib_position, attrib_texcoord, attrib_color;
     static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_screen, uniform_ipvmat;
 
     static void init();
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
-};
-
-class PointLightShader
-{
-public:
-    static GLuint Program;
-    static GLuint attrib_Position, attrib_Energy, attrib_Color;
-    static GLuint attrib_Corner;
-    static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen, uniform_invproj, uniform_VM, uniform_PM;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class BillboardShader
@@ -329,6 +317,38 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InvProjView, const core::vector2df &screen, unsigned TU_tex);
 };
 
+}
+
+#define MAXLIGHT 16
+
+namespace LightShader
+{
+    struct PointLightInfo
+    {
+        float posX;
+        float posY;
+        float posZ;
+        float energy;
+        float red;
+        float green;
+        float blue;
+        float padding;
+    };
+
+
+    class PointLightShader
+    {
+    public:
+        static GLuint Program;
+        static GLuint attrib_Position, attrib_Energy, attrib_Color;
+        static GLuint attrib_Corner;
+        static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen, uniform_invproj, uniform_VM, uniform_PM;
+        static GLuint vbo;
+        static GLuint vao;
+
+        static void init();
+        static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
+    };
 }
 
 namespace ParticleShader

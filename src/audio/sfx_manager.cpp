@@ -315,16 +315,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 }   // createSoundSource
 
 //----------------------------------------------------------------------------
-
-void SFXManager::dump()
-{
-    for(int n=0; n<(int)m_all_sfx.size(); n++)
-    {
-        Log::debug("SFXManager", "Sound %i : %s \n", n, m_all_sfx[n]->getBuffer()->getFileName().c_str());
-    }
-}
-
-//----------------------------------------------------------------------------
 SFXBase* SFXManager::createSoundSource(const std::string &name,
                                        const bool addToSFXList)
 {

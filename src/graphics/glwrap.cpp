@@ -64,7 +64,9 @@ PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 static bool is_gl_init = false;
 
 #ifdef DEBUG
+#ifdef WIN32
 #define ARB_DEBUG_OUTPUT
+#endif
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
@@ -200,7 +202,7 @@ void initGL()
 #endif
 #endif
 #ifdef ARB_DEBUG_OUTPUT
-	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
+    glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 }
 

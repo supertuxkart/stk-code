@@ -743,50 +743,11 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 }
 
 // ----------------------------------------------------------------------------
-#define MAXLIGHT 16 // to be adjusted in pointlight.frag too
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+static LightShader::PointLightInfo PointLightsInfo[MAXLIGHT];
 
-
-static GLuint pointlightvbo = 0;
-static GLuint pointlightsvao = 0;
-
-struct PointLightInfo
-{
-    float posX;
-    float posY;
-    float posZ;
-    float energy;
-    float red;
-    float green;
-    float blue;
-    float padding;
-};
-
-void createPointLightVAO()
-{
-    glGenVertexArrays(1, &pointlightsvao);
-    glBindVertexArray(pointlightsvao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
-    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Corner);
-    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Corner, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-
-    glGenBuffers(1, &pointlightvbo);
-    glBindBuffer(GL_ARRAY_BUFFER, pointlightvbo);
-    glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0, GL_DYNAMIC_DRAW);
-
-    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Position);
-    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
-    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Energy);
-    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Energy, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(MeshShader::PointLightShader::attrib_Color);
-    glVertexAttribPointer(MeshShader::PointLightShader::attrib_Color, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(4 * sizeof(float)));
-
-    glVertexAttribDivisor(MeshShader::PointLightShader::attrib_Position, 1);
-    glVertexAttribDivisor(MeshShader::PointLightShader::attrib_Energy, 1);
-    glVertexAttribDivisor(MeshShader::PointLightShader::attrib_Color, 1);
-}
-
-static void renderPointLights()
+static void renderPointLights(unsigned count)
 {
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
@@ -794,22 +755,17 @@ static void renderPointLights()
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
 
-    glUseProgram(MeshShader::PointLightShader::Program);
-    glBindVertexArray(pointlightsvao);
+    glUseProgram(LightShader::PointLightShader::Program);
+    glBindVertexArray(LightShader::PointLightShader::vao);
+    glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
     setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
     setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    MeshShader::PointLightShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 200, 0, 1);
+    LightShader::PointLightShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 200, 0, 1);
 
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, MAXLIGHT);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
-
-PointLightInfo PointLightsInfo[MAXLIGHT];
 
 void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              scene::ICameraSceneNode * const camnode,
@@ -848,7 +804,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
         unsigned idx = (unsigned)(lightpos.getLength() / 10);
         if (idx > 14)
-          continue;
+          idx = 14;
         BucketedLN[idx].push_back(m_lights[i]);
     }
 
@@ -895,17 +851,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
     lightnum++;
 
-	// Fill lights
-	for (; lightnum < MAXLIGHT; lightnum++) {
-        PointLightsInfo[lightnum].energy = 0;
-	}
-
-    if (!pointlightsvao)
-        createPointLightVAO();
-    glBindVertexArray(pointlightsvao);
-    glBindBuffer(GL_ARRAY_BUFFER, pointlightvbo);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, MAXLIGHT * sizeof(PointLightInfo), PointLightsInfo);
-    renderPointLights();
+    renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     // Handle SSAO
@@ -991,9 +937,6 @@ static void createcubevao()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
-
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
 {

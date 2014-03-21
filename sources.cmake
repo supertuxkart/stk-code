@@ -227,6 +227,7 @@ src/states_screens/dialogs/addons_loading.cpp
 src/states_screens/dialogs/change_password_dialog.cpp
 src/states_screens/dialogs/confirm_resolution_dialog.cpp
 src/states_screens/dialogs/custom_video_settings.cpp
+src/states_screens/dialogs/enter_gp_name_dialog.cpp
 src/states_screens/dialogs/enter_player_name_dialog.cpp
 src/states_screens/dialogs/gp_info_dialog.cpp
 src/states_screens/dialogs/message_dialog.cpp
@@ -243,7 +244,10 @@ src/states_screens/dialogs/tutorial_message_dialog.cpp
 src/states_screens/dialogs/user_info_dialog.cpp
 src/states_screens/dialogs/vote_dialog.cpp
 src/states_screens/easter_egg_screen.cpp
+src/states_screens/edit_gp_screen.cpp
+src/states_screens/edit_track_screen.cpp
 src/states_screens/feature_unlocked.cpp
+src/states_screens/grand_prix_editor_screen.cpp
 src/states_screens/grand_prix_lose.cpp
 src/states_screens/grand_prix_win.cpp
 src/states_screens/guest_login_screen.cpp
@@ -563,6 +567,7 @@ src/states_screens/dialogs/addons_loading.hpp
 src/states_screens/dialogs/change_password_dialog.hpp
 src/states_screens/dialogs/confirm_resolution_dialog.hpp
 src/states_screens/dialogs/custom_video_settings.hpp
+src/states_screens/dialogs/enter_gp_name_dialog.hpp
 src/states_screens/dialogs/enter_player_name_dialog.hpp
 src/states_screens/dialogs/gp_info_dialog.hpp
 src/states_screens/dialogs/message_dialog.hpp
@@ -579,7 +584,10 @@ src/states_screens/dialogs/tutorial_message_dialog.hpp
 src/states_screens/dialogs/user_info_dialog.hpp
 src/states_screens/dialogs/vote_dialog.hpp
 src/states_screens/easter_egg_screen.hpp
+src/states_screens/edit_gp_screen.hpp
+src/states_screens/edit_track_screen.hpp
 src/states_screens/feature_unlocked.hpp
+src/states_screens/grand_prix_editor_screen.hpp
 src/states_screens/grand_prix_lose.hpp
 src/states_screens/grand_prix_win.hpp
 src/states_screens/guest_login_screen.hpp
