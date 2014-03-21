@@ -18,6 +18,8 @@
 #    include <GL/gl.h>
 #endif
 
+#include "utils/log.hpp"
+
 // already includes glext.h, which defines useful GL constants.
 // COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLDriver.h"
