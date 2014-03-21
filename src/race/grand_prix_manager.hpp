@@ -30,16 +30,31 @@
 class GrandPrixManager
 {
 private:
+    static const char* SUFFIX;
+
+    void loadFiles();
+    void loadDir(const std::string& dir);
+    void load(const std::string &filename);
+
+    std::string generateId();
+
+    bool existsId(const std::string& id) const;
+    bool existsName(const irr::core::stringw& name) const;
+
     std::vector<GrandPrixData*> m_gp_data;
 public:
                          GrandPrixManager();
                         ~GrandPrixManager();
-    void                 load(const std::string &filename);
-    const GrandPrixData* getGrandPrix(int i)    const { return m_gp_data[i];     }
+    void                 reload();
+    const GrandPrixData* getGrandPrix(const int i)    const { return m_gp_data[i];     }
     const GrandPrixData* getGrandPrix(const std::string& s) const;
+    GrandPrixData*       editGrandPrix(const std::string& s) const;
     unsigned int         getNumberOfGrandPrix() const { return m_gp_data.size(); }
     void                 checkConsistency();
 
+    GrandPrixData*       createNew(const irr::core::stringw& newName);
+    GrandPrixData*       copy(const std::string& id, const irr::core::stringw& newName);
+    void                 remove(const std::string& id);
 };   // GrandPrixManager
 
 extern GrandPrixManager *grand_prix_manager;
