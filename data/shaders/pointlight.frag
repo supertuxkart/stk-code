@@ -12,12 +12,7 @@ flat in vec3 col;
 out vec4 Diffuse;
 out vec4 Specular;
 
-vec3 DecodeNormal(vec2 n)
-{
-  float z = dot(n, n) * 2. - 1.;
-  vec2 xy = normalize(n) * sqrt(1. - z * z);
-  return vec3(xy,z);
-}
+vec3 DecodeNormal(vec2 n);
 
 void main() {
 	vec2 texc = gl_FragCoord.xy / screen;
