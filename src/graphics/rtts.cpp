@@ -137,6 +137,8 @@ RTT::RTT()
     drv->setRenderTarget(0, false, false);
 
     drv->endScene();
+    if (irr_driver->getGLSLVersion() < 150)
+      return;
     glGenFramebuffers(1, &shadowFBO);
     glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
     glGenTextures(1, &shadowColorTex);
