@@ -210,7 +210,9 @@ void initGL()
 GLuint LoadShader(const char * file, unsigned type)
 {
 	GLuint Id = glCreateShader(type);
-    std::string Code = "#version 330\n";
+    char versionString[20];
+    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
+    std::string Code = versionString;
 	std::ifstream Stream(file, std::ios::in);
 	if (Stream.is_open())
 	{

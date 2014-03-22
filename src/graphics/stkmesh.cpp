@@ -55,6 +55,8 @@ TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE typ
 
 GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
 {
+    if (attrib_position == -1)
+        return 0;
 	GLuint vao;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);

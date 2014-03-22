@@ -1049,6 +1049,12 @@ namespace MeshShader
 
     void ShadowShader::init()
     {
+        // Geometry shader needed
+        if (irr_driver->getGLSLVersion() < 150)
+        {
+            attrib_position = -1;
+            return;
+        }
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
@@ -1076,6 +1082,13 @@ namespace MeshShader
 
     void RefShadowShader::init()
     {
+        // Geometry shader needed
+        if (irr_driver->getGLSLVersion() < 150)
+        {
+            attrib_position = -1;
+            attrib_texcoord = -1;
+            return;
+        }
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),

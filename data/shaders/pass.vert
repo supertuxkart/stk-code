@@ -1,5 +1,5 @@
 // Passthrough shader for drawQuad()
-#version 330
+#version 140
 
 in vec3 Position;
 in vec2 Texcoord;

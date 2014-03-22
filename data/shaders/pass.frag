@@ -1,4 +1,4 @@
-#version 330
+#version 140
 uniform sampler2D tex;
 
 in vec2 uv;
