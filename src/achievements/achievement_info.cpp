@@ -55,9 +55,7 @@ AchievementInfo::AchievementInfo(const XMLNode * input)
         m_reset_type = AFTER_RACE;
     else if (s == "lap")
         m_reset_type = AFTER_LAP;
-    else if (s == "never")
-        m_reset_type = NEVER;
-    else
+    else if (s != "never")
         Log::warn("AchievementInfo", "Achievement check type '%s' unknown.",
             s.c_str());
 

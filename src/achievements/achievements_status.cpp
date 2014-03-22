@@ -140,4 +140,4 @@ void AchievementsStatus::onLapEnd()
     for (iter = m_achievements.begin(); iter != m_achievements.end(); ++iter) {
         iter->second->onLapEnd();
     }
-}   // onRaceEnd
+}   // onLapEnd
