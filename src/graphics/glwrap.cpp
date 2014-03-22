@@ -361,6 +361,16 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    const video::SColor &colors, bool useAlphaChannelOfTexture)
+{
+    video::SColor duplicatedArray[4] = {
+        colors, colors, colors, colors
+    };
+    draw2DImage(texture, destRect, sourceRect, clipRect, duplicatedArray, useAlphaChannelOfTexture);
+}
+
+void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
 	const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
 	const video::SColor* const colors, bool useAlphaChannelOfTexture)
 {

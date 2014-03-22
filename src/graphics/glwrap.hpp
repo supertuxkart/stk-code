@@ -137,6 +137,10 @@ GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
+    const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
+    const irr::video::SColor &color, bool useAlphaChannelOfTexture);
+
+void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
 	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
 	const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
 
