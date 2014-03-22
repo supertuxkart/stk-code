@@ -932,8 +932,8 @@ static void createcubevao()
 	glBindVertexArray(cubevao);
 	glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
 	glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+	glEnableVertexAttribArray(MeshShader::SkyboxShader::attrib_position);
+    glVertexAttribPointer(MeshShader::SkyboxShader::attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
