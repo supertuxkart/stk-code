@@ -105,6 +105,68 @@ static void initBillboardVBO()
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad, GL_STATIC_DRAW);
 }
 
+GLuint SharedObject::cubevbo = 0;
+GLuint SharedObject::cubeindexes = 0;
+
+static void initCubeVBO()
+{
+    // From CSkyBoxSceneNode
+    float corners[] =
+    {
+        // top side
+        1., 1., -1.,
+        1., 1., 1.,
+        -1., 1., 1.,
+        -1., 1., -1.,
+
+        // Bottom side
+        1., -1., 1.,
+        1., -1., -1.,
+        -1., -1., -1.,
+        -1., -1., 1.,
+
+        // right side
+        1., -1, -1,
+        1., -1, 1,
+        1., 1., 1.,
+        1., 1., -1.,
+
+        // left side
+        -1., -1., 1.,
+        -1., -1., -1.,
+        -1., 1., -1.,
+        -1., 1., 1.,
+
+        // back side
+        -1., -1., -1.,
+        1., -1, -1.,
+        1, 1, -1.,
+        -1, 1, -1.,
+
+        // front side
+        1., -1., 1.,
+        -1., -1., 1.,
+        -1, 1., 1.,
+        1., 1., 1.,
+    };
+    int indices[] = {
+        0, 1, 2, 2, 3, 0,
+        4, 5, 6, 6, 7, 4,
+        8, 9, 10, 10, 11, 8,
+        12, 13, 14, 14, 15, 12,
+        16, 17, 18, 18, 19, 16,
+        20, 21, 22, 22, 23, 20
+    };
+
+    glGenBuffers(1, &SharedObject::cubevbo);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
+    glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &SharedObject::cubeindexes);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
+}
+
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -232,6 +294,7 @@ void Shaders::loadShaders()
 	initQuadVBO();
 	initQuadBuffer();
     initBillboardVBO();
+    initCubeVBO();
 	FullScreenShader::BloomBlendShader::init();
 	FullScreenShader::BloomShader::init();
 	FullScreenShader::ColorLevelShader::init();
@@ -1206,6 +1269,7 @@ namespace MeshShader
     GLuint SkyboxShader::uniform_tex;
     GLuint SkyboxShader::uniform_screen;
     GLuint SkyboxShader::uniform_InvProjView;
+    GLuint SkyboxShader::cubevao;
 
     void SkyboxShader::init()
     {
@@ -1217,6 +1281,14 @@ namespace MeshShader
         uniform_InvProjView = glGetUniformLocation(Program, "InvProjView");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_screen = glGetUniformLocation(Program, "screen");
+
+        glGenVertexArrays(1, &cubevao);
+        glBindVertexArray(cubevao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::cubevbo);
+        glEnableVertexAttribArray(attrib_position);
+        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::cubeindexes);
+        glBindVertexArray(0);
     }
 
     void SkyboxShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InvProjView, const core::vector2df &screen, unsigned TU_tex)

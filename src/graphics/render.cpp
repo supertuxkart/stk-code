@@ -870,74 +870,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
 }
 
-
-static GLuint cubevao = 0;
-static GLuint cubevbo;
-static GLuint cubeidx;
-
-static void createcubevao()
-{
-	// From CSkyBoxSceneNode
-	float corners[] = 
-	{
-		// top side
-		1., 1., -1.,
-		1., 1., 1.,
-		-1., 1., 1.,
-		-1., 1., -1.,
-
-		// Bottom side
-		1., -1., 1.,
-		1., -1., -1.,
-		-1., -1., -1.,
-		-1., -1., 1.,
-
-		// right side
-		1., -1, -1,
-		1., -1, 1,
-		1., 1., 1.,
-		1., 1., -1.,
-
-		// left side
-		-1., -1., 1.,
-		-1., -1., -1.,
-		-1., 1., -1.,
-		-1., 1., 1.,
-
-		// back side
-		-1., -1., -1.,
-		1., -1, -1.,
-		1, 1, -1.,
-		-1, 1, -1.,
-		
-		// front side
-		1., -1., 1.,
-		-1., -1., 1.,
-		-1, 1., 1.,
-		1., 1., 1.,
-	};
-	int indices[] = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4,
-		8, 9, 10, 10, 11, 8,
-		12, 13, 14, 14, 15, 12,
-		16, 17, 18, 18, 19, 16,
-		20, 21, 22, 22, 23, 20
-	};
-
-	glGenBuffers(1, &cubevbo);
-	glGenBuffers(1, &cubeidx);
-	glGenVertexArrays(1, &cubevao);
-
-	glBindVertexArray(cubevao);
-	glBindBuffer(GL_ARRAY_BUFFER, cubevbo);
-	glBufferData(GL_ARRAY_BUFFER, 6 * 4 * 3 * sizeof(float), corners, GL_STATIC_DRAW);
-	glEnableVertexAttribArray(MeshShader::SkyboxShader::attrib_position);
-    glVertexAttribPointer(MeshShader::SkyboxShader::attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeidx);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
-}
-
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
 {
     switch (face)
@@ -1330,11 +1262,9 @@ void IrrDriver::renderSkybox()
     if (SkyboxTextures.empty()) return;
 
     scene::ICameraSceneNode *camera = m_scene_manager->getActiveCamera();
-	if (!cubevao)
-		createcubevao();
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
-	glBindVertexArray(cubevao);
+    glBindVertexArray(MeshShader::SkyboxShader::cubevao);
 	glDisable(GL_CULL_FACE);
 	assert(SkyboxTextures.size() == 6);
 	core::matrix4 transform = irr_driver->getProjViewMatrix();

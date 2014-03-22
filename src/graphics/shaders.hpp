@@ -29,6 +29,7 @@ class SharedObject
 {
 public:
     static GLuint billboardvbo;
+    static GLuint cubevbo, cubeindexes;
 };
 namespace MeshShader
 {
@@ -312,6 +313,7 @@ public:
     static GLuint Program;
     static GLuint attrib_position;
     static GLuint uniform_MVP, uniform_InvProjView, uniform_tex, uniform_screen;
+    static GLuint cubevao;
 
     static void init();
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InvProjView, const core::vector2df &screen, unsigned TU_tex);
