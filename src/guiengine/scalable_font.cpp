@@ -602,8 +602,6 @@ void ScalableFont::draw(const core::stringw& text,
 
         core::rect<s32> dest(offsets[n] + core::position2di(0, y_shift), size);
 
-        video::SColor colors[] = {color, color, color, color};
-
         video::ITexture* texture = (fallback[n] ?
                                     m_fallback_font->SpriteBank->getTexture(texID) :
                                     SpriteBank->getTexture(texID) );
@@ -644,7 +642,6 @@ void ScalableFont::draw(const core::stringw& text,
         {
             // draw black border
             video::SColor black(color.getAlpha(),0,0,0);
-            video::SColor black_colors[] = {black, black, black, black};
 
             for (int x_delta=-2; x_delta<=2; x_delta++)
             {
@@ -652,10 +649,10 @@ void ScalableFont::draw(const core::stringw& text,
                 {
                     if (x_delta == 0 || y_delta == 0) continue;
                     draw2DImage(texture,
-                                        dest + core::position2d<s32>(x_delta, y_delta),
-                                        source,
-                                        clip,
-                                        black_colors, true);
+                                dest + core::position2d<s32>(x_delta, y_delta),
+                                source,
+                                clip,
+                                black, true);
                 }
             }
         }
@@ -667,18 +664,18 @@ void ScalableFont::draw(const core::stringw& text,
             static video::SColor yellow(color.getAlpha(), 255, 220, 15);
             video::SColor title_colors[] = {yellow, orange, orange, yellow};
             draw2DImage(texture,
-                                dest,
-                                source,
-                                clip,
-                                title_colors, true);
+                        dest,
+                        source,
+                        clip,
+                        title_colors, true);
         }
         else
         {
             draw2DImage(texture,
-                                dest,
-                                source,
-                                clip,
-                                colors, true);
+                        dest,
+                        source,
+                        clip,
+                        color, true);
 
 #ifdef FONT_DEBUG
             driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
