@@ -232,10 +232,11 @@ GLuint LoadShader(const char * file, unsigned type)
 	glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
 	if (Result == GL_FALSE)
     {
+        Log::error("GLWrap", "Error in shader %s", file);
 		glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		char *ErrorMessage = new char[InfoLogLength];
 		glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
-		printf(ErrorMessage);
+        Log::error("GLWrap", ErrorMessage);
 		delete[] ErrorMessage;
 	}
 
