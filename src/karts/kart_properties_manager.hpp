@@ -65,53 +65,57 @@ protected:
     KartPropertiesVector m_karts_properties;
 
 public:
-                             KartPropertiesManager();
-                            ~KartPropertiesManager();
-    static void              addKartSearchDir       (const std::string &s);
-    const KartProperties*    getKartById            (int i) const;
-    const KartProperties*    getKart(const std::string &ident) const;
-    const int                getKartId(const std::string &ident) const;
-    int                      getKartByGroup(const std::string& group,
-                                           int i) const;
+    /** The constructor only clears internal data structures. */
+     KartPropertiesManager() { m_all_groups.clear(); }
+    ~KartPropertiesManager() {}
+    
+    static void           addKartSearchDir     (const std::string &s);
+    const KartProperties* getKartById          (int i) const;
+    const KartProperties* getKart              (const std::string &ident) const;
+    const int             getKartId            (const std::string &ident) const;
+    int                   getKartByGroup       (const std::string& group,
+                                                int i) const;
 
-    bool                     loadKart               (const std::string &dir);
-    void                     loadAllKarts           (bool loading_icon = true);
-    void                     unloadAllKarts         ();
-    void                     removeKart(const std::string &id);
-    const std::vector<int>   getKartsInGroup        (const std::string& g);
-    bool                     kartAvailable(int kartid);
-    std::vector<std::string> getAllAvailableKarts() const;
-    void                     setUnavailableKarts(std::vector<std::string>);
-    void                     selectKartName(const std::string &kart_name);
-    bool                     testAndSetKart(int kartid);
-    void                     getRandomKartList(int count,
-                                           RemoteKartInfoList& existing_karts,
-                                           std::vector<std::string> *ai_list);
-    void                     setHatMeshName(const std::string &hat_name);
+    bool                  loadKart             (const std::string &dir);
+    void                  loadAllKarts         (bool loading_icon = true);
+    void                  unloadAllKarts       ();
+    void                  removeKart           (const std::string &id);
+    const std::vector<int>
+                          getKartsInGroup      (const std::string& g);
+    bool                  kartAvailable        (int kartid);
+    std::vector<std::string> 
+                          getAllAvailableKarts () const;
+    void                  setUnavailableKarts  (std::vector<std::string>);
+    void                  selectKartName       (const std::string &kart_name);
+    bool                  testAndSetKart       (int kartid);
+    void                  setHatMeshName       (const std::string &hat_name);
+    void                  getRandomKartList    (int count,
+                                             RemoteKartInfoList& existing_karts,
+                                             std::vector<std::string> *ai_list);
     // ------------------------------------------------------------------------
     /** Returns a list of all groups. */
-    const std::vector<std::string>& getAllGroups() const {return m_all_groups;}
+    const std::vector<std::string>& getAllGroups() const 
+                                        {return m_all_groups;}
     // ------------------------------------------------------------------------
     /** Clears all selected karts (used in networking only). */
-    void clearAllSelectedKarts() { m_selected_karts.clear(); }
+    void clearAllSelectedKarts()        { m_selected_karts.clear(); }
     // ------------------------------------------------------------------------
     /** Removed the last selected kart (used in networking only). */
-    void removeLastSelectedKart() { m_selected_karts.pop_back(); }
+    void removeLastSelectedKart()       { m_selected_karts.pop_back(); }
     // ------------------------------------------------------------------------
     /** Returns the number of selected karts (used in networking only). */
-    int getNumSelectedKarts() const { return m_selected_karts.size(); }
+    int getNumSelectedKarts() const     { return m_selected_karts.size(); }
     // ------------------------------------------------------------------------
     /** Sets a kartid to be selected (used in networking only). */
-    void selectKart(int kartid) { m_selected_karts.push_back(kartid); }
+    void selectKart(int kartid)         { m_selected_karts.push_back(kartid); }
     // ------------------------------------------------------------------------
     /** Returns all directories from which karts were loaded. */
     const std::vector<std::string>* getAllKartDirs() const
-                                    { return &m_all_kart_dirs; }
+                                        { return &m_all_kart_dirs; }
     // ------------------------------------------------------------------------
     /** Returns the number of karts. */
-    const unsigned int getNumberOfKarts() const {
-        return (unsigned int)m_karts_properties.size();
-    }   // getNumberOfKarts
+    const unsigned int getNumberOfKarts() const
+                            { return (unsigned int)m_karts_properties.size(); }
 };
 
 extern KartPropertiesManager *kart_properties_manager;
