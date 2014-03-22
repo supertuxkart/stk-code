@@ -71,7 +71,6 @@ public:
     }   // destroy
     // ========================================================================
 
-    void onRaceEnd();
     AchievementInfo* getAchievementInfo(uint32_t id) const;
     AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
     // ------------------------------------------------------------------------
