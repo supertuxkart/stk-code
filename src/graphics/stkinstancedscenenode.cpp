@@ -72,7 +72,7 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
         GLMesh &mesh = GLmeshes[i];
         GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type);
         ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures);
-        initvaostate(mesh, GeometricType, ShadedType);
+        initinstancedvaostate(mesh, GeometricType, ShadedType);
         if (mesh.vao_first_pass)
             GeometricMesh[GeometricType].push_back(&mesh);
         if (mesh.vao_second_pass)
@@ -97,6 +97,7 @@ static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjecti
 
   MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
 
+  printf("instance count is %d\n", instance_count);
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
 }
@@ -120,7 +121,6 @@ static void drawSMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjection
 void STKInstancedSceneNode::render()
 {
     setFirstTimeMaterial();
-    printf("instance count is %d\n", instance_pos.size() / 3);
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
@@ -128,16 +128,16 @@ void STKInstancedSceneNode::render()
         ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
 
         glUseProgram(MeshShader::InstancedObjectPass1Shader::Program);
-        for (unsigned i = 0; i < GLmeshes.size(); i++)
-            drawFSPMDefault(GLmeshes[i], ModelViewProjectionMatrix, instance_pos.size() / 3);
+        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
+            drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT][i], ModelViewProjectionMatrix, instance_pos.size() / 3);
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
         glUseProgram(MeshShader::InstancedObjectPass2Shader::Program);
-        for (unsigned i = 0; i < GLmeshes.size(); i++)
-            drawSMDefault(GLmeshes[i], ModelViewProjectionMatrix, instance_pos.size() / 3);
+        for (unsigned i = 0; i < ShadedMesh[FPSM_DEFAULT].size(); i++)
+            drawSMDefault(*ShadedMesh[FPSM_DEFAULT][i], ModelViewProjectionMatrix, instance_pos.size() / 3);
         return;
     }
 }
