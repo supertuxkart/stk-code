@@ -33,30 +33,44 @@
 
 class Achievement;
 
-/** This is the base class for storing the definition of an achievement, e.g. 
+/** This is the base class for storing the definition of an achievement, e.g.
  *  title, description (which is common for all achievements), but also how
  *  to achieve this achievement.
-  * \ingroup achievements
-  */
+ * \ingroup achievements
+ */
 class AchievementInfo
 {
 public:
     /** Some handy names for the various achievements. */
-    enum { ACHIEVE_COLUMBUS   = 1,
-           ACHIEVE_FIRST      = ACHIEVE_COLUMBUS,
-           ACHIEVE_STRIKE     = 2,
-           ACHIEVE_ARCH_ENEMY = 3,
-           ACHIEVE_MARATHONER = 4,
-           ACHIEVE_SKIDDING   = 5
+    enum { ACHIEVE_COLUMBUS    = 1,
+           ACHIEVE_FIRST       = ACHIEVE_COLUMBUS,
+           ACHIEVE_STRIKE      = 2,
+           ACHIEVE_ARCH_ENEMY  = 3,
+           ACHIEVE_MARATHONER  = 4,
+           ACHIEVE_SKIDDING    = 5,
+           ACHIEVE_GOLD_DRIVER = 6,
+           ACHIEVE_POWERUP_LOVER = 7,
+           ACHIEVE_UNSTOPPABLE = 8
     };
-    /** Achievement check type: 
+    /** Achievement check type:
      *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
      *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
      */
-    enum AchievementCheckType 
+    enum AchievementCheckType
     {
         AC_ALL_AT_LEAST,
         AC_ONE_AT_LEAST
+    };
+    /** Achievement reset type:
+     *  AFTER_LAP:  Achievement needs to be reset after each lap.
+     *  AFTER_RACE: Achievement needs to be reset after each race.
+     *  NEVER:      Achievement does not need to be reset
+     */
+    enum ResetType
+    {
+        AFTER_LAP  = 1,
+        AFTER_RACE = 2,
+        NEVER      = 3
     };
 
 private:
@@ -75,8 +89,8 @@ private:
     /** The target values needed to be reached. */
     std::map<std::string, int> m_goal_values;
 
-    /** True if the achievement needs to be reset after each race. */
-    bool m_reset_after_race;
+    /** Determines when the achievement needs to be reset */
+    ResetType m_reset_type;
 
 public:
              AchievementInfo(const XMLNode * input);
@@ -96,7 +110,9 @@ public:
     /** Returns the title of this achievement. */
     irr::core::stringw getTitle() const { return m_title; }
     // ------------------------------------------------------------------------
-    bool needsResetAfterRace() const { return m_reset_after_race; }
+    bool needsResetAfterRace() const { return m_reset_type == AFTER_RACE; }
+    // ------------------------------------------------------------------------
+    bool needsResetAfterLap() const { return m_reset_type == AFTER_LAP; }
     // ------------------------------------------------------------------------
     /** Returns the check type for this achievement. */
     AchievementCheckType getCheckType() const { return m_check_type; }

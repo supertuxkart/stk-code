@@ -18,11 +18,7 @@
 #    include <GL/gl.h>
 #endif
 
-void initGL();
-GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path);
-GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path);
-GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
-void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF = false);
+#include "utils/log.hpp"
 
 // already includes glext.h, which defines useful GL constants.
 // COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
@@ -87,12 +83,63 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
 
 
+void initGL();
+GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount);
+void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF = false);
+GLuint LoadShader(const char * file, unsigned type);
+
+template<typename ... Types>
+void loadAndAttach(GLint ProgramID)
+{
+    return;
+}
+
+template<typename ... Types>
+void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Types ... args)
+{
+    GLint ShaderID = LoadShader(filepath, ShaderType);
+    glAttachShader(ProgramID, ShaderID);
+    glDeleteShader(ShaderID);
+    loadAndAttach(ProgramID, args...);
+}
+
+template<typename ... Types>
+GLint LoadProgram(Types ... args)
+{
+    GLint ProgramID = glCreateProgram();
+    loadAndAttach(ProgramID, args...);
+    glLinkProgram(ProgramID);
+
+    GLint Result = GL_FALSE;
+    int InfoLogLength;
+    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
+    if (Result == GL_FALSE) {
+        glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
+        char *ErrorMessage = new char[InfoLogLength];
+        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
+        printf(ErrorMessage);
+        delete[] ErrorMessage;
+    }
+
+    GLenum glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
+    }
+
+    return ProgramID;
+}
+
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+
+void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
+    const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
+    const irr::video::SColor &color, bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
 	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

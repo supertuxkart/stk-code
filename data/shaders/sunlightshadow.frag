@@ -23,18 +23,13 @@ varying vec2 uv;
 #endif
 
 
-vec3 DecodeNormal(vec2 n)
-{
-  float z = dot(n, n) * 2. - 1.;
-  vec2 xy = normalize(n) * sqrt(1. - z * z);
-  return vec3(xy,z);
-}
+vec3 DecodeNormal(vec2 n);
 
 float getShadowFactor(vec3 pos, float bias, int index)
 {
   //float a[5] = float[](3.4, 4.2, 5.0, 5.2, 1.1);
   
-	const vec2 shadowoffset[4] = vec2[](
+	vec2 shadowoffset[4] = vec2[](
 		vec2(-1., -1.),
 		vec2(-1., 1.),
 		vec2(1., -1.),

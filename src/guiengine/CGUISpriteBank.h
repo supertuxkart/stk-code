@@ -67,12 +67,15 @@ public:
         m_scale = scale;
     }
 
+    void scaleToHeight(int height);
+
 protected:
 
     // this object was getting access after being freed, I wanna see when/why
     unsigned int m_magic_number;
 
     float m_scale;
+    int m_height;
 
     struct SDrawBatch
     {
@@ -91,6 +94,8 @@ protected:
     IGUIEnvironment* Environment;
     video::IVideoDriver* Driver;
 
+    s32 getScaledWidth(s32 width) const;
+    s32 getScaledHeight(s32 height) const;
 };
 
 } // end namespace gui

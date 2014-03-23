@@ -96,14 +96,6 @@ AchievementsStatus*
 }   // createAchievementStatus
 
 // ----------------------------------------------------------------------------
-void AchievementsManager::onRaceEnd()
-{
-    //reset all values that need to be reset
-    PlayerManager::get()->getCurrentPlayer()
-        ->getAchievementsStatus()->onRaceEnd();
-}  // onRaceEnd
-
-// ----------------------------------------------------------------------------
 AchievementInfo * AchievementsManager::getAchievementInfo(uint32_t id) const
 {
     std::map<uint32_t, AchievementInfo*>::const_iterator info = 

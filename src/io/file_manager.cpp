@@ -188,10 +188,11 @@ FileManager::FileManager()
         addRootDirs(root_dir+"../../stk-assets");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
-        
+
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
     checkAndCreateScreenshotDir();
+    checkAndCreateGPDir();
 
 #ifdef WIN32
     redirectOutput();
@@ -203,12 +204,14 @@ FileManager::FileManager()
     for(unsigned int i=0; i<m_root_dirs.size(); i++)
         Log::info("[FileManager]", "Data files will be fetched from: '%s'",
                    m_root_dirs[i].c_str());
-    Log::info("[FileManager]", "User directory is '%s'.", 
+    Log::info("[FileManager]", "User directory is '%s'.",
               m_user_config_dir.c_str());
     Log::info("[FileManager]", "Addons files will be stored in '%s'.",
                m_addons_dir.c_str());
     Log::info("[FileManager]", "Screenshots will be stored in '%s'.",
                m_screenshot_dir.c_str());
+    Log::info("[FileManager]", "User-defined grand prix will be stored in '%s'.",
+               m_gp_dir.c_str());
 
     /** Now search for the path to all needed subdirectories. */
     // ==========================================================
@@ -270,7 +273,7 @@ void FileManager::reInit()
 
     // Note that we can't push the texture search path in the constructor
     // since this also adds a file archive to te file system - and
-    // m_file_system is deleted (in irr_driver) after 
+    // m_file_system is deleted (in irr_driver) after
     pushTextureSearchPath(m_subdir_name[TEXTURE]);
     if(fileExists(m_subdir_name[TEXTURE]+"deprecated/"))
         pushTextureSearchPath(m_subdir_name[TEXTURE]+"deprecated/");
@@ -543,7 +546,7 @@ std::string FileManager::getAssetChecked(FileManager::AssetType type,
 }   // getAssetChecked
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a file of the given asset class. It is not 
+/** Returns the full path of a file of the given asset class. It is not
  *  checked if the file actually exists (use getAssetChecked() instead if
  *  checking is needed).
  *  \param type Type of the asset class.
@@ -577,7 +580,15 @@ std::string FileManager::getScreenshotDir() const
 }   // getScreenshotDir
 
 //-----------------------------------------------------------------------------
-/** Returns the full path of a texture file name by searching in all 
+/** Returns the directory in which user-defined grand prix should be stored.
+ */
+std::string FileManager::getGPDir() const
+{
+    return m_gp_dir;
+}   // getGPDir
+
+//-----------------------------------------------------------------------------
+/** Returns the full path of a texture file name by searching in all
  *  directories currently in the texture search path. The difference to
  *  a call getAsset(TEXTURE,...) is that the latter will only return
  *  textures from .../textures, while the searchTexture will also
@@ -666,7 +677,7 @@ bool FileManager::checkAndCreateDirectoryP(const std::string &path)
 
 //-----------------------------------------------------------------------------
 /** Checks if the config directory exists, and it not, tries to create it.
- *  It will set m_user_config_dir to the path to which user-specific config 
+ *  It will set m_user_config_dir to the path to which user-specific config
  *  files are stored.
  */
 void FileManager::checkAndCreateConfigDir()
@@ -725,7 +736,7 @@ void FileManager::checkAndCreateConfigDir()
         }
         else if (!getenv("HOME"))
         {
-            Log::error("[FileManager]", 
+            Log::error("[FileManager]",
                         "No home directory, this should NOT happen "
                         "- trying '.' for config files!");
             m_user_config_dir = ".";
@@ -737,7 +748,7 @@ void FileManager::checkAndCreateConfigDir()
             if(!checkAndCreateDirectory(m_user_config_dir))
             {
                 // If $HOME/.config can not be created:
-                Log::error("[FileManager]", 
+                Log::error("[FileManager]",
                             "Cannot create directory '%s', falling back to use '%s'",
                             m_user_config_dir.c_str(), getenv("HOME"));
                 m_user_config_dir = getenv("HOME");
@@ -823,6 +834,32 @@ void FileManager::checkAndCreateScreenshotDir()
     }
 
 }   // checkAndCreateScreenshotDir
+
+// ----------------------------------------------------------------------------
+/** Creates the directories for user-defined grand prix. This will set m_gp_dir
+ *  with the appropriate path.
+ */
+void FileManager::checkAndCreateGPDir()
+{
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_gp_dir = m_user_config_dir + "grandprix/";
+#elif defined(__APPLE__)
+    m_gp_dir  = getenv("HOME");
+    m_gp_dir += "/Library/Application Support/SuperTuxKart/grandprix/";
+#else
+    m_gp_dir = checkAndCreateLinuxDir("XDG_DATA_HOME", "supertuxkart",
+                                          ".local/share", ".supertuxkart");
+    m_gp_dir += "grandprix/";
+#endif
+
+    if(!checkAndCreateDirectory(m_gp_dir))
+    {
+        Log::error("FileManager", "Can not create user-defined grand prix directory '%s', "
+                   "falling back to '.'.", m_gp_dir.c_str());
+        m_gp_dir = ".";
+    }
+
+}   // checkAndCreateGPDir
 
 // ----------------------------------------------------------------------------
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
