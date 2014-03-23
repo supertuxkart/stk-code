@@ -21,10 +21,12 @@
 
 class LODNode;
 class Track;
+class STKInstancedSceneNode;
 
 #include <map>
 #include <vector>
 #include <string>
+#include <irrlicht.h>
 #include "io/xml_node.hpp"
 
 namespace irr
@@ -72,14 +74,17 @@ class LodNodeLoader
 {
 private:
     std::map< std::string, std::vector< LodModel > > m_lod_groups;
+    std::map< std::string, STKInstancedSceneNode* > m_instancing_nodes;
     Track* m_track;
 
 public:
          LodNodeLoader(Track* track);
 
-    void addLODModelDefinition(const XMLNode* xml);
-    LODNode* instanciate(const XMLNode* xml_node, scene::ISceneNode* parent);
-                         //Track* track, std::vector<irr::scene::IMesh*>& cache);
+    void addModelDefinition(const XMLNode* xml);
+    LODNode* instanciateAsLOD(const XMLNode* xml_node, scene::ISceneNode* parent);
+    void instanciate(const core::vector3df& position,
+                     const core::matrix4& transform,
+                     const std::string& name);
 
     void clear();
 

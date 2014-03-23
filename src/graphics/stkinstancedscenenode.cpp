@@ -8,6 +8,7 @@ STKInstancedSceneNode::STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     createGLMeshes();
+    setAutomaticCulling(0);
 }
 
 void STKInstancedSceneNode::createGLMeshes()

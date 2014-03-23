@@ -156,6 +156,16 @@ public:
     virtual ~TrackObjectPresentationLOD();
 };
 
+class TrackObjectPresentationInstancing : public TrackObjectPresentationSceneNode
+{
+public:
+
+    TrackObjectPresentationInstancing(const XMLNode& xml_node,
+        scene::ISceneNode* parent,
+        LodNodeLoader& lod_loader);
+    virtual ~TrackObjectPresentationInstancing();
+};
+
 /**
  * \ingroup tracks
  * A track object representation that consists of a mesh scene node.

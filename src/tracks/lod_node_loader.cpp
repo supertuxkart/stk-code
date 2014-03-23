@@ -21,6 +21,7 @@ using namespace irr;
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/track.hpp"
 
@@ -36,7 +37,7 @@ LodNodeLoader::LodNodeLoader(Track* track)
 
 // ----------------------------------------------------------------------------
 
-void LodNodeLoader::addLODModelDefinition(const XMLNode* xml)
+void LodNodeLoader::addModelDefinition(const XMLNode* xml)
 {
     float lod_distance = -1.0f;
     xml->get("lod_distance", &lod_distance);
@@ -55,8 +56,7 @@ void LodNodeLoader::addLODModelDefinition(const XMLNode* xml)
 
 // ----------------------------------------------------------------------------
 
-LODNode* LodNodeLoader::instanciate(const XMLNode* node, scene::ISceneNode* parent)
-                                    //Track* track, std::vector<irr::scene::IMesh*>& cache)
+LODNode* LodNodeLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent)
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
 
@@ -65,20 +65,10 @@ LODNode* LodNodeLoader::instanciate(const XMLNode* node, scene::ISceneNode* pare
 
     std::vector< LodModel >& group = m_lod_groups[groupname];
 
-    //core::vector3df xyz(0,0,0);
-    //node->get("xyz", &xyz);
-    //core::vector3df hpr(0,0,0);
-    //node->get("hpr", &hpr);
-    //core::vector3df scale(1.0f, 1.0f, 1.0f);
-    //node->get("scale", &scale);
-
     if (group.size() > 0)
     {
         scene::ISceneNode* actual_parent = (parent == NULL ? sm->getRootSceneNode() : parent);
         LODNode* lod_node = new LODNode(groupname, actual_parent, sm);
-        //lod_node->setPosition(xyz);
-        //lod_node->setRotation(hpr);
-        //lod_node->setScale(scale);
         lod_node->updateAbsolutePosition();
         for (unsigned int m=0; m<group.size(); m++)
         {
@@ -122,6 +112,28 @@ LODNode* LodNodeLoader::instanciate(const XMLNode* node, scene::ISceneNode* pare
         Log::warn("LodNodeLoader", "LOD group '%s' is empty", groupname.c_str());
         return NULL;
     }
+}
+
+// ----------------------------------------------------------------------------
+
+void LodNodeLoader::instanciate(const irr::core::vector3df& position,
+                                const irr::core::matrix4& transform,
+                                const std::string& name)
+{
+    if (m_instancing_nodes.find(name) == m_instancing_nodes.end())
+    {
+        if (m_lod_groups.find(name) == m_lod_groups.end())
+        {
+            Log::warn("Instancing", "Cannot find instancing model <%s>", name.c_str());
+            return;
+        }
+
+        scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
+        m_instancing_nodes[name] = new STKInstancedSceneNode(mesh,
+            irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
+    }
+
+    m_instancing_nodes[name]->addWorldMatrix(position);
 }
 
 // ----------------------------------------------------------------------------

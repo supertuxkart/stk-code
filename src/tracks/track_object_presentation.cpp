@@ -141,7 +141,7 @@ TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
     scene::ISceneNode* parent, LodNodeLoader& lod_loader) :
     TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = lod_loader.instanciate(&xml_node, parent);
+    m_node = lod_loader.instanciateAsLOD(&xml_node, parent);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -152,6 +152,27 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 {
     if (m_node)
         irr_driver->removeNode(m_node);
+}
+
+// ----------------------------------------------------------------------------
+
+TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNode& xml_node,
+    scene::ISceneNode* parent,
+    LodNodeLoader& lod_loader) : TrackObjectPresentationSceneNode(xml_node)
+{
+    std::string instancing_model;
+    xml_node.get("instancing_model", &instancing_model);
+
+    m_node = irr_driver->getSceneManager()->addEmptySceneNode(parent);
+    m_node->setPosition(m_init_xyz);
+    m_node->setRotation(m_init_hpr);
+    m_node->setScale(m_init_scale);
+    m_node->updateAbsolutePosition();
+    lod_loader.instanciate(m_node->getAbsolutePosition(), m_node->getAbsoluteTransformation(), instancing_model);
+}
+
+TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
+{
 }
 
 // ----------------------------------------------------------------------------

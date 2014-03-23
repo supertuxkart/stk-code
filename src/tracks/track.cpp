@@ -891,7 +891,21 @@ bool Track::loadMainTrack(const XMLNode &root)
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                lodLoader.addLODModelDefinition(lod_group_xml->getNode(j));
+                lodLoader.addModelDefinition(lod_group_xml->getNode(j));
+            }
+        }
+    }
+
+    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
+    const XMLNode *instancing_xml_node = root.getNode("instancing");
+    if (instancing_xml_node != NULL)
+    {
+        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
+        {
+            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                lodLoader.addModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
@@ -1075,7 +1089,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (lod_instance)
         {
-            LODNode* node = lodLoader.instanciate(n, NULL);
+            LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
             if (node != NULL)
             {
                 node->setPosition(xyz);
@@ -1535,7 +1549,21 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
+                lod_loader.addModelDefinition(lod_group_xml->getNode(j));
+            }
+        }
+    }
+
+    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
+    const XMLNode *instancing_xml_node = root->getNode("instancing");
+    if (instancing_xml_node != NULL)
+    {
+        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
+        {
+            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                lod_loader.addModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
@@ -1770,7 +1798,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
                         const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
                         for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
                         {
-                            lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
+                            lod_loader.addModelDefinition(lod_group_xml->getNode(j));
                         }
                     }
                 }
