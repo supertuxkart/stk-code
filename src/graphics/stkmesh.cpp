@@ -102,7 +102,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 		glVertexAttribPointer(attrib_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (GLvoid*)24);
 		
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
-	glBindVertexArray(0);
 	return vao;
 }
 
