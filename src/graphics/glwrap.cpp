@@ -65,7 +65,9 @@ PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 static bool is_gl_init = false;
 
 #ifdef DEBUG
+#ifdef WIN32
 #define ARB_DEBUG_OUTPUT
+#endif
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
@@ -202,15 +204,17 @@ void initGL()
 #endif
 #endif
 #ifdef ARB_DEBUG_OUTPUT
-	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
+    glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 }
 
 // Mostly from shader tutorial
-static GLuint LoadShader(const char * file, unsigned type)
+GLuint LoadShader(const char * file, unsigned type)
 {
 	GLuint Id = glCreateShader(type);
-    std::string Code = "#version 330\n";
+    char versionString[20];
+    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
+    std::string Code = versionString;
 	std::ifstream Stream(file, std::ios::in);
 	if (Stream.is_open())
 	{
@@ -230,10 +234,11 @@ static GLuint LoadShader(const char * file, unsigned type)
 	glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
 	if (Result == GL_FALSE)
     {
+        Log::error("GLWrap", "Error in shader %s", file);
 		glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		char *ErrorMessage = new char[InfoLogLength];
 		glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
-		printf(ErrorMessage);
+        Log::error("GLWrap", ErrorMessage);
 		delete[] ErrorMessage;
 	}
 
@@ -246,80 +251,10 @@ static GLuint LoadShader(const char * file, unsigned type)
 	return Id;
 }
 
-GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path)
-{
-	GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
-	GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
-
-	GLuint ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
-	glLinkProgram(ProgramID);
-
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	if (Result == GL_FALSE) {
-		glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-		char *ErrorMessage = new char[InfoLogLength];
-		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
-		printf(ErrorMessage);
-		delete[] ErrorMessage;
-	}
-
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
-
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
-
-	return ProgramID;
-}
-
-GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path)
-{
-    GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
-    GLuint GeometryShaderID = LoadShader(geometry_file_path, GL_GEOMETRY_SHADER);
-
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, GeometryShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
-
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-    if (Result == GL_FALSE) {
-        glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        char *ErrorMessage = new char[InfoLogLength];
-        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(GeometryShaderID);
-    glDeleteShader(FragmentShaderID);
-    
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
-
-    return ProgramID;
-}
-
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount)
 {
-	GLuint Shader = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
 	GLuint Program = glCreateProgram();
-	glAttachShader(Program, Shader);
+    loadAndAttach(Program, GL_VERTEX_SHADER, vertex_file_path);
 	glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
 	glLinkProgram(Program);
 
@@ -334,7 +269,6 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 		printf(ErrorMessage);
 		delete[] ErrorMessage;
 	}
-	glDeleteShader(Shader);
 
     GLenum glErr = glGetError();
     if (glErr != GL_NO_ERROR)
@@ -426,6 +360,16 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
     {
         Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
     }
+}
+
+void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    const video::SColor &colors, bool useAlphaChannelOfTexture)
+{
+    video::SColor duplicatedArray[4] = {
+        colors, colors, colors, colors
+    };
+    draw2DImage(texture, destRect, sourceRect, clipRect, duplicatedArray, useAlphaChannelOfTexture);
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,

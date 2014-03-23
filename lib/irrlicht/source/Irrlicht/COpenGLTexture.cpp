@@ -868,16 +868,9 @@ bool COpenGLFBODepthTexture::attach(ITexture* renderTex)
 #ifdef GL_EXT_framebuffer_object
 	if (UseStencil)
 	{
-		// attach stencil texture to stencil buffer
+		// attach depth stencil texture to depth buffer
 		Driver->extGlFramebufferTexture2D(GL_FRAMEBUFFER_EXT,
-						GL_STENCIL_ATTACHMENT_EXT,
-						GL_TEXTURE_2D,
-						StencilRenderBuffer,
-						0);
-
-		// attach depth texture to depth buffer
-		Driver->extGlFramebufferTexture2D(GL_FRAMEBUFFER_EXT,
-						GL_DEPTH_ATTACHMENT_EXT,
+						GL_DEPTH_STENCIL_ATTACHMENT,
 						GL_TEXTURE_2D,
 						DepthRenderBuffer,
 						0);

@@ -487,6 +487,14 @@ namespace GUIEngine
 
 
  \n
+ \subsection prop20 PROP_KEEP_SELECTION
+ <em> Name in XML files: </em> \c "keep_selection"
+
+ Used on lists, indicates that the list should keep showing the selected item
+ even when it doesn't have the focus
+
+
+ \n
  <HR>
  \section code Using the engine in code
  <HR>
@@ -724,20 +732,6 @@ namespace GUIEngine
     std::vector<MenuMessage> gui_messages;
 
     // ------------------------------------------------------------------------
-    Screen* getScreenNamed(const char* name)
-    {
-        const int screenCount = g_loaded_screens.size();
-        for (int n=0; n<screenCount; n++)
-        {
-            if (g_loaded_screens[n].getName() == name)
-            {
-                return g_loaded_screens.get(n);
-            }
-        }
-        return NULL;
-    }   // getScreenNamed
-
-    // ------------------------------------------------------------------------
     void showMessage(const wchar_t* message, const float time)
     {
         // check for duplicates
@@ -800,13 +794,14 @@ namespace GUIEngine
     {
         return Private::small_font_height;
     }   // getSmallFontHeight
-
-    // ------------------------------------------------------------------------
+ 
+    // ------------------------------------------------------------------------    
     int getLargeFontHeight()
-    {
+   {
+
         return Private::large_font_height;
     }   // getSmallFontHeight
-
+        
     // ------------------------------------------------------------------------
     void clear()
     {

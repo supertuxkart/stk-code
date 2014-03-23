@@ -30,6 +30,8 @@ STKBillboard::STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneMan
 
 void STKBillboard::render()
 {
+    if (irr_driver->getPhase() != TRANSPARENT_PASS)
+        return;
 	core::vector3df pos = getAbsolutePosition();
 	glBindVertexArray(billboardvao);
     GLuint texid = getTextureGLuint(Material.getTexture(0));

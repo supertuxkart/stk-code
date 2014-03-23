@@ -60,6 +60,7 @@ public :
     void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
+    void onLapEnd();
     // ------------------------------------------------------------------------
     const std::map<uint32_t, Achievement *>& getAllAchievements() 
     {

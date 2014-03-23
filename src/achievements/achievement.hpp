@@ -69,7 +69,8 @@ public:
 
     virtual void reset();
     virtual irr::core::stringw getProgressAsString() const;
-    void onRaceEnd();
+    void onRaceEnd(); 
+    void onLapEnd();
     // ------------------------------------------------------------------------
     /** Returns the id of this achievement. */
     uint32_t getID() const { return m_id; }

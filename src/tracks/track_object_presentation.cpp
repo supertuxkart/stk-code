@@ -747,6 +747,16 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!", fire),
                                 true);
     }
+    else if (m_action == "tutorial_backgiftboxes")
+    {
+        m_action_active = false;
+        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        DeviceConfig* config = device->getConfiguration();
+        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
+        
+        new TutorialMessageDialog(_("Press <B> to look behind, to fire the weapon with <%s> while pressing <B> to to fire behind!", fire),
+                                  true);
+    }
     else if (m_action == "tutorial_nitro_collect")
     {
         m_action_active = false;
