@@ -512,7 +512,7 @@ namespace MeshShader
     void InstancedObjectPass1Shader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass1.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         attrib_origin = glGetAttribLocation(Program, "Origin");
@@ -587,7 +587,7 @@ namespace MeshShader
     void InstancedObjectPass2Shader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
