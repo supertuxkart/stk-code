@@ -94,7 +94,7 @@ void main()
 	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
 	FragPos /= FragPos.w;
 	
-	float depth = clamp((FragPos.z/180), 0, 1);
+	float depth = clamp((FragPos.z/180), 0., 1.);
 	
 	
 	float blur = 0.0;
@@ -147,9 +147,9 @@ void main()
   vec2 inTex = uv - 0.5;
 	float vignette  = 1 - dot(inTex, inTex);
 
-  vignette = clamp(pow(vignette, 0.8), 0, 1) ;
+  vignette = clamp(pow(vignette, 0.8), 0., 1.) ;
   vignette = vignette + vignette - 0.5;
-  final.rgb *= clamp(vignette, 0, 1.15);
+  final.rgb *= clamp(vignette, 0., 1.15);
 
 	FragColor.rgb = final;
 	FragColor.a = 1.0;
@@ -182,7 +182,7 @@ void main()
 	float outBlack = outlevel.x;
 	float outWhite = outlevel.y;
 
-  float depth1 = clamp((FragPos.z/180), 0, 1);
+  float depth1 = clamp((FragPos.z/180), 0., 1.);
 
 	vec3 colOut = (pow(((col.rgb * 255.0) - inBlack) / (inWhite - inBlack),
                 vec3(1.0 / inGamma)) * (outWhite - outBlack) + outBlack) / 255.0;
@@ -190,9 +190,9 @@ void main()
   depth1  = (1 - depth1);
   vec3 final = colOut * depth1 + col.rgb * (1 - depth1);
   
-  vignette = clamp(pow(vignette, 0.8), 0, 1) ;
+  vignette = clamp(pow(vignette, 0.8), 0., 1.) ;
   vignette = vignette + vignette - 0.5;
-  final.rgb *= clamp(vignette, 0, 1.15);
+  final.rgb *= clamp(vignette, 0., 1.15);
   FragColor = vec4(final, 1.0);
 
 
@@ -223,7 +223,7 @@ void main()
     float curdepth = texture(dtex, uv).x;
     vec4 FragPos = invprojm * (2.0 * vec4(uv, curdepth, 1.0f) - 1.0f);
     FragPos /= FragPos.w;
-    float depth = clamp(FragPos.z / 180, 0, 1);
+    float depth = clamp(FragPos.z / 180, 0., 1.);
     depth = (1 - depth);
 
     // Compute the vignette
