@@ -88,9 +88,9 @@ KartProperties::KartProperties(const std::string &filename)
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_max_lean = m_lean_speed =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
-        m_squash_duration = m_downward_impulse_factor = 
+        m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
-        m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time = 
+        m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -177,14 +177,15 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // share the same KartModel
     m_kart_model = new KartModel(/*is_master*/true);
 
-    const XMLNode * root = NULL;
-    m_root  = StringUtils::getPath(filename)+"/";
+    m_root  = StringUtils::getPath(filename) + "/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
     // If this is an addon kart, add "addon_" to the identifier - just in
     // case that an addon kart has the same directory name (and therefore
     // identifier) as an included kart.
     if(Addon::isAddon(filename))
         m_ident = Addon::createAddonId(m_ident);
+
+    const XMLNode * root;
     try
     {
         root = new XMLNode(filename);
@@ -192,16 +193,16 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         {
             delete m_kart_model;
             throw std::runtime_error("Couldn't load kart properties in " +
-                                     filename + "no kart node.");
+                                     filename + ": no kart node.");
         }
         getAllData(root);
     }
     catch(std::exception& e)
     {
-        Log::error("[KartProperties]", "Error while parsing KartProperties in "
+        Log::error("[KartProperties]", "Error while parsing kart properties in "
                    "%s: %s", filename.c_str(), e.what());
     }
-    if(root) delete root;
+    if (root) delete root;
 
     // Set a default group (that has to happen after init_default and load)
     if(m_groups.size() == 0)
@@ -212,7 +213,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     file_manager->pushModelSearchPath  (m_root);
     file_manager->pushTextureSearchPath(m_root);
 
-    irr_driver->setTextureErrorMessage("Error while loading kart '%s':",
+    irr_driver->setTextureErrorMessage("Error while loading kart '%s': ",
                                        m_name);
 
     // addShared makes sure that these textures/material infos stay in memory
@@ -561,7 +562,7 @@ void KartProperties::getAllData(const XMLNode * root)
             {
                 m_engine_sfx_type = s;
             }
-            else 
+            else
             {
                 Log::error("[KartProperties]",
                            "Kart '%s' has an invalid engine '%s'.",
