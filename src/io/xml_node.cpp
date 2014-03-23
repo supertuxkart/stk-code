@@ -41,7 +41,7 @@ XMLNode::XMLNode(const std::string &filename)
     m_file_name = filename;
 
     io::IXMLReader *xml = file_manager->createXMLReader(filename);
-    
+
     if (xml == NULL)
     {
         throw std::runtime_error("Cannot find file "+filename);
