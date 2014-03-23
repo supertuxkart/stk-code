@@ -38,23 +38,24 @@ namespace irr
     }
 }
 
-
-struct LodModel
+struct ModelDefinition
 {
     std::string m_model_file;
     bool m_tangent;
     const XMLNode* m_xml;
+
+    /** For LOD */
     int m_distance;
 
     /** Constructor to allow storing this in STL containers */
-    LodModel()
+    ModelDefinition()
     {
         m_tangent = false;
         m_distance = 0;
         m_xml = NULL;
     }
 
-    LodModel(const XMLNode* xml, int distance, std::string& model, bool tangent)
+    ModelDefinition(const XMLNode* xml, int distance, std::string& model, bool tangent)
     {
         m_model_file = model;
         m_tangent = tangent;
@@ -62,23 +63,23 @@ struct LodModel
         m_distance = distance;
     }
 
-    ~LodModel()
+    ~ModelDefinition()
     {
     }
 };
 
-/** Utility class to load level-of-detail nodes
+/** Utility class to load level-of-detail nodes and instaincing nodes
  * \ingroup tracks
  */
-class LodNodeLoader
+class ModelDefinitionLoader
 {
 private:
-    std::map< std::string, std::vector< LodModel > > m_lod_groups;
+    std::map< std::string, std::vector< ModelDefinition > > m_lod_groups;
     std::map< std::string, STKInstancedSceneNode* > m_instancing_nodes;
     Track* m_track;
 
 public:
-         LodNodeLoader(Track* track);
+         ModelDefinitionLoader(Track* track);
 
     void addModelDefinition(const XMLNode* xml);
     LODNode* instanciateAsLOD(const XMLNode* xml_node, scene::ISceneNode* parent);
@@ -88,6 +89,6 @@ public:
 
     void clear();
 
-};  // LodNodeLoader
+};  // ModelDefinitionLoader
 
 #endif // HEADER_LOD_NODE_LOADER_HPP

@@ -39,9 +39,9 @@
  * \param lod_node Lod node (defaults to NULL).
  */
 TrackObject::TrackObject(const XMLNode &xml_node, scene::ISceneNode* parent,
-                         LodNodeLoader& lod_loader)
+                         ModelDefinitionLoader& model_def_loader)
 {
-    init(xml_node, parent, lod_loader);
+    init(xml_node, parent, model_def_loader);
 }
 
 // ----------------------------------------------------------------------------
@@ -80,7 +80,7 @@ TrackObject::TrackObject(const core::vector3df& xyz, const core::vector3df& hpr,
 
 // ----------------------------------------------------------------------------
 void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
-                       LodNodeLoader& lod_loader)
+                       ModelDefinitionLoader& model_def_loader)
 {
     m_init_xyz   = core::vector3df(0,0,0);
     m_init_hpr   = core::vector3df(0,0,0);
@@ -163,14 +163,14 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         {
             m_type = "lod";
             TrackObjectPresentationInstancing* instancing_node =
-                new TrackObjectPresentationInstancing(xml_node, parent, lod_loader);
+                new TrackObjectPresentationInstancing(xml_node, parent, model_def_loader);
             m_presentation = instancing_node;
         }
         else if (lod_instance)
         {
             m_type = "lod";
             TrackObjectPresentationLOD* lod_node = 
-                new TrackObjectPresentationLOD(xml_node, parent, lod_loader);
+                new TrackObjectPresentationLOD(xml_node, parent, model_def_loader);
             m_presentation = lod_node;
 
             glownode = ((LODNode*)lod_node->getNode())->getAllNodes()[0];

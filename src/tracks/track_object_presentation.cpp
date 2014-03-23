@@ -34,7 +34,7 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 
 #include <ISceneManager.h>
@@ -138,10 +138,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 // ----------------------------------------------------------------------------
 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
-    scene::ISceneNode* parent, LodNodeLoader& lod_loader) :
+    scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader) :
     TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = lod_loader.instanciateAsLOD(&xml_node, parent);
+    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -158,7 +158,7 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 
 TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNode& xml_node,
     scene::ISceneNode* parent,
-    LodNodeLoader& lod_loader) : TrackObjectPresentationSceneNode(xml_node)
+    ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
 {
     std::string instancing_model;
     xml_node.get("instancing_model", &instancing_model);
@@ -168,7 +168,7 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
     m_node->updateAbsolutePosition();
-    lod_loader.instanciate(m_node->getAbsolutePosition(), m_node->getAbsoluteTransformation(), instancing_model);
+    model_def_loader.instanciate(m_node->getAbsolutePosition(), m_node->getAbsoluteTransformation(), instancing_model);
 }
 
 TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()

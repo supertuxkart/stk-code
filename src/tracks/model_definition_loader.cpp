@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 using namespace irr;
 
 #include "graphics/irr_driver.hpp"
@@ -30,14 +30,14 @@ using namespace irr;
 #include <IMeshManipulator.h>
 #include <algorithm>
 
-LodNodeLoader::LodNodeLoader(Track* track)
+ModelDefinitionLoader::ModelDefinitionLoader(Track* track)
 {
     m_track = track;
 }
 
 // ----------------------------------------------------------------------------
 
-void LodNodeLoader::addModelDefinition(const XMLNode* xml)
+void ModelDefinitionLoader::addModelDefinition(const XMLNode* xml)
 {
     float lod_distance = -1.0f;
     xml->get("lod_distance", &lod_distance);
@@ -51,19 +51,19 @@ void LodNodeLoader::addModelDefinition(const XMLNode* xml)
     std::string model_name;
     xml->get("model", &model_name);
 
-    m_lod_groups[lodgroup].push_back(LodModel(xml, (int)lod_distance, model_name, tangent));
+    m_lod_groups[lodgroup].push_back(ModelDefinition(xml, (int)lod_distance, model_name, tangent));
 }
 
 // ----------------------------------------------------------------------------
 
-LODNode* LodNodeLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent)
+LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode* parent)
 {
     scene::ISceneManager* sm = irr_driver->getSceneManager();
 
     std::string groupname = "";
     node->get("lod_group", &groupname);
 
-    std::vector< LodModel >& group = m_lod_groups[groupname];
+    std::vector< ModelDefinition >& group = m_lod_groups[groupname];
 
     if (group.size() > 0)
     {
@@ -109,14 +109,14 @@ LODNode* LodNodeLoader::instanciateAsLOD(const XMLNode* node, scene::ISceneNode*
     }
     else
     {
-        Log::warn("LodNodeLoader", "LOD group '%s' is empty", groupname.c_str());
+        Log::warn("ModelDefinitionLoader", "LOD group '%s' is empty", groupname.c_str());
         return NULL;
     }
 }
 
 // ----------------------------------------------------------------------------
 
-void LodNodeLoader::instanciate(const irr::core::vector3df& position,
+void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
                                 const irr::core::matrix4& transform,
                                 const std::string& name)
 {
@@ -138,7 +138,7 @@ void LodNodeLoader::instanciate(const irr::core::vector3df& position,
 
 // ----------------------------------------------------------------------------
 
-void LodNodeLoader::clear()
+void ModelDefinitionLoader::clear()
 {
     m_lod_groups.clear();
 }

@@ -52,7 +52,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
@@ -880,7 +880,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
-    LodNodeLoader lodLoader(this);
+    ModelDefinitionLoader lodLoader(this);
 
     // Load LOD groups
     const XMLNode *lod_xml_node = root.getNode("lod");
@@ -1538,7 +1538,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    LodNodeLoader lod_loader(this);
+    ModelDefinitionLoader model_def_loader(this);
 
     // Load LOD groups
     const XMLNode *lod_xml_node = root->getNode("lod");
@@ -1549,7 +1549,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                lod_loader.addModelDefinition(lod_group_xml->getNode(j));
+                model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
@@ -1563,13 +1563,13 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                lod_loader.addModelDefinition(lod_group_xml->getNode(j));
+                model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
 
     std::map<std::string, XMLNode*> library_nodes;
-    loadObjects(root, path, lod_loader, true, NULL, library_nodes);
+    loadObjects(root, path, model_def_loader, true, NULL, library_nodes);
 
     // Cleanup library nodes
     for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
@@ -1737,7 +1737,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 //-----------------------------------------------------------------------------
 
-void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoader& lod_loader,
+void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
                         bool create_lod_definitions, scene::ISceneNode* parent,
                         std::map<std::string, XMLNode*>& library_nodes)
 {
@@ -1753,7 +1753,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         if (name == "track" || name == "default-start") continue;
         if (name == "object")
         {
-            m_track_object_manager->add(*node, parent, lod_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader);
         }
         else if (name == "library")
         {
@@ -1798,7 +1798,21 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
                         const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
                         for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
                         {
-                            lod_loader.addModelDefinition(lod_group_xml->getNode(j));
+                            model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
+                        }
+                    }
+                }
+
+                // Load instancing definitions
+                const XMLNode *instancing_xml_node = libroot->getNode("instancing");
+                if (instancing_xml_node != NULL)
+                {
+                    for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
+                    {
+                        const XMLNode* instancing_group_xml = instancing_xml_node->getNode(i);
+                        for (unsigned int j = 0; j < instancing_group_xml->getNumNodes(); j++)
+                        {
+                            model_def_loader.addModelDefinition(instancing_group_xml->getNode(j));
                         }
                     }
                 }
@@ -1814,7 +1828,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
             parent->setRotation(hpr);
             parent->setScale(scale);
             parent->updateAbsolutePosition();
-            loadObjects(libroot, lib_path, lod_loader, create_lod_definitions, parent, library_nodes);
+            loadObjects(libroot, lib_path, model_def_loader, create_lod_definitions, parent, library_nodes);
         }
         else if (name == "water")
         {
@@ -1858,7 +1872,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, lod_loader);
+                m_track_object_manager->add(*node, parent, model_def_loader);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1871,7 +1885,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, lod_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader);
         }
         else if (name == "weather")
         {
@@ -1908,6 +1922,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
             // handled above
         }
         else if (name == "lod")
+        {
+            // handled above
+        }
+        else if (name == "instancing")
         {
             // handled above
         }
