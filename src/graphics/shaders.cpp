@@ -913,6 +913,7 @@ namespace MeshShader
     GLuint InstancedGrassPass2Shader::attrib_position;
     GLuint InstancedGrassPass2Shader::attrib_texcoord;
     GLuint InstancedGrassPass2Shader::attrib_color;
+    GLuint InstancedGrassPass2Shader::attrib_origin;
     GLuint InstancedGrassPass2Shader::uniform_VP;
     GLuint InstancedGrassPass2Shader::uniform_screen;
     GLuint InstancedGrassPass2Shader::uniform_ambient;
@@ -928,6 +929,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
         uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");

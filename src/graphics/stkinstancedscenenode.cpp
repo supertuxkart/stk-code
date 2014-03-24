@@ -28,40 +28,50 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
     case FPSM_DEFAULT:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
             MeshShader::InstancedObjectPass1Shader::attrib_position, -1, -1, MeshShader::InstancedObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+        glGenBuffers(1, &instances_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(MeshShader::InstancedObjectPass1Shader::attrib_origin);
+        glVertexAttribPointer(MeshShader::InstancedObjectPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribDivisor(MeshShader::InstancedObjectPass1Shader::attrib_origin, 1);
         break;
     case FPSM_GRASS:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
             MeshShader::InstancedGrassPass1Shader::attrib_position, MeshShader::InstancedGrassPass1Shader::attrib_texcoord, -1, MeshShader::InstancedGrassPass1Shader::attrib_normal, -1, -1, MeshShader::InstancedGrassPass1Shader::attrib_color, mesh.Stride);
+        glGenBuffers(1, &instances_vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
+        glEnableVertexAttribArray(MeshShader::InstancedGrassPass1Shader::attrib_origin);
+        glVertexAttribPointer(MeshShader::InstancedGrassPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribDivisor(MeshShader::InstancedGrassPass1Shader::attrib_origin, 1);
         break;
     default:
       return;
     }
 
-    glGenBuffers(1, &instances_vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-    glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
-    glEnableVertexAttribArray(MeshShader::InstancedObjectPass1Shader::attrib_origin);
-    glVertexAttribPointer(MeshShader::InstancedObjectPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-    glVertexAttribDivisor(MeshShader::InstancedObjectPass1Shader::attrib_origin, 1);
+
 
     switch (ShadedMat)
     {
     case SM_DEFAULT:
         mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
             MeshShader::InstancedObjectPass2Shader::attrib_position, MeshShader::InstancedObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        glEnableVertexAttribArray(MeshShader::InstancedObjectPass2Shader::attrib_origin);
+        glVertexAttribPointer(MeshShader::InstancedObjectPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribDivisor(MeshShader::InstancedObjectPass2Shader::attrib_origin, 1);
         break;
     case SM_GRASS:
         mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
             MeshShader::InstancedGrassPass2Shader::attrib_position, MeshShader::InstancedGrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::InstancedGrassPass2Shader::attrib_color, mesh.Stride);
+        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        glEnableVertexAttribArray(MeshShader::InstancedGrassPass2Shader::attrib_origin);
+        glVertexAttribPointer(MeshShader::InstancedGrassPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribDivisor(MeshShader::InstancedGrassPass2Shader::attrib_origin, 1);
         break;
     default:
       return;
     }
-
-    glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-    glEnableVertexAttribArray(MeshShader::InstancedObjectPass2Shader::attrib_origin);
-    glVertexAttribPointer(MeshShader::InstancedObjectPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-    glVertexAttribDivisor(MeshShader::InstancedObjectPass2Shader::attrib_origin, 1);
 
     glBindVertexArray(0);
 }
