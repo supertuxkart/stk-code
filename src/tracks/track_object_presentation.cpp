@@ -673,6 +673,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
 
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
+	const AbstractKart* kart = who->getEventHandler();
     if (!m_action_active) return;
 
     if (m_action == "garage")

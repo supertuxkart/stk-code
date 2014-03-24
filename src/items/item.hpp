@@ -243,6 +243,9 @@ public:
     /** Returns the type of this item. */
     ItemType      getType()      const { return m_type;     }
     // ------------------------------------------------------------------------
+    /** Returns the current event handler (kart) */
+    const AbstractKart* getEventHandler() const { return m_event_handler;}
+    // ------------------------------------------------------------------------
     /** Returns true if this item is currently collected. */
     bool          wasCollected() const { return m_collected;}
     // ------------------------------------------------------------------------
