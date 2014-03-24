@@ -9,6 +9,7 @@
 #include "modes/world.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
+#include "karts/kart.hpp"
 
 using namespace irr;
 
@@ -47,6 +48,13 @@ void displayMessage(asIScriptGeneric *gen){
 void disableAnimation(asIScriptGeneric *gen){
 		std::string *str = (std::string*)gen->GetArgAddress(0);
 		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+}
+
+void squashKart(asIScriptGeneric *gen){
+		int id = (int)gen->GetArgAddress(0);
+		float time = gen->GetArgFloat(1);
+		AbstractKart* kart = World::getWorld()->getKart(id);
+		kart->setSquash(time,0.5);  //0.5 * max speed is new max for squashed duration
 }
 
 
@@ -169,6 +177,8 @@ void configureEngine(asIScriptEngine *engine)
 	}
 	r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r>=0);
 	r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
+	r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
+
 	// It is possible to register the functions, properties, and types in 
 	// configuration groups as well. When compiling the scripts it then
 	// be defined which configuration groups should be available for that

@@ -7,4 +7,5 @@ void onTrigger()
 */
     displayMessage("Wow! Such Message. Very Script... wow");
     disableAnimation("hayBail.b3d");
+    squashKart(0,35.0); //id of kart,time to squash
 }
