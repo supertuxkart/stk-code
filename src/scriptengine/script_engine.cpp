@@ -71,13 +71,6 @@ void ScriptEngine::runScript(std::string scriptName)
 		return;
 	}
 
-	// We don't want to allow the script to hang the application, e.g. with an
-	// infinite loop, so we'll use the line callback function to set a timeout
-	// that will abort the script after a certain time. Before executing the 
-	// script the timeOut variable will be set to the time when the script must 
-	// stop executing. 
-	//DWORD timeOut;
-	//r = ctx->SetLineCallback(asFUNCTION(LineCallback), &timeOut, asCALL_CDECL);
 	if( r < 0 )
 	{
 		std::cout << "Failed to set the line callback function." << std::endl;
@@ -88,7 +81,7 @@ void ScriptEngine::runScript(std::string scriptName)
 
 	// Find the function for the function we want to execute.
 	//This is how you call a normal function with arguments
-	//asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger(float, float)");
+	//asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
 	asIScriptFunction *func = m_engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
 	if( func == 0 )
 	{
