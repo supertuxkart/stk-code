@@ -205,6 +205,21 @@ void computeTIMV(core::matrix4 &TransposeInverseModelView)
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
 }
 
+core::vector3df getWind()
+{
+    const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
+    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+    GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
+    float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
+
+    float strength = (pos.X + pos.Y + pos.Z) * 1.2f + time * m_speed;
+    strength = noise2d(strength / 10.0f) * m_amplitude * 5;
+    // * 5 is to work with the existing amplitude values.
+
+    // Pre-multiply on the cpu
+    return irr_driver->getWind() * strength;
+}
+
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
     irr_driver->IncreaseObjectCount();

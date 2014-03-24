@@ -16,6 +16,7 @@ protected:
     bool isMaterialInitialized;
     void setFirstTimeMaterial();
     void initinstancedvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
+    core::vector3df windDir;
 public:
     STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
         const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
