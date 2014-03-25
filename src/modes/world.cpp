@@ -459,7 +459,7 @@ void World::terminateRace()
     {
         std::string mode_name = getIdent(); // Get the race mode name
         int winner_position = 1;
-        int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
+        unsigned int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
         if (mode_name == IDENT_FTL)
         {
             winner_position = 2;
