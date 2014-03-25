@@ -23,7 +23,7 @@ public:
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
     virtual void render();
-    void addWorldMatrix(const core::vector3df &);
+    void addInstance(const core::vector3df &origin, const core::vector3df &orientation);
 };
 
 #endif

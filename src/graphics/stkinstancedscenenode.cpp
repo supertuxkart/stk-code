@@ -42,8 +42,10 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(MeshShader::InstancedGrassPass1Shader::attrib_origin);
-        glVertexAttribPointer(MeshShader::InstancedGrassPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribPointer(MeshShader::InstancedGrassPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
         glVertexAttribDivisor(MeshShader::InstancedGrassPass1Shader::attrib_origin, 1);
+        glVertexAttribPointer(MeshShader::InstancedGrassPass1Shader::attrib_orientation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+        glVertexAttribDivisor(MeshShader::InstancedGrassPass1Shader::attrib_orientation, 1);
         break;
     default:
       return;
@@ -58,7 +60,7 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
             MeshShader::InstancedObjectPass2Shader::attrib_position, MeshShader::InstancedObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glEnableVertexAttribArray(MeshShader::InstancedObjectPass2Shader::attrib_origin);
-        glVertexAttribPointer(MeshShader::InstancedObjectPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribPointer(MeshShader::InstancedObjectPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
         glVertexAttribDivisor(MeshShader::InstancedObjectPass2Shader::attrib_origin, 1);
         break;
     case SM_GRASS:
@@ -66,8 +68,10 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
             MeshShader::InstancedGrassPass2Shader::attrib_position, MeshShader::InstancedGrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::InstancedGrassPass2Shader::attrib_color, mesh.Stride);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glEnableVertexAttribArray(MeshShader::InstancedGrassPass2Shader::attrib_origin);
-        glVertexAttribPointer(MeshShader::InstancedGrassPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribPointer(MeshShader::InstancedGrassPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
         glVertexAttribDivisor(MeshShader::InstancedGrassPass2Shader::attrib_origin, 1);
+        glVertexAttribPointer(MeshShader::InstancedGrassPass2Shader::attrib_orientation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*) (3 * sizeof(float)));
+        glVertexAttribDivisor(MeshShader::InstancedGrassPass2Shader::attrib_orientation, 1);
         break;
     default:
       return;
@@ -99,11 +103,14 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
     isMaterialInitialized = true;
 }
 
-void STKInstancedSceneNode::addWorldMatrix(const core::vector3df &v)
+void STKInstancedSceneNode::addInstance(const core::vector3df &origin, const core::vector3df &orientation)
 {
-    instance_pos.push_back(v.X);
-    instance_pos.push_back(v.Y);
-    instance_pos.push_back(v.Z);
+    instance_pos.push_back(origin.X);
+    instance_pos.push_back(origin.Y);
+    instance_pos.push_back(origin.Z);
+    instance_pos.push_back(orientation.X);
+    instance_pos.push_back(orientation.Y);
+    instance_pos.push_back(orientation.Z);
 }
 
 static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, size_t instance_count)

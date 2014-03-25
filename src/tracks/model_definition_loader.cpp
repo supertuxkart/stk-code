@@ -117,7 +117,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 // ----------------------------------------------------------------------------
 
 void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
-                                const irr::core::matrix4& transform,
+                                const irr::core::vector3df& rotation,
                                 const std::string& name)
 {
     if (m_instancing_nodes.find(name) == m_instancing_nodes.end())
@@ -133,7 +133,7 @@ void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
             irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
     }
 
-    m_instancing_nodes[name]->addWorldMatrix(position);
+    m_instancing_nodes[name]->addInstance(position, rotation);
 }
 
 // ----------------------------------------------------------------------------

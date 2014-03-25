@@ -92,7 +92,7 @@ class InstancedGrassPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_origin, attrib_color, attrib_texcoord;
+    static GLuint attrib_position, attrib_normal, attrib_origin, attrib_orientation, attrib_color, attrib_texcoord;
     static GLuint uniform_MP, uniform_VM, uniform_windDir, uniform_tex;
 
     static void init();
@@ -198,7 +198,7 @@ class InstancedGrassPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color, attrib_origin;
+    static GLuint attrib_position, attrib_texcoord, attrib_color, attrib_origin, attrib_orientation;
     static GLuint uniform_VP, uniform_TM, uniform_screen, uniform_ambient, uniform_windDir;
     static GLuint TU_Albedo;
 

@@ -534,6 +534,7 @@ namespace MeshShader
     GLuint InstancedGrassPass1Shader::attrib_position;
     GLuint InstancedGrassPass1Shader::attrib_normal;
     GLuint InstancedGrassPass1Shader::attrib_origin;
+    GLuint InstancedGrassPass1Shader::attrib_orientation;
     GLuint InstancedGrassPass1Shader::attrib_texcoord;
     GLuint InstancedGrassPass1Shader::attrib_color;
     GLuint InstancedGrassPass1Shader::uniform_MP;
@@ -548,6 +549,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_normal = glGetAttribLocation(Program, "Normal");
         attrib_color = glGetAttribLocation(Program, "Color");
@@ -914,6 +916,7 @@ namespace MeshShader
     GLuint InstancedGrassPass2Shader::attrib_texcoord;
     GLuint InstancedGrassPass2Shader::attrib_color;
     GLuint InstancedGrassPass2Shader::attrib_origin;
+    GLuint InstancedGrassPass2Shader::attrib_orientation;
     GLuint InstancedGrassPass2Shader::uniform_VP;
     GLuint InstancedGrassPass2Shader::uniform_screen;
     GLuint InstancedGrassPass2Shader::uniform_ambient;
@@ -930,6 +933,7 @@ namespace MeshShader
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
         attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
         uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
