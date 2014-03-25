@@ -68,6 +68,12 @@ public:
     // ------------------------------------------------------------------------
     void addSubEntry(stringw& subEntryString)
     {
+        //Add a blank entry if no entry exists for this sub entry.
+        if(m_entries.size() == 0){
+            stringw blank_line(L"");
+            CreditsEntry entry(blank_line);
+            addEntry(entry);
+        }
         m_entries[m_entries.size()-1].m_subentries.push_back(subEntryString);
     }
 };   // CreditdsSection
