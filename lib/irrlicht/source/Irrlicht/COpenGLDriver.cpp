@@ -84,6 +84,52 @@ bool COpenGLDriver::changeRenderContext(const SExposedVideoData& videoData, CIrr
 	return true;
 }
 
+static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB;
+
+static HGLRC getMeAGLContext(HDC HDc)
+{
+    HGLRC hrc = 0;
+    int ctx40[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 0,
+        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx40);
+    if (hrc)
+        return hrc;
+
+    int ctx33[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx33);
+    if (hrc)
+        return hrc;
+
+    int ctx31[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx33);
+    if (hrc)
+        return hrc;
+
+    return NULL;
+}
+
 //! inits the open gl driver
 bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 {
@@ -339,7 +385,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 #endif
 		AntiAlias=0;
 #ifdef WGL_ARB_create_context
-	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+	wglCreateContextAttribs_ARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
 #endif
 	wglMakeCurrent(HDc, NULL);
 	wglDeleteContext(hrc);
@@ -409,22 +455,7 @@ bool COpenGLDriver::initDriver(CIrrDeviceWin32* device)
 #ifdef WGL_ARB_create_context
 	if (wglCreateContextAttribs_ARB)
 	{
-		int iAttribs[] =
-		{
-			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
-			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-			WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-            WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, //WGL_CONTEXT_CORE_PROFILE_BIT_ARB
-			0
-		};
-        // hd3000 only provides 3.1, so try all minor versions backwards, to find one that works.
-        for (int minor = 3; minor >= 0; minor--)
-        {
-            iAttribs[3] = minor;
-            hrc = wglCreateContextAttribs_ARB(HDc, 0, iAttribs);
-            if (hrc)
-                break;
-        }
+        hrc = getMeAGLContext(HDc);
     }
 	else
 #endif
