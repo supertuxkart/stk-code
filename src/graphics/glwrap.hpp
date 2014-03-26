@@ -103,16 +103,16 @@ void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Type
 }
 
 template<typename ...Types>
+void printFileList()
+{
+    return;
+}
+
+template<typename ...Types>
 void printFileList(GLint ShaderType, const char *filepath, Types ... args)
 {
     Log::error("GLWrapp", filepath);
     printFileList(args...);
-}
-
-template<typename ...Types>
-void printFileList()
-{
-    return;
 }
 
 template<typename ... Types>
