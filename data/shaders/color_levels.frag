@@ -1,3 +1,7 @@
+//#define DOF_ENABLED
+
+#ifdef DOF_ENABLED
+
 uniform sampler2D tex;
 uniform sampler2D dtex;
 uniform vec3 inlevel;
@@ -198,9 +202,9 @@ void main()
 
 }*/
 
+#else
 
-
-/*uniform sampler2D tex;
+uniform sampler2D tex;
 uniform sampler2D dtex;
 uniform vec3 inlevel;
 uniform vec2 outlevel;
@@ -246,4 +250,5 @@ void main()
   
 	FragColor = vec4(colFinal * vignette, 1.0);
     //FragColor = vec4(vec3(depth), 1.0);
-}*/
+}
+#endif
