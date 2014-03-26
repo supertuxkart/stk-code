@@ -389,7 +389,7 @@ namespace MeshShader
 	void ObjectPass1Shader::init()
 	{
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass1.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
@@ -515,7 +515,7 @@ namespace MeshShader
 	void ObjectPass2Shader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
@@ -560,7 +560,7 @@ namespace MeshShader
 	void DetailledObjectPass2Shader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
@@ -603,7 +603,7 @@ namespace MeshShader
 	void ObjectUnlitShader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
@@ -720,7 +720,7 @@ namespace MeshShader
 	{
 		initGL();
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
@@ -811,7 +811,7 @@ namespace MeshShader
 	void SphereMapShader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass1.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		attrib_normal = glGetAttribLocation(Program, "Normal");
@@ -909,7 +909,7 @@ namespace MeshShader
     void CausticsShader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/caustics.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
@@ -1094,7 +1094,7 @@ namespace MeshShader
 	void ColorizeShader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
 		uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
@@ -1275,7 +1275,7 @@ namespace MeshShader
     void SkyboxShader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sky.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
