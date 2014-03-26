@@ -635,6 +635,18 @@ public:
 	static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
 };
 
+class UniformColoredTextureRectShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord;
+    static GLuint uniform_tex, uniform_color, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, const video::SColor &color, unsigned TU_tex);
+};
+
 class ColoredTextureRectShader
 {
 public:

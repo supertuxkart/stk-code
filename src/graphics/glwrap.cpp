@@ -361,14 +361,112 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
     }
 }
 
+static void
+getSize(const video::ITexture* texture, const core::rect<s32>& destRect,
+const core::rect<s32>& sourceRect,
+float &width, float &height,
+float &center_pos_x, float &center_pos_y,
+float &tex_width, float &tex_height,
+float &tex_center_pos_x, float &tex_center_pos_y
+)
+{
+    core::dimension2d<u32> frame_size =
+        irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+    const int screen_w = frame_size.Width;
+    const int screen_h = frame_size.Height;
+    center_pos_x = destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X;
+    center_pos_x /= screen_w;
+    center_pos_x -= 1.;
+    center_pos_y = destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y;
+    center_pos_y /= screen_h;
+    center_pos_y = 1. - center_pos_y;
+    width = destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X;
+    width /= screen_w;
+    height = destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y;
+    height /= screen_h;
+
+    const core::dimension2d<u32>& ss = texture->getOriginalSize();
+    tex_center_pos_x = sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X;
+    tex_center_pos_x /= ss.Width * 2.;
+    tex_center_pos_y = sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y;
+    tex_center_pos_y /= ss.Height * 2.;
+    tex_width = sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X;
+    tex_width /= ss.Width * 2.;
+    tex_height = sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y;
+    tex_height /= ss.Height * 2.;
+
+    if (texture->isRenderTarget())
+    {
+        tex_height = -tex_height;
+    }
+
+    const f32 invW = 1.f / static_cast<f32>(ss.Width);
+    const f32 invH = 1.f / static_cast<f32>(ss.Height);
+    const core::rect<f32> tcoords(
+        sourceRect.UpperLeftCorner.X * invW,
+        sourceRect.UpperLeftCorner.Y * invH,
+        sourceRect.LowerRightCorner.X * invW,
+        sourceRect.LowerRightCorner.Y *invH);
+}
+
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
     const video::SColor &colors, bool useAlphaChannelOfTexture)
 {
-    video::SColor duplicatedArray[4] = {
-        colors, colors, colors, colors
-    };
-    draw2DImage(texture, destRect, sourceRect, clipRect, duplicatedArray, useAlphaChannelOfTexture);
+    if (!irr_driver->isGLSL()) {
+        video::SColor duplicatedArray[4] = {
+            colors, colors, colors, colors
+        };
+        draw2DImage(texture, destRect, sourceRect, clipRect, duplicatedArray, useAlphaChannelOfTexture);
+        return;
+    }
+
+    float width, height,
+        center_pos_x, center_pos_y,
+        tex_width, tex_height,
+        tex_center_pos_x, tex_center_pos_y;
+
+    getSize(texture, destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+        tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
+
+    if (useAlphaChannelOfTexture)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+    if (clipRect)
+    {
+        if (!clipRect->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
+            clipRect->getWidth(), clipRect->getHeight());
+    }
+
+    glUseProgram(UIShader::UniformColoredTextureRectShader::Program);
+    glBindVertexArray(UIShader::UniformColoredTextureRectShader::vao);
+
+    setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height,colors, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (clipRect)
+        glDisable(GL_SCISSOR_TEST);
+    glUseProgram(0);
+
+    GLenum glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
+    }
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
@@ -381,46 +479,13 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 		return;
 	}
 
-	core::dimension2d<u32> frame_size =
-		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-	const int screen_w = frame_size.Width;
-	const int screen_h = frame_size.Height;
-	float center_pos_x = destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X;
-	center_pos_x /= screen_w;
-	center_pos_x -= 1.;
-	float center_pos_y = destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y;
-	center_pos_y /= screen_h;
-	center_pos_y = 1. - center_pos_y;
-	float width = destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X;
-	width /= screen_w;
-	float height = destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y;
-	height /= screen_h;
+    float width, height,
+        center_pos_x, center_pos_y,
+        tex_width, tex_height,
+        tex_center_pos_x, tex_center_pos_y;
 
-	const core::dimension2d<u32>& ss = texture->getOriginalSize();
-
-	float tex_center_pos_x = sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X;
-	tex_center_pos_x /= ss.Width * 2.;
-	//tex_center_pos_x -= 1.;
-	float tex_center_pos_y = sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y;
-	tex_center_pos_y /= ss.Height * 2.;
-	//tex_center_pos_y -= 1.;
-	float tex_width = sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X;
-	tex_width /= ss.Width * 2.;
-	float tex_height = sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y;
-	tex_height /= ss.Height * 2.;
-
-	if (texture->isRenderTarget())
-    {
-		tex_height = - tex_height;
-	}
-
-	const f32 invW = 1.f / static_cast<f32>(ss.Width);
-	const f32 invH = 1.f / static_cast<f32>(ss.Height);
-	const core::rect<f32> tcoords(
-		sourceRect.UpperLeftCorner.X * invW,
-		sourceRect.UpperLeftCorner.Y * invH,
-		sourceRect.LowerRightCorner.X * invW,
-		sourceRect.LowerRightCorner.Y *invH);
+    getSize(texture, destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+        tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
 	if (useAlphaChannelOfTexture)
 	{
