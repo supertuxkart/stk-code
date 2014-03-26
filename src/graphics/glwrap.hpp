@@ -102,6 +102,19 @@ void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Type
     loadAndAttach(ProgramID, args...);
 }
 
+template<typename ...Types>
+void printFileList(GLint ShaderType, const char *filepath, Types ... args)
+{
+    Log::error("GLWrapp", filepath);
+    printFileList(args...);
+}
+
+template<typename ...Types>
+void printFileList()
+{
+    return;
+}
+
 template<typename ... Types>
 GLint LoadProgram(Types ... args)
 {
@@ -113,10 +126,12 @@ GLint LoadProgram(Types ... args)
     int InfoLogLength;
     glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
     if (Result == GL_FALSE) {
+        Log::error("GLWrapp", "Error when linking these shaders :");
+        printFileList(args...);
         glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
         char *ErrorMessage = new char[InfoLogLength];
         glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
+        Log::error("GLWrapp", ErrorMessage);
         delete[] ErrorMessage;
     }
 
