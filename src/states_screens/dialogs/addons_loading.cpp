@@ -59,6 +59,8 @@ AddonsLoading::AddonsLoading(const std::string &id)
     m_install_button   = getWidget<IconButtonWidget> ("install" );
     m_back_button      = getWidget<IconButtonWidget> ("back"  );
     m_back_button->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
+    m_cancel_button    = getWidget<ButtonWidget> ("cancel");
+    m_cancel_button->setVisible(false);
 
     if(m_progress)
         m_progress->setVisible(false);
@@ -83,7 +85,8 @@ void AddonsLoading::beforeAddingWidgets()
     m_icon             = getWidget<IconButtonWidget> ("icon"    );
     m_progress         = getWidget<ProgressBarWidget>("progress");
     m_back_button      = getWidget<IconButtonWidget> ("back"    );
-
+    m_cancel_button    = getWidget<ButtonWidget> ("cancel");
+    
     RibbonWidget* r = getWidget<RibbonWidget>("actions");
     RatingBarWidget* rating = getWidget<RatingBarWidget>("rating");
 
@@ -223,10 +226,8 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
             {
                 m_progress->setValue(0);
                 m_progress->setVisible(true);
-                // Change the 'back' button into a 'cancel' button.
-                m_back_button->setLabel(_("Cancel"));
-
                 actions_ribbon->setVisible(false);
+                m_cancel_button->setVisible(true);
 
                 startDownload();
             }
@@ -247,6 +248,11 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
     {
         voteClicked();
         return GUIEngine::EVENT_BLOCK;
+    }
+    else if(event_source == "cancel")
+    {
+        stopDownload();
+        ModalDialog::dismiss();
     }
     return GUIEngine::EVENT_LET;
 }   // processEvent
