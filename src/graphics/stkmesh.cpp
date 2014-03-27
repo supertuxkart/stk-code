@@ -212,12 +212,7 @@ core::vector3df getWind()
     GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
     float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
 
-    float strength = (pos.X + pos.Y + pos.Z) * 1.2f + time * m_speed;
-    strength = noise2d(strength / 10.0f) * m_amplitude * 5;
-    // * 5 is to work with the existing amplitude values.
-
-    // Pre-multiply on the cpu
-    return irr_driver->getWind() * strength;
+    return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
 
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
