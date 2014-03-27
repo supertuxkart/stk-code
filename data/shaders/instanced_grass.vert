@@ -16,12 +16,12 @@ out vec2 uv;
 mat4 getWorldMatrix(vec3 origin, vec3 rotation)
 {
     // from irrlicht
-    float cr = cos( rotation.x );
-    float sr = sin( rotation.x );
-    float cp = cos( rotation.y );
-    float sp = sin( rotation.y );
-    float cy = cos( rotation.z );
-    float sy = sin( rotation.z );
+    float cr = cos( rotation.z );
+    float sr = sin( rotation.z );
+    float cp = cos( rotation.x );
+    float sp = sin( rotation.x );
+    float cy = cos( rotation.y );
+    float sy = sin( rotation.y );
 
     float srsp = sr*sp;
     float crsp = cr*sp;
