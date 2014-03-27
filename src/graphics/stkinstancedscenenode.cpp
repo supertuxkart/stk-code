@@ -120,7 +120,10 @@ static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjecti
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+  core::matrix4 InverseViewMatrix;
+  irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW).getInverse(InverseViewMatrix);
+
+  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -133,8 +136,11 @@ static void drawFSPMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjection
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
+    core::matrix4 InverseViewMatrix;
+    irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW).getInverse(InverseViewMatrix);
+
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedGrassPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW), windDir, 0);
+    MeshShader::InstancedGrassPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix, windDir, 0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);

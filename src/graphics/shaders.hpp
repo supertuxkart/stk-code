@@ -93,10 +93,10 @@ class InstancedGrassPass1Shader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_normal, attrib_origin, attrib_orientation, attrib_color, attrib_texcoord;
-    static GLuint uniform_MP, uniform_VM, uniform_windDir, uniform_tex;
+    static GLuint uniform_MP, uniform_IVM, uniform_windDir, uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &ViewMatrix, const core::vector3df &windDir, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::vector3df &windDir, unsigned TU_tex);
 };
 
 class ObjectPass2Shader

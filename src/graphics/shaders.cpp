@@ -538,7 +538,7 @@ namespace MeshShader
     GLuint InstancedGrassPass1Shader::attrib_texcoord;
     GLuint InstancedGrassPass1Shader::attrib_color;
     GLuint InstancedGrassPass1Shader::uniform_MP;
-    GLuint InstancedGrassPass1Shader::uniform_VM;
+    GLuint InstancedGrassPass1Shader::uniform_IVM;
     GLuint InstancedGrassPass1Shader::uniform_windDir;
     GLuint InstancedGrassPass1Shader::uniform_tex;
 
@@ -555,15 +555,15 @@ namespace MeshShader
         attrib_color = glGetAttribLocation(Program, "Color");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
-        uniform_VM = glGetUniformLocation(Program, "ViewMatrix");
+        uniform_IVM = glGetUniformLocation(Program, "InverseViewMatrix");
         uniform_windDir = glGetUniformLocation(Program, "windDir");
         uniform_tex = glGetUniformLocation(Program, "tex");
     }
 
-    void InstancedGrassPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix, const core::vector3df &windDir, unsigned TU_tex)
+    void InstancedGrassPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::vector3df &windDir, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+        glUniformMatrix4fv(uniform_IVM, 1, GL_FALSE, InverseViewMatrix.pointer());
         glUniform3f(uniform_windDir, windDir.X, windDir.Y, windDir.Z);
         glUniform1i(uniform_tex, TU_tex);
     }
