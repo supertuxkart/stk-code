@@ -131,6 +131,7 @@ void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
         scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
         m_instancing_nodes[name] = new STKInstancedSceneNode(mesh,
             irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
+        m_track->addNode(m_instancing_nodes[name]);
     }
 
     m_instancing_nodes[name]->addInstance(position, rotation);

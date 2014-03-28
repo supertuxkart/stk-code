@@ -606,6 +606,7 @@ public:
     bool hasGodRays() const { return m_godrays; }
     bool hasShadows() const { return m_shadows; }
     
+    void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
 
     float getDisplacementSpeed() const { return m_displacement_speed; }
     float getCausticsSpeed() const { return m_caustics_speed; }
