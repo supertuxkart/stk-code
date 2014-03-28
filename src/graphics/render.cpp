@@ -189,14 +189,14 @@ void IrrDriver::renderGLSL(float dt)
         }*/
 
         // Fire up the MRT
-		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
+        irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+        PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
-		glDepthFunc(GL_LEQUAL);
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_TRUE);
-		glDisable(GL_BLEND);
+        glDepthFunc(GL_LEQUAL);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_ALPHA_TEST);
+        glDepthMask(GL_TRUE);
+        glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
         irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
         m_scene_manager->drawAll(m_renderpass);
@@ -204,7 +204,7 @@ void IrrDriver::renderGLSL(float dt)
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
 
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_POP_CPU_MARKER();
 
         // Todo : reenable glow and shadows
         //ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
@@ -227,14 +227,14 @@ void IrrDriver::renderGLSL(float dt)
 
         // Lights
         renderLights(cambox, camnode, overridemat, cam, dt);
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_POP_CPU_MARKER();
 
-		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
+        PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
         irr_driver->setPhase(SOLID_LIT_PASS);
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_FALSE);
-		glDisable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_ALPHA_TEST);
+        glDepthMask(GL_FALSE);
+        glDisable(GL_BLEND);
         m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
         setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
         setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
@@ -248,27 +248,27 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_POP_CPU_MARKER();
 
-		  if (World::getWorld()->getTrack()->isFogEnabled())
-		  {
-			  PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			  m_post_processing->renderFog(irr_driver->getInvProjMatrix());
-			  PROFILER_POP_CPU_MARKER();
-		  }
+          if (World::getWorld()->getTrack()->isFogEnabled())
+          {
+              PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+              m_post_processing->renderFog(irr_driver->getInvProjMatrix());
+              PROFILER_POP_CPU_MARKER();
+          }
 
         PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
 
-		// Render anything glowing.
-		if (!m_mipviz && !m_wireframe)
-		{
-			irr_driver->setPhase(GLOW_PASS);
-			renderGlow(overridemat, glows, cambox, cam);
-		} // end glow
+        // Render anything glowing.
+        if (!m_mipviz && !m_wireframe)
+        {
+            irr_driver->setPhase(GLOW_PASS);
+            renderGlow(overridemat, glows, cambox, cam);
+        } // end glow
 
         PROFILER_POP_CPU_MARKER();
 
-		PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-		renderSkybox();
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+        renderSkybox();
+        PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
@@ -276,7 +276,7 @@ void IrrDriver::renderGLSL(float dt)
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
         if (true)//hasflare || hasgodrays)
         {
-            irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+            irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
             GLuint res = 0;
             if (m_query_issued)
@@ -305,26 +305,26 @@ void IrrDriver::renderGLSL(float dt)
 
         // We need to re-render camera due to the per-cam-node hack.
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
-		irr_driver->setPhase(TRANSPARENT_PASS);
-		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_FALSE);
-		glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable(GL_CULL_FACE);
+        irr_driver->setPhase(TRANSPARENT_PASS);
+        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
+        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_ALPHA_TEST);
+        glDepthMask(GL_FALSE);
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glDisable(GL_CULL_FACE);
         m_scene_manager->drawAll(m_renderpass);
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_POP_CPU_MARKER();
 
-		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
-		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
-		glDepthMask(GL_FALSE);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		m_scene_manager->drawAll(m_renderpass);
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
+        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+        glDepthMask(GL_FALSE);
+        glDisable(GL_CULL_FACE);
+        glEnable(GL_BLEND);
+        glBlendEquation(GL_FUNC_ADD);
+        m_scene_manager->drawAll(m_renderpass);
+        PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Displacement", 0x00, 0x00, 0xFF);
         // Handle displacing nodes, if any
@@ -689,10 +689,10 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
 
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
 
     for (u32 i = 0; i < glowcount; i++)
     {
@@ -723,22 +723,22 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
 
     // To half
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_HALF1), false, false);
-	m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_TMP1));
+    m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_TMP1));
 
     // To quarter
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_QUARTER1), false, false);
-	m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_HALF1));
+    m_post_processing->renderPassThrough(m_rtts->getRTT(RTT_HALF1));
 
     // Blur it
-	m_post_processing->renderGaussian6Blur(m_rtts->getRTT(RTT_QUARTER1), m_rtts->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
+    m_post_processing->renderGaussian6Blur(m_rtts->getRTT(RTT_QUARTER1), m_rtts->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
 
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glStencilFunc(GL_EQUAL, 0, ~0);
-	glEnable(GL_STENCIL_TEST);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glStencilFunc(GL_EQUAL, 0, ~0);
+    glEnable(GL_STENCIL_TEST);
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
-	m_post_processing->renderGlow(m_rtts->getRTT(RTT_QUARTER1));
+    m_post_processing->renderGlow(m_rtts->getRTT(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
 }
 
@@ -863,9 +863,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
 
     // Blur it to reduce noise.
     if(UserConfigParams::m_ssao == 1)
-		m_post_processing->renderGaussian3Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_QUARTER4), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
+        m_post_processing->renderGaussian3Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_QUARTER4), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
     else if (UserConfigParams::m_ssao == 2)
-		m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
+        m_post_processing->renderGaussian6Blur(irr_driver->getRTT(RTT_SSAO), irr_driver->getRTT(RTT_TMP4), 1.f / UserConfigParams::m_width, 1.f / UserConfigParams::m_height);
 
     m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, false);
 }
@@ -1265,17 +1265,17 @@ void IrrDriver::renderSkybox()
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
-	glDisable(GL_CULL_FACE);
-	assert(SkyboxTextures.size() == 6);
-	core::matrix4 transform = irr_driver->getProjViewMatrix();
-	core::matrix4 translate;
-	translate.setTranslation(camera->getAbsolutePosition());
+    glDisable(GL_CULL_FACE);
+    assert(SkyboxTextures.size() == 6);
+    core::matrix4 transform = irr_driver->getProjViewMatrix();
+    core::matrix4 translate;
+    translate.setTranslation(camera->getAbsolutePosition());
 
-	// Draw the sky box between the near and far clip plane
-	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
-	core::matrix4 scale;
-	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
-	transform *= translate * scale;
+    // Draw the sky box between the near and far clip plane
+    const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
+    core::matrix4 scale;
+    scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
+    transform *= translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
 
@@ -1297,15 +1297,15 @@ void IrrDriver::renderDisplacement(video::SOverrideMaterial &overridemat,
     irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_TMP4), true, false);
     irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_DISPLACE), true, false);
 
-	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-	cb->update();
+    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+    cb->update();
 
     const int displacingcount = m_displacing.size();
-	irr_driver->setPhase(DISPLACEMENT_PASS);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
+    irr_driver->setPhase(DISPLACEMENT_PASS);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
     glClear(GL_STENCIL_BUFFER_BIT);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);

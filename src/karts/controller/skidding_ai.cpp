@@ -1223,12 +1223,12 @@ void SkiddingAI::handleItems(const float dt)
                 break;
             }
 
-            // If this kart is in its last lap, drop bubble gums at every 
+            // If this kart is in its last lap, drop bubble gums at every
             // opportunity, since this kart won't envounter them anymore.
             LinearWorld *lin_world = dynamic_cast<LinearWorld*>(World::getWorld());
-            if(m_time_since_last_shot > 3.0f && 
-                lin_world && 
-                lin_world->getKartLaps(m_kart->getWorldKartId()) 
+            if(m_time_since_last_shot > 3.0f &&
+                lin_world &&
+                lin_world->getKartLaps(m_kart->getWorldKartId())
                                    == race_manager->getNumLaps()-1)
             {
                 m_controls->m_fire      = true;

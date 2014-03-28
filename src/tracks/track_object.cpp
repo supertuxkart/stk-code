@@ -105,7 +105,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);
-    
+
     m_garage = false;
     m_distance = 0;
 
@@ -159,7 +159,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         if (lod_instance)
         {
             m_type = "lod";
-            TrackObjectPresentationLOD* lod_node = 
+            TrackObjectPresentationLOD* lod_node =
                 new TrackObjectPresentationLOD(xml_node, parent, lod_loader);
             m_presentation = lod_node;
 
@@ -177,7 +177,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         std::string render_pass;
         xml_node.get("renderpass", &render_pass);
 
-        if (m_interaction != "ghost" && m_interaction != "none" && 
+        if (m_interaction != "ghost" && m_interaction != "none" &&
             render_pass != "skybox"                                     )
         {
             m_physical_object = PhysicalObject::fromXML(type == "movable",
@@ -272,7 +272,7 @@ void TrackObject::move(const core::vector3df& xyz, const core::vector3df& hpr,
                        const core::vector3df& scale, bool update_rigid_body)
 {
     if (m_presentation != NULL) m_presentation->move(xyz, hpr, scale);
-    if (update_rigid_body && m_physical_object != NULL) 
+    if (update_rigid_body && m_physical_object != NULL)
     {
         // If we set a bullet position from an irrlicht position, we need to
         // get the absolute transform from the presentation object (as set in

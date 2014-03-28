@@ -212,7 +212,7 @@ void btKart::updateWheelTransformsWS(btWheelInfo& wheel,
 }   // updateWheelTransformsWS
 
 // ----------------------------------------------------------------------------
-/** 
+/**
  */
 btScalar btKart::rayCast(unsigned int index)
 {
@@ -350,7 +350,7 @@ btScalar btKart::rayCast(unsigned int index)
             void* object = m_vehicleRaycaster->castRay(source,target,rayResults);
             m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
             m_visual_contact_point[index-2] = source;
-            m_visual_wheels_touch_ground &= (object!=NULL);        
+            m_visual_wheels_touch_ground &= (object!=NULL);
         }
     }
 #endif

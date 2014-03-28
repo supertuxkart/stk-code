@@ -271,7 +271,7 @@ public:
     // ------------------------------------------------------------------------
     bool filterByWords(const core::stringw words) const;
     // ------------------------------------------------------------------------
-    
+
     /** Compares two addons according to the sort order currently defined.
      *  \param a The addon to compare this addon to.
      */

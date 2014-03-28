@@ -155,7 +155,7 @@ namespace Online
     void RequestManager::cancelAllDownloads()
     {
         m_abort.setAtomic(true);
-        // FIXME doesn't get called at the moment. When using this again, 
+        // FIXME doesn't get called at the moment. When using this again,
         // be sure that HTTP_MAX_PRIORITY requests still get executed.
     }   // cancelAllDownloads
 
@@ -189,7 +189,7 @@ namespace Online
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while( me->m_request_queue.getData().empty() || 
+        while( me->m_request_queue.getData().empty() ||
                me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
         {
             bool empty = me->m_request_queue.getData().empty();

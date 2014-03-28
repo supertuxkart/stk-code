@@ -127,7 +127,7 @@ static FocusDispatcher* g_dispatcher = NULL;
 /** A small extension to the spinner widget to add features like player ID
  *  management or badging */
 
-PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent, 
+PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
                                      const int player_id)
 {
     m_player_id       = player_id;
@@ -142,7 +142,7 @@ void PlayerNameSpinner::setID(const int m_player_id)
 {
     PlayerNameSpinner::m_player_id = m_player_id;
     setSpinnerWidgetPlayerID(m_player_id);
-}   // setID 
+}   // setID
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
 void PlayerNameSpinner::markAsIncorrect()
@@ -272,7 +272,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
-    
+
 
 
     // ----- Kart model view
@@ -485,7 +485,7 @@ void PlayerKartWidget::add()
         const int player_amount = PlayerManager::get()->getNumPlayers();
         for (int n=0; n<player_amount; n++)
         {
-            core::stringw name = PlayerManager::get()->getPlayer(n)->getName(); 	
+            core::stringw name = PlayerManager::get()->getPlayer(n)->getName();
             m_player_ident_spinner->addLabel( translations->fribidize(name) );
         }
 
@@ -1692,7 +1692,7 @@ void KartSelectionScreen::allPlayersDone()
     if(UserConfigParams::logGUI())
     {
         Log::info("[KartSelectionScreen]", "players : %d",players.size());
-        
+
         for (unsigned int n=0; n<players.size(); n++)
         {
             Log::info("[KartSelectionScreen]", "     Player %u is %s on %s",n,

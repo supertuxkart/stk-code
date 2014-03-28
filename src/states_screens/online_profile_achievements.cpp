@@ -46,7 +46,7 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileAchievements );
 // -----------------------------------------------------------------------------
 /** Constructor.
  */
-OnlineProfileAchievements::OnlineProfileAchievements() 
+OnlineProfileAchievements::OnlineProfileAchievements()
                       : OnlineProfileBase("online/profile_achievements.stkgui")
 {
     m_selected_achievement_index = -1;
@@ -73,7 +73,7 @@ void OnlineProfileAchievements::beforeAddingWidget()
     m_achievements_list_widget->addColumn( _("Name"), 2 );
 
     // For the current player (even if not logged in, i.e. m_visiting_profile
-    // = NULL) user achievement progress will  also be displayed 
+    // = NULL) user achievement progress will  also be displayed
     if(!m_visiting_profile || m_visiting_profile->isCurrentUser())
     {
         m_achievements_list_widget->addColumn( _("Progress"), 1 );
@@ -86,7 +86,7 @@ void OnlineProfileAchievements::beforeAddingWidget()
 void OnlineProfileAchievements::init()
 {
     OnlineProfileBase::init();
-    m_profile_tabs->select( m_achievements_tab->m_properties[PROP_ID], 
+    m_profile_tabs->select( m_achievements_tab->m_properties[PROP_ID],
                             PLAYER_ID_GAME_MASTER                       );
 
     // For current user add the progrss information.
@@ -121,21 +121,21 @@ void OnlineProfileAchievements::init()
         m_waiting_for_achievements = true;
         m_visiting_profile->fetchAchievements();
         m_achievements_list_widget->clear();
-        m_achievements_list_widget->addItem("loading", 
+        m_achievements_list_widget->addItem("loading",
                                              Messages::fetchingAchievements());
     }
 }   // init
 
 // -----------------------------------------------------------------------------
 
-void OnlineProfileAchievements::eventCallback(Widget* widget, 
+void OnlineProfileAchievements::eventCallback(Widget* widget,
                                               const std::string& name,
                                               const int playerID)
 {
     OnlineProfileBase::eventCallback( widget, name, playerID);
     if (name == m_achievements_list_widget->m_properties[GUIEngine::PROP_ID])
     {
-        m_selected_achievement_index = 
+        m_selected_achievement_index =
                                   m_achievements_list_widget->getSelectionID();
 
         int id;
@@ -171,7 +171,7 @@ void OnlineProfileAchievements::onUpdate(float delta)
     const OnlineProfile::IDList &a = m_visiting_profile->getAchievements();
     for (unsigned int i = 0; i < a.size(); i++)
     {
-        AchievementInfo *info = 
+        AchievementInfo *info =
                           AchievementsManager::get()->getAchievementInfo(a[i]);
         m_achievements_list_widget->addItem(StringUtils::toString(info->getID()),
                                             info->getTitle()                   );

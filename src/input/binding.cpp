@@ -69,7 +69,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
             printf("WARNING: IT_STICKMOTION without direction, ignoring.\n");
             return false;
         }
-        
+
         // If the action is a stick motion & a range is defined
         if (range_string == NULL)
         {
@@ -79,7 +79,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
         {
             m_range = (Input::AxisRange)atoi(range_string);
         }
-   
+
         m_dir   = (Input::AxisDirection)atoi(dir_string);
 
     }   // if m_type!=stickmotion

@@ -72,24 +72,24 @@ public:
     void         begin();
     void         update(float dt);
 
-	/** Generate diffuse and specular map */
-	void         renderSunlight();
+    /** Generate diffuse and specular map */
+    void         renderSunlight();
     void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
-	void renderFog(const core::matrix4 &ipvmat);
-	void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
+    void renderFog(const core::matrix4 &ipvmat);
+    void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
     void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
 
-	/** Blur the in texture */
-	void renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
-	void renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
+    /** Blur the in texture */
+    void renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
+    void renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
 
-	/** Render tex. Used for blit/texture resize */
-	void renderPassThrough(video::ITexture *tex);
+    /** Render tex. Used for blit/texture resize */
+    void renderPassThrough(video::ITexture *tex);
     void renderPassThrough(unsigned tex);
 
     void renderMotionBlur(unsigned cam, video::ITexture *in, video::ITexture *out);
-	void renderGlow(video::ITexture *tex);
+    void renderGlow(video::ITexture *tex);
 
     /** Render the post-processed scene */
     void         render();

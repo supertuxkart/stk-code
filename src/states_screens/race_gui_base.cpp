@@ -723,7 +723,7 @@ void RaceGUIBase::drawGlobalReadySetGo()
                                 UserConfigParams::m_height>>1);
             //gui::IGUIFont* font = irr_driver->getRaceFont();
             gui::IGUIFont* font = GUIEngine::getTitleFont();
-            
+
             if (race_manager->getCoinTarget() > 0)
                 font->draw(_("Collect nitro!"), pos, color, true, true);
             else if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_FOLLOW_LEADER)

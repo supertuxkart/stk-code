@@ -151,7 +151,7 @@ void RegisterScreen::onUpdate(float dt)
                 new MessageDialog(
                     _("You will receive an email with further instructions "
                     "regarding account activation. Please be patient and be "
-                    "sure to check your spam folder."), 
+                    "sure to check your spam folder."),
                     MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
                 // Set the flag that the message was shown, which will triger
                 // a pop of this menu and so a return to the main menu
@@ -177,18 +177,18 @@ void RegisterScreen::onUpdate(float dt)
 
 // -----------------------------------------------------------------------------
 
-void RegisterScreen::eventCallback(Widget* widget, const std::string& name, 
+void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
                                 const int playerID)
 {
     if (name == "login_tabs")
     {
-        const std::string selection = 
+        const std::string selection =
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         StateManager *sm = StateManager::get();
         if (selection == "tab_login")
             sm->replaceTopMostScreen(LoginScreen::getInstance());
         else if (selection == "tab_guest_login")
-            sm->replaceTopMostScreen(GuestLoginScreen::getInstance());    
+            sm->replaceTopMostScreen(GuestLoginScreen::getInstance());
     }
     else if (name=="options")
     {

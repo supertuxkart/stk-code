@@ -155,7 +155,7 @@ STKRenderingPass IrrDriver::getPhase() const
 
 void IrrDriver::IncreaseObjectCount()
 {
-	object_count[m_phase]++;
+    object_count[m_phase]++;
 }
 
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
@@ -424,10 +424,10 @@ void IrrDriver::initDevice()
 
     GLMajorVersion = 2;
     GLMinorVersion = 1;
-	glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
+    glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
     glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
-	m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1)) && UserConfigParams::m_pixel_shaders;
+    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1)) && UserConfigParams::m_pixel_shaders;
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);
@@ -458,7 +458,7 @@ void IrrDriver::initDevice()
         m_mrt.push_back(m_rtts->getRTT(RTT_COLOR));
         m_mrt.push_back(m_rtts->getRTT(RTT_NORMAL_AND_DEPTH));
 
-        irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+        irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
         m_query_issued = false;
 
@@ -595,7 +595,7 @@ core::position2di IrrDriver::getMouseLocation()
 bool IrrDriver::moveWindow(const int x, const int y)
 {
 #ifdef WIN32
-    const video::SExposedVideoData& videoData = 
+    const video::SExposedVideoData& videoData =
                     m_video_driver->getExposedVideoData();
     // this should work even if using DirectX in theory,
     // because the HWnd is always third pointer in the struct,
@@ -964,17 +964,17 @@ scene::ISceneNode *IrrDriver::addBillboard(const core::dimension2d< f32 > size,
                                            video::ITexture *texture,
                                            scene::ISceneNode* parent, bool alphaTesting)
 {
-	scene::IBillboardSceneNode* node;
-	if (isGLSL())
-	{
-		if (!parent)
-			parent = m_scene_manager->getRootSceneNode();
+    scene::IBillboardSceneNode* node;
+    if (isGLSL())
+    {
+        if (!parent)
+            parent = m_scene_manager->getRootSceneNode();
 
-		node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
-		node->drop();
-	}
-	else
-		node = m_scene_manager->addBillboardSceneNode(parent, size);
+        node = new STKBillboard(parent, m_scene_manager, -1, vector3df(0., 0., 0.), size);
+        node->drop();
+    }
+    else
+        node = m_scene_manager->addBillboardSceneNode(parent, size);
     assert(node->getMaterialCount() > 0);
     node->setMaterialTexture(0, texture);
     if(alphaTesting)
@@ -1150,7 +1150,7 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
                                          float texture_percent,
                                          float sphere_percent)
 {
-	Log::error("skybox", "Using deprecated SkyDome");
+    Log::error("skybox", "Using deprecated SkyDome");
     return m_scene_manager->addSkyDomeSceneNode(texture, hori_res, vert_res,
                                                 texture_percent,
                                                 sphere_percent);
@@ -1171,7 +1171,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
                                         &texture)
 {
     assert(texture.size() == 6);
-	SkyboxTextures = texture;
+    SkyboxTextures = texture;
     SkyboxCubeMap = 0;
     ConvolutedSkyboxCubeMap = 0;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
@@ -1181,7 +1181,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
 
 void IrrDriver::suppressSkyBox()
 {
-	SkyboxTextures.clear();
+    SkyboxTextures.clear();
     glDeleteTextures(1, &SkyboxCubeMap);
     glDeleteTextures(1, &ConvolutedSkyboxCubeMap);
     SkyboxCubeMap = 0;
@@ -1518,9 +1518,9 @@ void IrrDriver::displayFPS()
     {
         sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
                 min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
-		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
-		object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
-		object_count[TRANSPARENT_PASS] = 0;
+        object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+        object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+        object_count[TRANSPARENT_PASS] = 0;
     }
     else
     {
@@ -1531,7 +1531,7 @@ void IrrDriver::displayFPS()
     core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-    
+
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
@@ -2017,7 +2017,7 @@ void IrrDriver::RTTProvider::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         m_rtt_main_node->getMaterial(n).SpecularColor.set(255,50,50,50);
         m_rtt_main_node->getMaterial(n).DiffuseColor.set(255,150,150,150);
 
-        m_rtt_main_node->getMaterial(n).setFlag(video::EMF_GOURAUD_SHADING , 
+        m_rtt_main_node->getMaterial(n).setFlag(video::EMF_GOURAUD_SHADING ,
                                                 true);
     }
 
@@ -2136,7 +2136,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     //    viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
     //    mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
     //}
-    
+
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
@@ -2216,7 +2216,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
     }
     else
     {
-		return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(),
+        return m_scene_manager->addLightSceneNode(m_scene_manager->getRootSceneNode(),
                                                   pos, video::SColorf(1.0f, r, g, b));
     }
 }

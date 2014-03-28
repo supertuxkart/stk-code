@@ -33,7 +33,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world.hpp" 
+#include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -81,7 +81,7 @@ Attachment::~Attachment()
         sfx_manager->deleteSFX(m_bomb_sound);
         m_bomb_sound = NULL;
     }
-    
+
     if (m_bubble_explode_sound)
     {
         sfx_manager->deleteSFX(m_bubble_explode_sound);
@@ -123,7 +123,7 @@ void Attachment::set(AttachmentType type, float time,
 
     clear();
     m_node_scale = 0.3f;
-    
+
     // If necessary create the appropriate plugin which encapsulates
     // the associated behavior
     switch(type)
@@ -323,7 +323,7 @@ void Attachment::hitBanana(Item *item, int new_attachment)
 void Attachment::handleCollisionWithKart(AbstractKart *other)
 {
     Attachment *attachment_other=other->getAttachment();
-    
+
     if(getType()==Attachment::ATTACH_BOMB)
     {
         // Don't attach a bomb when the kart is shielded
@@ -380,15 +380,15 @@ void Attachment::update(float dt)
 {
     if(m_type==ATTACH_NOTHING) return;
     m_time_left -=dt;
-    
-    
+
+
     bool is_shield = (m_type == ATTACH_BUBBLEGUM_SHIELD|| m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD);
     float m_wanted_node_scale = is_shield ? std::max(1.0f, m_kart->getHighestPoint()*1.1f) : 1.0f;
-    
+
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
-        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale; 
+        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale;
         m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
     }
 
@@ -416,7 +416,7 @@ void Attachment::update(float dt)
         if (f > 1.0f) f = 1.0f;   // cap fraction
         if (m_kart->getSpeed() <= m_initial_speed *
                                  (stk_config->m_parachute_lbound_fraction +
-                                  f * (  stk_config->m_parachute_ubound_fraction 
+                                  f * (  stk_config->m_parachute_ubound_fraction
                                        - stk_config->m_parachute_lbound_fraction)))
         {
             m_time_left = -1;
@@ -471,7 +471,7 @@ void Attachment::update(float dt)
             m_bubble_explode_sound = sfx_manager->createSoundSource("bubblegum_explode");
             m_bubble_explode_sound->position(m_kart->getXYZ());
             m_bubble_explode_sound->play();
-            
+
             // drop a small bubble gum
             Vec3 hit_point;
             Vec3 normal;
@@ -488,7 +488,7 @@ void Attachment::update(float dt)
                 normal.normalize();
 
                 pos.setY(hit_point.getY()-0.05f);
-                
+
                 ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_kart);
             }
         }

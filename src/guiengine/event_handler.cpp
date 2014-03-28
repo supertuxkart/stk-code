@@ -65,7 +65,7 @@ bool EventHandler::OnEvent (const SEvent &event)
 
     if(!Debug::onEvent(event))
         return false;
-    
+
     // TO DEBUG HATS (when you don't actually have a hat)
     /*
     if (event.EventType == EET_KEY_INPUT_EVENT)
@@ -630,7 +630,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
     if (w->m_deactivated) return EVENT_BLOCK;
 
     Widget* parent = w->m_event_handler;
-    
+
     if (ModalDialog::isADialogActive() && (parent == NULL || parent->m_type != GUIEngine::WTYPE_RIBBON))
     {
         if (ModalDialog::getCurrent()->processEvent(w->m_properties[PROP_ID]) == EVENT_BLOCK)
