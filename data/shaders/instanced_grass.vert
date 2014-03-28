@@ -52,9 +52,9 @@ mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation)
 
 void main()
 {
-    mat4 ModelMatrix = getWorldMatrix(Origin, Orientation);
-    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation) * InverseViewMatrix);
-    gl_Position = ViewProjectionMatrix *  ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    mat4 ModelMatrix = getWorldMatrix(Origin + windDir * Color.r, Orientation);
+    mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin + windDir * Color.r, Orientation) * InverseViewMatrix);
+    gl_Position = ViewProjectionMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
 }
