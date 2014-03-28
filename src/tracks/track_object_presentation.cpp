@@ -80,7 +80,7 @@ const core::vector3df TrackObjectPresentationSceneNode::getAbsolutePosition() co
     return m_node->getAbsolutePosition();
 }
 
- 
+
 const core::vector3df& TrackObjectPresentationSceneNode::getRotation() const
 {
     if (m_node == NULL) return m_init_hpr;
@@ -182,15 +182,15 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 
     bool tangent = false;
     xml_node.get("tangents", &tangent);
-    
+
     //std::string full_path =
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	xml_node.get("displacing", &displacing);
-	animated &= !displacing;
+    bool displacing = false;
+    xml_node.get("displacing", &displacing);
+    animated &= !displacing;
 
     if (animated)
     {
@@ -256,10 +256,10 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	if(xml_node)
+    bool displacing = false;
+    if(xml_node)
         xml_node->get("displacing", &displacing);
-	animated &= !displacing;
+    animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
@@ -542,7 +542,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
 
     std::string path;
     xml_node.get("kind", &path);
-    
+
     int clip_distance = -1;
     xml_node.get("clip_distance", &clip_distance);
 
@@ -732,7 +732,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
         DeviceConfig* config = device->getConfiguration();
         irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
-        
+
         new TutorialMessageDialog(_("Press <B> to look behind, to fire the weapon with <%s> while pressing <B> to to fire behind!", fire),
                                   true);
     }

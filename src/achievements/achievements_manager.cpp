@@ -74,14 +74,14 @@ AchievementsManager::~AchievementsManager()
  *  information for a single player.
  *  \param node The XML of saved data, or NULL if no saved data exists.
  */
-AchievementsStatus* 
+AchievementsStatus*
              AchievementsManager::createAchievementsStatus(const XMLNode *node)
 {
     AchievementsStatus *status = new AchievementsStatus();
 
     // First add all achievements, before restoring the saved data.
     std::map<uint32_t, AchievementInfo *>::const_iterator it;
-    for (it  = m_achievements_info.begin(); 
+    for (it  = m_achievements_info.begin();
          it != m_achievements_info.end(); ++it)
     {
         Achievement * achievement;
@@ -98,7 +98,7 @@ AchievementsStatus*
 // ----------------------------------------------------------------------------
 AchievementInfo * AchievementsManager::getAchievementInfo(uint32_t id) const
 {
-    std::map<uint32_t, AchievementInfo*>::const_iterator info = 
+    std::map<uint32_t, AchievementInfo*>::const_iterator info =
         m_achievements_info.find(id);
     if (info != m_achievements_info.end())
         return info->second;

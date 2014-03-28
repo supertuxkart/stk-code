@@ -16,7 +16,7 @@ const core::vector3df& rotation,
 const core::vector3df& scale) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-	firstTime = true;
+    firstTime = true;
 }
 
 void STKAnimatedMesh::cleanGLMeshes()
@@ -45,13 +45,13 @@ void STKAnimatedMesh::cleanGLMeshes()
 
 void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 {
-	firstTime = true;
-	GLmeshes.clear();
+    firstTime = true;
+    GLmeshes.clear();
     for (unsigned i = 0; i < FPSM_COUNT; i++)
         GeometricMesh[i].clear();
     for (unsigned i = 0; i < SM_COUNT; i++)
         ShadedMesh[i].clear();
-	CAnimatedMeshSceneNode::setMesh(mesh);
+    CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
 void STKAnimatedMesh::drawSolidPass1(const GLMesh &mesh, GeometricMaterial type)
@@ -97,26 +97,26 @@ void STKAnimatedMesh::drawSolidPass2(const GLMesh &mesh, ShadedMaterial type)
 
 void STKAnimatedMesh::render()
 {
-	video::IVideoDriver* driver = SceneManager->getVideoDriver();
+    video::IVideoDriver* driver = SceneManager->getVideoDriver();
 
-	bool isTransparentPass =
-		SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
+    bool isTransparentPass =
+        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
 
-	++PassCount;
+    ++PassCount;
 
-	scene::IMesh* m = getMeshForCurrentFrame();
+    scene::IMesh* m = getMeshForCurrentFrame();
 
-	if (m)
-	{
-		Box = m->getBoundingBox();
-	}
-	else
-	{
-		Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
-		return;
-	}
+    if (m)
+    {
+        Box = m->getBoundingBox();
+    }
+    else
+    {
+        Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
+        return;
+    }
 
-	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
+    driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
 
     if (firstTime)
     {
@@ -157,7 +157,7 @@ void STKAnimatedMesh::render()
             }
         }
     }
-	firstTime = false;
+    firstTime = false;
 
     for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
     {

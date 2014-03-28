@@ -25,7 +25,7 @@
 #include <string>
 #include <vector>
 
-/** A small class to manage the 'argv' parameters of a program. That includes 
+/** A small class to manage the 'argv' parameters of a program. That includes
  *  the name of the executable (argv[0]) and all command line parameters.
  *  Example usage
  *  \code
@@ -38,8 +38,8 @@
  *     ...
  *     CommandLine::reportInvalidParameters();
  *  \endcode
- *  The two 'has' functions will remove a parameter from the list of all 
- *  parameters, so any parameters remaining at the end are invalid 
+ *  The two 'has' functions will remove a parameter from the list of all
+ *  parameters, so any parameters remaining at the end are invalid
  *  parameters, which will be listed by reportInvalidParameters.
  */
 class CommandLine
@@ -55,7 +55,7 @@ private:
     /** Searches for an option 'option=XX'. If found, *t will contain 'XX'.
      *  If the value was found, the entry is removed from the list of all
      *  command line arguments.
-     *  \param option The option (must include '-' or '--' as required). 
+     *  \param option The option (must include '-' or '--' as required).
      *  \param t Address of a variable to store the value.
      *  \param format The '%' format to sscanf the value in t with.
      *  \return true if the value was found, false otherwise.
@@ -86,7 +86,7 @@ public:
      *  If the value was found, the entry is removed from the list of all
      *  command line arguments. This is the interface for any integer
      *  values (i.e. using %d as format while scanning).
-     *  \param option The option (must include '-' or '--' as required). 
+     *  \param option The option (must include '-' or '--' as required).
      *  \param t Address of a variable to store the value.
      *  \param format The '%' format to sscanf the value in t with.
      *  \return true if the value was found, false otherwise.
@@ -99,7 +99,7 @@ public:
     /** Searches for an option 'option=XX'. If found, *t will contain 'XX'.
      *  If the value was found, the entry is removed from the list of all
      *  command line arguments. This is the interface for a std::string
-     *  \param option The option (must include '-' or '--' as required). 
+     *  \param option The option (must include '-' or '--' as required).
      *  \param t Address of a variable to store the value.
      *  \param format The '%' format to sscanf the value in t with.
      *  \return true if the value was found, false otherwise.

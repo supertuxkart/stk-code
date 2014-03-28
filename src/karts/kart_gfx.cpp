@@ -49,7 +49,7 @@ KartGFX::KartGFX(const AbstractKart *kart)
 
     Vec3 rear_center(0, kart->getKartHeight()*0.35f,
                        -kart->getKartLength()*0.35f);
-                       
+
     Vec3 rear_nitro_center(0, kart->getKartHeight()*0.2f,
                        -kart->getKartLength()*0.1f);
 

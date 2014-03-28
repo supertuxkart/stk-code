@@ -56,7 +56,7 @@ void RatingBarWidget::add()
 
 // -----------------------------------------------------------------------------
 /** Get the current step of the star
- * 
+ *
  * \param index     The index of the star.
  * \return The current step of the star.
  */

@@ -159,7 +159,7 @@ void SFXOpenAL::volume(float gain)
 void SFXOpenAL::masterVolume(float gain)
 {
     m_master_gain = gain;
-    
+
     if(!m_ok) return;
 
     alSourcef(m_soundSource, AL_GAIN, (m_gain < 0.0f ? m_defaultGain : m_gain) * m_master_gain);

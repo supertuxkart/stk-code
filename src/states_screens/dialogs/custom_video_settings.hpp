@@ -27,7 +27,7 @@
  */
 class CustomVideoSettingsialog : public GUIEngine::ModalDialog
 {
-    
+
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
@@ -38,7 +38,7 @@ public:
     virtual void beforeAddingWidgets();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
+
 };
 
 #endif

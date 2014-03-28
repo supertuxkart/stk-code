@@ -147,7 +147,7 @@ void OptionsScreenUI::init()
     }
     if (!currSkinFound)
     {
-        Log::warn("OptionsScreenUI", 
+        Log::warn("OptionsScreenUI",
                   "Couldn't find current skin in the list of skins!");
         skinSelector->setValue(0);
         GUIEngine::reloadSkin();
@@ -162,7 +162,7 @@ void OptionsScreenUI::init()
     const std::vector<std::string>* lang_list = translations->getLanguageList();
     const int amount = lang_list->size();
 
-    // The names need to be sorted alphabetically. Store the 2-letter 
+    // The names need to be sorted alphabetically. Store the 2-letter
     // language names in a mapping, to be able to get them from the
     // user visible full name.
     std::vector<std::string> nice_lang_list;
@@ -177,7 +177,7 @@ void OptionsScreenUI::init()
     std::sort(nice_lang_list.begin(), nice_lang_list.end());
     for(unsigned int i=0; i<nice_lang_list.size(); i++)
     {
-        list_widget->addItem(nice_name_2_id[nice_lang_list[i]], 
+        list_widget->addItem(nice_name_2_id[nice_lang_list[i]],
                               nice_lang_list[i].c_str());
     }
 
@@ -235,7 +235,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         UserConfigParams::m_internet_status =
             internet->getState() ? RequestManager::IPERM_ALLOWED
                                  : RequestManager::IPERM_NOT_ALLOWED;
-        // If internet gets enabled, re-initialise the addon manager (which 
+        // If internet gets enabled, re-initialise the addon manager (which
         // happens in a separate thread) so that news.xml etc can be
         // downloaded if necessary.
         if(internet->getState())

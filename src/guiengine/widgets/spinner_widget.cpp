@@ -62,17 +62,17 @@ void SpinnerWidget::add()
 
     if (min_s.size() > 0)
     {
-		if (!StringUtils::parseString<int>(min_s, &m_min))
+        if (!StringUtils::parseString<int>(min_s, &m_min))
         {
-			Log::warn("invalid value for spinner widget minimum value : %s", min_s.c_str());
+            Log::warn("invalid value for spinner widget minimum value : %s", min_s.c_str());
         }
     }
 
     if (max_s.size() > 0)
     {
-		if (!StringUtils::parseString<int>(max_s, &m_max))
-		{
-			Log::warn("invalid value for spinner widget maximum value : %s", max_s.c_str());
+        if (!StringUtils::parseString<int>(max_s, &m_max))
+        {
+            Log::warn("invalid value for spinner widget maximum value : %s", max_s.c_str());
         }
     }
 
@@ -160,7 +160,7 @@ void SpinnerWidget::add()
         {
             label->setText(m_labels[m_value].c_str() );
         }
-	
+
     }
 
 
@@ -174,7 +174,7 @@ void SpinnerWidget::add()
     m_children[2].m_id = m_children[2].m_element->getID();
 
     // refresh display
-	
+
 
     setValue(m_value);
 }

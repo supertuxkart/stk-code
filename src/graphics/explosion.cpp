@@ -39,7 +39,7 @@ Explosion::Explosion(const Vec3& coord, const char* explosion_sound, const char 
 {
     // short emision time, explosion, not constant flame
     m_remaining_time  = burst_time;
-    
+
     ParticleKindManager* pkm = ParticleKindManager::get();
     ParticleKind* particles = pkm->getParticles(particle_file);
     m_emitter = new ParticleEmitter(particles, coord,  NULL);
@@ -72,7 +72,7 @@ bool Explosion::updateAndDelete(float dt)
     if (m_remaining_time < 0.0f && m_remaining_time >= -explosion_time)
     {
         scene::ISceneNode* node = m_emitter->getNode();
-        
+
         const int intensity = (int)(255-(m_remaining_time/-explosion_time)*255);
         node->getMaterial(0).AmbientColor.setGreen(intensity);
         node->getMaterial(0).DiffuseColor.setGreen(intensity);

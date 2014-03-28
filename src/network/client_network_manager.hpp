@@ -52,7 +52,7 @@ class ClientNetworkManager : public NetworkManager
          *  \param reliable : If set to true, ENet will ensure that the packet is received.
          */
         virtual void sendPacket(const NetworkString& data, bool reliable = true);
-        
+
         /*! \brief Get the peer (the server)
          *  \return The peer with whom we're connected (if it exists). NULL elseway.
          */

@@ -251,7 +251,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
     }
 
     std::string sfx_name = StringUtils::removeExtension(filename);
-    
+
     if(m_all_sfx_types.find(sfx_name)!=m_all_sfx_types.end())
     {
         Log::error("SFXManager",
@@ -262,7 +262,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     // Only use the filename if no full path is specified. This is used
     // to load terrain specific sfx.
-    const std::string full_path = (path == "") 
+    const std::string full_path = (path == "")
                                 ? file_manager->getAsset(FileManager::SFX,filename)
                                 : path;
 

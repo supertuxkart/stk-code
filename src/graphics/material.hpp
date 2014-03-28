@@ -107,7 +107,7 @@ private:
     /** If a kart is rescued when driving on this surface. */
     bool             m_drive_reset;
 
-    /** True if this is a texture that will start the jump animatoin when 
+    /** True if this is a texture that will start the jump animatoin when
      *  leaving it and being in the air. */
     bool             m_is_jump_texture;
 
@@ -179,8 +179,8 @@ private:
     float            m_slowdown_time;
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
-    /** Minimum speed on this terrain. This is used for zippers on a ramp to 
-     *  guarantee the right jump distance. A negative value indicates no 
+    /** Minimum speed on this terrain. This is used for zippers on a ramp to
+     *  guarantee the right jump distance. A negative value indicates no
      *  minimum speed. */
     float            m_zipper_min_speed;
     /** The minimum speed at which a special sfx is started to be played. */
@@ -346,9 +346,9 @@ public:
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
     void isInitiallyHidden(scene::IMeshBuffer* who);
-	/** For particle system : specify if the particle should be additively blended
-	 */
-	bool isAlphaAdditive() const { return !m_alpha_blending;  }
+    /** For particle system : specify if the particle should be additively blended
+     */
+    bool isAlphaAdditive() const { return !m_alpha_blending;  }
 } ;
 
 

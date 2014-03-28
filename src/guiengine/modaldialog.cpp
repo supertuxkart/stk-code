@@ -89,7 +89,7 @@ void ModalDialog::doInit()
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
-    const core::dimension2d<u32>& frame_size = 
+    const core::dimension2d<u32>& frame_size =
         GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
     const int w = (int)(frame_size.Width* m_percent_width);
@@ -131,7 +131,7 @@ void ModalDialog::doInit()
     }
     modalWindow = this;
 
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, 
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area,
                                                           true /* modal */);
 
     GUIEngine::getSkin()->m_dialog = true;

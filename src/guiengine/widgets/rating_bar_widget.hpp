@@ -29,7 +29,7 @@
 
 namespace GUIEngine
 {
-    /** 
+    /**
       * \brief A rating bar widget.
       * \ingroup widgetsgroup
       */
@@ -47,28 +47,28 @@ namespace GUIEngine
         void setStepValues(float rating);
 
     public:
-        
+
         LEAK_CHECK()
-        
+
         RatingBarWidget();
         virtual ~RatingBarWidget() {}
-        
+
 
 
         void add();
-        
+
         /** Change the rating value of the widget. */
         void setRating(float rating);
-        
+
         /** Get the current value of the widget. */
         float getRating() {return m_rating; };
-        
+
         /** Change the number of stars of the widget. */
         void setStarNumber(int star_number) { m_stars = star_number; };
-        
+
         /** Get the current number of stars of the widget. */
         int getStarNumber() {return m_stars; };
-        
+
         int getStepsOfStar(int index);
 
         void setStepValuesByMouse(const core::position2di & mouse_position, const core::recti & stars_rect);
@@ -76,7 +76,7 @@ namespace GUIEngine
         virtual void onClick();
 
         void allowVoting() { m_allow_voting = true; }
-    }; 
+    };
 }
 
 #endif

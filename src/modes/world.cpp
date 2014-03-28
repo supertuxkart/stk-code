@@ -453,7 +453,7 @@ void World::terminateRace()
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
                                            "laps", race_manager->getNumLaps());
     }
-    
+
     Achievement *achiev = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
     if (achiev)
     {
@@ -483,9 +483,9 @@ void World::terminateRace()
                                                         mode_name, 1);
                 }
             }
-	    } // for i < kart_amount
+        } // for i < kart_amount
     } // if (achiev)
-    
+
     Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
     //if achivement has been unlocked
     if (win->getValue("wins") < 5 )
@@ -504,7 +504,7 @@ void World::terminateRace()
                                                             "wins", 1);
                 }
                 else
-                {     
+                {
                       //Set number of consecutive wins to 0
                       win->reset();
                 }

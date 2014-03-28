@@ -265,7 +265,7 @@ void ParticleSystemProxy::FlipParticleVAOBind(GLuint PositionBuffer, GLuint Quat
 
     glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_rotationvec);
     glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_anglespeed);
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, QuaternionBuffer);
     glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_rotationvec, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_anglespeed, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
@@ -273,7 +273,7 @@ void ParticleSystemProxy::FlipParticleVAOBind(GLuint PositionBuffer, GLuint Quat
     glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
     glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, PositionBuffer);
     glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
     glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
@@ -297,7 +297,7 @@ void ParticleSystemProxy::SimpleParticleVAOBind(GLuint PositionBuffer)
     glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
     glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-    
+
     glBindBuffer(GL_ARRAY_BUFFER, PositionBuffer);
     glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
     glVertexAttribPointer(ParticleShader::SimpleParticleRender::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));

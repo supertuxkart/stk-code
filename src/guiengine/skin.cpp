@@ -818,7 +818,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
-    
+
     const int star_number = ratingBar->getStarNumber();
 
     int star_h = rect.getHeight();
@@ -830,7 +830,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_w = (int)(star_w * scale_factor);
         star_h = (int)(star_h * scale_factor);
     }
-    
+
     // center horizontally and vertically
     const int x_from = rect.UpperLeftCorner.X;
     const int y_from = rect.UpperLeftCorner.Y;
@@ -853,10 +853,10 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.UpperLeftCorner.Y  = y_from;
         star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
         star_rect.LowerRightCorner.Y = y_from + star_h;
-        
+
         int step = ratingBar->getStepsOfStar(i);
-        
-        const core::recti source_area(texture_w * step, 0, 
+
+        const core::recti source_area(texture_w * step, 0,
                                       texture_w * (step + 1), texture_h);
 
         draw2DImage(texture,
@@ -1253,7 +1253,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo::neutral"]);
-        
+
 
     }
     else if (widget->isFocusedForPlayer(1))
@@ -1314,7 +1314,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
-    
+
     if (w->isGauge() && !w->m_deactivated)
     {
         const int handle_size = (int)( widget->m_h*params->m_left_border
@@ -1651,7 +1651,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     drawBoxFromStretchableTexture(&widget, rect,
                               SkinConfig::m_render_params["section::neutral"]);
                 }
-                
+
                 renderSections( &widget.m_children );
             }
             else if (widget.isBottomBar())
@@ -2097,7 +2097,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         core::recti innerArea = borderArea;
         innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
         innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
-		GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
+        GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)
@@ -2161,7 +2161,7 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-	GL32_draw2DRectangle(color,
+    GL32_draw2DRectangle(color,
                                             core::recti(position2d< s32 >(0,0),
                        GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }   // drawBGFadeColor
@@ -2211,7 +2211,7 @@ void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
     SColor color = SColor(150, 96, 74, 196);
-	GL32_draw2DRectangle(color, rect);
+    GL32_draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------

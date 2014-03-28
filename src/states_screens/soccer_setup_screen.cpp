@@ -54,7 +54,7 @@ void SoccerSetupScreen::loadedFromFile()
 }
 
 // ----------------------------------------------------------------------------
-void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, 
+void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
                                       const int playerID)
 {
     if(m_schedule_continue)
@@ -64,7 +64,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     {
         int nb_players = m_kart_view_info.size();
 
-        if (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+        if (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 ||
             getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0)
         {
             for(int i=0 ; i < nb_players ; i++)
@@ -77,7 +77,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
             sfx_manager->quickSound( "anvil" );
             return;
         }
-        else if(!areAllKartsConfirmed())    
+        else if(!areAllKartsConfirmed())
         {
             for(int i=0 ; i < nb_players ; i++)
             {
@@ -198,10 +198,10 @@ void SoccerSetupScreen::init()
     m_schedule_continue = false;
 
     Screen::init();
-    
+
     if (UserConfigParams::m_num_goals <= 0)
         UserConfigParams::m_num_goals = 3;
-        
+
     if (UserConfigParams::m_soccer_time_limit <= 0)
         UserConfigParams::m_soccer_time_limit = 3;
 
@@ -236,7 +236,7 @@ void SoccerSetupScreen::tearDown()
 
     // Reset the 'map fire to select' option of the device manager
     input_manager->getDeviceList()->mapFireToSelect(false);
-    
+
     UserConfigParams::m_num_goals = getWidget<SpinnerWidget>("goalamount")->getValue();
     UserConfigParams::m_soccer_time_limit = getWidget<SpinnerWidget>("timeamount")->getValue();
 
@@ -303,20 +303,20 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         break;
     case PA_MENU_SELECT:
     {
-        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) || 
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
             areAllKartsConfirmed())
         {
             return result;
         }
 
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) && 
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             m_kart_view_info[playerId].confirmed)
         {
             return EVENT_BLOCK;
         }
 
-        if (getNumConfirmedKarts() > nb_players-2 && 
-           (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+        if (getNumConfirmedKarts() > nb_players-2 &&
+           (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 ||
             getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0))
         {
             sfx_manager->quickSound( "anvil" );
@@ -356,14 +356,14 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
     default:
         break;
     }
-     
+
     if(team_switch != SOCCER_TEAM_NONE) // A player wants to change his team?
     {
         race_manager->setLocalKartSoccerTeam(playerId, team_switch);
         m_kart_view_info[playerId].team = team_switch;
         updateKartViewsLayout();
     }
-    
+
 
 
     return result;
@@ -373,7 +373,7 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
 void SoccerSetupScreen::onUpdate(float delta)
 {
     int nb_players = m_kart_view_info.size();
-    
+
     if(m_schedule_continue)
     {
         for(int i=0 ; i < nb_players ; i++)
