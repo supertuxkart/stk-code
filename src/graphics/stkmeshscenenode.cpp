@@ -105,6 +105,10 @@ void STKMeshSceneNode::cleanGLMeshes()
             glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
         if (mesh.vao_displace_pass)
             glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
+        if (mesh.vao_displace_mask_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
+        if (mesh.vao_shadow_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
     }
