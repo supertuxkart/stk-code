@@ -116,7 +116,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 
 // ----------------------------------------------------------------------------
 
-void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
+STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
                                 const irr::core::vector3df& rotation,
                                 const std::string& name)
 {
@@ -125,7 +125,7 @@ void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
         if (m_lod_groups.find(name) == m_lod_groups.end())
         {
             Log::warn("Instancing", "Cannot find instancing model <%s>", name.c_str());
-            return;
+            return NULL;
         }
 
         scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
@@ -135,6 +135,7 @@ void ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
     }
 
     m_instancing_nodes[name]->addInstance(position, rotation);
+    return m_instancing_nodes[name];
 }
 
 // ----------------------------------------------------------------------------

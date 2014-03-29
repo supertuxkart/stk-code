@@ -168,7 +168,7 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
     m_node->updateAbsolutePosition();
-    model_def_loader.instanciate(m_node->getAbsolutePosition(),
+    m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
         m_node->getAbsoluteTransformation().getRotationDegrees(),
         instancing_model);
 }

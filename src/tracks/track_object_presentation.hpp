@@ -41,6 +41,7 @@ class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
 class ModelDefinitionLoader;
+class STKInstancedSceneNode;
 
 /**
  * \ingroup tracks
@@ -158,12 +159,15 @@ public:
 
 class TrackObjectPresentationInstancing : public TrackObjectPresentationSceneNode
 {
+    STKInstancedSceneNode* m_instancing_group;
 public:
 
     TrackObjectPresentationInstancing(const XMLNode& xml_node,
         scene::ISceneNode* parent,
         ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationInstancing();
+
+    STKInstancedSceneNode* getInstancingGroup() { return m_instancing_group;  }
 };
 
 /**

@@ -83,9 +83,9 @@ public:
 
     void addModelDefinition(const XMLNode* xml);
     LODNode* instanciateAsLOD(const XMLNode* xml_node, scene::ISceneNode* parent);
-    void instanciate(const core::vector3df& position,
-                     const irr::core::vector3df& rotation,
-                     const std::string& name);
+    STKInstancedSceneNode* instanciate(const core::vector3df& position,
+                                       const irr::core::vector3df& rotation,
+                                       const std::string& name);
 
     void clear();
 
