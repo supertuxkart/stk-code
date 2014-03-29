@@ -40,11 +40,14 @@ def main():
                     lines_total += len(lines)
 
                 for i in range(len(lines)):
-                    lines[i] = lines[i].rstrip().replace("\t", "    ") + "\n"
-                    if statistics:
-                        if (lines[i].lstrip() != ""
-                            and lines[i].lstrip()[0:2] != "//"):
-                            lines_code += 1
+                    # replacing tabs with four spaces
+                    lines[i] = lines[i].replace("\t", "    ")
+                    
+                    if lines[i].rstrip() != "": # don't de-indent empty lines
+                        lines[i] = lines[i].rstrip() + "\n"
+                        if statistics:
+                            if lines[i].lstrip().startswith("//"):
+                                lines_code += 1
                 src_file.close()
 
                 # writing back
