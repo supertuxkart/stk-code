@@ -64,6 +64,8 @@ void computeMVP(core::matrix4 &ModelViewProjectionMatrix);
 void computeTIMV(core::matrix4 &TransposeInverseModelView);
 bool isObject(video::E_MATERIAL_TYPE type);
 
+core::vector3df getWind();
+
 // Pass 1 shader (ie shaders that outputs normals and depth)
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);

@@ -102,7 +102,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 		glVertexAttribPointer(attrib_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (GLvoid*)24);
 		
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
-	glBindVertexArray(0);
 	return vao;
 }
 
@@ -204,6 +203,16 @@ void computeTIMV(core::matrix4 &TransposeInverseModelView)
 	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 	TransposeInverseModelView.makeInverse();
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+}
+
+core::vector3df getWind()
+{
+    const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
+    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+    GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
+    float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
+
+    return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
 
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)

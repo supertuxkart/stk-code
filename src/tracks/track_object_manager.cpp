@@ -49,11 +49,11 @@ TrackObjectManager::~TrackObjectManager()
  *        in a separate section that's read before everything and remove all this
  *        crap
  */
-void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader)
+void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader)
 {
     try
     {
-        m_all_objects.push_back(new TrackObject(xml_node, parent, lod_loader));
+        m_all_objects.push_back(new TrackObject(xml_node, parent, model_def_loader));
     }
     catch (std::exception& e)
     {

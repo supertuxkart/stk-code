@@ -35,7 +35,7 @@ namespace irr
     namespace scene { class IMesh; class ILightSceneNode; }
 }
 using namespace irr;
-class LodNodeLoader;
+class ModelDefinitionLoader;
 
 #include "LinearMath/btTransform.h"
 
@@ -401,7 +401,7 @@ private:
                              std::vector<MusicInformation*>& m_music   );
     void loadCurves(const XMLNode &node);
     void handleSky(const XMLNode &root, const std::string &filename);
-    void loadObjects(const XMLNode* root, const std::string& path, LodNodeLoader& lod_loader,
+    void loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& lod_loader,
                      bool create_lod_definitions, scene::ISceneNode* parent,
                      std::map<std::string, XMLNode*>& library_nodes);
 
@@ -606,6 +606,7 @@ public:
     bool hasGodRays() const { return m_godrays; }
     bool hasShadows() const { return m_shadows; }
     
+    void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
 
     float getDisplacementSpeed() const { return m_displacement_speed; }
     float getCausticsSpeed() const { return m_caustics_speed; }

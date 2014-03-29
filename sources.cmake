@@ -63,6 +63,7 @@ src/graphics/slip_stream.cpp
 src/graphics/stars.cpp
 src/graphics/stkanimatedmesh.cpp
 src/graphics/stkbillboard.cpp
+src/graphics/stkinstancedscenenode.cpp
 src/graphics/stkmesh.cpp
 src/graphics/stkmeshscenenode.cpp
 src/graphics/sun.cpp
@@ -304,7 +305,7 @@ src/tracks/check_manager.cpp
 src/tracks/check_sphere.cpp
 src/tracks/check_structure.cpp
 src/tracks/graph_node.cpp
-src/tracks/lod_node_loader.cpp
+src/tracks/model_definition_loader.cpp
 src/tracks/quad.cpp
 src/tracks/quad_graph.cpp
 src/tracks/quad_set.cpp
@@ -399,6 +400,7 @@ src/graphics/slip_stream.hpp
 src/graphics/stars.hpp
 src/graphics/stkanimatedmesh.hpp
 src/graphics/stkbillboard.hpp
+src/graphics/stkinstancedscenenode.hpp
 src/graphics/stkmesh.hpp
 src/graphics/stkmeshscenenode.hpp
 src/graphics/sun.hpp
@@ -646,7 +648,7 @@ src/tracks/check_manager.hpp
 src/tracks/check_sphere.hpp
 src/tracks/check_structure.hpp
 src/tracks/graph_node.hpp
-src/tracks/lod_node_loader.hpp
+src/tracks/model_definition_loader.hpp
 src/tracks/quad.hpp
 src/tracks/quad_graph.hpp
 src/tracks/quad_set.hpp

@@ -36,6 +36,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -49,6 +50,8 @@
 #include "utils/profiler.hpp"
 
 #include <algorithm>
+
+STKInstancedSceneNode *InstancedBox = 0;
 
 void IrrDriver::renderGLSL(float dt)
 {
@@ -203,7 +206,6 @@ void IrrDriver::renderGLSL(float dt)
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
-
 		PROFILER_POP_CPU_MARKER();
 
         // Todo : reenable glow and shadows
@@ -245,7 +247,6 @@ void IrrDriver::renderGLSL(float dt)
             glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
         }
         m_scene_manager->drawAll(m_renderpass);
-
         PROFILER_POP_CPU_MARKER();
 
 		  if (World::getWorld()->getTrack()->isFogEnabled())

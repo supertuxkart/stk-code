@@ -318,7 +318,11 @@ void Shaders::loadShaders()
 	MeshShader::NormalMapShader::init();
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
+    MeshShader::InstancedObjectPass1Shader::init();
+    MeshShader::InstancedGrassPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
+    MeshShader::InstancedObjectPass2Shader::init();
+    MeshShader::InstancedGrassPass2Shader::init();
 	MeshShader::DetailledObjectPass2Shader::init();
 	MeshShader::ObjectRimLimitShader::init();
 	MeshShader::UntexturedObjectShader::init();
@@ -501,6 +505,72 @@ namespace MeshShader
         glUniform1i(uniform_normalMap, TU_normalMap);
     }
 
+    GLuint InstancedObjectPass1Shader::Program;
+    GLuint InstancedObjectPass1Shader::attrib_position;
+    GLuint InstancedObjectPass1Shader::attrib_normal;
+    GLuint InstancedObjectPass1Shader::attrib_origin;
+    GLuint InstancedObjectPass1Shader::uniform_MP;
+    GLuint InstancedObjectPass1Shader::uniform_VM;
+
+    void InstancedObjectPass1Shader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_normal = glGetAttribLocation(Program, "Normal");
+        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_VM = glGetUniformLocation(Program, "InverseViewMatrix");
+    }
+
+    void InstancedObjectPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix)
+    {
+        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+    }
+
+    GLuint InstancedGrassPass1Shader::Program;
+    GLuint InstancedGrassPass1Shader::attrib_position;
+    GLuint InstancedGrassPass1Shader::attrib_normal;
+    GLuint InstancedGrassPass1Shader::attrib_origin;
+    GLuint InstancedGrassPass1Shader::attrib_orientation;
+    GLuint InstancedGrassPass1Shader::attrib_texcoord;
+    GLuint InstancedGrassPass1Shader::attrib_color;
+    GLuint InstancedGrassPass1Shader::uniform_MP;
+    GLuint InstancedGrassPass1Shader::uniform_IVM;
+    GLuint InstancedGrassPass1Shader::uniform_windDir;
+    GLuint InstancedGrassPass1Shader::uniform_tex;
+
+    void InstancedGrassPass1Shader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_normal = glGetAttribLocation(Program, "Normal");
+        attrib_color = glGetAttribLocation(Program, "Color");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_IVM = glGetUniformLocation(Program, "InverseViewMatrix");
+        uniform_windDir = glGetUniformLocation(Program, "windDir");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+    }
+
+    void InstancedGrassPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::vector3df &windDir, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_IVM, 1, GL_FALSE, InverseViewMatrix.pointer());
+        glUniform3f(uniform_windDir, windDir.X, windDir.Y, windDir.Z);
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
     // Solid Lit pass shaders
 
 	GLuint ObjectPass2Shader::Program;
@@ -546,6 +616,53 @@ namespace MeshShader
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
+
+    GLuint InstancedObjectPass2Shader::Program;
+    GLuint InstancedObjectPass2Shader::attrib_position;
+    GLuint InstancedObjectPass2Shader::attrib_texcoord;
+    GLuint InstancedObjectPass2Shader::attrib_origin;
+    GLuint InstancedObjectPass2Shader::uniform_VP;
+    GLuint InstancedObjectPass2Shader::uniform_TM;
+    GLuint InstancedObjectPass2Shader::uniform_screen;
+    GLuint InstancedObjectPass2Shader::uniform_ambient;
+    GLuint InstancedObjectPass2Shader::TU_Albedo;
+
+    void InstancedObjectPass2Shader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
+        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        TU_Albedo = 3;
+
+        glUseProgram(Program);
+        glUniform1i(uniform_DiffuseMap, 0);
+        glUniform1i(uniform_SpecularMap, 1);
+        glUniform1i(uniform_SSAO, 2);
+        glUniform1i(uniform_Albedo, TU_Albedo);
+        glUseProgram(0);
+    }
+
+    void InstancedObjectPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
+    {
+        glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
+        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
+    }
 
 	GLuint DetailledObjectPass2Shader::Program;
 	GLuint DetailledObjectPass2Shader::attrib_position;
@@ -797,6 +914,57 @@ namespace MeshShader
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 		glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
 	}
+
+    GLuint InstancedGrassPass2Shader::Program;
+    GLuint InstancedGrassPass2Shader::attrib_position;
+    GLuint InstancedGrassPass2Shader::attrib_texcoord;
+    GLuint InstancedGrassPass2Shader::attrib_color;
+    GLuint InstancedGrassPass2Shader::attrib_origin;
+    GLuint InstancedGrassPass2Shader::attrib_orientation;
+    GLuint InstancedGrassPass2Shader::uniform_VP;
+    GLuint InstancedGrassPass2Shader::uniform_screen;
+    GLuint InstancedGrassPass2Shader::uniform_ambient;
+    GLuint InstancedGrassPass2Shader::uniform_windDir;
+    GLuint InstancedGrassPass2Shader::TU_Albedo;
+
+    void InstancedGrassPass2Shader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_color = glGetAttribLocation(Program, "Color");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        uniform_windDir = glGetUniformLocation(Program, "windDir");
+        TU_Albedo = 3;
+
+        glUseProgram(Program);
+        glUniform1i(uniform_DiffuseMap, 0);
+        glUniform1i(uniform_SpecularMap, 1);
+        glUniform1i(uniform_SSAO, 2);
+        glUniform1i(uniform_Albedo, TU_Albedo);
+        glUseProgram(0);
+    }
+
+    void InstancedGrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection)
+    {
+        glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
+        glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
+    }
 
 	GLuint SphereMapShader::Program;
 	GLuint SphereMapShader::attrib_position;
