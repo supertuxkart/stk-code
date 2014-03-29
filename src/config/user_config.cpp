@@ -692,7 +692,7 @@ bool UserConfig::loadConfig()
                    "Could not read user config file '%s'.", filename.c_str());
         if(root) delete root;
         // Create a default config file - just in case that stk crashes later
-        // there is a config file that can be modified (to e.g. disable 
+        // there is a config file that can be modified (to e.g. disable
         // shaders)
         saveConfig();
         return false;
@@ -703,7 +703,7 @@ bool UserConfig::loadConfig()
     if(root->get("version", &config_file_version) < 1)
     {
         GUIEngine::showMessage( _("Your config file was malformed, so it was deleted and a new one will be created."), 10.0f);
-        Log::error("UserConfig", 
+        Log::error("UserConfig",
                    "Warning, malformed user config file! Contains no version");
     }
     if (config_file_version < m_current_config_version)

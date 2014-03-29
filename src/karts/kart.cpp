@@ -355,7 +355,7 @@ void Kart::reset()
 
     // In case that the kart was in the air, in which case its
     // linear damping is 0
-    if(m_body) 
+    if(m_body)
         m_body->setDamping(m_kart_properties->getChassisLinearDamping(),
                            m_kart_properties->getChassisAngularDamping() );
 
@@ -894,15 +894,15 @@ void Kart::collectedItem(Item *item, int add_info)
             break;
         }
     case Item::ITEM_BUBBLEGUM:
-        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL && 
+        m_has_caught_nolok_bubblegum = (item->getEmitter() != NULL &&
                                     item->getEmitter()->getIdent() == "nolok");
 
         // slow down
         m_bubblegum_time = m_kart_properties->getBubblegumTime();
-        m_bubblegum_torque = (rand()%2) 
+        m_bubblegum_torque = (rand()%2)
                            ?  m_kart_properties->getBubblegumTorque()
                            : -m_kart_properties->getBubblegumTorque();
-        m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE, 
+        m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction(),
                                  m_kart_properties->getBubblegumFadeInTime(),
                                  m_bubblegum_time);
@@ -1107,7 +1107,7 @@ void Kart::update(float dt)
         // When really on air, free fly, when near ground, try to glide /
         // adjust for landing. If zipped, be stable, so ramp+zipper can
         // allow nice jumps without scripting the fly
-        // Also disable he upright constraint when gravity is changed by 
+        // Also disable he upright constraint when gravity is changed by
         // the terrain
         if( (!isNearGround() &&
               m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f ) ||
@@ -1182,13 +1182,13 @@ void Kart::update(float dt)
     m_skid_sound->position   ( getXYZ() );
     m_boing_sound->position  ( getXYZ() );
 
-    // Check if a kart is (nearly) upside down and not moving much --> 
+    // Check if a kart is (nearly) upside down and not moving much -->
     // automatic rescue
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
-    // gravity (which can 
+    // gravity (which can
     if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
-        (!m_terrain_info->getMaterial() || 
+        (!m_terrain_info->getMaterial() ||
          !m_terrain_info->getMaterial()->hasGravity())          &&
         !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD &&
                               fabs(getSpeed())<3.0f                )
@@ -1244,7 +1244,7 @@ void Kart::update(float dt)
             float g = World::getWorld()->getTrack()->getGravity();
             Vec3 gravity(0.0f, -g, 0.0f);
             btRigidBody *body = getVehicle()->getRigidBody();
-            // If the material should overwrite the gravity, 
+            // If the material should overwrite the gravity,
             if (material->hasGravity())
             {
                 Vec3 normal = m_terrain_info->getNormal();
@@ -1339,7 +1339,7 @@ void Kart::update(float dt)
     {
         // Kart touched ground again
         m_is_jumping = false;
-        HitEffect *effect =  new Explosion(getXYZ(), "jump", 
+        HitEffect *effect =  new Explosion(getXYZ(), "jump",
                                           "jump_explosion.xml");
         projectile_manager->addHitEffect(effect);
         m_kart_model->setAnimation(KartModel::AF_DEFAULT);
@@ -1359,7 +1359,7 @@ void Kart::update(float dt)
     if(!m_shadow_enabled && isOnGround() && !emergency)
     {
         m_shadow->enableShadow();
-        m_shadow_enabled = true;  
+        m_shadow_enabled = true;
     }
 }   // update
 
@@ -1394,7 +1394,7 @@ void Kart::setSquash(float time, float slowdown)
         return;
     }
     m_node->setScale(core::vector3df(1.0f, 0.5f, 1.0f));
-    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown, 
+    m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_SQUASH, slowdown,
                              0.1f, time);
     m_squash_time  = time;
 }   // setSquash
@@ -1459,13 +1459,13 @@ void Kart::handleMaterialSFX(const Material *material)
         m_previous_terrain_sound = NULL;
     }
     
-    bool m_schedule_pause = m_flying || 
+    bool m_schedule_pause = m_flying ||
                         dynamic_cast<RescueAnimation*>(getKartAnimation()) ||
                         dynamic_cast<ExplosionAnimation*>(getKartAnimation());
 
     // terrain sound is not necessarily a looping sound so check its status before
     // setting its speed, to avoid 'ressuscitating' sounds that had already stopped
-    if(m_terrain_sound && 
+    if(m_terrain_sound &&
       (m_terrain_sound->getStatus()==SFXManager::SFX_PLAYING ||
        m_terrain_sound->getStatus()==SFXManager::SFX_PAUSED))
     {
@@ -2411,10 +2411,10 @@ void Kart::applyEngineForce(float force)
 void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
                           const btQuaternion& rotation)
 {
-    // Upate particle effects (creation rate, and emitter size 
+    // Upate particle effects (creation rate, and emitter size
     // depending on speed)
     // --------------------------------------------------------
-    if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) && 
+    if ( (m_controls.m_nitro || m_min_nitro_time > 0.0f) &&
          isOnGround() &&  m_collected_energy > 0            )
     {
         // fabs(speed) is important, otherwise the negative number will
@@ -2500,7 +2500,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     }
 
     // Now determine graphical chassis and wheel position depending on
-    // the physics result. The center of gravity of the chassis is at the 
+    // the physics result. The center of gravity of the chassis is at the
     // bottom of the chassis, but the position of the graphical chassis is at
     // the bottom of the wheels (i.e. in blender the kart is positioned on
     // the horizonal plane through (0,0,0)). So first determine how far
@@ -2514,7 +2514,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        height_above_terrain[i] = 
+        height_above_terrain[i] =
             (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
              - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
             - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
@@ -2531,7 +2531,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
             height_above_terrain[i] -= chassis_delta;
     }
 
-    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(), 
+    m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(),
                         height_above_terrain, m_speed);
 
 
@@ -2541,7 +2541,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
 
     Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
 
-    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height 
+    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height
                        - m_kart_model->getLowestPoint() -chassis_delta    );
     float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
@@ -2595,7 +2595,7 @@ void Kart::setOnScreenText(const wchar_t *text)
     // FIXME: Titlefont is the only font guaranteed to be loaded if STK
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
-	// TODO: Add support in the engine for BillboardText or find a replacement
+    // TODO: Add support in the engine for BillboardText or find a replacement
     /*scene::ISceneManager* sm = irr_driver->getSceneManager();
     sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
                                                   : GUIEngine::getTitleFont(),

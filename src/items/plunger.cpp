@@ -3,7 +3,7 @@
 //  Copyright (C) 2007-2013 Joerg Henrichs
 //
 //  Physics improvements and linear intersection algorithm by
-//  Copyright (C) 2009-2013 David Mikos. 
+//  Copyright (C) 2009-2013 David Mikos.
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License

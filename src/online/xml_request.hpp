@@ -68,7 +68,7 @@ namespace Online
         }   // getXMLData
 
         // ------------------------------------------------------------------------
-        /** Returns the additional information (or error message) contained in 
+        /** Returns the additional information (or error message) contained in
          *  a finished request.
         * \pre request had to be executed.
         * \return get the info from the request reply
@@ -83,10 +83,10 @@ namespace Online
         /** Returns whether the request was successfully executed on the server.
          * \pre request had to be executed.
          * \return whether or not the request was a success. */
-        bool isSuccess() const 
+        bool isSuccess() const
         {
             assert(hasBeenExecuted());
-            return m_success; 
+            return m_success;
         }   // isSuccess
 
     };   // class XMLRequest

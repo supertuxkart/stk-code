@@ -29,7 +29,7 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-MessageDialog::MessageDialog(const irr::core::stringw &msg, MessageDialogType type, 
+MessageDialog::MessageDialog(const irr::core::stringw &msg, MessageDialogType type,
                              IConfirmDialogListener* listener, bool own_listener) :
     ModalDialog(0.6f, 0.6f)
 {

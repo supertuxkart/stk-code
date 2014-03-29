@@ -340,7 +340,7 @@ void RaceManager::startNew(bool from_overworld)
     }
 
     m_track_number = 0;
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && 
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX &&
         !NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // offline mode only
     {
         //We look if Player 1 has a saved version of this GP.
@@ -752,7 +752,7 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld, 
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
                           bool continue_saved_gp)
 {
     assert(gp != NULL);

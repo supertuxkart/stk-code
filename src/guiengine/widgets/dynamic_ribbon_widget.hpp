@@ -39,7 +39,7 @@ namespace GUIEngine
     {
     public:
         virtual ~DynamicRibbonHoverListener() {}
-        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget, 
+        virtual void onSelectionChanged(DynamicRibbonWidget* theWidget,
                                        const std::string& selectionID,
                                        const irr::core::stringw& selectionText,
                                        const int playerID) = 0;
@@ -62,7 +62,7 @@ namespace GUIEngine
         unsigned int m_badges;
     };
     
-    /** 
+    /**
       * \brief An extended version of RibbonWidget, with more capabilities.
       * A dynamic ribbon builds upon RibbonWidget, adding dynamic contents creation and sizing,
       * scrolling, multiple-row layouts.
@@ -221,7 +221,7 @@ namespace GUIEngine
             'updateItemDisplay' to update the display. */
         void clearItems();
         
-        /** 
+        /**
           * \brief Register a listener to be notified of selection changes within the ribbon.
           * \note  The ribbon takes ownership of this listener and will delete it.
           * \note  The listener will be deleted upon leaving the screen, so you will likely
@@ -248,7 +248,7 @@ namespace GUIEngine
         /** Returns a read-only list of items added to this ribbon */
         const std::vector<ItemDescription>& getItems() const { return m_items; }
         
-        /** 
+        /**
           * \brief Select an item from its numerical ID. Only for [1-row] combo ribbons.
           *
           * \param  item_id In range [0 .. number of items added through 'addItem' - 1]
@@ -261,8 +261,8 @@ namespace GUIEngine
           *
           * \return Whether setting the selection was successful (whether the item exists)
           */
-        bool setSelection(const std::string &item_codename, 
-                          const int playerID, const bool focusIt, 
+        bool setSelection(const std::string &item_codename,
+                          const int playerID, const bool focusIt,
                           bool evenIfDeactivated=false);
         
         /** \brief Callback from parent class Widget. */

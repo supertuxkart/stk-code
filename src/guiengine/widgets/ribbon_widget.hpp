@@ -42,8 +42,8 @@ namespace GUIEngine
     /** \brief A static text/icons/tabs bar widget.
       * The contents of this ribbon are static.
       * \ingroup widgetsgroup
-      * \note items you add to a list are kept after the the ribbon was in 
-      *       is removed (i.e. you don't need to add items everytime the 
+      * \note items you add to a list are kept after the the ribbon was in
+      *       is removed (i.e. you don't need to add items everytime the
       *       screen is shown, only upon loading)
       */
     class RibbonWidget : public Widget
@@ -54,7 +54,7 @@ namespace GUIEngine
         public:
             virtual ~IRibbonListener(){}
             virtual void onRibbonWidgetScroll(const int delta_x) = 0;
-            virtual void onRibbonWidgetFocus(RibbonWidget* emitter, 
+            virtual void onRibbonWidgetFocus(RibbonWidget* emitter,
                                              const int playerID) = 0;
             virtual void onSelectionChange() = 0;
         };
@@ -68,17 +68,17 @@ namespace GUIEngine
         /** The type of this ribbon (toolbar, combo, tabs) */
         RibbonType m_ribbon_type;
                 
-        /** Each item within the ribbon holds a flag saying whether it is 
-         *  selected or not. This method updates the flag in all of this 
+        /** Each item within the ribbon holds a flag saying whether it is
+         *  selected or not. This method updates the flag in all of this
          *  ribbon's children. Called everytime selection changes.*/
         void updateSelection();
         
         /** Callbacks */
         virtual EventPropagation rightPressed(const int playerID=0);
         virtual EventPropagation leftPressed(const int playerID=0);
-        virtual EventPropagation mouseHovered(Widget* child, 
+        virtual EventPropagation mouseHovered(Widget* child,
                                               const int playerID);
-        virtual EventPropagation transmitEvent(Widget* w, 
+        virtual EventPropagation transmitEvent(Widget* w,
                                                const std::string& originator,
                                                const int playerID=0);
         virtual EventPropagation focused(const int playerID);
@@ -93,15 +93,15 @@ namespace GUIEngine
         
         LEAK_CHECK()
         
-        /** Internal identifier of filler items that are added in a ribbon 
-         *  widget to filllines when the number of items cannot be divided 
-         *  by the number of rows in the grid (mostly used by dynamic ribbon 
+        /** Internal identifier of filler items that are added in a ribbon
+         *  widget to filllines when the number of items cannot be divided
+         *  by the number of rows in the grid (mostly used by dynamic ribbon
          *  widgets, but the base ribbon needs to know about filler items)
          */
         static const char NO_ITEM_ID[];
         
         /** Contains which element within the ribbon is currently focused by
-         *  player 0 (used by the skin to show mouse hovers over items that 
+         *  player 0 (used by the skin to show mouse hovers over items that
          *  are not selected). Only used for COMBO and TAB ribbons. */
         Widget* m_mouse_focus;
         
@@ -112,21 +112,21 @@ namespace GUIEngine
 
         /** Sets a listener that will be notified of changes on this ribbon.
          *  Does _not_ take ownership of the listener, i.e. will not delete it.
-         *  You may call this with the listener parameter set to NULL to 
+         *  You may call this with the listener parameter set to NULL to
          *  remove the listener. */
         void setListener(IRibbonListener* listener) { m_listener = listener; }
         // --------------------------------------------------------------------
-        /** Returns the type of this ribbon (see the GUI module overview page 
+        /** Returns the type of this ribbon (see the GUI module overview page
          *  for detailed descriptions) */
         RibbonType getRibbonType() const { return m_ribbon_type; }
         // --------------------------------------------------------------------
         /** Returns the numerical ID of the selected item within the ribbon */
-        int getSelection(const int playerID) const 
+        int getSelection(const int playerID) const
                                               { return m_selection[playerID]; }
-        // --------------------------------------------------------------------        
+        // --------------------------------------------------------------------
         /** Returns the string ID (internal name) of the selection */
         const std::string& getSelectionIDString(const int playerID);
-        // --------------------------------------------------------------------        
+        // --------------------------------------------------------------------
         /** Returns the user-visible text of the selection */
         irr::core::stringw getSelectionText(const int playerID)
         {
@@ -134,10 +134,10 @@ namespace GUIEngine
             if (selection < 0 || selection >= int(m_children.size())) return "";
             return m_children[selection].m_text;
         }
-        // --------------------------------------------------------------------        
+        // --------------------------------------------------------------------
 
         /** Sets the ID of the selected item within the ribbon */
-        void setSelection(const int i, const int playerID) 
+        void setSelection(const int i, const int playerID)
                              { m_selection[playerID] = i; updateSelection(); }
         
         /** Select an item in the ribbon by its internal name */
@@ -159,9 +159,9 @@ namespace GUIEngine
         GUIEngine::Widget * findWidgetNamed(const char* interalName);
 
         /** \brief Dynamically (at runtime) add a text item to this ribbon
-          * \pre This must be called before RibbonWidget::add, while the 
+          * \pre This must be called before RibbonWidget::add, while the
           *      widget is not yet displayed
-          * \pre only valid for ribbons that take text-only contents 
+          * \pre only valid for ribbons that take text-only contents
           *       (e.g. tab bars)
           */
         void addTextChild(const wchar_t* text, const std::string id);

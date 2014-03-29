@@ -32,11 +32,11 @@
 
 namespace Online
 {
-    /** Creates a HTTP(S) request that will have a raw string as result. (Can 
+    /** Creates a HTTP(S) request that will have a raw string as result. (Can
      *  of course be used if the result doesn't matter.)
      *  \param manage_memory whether or not the RequestManager should take care of
      *         deleting the object after all callbacks have been done.
-     *  \param priority by what priority should the RequestManager take care of 
+     *  \param priority by what priority should the RequestManager take care of
      *         this request.
      */
     HTTPRequest::HTTPRequest(bool manage_memory, int priority)
@@ -50,15 +50,15 @@ namespace Online
      *  \param filename Name of the file to save the data to.
      *  \param manage_memory whether or not the RequestManager should take care of
      *         deleting the object after all callbacks have been done.
-     *  \param priority by what priority should the RequestManager take care of 
+     *  \param priority by what priority should the RequestManager take care of
      *         this request.
      */
-    HTTPRequest::HTTPRequest(const std::string &filename, bool manage_memory, 
+    HTTPRequest::HTTPRequest(const std::string &filename, bool manage_memory,
                                        int priority)
                : Request(manage_memory, priority, 0)
     {
         // A http request should not even be created when internet is disabled
-        assert(UserConfigParams::m_internet_status == 
+        assert(UserConfigParams::m_internet_status ==
                RequestManager::IPERM_ALLOWED);
         assert(filename.size()>0);
         init();
@@ -69,12 +69,12 @@ namespace Online
     /** Char * needs a separate constructor, otherwise it will be considered
      *  to be the no-filename constructor (char* -> bool).
      */
-    HTTPRequest::HTTPRequest(const char* const filename, bool manage_memory, 
+    HTTPRequest::HTTPRequest(const char* const filename, bool manage_memory,
                                        int priority)
                : Request(manage_memory, priority, 0)
     {
         // A http request should not even be created when internet is disabled
-        assert(UserConfigParams::m_internet_status == 
+        assert(UserConfigParams::m_internet_status ==
                RequestManager::IPERM_ALLOWED);
         init();
         m_filename = file_manager->getAddonsFile(filename);
@@ -94,7 +94,7 @@ namespace Online
     }   // init
 
     // ------------------------------------------------------------------------
-    /** A handy shortcut that appends the given path to the URL of the 
+    /** A handy shortcut that appends the given path to the URL of the
      *  mutiplayer server.
      *  \param path The path to add to the server.
      */
@@ -151,7 +151,7 @@ namespace Online
             struct curl_slist *chunk = NULL;
             chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
             curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
-            curl_easy_setopt(m_curl_session, CURLOPT_CAINFO, 
+            curl_easy_setopt(m_curl_session, CURLOPT_CAINFO,
                 file_manager->getAsset("web.tuxfamily.org.pem").c_str());
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYPEER, 1L);
             curl_easy_setopt(m_curl_session, CURLOPT_SSL_VERIFYHOST, 0L);
@@ -183,13 +183,13 @@ namespace Online
         }
         else
         {
-            curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA, 
+            curl_easy_setopt(m_curl_session, CURLOPT_WRITEDATA,
                              &m_string_buffer);
-            curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION, 
+            curl_easy_setopt(m_curl_session, CURLOPT_WRITEFUNCTION,
                              &HTTPRequest::writeCallback);
         }
 
-        // All parameters added have a '&' added 
+        // All parameters added have a '&' added
         if(m_parameters.size()>0)
         {
             m_parameters.erase(m_parameters.size()-1);
@@ -254,7 +254,7 @@ namespace Online
                                "Could not removed existing addons.xml file.");
                     m_curl_code = CURLE_WRITE_ERROR;
                 }
-                int ret = rename((m_filename+".part").c_str(), 
+                int ret = rename((m_filename+".part").c_str(),
                                  m_filename.c_str()           );
                 // In case of an error, set the status to indicate this
                 if(ret!=0)
@@ -268,7 +268,7 @@ namespace Online
     }   // operation
 
     // ------------------------------------------------------------------------
-    /** Cleanup once the download is finished. The value of progress is 
+    /** Cleanup once the download is finished. The value of progress is
      *  guaranteed to be >=0 and <1 while the download is in progress, and
      *  will only be set to 1 on a successfull finish here.
      */

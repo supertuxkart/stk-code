@@ -62,7 +62,7 @@ public :
     void onRaceEnd();
     void onLapEnd();
     // ------------------------------------------------------------------------
-    const std::map<uint32_t, Achievement *>& getAllAchievements() 
+    const std::map<uint32_t, Achievement *>& getAllAchievements()
     {
         return m_achievements;
     }

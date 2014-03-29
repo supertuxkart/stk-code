@@ -80,7 +80,7 @@ public:
     // ------------------------------------------------------------------------
     virtual bool raceHasLaps() OVERRIDE { return false; }
     // ------------------------------------------------------------------------
-    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE 
+    virtual unsigned int getNumberOfRescuePositions() const OVERRIDE
     {
         return 0;
     }   // getNumberOfRescuePositions

@@ -35,7 +35,7 @@ using namespace Online;
 namespace Online
 {
 
-OnlineProfile::RelationInfo::RelationInfo(const irr::core::stringw & date, 
+OnlineProfile::RelationInfo::RelationInfo(const irr::core::stringw & date,
                                     bool is_online, bool is_pending,
                                     bool is_asker)
 {
@@ -319,9 +319,9 @@ void OnlineProfile::merge(OnlineProfile *profile)
     if (this->m_relation_info == NULL && profile->m_relation_info != NULL)
     {
         this->m_relation_info = profile->m_relation_info;
-        // We don't want the destructor of the profile instance to destroy 
+        // We don't want the destructor of the profile instance to destroy
         // the relation info
-        profile->m_relation_info = NULL; 
+        profile->m_relation_info = NULL;
     }
     delete profile;
 }   // merge

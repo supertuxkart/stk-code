@@ -795,7 +795,7 @@ namespace GUIEngine
         return Private::small_font_height;
     }   // getSmallFontHeight
  
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     int getLargeFontHeight()
    {
 

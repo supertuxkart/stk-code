@@ -44,7 +44,7 @@ class EndController : public AIBaseController
 {
 private:
     /** Stores the type of the previous controller. This is necessary so that
-     *  after the end of race ths kart (and its results) can still be 
+     *  after the end of race ths kart (and its results) can still be
      *  identified to be from a player kart. */
     bool  m_was_player_controller;
 
@@ -66,7 +66,7 @@ private:
     /** Stores a pointer to the original controller. */
     Controller *m_previous_controller;
 
-    /** For debugging purpose: a sphere indicating where the AI 
+    /** For debugging purpose: a sphere indicating where the AI
      *  is targeting at. */
     irr::scene::ISceneNode *m_debug_sphere;
 
@@ -81,13 +81,13 @@ private:
     void         findNonCrashingPoint(Vec3 *result);
     int          calcSteps();
 public:
-                 EndController(AbstractKart *kart, 
-                               StateManager::ActivePlayer* player, 
+                 EndController(AbstractKart *kart,
+                               StateManager::ActivePlayer* player,
                                Controller *prev_controller);
                 ~EndController();
     virtual void update      (float delta) ;
     virtual void reset       ();
-    /** Returns if the original controller of the kart was a player 
+    /** Returns if the original controller of the kart was a player
      *  controller. This way e.g. highscores can still be assigned
      *  to the right player. */
     virtual bool isPlayerController () const {return m_player!=NULL;}
