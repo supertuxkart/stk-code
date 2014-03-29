@@ -91,7 +91,7 @@ void CheckGoal::trigger(unsigned int kart_index)
     SoccerWorld* world = dynamic_cast<SoccerWorld*>(World::getWorld());
     if(!world)
     {
-        Log::warn("CheckGoal",
+        Log::warn("CheckGoal", 
                   "No soccer world found, cannot count the points.");
         return;
     }

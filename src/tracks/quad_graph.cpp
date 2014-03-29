@@ -638,7 +638,7 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
  *  distance from start.
  *  \param indx Index of the node for which to increase the distance.
  *  \param delta Amount by which to increase the distance.
- *  \param recursive_count Counts how often this function was called
+ *  \param recursive_count Counts how often this function was called 
  *         recursively in order to catch incorrect graphs that contain loops.
  */
 void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
@@ -669,7 +669,7 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
         if(g.getDistanceFromStart()+g.getDistanceToSuccessor(i) >
             g_next.getDistanceFromStart())
         {
-            updateDistancesForAllSuccessors(g.getSuccessor(i), delta,
+            updateDistancesForAllSuccessors(g.getSuccessor(i), delta, 
                                             recursive_count);
         }
     }

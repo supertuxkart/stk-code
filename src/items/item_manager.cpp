@@ -67,7 +67,7 @@ void ItemManager::destroy()
 void ItemManager::loadDefaultItemMeshes()
 {
     m_item_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);
-    m_glow_color.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1,
+    m_glow_color.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, 
                         video::SColorf(255.0f, 255.0f, 255.0f) );
 
     m_item_lowres_mesh.resize(Item::ITEM_LAST-Item::ITEM_FIRST+1, NULL);

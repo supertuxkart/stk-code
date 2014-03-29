@@ -35,7 +35,7 @@ class XMLNode;
  *  storage for state information by a generic key-value mapping. The values
  *  are stored as strings, but can be used to store numerical values. E.g.
  *  you can call increase("key", 10) for an achievement, which will convert
- *  the string to int, add 10, then convert the result back to string for
+ *  the string to int, add 10, then convert the result back to string for 
  *  storage.
  * \ingroup achievements
  */
@@ -69,7 +69,7 @@ public:
 
     virtual void reset();
     virtual irr::core::stringw getProgressAsString() const;
-    void onRaceEnd();
+    void onRaceEnd(); 
     void onLapEnd();
     // ------------------------------------------------------------------------
     /** Returns the id of this achievement. */

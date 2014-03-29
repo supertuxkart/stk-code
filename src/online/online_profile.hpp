@@ -55,7 +55,7 @@ public:
         bool m_is_asker;
         irr::core::stringw m_date;
     public:
-        RelationInfo(const irr::core::stringw & date, bool is_online,
+        RelationInfo(const irr::core::stringw & date, bool is_online, 
                      bool is_pending, bool is_asker = false);
         void setOnline(bool online);
         // --------------------------------------------------------------------
@@ -91,7 +91,7 @@ private:
     bool                            m_has_fetched_friends;
 
     /** List of user id's that are friends with the user of this profile.
-     * In case this profile is of the current user, this list also contains
+     * In case this profile is of the current user, this list also contains 
      * any id's of users that still have a friend request pending. */
     std::vector<uint32_t>           m_friends;
 
@@ -139,7 +139,7 @@ public:
     // ------------------------------------------------------------------------
     void setRelationInfo(RelationInfo * r)
     {
-        delete m_relation_info; m_relation_info = r;
+        delete m_relation_info; m_relation_info = r; 
     }   // setRelationInfo
     // ------------------------------------------------------------------------
     /** Sets the cache bit of this profile. Used by the cache eviction

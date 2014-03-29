@@ -88,9 +88,9 @@ KartProperties::KartProperties(const std::string &filename)
         m_rescue_time = m_rescue_height = m_explosion_time =
         m_explosion_radius = m_max_lean = m_lean_speed =
         m_swatter_distance2 = m_swatter_duration = m_squash_slowdown =
-        m_squash_duration = m_downward_impulse_factor =
+        m_squash_duration = m_downward_impulse_factor = 
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
-        m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
+        m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time = 
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -564,7 +564,7 @@ void KartProperties::getAllData(const XMLNode * root)
             {
                 m_engine_sfx_type = s;
             }
-            else
+            else 
             {
                 Log::error("[KartProperties]",
                            "Kart '%s' has an invalid engine '%s'.",

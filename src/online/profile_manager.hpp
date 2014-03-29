@@ -32,12 +32,12 @@ namespace Online
 
     class OnlineProfile;
 
-/** Class that manages all online profiles. Profiles are used for storing
+/** Class that manages all online profiles. Profiles are used for storing 
  *  online information from local users, but also to store information about
  *  remote users (e.g. if you want to see the achievements of another user
  *  a Profile for this user is created, the server is then queried for
  *  the information and the result is stored in that profile).
- *  The profile manager has two
+ *  The profile manager has two 
  * \ingroup online.
  */
 class ProfileManager
@@ -58,7 +58,7 @@ private:
     ProfilesMap m_profiles_persistent;
 
     /** Any profiles that don't go into the persistent map, go here. This
-     *  uses a pseudo-LRU algorithm with age bits to remove entries when
+     *  uses a pseudo-LRU algorithm with age bits to remove entries when 
      *  the max size is reached. */
     ProfilesMap  m_profiles_cache;
 
@@ -66,7 +66,7 @@ private:
      *  e.g. its data is shown in a gui. */
     OnlineProfile* m_currently_visiting;
 
-    /** The max size of the m_profiles cache. Its default size can be
+    /** The max size of the m_profiles cache. Its default size can be 
      *  inrceased when necessary (e.g. when too many search results are
      *  loaded, to make sure they can be all stored). */
     unsigned int  m_max_cache_size;

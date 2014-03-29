@@ -76,99 +76,99 @@ THE SOFTWARE.
 */
 
 static inline float mod289(float x) {
-//    return x - floorf(x * (1.0 / 289.0)) * 289.0;
-    return fmodf(x, 289);
+//	return x - floorf(x * (1.0 / 289.0)) * 289.0;
+	return fmodf(x, 289);
 }
 
 static inline float permute(float x) {
-    return mod289(((x*34.0f)+1.0f)*x);
+	return mod289(((x*34.0f)+1.0f)*x);
 }
 
 // Vectorized 2d simplex noise.
 float noise2d(float v1, float v2) {
 
-    const float C[] = {
-        0.211324865405187f,
-        0.366025403784439f,
-        -0.577350269189626f,
-        0.024390243902439f };
+	const float C[] = {
+		0.211324865405187f,
+		0.366025403784439f,
+		-0.577350269189626f,
+		0.024390243902439f };
 
-    // First corner
-    float i[2];
-    i[0] = floorf(v1 + v1*C[1] + v2*C[1]);
-    i[1] = floorf(v2 + v1*C[1] + v2*C[1]);
+	// First corner
+	float i[2];
+	i[0] = floorf(v1 + v1*C[1] + v2*C[1]);
+	i[1] = floorf(v2 + v1*C[1] + v2*C[1]);
 
-    float x0[2];
-    x0[0] = v1 - i[0] + i[0]*C[0] + i[1]*C[0];
-    x0[1] = v2 - i[1] + i[0]*C[0] + i[1]*C[0];
+	float x0[2];
+	x0[0] = v1 - i[0] + i[0]*C[0] + i[1]*C[0];
+	x0[1] = v2 - i[1] + i[0]*C[0] + i[1]*C[0];
 
-    // Other corners
-    float i1[2];
-    if (x0[0] > x0[1]) {
-        i1[0] = 1;
-        i1[1] = 0;
-    } else {
-        i1[0] = 0;
-        i1[1] = 1;
-    }
+	// Other corners
+	float i1[2];
+	if (x0[0] > x0[1]) {
+		i1[0] = 1;
+		i1[1] = 0;
+	} else {
+		i1[0] = 0;
+		i1[1] = 1;
+	}
 
-    float x12[4];
-    x12[0] = x0[0] + C[0] - i1[0];
-    x12[1] = x0[1] + C[0] - i1[1];
-    x12[2] = x0[0] + C[2];
-    x12[3] = x0[1] + C[2];
+	float x12[4];
+	x12[0] = x0[0] + C[0] - i1[0];
+	x12[1] = x0[1] + C[0] - i1[1];
+	x12[2] = x0[0] + C[2];
+	x12[3] = x0[1] + C[2];
 
-    // Permutations
-    i[0] = mod289(i[0]);
-    i[1] = mod289(i[1]);
+	// Permutations
+	i[0] = mod289(i[0]);
+	i[1] = mod289(i[1]);
 
-    float p[3];
-    p[0] = permute(permute(i[1]) + i[0]);
-    p[1] = permute(permute(i[1] + i1[1]) + i[0] + i1[0]);
-    p[2] = permute(permute(i[1] + 1) + i[0] + 1);
+	float p[3];
+	p[0] = permute(permute(i[1]) + i[0]);
+	p[1] = permute(permute(i[1] + i1[1]) + i[0] + i1[0]);
+	p[2] = permute(permute(i[1] + 1) + i[0] + 1);
 
-    float m[3];
-    m[0] = std::max<float>(0.5f - x0[0]*x0[0] - x0[1]*x0[1], 0);
-    m[1] = std::max<float>(0.5f - x12[0]*x12[0] - x12[1]*x12[1], 0);
-    m[2] = std::max<float>(0.5f - x12[2]*x12[2] - x12[3]*x12[3], 0);
+	float m[3];
+	m[0] = std::max<float>(0.5f - x0[0]*x0[0] - x0[1]*x0[1], 0);
+	m[1] = std::max<float>(0.5f - x12[0]*x12[0] - x12[1]*x12[1], 0);
+	m[2] = std::max<float>(0.5f - x12[2]*x12[2] - x12[3]*x12[3], 0);
 
-    m[0] = m[0] * m[0] * m[0] * m[0];
-    m[1] = m[1] * m[1] * m[1] * m[1];
-    m[2] = m[2] * m[2] * m[2] * m[2];
+	m[0] = m[0] * m[0] * m[0] * m[0];
+	m[1] = m[1] * m[1] * m[1] * m[1];
+	m[2] = m[2] * m[2] * m[2] * m[2];
 
-    // Gradients
-    float tmp;
+	// Gradients
+	float tmp;
 
-    float x[3];
-    x[0] = 2 * modff(p[0] * C[3], &tmp) - 1;
-    x[1] = 2 * modff(p[1] * C[3], &tmp) - 1;
-    x[2] = 2 * modff(p[2] * C[3], &tmp) - 1;
+	float x[3];
+	x[0] = 2 * modff(p[0] * C[3], &tmp) - 1;
+	x[1] = 2 * modff(p[1] * C[3], &tmp) - 1;
+	x[2] = 2 * modff(p[2] * C[3], &tmp) - 1;
 
-    float h[3];
-    h[0] = fabsf(x[0]) - 0.5f;
-    h[1] = fabsf(x[1]) - 0.5f;
-    h[2] = fabsf(x[2]) - 0.5f;
+	float h[3];
+	h[0] = fabsf(x[0]) - 0.5f;
+	h[1] = fabsf(x[1]) - 0.5f;
+	h[2] = fabsf(x[2]) - 0.5f;
 
-    float ox[3];
-    ox[0] = floorf(x[0] + 0.5f);
-    ox[1] = floorf(x[1] + 0.5f);
-    ox[2] = floorf(x[2] + 0.5f);
+	float ox[3];
+	ox[0] = floorf(x[0] + 0.5f);
+	ox[1] = floorf(x[1] + 0.5f);
+	ox[2] = floorf(x[2] + 0.5f);
 
-    float a0[3];
-    a0[0] = x[0] - ox[0];
-    a0[1] = x[1] - ox[1];
-    a0[2] = x[2] - ox[2];
+	float a0[3];
+	a0[0] = x[0] - ox[0];
+	a0[1] = x[1] - ox[1];
+	a0[2] = x[2] - ox[2];
 
-    // Normalize
-    m[0] *= 1.79284291400159f - 0.85373472095314f * (a0[0]*a0[0] + h[0]*h[0]);
-    m[1] *= 1.79284291400159f - 0.85373472095314f * (a0[1]*a0[1] + h[1]*h[1]);
-    m[2] *= 1.79284291400159f - 0.85373472095314f * (a0[2]*a0[2] + h[2]*h[2]);
+	// Normalize
+	m[0] *= 1.79284291400159f - 0.85373472095314f * (a0[0]*a0[0] + h[0]*h[0]);
+	m[1] *= 1.79284291400159f - 0.85373472095314f * (a0[1]*a0[1] + h[1]*h[1]);
+	m[2] *= 1.79284291400159f - 0.85373472095314f * (a0[2]*a0[2] + h[2]*h[2]);
 
-    // Compute final value
-    float g[3];
-    g[0] = a0[0] * x0[0] + h[0] * x0[1];
-    g[1] = a0[1] * x12[0] + h[1] * x12[1];
-    g[2] = a0[2] * x12[2] + h[2] * x12[3];
+	// Compute final value
+	float g[3];
+	g[0] = a0[0] * x0[0] + h[0] * x0[1];
+	g[1] = a0[1] * x12[0] + h[1] * x12[1];
+	g[2] = a0[2] * x12[2] + h[2] * x12[3];
 
-    return 130 * (m[0] * g[0] + m[1] * g[1] + m[2] * g[2]);
+	return 130 * (m[0] * g[0] + m[1] * g[1] + m[2] * g[2]);
 }

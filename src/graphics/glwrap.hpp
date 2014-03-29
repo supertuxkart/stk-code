@@ -156,9 +156,9 @@ void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>
     const irr::video::SColor &color, bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
-    const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
-    const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
+	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
+	const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
 
 void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
-    const irr::core::rect<s32>* clip = 0);
+	const irr::core::rect<s32>* clip = 0);
 #endif

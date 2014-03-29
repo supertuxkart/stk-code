@@ -96,31 +96,31 @@ void addPowerup(PowerupManager::PowerupType powerup)
 
 void addAttachment(Attachment::AttachmentType type)
 {
-    World* world = World::getWorld();
-        if (world == NULL) return;
-        for(unsigned int i = 0; i < world->getNumKarts(); i++)
-        {
-        AbstractKart *kart = world->getKart(i);
-        if (kart->getController()->isPlayerController()) {
-            if (type == Attachment::ATTACH_ANVIL)
-            {
-                kart->getAttachment()
-                    ->set(type, stk_config->m_anvil_time);
-                kart->adjustSpeed(stk_config->m_anvil_speed_factor);
-                kart->updateWeight();
-            }
-            else if (type == Attachment::ATTACH_PARACHUTE)
-            {
-                kart->getAttachment()
-                        ->set(type, stk_config->m_parachute_time);
-            }
-            else if (type == Attachment::ATTACH_BOMB)
-            {
-                kart->getAttachment()
-                        ->set(type, stk_config->m_bomb_time);
-            }
-        }
-        }
+	World* world = World::getWorld();
+	    if (world == NULL) return;
+	    for(unsigned int i = 0; i < world->getNumKarts(); i++)
+	    {
+		AbstractKart *kart = world->getKart(i);
+		if (kart->getController()->isPlayerController()) {
+			if (type == Attachment::ATTACH_ANVIL)
+			{
+				kart->getAttachment()
+					->set(type, stk_config->m_anvil_time);
+				kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+				kart->updateWeight();
+			}
+			else if (type == Attachment::ATTACH_PARACHUTE)
+			{
+				kart->getAttachment()
+			            ->set(type, stk_config->m_parachute_time);
+			}
+			else if (type == Attachment::ATTACH_BOMB)
+			{
+				kart->getAttachment()
+						->set(type, stk_config->m_bomb_time);
+			}
+		}
+	    }
 
 }
 
@@ -143,7 +143,7 @@ bool onEvent(const SEvent &event)
             IGUIContextMenu* mnu = guienv->addContextMenu(
                 core::rect<s32>(event.MouseInput.X, event.MouseInput.Y, event.MouseInput.Y+100, event.MouseInput.Y+100),NULL);
             int graphicsMenuIndex = mnu->addItem(L"Graphics >",-1,true,true);
-
+            
             // graphics menu
             IGUIContextMenu* sub = mnu->getSubMenu(graphicsMenuIndex);
 
@@ -171,7 +171,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Switch", DEBUG_POWERUP_SWITCH );
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
-
+            
             mnu->addItem(L"Attachments >",-1,true, true);
             sub = mnu->getSubMenu(2);
             sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
@@ -369,15 +369,15 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_ATTACHMENT_ANVIL)
                 {
-            addAttachment(Attachment::ATTACH_ANVIL);
+			addAttachment(Attachment::ATTACH_ANVIL);
                 }
                 else if (cmdID == DEBUG_ATTACHMENT_BOMB)
                 {
-            addAttachment(Attachment::ATTACH_BOMB);
+			addAttachment(Attachment::ATTACH_BOMB);
                 }
                 else if (cmdID == DEBUG_ATTACHMENT_PARACHUTE)
                 {
-            addAttachment(Attachment::ATTACH_PARACHUTE);
+			addAttachment(Attachment::ATTACH_PARACHUTE);
                 }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {

@@ -195,7 +195,7 @@ namespace StringUtils
         }
         catch (std::exception& e)
         {
-            Log::error("StringUtils",
+            Log::error("StringUtils", 
                        "Error in split(std::string) : %s @ line %i : %s.",
                      __FILE__, __LINE__, e.what());
             Log::error("StringUtils", "Splitting '%s'.", s.c_str());
@@ -325,7 +325,7 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            Log::fatal("StringUtils",
+            Log::fatal("StringUtils", 
                 "Fatal error in splitPath : %s @ line %i: '%s'.",
                         __FILE__, __LINE__, path.c_str());
             exit(1);
@@ -356,7 +356,7 @@ namespace StringUtils
                     {
                         if (insertValID >= all_vals.size())
                         {
-                            Log::warn("StringUtils",
+                            Log::warn("StringUtils", 
                                       "insertValues: "
                                       "Invalid number of arguments in '%s'.",
                                       s.c_str());
@@ -395,7 +395,7 @@ namespace StringUtils
         catch (std::exception& e)
         {
             (void)e;  // avoid warning about unused variable
-            Log::fatal("StringUtils",
+            Log::fatal("StringUtils", 
                        "Fatal error in insertValues(std::string) : %s @ "
                        "line %i: '%s'", __FILE__, __LINE__, s.c_str());
             exit(1);

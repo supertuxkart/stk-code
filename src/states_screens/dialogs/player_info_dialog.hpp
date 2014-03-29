@@ -36,7 +36,7 @@ class PlayerInfoDialog : public GUIEngine::ModalDialog
 {
     GUIEngine::TextBoxWidget* textCtrl;
     PlayerProfile* m_player;
-
+    
     void showRegularDialog();
     void showConfirmDialog();
 public:
@@ -45,12 +45,12 @@ public:
      */
     PlayerInfoDialog(PlayerProfile* PlayerInfoDialog,
                      const float percentWidth, const float percentHeight);
-
+    
     virtual ~PlayerInfoDialog();
-
+    
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
-
+  
 
 #endif

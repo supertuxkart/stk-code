@@ -169,7 +169,7 @@ void KartModel::loadInfo(const XMLNode &node)
         loadWheelInfo(*wheels_node, "rear-right",  2);
         loadWheelInfo(*wheels_node, "rear-left",   3);
     }
-
+    
     m_nitro_emitter_position[0] = Vec3 (0,0.1f,0);
     m_nitro_emitter_position[1] = Vec3 (0,0.1f,0);
     m_has_nitro_emitter = false;
@@ -287,11 +287,11 @@ KartModel* KartModel::makeCopy()
     km->m_animated_node     = NULL;
     km->m_hat_offset        = m_hat_offset;
     km->m_hat_name          = m_hat_name;
-
+    
     km->m_nitro_emitter_position[0] = m_nitro_emitter_position[0];
     km->m_nitro_emitter_position[1] = m_nitro_emitter_position[1];
     km->m_has_nitro_emitter = m_has_nitro_emitter;
-
+    
     for(unsigned int i=0; i<4; i++)
     {
         km->m_wheel_model[i]             = m_wheel_model[i];
@@ -305,7 +305,7 @@ KartModel* KartModel::makeCopy()
         km->m_max_suspension[i]             = m_max_suspension[i];
         km->m_dampen_suspension_amplitude[i]= m_dampen_suspension_amplitude[i];
     }
-
+    
     km->m_speed_weighted_objects.resize(m_speed_weighted_objects.size());
     for(size_t i=0; i<m_speed_weighted_objects.size(); i++)
     {
@@ -462,7 +462,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     irr_driver->grabAllTextures(m_mesh);
 
     Vec3 kart_min, kart_max;
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
                         &kart_min, &kart_max);
 
 #undef MOVE_KART_MESHES
@@ -480,7 +480,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
     translate.setTranslation(offset_from_center.toIrrVector());
     mani->transform(m_mesh, translate);
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
                         &kart_min, &kart_max);
 #endif
     m_kart_highest_point = kart_max.getY();
@@ -578,7 +578,7 @@ void KartModel::loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, const 
     SpeedWeightedObject obj;
     obj.m_properties    = fallback_properties;
     obj.m_properties.loadFromXMLNode(speed_weighted_node);
-
+    
     speed_weighted_node->get("position", &obj.m_position);
     speed_weighted_node->get("model",    &obj.m_name);
 
@@ -770,7 +770,7 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
  */
-void KartModel::update(float dt, float rotation_dt, float steer,
+void KartModel::update(float dt, float rotation_dt, float steer, 
                        const float height_above_terrain[4], float speed)
 {
    core::vector3df wheel_steer(0, steer*30.0f, 0);
@@ -789,7 +789,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,
         }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y = m_kart_lowest_point -  height_above_terrain[i]
+        pos.Y = m_kart_lowest_point -  height_above_terrain[i] 
               + m_wheel_graphics_radius[i];
         m_wheel_node[i]->setPosition(pos);
 
@@ -825,7 +825,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,
             btClamp<float>(strength, 0.0f, 1.0f);
         }
         obj.m_node->setAnimationStrength(strength);
-
+        
         // Animation speed
         const float speed_factor =   GET_VALUE(obj, m_speed_factor);
         if(speed_factor >= 0.0f)
@@ -843,7 +843,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,
             obj.m_texture_cur_offset += speed * tex_speed * dt;
             if(obj.m_texture_cur_offset.X > 1.0f) obj.m_texture_cur_offset.X = fmod(obj.m_texture_cur_offset.X, 1.0f);
             if(obj.m_texture_cur_offset.Y > 1.0f) obj.m_texture_cur_offset.Y = fmod(obj.m_texture_cur_offset.Y, 1.0f);
-
+            
             for(unsigned int i=0; i<obj.m_node->getMaterialCount(); i++)
             {
                 video::SMaterial &irrMaterial=obj.m_node->getMaterial(i);
@@ -854,7 +854,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,
                     core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                     m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
                 }   // for j<MATERIAL_MAX_TEXTURES
-            }   // for i<getMaterialCount
+            }   // for i<getMaterialCount 
         }
 #undef GET_VALUE
     }

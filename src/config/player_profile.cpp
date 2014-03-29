@@ -45,7 +45,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_unique_id           = PlayerManager::get()->getUniqueId();
     m_story_mode_status   = unlock_manager->createStoryModeStatus();
     m_is_default          = false;
-    m_achievements_status =
+    m_achievements_status = 
                         AchievementsManager::get()->createAchievementsStatus();
 }   // PlayerProfile
 
@@ -77,8 +77,8 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    out << L"    <player name=\"" << m_name
-        << L"\" guest=\""         << m_is_guest_account
+    out << L"    <player name=\"" << m_name 
+        << L"\" guest=\""         << m_is_guest_account 
         << L"\" use-frequency=\"" << m_use_frequency
         << L"\" is-default=\""    << m_is_default
         << L"\" unique-id=\"" << m_unique_id << L"\">\n";
@@ -111,7 +111,7 @@ void PlayerProfile::raceFinished()
 }   // raceFinished
 
 //------------------------------------------------------------------------------
-/** Comparison used to sort players.
+/** Comparison used to sort players. 
  */
 bool PlayerProfile::operator<(const PlayerProfile &other)
 {

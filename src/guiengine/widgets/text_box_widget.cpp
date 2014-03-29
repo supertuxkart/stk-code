@@ -154,7 +154,7 @@ void TextBoxWidget::unfocused(const int playerID, Widget* new_focus)
     assert(playerID == 0); // No support for multiple players in text areas!
 
     setWithinATextBox(false);
-
+    
     GUIEngine::getGUIEnv()->removeFocus(m_element);
 }
 

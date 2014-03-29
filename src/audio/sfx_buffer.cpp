@@ -78,7 +78,7 @@ SFXBuffer::SFXBuffer(const std::string& file,
 bool SFXBuffer::load()
 {
     if (UserConfigParams::m_sfx == false) return false;
-
+    
 #if HAVE_OGGVORBIS
     if (m_loaded) return false;
 

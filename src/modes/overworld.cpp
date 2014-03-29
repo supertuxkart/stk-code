@@ -155,7 +155,7 @@ void OverWorld::update(float dt)
         s->setMultiplayer(false);
         s->setFromOverworld(true);
         StateManager::get()->resetAndGoToScreen(s);
-    }
+    }    
 }   // update
 
 //-----------------------------------------------------------------------------

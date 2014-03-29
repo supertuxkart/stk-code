@@ -40,7 +40,7 @@ private:
     GUIEngine::IconButtonWidget  *m_install_button;
 
     GUIEngine::IconButtonWidget  *m_icon;
-
+    
     /** The addon to load. */
     Addon                         m_addon;
     void startDownload();
@@ -65,14 +65,14 @@ public:
     virtual GUIEngine::EventPropagation processEvent(const std::string& event_source);
     virtual void beforeAddingWidgets();
     virtual void init();
-
+    
     /** This function is called by the GUI, all the frame (or somthing like
      * that). It checks the flags (m_can_load_icon and
      *  and do the necessary.
      * */
     void onUpdate(float delta);
     void voteClicked();
-
+    
 };   // AddonsLoading
 
 #endif

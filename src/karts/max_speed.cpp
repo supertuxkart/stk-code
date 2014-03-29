@@ -235,7 +235,7 @@ void MaxSpeed::update(float dt)
     {
         SpeedDecrease &slowdown = m_speed_decrease[i];
         slowdown.update(dt);
-        slowdown_factor = std::min(slowdown_factor,
+        slowdown_factor = std::min(slowdown_factor, 
                                    slowdown.getSlowdownFraction());
     }
 

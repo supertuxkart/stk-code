@@ -102,7 +102,7 @@ void StateManager::updateActivePlayerIDs()
 // ----------------------------------------------------------------------------
 
 int StateManager::createActivePlayer(PlayerProfile *profile,
-                                     InputDevice *device,
+                                     InputDevice *device, 
                                      Online::OnlineProfile* user)
 {
     ActivePlayer *p;

@@ -39,16 +39,16 @@ class TrackInfoDialog : public GUIEngine::ModalDialog
 {
     std::string m_track_ident;
     std::string m_ribbon_item;
-
+    
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
     GUIEngine::SpinnerWidget* m_spinner;
     GUIEngine::CheckBoxWidget* m_checkbox;
     GUIEngine::IconButtonWidget* m_kart_icons[HIGHSCORE_COUNT];
     GUIEngine::LabelWidget* m_highscore_entries[HIGHSCORE_COUNT];
-
+    
     void updateHighScores();
-
+    
 public:
     /**
      * \brief Creates a track info modal dialog with given percentage of screen width and height
@@ -62,7 +62,7 @@ public:
                     const irr::core::stringw& trackName, irr::video::ITexture* screenshot,
                     const float percentWidth, const float percentHeight);
     virtual ~TrackInfoDialog();
-
+    
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };

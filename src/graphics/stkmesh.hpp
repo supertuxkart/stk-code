@@ -40,19 +40,19 @@ enum TransparentMaterial
 };
 
 struct GLMesh {
-    GLuint vao_first_pass;
-    GLuint vao_second_pass;
-    GLuint vao_glow_pass;
-    GLuint vao_displace_pass;
+	GLuint vao_first_pass;
+	GLuint vao_second_pass;
+	GLuint vao_glow_pass;
+	GLuint vao_displace_pass;
     GLuint vao_displace_mask_pass;
     GLuint vao_shadow_pass;
-    GLuint vertex_buffer;
-    GLuint index_buffer;
-    GLuint textures[6];
-    GLenum PrimitiveType;
-    GLenum IndexType;
-    size_t IndexCount;
-    size_t Stride;
+	GLuint vertex_buffer;
+	GLuint index_buffer;
+	GLuint textures[6];
+	GLenum PrimitiveType;
+	GLenum IndexType;
+	size_t IndexCount;
+	size_t Stride;
     core::matrix4 TextureMatrix;
 };
 

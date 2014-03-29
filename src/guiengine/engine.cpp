@@ -794,14 +794,14 @@ namespace GUIEngine
     {
         return Private::small_font_height;
     }   // getSmallFontHeight
-
-    // ------------------------------------------------------------------------
+ 
+    // ------------------------------------------------------------------------    
     int getLargeFontHeight()
    {
 
         return Private::large_font_height;
     }   // getSmallFontHeight
-
+        
     // ------------------------------------------------------------------------
     void clear()
     {

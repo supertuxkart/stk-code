@@ -39,7 +39,7 @@ DEFINE_SCREEN_SINGLETON( OnlineProfileFriends );
 // -----------------------------------------------------------------------------
 /** Constructor for a display of all friends.
  */
-OnlineProfileFriends::OnlineProfileFriends()
+OnlineProfileFriends::OnlineProfileFriends() 
                     : OnlineProfileBase("online/profile_friends.stkgui")
 {
 }   // OnlineProfileFriends
@@ -79,7 +79,7 @@ void OnlineProfileFriends::beforeAddingWidget()
 void OnlineProfileFriends::init()
 {
     OnlineProfileBase::init();
-    m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID],
+    m_profile_tabs->select( m_friends_tab->m_properties[PROP_ID], 
                             PLAYER_ID_GAME_MASTER );
     assert(m_visiting_profile != NULL);
     m_visiting_profile->fetchFriends();
@@ -92,7 +92,7 @@ void OnlineProfileFriends::init()
 /** Called when an event occurs (i.e. user clicks on something).
 */
 void OnlineProfileFriends::eventCallback(Widget* widget,
-                                         const std::string& name,
+                                         const std::string& name, 
                                          const int playerID)
 {
     OnlineProfileBase::eventCallback( widget, name, playerID);
@@ -111,7 +111,7 @@ void OnlineProfileFriends::eventCallback(Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-/** Displays the friends from a given profile.
+/** Displays the friends from a given profile. 
  */
 void OnlineProfileFriends::displayResults()
 {
@@ -120,7 +120,7 @@ void OnlineProfileFriends::displayResults()
     for (unsigned int i = 0; i < friends.size(); i++)
     {
         std::vector<ListWidget::ListCell> row;
-        OnlineProfile* friend_profile =
+        OnlineProfile* friend_profile = 
             ProfileManager::get()->getProfileByID(friends[i]);
 
         // When looking at friends of a friend those profiles are not
@@ -135,18 +135,18 @@ void OnlineProfileFriends::displayResults()
                                            -1, 2)                         );
         if (m_visiting_profile->isCurrentUser())
         {
-            OnlineProfile::RelationInfo * relation_info =
+            OnlineProfile::RelationInfo * relation_info = 
                                              friend_profile->getRelationInfo();
             row.push_back(ListWidget::ListCell(relation_info->getDate(),
                                                -1, 1, true)             );
             irr::core::stringw status("");
             if (relation_info->isPending())
             {
-                status = (relation_info->isAsker() ? _("New Request")
+                status = (relation_info->isAsker() ? _("New Request") 
                                                    : _("Pending")     );
             }
             else
-                status = (relation_info->isOnline() ? _("Online")
+                status = (relation_info->isOnline() ? _("Online") 
                                                     : _("Offline") );
             row.push_back(ListWidget::ListCell(status, -1, 2, true));
         }
@@ -170,7 +170,7 @@ void OnlineProfileFriends::onUpdate(float delta)
         }
         else
         {
-            m_friends_list_widget->renameItem("loading",
+            m_friends_list_widget->renameItem("loading", 
                                               Messages::fetchingFriends());
         }
     }

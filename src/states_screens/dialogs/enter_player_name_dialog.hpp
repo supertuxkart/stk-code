@@ -37,23 +37,23 @@ namespace GUIEngine
  */
 class EnterPlayerNameDialog : public GUIEngine::ModalDialog//, public GUIEngine::ITextBoxWidgetListener
 {
-
+    
 public:
-
+    
     class INewPlayerListener
     {
     public:
         virtual void onNewPlayerWithName(const irr::core::stringw& newName) = 0;
         virtual ~INewPlayerListener(){}
     };
-
+    
 private:
-
+    
     INewPlayerListener* m_listener;
     bool m_self_destroy;
-
+    
 public:
-
+    
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
@@ -63,7 +63,7 @@ public:
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-
+    
     virtual void onUpdate(float dt);
     //virtual void onTextUpdated();
 };

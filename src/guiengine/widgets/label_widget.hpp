@@ -40,23 +40,23 @@ namespace GUIEngine
 
         /** Scroll speed in characters/seconds (0 if no scrolling). */
         float              m_scroll_speed;
-
+        
         /** Current scroll offset. */
         float              m_scroll_offset;
-
+        
     public:
-
+        
         LEAK_CHECK()
-
+        
         /** Constructs the label widget. Parameter:
           * \param title  True if the special title font should be used.
           * \param bright True if a bright color should be used
           * \note \c title and \c bright are mutually exclusive
           */
         LabelWidget(bool title=false, bool bright=false);
-
+        
         virtual ~LabelWidget() {}
-
+        
         /** \brief Callback from base class Widget */
         virtual void add();
 
@@ -65,10 +65,10 @@ namespace GUIEngine
         void     setColor(const irr::video::SColor& color);
         void     setErrorColor();
         void     setDefaultColor();
-
+        
         /** \brief Callback from base class Widget */
         virtual void update(float dt);
-
+                
         /**
           * \brief Sets the text in the label.
           *
@@ -84,21 +84,21 @@ namespace GUIEngine
           *                       only be passed after the widget has been add()ed.
           */
         virtual void setText(const wchar_t *text, bool expandAsNeeded);
-
+        
         /** Overloaded function which takes a stringw. */
         virtual void setText(const irr::core::stringw &s, bool expandAsNeeded)
         {
-            setText(s.c_str(), expandAsNeeded);
+            setText(s.c_str(), expandAsNeeded); 
         }
 
         // --------------------------------------------------------------------
-
+        
         /** Sets horizontal scroll speed. */
         void setScrollSpeed(float speed);
-
+        
         // --------------------------------------------------------------------
-
-        /**
+        
+        /** 
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off
           * \pre May only be called after this widget has been add()ed

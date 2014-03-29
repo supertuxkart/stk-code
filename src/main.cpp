@@ -367,7 +367,7 @@ void handleXmasMode()
     bool xmas = false;
     switch(UserConfigParams::m_xmas_mode)
     {
-    case 0:
+    case 0:  
         {
             int day, month;
             StkTime::getDate(&day, &month);
@@ -514,7 +514,7 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_log_errors_to_console=true;
     }
 
-    if(CommandLine::has("--screensize", &s) ||
+    if(CommandLine::has("--screensize", &s) || 
        CommandLine::has("-s", &s)              )
     {
         //Check if fullscreen and new res is blacklisted
@@ -522,7 +522,7 @@ int handleCmdLinePreliminary()
         if (sscanf(s.c_str(), "%dx%d", &width, &height) == 2)
         {
             // Reassemble the string in case that the original width or
-            // height contained a leading 0
+            // height contained a leading 0 
             std::ostringstream o;
             o << width << "x" << height;
             std::string res = o.str();
@@ -584,7 +584,7 @@ int handleCmdLinePreliminary()
                           IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
     }   // --verbose or -v
-
+    
     // Enable loading GP's from local directory
     if(CommandLine::has("--add-gp-dir", &s))
     {
@@ -836,7 +836,7 @@ int handleCmdLine()
                      (int)UserConfigParams::m_num_karts);
     }   // --numkarts
 
-    if(CommandLine::has( "--no-start-screen") ||
+    if(CommandLine::has( "--no-start-screen") || 
         CommandLine::has("-N")                   )
         UserConfigParams::m_no_start_screen = true;
     if(CommandLine::has("--race-now") || CommandLine::has("-R"))
@@ -986,7 +986,7 @@ void initUserConfig()
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
-    user_config->loadConfig();
+    user_config->loadConfig();    
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1054,7 +1054,7 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI,
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI, 
                                                      "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
@@ -1127,7 +1127,7 @@ int main(int argc, char *argv[] )
 
     srand(( unsigned ) time( 0 ));
 
-    try
+    try 
     {
         std::string s;
         if(CommandLine::has("--root", &s))
@@ -1138,7 +1138,7 @@ int main(int argc, char *argv[] )
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
-        initUserConfig();
+        initUserConfig(); 
 
         handleCmdLinePreliminary();
 
@@ -1173,7 +1173,7 @@ int main(int argc, char *argv[] )
         // and the AchievementsManager to initialise the AchievementsStatus.
         PlayerManager::create();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
                                                           "gui_lock.png"  ) );
         projectile_manager->loadData();
 
@@ -1225,7 +1225,7 @@ int main(int argc, char *argv[] )
 
         // Load addons.xml to get info about addons even when not
         // allowed to access the internet
-        if (UserConfigParams::m_internet_status !=
+        if (UserConfigParams::m_internet_status != 
             Online::RequestManager::IPERM_ALLOWED)
         {
             std::string xml_file = file_manager->getAddonsFile("addons.xml");
@@ -1253,7 +1253,7 @@ int main(int argc, char *argv[] )
             // displayed (if necessary), so we have to make sure there is
             // a current player
             PlayerManager::get()->enforceCurrentPlayer();
-
+            
             InputDevice *device;
 
             // Use keyboard 0 by default in --no-start-screen
@@ -1385,7 +1385,7 @@ int main(int argc, char *argv[] )
 // ============================================================================
 #ifdef WIN32
 //routine for running under windows
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
                      LPTSTR lpCmdLine, int nCmdShow)
 {
     return main(__argc, __argv);

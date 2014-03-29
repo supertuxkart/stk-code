@@ -24,14 +24,14 @@ using core::vector3df;
 class Wind
 {
 public:
-    Wind();
+	Wind();
 
-    vector3df getWind() const;
-    void update();
+	vector3df getWind() const;
+	void update();
 
 private:
-    vector3df m_wind;
-    float m_seed;
+	vector3df m_wind;
+	float m_seed;
 };
 
 #endif

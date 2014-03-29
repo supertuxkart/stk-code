@@ -260,7 +260,7 @@ void GrandPrixWin::tearDown()
         delete m_unlocked_label;
         m_unlocked_label = NULL;
     }
-
+    
     if (m_finish_sound != NULL &&
         m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
     {

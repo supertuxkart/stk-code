@@ -67,7 +67,7 @@ public:
     float m_parachute_ubound_fraction; /**<Upper bound fraction of speed when
                                            lost will detach parachute.         */
     float m_parachute_lbound_fraction; /**<Lower bound fraction of speed when
-                                           lost will detach parachute.           */
+                                           lost will detach parachute.	       */
     float m_parachute_max_speed;       /**<Max speed to rate current speed     */
     float m_parachute_time;            /**<Time a parachute is active.         */
     float m_parachute_time_other;      /**<Time a parachute attached to other

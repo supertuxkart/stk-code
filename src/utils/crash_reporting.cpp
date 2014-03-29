@@ -76,7 +76,7 @@
         _In_ DWORD maxStringLength,
         _In_ DWORD flags
     );
-
+    
     namespace CrashReporting
     {
         void getCallStackWithContext(std::string& callstack, PCONTEXT pContext);
@@ -88,7 +88,7 @@
                 getCallStackWithContext(callstack, pContext);
             else
                 getCallStack(callstack);
-
+            
             std::string msg =   "SuperTuxKart crashed!\n"
                                 "Please hit Ctrl+C to copy to clipboard and signal the problem\n"
                                 "to the developers on our forum: http://forum.freegamedev.net/viewforum.php?f=16\n"
@@ -164,7 +164,7 @@
             FreeLibrary(hImageHlpDll);  \
             return; \
     }
-
+            
             GET_FUNC_PTR(SymCleanup                 )
             GET_FUNC_PTR(SymFunctionTableAccess64   )
             GET_FUNC_PTR(SymGetLineFromAddr64       )
@@ -223,7 +223,7 @@
                 STACKFRAME64    stackframe;
                 memset(&stackframe, 0, sizeof(stackframe));
                 stackframe.AddrPC.Offset    = pContext->Eip;
-                stackframe.AddrPC.Mode      = AddrModeFlat;
+                stackframe.AddrPC.Mode      = AddrModeFlat; 
                 stackframe.AddrStack.Offset = pContext->Esp;
                 stackframe.AddrStack.Mode   = AddrModeFlat;
                 stackframe.AddrFrame.Offset = pContext->Ebp;
@@ -294,7 +294,7 @@
             FreeLibrary(hImageHlpDll);
         }
 
-
+        
         void getCallStack(std::string& callstack)
         {
             // Get the current CONTEXT

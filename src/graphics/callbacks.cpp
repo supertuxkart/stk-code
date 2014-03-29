@@ -130,7 +130,7 @@ void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
     vector3df sun_pos = m_sunpos;
     srv->setVertexShaderConstant("sun_pos", &sun_pos.X, 3);
-
+    
     core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
     ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
     ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
@@ -558,21 +558,21 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void DisplaceProvider::update()
 {
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
+	const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+	const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
 
-    float strength = time;
-    strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
+	float strength = time;
+	strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.002f;
 
-    vector3df wind = irr_driver->getWind() * strength * speed;
-    m_dir[0] += wind.X;
-    m_dir[1] += wind.Z;
+	vector3df wind = irr_driver->getWind() * strength * speed;
+	m_dir[0] += wind.X;
+	m_dir[1] += wind.Z;
 
-    strength = time * 0.56f + sinf(time);
-    strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
+	strength = time * 0.56f + sinf(time);
+	strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.0025f;
 
-    wind = irr_driver->getWind() * strength * speed;
-    wind.rotateXZBy(cosf(time));
-    m_dir2[0] += wind.X;
-    m_dir2[1] += wind.Z;
+	wind = irr_driver->getWind() * strength * speed;
+	wind.rotateXZBy(cosf(time));
+	m_dir2[0] += wind.X;
+	m_dir2[1] += wind.Z;
 }

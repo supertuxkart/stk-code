@@ -38,8 +38,8 @@
  *  \brief Gives the general functions to use network communication.
  *  This class is in charge of storing the peers connected to this host.
  *  It also stores the host, and brings the functions to send messages to peers.
- *  It automatically dispatches the events or packets it receives. This class
- *  also stores the public address when known and the player login.
+ *  It automatically dispatches the events or packets it receives. This class 
+ *  also stores the public address when known and the player login. 
  *  Here are defined some functions that will be specifically implemented by
  *  the ServerNetworkManager and the ClientNetworkManager.
  */
@@ -67,7 +67,7 @@ class NetworkManager : public Singleton<NetworkManager>
         virtual bool connect(TransportAddress peer);
         /** \brief Changes the socket working mode.
          *  Sockets can be in two modes : The ENet mode and a mode we will call
-         *  the 'Raw' mode. In the ENet mode, the socket will be read as
+         *  the 'Raw' mode. In the ENet mode, the socket will be read as 
          *  \param peer : The transport address which you want to connect to.
          *  \return True if we're successfully connected. False elseway.
          */
@@ -75,13 +75,13 @@ class NetworkManager : public Singleton<NetworkManager>
 
         // message/packets related functions
         virtual void notifyEvent(Event* event);
-        virtual void sendPacket(const NetworkString& data,
+        virtual void sendPacket(const NetworkString& data, 
                                 bool reliable = true) = 0;
-        virtual void sendPacket(STKPeer* peer,
-                                const NetworkString& data,
+        virtual void sendPacket(STKPeer* peer, 
+                                const NetworkString& data, 
                                 bool reliable = true);
-        virtual void sendPacketExcept(STKPeer* peer,
-                                const NetworkString& data,
+        virtual void sendPacketExcept(STKPeer* peer, 
+                                const NetworkString& data, 
                                 bool reliable = true);
 
         // Game related functions

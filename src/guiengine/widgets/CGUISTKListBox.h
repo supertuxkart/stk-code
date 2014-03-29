@@ -17,12 +17,12 @@ namespace irr
 {
     namespace gui
     {
-    class IGUIFont;
-    class IGUIScrollBar;
+	class IGUIFont;
+	class IGUIScrollBar;
 
-    class CGUISTKListBox : public IGUIElement
-    {
-    public:
+	class CGUISTKListBox : public IGUIElement
+	{
+	public:
 
             struct ListItem
             {
@@ -163,7 +163,7 @@ namespace irr
             //! Sets whether to draw the background
             virtual void setDrawBackground(bool draw);
 
-    private:
+	private:
 
             void recalculateItemHeight();
             void selectNew(s32 ypos, bool onlyHover=false);
@@ -189,7 +189,7 @@ namespace irr
             bool MoveOverSelect;
             bool AutoScroll;
             bool HighlightWhenNotFocused;
-    };
+	};
 
 
     } // end namespace gui

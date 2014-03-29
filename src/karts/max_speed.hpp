@@ -119,7 +119,7 @@ private:
          *  into account. */
         float m_current_fraction;
 
-        /** How long the effect should last. A -1.0f as value indicates
+        /** How long the effect should last. A -1.0f as value indicates 
          *  that this effect stays active till it is changed back. */
         float m_duration;
 
@@ -166,7 +166,7 @@ public:
     void  reset();
     // ------------------------------------------------------------------------
     /** Sets the minimum speed a kart should have. This is used to guarantee
-     *  that e.g. zippers on ramps will always fast enough for the karts to
+     *  that e.g. zippers on ramps will always fast enough for the karts to 
      *  reach the other end. If set to a negative number, it will have
      *  no effect. */
     void setMinSpeed(float s) { m_min_speed = s; }

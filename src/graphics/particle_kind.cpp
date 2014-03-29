@@ -95,7 +95,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     else if (emitterShape == "sphere")
     {
         m_shape = EMITTER_SPHERE;
-
+        
         xml->get("radius", &m_sphere_radius);
     }
     else
@@ -169,7 +169,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
         bool has_y = size->get("y-increase-factor", &m_scale_affector_factor_y) == 1;
         m_has_scale_affector = (has_x || has_y);
     }
-
+    
     else
     {
         m_has_scale_affector = false;

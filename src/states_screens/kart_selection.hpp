@@ -35,7 +35,7 @@ namespace GUIEngine
     class Widget;
     class BubbleWidget;
     enum EventPropagation;
-
+   
 }
 namespace Online
 {
@@ -220,7 +220,7 @@ public:
 
     // ------------------------------------------------------------------------
     /** Remove any red mark set with 'markAsIncorrect' */
-    void markAsCorrect();
+    void markAsCorrect();  
 };
 
 /** A widget representing the kart selection for a player (i.e. the player's

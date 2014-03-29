@@ -441,21 +441,21 @@ void Track::loadTrackInfo()
     std::string dir = StringUtils::getPath(m_filename);
     std::string easter_name = dir+"/easter_eggs.xml";
 
-    XMLNode *easter = file_manager->createXMLTree(easter_name);
-
-    if(easter)
+    XMLNode *easter = file_manager->createXMLTree(easter_name); 
+  
+    if(easter) 
     {
-        for(unsigned int i=0; i<easter->getNumNodes(); i++)
-        {
-            const XMLNode *eggs = easter->getNode(i);
-            if(eggs->getNumNodes() > 0)
-            {
-                m_has_easter_eggs = true;
-                break;
-            }
-        }
+        for(unsigned int i=0; i<easter->getNumNodes(); i++) 
+        { 
+            const XMLNode *eggs = easter->getNode(i); 
+            if(eggs->getNumNodes() > 0) 
+            { 
+                m_has_easter_eggs = true; 
+                break; 
+            } 
+        } 
         delete easter;
-    }
+    } 
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
@@ -969,7 +969,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
-            // TODO: Add support in the engine for BillboardText or find a replacement
+			// TODO: Add support in the engine for BillboardText or find a replacement
 /*          scene::ISceneManager* sm = irr_driver->getSceneManager();
             scene::ISceneNode* sn =
                 sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
@@ -978,7 +978,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                                               core::dimension2df(textsize.Width/45.0f,
                                                                  textsize.Height/45.0f),
                                               xyz,
-                                              -1, // id
+                                              -1, // id 
                                               video::SColor(255, 255, 225, 0),
                                               video::SColor(255, 255, 89, 0));
             m_all_nodes.push_back(sn);*/
@@ -1581,7 +1581,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Sky dome and boxes support
     // --------------------------
-    irr_driver->suppressSkyBox();
+	irr_driver->suppressSkyBox();
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
@@ -1780,7 +1780,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
                 libroot = library_nodes[name];
                 create_lod_definitions = false; // LOD definitions are already created, don't create them again
             }
-
+    
             scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
             parent->setPosition(xyz);
             parent->setRotation(hpr);

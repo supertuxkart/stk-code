@@ -168,12 +168,12 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-
+                
                 if (control_is_pressed)
                     kart->setPowerup(PowerupManager::POWERUP_SWATTER, 10000);
                 else
                     kart->setPowerup(PowerupManager::POWERUP_RUBBERBALL, 10000);
-
+                    
 #ifdef FORCE_RESCUE_ON_FIRST_KART
                 // Can be useful for debugging places where the AI gets into
                 // a rescue loop: rescue, drive, crash, rescue to same place
@@ -185,7 +185,7 @@ void InputManager::handleStaticAction(int key, int value)
             if (UserConfigParams::m_artist_debug_mode && world)
             {
                 AbstractKart* kart = world->getLocalPlayerKart(0);
-
+                
                 kart->setPowerup(PowerupManager::POWERUP_PLUNGER, 10000);
             }
             break;
@@ -481,13 +481,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         m_mode == INPUT_SENSE_GAMEPAD)
     {
         // Do not pick disabled gamepads for input sensing
-         if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+ 	    if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
         {
-             GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID);
-             DeviceConfig *conf = gPad->getConfiguration();
-             if (!conf->isEnabled())
-                 return;
-         }
+ 	        GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID); 
+ 	        DeviceConfig *conf = gPad->getConfiguration(); 
+ 	        if (!conf->isEnabled()) 
+ 	            return; 
+ 	    }
 
         inputSensing(type, deviceID, button, axisDirection,  value);
         return;

@@ -3,7 +3,7 @@
 //  Copyright (C) 2007-2013 Joerg Henrichs
 //
 //  Physics improvements and linear intersection algorithm by
-//  Copyright (C) 2009-2013 David Mikos.
+//  Copyright (C) 2009-2013 David Mikos. 
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -158,7 +158,7 @@ bool Plunger::updateAndDelete(float dt)
 bool Plunger::hit(AbstractKart *kart, PhysicalObject *obj)
 {
     if(isOwnerImmunity(kart)) return false;
-
+    
     // pulling back makes no sense in battle mode, since this mode is not a race.
     // so in battle mode, always hide view
     if( m_reverse_mode || race_manager->isBattleMode() )

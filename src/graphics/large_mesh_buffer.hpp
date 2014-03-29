@@ -13,43 +13,43 @@ namespace irr
 {
 namespace scene
 {
-    //! A SMeshBuffer with 32-bit indices
-    class LargeMeshBuffer : public SMeshBuffer
-    {
-    public:
-        //! Get type of index data which is stored in this meshbuffer.
-        /** \return Index type of this buffer. */
-        virtual video::E_INDEX_TYPE getIndexType() const
-        {
-            return video::EIT_32BIT;
-        }
+	//! A SMeshBuffer with 32-bit indices
+	class LargeMeshBuffer : public SMeshBuffer
+	{
+	public:
+		//! Get type of index data which is stored in this meshbuffer.
+		/** \return Index type of this buffer. */
+		virtual video::E_INDEX_TYPE getIndexType() const
+		{
+			return video::EIT_32BIT;
+		}
 
-        //! Get pointer to indices
-        /** \return Pointer to indices. */
-        virtual const u16* getIndices() const
-        {
-            return (u16 *) Indices.const_pointer();
-        }
-
-
-        //! Get pointer to indices
-        /** \return Pointer to indices. */
-        virtual u16* getIndices()
-        {
-            return (u16 *) Indices.pointer();
-        }
+		//! Get pointer to indices
+		/** \return Pointer to indices. */
+		virtual const u16* getIndices() const
+		{
+			return (u16 *) Indices.const_pointer();
+		}
 
 
-        //! Get number of indices
-        /** \return Number of indices. */
-        virtual u32 getIndexCount() const
-        {
-            return Indices.size();
-        }
+		//! Get pointer to indices
+		/** \return Pointer to indices. */
+		virtual u16* getIndices()
+		{
+			return (u16 *) Indices.pointer();
+		}
 
-        //! Indices into the vertices of this buffer.
-        core::array<u32> Indices;
-    };
+
+		//! Get number of indices
+		/** \return Number of indices. */
+		virtual u32 getIndexCount() const
+		{
+			return Indices.size();
+		}
+
+		//! Indices into the vertices of this buffer.
+		core::array<u32> Indices;
+	};
 } // end namespace scene
 } // end namespace irr
 

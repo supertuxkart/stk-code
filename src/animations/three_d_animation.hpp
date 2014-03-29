@@ -53,7 +53,7 @@ private:
     /** True if a collision with this object should trigger
      *  "exploding" a kart. */
     bool                  m_explode_kart;
-
+    
     bool                  m_flatten_kart;
 
     /** We have to store the rotation value as computed in blender, since

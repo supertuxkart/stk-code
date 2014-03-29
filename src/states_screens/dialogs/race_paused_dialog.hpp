@@ -31,7 +31,7 @@ namespace GUIEngine
  */
 class RacePausedDialog : public GUIEngine::ModalDialog
 {
-
+    
 protected:
     virtual void loadedFromFile();
 
@@ -39,12 +39,12 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    RacePausedDialog(const float percentWidth, const float percentHeight);
+    RacePausedDialog(const float percentWidth, const float percentHeight);  
     virtual ~RacePausedDialog();
-
+    
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-
+    
 };
 
 #endif

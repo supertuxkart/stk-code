@@ -187,7 +187,7 @@ void UserInfoDialog::acceptFriendRequest()
 {
     // ----------------------------------------------------------------
     class AcceptFriendRequest : public XMLRequest
-    {
+    {    
         /** Callback for the request to accept a friend invitation. Shows a
         *  confirmation message and takes care of updating all the cached
         *  information.
@@ -199,7 +199,7 @@ void UserInfoDialog::acceptFriendRequest()
             core::stringw info_text("");
             if (isSuccess())
             {
-                OnlineProfile * profile =
+                OnlineProfile * profile = 
                                      ProfileManager::get()->getProfileByID(id);
                 profile->setFriend();
                 OnlineProfile::RelationInfo *info =
@@ -322,7 +322,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_remove_widget->m_properties[PROP_ID])
         {
-            if (m_profile->getRelationInfo() &&
+            if (m_profile->getRelationInfo() && 
                 m_profile->getRelationInfo()->isPending() )
                 removePendingFriend();
             else

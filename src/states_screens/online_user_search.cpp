@@ -184,7 +184,7 @@ void OnlineUserSearch::showList()
 
 // ----------------------------------------------------------------------------
 /** Called when a search is triggered. When it is a new search (and not just
- *  searching for the same string again), a request will be queued to
+ *  searching for the same string again), a request will be queued to 
  *  receive the search results
  */
 void OnlineUserSearch::search()
@@ -244,7 +244,7 @@ void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in s
 }   // setLastSelected
 
 // ----------------------------------------------------------------------------
-/** Called every frame. It queries the search request for results and
+/** Called every frame. It queries the search request for results and 
  *  displays them if necessary.
  */
 void OnlineUserSearch::onUpdate(float dt)

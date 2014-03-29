@@ -78,8 +78,8 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     else if(shape=="sphere"   ) m_body_type = MP_SPHERE;
     else if(shape=="exact"    ) m_body_type = MP_EXACT;
 
-    else
-        Log::error("PhysicalObject", "Unknown shape type : %s.",
+    else 
+        Log::error("PhysicalObject", "Unknown shape type : %s.", 
                    shape.c_str());
 }   // Settings(XMLNode)
 
@@ -554,7 +554,7 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
  */
 bool PhysicalObject::isSoccerBall() const
 {
-    return m_object->isSoccerBall();
+    return m_object->isSoccerBall(); 
 }   // is SoccerBall
 
 // ----------------------------------------------------------------------------
@@ -565,7 +565,7 @@ bool PhysicalObject::isSoccerBall() const
  */
 void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 {
-    if(isSoccerBall() && m != NULL &&
+    if(isSoccerBall() && m != NULL && 
        m->getCollisionReaction() == Material::PUSH_SOCCER_BALL)
     {
         m_body->applyCentralImpulse(normal * 1000.0f);

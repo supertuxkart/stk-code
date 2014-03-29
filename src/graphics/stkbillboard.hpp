@@ -8,12 +8,12 @@
 class STKBillboard : public irr::scene::CBillboardSceneNode
 {
 public:
-    STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
-        const irr::core::vector3df& position, const irr::core::dimension2d<irr::f32>& size,
-        irr::video::SColor colorTop = irr::video::SColor(0xFFFFFFFF),
-        irr::video::SColor colorBottom = irr::video::SColor(0xFFFFFFFF));
+	STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
+		const irr::core::vector3df& position, const irr::core::dimension2d<irr::f32>& size,
+		irr::video::SColor colorTop = irr::video::SColor(0xFFFFFFFF),
+		irr::video::SColor colorBottom = irr::video::SColor(0xFFFFFFFF));
 
-    virtual void render();
+	virtual void render();
 };
 
 #endif

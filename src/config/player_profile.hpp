@@ -31,7 +31,7 @@ using namespace irr;
 class UTFWriter;
 class AchievementsStatus;
 
-/** Class for managing player profiles (name, usage frequency,
+/** Class for managing player profiles (name, usage frequency, 
  *  etc.). All PlayerProfiles are managed by the PlayerManager.
  *  A PlayerProfile keeps track of the story mode progress using an instance
  *  of StoryModeStatus, and achievements with AchievementsStatus. All data
@@ -42,7 +42,7 @@ class PlayerProfile : public NoCopy
 {
 private:
 
-    /** The name of the player (wide string, so it can be in native
+    /** The name of the player (wide string, so it can be in native 
      *  language). */
     core::stringw m_name;
 
@@ -130,14 +130,14 @@ public:
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
     {
-        return m_story_mode_status->isLocked(feature);
+        return m_story_mode_status->isLocked(feature); 
     }   // isLocked
     // ------------------------------------------------------------------------
     /** Returns all active challenges. */
     void computeActive() { m_story_mode_status->computeActive(); }
     // ------------------------------------------------------------------------
     /** Returns the list of recently completed challenges. */
-    std::vector<const ChallengeData*> getRecentlyCompletedChallenges()
+    std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
     {
         return m_story_mode_status->getRecentlyCompletedChallenges();
     }   // getRecently Completed Challenges
@@ -173,7 +173,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getNumEasyTrophies() const
     {
-        return m_story_mode_status->getNumEasyTrophies();
+        return m_story_mode_status->getNumEasyTrophies(); 
     }   // getNumEasyTrophies
     // ------------------------------------------------------------------------
     unsigned int getNumMediumTrophies() const
@@ -183,10 +183,10 @@ public:
     // -----------------------------------------------------------------------
     unsigned int getNumHardTrophies() const
     {
-        return m_story_mode_status->getNumHardTrophies();
+        return m_story_mode_status->getNumHardTrophies(); 
     }   // getNumHardTropies
     // ------------------------------------------------------------------------
-    AchievementsStatus* getAchievementsStatus()
+    AchievementsStatus* getAchievementsStatus() 
     {
         return m_achievements_status;
     }   // getAchievementsStatus

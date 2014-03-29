@@ -183,7 +183,7 @@ void MaterialManager::loadMaterial()
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
     //
-    addSharedMaterial(file_manager->getAssetChecked(FileManager::TEXTURE,
+    addSharedMaterial(file_manager->getAssetChecked(FileManager::TEXTURE, 
                                                     "materials.xml", true));
     std::string deprecated = file_manager->getAssetChecked(FileManager::TEXTURE,
                                                            "deprecated/materials.xml");
@@ -298,12 +298,12 @@ Material *MaterialManager::getMaterial(const std::string& fname,
     }
 
     std::string basename;
-
+    
     if (strip_path)
         basename = StringUtils::getBasename(fname);
     else
         basename = fname;
-
+        
     // Search backward so that temporary (track) textures are found first
     for(int i = (int)m_materials.size()-1; i>=0; i-- )
     {

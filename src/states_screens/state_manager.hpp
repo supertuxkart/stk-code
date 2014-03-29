@@ -197,7 +197,7 @@ public:
       */
     const PlayerProfile* getActivePlayerProfile(const int id);
 
-    int createActivePlayer(PlayerProfile *profile, InputDevice *device,
+    int createActivePlayer(PlayerProfile *profile, InputDevice *device, 
                            Online::OnlineProfile* use);
     void removeActivePlayer(int id);
 

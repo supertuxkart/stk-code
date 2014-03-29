@@ -107,7 +107,7 @@ class ProtocolManager : public Singleton<ProtocolManager>
     friend class Singleton<ProtocolManager>;
     friend void* protocolManagerAsynchronousUpdate(void* data);
     public:
-
+        
         /*! \brief Stops the protocol manager. */
         virtual void            abort();
         /*!

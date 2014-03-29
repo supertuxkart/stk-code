@@ -39,7 +39,7 @@ ExplosionAnimation *ExplosionAnimation::create(AbstractKart *kart,
                                                bool direct_hit)
 {
     if(kart->isInvulnerable()) return NULL;
-
+    
     float r = kart->getKartProperties()->getExplosionRadius();
 
     // Ignore explosion that are too far away.

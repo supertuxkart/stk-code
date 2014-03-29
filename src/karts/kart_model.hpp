@@ -163,7 +163,7 @@ private:
 
     /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
-
+    
     /** The position of the nitro emitters */
     Vec3          m_nitro_emitter_position[2];
 
@@ -172,7 +172,7 @@ private:
 
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
-
+    
     /** Minimum suspension length. If the displayed suspension is
      *  shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
@@ -203,7 +203,7 @@ private:
     float m_kart_highest_point;
 
     /** Smallest coordinate on up axis. */
-    float m_kart_lowest_point;
+    float m_kart_lowest_point; 
 
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
@@ -212,11 +212,11 @@ private:
 
     void  loadWheelInfo(const XMLNode &node,
                         const std::string &wheel_name, int index);
-
+    
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, 
                                 const SpeedWeightedObject::Properties& fallback_properties);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);

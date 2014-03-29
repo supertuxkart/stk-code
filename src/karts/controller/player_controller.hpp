@@ -55,7 +55,7 @@ private:
 
     void           steer(float, int);
 public:
-                   PlayerController  (AbstractKart *kart,
+                   PlayerController  (AbstractKart *kart, 
                                       StateManager::ActivePlayer *_player,
                                       unsigned int player_index);
                   ~PlayerController  ();

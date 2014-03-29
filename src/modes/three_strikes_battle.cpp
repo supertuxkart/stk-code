@@ -336,7 +336,7 @@ void ThreeStrikesBattle::update(float dt)
                                                    m_tire_rotation *RAD_TO_DEGREE + 180);
         core::vector3df tire_scale(scale,scale,scale);
 
-        PhysicalObject::Settings physics_settings(body_shape,
+        PhysicalObject::Settings physics_settings(body_shape, 
                                                   radius, /*mass*/15.0f);
 
         TrackObjectPresentationMesh* tire_presentation =
@@ -513,7 +513,7 @@ unsigned int ThreeStrikesBattle::getRescuePositionIndex(AbstractKart *kart)
             accumulated_distance += sqrt(abs_distance2);
         }
 
-        if(accumulated_distance > largest_accumulated_distance_found &&
+        if(accumulated_distance > largest_accumulated_distance_found && 
             spawn_point_clear)
         {
             furthest_id_found = n;

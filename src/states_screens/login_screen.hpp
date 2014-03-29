@@ -21,7 +21,7 @@
 #include "guiengine/screen.hpp"
 
 namespace GUIEngine { class LabelWidget;
-                      class RibbonWidget;
+                      class RibbonWidget; 
                       class Widget;        }
 
 /**

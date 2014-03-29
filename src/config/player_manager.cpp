@@ -29,7 +29,7 @@
 PlayerManager *PlayerManager::m_player_manager = NULL;
 
 
-/** Create the instance of the player manager.
+/** Create the instance of the player manager. 
  *  Also make sure that at least one player is defined (and if not,
  *  create a default player and a guest player).
  */
@@ -137,7 +137,7 @@ void PlayerManager::addNewPlayer(const core::stringw& name)
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
-/** Deletes a player profile from the list of all profiles.
+/** Deletes a player profile from the list of all profiles. 
  */
 void PlayerManager::deletePlayer(PlayerProfile *player)
 {
@@ -146,7 +146,7 @@ void PlayerManager::deletePlayer(PlayerProfile *player)
 
 // ----------------------------------------------------------------------------
 /** This function makes sure that a current player is defined. This is called
- *  when a screen skipping command line option is given (-N, -R, ...), in
+ *  when a screen skipping command line option is given (-N, -R, ...), in 
  *  which case there might not be a current player (if no default player is
  *  set in players.xml, i.e. the 'remember be' option was not picked ). Since
  *  a lot of code depends on having a local player, just set the most

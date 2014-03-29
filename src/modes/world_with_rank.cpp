@@ -135,7 +135,7 @@ unsigned int WorldWithRank::getNumberOfRescuePositions() const
 // ----------------------------------------------------------------------------
 /** Finds the starting position which is closest to the kart.
  *  \param kart The kart for which a rescue position needs to be determined.
- */
+ */ 
 unsigned int WorldWithRank::getRescuePositionIndex(AbstractKart *kart)
 {
     // find closest point to drop kart on

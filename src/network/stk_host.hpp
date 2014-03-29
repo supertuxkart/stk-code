@@ -63,7 +63,7 @@ class STKHost
         STKHost();
         /*! \brief Destructor                                               */
         virtual ~STKHost();
-
+        
         /*! \brief Log packets into a file
          *  \param ns : The data in the packet
          *  \param incoming : True if the packet comes from a peer.

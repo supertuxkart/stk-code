@@ -73,15 +73,15 @@ protected:
     std::string                    m_type;
 
     bool                           m_soccer_ball;
-
+    
     bool                           m_garage;
-
+    
     float                          m_distance;
 
     PhysicalObject*                m_physical_object;
 
     ThreeDAnimation*               m_animator;
-
+    
     void init(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
 
 public:
@@ -112,7 +112,7 @@ public:
     bool isSoccerBall() const { return m_soccer_ball; }
     bool isGarage() const { return m_garage; }
     float getDistance() const { return m_distance; }
-
+    
     const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
     PhysicalObject* getPhysicalObject() { return m_physical_object; }
 

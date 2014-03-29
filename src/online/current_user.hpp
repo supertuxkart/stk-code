@@ -60,7 +60,7 @@ namespace Online
             {
                 virtual void callback ();
             public:
-                SignInRequest(bool manage_memory = false)
+                SignInRequest(bool manage_memory = false) 
                     : XMLRequest(manage_memory, /*priority*/10) {}
             };   // SignInRequest
 

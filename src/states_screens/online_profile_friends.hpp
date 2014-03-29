@@ -31,7 +31,7 @@
 namespace GUIEngine { class Widget; }
 
 
-/** Online profile overview screen.
+/** Online profile overview screen. 
  * \ingroup states_screens
  */
 class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileFriends>
@@ -54,8 +54,8 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget,
-                               const std::string& name,
+    virtual void eventCallback(GUIEngine::Widget* widget, 
+                               const std::string& name, 
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

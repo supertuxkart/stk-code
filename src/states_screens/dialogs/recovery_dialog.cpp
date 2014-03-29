@@ -80,7 +80,7 @@ void RecoveryDialog::showRecoveryInput()
 }   // showRecoveryInput
 
 // -----------------------------------------------------------------------------
-/** Informs the user that an email will be sent.
+/** Informs the user that an email will be sent. 
  */
 void RecoveryDialog::showRecoveryInfo()
 {
@@ -112,7 +112,7 @@ void RecoveryDialog::processInput()
 {
     const core::stringw username = m_username_widget->getText().trim();
     const core::stringw email = m_email_widget->getText().trim();
-    if (username.size() < 4 || username.size() > 30 ||
+    if (username.size() < 4 || username.size() > 30 || 
         email.size() < 4    || email.size() > 50       )
     {
         sfx_manager->quickSound("anvil");
@@ -136,12 +136,12 @@ void RecoveryDialog::processInput()
 // -----------------------------------------------------------------------------
 /** Handle a user event.
  */
-GUIEngine::EventPropagation
+GUIEngine::EventPropagation 
                    RecoveryDialog::processEvent(const std::string& eventSource)
 {
     std::string selection;
     if (eventSource == m_options_widget->m_properties[PROP_ID])
-        selection =
+        selection = 
                  m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     else
         selection = eventSource;

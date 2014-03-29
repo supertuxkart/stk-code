@@ -70,7 +70,7 @@ public:
         m_player_manager = NULL;
     }   // destroy
     // ------------------------------------------------------------------------
-
+    
     void save();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
