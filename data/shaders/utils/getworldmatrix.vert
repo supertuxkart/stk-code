@@ -15,11 +15,11 @@ mat4 getMatrixFromRotation(vec3 rotation)
     float srsp = sr*sp;
     float crsp = cr*sp;
 
-    return mat4(
+    return transpose(mat4(
         vec4(cp * cy, srsp * cy - cr * sy, crsp * cy + sr * sy, 0.),
         vec4(cp * sy, srsp * sy + cr * cy, crsp * sy - sr * cy, 0.),
         vec4(-sp, sr * cp, cr * cp, 0.),
-        vec4(0., 0., 0., 1.));
+        vec4(0., 0., 0., 1.)));
 }
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation)
