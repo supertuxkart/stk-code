@@ -508,7 +508,9 @@ namespace MeshShader
     GLuint InstancedObjectPass1Shader::Program;
     GLuint InstancedObjectPass1Shader::attrib_position;
     GLuint InstancedObjectPass1Shader::attrib_normal;
+    GLuint InstancedObjectPass1Shader::attrib_orientation;
     GLuint InstancedObjectPass1Shader::attrib_origin;
+
     GLuint InstancedObjectPass1Shader::uniform_MP;
     GLuint InstancedObjectPass1Shader::uniform_VM;
 
@@ -520,6 +522,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
@@ -621,6 +624,7 @@ namespace MeshShader
     GLuint InstancedObjectPass2Shader::attrib_position;
     GLuint InstancedObjectPass2Shader::attrib_texcoord;
     GLuint InstancedObjectPass2Shader::attrib_origin;
+    GLuint InstancedObjectPass2Shader::attrib_orientation;
     GLuint InstancedObjectPass2Shader::uniform_VP;
     GLuint InstancedObjectPass2Shader::uniform_TM;
     GLuint InstancedObjectPass2Shader::uniform_screen;
@@ -637,6 +641,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
         uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");

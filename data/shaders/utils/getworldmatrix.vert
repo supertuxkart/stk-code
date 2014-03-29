@@ -1,13 +1,16 @@
+const float DEG2GRAD = 3.14 / 180.;
+
+
 mat4 getMatrixFromRotation(vec3 rotation)
 {
 
     // from irrlicht
-    float cr = cos( rotation.z );
-    float sr = sin( rotation.z );
-    float cp = cos( rotation.x );
-    float sp = sin( rotation.x );
-    float cy = cos( rotation.y );
-    float sy = sin( rotation.y );
+    float cr = cos(DEG2GRAD * rotation.x );
+    float sr = sin(DEG2GRAD * rotation.x );
+    float cp = cos(DEG2GRAD * rotation.y );
+    float sp = sin(DEG2GRAD * rotation.y );
+    float cy = cos(DEG2GRAD * rotation.z );
+    float sy = sin(DEG2GRAD * rotation.z );
 
     float srsp = sr*sp;
     float crsp = cr*sp;

@@ -62,8 +62,10 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         glEnableVertexAttribArray(MeshShader::InstancedObjectPass1Shader::attrib_origin);
-        glVertexAttribPointer(MeshShader::InstancedObjectPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glVertexAttribPointer(MeshShader::InstancedObjectPass1Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
         glVertexAttribDivisor(MeshShader::InstancedObjectPass1Shader::attrib_origin, 1);
+        glVertexAttribPointer(MeshShader::InstancedObjectPass1Shader::attrib_orientation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+        glVertexAttribDivisor(MeshShader::InstancedObjectPass1Shader::attrib_orientation, 1);
         break;
     case FPSM_GRASS:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -92,6 +94,8 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glEnableVertexAttribArray(MeshShader::InstancedObjectPass2Shader::attrib_origin);
         glVertexAttribPointer(MeshShader::InstancedObjectPass2Shader::attrib_origin, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), 0);
         glVertexAttribDivisor(MeshShader::InstancedObjectPass2Shader::attrib_origin, 1);
+        glVertexAttribPointer(MeshShader::InstancedObjectPass2Shader::attrib_orientation, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (GLvoid*)(3 * sizeof(float)));
+        glVertexAttribDivisor(MeshShader::InstancedObjectPass2Shader::attrib_orientation, 1);
         break;
     case SM_GRASS:
         mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
