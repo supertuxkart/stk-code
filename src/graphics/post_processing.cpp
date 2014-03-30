@@ -441,11 +441,6 @@ void PostProcessing::renderPassThrough(ITexture *tex)
     glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
 }
 
 void PostProcessing::renderPassThrough(GLuint tex)
@@ -682,11 +677,18 @@ void PostProcessing::render()
                 renderPassThrough(irr_driver->getRTT(RTT_QUARTER1));
 
                 // Blur it for distribution.
+                renderGaussian6Blur(irr_driver->getRTT(RTT_HALF1), irr_driver->getRTT(RTT_HALF2), 2.f / UserConfigParams::m_width, 2.f / UserConfigParams::m_height);
+                renderGaussian6Blur(irr_driver->getRTT(RTT_QUARTER1), irr_driver->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
                 renderGaussian6Blur(irr_driver->getRTT(RTT_EIGHTH1), irr_driver->getRTT(RTT_EIGHTH2), 8.f / UserConfigParams::m_width, 8.f / UserConfigParams::m_height);
 
                 // Additively blend on top of tmp1
                 drv->setRenderTarget(out, false, false);
-                renderBloomBlend(irr_driver->getRTT(RTT_EIGHTH1));
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_ONE, GL_ONE);
+                glBlendEquation(GL_FUNC_ADD);
+                renderPassThrough(irr_driver->getRTT(RTT_HALF1));
+                renderPassThrough(irr_driver->getRTT(RTT_QUARTER1));
+                renderPassThrough(irr_driver->getRTT(RTT_EIGHTH1));
             } // end if bloom
 
             in = irr_driver->getRTT(RTT_TMP1);
@@ -697,6 +699,8 @@ void PostProcessing::render()
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         if (m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
         {
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
             // Grab the sky
             drv->setRenderTarget(out, true, false);
 //            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
