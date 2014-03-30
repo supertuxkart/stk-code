@@ -1228,10 +1228,18 @@ int main(int argc, char *argv[] )
         if (UserConfigParams::m_internet_status !=
             Online::RequestManager::IPERM_ALLOWED)
         {
-            std::string xml_file = file_manager->getAddonsFile("addons.xml");
-            if (file_manager->fileExists(xml_file)) {
-                const XMLNode *xml = new XMLNode (xml_file);
-                addons_manager->initAddons(xml);
+            std::string xml_file = file_manager->getAddonsFile("addonsX.xml");
+            if (file_manager->fileExists(xml_file))
+            {
+                try
+                {
+                    const XMLNode *xml = new XMLNode(xml_file);
+                    addons_manager->initAddons(xml);
+                }
+                catch (std::runtime_error& e)
+                {
+                    Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
+                }
             }
         }
 
