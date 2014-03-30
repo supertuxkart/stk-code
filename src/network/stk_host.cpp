@@ -121,10 +121,10 @@ void STKHost::setupServer(uint32_t address, uint16_t port, int peer_count,
     addr->port = port;
 
 #ifdef WIN32/*
-	addr->host = 0;
-	addr->host += ((unsigned int)(192)<<0); // 192.168.0.11
-	addr->host += ((unsigned int)(168)<<8); // 192.168.0.11
-	addr->host += ((unsigned int)(11)<<24); // 192.168.0.11*/
+    addr->host = 0;
+    addr->host += ((unsigned int)(192)<<0); // 192.168.0.11
+    addr->host += ((unsigned int)(168)<<8); // 192.168.0.11
+    addr->host += ((unsigned int)(11)<<24); // 192.168.0.11*/
 #endif
 
     m_host = enet_host_create(addr, peer_count, channel_limit,
@@ -235,10 +235,10 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress* sender)
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
         StkTime::sleep(1); // wait 1 millisecond between two checks
     }
-	if (len == SOCKET_ERROR)
-	{
-		Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
-	}
+    if (len == SOCKET_ERROR)
+    {
+        Log::error("STKHost", "Problem with the socket. Please contact the dev team.");
+    }
     // we received the data
     sender->ip = ntohl((uint32_t)(addr.sin_addr.s_addr));
     sender->port = ntohs(addr.sin_port);
@@ -272,8 +272,8 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
     while(len < 0 || addr.sin_addr.s_addr == sender.ip)
     {
         i++;
-		if (len>=0)
-		{
+        if (len>=0)
+        {
             Log::info("STKHost", "Message received but the ip address didn't match the expected one.");
         }
         len = recvfrom(m_host->socket, (char*)buffer, 2048, 0, (struct sockaddr*)(&addr), &from_len);
@@ -281,10 +281,10 @@ uint8_t* STKHost::receiveRawPacket(TransportAddress sender, int max_tries)
         if (i >= max_tries && max_tries != -1)
         {
             Log::verbose("STKHost", "No answer from the server on %u.%u.%u.%u:%u", (m_host->address.host&0xff),
-						(m_host->address.host>>8&0xff),
-						(m_host->address.host>>16&0xff),
-						(m_host->address.host>>24&0xff),
-						(m_host->address.port));
+                        (m_host->address.host>>8&0xff),
+                        (m_host->address.host>>16&0xff),
+                        (m_host->address.host>>24&0xff),
+                        (m_host->address.port));
             return NULL;
         }
     }

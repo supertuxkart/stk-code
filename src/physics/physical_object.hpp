@@ -62,7 +62,7 @@ public:
         /** Reset the object when it falls under the track (useful
          *  e.g. for a boulder rolling down a hill). */
         bool                      m_reset_when_too_low;
-        /** If the item is below that height, it is reset (when 
+        /** If the item is below that height, it is reset (when
          *  m_reset_when_too_low is true). */
         float                     m_reset_height;
     private:

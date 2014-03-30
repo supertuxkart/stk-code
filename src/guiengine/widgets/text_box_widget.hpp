@@ -35,7 +35,7 @@ namespace GUIEngine
         virtual void onTextUpdated() = 0;
     };
     
-    /** \brief A text field widget. 
+    /** \brief A text field widget.
       * \ingroup widgetsgroup
       */
     class TextBoxWidget : public Widget

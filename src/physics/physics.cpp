@@ -277,7 +277,7 @@ void Physics::update(float dt)
                                                        target_kart->getIdent(), 1);
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE, 
+                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE,
                                                           "ball", 1);
                     }   // is bowling ball
                 }   // if target_kart != kart && is a player kart and is current player

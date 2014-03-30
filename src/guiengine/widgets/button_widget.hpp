@@ -33,7 +33,7 @@
 
 namespace GUIEngine
 {
-    /** 
+    /**
       * \brief A text button widget.
       * \ingroup widgetsgroup
       */
@@ -49,7 +49,7 @@ namespace GUIEngine
         /** \brief Implement callback from base class Widget */
         void add();
         
-        /** 
+        /**
           * \brief Change the label on the button
           * \pre This should only be called after a widget has been add()ed (changing the label
           *               before the widget is added can be done by editing the 'text' property of Widget).
@@ -63,7 +63,7 @@ namespace GUIEngine
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
-    }; 
+    };
 }
 
 #endif

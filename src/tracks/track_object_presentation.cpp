@@ -211,9 +211,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	xml_node.get("displacing", &displacing);
-	animated &= !displacing;
+    bool displacing = false;
+    xml_node.get("displacing", &displacing);
+    animated &= !displacing;
 
     if (animated)
     {
@@ -279,10 +279,10 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	if(xml_node)
+    bool displacing = false;
+    if(xml_node)
         xml_node->get("displacing", &displacing);
-	animated &= !displacing;
+    animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);

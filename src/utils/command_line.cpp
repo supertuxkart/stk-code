@@ -24,7 +24,7 @@
 std::vector<std::string>  CommandLine::m_argv;
 std::string               CommandLine::m_exec_name="";
 
-/** The constructor takes the standard C arguments argc and argv and 
+/** The constructor takes the standard C arguments argc and argv and
  *  stores the information internally.
  *  \param argc Number of arguments (in argv).
  *  \param argv Array of char* with all command line arguments.

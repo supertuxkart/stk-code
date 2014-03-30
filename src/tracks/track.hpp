@@ -383,7 +383,7 @@ private:
     float m_displacement_speed;
     float m_caustics_speed;
     
-    /** The levels for color correction 
+    /** The levels for color correction
      * m_color_inlevel(black, gamma, white)
      * m_color_outlevel(black, white)*/
     core::vector3df m_color_inlevel;

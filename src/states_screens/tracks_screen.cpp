@@ -88,7 +88,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
 
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s':",
                                                 clickedTrack->getFilename()   );
@@ -111,7 +111,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 Track* clickedTrack = track_manager->getTrack(selection);
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s'",
                                                 clickedTrack->getFilename());

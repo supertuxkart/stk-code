@@ -67,7 +67,7 @@ public:
     static void printMessage(int level, const char *component,
                              const char *format, VALIST va_list);
     // ------------------------------------------------------------------------
-    /** A simple macro to define the various log functions. 
+    /** A simple macro to define the various log functions.
      *  Note that an assert is added so that a debugger is triggered
      *  when debugging. */
 #define LOG(NAME, LEVEL)                                             \

@@ -71,14 +71,14 @@ namespace GUIEngine
           * it displays how close the value is to the maximum by filling a line
           */
         bool m_gauge;
-	
-	
+    
+    
         /** \brief Whether to wrap back to the first value when going "beyond" the last value */
         bool m_wrap_around;
         
         /** \brief implementing method from base class Widget */
-        virtual EventPropagation transmitEvent(Widget* w, 
-                                               const std::string& originator, 
+        virtual EventPropagation transmitEvent(Widget* w,
+                                               const std::string& originator,
                                                const int playerID);
         
         /** \brief implementing method from base class Widget */
@@ -109,7 +109,7 @@ namespace GUIEngine
         void addLabel(irr::core::stringw label);
         void clearLabels();
 
-	// next four functions are for background colour behind playername in multikart screen selection
+    // next four functions are for background colour behind playername in multikart screen selection
         void setUseBackgroundColor()                {m_use_background_color=true;        }
         bool getUseBackgroundColor()                {return m_use_background_color;      }
         void setSpinnerWidgetPlayerID(int playerID) {m_spinner_widget_player_id=playerID;}
@@ -141,13 +141,13 @@ namespace GUIEngine
           */
         bool isGauge()  const { return m_gauge; }
         
-        /** 
+        /**
          * \brief retrieve the current value of the spinner
          * \return the current value of the spinner, in a int form
          */
         int  getValue() const { return m_value; }
         
-        /** 
+        /**
           * \brief retrieve the current value of the spinner
           * \return the current value of the spinner, in a string form
           */

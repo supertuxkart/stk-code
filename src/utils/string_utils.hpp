@@ -124,7 +124,7 @@ namespace StringUtils
      *  and this is in the best case very confusing for translators (which get
      *  to see two strings instead of one sentence, see xgettext manual
      *  for why this is a bad idea)
-     *  In order to accomodate translations even more, you can use formats 
+     *  In order to accomodate translations even more, you can use formats
      *  %0, %1, %2, etc..., where %0 is replaced by the first argument, %1 by
      *  the second argument, etc... This allows translated strings to not
      *  necessarily insert the words in the same order as in English.

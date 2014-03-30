@@ -29,7 +29,7 @@
 
 namespace GUIEngine
 {
-    /** 
+    /**
       * \brief A rating bar widget.
       * \ingroup widgetsgroup
       */
@@ -76,7 +76,7 @@ namespace GUIEngine
         virtual void onClick();
 
         void allowVoting() { m_allow_voting = true; }
-    }; 
+    };
 }
 
 #endif

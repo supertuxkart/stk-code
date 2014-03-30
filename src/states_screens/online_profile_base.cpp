@@ -52,16 +52,16 @@ void OnlineProfileBase::loadedFromFile()
     m_header = getWidget<LabelWidget>("title");
     assert(m_header != NULL);
 
-    m_overview_tab = 
+    m_overview_tab =
         (IconButtonWidget *)m_profile_tabs->findWidgetNamed("tab_overview");
     assert(m_overview_tab != NULL);
     m_friends_tab =
         (IconButtonWidget *) m_profile_tabs->findWidgetNamed("tab_friends");
     assert(m_friends_tab != NULL);
-    m_achievements_tab = 
+    m_achievements_tab =
         (IconButtonWidget*)m_profile_tabs->findWidgetNamed("tab_achievements");
     assert(m_achievements_tab != NULL);
-    m_settings_tab = 
+    m_settings_tab =
         (IconButtonWidget *) m_profile_tabs->findWidgetNamed("tab_settings");
     assert(m_settings_tab != NULL);
 }   // loadedFromFile
@@ -111,7 +111,7 @@ void OnlineProfileBase::init()
 // -----------------------------------------------------------------------------
 /** Called when an event occurs (i.e. user clicks on something).
 */
-void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name, 
+void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
                                       const int playerID)
 {
     if (name == m_profile_tabs->m_properties[PROP_ID])
@@ -125,7 +125,7 @@ void OnlineProfileBase::eventCallback(Widget* widget, const std::string& name,
             sm->replaceTopMostScreen(OnlineProfileFriends::getInstance());
         else if (selection == m_achievements_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileAchievements::getInstance());
-        else if (selection == m_settings_tab->m_properties[PROP_ID]) 
+        else if (selection == m_settings_tab->m_properties[PROP_ID])
             sm->replaceTopMostScreen(OnlineProfileSettings::getInstance());
     }
     else if (name == "back")

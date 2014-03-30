@@ -203,7 +203,7 @@ private:
     float m_kart_highest_point;
 
     /** Smallest coordinate on up axis. */
-    float m_kart_lowest_point; 
+    float m_kart_lowest_point;
 
     /** True if this is the master copy, managed by KartProperties. This
      *  is mainly used for debugging, e.g. the master copies might not have
@@ -216,7 +216,7 @@ private:
     void  loadNitroEmitterInfo(const XMLNode &node,
                         const std::string &emitter_name, int index);
 
-    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node, 
+    void  loadSpeedWeightedInfo(const XMLNode* speed_weighted_node,
                                 const SpeedWeightedObject::Properties& fallback_properties);
 
     void OnAnimationEnd(scene::IAnimatedMeshSceneNode *node);
