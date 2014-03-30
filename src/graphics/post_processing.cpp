@@ -271,6 +271,8 @@ void renderColorLevel(ITexture *in)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_LOG_LUMINANCE)), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_logluminancetex, 2);
     glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -866,6 +868,8 @@ void PostProcessing::render()
             glDisable(GL_STENCIL_TEST);
             PROFILER_POP_CPU_MARKER();
         }
+
+        computeLogLuminance(getTextureGLuint(in));
 
         // Final blit
         // TODO : Use glBlitFramebuffer

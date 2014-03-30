@@ -1791,6 +1791,7 @@ namespace FullScreenShader
 
 	GLuint ColorLevelShader::Program;
 	GLuint ColorLevelShader::uniform_tex;
+    GLuint ColorLevelShader::uniform_logluminancetex;
 	GLuint ColorLevelShader::uniform_inlevel;
 	GLuint ColorLevelShader::uniform_outlevel;
 	GLuint ColorLevelShader::vao;
@@ -1800,8 +1801,11 @@ namespace FullScreenShader
 	{
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/color_levels.frag").c_str());
 		uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
 		uniform_inlevel = glGetUniformLocation(Program, "inlevel");
 		uniform_outlevel = glGetUniformLocation(Program, "outlevel");

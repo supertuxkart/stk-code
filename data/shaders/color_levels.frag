@@ -209,6 +209,7 @@ uniform sampler2D dtex;
 uniform vec3 inlevel;
 uniform vec2 outlevel;
 uniform mat4 invprojm;
+uniform sampler2D logluminancetex;
 
 #if __VERSION__ >= 130
 in vec2 uv;
@@ -218,11 +219,23 @@ varying vec2 uv;
 #define FragColor gl_FragColor
 #endif
 
+vec3 getCIEYxy(vec3 rgbColor);
+vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
+float exposure = .1;
+float whitePoint = 1.;
+float delta = 0.0001;
 
 void main()
 {
 	vec4 col = texture(tex, uv);
+    float avgLuminance = textureLod(logluminancetex, uv, 10.);
+    avgLuminance = exp(avgLuminance) - delta;
+
+    vec3 Yxy = getCIEYxy(col.xyz);
+    float Lp = Yxy.r * exposure / avgLuminance;
+    Yxy.r = (Lp * (1. * Lp / (whitePoint * whitePoint))) / (1. + Lp);
+    col.xyz = getRGBFromCIEXxy(Yxy);
 
     float curdepth = texture(dtex, uv).x;
     vec4 FragPos = invprojm * (2.0 * vec4(uv, curdepth, 1.0f) - 1.0f);
