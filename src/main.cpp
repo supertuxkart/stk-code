@@ -463,25 +463,40 @@ void cmdLineHelp()
  */
 int handleCmdLinePreliminary()
 {
-    if( CommandLine::has("--help") || CommandLine::has("-help") ||
-        CommandLine::has("-h")                                      )
+    if(CommandLine::has("--help") || CommandLine::has("--help") ||
+       CommandLine::has("-h"))
     {
         cmdLineHelp();
         exit(0);
     }
-    if( CommandLine::has("--gamepad-visualisation") ||
-        CommandLine::has("--gamepad-visualization")    )
+
+    if(CommandLine::has("--version") || CommandLine::has("-v"))
+    {
+        Log::info("main", "==============================");
+        Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
+        // IRRLICHT_VERSION_SVN
+        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
+                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
+                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
+        Log::info("main", "==============================");
+        exit(0);
+    }
+
+    if(CommandLine::has("--gamepad-visualisation") ||   // only BE
+       CommandLine::has("--gamepad-visualization")    ) // both AE and BE
         UserConfigParams::m_gamepad_visualisation=true;
-    if( CommandLine::has("--debug=memory"))
+    if(CommandLine::has("--debug=memory"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
-    if( CommandLine::has("--debug=addons"))
+    if(CommandLine::has("--debug=addons"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ADDONS;
-    if( CommandLine::has("--debug=mgui"))
+    if(CommandLine::has("--debug=mgui"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_GUI;
-    if( CommandLine::has("--debug=flyable"))
+    if(CommandLine::has("--debug=flyable"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_FLYABLE;
-    if( CommandLine::has("--debug=mist"))
+    if(CommandLine::has("--debug=mist"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
+    if(CommandLine::has("--debug=all") )
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--console"))
         UserConfigParams::m_log_errors_to_console=true;
     if(CommandLine::has("--no-console"))
@@ -493,36 +508,32 @@ int handleCmdLinePreliminary()
         Log::disableColor();
         Log::verbose("main", "Colours disabled.");
     }
-    if(CommandLine::has("--debug=all") )
-        UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
 
     std::string s;
-    if( CommandLine::has( "--stk-config", &s))
+    if(CommandLine::has("--stk-config", &s))
     {
         stk_config->load(file_manager->getAsset(s));
         Log::info("main", "STK config will be read from %s.",s.c_str());
     }
-    if( CommandLine::has( "--trackdir", &s))
+    if(CommandLine::has("--trackdir", &s))
         TrackManager::addTrackSearchDir(s);
-    if( CommandLine::has( "--kartdir", &s))
+    if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
-    if( CommandLine::has( "--no-graphics") ||
-        CommandLine::has("-l"            )    )
+    if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
     {
         ProfileWorld::disableGraphics();
         UserConfigParams::m_log_errors_to_console=true;
     }
 
-    if(CommandLine::has("--screensize", &s) || 
-       CommandLine::has("-s", &s)              )
+    if(CommandLine::has("--screensize", &s) || CommandLine::has("-s", &s))
     {
         //Check if fullscreen and new res is blacklisted
         int width, height;
         if (sscanf(s.c_str(), "%dx%d", &width, &height) == 2)
         {
             // Reassemble the string in case that the original width or
-            // height contained a leading 0 
+            // height contained a leading 0
             std::ostringstream o;
             o << width << "x" << height;
             std::string res = o.str();
@@ -550,8 +561,6 @@ int handleCmdLinePreliminary()
         }
     }
 
-
-//#if !defined(WIN32) && !defined(__CYGWIN)
     if(CommandLine::has("--fullscreen") || CommandLine::has("-f"))
     {
         // Check that current res is not blacklisted
@@ -566,26 +575,11 @@ int handleCmdLinePreliminary()
             Log::warn("main", "Resolution %s has been blacklisted, so it "
             "is not available!", res.c_str());
     }
+
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
-//#endif
 
-    if(CommandLine::has("--version") || CommandLine::has("-v"))
-    {
-        Log::info("main", "==============================");
-        Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
-#ifdef SVNVERSION
-        Log::info("main", "SuperTuxKart, SVN revision number '%s'.",
-                          SVNVERSION ) ;
-#endif
-        // IRRLICHT_VERSION_SVN
-        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
-                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
-        Log::info("main", "==============================");
-    }   // --verbose or -v
-    
-    // Enable loading GP's from local directory
+    // Enable loading grand prix from local directory
     if(CommandLine::has("--add-gp-dir", &s))
     {
         // Ensure that the path ends with a /
