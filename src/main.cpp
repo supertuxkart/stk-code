@@ -1146,7 +1146,6 @@ int main(int argc, char *argv[] )
             StkTime::getDate(&day, &month);
             if((month == 12 && day >= 17) || (month ==  1 && day <= 5))
                 kart_properties_manager->setHatMeshName("christmas_hat.b3d");
-            break;
         }
         else if (UserConfigParams::m_xmas_mode == 1)
         {
