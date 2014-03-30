@@ -665,19 +665,8 @@ void PostProcessing::render()
             {
                 drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
                 renderBloom(in);
-            }
 
-
-            if (globalbloom)
-            {
-                // Clear the alpha to a suitable value, stencil
-                glClearColor(0, 0, 0, 0.1f);
-                glColorMask(0, 0, 0, 1);
-
-                glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-                glClearColor(0, 0, 0, 0);
-                glColorMask(1, 1, 1, 1);
+                glClear(GL_STENCIL_BUFFER_BIT);
 
                 // To half
                 drv->setRenderTarget(irr_driver->getRTT(RTT_HALF1), true, false);
