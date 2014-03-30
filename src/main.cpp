@@ -463,7 +463,8 @@ void cmdLineHelp()
  */
 int handleCmdLinePreliminary()
 {
-    if( CommandLine::has("--help") || CommandLine::has("-h"))
+    if(CommandLine::has("--help") || CommandLine::has("--help") ||
+       CommandLine::has("-h"))
     {
         cmdLineHelp();
         exit(0);
