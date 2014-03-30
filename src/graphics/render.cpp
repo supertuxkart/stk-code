@@ -1213,7 +1213,6 @@ void IrrDriver::generateSkyboxCubemap()
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     glGenTextures(1, &SkyboxCubeMap);
-    glGenTextures(1, &ConvolutedSkyboxCubeMap);
 
     GLint w = 0, h = 0;
     for (unsigned i = 0; i < 6; i++)
@@ -1245,6 +1244,7 @@ void IrrDriver::generateSkyboxCubemap()
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
 
+    /*
     testSH(rgba, w, h, blueSHCoeff, greenSHCoeff, redSHCoeff);
 
     for (unsigned i = 0; i < 6; i++)
@@ -1254,7 +1254,7 @@ void IrrDriver::generateSkyboxCubemap()
     }
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
 }
 
 
@@ -1281,11 +1281,11 @@ void IrrDriver::renderSkybox()
     transform.getInverse(invtransform);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glUseProgram(MeshShader::SkyboxShader::Program);
-        MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
+    MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

@@ -131,7 +131,7 @@ private:
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
 public:
-    GLuint SkyboxCubeMap, ConvolutedSkyboxCubeMap;
+    GLuint SkyboxCubeMap;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
