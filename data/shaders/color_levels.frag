@@ -233,8 +233,9 @@ void main()
     avgLuminance = exp(avgLuminance) - delta;
 
     vec3 Yxy = getCIEYxy(col.xyz);
-    float Lp = Yxy.r * exposure / avgLuminance;
-    Yxy.r = (Lp * (1. * Lp / (whitePoint * whitePoint))) / (1. + Lp);
+    float a = max(0, 1.5 - 1.5 / (avgLuminance * .1 + 1)) + .1;
+    float Lp = Yxy.r * a / avgLuminance;
+    Yxy.r = Lp;//(Lp * (1. * Lp / (whitePoint * whitePoint))) / (1. + Lp);
     col.xyz = getRGBFromCIEXxy(Yxy);
 
     float curdepth = texture(dtex, uv).x;
