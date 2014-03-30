@@ -618,6 +618,28 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
     glEnable(GL_DEPTH_TEST);
 }
 
+static void averageTexture(GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+static void computeLogLuminance(GLuint tex)
+{
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    IVideoDriver *const drv = irr_driver->getVideoDriver();
+    drv->setRenderTarget(irr_driver->getRTT(RTT_LOG_LUMINANCE), false, false);
+    glUseProgram(FullScreenShader::LogLuminanceShader::Program);
+    glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LogLuminanceShader::setUniforms(0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    averageTexture(getTextureGLuint(irr_driver->getRTT(RTT_LOG_LUMINANCE)));
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()

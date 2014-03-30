@@ -665,6 +665,17 @@ public:
     static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
 };
 
+class LogLuminanceShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(unsigned TU_tex);
+};
+
 }
 
 namespace UIShader
