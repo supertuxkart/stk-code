@@ -855,12 +855,14 @@ void PostProcessing::render()
         // Final blit
         // TODO : Use glBlitFramebuffer
         drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
+        glEnable(GL_FRAMEBUFFER_SRGB);
         if (irr_driver->getNormals())
             renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         else if (irr_driver->getSSAOViz())
             renderPassThrough(irr_driver->getRTT(RTT_SSAO));
         else
             renderColorLevel(in);
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }   // render
 

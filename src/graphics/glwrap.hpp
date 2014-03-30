@@ -76,6 +76,7 @@ extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 extern PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 extern PFNGLTEXIMAGE3DPROC glTexImage3D;
+extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
@@ -151,6 +152,7 @@ GLint LoadProgram(Types ... args)
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+void transformTexturesTosRGB(irr::video::ITexture *tex);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
