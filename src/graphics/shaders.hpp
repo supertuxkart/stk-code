@@ -457,20 +457,22 @@ class BloomShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_texture, uniform_low;
+    static GLuint uniform_texture;
     static GLuint vao;
 
     static void init();
+    static void setUniforms(unsigned TU_tex);
 };
 
 class BloomBlendShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_texture, uniform_low;
+    static GLuint uniform_texture;
     static GLuint vao;
 
     static void init();
+    static void setUniforms(unsigned TU_tex);
 };
 
 class ColorLevelShader

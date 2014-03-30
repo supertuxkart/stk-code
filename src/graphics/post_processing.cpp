@@ -210,18 +210,11 @@ void renderBloom(ITexture *in)
     const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
     glUseProgram(FullScreenShader::BloomShader::Program);
     glBindVertexArray(FullScreenShader::BloomShader::vao);
-    glUniform1f(FullScreenShader::BloomShader::uniform_low, threshold);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glUniform1i(FullScreenShader::BloomShader::uniform_texture, 0);
+    setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::BloomShader::setUniforms(0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 static
@@ -235,18 +228,10 @@ void renderBloomBlend(ITexture *in)
     glUseProgram(FullScreenShader::BloomBlendShader::Program);
     glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glUniform1i(FullScreenShader::BloomBlendShader::uniform_texture, 0);
+    setTexture(0, getTextureGLuint(in), GL_LINEAR, GL_LINEAR);
+    FullScreenShader::BloomBlendShader::setUniforms(0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
 }
 
 static
