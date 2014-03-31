@@ -59,6 +59,7 @@ PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLTEXIMAGE3DPROC glTexImage3D;
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 #endif
 
@@ -198,6 +199,7 @@ void initGL()
     glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindFramebuffer");
     glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
     glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
     glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
 #ifdef DEBUG
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
@@ -289,6 +291,26 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 {
     assert(tex->isRenderTarget());
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
+}
+
+std::set<irr::video::ITexture *> AlreadyTransformedTexture;
+
+void transformTexturesTosRGB(irr::video::ITexture *tex)
+{
+    if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
+        return;
+    AlreadyTransformedTexture.insert(tex);
+    size_t w = tex->getSize().Width, h = tex->getSize().Height;
+    char *data = new char[w * h * 4];
+    memcpy(data, tex->lock(), w * h * 4);
+    tex->unlock();
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
+    if (tex->hasAlpha())
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    else
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    delete[] data;
 }
 
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)

@@ -1026,9 +1026,10 @@ static void projectSH(float *color[], size_t width, size_t height,
 
                 // Constant obtained by projecting unprojected ref values
                 float solidangle = 2.75 / (wh * pow(d, 1.5f));
-                float b = color[face][4 * height * i + 4 * j] / 255.;
-                float g = color[face][4 * height * i + 4 * j + 1] / 255.;
-                float r = color[face][4 * height * i + 4 * j + 2] / 255.;
+                // pow(., 2.2) to convert from srgb
+                float b = pow(color[face][4 * height * i + 4 * j] / 255., 2.2);
+                float g = pow(color[face][4 * height * i + 4 * j + 1] / 255., 2.2);
+                float r = pow(color[face][4 * height * i + 4 * j + 2] / 255., 2.2);
 
                 assert(b >= 0.);
 
@@ -1241,7 +1242,7 @@ void IrrDriver::generateSkyboxCubemap()
         image->drop();
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
 
     /*
@@ -1250,7 +1251,7 @@ void IrrDriver::generateSkyboxCubemap()
     for (unsigned i = 0; i < 6; i++)
     {
         glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];

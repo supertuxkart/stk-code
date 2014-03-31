@@ -256,6 +256,8 @@ void renderColorLevel(ITexture *in)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_LOG_LUMINANCE)), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_logluminancetex, 2);
     glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -426,11 +428,6 @@ void PostProcessing::renderPassThrough(ITexture *tex)
     glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_BLEND);
 }
 
 void PostProcessing::renderPassThrough(GLuint tex)
@@ -608,6 +605,28 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
     glEnable(GL_DEPTH_TEST);
 }
 
+static void averageTexture(GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+static void computeLogLuminance(GLuint tex)
+{
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    IVideoDriver *const drv = irr_driver->getVideoDriver();
+    drv->setRenderTarget(irr_driver->getRTT(RTT_LOG_LUMINANCE), false, false);
+    glUseProgram(FullScreenShader::LogLuminanceShader::Program);
+    glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LogLuminanceShader::setUniforms(0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    averageTexture(getTextureGLuint(irr_driver->getRTT(RTT_LOG_LUMINANCE)));
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -650,19 +669,8 @@ void PostProcessing::render()
             {
                 drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
                 renderBloom(in);
-            }
 
-
-            if (globalbloom)
-            {
-                // Clear the alpha to a suitable value, stencil
-                glClearColor(0, 0, 0, 0.1f);
-                glColorMask(0, 0, 0, 1);
-
-                glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-                glClearColor(0, 0, 0, 0);
-                glColorMask(1, 1, 1, 1);
+                glClear(GL_STENCIL_BUFFER_BIT);
 
                 // To half
                 drv->setRenderTarget(irr_driver->getRTT(RTT_HALF1), true, false);
@@ -678,11 +686,18 @@ void PostProcessing::render()
                 renderPassThrough(irr_driver->getRTT(RTT_QUARTER1));
 
                 // Blur it for distribution.
+                renderGaussian6Blur(irr_driver->getRTT(RTT_HALF1), irr_driver->getRTT(RTT_HALF2), 2.f / UserConfigParams::m_width, 2.f / UserConfigParams::m_height);
+                renderGaussian6Blur(irr_driver->getRTT(RTT_QUARTER1), irr_driver->getRTT(RTT_QUARTER2), 4.f / UserConfigParams::m_width, 4.f / UserConfigParams::m_height);
                 renderGaussian6Blur(irr_driver->getRTT(RTT_EIGHTH1), irr_driver->getRTT(RTT_EIGHTH2), 8.f / UserConfigParams::m_width, 8.f / UserConfigParams::m_height);
 
                 // Additively blend on top of tmp1
                 drv->setRenderTarget(out, false, false);
-                renderBloomBlend(irr_driver->getRTT(RTT_EIGHTH1));
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_ONE, GL_ONE);
+                glBlendEquation(GL_FUNC_ADD);
+                renderPassThrough(irr_driver->getRTT(RTT_HALF1));
+                renderPassThrough(irr_driver->getRTT(RTT_QUARTER1));
+                renderPassThrough(irr_driver->getRTT(RTT_EIGHTH1));
             } // end if bloom
 
             in = irr_driver->getRTT(RTT_TMP1);
@@ -693,6 +708,8 @@ void PostProcessing::render()
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         if (m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
         {
+            glDisable(GL_BLEND);
+            glEnable(GL_DEPTH_TEST);
             // Grab the sky
             drv->setRenderTarget(out, true, false);
 //            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
@@ -837,15 +854,19 @@ void PostProcessing::render()
             PROFILER_POP_CPU_MARKER();
         }
 
+        computeLogLuminance(getTextureGLuint(in));
+
         // Final blit
         // TODO : Use glBlitFramebuffer
         drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
+        glEnable(GL_FRAMEBUFFER_SRGB);
         if (irr_driver->getNormals())
             renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
         else if (irr_driver->getSSAOViz())
             renderPassThrough(irr_driver->getRTT(RTT_SSAO));
         else
             renderColorLevel(in);
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }   // render
 

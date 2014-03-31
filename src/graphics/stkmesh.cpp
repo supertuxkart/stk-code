@@ -180,8 +180,11 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	for (unsigned i = 0; i < 6; i++)
 	{
 		tex = mb->getMaterial().getTexture(i);
-		if (tex)
-			result.textures[i] = getTextureGLuint(tex);
+        if (tex)
+        {
+            transformTexturesTosRGB(tex);
+            result.textures[i] = getTextureGLuint(tex);
+        }
 		else
 			result.textures[i] = 0;
 	}
