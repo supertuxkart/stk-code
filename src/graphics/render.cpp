@@ -21,7 +21,6 @@
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/glow.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
@@ -77,23 +76,10 @@ void IrrDriver::renderGLSL(float dt)
     // Get a list of all glowing things. The driver's list contains the static ones,
     // here we add items, as they may disappear each frame.
     std::vector<GlowData> glows = m_glowing;
-    std::vector<GlowNode *> transparent_glow_nodes;
 
     ItemManager * const items = ItemManager::get();
     const u32 itemcount = items->getNumberOfItems();
     u32 i;
-
-    // For each static node, give it a glow representation
-    const u32 staticglows = glows.size();
-    for (i = 0; i < staticglows; i++)
-    {
-        scene::ISceneNode * const node = glows[i].node;
-
-        const float radius = (node->getBoundingBox().getExtent().getLength() / 2) * 2.0f;
-        GlowNode * const repnode = new GlowNode(irr_driver->getSceneManager(), radius);
-        repnode->setPosition(node->getTransformedBoundingBox().getCenter());
-        transparent_glow_nodes.push_back(repnode);
-    }
 
     for (i = 0; i < itemcount; i++)
     {
@@ -127,12 +113,6 @@ void IrrDriver::renderGLSL(float dt)
         dat.b = c.getBlue();
 
         glows.push_back(dat);
-
-        // Push back its representation too
-        const float radius = (node->getBoundingBox().getExtent().getLength() / 2) * 2.0f;
-        GlowNode * const repnode = new GlowNode(irr_driver->getSceneManager(), radius);
-        repnode->setPosition(node->getTransformedBoundingBox().getCenter());
-        transparent_glow_nodes.push_back(repnode);
     }
 
     // Start the RTT for post-processing.
@@ -249,27 +229,25 @@ void IrrDriver::renderGLSL(float dt)
         m_scene_manager->drawAll(m_renderpass);
         PROFILER_POP_CPU_MARKER();
 
-		  if (World::getWorld()->getTrack()->isFogEnabled())
-		  {
-			  PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			  m_post_processing->renderFog(irr_driver->getInvProjMatrix());
-			  PROFILER_POP_CPU_MARKER();
-		  }
+        if (World::getWorld()->getTrack()->isFogEnabled())
+        {
+            PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+            m_post_processing->renderFog(irr_driver->getInvProjMatrix());
+            PROFILER_POP_CPU_MARKER();
+        }
 
-        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
-
-		// Render anything glowing.
-		if (!m_mipviz && !m_wireframe)
-		{
-			irr_driver->setPhase(GLOW_PASS);
-			renderGlow(overridemat, glows, cambox, cam);
-		} // end glow
-
+        PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+        renderSkybox();
         PROFILER_POP_CPU_MARKER();
 
-		PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-		renderSkybox();
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
+        // Render anything glowing.
+        if (!m_mipviz && !m_wireframe)
+        {
+            irr_driver->setPhase(GLOW_PASS);
+            renderGlow(overridemat, glows, cambox, cam);
+        } // end glow
+        PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
@@ -335,14 +313,6 @@ void IrrDriver::renderGLSL(float dt)
             renderDisplacement(overridemat, cam);
         }
         PROFILER_POP_CPU_MARKER();
-
-        // Drawing for this cam done, cleanup
-        const u32 glowrepcount = transparent_glow_nodes.size();
-        for (i = 0; i < glowrepcount; i++)
-        {
-            transparent_glow_nodes[i]->remove();
-            transparent_glow_nodes[i]->drop();
-        }
 
         PROFILER_POP_CPU_MARKER();
 

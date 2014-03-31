@@ -423,7 +423,7 @@ namespace MeshShader
 	void ObjectRefPass1Shader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/objectref_pass1.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
