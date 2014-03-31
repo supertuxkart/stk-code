@@ -25,7 +25,7 @@ public:
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
     ~STKInstancedSceneNode();
     virtual void render();
-    void addInstance(const core::vector3df &origin, const core::vector3df &orientation);
+    void addInstance(const core::vector3df &origin, const core::vector3df &orientation, const core::vector3df &scale);
 };
 
 #endif

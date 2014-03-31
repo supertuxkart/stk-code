@@ -118,6 +118,7 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
 
 STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vector3df& position,
                                 const irr::core::vector3df& rotation,
+                                const irr::core::vector3df scale,
                                 const std::string& name)
 {
     if (m_instancing_nodes.find(name) == m_instancing_nodes.end())
@@ -134,7 +135,7 @@ STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vecto
         m_track->addNode(m_instancing_nodes[name]);
     }
 
-    m_instancing_nodes[name]->addInstance(position, rotation);
+    m_instancing_nodes[name]->addInstance(position, rotation, scale);
     return m_instancing_nodes[name];
 }
 

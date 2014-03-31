@@ -22,18 +22,29 @@ mat4 getMatrixFromRotation(vec3 rotation)
         vec4(0., 0., 0., 1.)));
 }
 
-mat4 getWorldMatrix(vec3 translation, vec3 rotation)
+mat4 getScaleMatrix(vec3 scale)
+{
+    mat4 result = mat4(
+		vec4(scale.x, 0., 0., 0.),
+		vec4(0., scale.y, 0., 0.),
+		vec4(0., 0., scale.z, 0.),
+		vec4(0., 0., 0., 1.)
+);
+    return result;
+}
+
+mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale)
 {
     mat4 result = getMatrixFromRotation(rotation);
     // translation
     result[3].xyz += translation;
-    return result;
+    return result * getScaleMatrix(scale);
 }
 
-mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation)
+mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale)
 {
     mat4 result = transpose(getMatrixFromRotation(rotation));
     // FIXME: it's wrong but the fourth column is not used
     result[3].xyz -= translation;
-    return result;
+    return getScaleMatrix(1. / scale) * result;
 }

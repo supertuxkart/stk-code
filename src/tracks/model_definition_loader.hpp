@@ -85,6 +85,7 @@ public:
     LODNode* instanciateAsLOD(const XMLNode* xml_node, scene::ISceneNode* parent);
     STKInstancedSceneNode* instanciate(const core::vector3df& position,
                                        const irr::core::vector3df& rotation,
+                                       const irr::core::vector3df scale,
                                        const std::string& name);
 
     void clear();
