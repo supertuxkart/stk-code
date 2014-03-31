@@ -326,10 +326,21 @@ class ShadowShader
 public:
     static GLuint Program;
     static GLuint attrib_position;
-    static GLuint uniform_MVP;
+    static GLuint uniform_VP, uniform_MM;
 
     static void init();
-    static void setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const std::vector<core::matrix4> &ViewProjectionMatrix);
+};
+
+class InstancedShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint uniform_VP;
+
+    static void init();
+    static void setUniforms(const std::vector<core::matrix4> &ViewProjectionMatrix);
 };
 
 class RefShadowShader

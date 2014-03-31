@@ -344,6 +344,7 @@ void Shaders::loadShaders()
 	MeshShader::DisplaceShader::init();
     MeshShader::DisplaceMaskShader::init();
     MeshShader::ShadowShader::init();
+    MeshShader::InstancedShadowShader::init();
     MeshShader::RefShadowShader::init();
     MeshShader::GrassShadowShader::init();
     MeshShader::SkyboxShader::init();
@@ -1379,7 +1380,8 @@ namespace MeshShader
 
     GLuint ShadowShader::Program;
     GLuint ShadowShader::attrib_position;
-    GLuint ShadowShader::uniform_MVP;
+    GLuint ShadowShader::uniform_VP;
+    GLuint ShadowShader::uniform_MM;
 
     void ShadowShader::init()
     {
@@ -1394,17 +1396,57 @@ namespace MeshShader
             GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix[0]");
+        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
     }
 
-    void ShadowShader::setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix)
+    void ShadowShader::setUniforms(const core::matrix4 &ModelMatrix, const std::vector<core::matrix4> &ViewProjectionMatrix)
     {
-        size_t size = ModelViewProjectionMatrix.size();
+        size_t size = ViewProjectionMatrix.size();
         float *tmp = new float[16 * size];
         for (unsigned i = 0; i < size; i++) {
-            memcpy(&tmp[16 * i], ModelViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
+            memcpy(&tmp[16 * i], ViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
         }
-        glUniformMatrix4fv(uniform_MVP, size, GL_FALSE, tmp);
+        glUniformMatrix4fv(uniform_VP, size, GL_FALSE, tmp);
+        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
+        delete[] tmp;
+    }
+
+    GLuint InstancedShadowShader::Program;
+    GLuint InstancedShadowShader::attrib_position;
+    GLuint InstancedShadowShader::attrib_origin;
+    GLuint InstancedShadowShader::attrib_orientation;
+    GLuint InstancedShadowShader::attrib_scale;
+    GLuint InstancedShadowShader::uniform_VP;
+
+    void InstancedShadowShader::init()
+    {
+        // Geometry shader needed
+        if (irr_driver->getGLSLVersion() < 150)
+        {
+            attrib_position = -1;
+            return;
+        }
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
+            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
+        attrib_scale = glGetAttribLocation(Program, "Scale");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix[0]");
+    }
+
+    void InstancedShadowShader::setUniforms(const std::vector<core::matrix4> &ViewProjectionMatrix)
+    {
+        size_t size = ViewProjectionMatrix.size();
+        float *tmp = new float[16 * size];
+        for (unsigned i = 0; i < size; i++) {
+            memcpy(&tmp[16 * i], ViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
+        }
+        glUniformMatrix4fv(uniform_VP, size, GL_FALSE, tmp);
         delete[] tmp;
     }
 

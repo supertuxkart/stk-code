@@ -685,8 +685,6 @@ void drawShadow(const GLMesh &mesh)
     size_t count = mesh.IndexCount;
 
     std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    for (unsigned i = 0; i < ShadowMVP.size(); i++)
-        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
     /*    if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
     {
@@ -695,7 +693,7 @@ void drawShadow(const GLMesh &mesh)
     MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
     }*/
 
-    MeshShader::ShadowShader::setUniforms(ShadowMVP);
+    MeshShader::ShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);

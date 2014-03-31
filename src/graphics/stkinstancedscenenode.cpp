@@ -76,6 +76,9 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectPass1Shader>();
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        setInstanceAttribPointer<MeshShader::InstancedShadowShader>();
         break;
     case FPSM_ALPHA_REF_TEXTURE:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -176,6 +179,21 @@ static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjecti
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
+}
+
+static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
+    MeshShader::InstancedShadowShader::setUniforms(ShadowMVP);
+
+    assert(mesh.vao_shadow_pass);
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
 }
 
 static void drawFSPMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, size_t instance_count)
@@ -300,6 +318,15 @@ void STKInstancedSceneNode::render()
             glUseProgram(MeshShader::InstancedGrassPass2Shader::Program);
         for (unsigned i = 0; i < ShadedMesh[SM_GRASS].size(); i++)
             drawSMGrass(*ShadedMesh[SM_GRASS][i], ModelViewProjectionMatrix, windDir, instance_pos.size() / 9);
+        return;
+    }
+
+    if (irr_driver->getPhase() == SHADOW_PASS)
+    {
+        if (!GeometricMesh[FPSM_DEFAULT].empty())
+            glUseProgram(MeshShader::InstancedShadowShader::Program);
+        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
+            drawShadowDefault(*GeometricMesh[FPSM_DEFAULT][i], instance_pos.size() / 9);
         return;
     }
 }
