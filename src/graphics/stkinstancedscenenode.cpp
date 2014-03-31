@@ -161,10 +161,9 @@ void STKInstancedSceneNode::addInstance(const core::vector3df &origin, const cor
     instance_pos.push_back(orientation.X);
     instance_pos.push_back(orientation.Y);
     instance_pos.push_back(orientation.Z);
-    instance_pos.push_back(1.);// scale.X);
-    instance_pos.push_back(1.);// scale.Y);
-    instance_pos.push_back(1.);// scale.Z);
-    printf("scale is %f %f %f\n", scale.X, scale.Y, scale.Z);
+    instance_pos.push_back(scale.X);
+    instance_pos.push_back(scale.Y);
+    instance_pos.push_back(scale.Z);
 }
 
 static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, size_t instance_count)
