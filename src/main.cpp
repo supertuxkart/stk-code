@@ -1134,11 +1134,11 @@ int main(int argc, char *argv[] )
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
 
-        /* Decide about showing Christmas hats
+        /* Decide about showing Christmas hats - change with --xmas=n
          * 0: default; Christmas hats are shown between 17th of December and
               5th of January
          * 1: always on
-         * 2: (And everything else): always off
+         * 2: (and everything else): always off
          */
         if (UserConfigParams::m_xmas_mode == 0)
         {
