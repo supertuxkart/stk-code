@@ -320,9 +320,11 @@ void Shaders::loadShaders()
 	MeshShader::ObjectPass1Shader::init();
 	MeshShader::ObjectRefPass1Shader::init();
     MeshShader::InstancedObjectPass1Shader::init();
+    MeshShader::InstancedObjectRefPass1Shader::init();
     MeshShader::InstancedGrassPass1Shader::init();
 	MeshShader::ObjectPass2Shader::init();
     MeshShader::InstancedObjectPass2Shader::init();
+    MeshShader::InstancedObjectRefPass2Shader::init();
     MeshShader::InstancedGrassPass2Shader::init();
 	MeshShader::DetailledObjectPass2Shader::init();
 	MeshShader::ObjectRimLimitShader::init();
@@ -537,6 +539,42 @@ namespace MeshShader
         glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
     }
 
+    GLuint InstancedObjectRefPass1Shader::Program;
+    GLuint InstancedObjectRefPass1Shader::attrib_position;
+    GLuint InstancedObjectRefPass1Shader::attrib_normal;
+    GLuint InstancedObjectRefPass1Shader::attrib_texcoord;
+    GLuint InstancedObjectRefPass1Shader::attrib_orientation;
+    GLuint InstancedObjectRefPass1Shader::attrib_origin;
+    GLuint InstancedObjectRefPass1Shader::attrib_scale;
+    GLuint InstancedObjectRefPass1Shader::uniform_MP;
+    GLuint InstancedObjectRefPass1Shader::uniform_VM;
+    GLuint InstancedObjectRefPass1Shader::uniform_tex;
+
+    void InstancedObjectRefPass1Shader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_scale = glGetAttribLocation(Program, "Scale");
+        attrib_normal = glGetAttribLocation(Program, "Normal");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_VM = glGetUniformLocation(Program, "InverseViewMatrix");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+    }
+
+    void InstancedObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
     GLuint InstancedGrassPass1Shader::Program;
     GLuint InstancedGrassPass1Shader::attrib_position;
     GLuint InstancedGrassPass1Shader::attrib_normal;
@@ -667,6 +705,57 @@ namespace MeshShader
     }
 
     void InstancedObjectPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
+    {
+        glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
+        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
+        glUniform3f(uniform_ambient, s.r, s.g, s.b);
+    }
+
+    GLuint InstancedObjectRefPass2Shader::Program;
+    GLuint InstancedObjectRefPass2Shader::attrib_position;
+    GLuint InstancedObjectRefPass2Shader::attrib_texcoord;
+    GLuint InstancedObjectRefPass2Shader::attrib_origin;
+    GLuint InstancedObjectRefPass2Shader::attrib_orientation;
+    GLuint InstancedObjectRefPass2Shader::attrib_scale;
+    GLuint InstancedObjectRefPass2Shader::uniform_VP;
+    GLuint InstancedObjectRefPass2Shader::uniform_TM;
+    GLuint InstancedObjectRefPass2Shader::uniform_screen;
+    GLuint InstancedObjectRefPass2Shader::uniform_ambient;
+    GLuint InstancedObjectRefPass2Shader::TU_Albedo;
+
+    void InstancedObjectRefPass2Shader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
+        attrib_scale = glGetAttribLocation(Program, "Scale");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix");
+        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
+        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
+        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
+        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
+        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        TU_Albedo = 3;
+
+        glUseProgram(Program);
+        glUniform1i(uniform_DiffuseMap, 0);
+        glUniform1i(uniform_SpecularMap, 1);
+        glUniform1i(uniform_SSAO, 2);
+        glUniform1i(uniform_Albedo, TU_Albedo);
+        glUseProgram(0);
+    }
+
+    void InstancedObjectRefPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
     {
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());

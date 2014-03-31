@@ -88,6 +88,17 @@ public:
     static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &ViewMatrix);
 };
 
+class InstancedObjectRefPass1Shader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_normal, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint uniform_MP, uniform_VM, uniform_tex;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex);
+};
+
 class InstancedGrassPass1Shader
 {
 public:
@@ -112,6 +123,18 @@ public:
 };
 
 class InstancedObjectPass2Shader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint uniform_VP, uniform_TM, uniform_screen, uniform_ambient;
+    static GLuint TU_Albedo;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+};
+
+class InstancedObjectRefPass2Shader
 {
 public:
     static GLuint Program;
