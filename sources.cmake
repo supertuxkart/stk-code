@@ -31,7 +31,6 @@ src/graphics/callbacks.cpp
 src/graphics/camera.cpp
 src/graphics/CBatchingMesh.cpp
 src/graphics/explosion.cpp
-src/graphics/glow.cpp
 src/graphics/glwrap.cpp
 src/graphics/gpuparticles.cpp
 src/graphics/hardware_skinning.cpp
@@ -366,7 +365,6 @@ src/graphics/callbacks.hpp
 src/graphics/camera.hpp
 src/graphics/CBatchingMesh.hpp
 src/graphics/explosion.hpp
-src/graphics/glow.hpp
 src/graphics/glwrap.hpp
 src/graphics/gpuparticles.hpp
 src/graphics/hardware_skinning.hpp
