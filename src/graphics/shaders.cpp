@@ -346,6 +346,7 @@ void Shaders::loadShaders()
     MeshShader::ShadowShader::init();
     MeshShader::InstancedShadowShader::init();
     MeshShader::RefShadowShader::init();
+    MeshShader::InstancedRefShadowShader::init();
     MeshShader::GrassShadowShader::init();
     MeshShader::SkyboxShader::init();
 	ParticleShader::FlipParticleRender::init();
@@ -1453,7 +1454,8 @@ namespace MeshShader
     GLuint RefShadowShader::Program;
     GLuint RefShadowShader::attrib_position;
     GLuint RefShadowShader::attrib_texcoord;
-    GLuint RefShadowShader::uniform_MVP;
+    GLuint RefShadowShader::uniform_VP;
+    GLuint RefShadowShader::uniform_MM;
     GLuint RefShadowShader::uniform_tex;
 
     void RefShadowShader::init()
@@ -1471,18 +1473,64 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix[0]");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
+    }
+
+    void RefShadowShader::setUniforms(const core::matrix4 &ModelMatrix, const std::vector<core::matrix4> &ViewProjectionMatrix, unsigned TU_tex)
+    {
+        size_t size = ViewProjectionMatrix.size();
+        float *tmp = new float[16 * size];
+        for (unsigned i = 0; i < size; i++) {
+            memcpy(&tmp[16 * i], ViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
+        }
+        glUniformMatrix4fv(uniform_VP, size, GL_FALSE, tmp);
+        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
+        glUniform1i(uniform_tex, TU_tex);
+        delete[] tmp;
+    }
+
+    GLuint InstancedRefShadowShader::Program;
+    GLuint InstancedRefShadowShader::attrib_position;
+    GLuint InstancedRefShadowShader::attrib_texcoord;
+    GLuint InstancedRefShadowShader::attrib_origin;
+    GLuint InstancedRefShadowShader::attrib_orientation;
+    GLuint InstancedRefShadowShader::attrib_scale;
+    GLuint InstancedRefShadowShader::uniform_VP;
+    GLuint InstancedRefShadowShader::uniform_tex;
+
+    void InstancedRefShadowShader::init()
+    {
+        // Geometry shader needed
+        if (irr_driver->getGLSLVersion() < 150)
+        {
+            attrib_position = -1;
+            attrib_texcoord = -1;
+            return;
+        }
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
+            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_origin = glGetAttribLocation(Program, "Origin");
+        attrib_orientation = glGetAttribLocation(Program, "Orientation");
+        attrib_scale = glGetAttribLocation(Program, "Scale");
+        uniform_VP = glGetUniformLocation(Program, "ViewProjectionMatrix[0]");
         uniform_tex = glGetUniformLocation(Program, "tex");
     }
 
-    void RefShadowShader::setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex)
+    void InstancedRefShadowShader::setUniforms(const std::vector<core::matrix4> &ViewProjectionMatrix, unsigned TU_tex)
     {
-        size_t size = ModelViewProjectionMatrix.size();
+        size_t size = ViewProjectionMatrix.size();
         float *tmp = new float[16 * size];
         for (unsigned i = 0; i < size; i++) {
-            memcpy(&tmp[16 * i], ModelViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
+            memcpy(&tmp[16 * i], ViewProjectionMatrix[i].pointer(), 16 * sizeof(float));
         }
-        glUniformMatrix4fv(uniform_MVP, size, GL_FALSE, tmp);
+        glUniformMatrix4fv(uniform_VP, size, GL_FALSE, tmp);
         glUniform1i(uniform_tex, TU_tex);
         delete[] tmp;
     }

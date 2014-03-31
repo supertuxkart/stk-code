@@ -87,6 +87,9 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectRefPass1Shader>();
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedRefShadowShader::attrib_position, MeshShader::InstancedRefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        setInstanceAttribPointer<MeshShader::InstancedRefShadowShader>();
         break;
     case FPSM_GRASS:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -213,6 +216,23 @@ static void drawFSPMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelView
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
 }
 
+static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
+
+    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedRefShadowShader::setUniforms(ShadowMVP, 0);
+
+    assert(mesh.vao_shadow_pass);
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
+}
+
 static void drawFSPMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDir, size_t instance_count)
 {
     irr_driver->IncreaseObjectCount();
@@ -327,6 +347,11 @@ void STKInstancedSceneNode::render()
             glUseProgram(MeshShader::InstancedShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
             drawShadowDefault(*GeometricMesh[FPSM_DEFAULT][i], instance_pos.size() / 9);
+
+        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
+            glUseProgram(MeshShader::InstancedRefShadowShader::Program);
+        for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
+            drawShadowAlphaRefTexture(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], instance_pos.size() / 9);
         return;
     }
 }

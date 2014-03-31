@@ -348,7 +348,18 @@ class RefShadowShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_MVP, uniform_tex;
+    static GLuint uniform_VP, uniform_MM, uniform_tex;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &ModelMatrix, const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex);
+};
+
+class InstancedRefShadowShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint uniform_VP, uniform_tex;
 
     static void init();
     static void setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex);
