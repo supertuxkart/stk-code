@@ -984,7 +984,7 @@ namespace MeshShader
 	void GrassPass2Shader::init()
 	{
 		Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass1.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
 		attrib_position = glGetAttribLocation(Program, "Position");
@@ -1021,6 +1021,7 @@ namespace MeshShader
     GLuint InstancedGrassPass2Shader::attrib_position;
     GLuint InstancedGrassPass2Shader::attrib_texcoord;
     GLuint InstancedGrassPass2Shader::attrib_color;
+    GLuint InstancedGrassPass2Shader::attrib_normal;
     GLuint InstancedGrassPass2Shader::attrib_origin;
     GLuint InstancedGrassPass2Shader::attrib_orientation;
     GLuint InstancedGrassPass2Shader::attrib_scale;
@@ -1028,7 +1029,11 @@ namespace MeshShader
     GLuint InstancedGrassPass2Shader::uniform_screen;
     GLuint InstancedGrassPass2Shader::uniform_ambient;
     GLuint InstancedGrassPass2Shader::uniform_windDir;
+    GLuint InstancedGrassPass2Shader::uniform_invproj;
+    GLuint InstancedGrassPass2Shader::uniform_IVM;
+    GLuint InstancedGrassPass2Shader::uniform_SunDir;
     GLuint InstancedGrassPass2Shader::TU_Albedo;
+    GLuint InstancedGrassPass2Shader::TU_dtex;
 
     void InstancedGrassPass2Shader::init()
     {
@@ -1036,10 +1041,11 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
+        attrib_normal = glGetAttribLocation(Program, "Normal");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
@@ -1048,23 +1054,32 @@ namespace MeshShader
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
         GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
         GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
+        GLuint uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_screen = glGetUniformLocation(Program, "screen");
         uniform_ambient = glGetUniformLocation(Program, "ambient");
         uniform_windDir = glGetUniformLocation(Program, "windDir");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        uniform_IVM = glGetUniformLocation(Program, "InverseViewMatrix");
+        uniform_SunDir = glGetUniformLocation(Program, "SunDir");
         TU_Albedo = 3;
+        TU_dtex = 4;
 
         glUseProgram(Program);
         glUniform1i(uniform_DiffuseMap, 0);
         glUniform1i(uniform_SpecularMap, 1);
         glUniform1i(uniform_SSAO, 2);
         glUniform1i(uniform_Albedo, TU_Albedo);
+        glUniform1i(uniform_dtex, TU_dtex);
         glUseProgram(0);
     }
 
-    void InstancedGrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection)
+    void InstancedGrassPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir)
     {
-        glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
+        glUniformMatrix4fv(uniform_IVM, 1, GL_FALSE, InverseViewMatrix.pointer());
         glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform3f(uniform_SunDir, SunDir.X, SunDir.Y, SunDir.Z);
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
         glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
@@ -1546,7 +1561,7 @@ namespace MeshShader
     void GrassShadowShader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass2.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass1.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");

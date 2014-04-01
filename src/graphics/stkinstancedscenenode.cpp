@@ -1,5 +1,6 @@
 #include "stkinstancedscenenode.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/callbacks.hpp"
 
 STKInstancedSceneNode::STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,
@@ -121,7 +122,7 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         break;
     case SM_GRASS:
         mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedGrassPass2Shader::attrib_position, MeshShader::InstancedGrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::InstancedGrassPass2Shader::attrib_color, mesh.Stride);
+            MeshShader::InstancedGrassPass2Shader::attrib_position, MeshShader::InstancedGrassPass2Shader::attrib_texcoord, -1, MeshShader::InstancedGrassPass2Shader::attrib_normal, -1, -1, MeshShader::InstancedGrassPass2Shader::attrib_color, mesh.Stride);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         setInstanceAttribPointer<MeshShader::InstancedGrassPass2Shader>();
         break;
@@ -288,8 +289,10 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
     size_t count = mesh.IndexCount;
 
     setTexture(MeshShader::InstancedGrassPass2Shader::TU_Albedo, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(MeshShader::InstancedGrassPass2Shader::TU_dtex, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
-    MeshShader::InstancedGrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir);
+    MeshShader::InstancedGrassPass2Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), irr_driver->getInvProjMatrix(), windDir, cb->getPosition());
 
     glBindVertexArray(mesh.vao_second_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);

@@ -221,12 +221,12 @@ class InstancedGrassPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color, attrib_origin, attrib_orientation, attrib_scale;
-    static GLuint uniform_VP, uniform_TM, uniform_screen, uniform_ambient, uniform_windDir;
-    static GLuint TU_Albedo;
+    static GLuint attrib_position, attrib_texcoord, attrib_normal, attrib_color, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint uniform_VP, uniform_TM, uniform_IVM, uniform_screen, uniform_ambient, uniform_windDir, uniform_invproj, uniform_SunDir;
+    static GLuint TU_Albedo, TU_dtex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::vector3df &windDirection);
+    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir);
 };
 
 class SphereMapShader
