@@ -62,6 +62,7 @@ enum TypeRTT
     RTT_HALF_SOFT,
 
     RTT_DISPLACE,
+    RTT_FINAL_COLOR,
 
     RTT_COUNT
 };

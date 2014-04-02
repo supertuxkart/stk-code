@@ -846,8 +846,12 @@ void PostProcessing::render()
         if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
         {
             PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+            glDisable(GL_BLEND);
+            drv->setRenderTarget(irr_driver->getRTT(RTT_FINAL_COLOR), false, false);
+            renderPassThrough(in);
             drv->setRenderTarget(out, false, false);
-            applyMLAA(in, out);
+            applyMLAA(irr_driver->getRTT(RTT_FINAL_COLOR), out);
+            in = irr_driver->getRTT(RTT_FINAL_COLOR);
             PROFILER_POP_CPU_MARKER();
         }
 
