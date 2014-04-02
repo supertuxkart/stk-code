@@ -22,8 +22,8 @@ void main() {
 	vec4 delta = abs(vec4(L) - vec4(Lleft, Ltop, Lright, Lbottom));
 	vec4 edges = step(vec4(threshold), delta);
 
-//	if (dot(edges, vec4(1.0)) == 0.0)
-//		discard;
+	if (dot(edges, vec4(1.0)) == 0.0)
+		discard;
 
 	FragColor = edges;
 }

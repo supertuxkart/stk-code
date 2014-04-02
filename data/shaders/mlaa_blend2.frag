@@ -6,6 +6,8 @@ uniform vec2 PIXEL_SIZE;
 #define MAX_SEARCH_STEPS 8.0
 #define MAX_DISTANCE 33.0
 
+in vec2 uv;
+
 out vec4 FragColor;
 
 /**
@@ -76,16 +78,16 @@ vec2 Area(vec2 distance, float e1, float e2) {
 void main() {
 	vec4 areas = vec4(0.0);
 
-	vec2 e = texture(edgesMap, gl_TexCoord[0].xy).rg;
+	vec2 e = texture(edgesMap, uv).rg;
 
 	if (e.g != 0.0) { // Edge at north
 
 		// Search distances to the left and to the right:
-		vec2 d = vec2(SearchXLeft(gl_TexCoord[0].xy), SearchXRight(gl_TexCoord[0].xy));
+		vec2 d = vec2(SearchXLeft(uv), SearchXRight(uv);
 
 		// Now fetch the crossing edges. Instead of sampling between edgels, we
 		// sample at 0.25, to be able to discern what value has each edgel:
-		vec4 coords = vec4(d.x, 0.25, d.y + 1.0, 0.25) * PIXEL_SIZE.xyxy + gl_TexCoord[0].xyxy;
+		vec4 coords = vec4(d.x, 0.25, d.y + 1.0, 0.25) * PIXEL_SIZE.xyxy + uv.xyxy;
 		float e1 = texture2DLod(edgesMap, coords.xy, 0.0).r;
 		float e2 = texture2DLod(edgesMap, coords.zw, 0.0).r;
 
@@ -97,10 +99,10 @@ void main() {
 	if (e.r != 0.0) { // Edge at west
 
 		// Search distances to the top and to the bottom:
-		vec2 d = vec2(SearchYUp(gl_TexCoord[0].xy), SearchYDown(gl_TexCoord[0].xy));
+		vec2 d = vec2(SearchYUp(uv), SearchYDown(uv));
 
 		// Now fetch the crossing edges (yet again):
-		vec4 coords = vec4(-0.25, d.x, -0.25, d.y - 1.0) * PIXEL_SIZE.xyxy + gl_TexCoord[0].xyxy;
+		vec4 coords = vec4(-0.25, d.x, -0.25, d.y - 1.0) * PIXEL_SIZE.xyxy + uv.xyxy;
 		float e1 = texture2DLod(edgesMap, coords.xy, 0.0).g;
 		float e2 = texture2DLod(edgesMap, coords.zw, 0.0).g;
 
