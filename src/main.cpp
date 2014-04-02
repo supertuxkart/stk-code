@@ -358,32 +358,6 @@ void gamepadVisualisation()
     }
 }   // gamepadVisualisation
 
-// ============================================================================
-/** Sets the Christmas flag (m_xmas_enabled), depending on currently set
- *  Christ mode (m_xmas_mode)
- */
-void handleXmasMode()
-{
-    bool xmas = false;
-    switch(UserConfigParams::m_xmas_mode)
-    {
-    case 0:
-        {
-            int day, month;
-            StkTime::getDate(&day, &month);
-            // Christmat hats are shown between 17. of December
-            // and 5th of January
-            xmas = (month == 12 && day>=17)  || (month ==  1 && day <=5);
-            break;
-        }
-    case 1:  xmas = true;  break;
-    default: xmas = false; break;
-    }   // switch m_xmas_mode
-
-    if(xmas)
-        kart_properties_manager->setHatMeshName("christmas_hat.b3d");
-}   // handleXmasMode
-
 // ----------------------------------------------------------------------------
 /** Prints help for command line options to stdout.
  */
@@ -550,8 +524,6 @@ int handleCmdLinePreliminary()
         }
     }
 
-
-//#if !defined(WIN32) && !defined(__CYGWIN)
     if(CommandLine::has("--fullscreen") || CommandLine::has("-f"))
     {
         // Check that current res is not blacklisted
@@ -568,7 +540,6 @@ int handleCmdLinePreliminary()
     }
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
-//#endif
 
     if(CommandLine::has("--version") || CommandLine::has("-v"))
     {
@@ -1162,7 +1133,24 @@ int main(int argc, char *argv[] )
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "options_video.png"));
         kart_properties_manager -> loadAllKarts    ();
-        handleXmasMode();
+
+        /* Decide about showing Christmas hats - change with --xmas=n
+         * 0: default; Christmas hats are shown between 17th of December and
+              5th of January
+         * 1: always on
+         * 2: (and everything else): always off
+         */
+        if (UserConfigParams::m_xmas_mode == 0)
+        {
+            int day, month;
+            StkTime::getDate(&day, &month);
+            if((month == 12 && day >= 17) || (month ==  1 && day <= 5))
+                kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+        }
+        else if (UserConfigParams::m_xmas_mode == 1)
+        {
+            kart_properties_manager->setHatMeshName("christmas_hat.b3d");
+        }
 
         // Needs the kart and track directories to load potential challenges
         // in those dirs.
