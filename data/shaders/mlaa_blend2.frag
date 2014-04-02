@@ -1,13 +1,10 @@
-#version 330 compatibility
-#define MAX_SEARCH_STEPS 8.0
-#define MAX_DISTANCE 33.0
-
-#extension GL_ARB_shader_texture_lod: enable
-
 uniform sampler2D edgesMap;
 uniform sampler2D areaMap;
 
 uniform vec2 PIXEL_SIZE;
+
+#define MAX_SEARCH_STEPS 8.0
+#define MAX_DISTANCE 33.0
 
 out vec4 FragColor;
 
@@ -17,7 +14,7 @@ out vec4 FragColor;
  * bit.
  */
 vec4 tex2Doffset(sampler2D map, vec2 texcoord, vec2 offset) {
-	return texture2DLod(map, texcoord + PIXEL_SIZE * offset, 0.0);
+	return textureLod(map, texcoord + PIXEL_SIZE * offset, 0.0);
 }
 
 float SearchXLeft(vec2 texcoord) {

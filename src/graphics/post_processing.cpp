@@ -627,6 +627,54 @@ static void computeLogLuminance(GLuint tex)
     averageTexture(getTextureGLuint(irr_driver->getRTT(RTT_LOG_LUMINANCE)));
 }
 
+void PostProcessing::applyMLAA(video::ITexture *in, video::ITexture *out)
+{
+    const core::vector2df &PIXEL_SIZE = core::vector2df(1.0f / UserConfigParams::m_width, 1.0f / UserConfigParams::m_height);
+    IVideoDriver *const drv = irr_driver->getVideoDriver();
+    glEnable(GL_STENCIL_TEST);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glStencilFunc(GL_ALWAYS, 1, ~0);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+    // Pass 1: color edge detection
+    setTexture(0, getTextureGLuint(in), GL_NEAREST, GL_NEAREST);
+    glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::Program);
+    FullScreenShader::MLAAColorEdgeDetectionSHader::setUniforms(PIXEL_SIZE, 0);
+
+    glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glStencilFunc(GL_EQUAL, 1, ~0);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+    // Pass 2: blend weights
+    drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
+
+    glUseProgram(FullScreenShader::MLAABlendWeightSHader::Program);
+    setTexture(0, getTextureGLuint(out), GL_LINEAR, GL_LINEAR);
+    setTexture(1, getTextureGLuint(m_areamap), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MLAABlendWeightSHader::setUniforms(PIXEL_SIZE, 0, 1);
+
+    glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // Pass 3: gather
+    drv->setRenderTarget(in, false, false);
+
+    glUseProgram(FullScreenShader::MLAAGatherSHader::Program);
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_TMP3)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_COLOR)), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MLAAGatherSHader::setUniforms(PIXEL_SIZE, 1, 0);
+
+    glBindVertexArray(FullScreenShader::MLAAGatherSHader::vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // Done.
+    glDisable(GL_STENCIL_TEST);
+
+}
+
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
 void PostProcessing::render()
@@ -799,58 +847,7 @@ void PostProcessing::render()
         {
             PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
             drv->setRenderTarget(out, false, false);
-
-            glEnable(GL_STENCIL_TEST);
-            glClearColor(0.0, 0.0, 0.0, 1.0);
-            glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            glStencilFunc(GL_ALWAYS, 1, ~0);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-            // Pass 1: color edge detection
-            m_material.setFlag(EMF_BILINEAR_FILTER, false);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, false);
-            m_material.MaterialType = irr_driver->getShader(ES_MLAA_COLOR1);
-            m_material.setTexture(0, in);
-
-            drawQuad(cam, m_material);
-            m_material.setFlag(EMF_BILINEAR_FILTER, true);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, true);
-
-            glStencilFunc(GL_EQUAL, 1, ~0);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
-            // Pass 2: blend weights
-            drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
-
-            m_material.MaterialType = irr_driver->getShader(ES_MLAA_BLEND2);
-            m_material.setTexture(0, out);
-            m_material.setTexture(1, m_areamap);
-            m_material.TextureLayer[1].BilinearFilter = false;
-            m_material.TextureLayer[1].TrilinearFilter = false;
-
-            drawQuad(cam, m_material);
-
-            m_material.TextureLayer[1].BilinearFilter = true;
-            m_material.TextureLayer[1].TrilinearFilter = true;
-            m_material.setTexture(1, 0);
-
-            // Pass 3: gather
-            drv->setRenderTarget(in, false, false);
-
-            m_material.setFlag(EMF_BILINEAR_FILTER, false);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, false);
-            m_material.MaterialType = irr_driver->getShader(ES_MLAA_NEIGH3);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_TMP3));
-            m_material.setTexture(1, irr_driver->getRTT(RTT_COLOR));
-
-            drawQuad(cam, m_material);
-
-            m_material.setFlag(EMF_BILINEAR_FILTER, true);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, true);
-            m_material.setTexture(1, 0);
-
-            // Done.
-            glDisable(GL_STENCIL_TEST);
+            applyMLAA(in, out);
             PROFILER_POP_CPU_MARKER();
         }
 

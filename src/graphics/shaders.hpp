@@ -723,6 +723,41 @@ public:
     static void setUniforms(unsigned TU_tex);
 };
 
+class MLAAColorEdgeDetectionSHader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_colorMapG, uniform_PIXEL_SIZE;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colorMapG);
+};
+
+class MLAABlendWeightSHader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_PIXEL_SIZE, uniform_edgesMap, uniform_areaMap;
+
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_edgesMap, unsigned TU_areaMap);
+
+};
+
+class MLAAGatherSHader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_PIXEL_SIZE, uniform_colorMap, uniform_blendMap;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colormap, unsigned TU_blendmap);
+};
+
 }
 
 namespace UIShader

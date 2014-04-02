@@ -87,6 +87,7 @@ public:
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(video::ITexture *tex);
     void renderPassThrough(unsigned tex);
+    void applyMLAA(video::ITexture *in, video::ITexture *out);
 
     void renderMotionBlur(unsigned cam, video::ITexture *in, video::ITexture *out);
     void renderGlow(video::ITexture *tex);

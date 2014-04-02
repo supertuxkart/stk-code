@@ -1,10 +1,10 @@
-#version 330 compatibility
-in vec4 offset[2];
-in vec2 uv;
-out vec4 FragColor;
-
 uniform sampler2D blendMap;
 uniform sampler2D colorMap;
+
+in vec4 offset[2];
+in vec2 uv;
+
+out vec4 FragColor;
 
 void main() {
 	// Fetch the blending weights for current pixel:
