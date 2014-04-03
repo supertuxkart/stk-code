@@ -287,8 +287,7 @@ void Camera::reset()
 void Camera::setInitialTransform()
 {
     if (m_kart == NULL) return;
-
-    Vec3 start_offset(0, 25, -50);
+    Vec3 start_offset(0, 2, -5);
     Vec3 xx = m_kart->getTrans()(start_offset);
     m_camera->setPosition(  xx.toIrrVector());
     // Reset the target from the previous target (in case of a restart
@@ -312,17 +311,36 @@ void Camera::setInitialTransform()
  *  \param wanted_position The position the camera wanted to reach.
  *  \param wanted_target The point the camera wants to point to.
  */
-void Camera::smoothMoveCamera(float dt, const Vec3 &wanted_position,
-                              const Vec3 &wanted_target)
+void Camera::smoothMoveCamera(float dt)
 {
+    
+    core::vector3df current_position  =  m_camera->getPosition();
     // Smoothly interpolate towards the position and target
-    core::vector3df current_position = m_camera->getPosition();
-    core::vector3df current_target   = m_camera->getTarget();
-    current_target   += ((wanted_target.toIrrVector()   - current_target  ) * m_target_speed  ) * dt;
-    current_position += ((wanted_position.toIrrVector() - current_position) * m_position_speed) * dt;
-    if(m_mode!=CM_FALLING)
-        m_camera->setPosition(current_position);
-    m_camera->setTarget(current_target);
+    const KartProperties *kp=m_kart->getKartProperties();
+    float max_increase_with_zipper = kp->getZipperMaxSpeedIncrease();
+    float max_speed_without_zipper = kp->getMaxSpeed();
+    float current_speed= m_kart->getSpeed();
+
+    float steer=m_kart->getSteerPercent();
+    const Skidding *ks=m_kart->getSkidding();
+    float skid_factor=ks->getVisualSkidRotation();
+
+    float skid_angle = asin(skid_factor);
+    float ratio = (current_speed - max_speed_without_zipper)/max_increase_with_zipper;
+    ratio = ratio > -0.12 ? ratio : -0.12;
+    
+    Vec3 camera_offset(-5*(1+ratio)*sin(skid_angle/2), 2*(1+ratio/2),-5*(1+ratio)*cos(skid_angle/2));// defines how far camera should be from player kart.
+    Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
+    
+    
+
+    core::vector3df current_target   = m_kart->getXYZ().toIrrVector();// next target
+    core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();// new required position of camera
+    
+    current_position += ((wanted_position - current_position)*dt*(m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 : -1*m_kart->getSpeed()/3) );
+
+    m_camera->setPosition(current_position);
+    m_camera->setTarget(current_target);//set new target
 
     assert(!isnan(m_camera->getPosition().X));
     assert(!isnan(m_camera->getPosition().Y));
@@ -480,13 +498,9 @@ void Camera::update(float dt)
 
         // Aim at the usual same position of the kart (i.e. slightly
         // above the kart).
-        core::vector3df wanted_target(m_kart->getXYZ().toIrrVector()
-                                      +core::vector3df(0, above_kart, 0) );
-        core::vector3df current_target   = m_camera->getTarget();
         // Note: this code is replicated from smoothMoveCamera so that
         // the camera keeps on pointing to the same spot.
-        current_target += ((wanted_target-current_target)*m_target_speed)*dt;
-
+        core::vector3df current_target   = (m_kart->getXYZ().toIrrVector()+core::vector3df(0, above_kart, 0));
         m_camera->setTarget(current_target);
     }
     else
@@ -535,7 +549,7 @@ void Camera::positionCamera(float dt, float above_kart, float cam_angle,
 
     if (smoothing)
     {
-        smoothMoveCamera(dt, wanted_position, wanted_target);
+        smoothMoveCamera(dt);
     }
     else
     {
