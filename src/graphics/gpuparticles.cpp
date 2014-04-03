@@ -435,7 +435,7 @@ void ParticleSystemProxy::simulate()
 
 void ParticleSystemProxy::drawFlip()
 {
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+    glBlendFunc(GL_ONE, GL_ONE);
     glUseProgram(ParticleShader::FlipParticleRender::Program);
 
     float screen[2] = {
@@ -455,9 +455,9 @@ void ParticleSystemProxy::drawFlip()
 void ParticleSystemProxy::drawNotFlip()
 {
     if (m_alpha_additive)
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+        glBlendFunc(GL_ONE, GL_ONE);
     else
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(ParticleShader::SimpleParticleRender::Program);
 
     float screen[2] = {
