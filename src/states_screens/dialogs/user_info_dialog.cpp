@@ -327,8 +327,44 @@ void UserInfoDialog::removeExistingFriend()
  */
 void UserInfoDialog::removePendingFriend()
 {
-    CurrentUser::get()->requestCancelFriend(m_profile->getID());
+    class CancelFriendRequest : public XMLRequest
+    {
+        // ------------------------------------------------------------------------
+        /** Callback for the request to cancel a friend invitation. Shows a
+        *  confirmation message and takes care of updating all the cached
+        *  information.
+        */
+        virtual void callback()
+        {
+            uint32_t id(0);
+            getXMLData()->get("friendid", &id);
+            core::stringw info_text("");
+            if (isSuccess())
+            {
+                CurrentUser::get()->getProfile()->removeFriend(id);
+                ProfileManager *pm = ProfileManager::get();
+                pm->moveToCache(id);
+                pm->getProfileByID(id)->deleteRelationalInfo();
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+                info_text = _("Friend request cancelled!");
+            }
+            else
+                info_text = getInfo();
 
+            UserInfoDialog *dia = new UserInfoDialog(id, info_text,
+                                                     !isSuccess(), true);
+            GUIEngine::DialogQueue::get()->pushDialog(dia, true);
+        }   // callback
+    public:
+        CancelFriendRequest() : XMLRequest(true) {}
+    };   // CancelFriendRequest
+    // ------------------------------------------------------------------------
+
+    CancelFriendRequest * request = new CancelFriendRequest();
+    CurrentUser::get()->setUserDetails(request);
+    request->addParameter("action", "cancel-friend-request");
+    request->addParameter("friendid", m_profile->getID());
+    request->queue();
 }   // removePendingFriend
 
 // -----------------------------------------------------------------------------

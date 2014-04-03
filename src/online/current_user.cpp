@@ -336,45 +336,6 @@ namespace Online
     }   // requestUserSearch
 
     // ------------------------------------------------------------------------
-    void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::CancelFriendRequest * request =
-                                        new CurrentUser::CancelFriendRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "cancel-friend-request");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestCancelFriend
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to cancel a friend invitation. Shows a
-     *  confirmation message and takes care of updating all the cached
-     *  information.
-     */
-    void CurrentUser::CancelFriendRequest::callback()
-    {
-        uint32_t id(0);
-        getXMLData()->get("friendid", &id);
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            CurrentUser::get()->getProfile()->removeFriend(id);
-            ProfileManager::get()->moveToCache(id);
-            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend request cancelled!");
-        }
-        else
-            info_text = getInfo();
-        UserInfoDialog *dia = new UserInfoDialog(id, info_text,!isSuccess(),
-                                                 true);
-        GUIEngine::DialogQueue::get()->pushDialog(dia, true);
-    }   // CancelFriendRequest::callback
-
-    // ------------------------------------------------------------------------
     /** A request to the server, to change the password of the signed in user.
      *  \param current_password The active password of the currently signed in
      *         user.
