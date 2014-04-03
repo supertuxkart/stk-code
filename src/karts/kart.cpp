@@ -749,7 +749,7 @@ void Kart::startEngineSFX()
  */
 bool Kart::isInRest() const
 {
-    return fabs(m_body->getLinearVelocity ().y())<0.2;
+    return fabsf(m_body->getLinearVelocity ().y())<0.2f;
 }  // isInRest
 
 //-----------------------------------------------------------------------------
