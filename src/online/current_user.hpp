@@ -88,15 +88,6 @@ namespace Online
             };   // SetAddonVoteRequest
 
             // ----------------------------------------------------------------
-            class RemoveFriendRequest : public XMLRequest {
-                unsigned int m_id;
-                virtual void callback ();
-            public:
-                RemoveFriendRequest(unsigned int id)
-                    : XMLRequest(true), m_id(id) {}
-            };   // RemoveFriendRequest
-
-            // ----------------------------------------------------------------
             class CancelFriendRequest : public XMLRequest {
                 virtual void callback ();
             public:
@@ -149,8 +140,6 @@ namespace Online
             const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
             const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
             void                            requestFriendRequest(const uint32_t friend_id) const;
-            void                            requestAcceptFriend(const uint32_t friend_id) const;
-            void                            requestRemoveFriend(const uint32_t friend_id) const;
             void                            requestCancelFriend(const uint32_t friend_id) const;
             void                            requestPasswordChange(  const irr::core::stringw &current_password,
                                                                     const irr::core::stringw &new_password,

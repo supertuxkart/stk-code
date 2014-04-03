@@ -375,46 +375,6 @@ namespace Online
     }   // CancelFriendRequest::callback
 
     // ------------------------------------------------------------------------
-    /** A request to the server, to remove a friend relation.
-     *  \param friend_id The id of the friend to be removed.
-     */
-    void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::RemoveFriendRequest * request =
-                                  new CurrentUser::RemoveFriendRequest(friend_id);
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "remove-friend");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestRemoveFriend
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to remove a friend. Shows a confirmation
-     *  message and takes care of updating all the cached information.
-     */
-    void CurrentUser::RemoveFriendRequest::callback()
-    {
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            CurrentUser::get()->getProfile()->removeFriend(m_id);
-            ProfileManager::get()->moveToCache(m_id);
-            ProfileManager::get()->getProfileByID(m_id)->deleteRelationalInfo();
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend removed!");
-        }
-        else
-            info_text = getInfo();
-        UserInfoDialog *info = new UserInfoDialog(m_id, info_text,!isSuccess(),
-                                                  true);
-        GUIEngine::DialogQueue::get()->pushDialog(info, true);
-
-    }   // RemoveFriendRequest::callback
-
-    // ------------------------------------------------------------------------
     /** A request to the server, to change the password of the signed in user.
      *  \param current_password The active password of the currently signed in
      *         user.

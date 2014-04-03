@@ -283,8 +283,43 @@ void UserInfoDialog::declineFriendRequest()
  */
 void UserInfoDialog::removeExistingFriend()
 {
-    CurrentUser::get()->requestRemoveFriend(m_profile->getID());
+    /** An inline class for the remove friend request. */
+    class RemoveFriendRequest : public XMLRequest
+    {
+        unsigned int m_id;
+        virtual void callback()
+        {
+            core::stringw info_text("");
+            if (isSuccess())
+            {
+                CurrentUser::get()->getProfile()->removeFriend(m_id);
+                ProfileManager *pm = ProfileManager::get();
+                pm->moveToCache(m_id);
+                pm->getProfileByID(m_id)->deleteRelationalInfo();
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+                info_text = _("Friend removed!");
+            }
+            else
+                info_text = getInfo();
 
+            UserInfoDialog *info = new UserInfoDialog(m_id, info_text, 
+                                                      !isSuccess(), true);
+            GUIEngine::DialogQueue::get()->pushDialog(info, true);
+
+        }   // callback
+        // --------------------------------------------------------------------
+    public:
+        RemoveFriendRequest(unsigned int id)
+                         : XMLRequest(true), m_id(id) {}
+    };   // RemoveFriendRequest
+    // ------------------------------------------------------------------------
+
+    int friend_id = m_profile->getID();
+    RemoveFriendRequest * request = new RemoveFriendRequest(friend_id);
+    CurrentUser::get()->setUserDetails(request);
+    request->addParameter("action", "remove-friend");
+    request->addParameter("friendid", friend_id);
+    request->queue();
 }   // removeExistingFriend
 
 // -----------------------------------------------------------------------------
