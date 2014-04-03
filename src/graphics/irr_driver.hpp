@@ -222,6 +222,10 @@ private:
 
     void renderFixed(float dt);
     void renderGLSL(float dt);
+    void renderSolidFirstPass();
+    void renderSolidSecondPass();
+    void renderTransparent();
+    void renderParticles();
     void renderShadows(//ShadowImportanceProvider * const sicb,
                        scene::ICameraSceneNode * const camnode,
                        //video::SOverrideMaterial &overridemat,

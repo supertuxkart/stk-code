@@ -29,6 +29,7 @@ varying vec2 uv;
 
 void main()
 {
-	FragColor = texture(tex, uv);
-	FragColor.a *= transparency;
+    vec4 Color = texture(tex, uv);
+    Color.a *= transparency;
+    FragColor = vec4(Color.rgb * Color.a, Color.a);
 }
