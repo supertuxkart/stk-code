@@ -42,6 +42,6 @@ void main(void)
     float g = dot(extendednormal, gmat * extendednormal);
     float b = dot(extendednormal, bmat * extendednormal);
 
-    Diff = 0.25 * vec4(r, g, b, .1);
+    Diff = max(0.25 * vec4(r, g, b, .1), vec4(0.));
     Spec = vec4(0.);
 }

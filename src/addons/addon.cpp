@@ -179,7 +179,7 @@ bool Addon::testIncluded(const std::string &min_ver, const std::string &max_ver)
 }
 
 // ----------------------------------------------------------------------------
-/** 
+/**
  * \brief Filter the add-on with a list of words.
  * \param words A list of words separated by ' '.
  * \return true if the add-on contains one of the words, otherwise false.

@@ -610,7 +610,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 }   // estimateFinishTimeForKart
 
 // ------------------------------------------------------------------------
-/** Returns the number of rescue positions on a given track, which in 
+/** Returns the number of rescue positions on a given track, which in
  *  linear races is just the number of driveline quads.
   */
 unsigned int LinearWorld::getNumberOfRescuePositions() const

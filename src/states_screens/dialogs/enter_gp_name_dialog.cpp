@@ -84,7 +84,7 @@ void EnterGPNameDialog::onEnterPressedInternal()
     if (name.size() > 0)
     {
         // check for duplicate names
-        for (int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
+        for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
         {
             const GrandPrixData* gp = grand_prix_manager->getGrandPrix(i);
             if (gp->getName() == name)

@@ -64,6 +64,7 @@ extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
 extern PFNGLBLENDEQUATIONPROC glBlendEquation;
 extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+extern PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
@@ -75,6 +76,7 @@ extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
 extern PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 extern PFNGLTEXIMAGE3DPROC glTexImage3D;
+extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
@@ -102,6 +104,19 @@ void loadAndAttach(GLint ProgramID, GLint ShaderType, const char *filepath, Type
     loadAndAttach(ProgramID, args...);
 }
 
+template<typename ...Types>
+void printFileList()
+{
+    return;
+}
+
+template<typename ...Types>
+void printFileList(GLint ShaderType, const char *filepath, Types ... args)
+{
+    Log::error("GLWrapp", filepath);
+    printFileList(args...);
+}
+
 template<typename ... Types>
 GLint LoadProgram(Types ... args)
 {
@@ -113,10 +128,12 @@ GLint LoadProgram(Types ... args)
     int InfoLogLength;
     glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
     if (Result == GL_FALSE) {
+        Log::error("GLWrapp", "Error when linking these shaders :");
+        printFileList(args...);
         glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
         char *ErrorMessage = new char[InfoLogLength];
         glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
+        Log::error("GLWrapp", ErrorMessage);
         delete[] ErrorMessage;
     }
 
@@ -135,6 +152,7 @@ GLint LoadProgram(Types ... args)
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+void transformTexturesTosRGB(irr::video::ITexture *tex);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

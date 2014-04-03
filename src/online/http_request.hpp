@@ -78,13 +78,13 @@ namespace Online
         void init();
 
     public :
-                           HTTPRequest(bool manage_memory = false, 
+                           HTTPRequest(bool manage_memory = false,
                                        int priority = 1);
                            HTTPRequest(const std::string &filename,
-                                       bool manage_memory = false, 
+                                       bool manage_memory = false,
                                        int priority = 1);
                            HTTPRequest(const char * const filename,
-                                       bool manage_memory = false, 
+                                       bool manage_memory = false,
                                        int priority = 1);
         virtual           ~HTTPRequest() {};
         virtual bool       isAllowedToAdd() const OVERRIDE;
@@ -99,7 +99,7 @@ namespace Online
          *  \pre m_curl_code!=CURLE_OK
          */
         const char* getDownloadErrorMessage() const
-        { 
+        {
             assert(hadDownloadError());
             return curl_easy_strerror(m_curl_code);
         }   // getDownloadErrorMessage
@@ -126,7 +126,7 @@ namespace Online
         // --------------------------------------------------------------------
         /** Sets a parameter to 'value' (stringw).
          */
-        void addParameter(const std::string & name, 
+        void addParameter(const std::string & name,
                           const irr::core::stringw &value)
         {
             core::stringc s = core::stringc(value.c_str());
@@ -142,7 +142,7 @@ namespace Online
         {
             assert(isPreparing());
             std::string s = StringUtils::toString(value);
-            char *s1 = curl_easy_escape(m_curl_session, name.c_str(), 
+            char *s1 = curl_easy_escape(m_curl_session, name.c_str(),
                                         name.size() );
             char *s2 = curl_easy_escape(m_curl_session, s.c_str(), s.size());
             m_parameters.append(std::string(s1)+"="+s2+"&");
@@ -159,9 +159,9 @@ namespace Online
         const std::string & getURL() const { assert(isBusy()); return m_url;}
         // --------------------------------------------------------------------
         /** Sets the URL for this request. */
-        void setURL(const std::string & url) 
+        void setURL(const std::string & url)
         {
-            assert(isPreparing()); 
+            assert(isPreparing());
             m_url = url;
         }   // setURL
 

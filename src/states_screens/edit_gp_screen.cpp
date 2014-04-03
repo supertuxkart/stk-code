@@ -199,7 +199,7 @@ void EditGPScreen::onConfirm()
     if (m_action == "remove")
     {
         m_gp->remove(m_selected);
-        setSelected(m_selected >= m_gp->getNumberOfTracks() ?
+        setSelected(m_selected >= (int)m_gp->getNumberOfTracks() ?
             m_gp->getNumberOfTracks() - 1 : m_selected);
         loadList(m_selected);
         setModified(true);

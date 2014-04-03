@@ -187,7 +187,7 @@ void UserInfoDialog::acceptFriendRequest()
 {
     // ----------------------------------------------------------------
     class AcceptFriendRequest : public XMLRequest
-    {    
+    {
         /** Callback for the request to accept a friend invitation. Shows a
         *  confirmation message and takes care of updating all the cached
         *  information.
@@ -199,7 +199,7 @@ void UserInfoDialog::acceptFriendRequest()
             core::stringw info_text("");
             if (isSuccess())
             {
-                OnlineProfile * profile = 
+                OnlineProfile * profile =
                                      ProfileManager::get()->getProfileByID(id);
                 profile->setFriend();
                 OnlineProfile::RelationInfo *info =
@@ -283,8 +283,43 @@ void UserInfoDialog::declineFriendRequest()
  */
 void UserInfoDialog::removeExistingFriend()
 {
-    CurrentUser::get()->requestRemoveFriend(m_profile->getID());
+    /** An inline class for the remove friend request. */
+    class RemoveFriendRequest : public XMLRequest
+    {
+        unsigned int m_id;
+        virtual void callback()
+        {
+            core::stringw info_text("");
+            if (isSuccess())
+            {
+                CurrentUser::get()->getProfile()->removeFriend(m_id);
+                ProfileManager *pm = ProfileManager::get();
+                pm->moveToCache(m_id);
+                pm->getProfileByID(m_id)->deleteRelationalInfo();
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+                info_text = _("Friend removed!");
+            }
+            else
+                info_text = getInfo();
 
+            UserInfoDialog *info = new UserInfoDialog(m_id, info_text, 
+                                                      !isSuccess(), true);
+            GUIEngine::DialogQueue::get()->pushDialog(info, true);
+
+        }   // callback
+        // --------------------------------------------------------------------
+    public:
+        RemoveFriendRequest(unsigned int id)
+                         : XMLRequest(true), m_id(id) {}
+    };   // RemoveFriendRequest
+    // ------------------------------------------------------------------------
+
+    int friend_id = m_profile->getID();
+    RemoveFriendRequest * request = new RemoveFriendRequest(friend_id);
+    CurrentUser::get()->setUserDetails(request);
+    request->addParameter("action", "remove-friend");
+    request->addParameter("friendid", friend_id);
+    request->queue();
 }   // removeExistingFriend
 
 // -----------------------------------------------------------------------------
@@ -322,7 +357,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_remove_widget->m_properties[PROP_ID])
         {
-            if (m_profile->getRelationInfo() && 
+            if (m_profile->getRelationInfo() &&
                 m_profile->getRelationInfo()->isPending() )
                 removePendingFriend();
             else

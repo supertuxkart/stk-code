@@ -111,8 +111,8 @@ void OnlineScreen::beforeAddingWidget()
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);
     hasStateChanged();
-    if (m_recorded_state == CurrentUser::US_SIGNED_OUT || 
-        m_recorded_state == CurrentUser::US_SIGNING_IN || 
+    if (m_recorded_state == CurrentUser::US_SIGNED_OUT ||
+        m_recorded_state == CurrentUser::US_SIGNING_IN ||
         m_recorded_state == CurrentUser::US_SIGNING_OUT    )
     {
         m_quick_play_widget->setDeactivated();

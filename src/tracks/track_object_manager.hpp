@@ -49,7 +49,7 @@ protected:
 public:
          TrackObjectManager();
         ~TrackObjectManager();
-    void add(const XMLNode &xml_node, scene::ISceneNode* parent, LodNodeLoader& lod_loader);
+    void add(const XMLNode &xml_node, scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader);
     void update(float dt);
     void handleExplosion(const Vec3 &pos, const PhysicalObject *mp,
                          bool secondary_hits=true);

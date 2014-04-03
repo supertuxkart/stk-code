@@ -21,7 +21,6 @@
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/glow.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/lens_flare.hpp"
 #include "graphics/light.hpp"
@@ -36,6 +35,7 @@
 #include "graphics/shaders.hpp"
 #include "graphics/shadow_importance.hpp"
 #include "graphics/stkmeshscenenode.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
 #include "io/file_manager.hpp"
 #include "items/item.hpp"
@@ -49,6 +49,8 @@
 #include "utils/profiler.hpp"
 
 #include <algorithm>
+
+STKInstancedSceneNode *InstancedBox = 0;
 
 void IrrDriver::renderGLSL(float dt)
 {
@@ -74,23 +76,10 @@ void IrrDriver::renderGLSL(float dt)
     // Get a list of all glowing things. The driver's list contains the static ones,
     // here we add items, as they may disappear each frame.
     std::vector<GlowData> glows = m_glowing;
-    std::vector<GlowNode *> transparent_glow_nodes;
 
     ItemManager * const items = ItemManager::get();
     const u32 itemcount = items->getNumberOfItems();
     u32 i;
-
-    // For each static node, give it a glow representation
-    const u32 staticglows = glows.size();
-    for (i = 0; i < staticglows; i++)
-    {
-        scene::ISceneNode * const node = glows[i].node;
-
-        const float radius = (node->getBoundingBox().getExtent().getLength() / 2) * 2.0f;
-        GlowNode * const repnode = new GlowNode(irr_driver->getSceneManager(), radius);
-        repnode->setPosition(node->getTransformedBoundingBox().getCenter());
-        transparent_glow_nodes.push_back(repnode);
-    }
 
     for (i = 0; i < itemcount; i++)
     {
@@ -124,12 +113,6 @@ void IrrDriver::renderGLSL(float dt)
         dat.b = c.getBlue();
 
         glows.push_back(dat);
-
-        // Push back its representation too
-        const float radius = (node->getBoundingBox().getExtent().getLength() / 2) * 2.0f;
-        GlowNode * const repnode = new GlowNode(irr_driver->getSceneManager(), radius);
-        repnode->setPosition(node->getTransformedBoundingBox().getCenter());
-        transparent_glow_nodes.push_back(repnode);
     }
 
     // Start the RTT for post-processing.
@@ -203,7 +186,6 @@ void IrrDriver::renderGLSL(float dt)
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
         irr_driver->genProjViewMatrix();
-
 		PROFILER_POP_CPU_MARKER();
 
         // Todo : reenable glow and shadows
@@ -245,30 +227,27 @@ void IrrDriver::renderGLSL(float dt)
             glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
         }
         m_scene_manager->drawAll(m_renderpass);
-
         PROFILER_POP_CPU_MARKER();
 
-		  if (World::getWorld()->getTrack()->isFogEnabled())
-		  {
-			  PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-			  m_post_processing->renderFog(irr_driver->getInvProjMatrix());
-			  PROFILER_POP_CPU_MARKER();
-		  }
+        if (World::getWorld()->getTrack()->isFogEnabled())
+        {
+            PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
+            m_post_processing->renderFog(irr_driver->getInvProjMatrix());
+            PROFILER_POP_CPU_MARKER();
+        }
+
+        PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
+        renderSkybox();
+        PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
-
-		// Render anything glowing.
-		if (!m_mipviz && !m_wireframe)
-		{
-			irr_driver->setPhase(GLOW_PASS);
-			renderGlow(overridemat, glows, cambox, cam);
-		} // end glow
-
+        // Render anything glowing.
+        if (!m_mipviz && !m_wireframe)
+        {
+            irr_driver->setPhase(GLOW_PASS);
+            renderGlow(overridemat, glows, cambox, cam);
+        } // end glow
         PROFILER_POP_CPU_MARKER();
-
-		PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-		renderSkybox();
-		PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Lensflare/godray", 0x00, 0xFF, 0xFF);
         // Is the lens flare enabled & visible? Check last frame's query.
@@ -334,14 +313,6 @@ void IrrDriver::renderGLSL(float dt)
             renderDisplacement(overridemat, cam);
         }
         PROFILER_POP_CPU_MARKER();
-
-        // Drawing for this cam done, cleanup
-        const u32 glowrepcount = transparent_glow_nodes.size();
-        for (i = 0; i < glowrepcount; i++)
-        {
-            transparent_glow_nodes[i]->remove();
-            transparent_glow_nodes[i]->drop();
-        }
 
         PROFILER_POP_CPU_MARKER();
 
@@ -1025,9 +996,10 @@ static void projectSH(float *color[], size_t width, size_t height,
 
                 // Constant obtained by projecting unprojected ref values
                 float solidangle = 2.75 / (wh * pow(d, 1.5f));
-                float b = color[face][4 * height * i + 4 * j] / 255.;
-                float g = color[face][4 * height * i + 4 * j + 1] / 255.;
-                float r = color[face][4 * height * i + 4 * j + 2] / 255.;
+                // pow(., 2.2) to convert from srgb
+                float b = pow(color[face][4 * height * i + 4 * j] / 255., 2.2);
+                float g = pow(color[face][4 * height * i + 4 * j + 1] / 255., 2.2);
+                float r = pow(color[face][4 * height * i + 4 * j + 2] / 255., 2.2);
 
                 assert(b >= 0.);
 
@@ -1212,7 +1184,6 @@ void IrrDriver::generateSkyboxCubemap()
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
     glGenTextures(1, &SkyboxCubeMap);
-    glGenTextures(1, &ConvolutedSkyboxCubeMap);
 
     GLint w = 0, h = 0;
     for (unsigned i = 0; i < 6; i++)
@@ -1241,19 +1212,19 @@ void IrrDriver::generateSkyboxCubemap()
         image->drop();
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
 
     testSH(rgba, w, h, blueSHCoeff, greenSHCoeff, redSHCoeff);
 
-    for (unsigned i = 0; i < 6; i++)
+    /*for (unsigned i = 0; i < 6; i++)
     {
         glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];
-    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
 }
 
 
@@ -1280,11 +1251,11 @@ void IrrDriver::renderSkybox()
     transform.getInverse(invtransform);
 
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glUseProgram(MeshShader::SkyboxShader::Program);
-        MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
+    MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

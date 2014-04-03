@@ -52,7 +52,7 @@ NewsManager::~NewsManager()
  *  separate thread to execute downloadNews() - which (if necessary) the
  *  news.xml file and updating the list of news messages. It also initialises
  *  the addons manager (which can trigger another download of news.xml).
- *  \param force_refresh Re-download news.xml, even if 
+ *  \param force_refresh Re-download news.xml, even if
  */
 void NewsManager::init(bool force_refresh)
 {
@@ -102,7 +102,7 @@ void* NewsManager::downloadNews(void *obj)
     bool download = ( UserConfigParams::m_news_last_updated==0  ||
                       UserConfigParams::m_news_last_updated
                           +UserConfigParams::m_news_frequency
-                        < StkTime::getTimeSinceEpoch()          || 
+                        < StkTime::getTimeSinceEpoch()          ||
                       me->m_force_refresh                       ||
                       !news_exists                                    )
          && UserConfigParams::m_internet_status==RequestManager::IPERM_ALLOWED;

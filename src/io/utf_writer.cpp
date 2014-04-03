@@ -25,12 +25,12 @@ using namespace irr;
 
 // ----------------------------------------------------------------------------
 
-UTFWriter::UTFWriter(const char* dest) 
+UTFWriter::UTFWriter(const char* dest)
          : m_base(dest, std::ios::out | std::ios::binary)
 {
     if (!m_base.is_open())
     {
-        throw std::runtime_error("Failed to open file for writing : " + 
+        throw std::runtime_error("Failed to open file for writing : " +
                                   std::string(dest));
     }
 

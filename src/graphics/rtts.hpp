@@ -33,6 +33,7 @@ enum TypeRTT
     RTT_TMP4,
     RTT_NORMAL_AND_DEPTH,
     RTT_COLOR,
+    RTT_LOG_LUMINANCE,
 
     RTT_HALF1,
     RTT_HALF2,
@@ -61,6 +62,7 @@ enum TypeRTT
     RTT_HALF_SOFT,
 
     RTT_DISPLACE,
+    RTT_FINAL_COLOR,
 
     RTT_COUNT
 };

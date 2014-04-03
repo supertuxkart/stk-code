@@ -359,15 +359,15 @@ void gamepadVisualisation()
 }   // gamepadVisualisation
 
 // ============================================================================
-/** Sets the Christmas flag (m_xmas_enabled), depending on currently set
- *  Christ mode (m_xmas_mode)
+/** Sets the hat mesh name depending on the current christmas mode 
+ *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
 void handleXmasMode()
 {
     bool xmas = false;
     switch(UserConfigParams::m_xmas_mode)
     {
-    case 0:  
+    case 0:
         {
             int day, month;
             StkTime::getDate(&day, &month);
@@ -514,7 +514,7 @@ int handleCmdLinePreliminary()
         UserConfigParams::m_log_errors_to_console=true;
     }
 
-    if(CommandLine::has("--screensize", &s) || 
+    if(CommandLine::has("--screensize", &s) ||
        CommandLine::has("-s", &s)              )
     {
         //Check if fullscreen and new res is blacklisted
@@ -522,7 +522,7 @@ int handleCmdLinePreliminary()
         if (sscanf(s.c_str(), "%dx%d", &width, &height) == 2)
         {
             // Reassemble the string in case that the original width or
-            // height contained a leading 0 
+            // height contained a leading 0
             std::ostringstream o;
             o << width << "x" << height;
             std::string res = o.str();
@@ -836,7 +836,7 @@ int handleCmdLine()
                      (int)UserConfigParams::m_num_karts);
     }   // --numkarts
 
-    if(CommandLine::has( "--no-start-screen") || 
+    if(CommandLine::has( "--no-start-screen") ||
         CommandLine::has("-N")                   )
         UserConfigParams::m_no_start_screen = true;
     if(CommandLine::has("--race-now") || CommandLine::has("-R"))
@@ -986,7 +986,7 @@ void initUserConfig()
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
-    user_config->loadConfig();    
+    user_config->loadConfig();
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1054,7 +1054,7 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI, 
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI,
                                                      "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
@@ -1127,7 +1127,7 @@ int main(int argc, char *argv[] )
 
     srand(( unsigned ) time( 0 ));
 
-    try 
+    try
     {
         std::string s;
         if(CommandLine::has("--root", &s))
@@ -1138,7 +1138,7 @@ int main(int argc, char *argv[] )
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
-        initUserConfig(); 
+        initUserConfig();
 
         handleCmdLinePreliminary();
 
@@ -1173,7 +1173,7 @@ int main(int argc, char *argv[] )
         // and the AchievementsManager to initialise the AchievementsStatus.
         PlayerManager::create();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gui_lock.png"  ) );
         projectile_manager->loadData();
 
@@ -1225,13 +1225,21 @@ int main(int argc, char *argv[] )
 
         // Load addons.xml to get info about addons even when not
         // allowed to access the internet
-        if (UserConfigParams::m_internet_status != 
+        if (UserConfigParams::m_internet_status !=
             Online::RequestManager::IPERM_ALLOWED)
         {
-            std::string xml_file = file_manager->getAddonsFile("addons.xml");
-            if (file_manager->fileExists(xml_file)) {
-                const XMLNode *xml = new XMLNode (xml_file);
-                addons_manager->initAddons(xml);
+            std::string xml_file = file_manager->getAddonsFile("addonsX.xml");
+            if (file_manager->fileExists(xml_file))
+            {
+                try
+                {
+                    const XMLNode *xml = new XMLNode(xml_file);
+                    addons_manager->initAddons(xml);
+                }
+                catch (std::runtime_error& e)
+                {
+                    Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
+                }
             }
         }
 
@@ -1385,7 +1393,7 @@ int main(int argc, char *argv[] )
 // ============================================================================
 #ifdef WIN32
 //routine for running under windows
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      LPTSTR lpCmdLine, int nCmdShow)
 {
     return main(__argc, __argv);

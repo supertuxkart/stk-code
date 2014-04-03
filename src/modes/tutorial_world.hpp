@@ -29,7 +29,7 @@ public:
     TutorialWorld();
     virtual unsigned int getNumberOfRescuePositions() const OVERRIDE
     {
-        // Don't use LinearWorld's function, but WorldWithRank, since the 
+        // Don't use LinearWorld's function, but WorldWithRank, since the
         // latter is based on rescuing to start positions
         return WorldWithRank::getNumberOfRescuePositions();
     }
@@ -37,7 +37,7 @@ public:
     /** Determines the rescue position index of the specified kart. */
     virtual unsigned int getRescuePositionIndex(AbstractKart *kart) OVERRIDE
     {
-        // Don't use LinearWorld's function, but WorldWithRank, since the 
+        // Don't use LinearWorld's function, but WorldWithRank, since the
         // latter is based on rescuing to start positions
         return WorldWithRank::getRescuePositionIndex(kart);
     }
@@ -45,7 +45,7 @@ public:
     /** Returns the bullet transformation for the specified rescue index. */
     virtual btTransform getRescueTransform(unsigned int index) const OVERRIDE
     {
-        // Don't use LinearWorld's function, but WorldWithRank, since the 
+        // Don't use LinearWorld's function, but WorldWithRank, since the
         // latter is based on rescuing to start positions
         return WorldWithRank::getRescueTransform(index);
     }

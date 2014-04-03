@@ -560,7 +560,7 @@ namespace UserConfigParams
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode
             PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
-                            &m_graphics_quality, "Christmas hats: 0 use calendar, 1 always on, 2 always off") );
+                            &m_graphics_quality, "Christmas hats: 0 use current date, 1 always on, 2 always off") );
 
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",

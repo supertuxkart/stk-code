@@ -100,7 +100,7 @@ namespace Online
             request->setServerURL("client-user.php");
             request->addParameter("action","saved-session");
             request->addParameter("userid", UserConfigParams::m_saved_user);
-            request->addParameter("token", 
+            request->addParameter("token",
                                   UserConfigParams::m_saved_token.c_str());
             request->queue();
             m_state = US_SIGNING_IN;
@@ -158,7 +158,7 @@ namespace Online
     /** Checks the server respond after a login attempt. If the login
      *  was successful, it marks the user as logged in, and (if requested)
      *  saves data to be able to login next time.
-     *  \param success If the answer from the server indicated a 
+     *  \param success If the answer from the server indicated a
      *         successful login attemp.
      *  \param input Xml tree with the complete server response.
      */
@@ -184,7 +184,7 @@ namespace Online
             std::string achieved_string("");
             if(input->get("achieved", &achieved_string) == 1)
             {
-                std::vector<uint32_t> achieved_ids = 
+                std::vector<uint32_t> achieved_ids =
                     StringUtils::splitToUInt(achieved_string, ' ');
                 PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
             }
@@ -234,7 +234,7 @@ namespace Online
     }   // signOut
 
     // ------------------------------------------------------------------------
-    CurrentUser::ServerJoinRequest* 
+    CurrentUser::ServerJoinRequest*
                              CurrentUser::requestServerJoin(uint32_t server_id,
                                                             bool request_now)
     {
@@ -263,7 +263,7 @@ namespace Online
     }   // ServerJoinRequest::callback
 
     // ------------------------------------------------------------------------
-    const XMLRequest* 
+    const XMLRequest*
            CurrentUser::requestGetAddonVote(const std::string & addon_id) const
     {
         assert(m_state == US_SIGNED_IN);
@@ -375,46 +375,6 @@ namespace Online
     }   // CancelFriendRequest::callback
 
     // ------------------------------------------------------------------------
-    /** A request to the server, to remove a friend relation.
-     *  \param friend_id The id of the friend to be removed.
-     */
-    void CurrentUser::requestRemoveFriend(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::RemoveFriendRequest * request = 
-                                  new CurrentUser::RemoveFriendRequest(friend_id);
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "remove-friend");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestRemoveFriend
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to remove a friend. Shows a confirmation
-     *  message and takes care of updating all the cached information.
-     */
-    void CurrentUser::RemoveFriendRequest::callback()
-    {
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            CurrentUser::get()->getProfile()->removeFriend(m_id);
-            ProfileManager::get()->moveToCache(m_id);
-            ProfileManager::get()->getProfileByID(m_id)->deleteRelationalInfo();
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend removed!");
-        }
-        else
-            info_text = getInfo();
-        UserInfoDialog *info = new UserInfoDialog(m_id, info_text,!isSuccess(), 
-                                                  true);
-        GUIEngine::DialogQueue::get()->pushDialog(info, true);
-
-    }   // RemoveFriendRequest::callback
-
-    // ------------------------------------------------------------------------
     /** A request to the server, to change the password of the signed in user.
      *  \param current_password The active password of the currently signed in
      *         user.
@@ -437,14 +397,14 @@ namespace Online
         request->queue();
     }   // requestPasswordChange
     // ------------------------------------------------------------------------
-    /** Callback for the change password request. If the matching dialog is 
+    /** Callback for the change password request. If the matching dialog is
      *  still open, show a confirmation message.
      */
     void CurrentUser::ChangePasswordRequest::callback()
     {
         if(GUIEngine::ModalDialog::isADialogActive())
         {
-            ChangePasswordDialog * dialog  = 
+            ChangePasswordDialog * dialog  =
                 dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog
                                                              ::getCurrent());
             if(dialog != NULL)
@@ -487,10 +447,10 @@ namespace Online
                 std::string online_friends_string("");
                 if(getXMLData()->get("online", &online_friends_string) == 1)
                 {
-                    std::vector<uint32_t> online_friends = 
+                    std::vector<uint32_t> online_friends =
                           StringUtils::splitToUInt(online_friends_string, ' ');
                     bool went_offline = false;
-                    std::vector<uint32_t> friends = 
+                    std::vector<uint32_t> friends =
                                 CurrentUser::get()->getProfile()->getFriends();
                     std::vector<core::stringw> to_notify;
                     for(unsigned int i = 0; i < friends.size(); ++i)
@@ -506,7 +466,7 @@ namespace Online
                          }
                          OnlineProfile * profile =
                              ProfileManager::get()->getProfileByID(friends[i]);
-                         OnlineProfile::RelationInfo * relation_info = 
+                         OnlineProfile::RelationInfo * relation_info =
                                                     profile->getRelationInfo();
                          if( relation_info->isOnline() )
                          {
@@ -524,7 +484,7 @@ namespace Online
                                  relation_info->setOnline(true);
                                  // Do this because a user might have accepted
                                  // a pending friend request.
-                                 profile->setFriend(); 
+                                 profile->setFriend();
                                  to_notify.push_back(profile->getUserName());
                              }
                          }
@@ -550,10 +510,10 @@ namespace Online
                         }
                         else if(to_notify.size() > 3)
                         {
-                            message = _("%d friends are now online.", 
+                            message = _("%d friends are now online.",
                                         to_notify.size());
                         }
-                        NotificationDialog *dia = 
+                        NotificationDialog *dia =
                             new NotificationDialog(NotificationDialog::T_Friends,
                                                    message);
                         GUIEngine::DialogQueue::get()->pushDialog(dia, false);
@@ -576,7 +536,7 @@ namespace Online
                 const XMLNode * node = getXMLData()->getNode(i);
                 if(node->getName() == "new_friend_request")
                 {
-                    OnlineProfile::RelationInfo * ri = 
+                    OnlineProfile::RelationInfo * ri =
                         new OnlineProfile::RelationInfo("New", false, true, true);
                     OnlineProfile * p = new OnlineProfile(node);
                     p->setRelationInfo(ri);
@@ -597,7 +557,7 @@ namespace Online
                     message = _("You have a new friend request!");
                 }
                 NotificationDialog *dia =
-                    new NotificationDialog(NotificationDialog::T_Friends, 
+                    new NotificationDialog(NotificationDialog::T_Friends,
                                            message);
                 GUIEngine::DialogQueue::get()->pushDialog(dia, false);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
@@ -659,7 +619,7 @@ namespace Online
 
     // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
-     */ 
+     */
     uint32_t CurrentUser::getID() const
     {
         if((m_state == US_SIGNED_IN ))

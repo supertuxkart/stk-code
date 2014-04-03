@@ -1,8 +1,8 @@
-#version 330 compatibility
+uniform sampler2D colorMapG;
+
 in vec4 offset[2];
 in vec2 uv;
 
-uniform sampler2D colorMapG;
 const float threshold = 0.1;
 
 out vec4 FragColor;

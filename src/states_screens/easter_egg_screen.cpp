@@ -85,7 +85,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
 
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s':",
                                                 clickedTrack->getFilename()   );
@@ -108,7 +108,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 Track* clickedTrack = track_manager->getTrack(selection);
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s'",
                                                 clickedTrack->getFilename());

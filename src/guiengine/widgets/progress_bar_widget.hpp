@@ -28,7 +28,7 @@
 
 namespace GUIEngine
 {
-    /** 
+    /**
       * \brief A progress bar widget.
       * \ingroup widgetsgroup
       */
@@ -62,7 +62,7 @@ namespace GUIEngine
         /** Get the current value of the widget. */
         int getValue() {return m_value; };
         
-    }; 
+    };
 }
 
 #endif

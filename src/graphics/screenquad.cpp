@@ -23,8 +23,8 @@ const u16 ScreenQuad::indices[4] = {0, 1, 2, 3};
 static const SColor white(255, 255, 255, 255);
 
 const S3DVertex ScreenQuad::vertices[4] = {
-		S3DVertex(-1, 1, 0, 0, 1, 0, white, 0, 1),
-		S3DVertex(1, 1, 0, 0, 1, 0, white, 1, 1),
-		S3DVertex(-1, -1, 0, 0, 1, 0, white, 0, 0),
-		S3DVertex(1, -1, 0, 0, 1, 0, white, 1, 0),
-		};
+        S3DVertex(-1, 1, 0, 0, 1, 0, white, 0, 1),
+        S3DVertex(1, 1, 0, 0, 1, 0, white, 1, 1),
+        S3DVertex(-1, -1, 0, 0, 1, 0, white, 0, 0),
+        S3DVertex(1, -1, 0, 0, 1, 0, white, 1, 0),
+        };

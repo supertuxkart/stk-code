@@ -10,22 +10,6 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-static
-core::vector3df getWind()
-{
-    const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
-    float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
-
-    float strength = (pos.X + pos.Y + pos.Z) * 1.2f + time * m_speed;
-    strength = noise2d(strength / 10.0f) * m_amplitude * 5;
-    // * 5 is to work with the existing amplitude values.
-
-    // Pre-multiply on the cpu
-    return irr_driver->getWind() * strength;
-}
-
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
@@ -105,6 +89,10 @@ void STKMeshSceneNode::cleanGLMeshes()
             glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
         if (mesh.vao_displace_pass)
             glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
+        if (mesh.vao_displace_mask_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
+        if (mesh.vao_shadow_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
     }

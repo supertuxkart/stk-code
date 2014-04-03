@@ -102,7 +102,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 		glVertexAttribPointer(attrib_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (GLvoid*)24);
 		
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
-	glBindVertexArray(0);
 	return vao;
 }
 
@@ -181,8 +180,11 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	for (unsigned i = 0; i < 6; i++)
 	{
 		tex = mb->getMaterial().getTexture(i);
-		if (tex)
-			result.textures[i] = getTextureGLuint(tex);
+        if (tex)
+        {
+            transformTexturesTosRGB(tex);
+            result.textures[i] = getTextureGLuint(tex);
+        }
 		else
 			result.textures[i] = 0;
 	}
@@ -204,6 +206,16 @@ void computeTIMV(core::matrix4 &TransposeInverseModelView)
 	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 	TransposeInverseModelView.makeInverse();
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+}
+
+core::vector3df getWind()
+{
+    const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
+    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
+    GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
+    float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
+
+    return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
 
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
@@ -654,11 +666,9 @@ void drawShadowRef(const GLMesh &mesh)
     size_t count = mesh.IndexCount;
 
     std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    for (unsigned i = 0; i < ShadowMVP.size(); i++)
-        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::RefShadowShader::setUniforms(ShadowMVP, 0);
+    MeshShader::RefShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP, 0);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
@@ -673,8 +683,6 @@ void drawShadow(const GLMesh &mesh)
     size_t count = mesh.IndexCount;
 
     std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    for (unsigned i = 0; i < ShadowMVP.size(); i++)
-        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
     /*    if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
     {
@@ -683,7 +691,7 @@ void drawShadow(const GLMesh &mesh)
     MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
     }*/
 
-    MeshShader::ShadowShader::setUniforms(ShadowMVP);
+    MeshShader::ShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);

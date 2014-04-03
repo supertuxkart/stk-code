@@ -223,7 +223,7 @@
                 STACKFRAME64    stackframe;
                 memset(&stackframe, 0, sizeof(stackframe));
                 stackframe.AddrPC.Offset    = pContext->Eip;
-                stackframe.AddrPC.Mode      = AddrModeFlat; 
+                stackframe.AddrPC.Mode      = AddrModeFlat;
                 stackframe.AddrStack.Offset = pContext->Esp;
                 stackframe.AddrStack.Mode   = AddrModeFlat;
                 stackframe.AddrFrame.Offset = pContext->Ebp;

@@ -459,7 +459,7 @@ void World::terminateRace()
     {
         std::string mode_name = getIdent(); // Get the race mode name
         int winner_position = 1;
-        int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
+        unsigned int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
         if (mode_name == IDENT_FTL)
         {
             winner_position = 2;
@@ -483,7 +483,7 @@ void World::terminateRace()
                                                         mode_name, 1);
                 }
             }
-	    } // for i < kart_amount
+        } // for i < kart_amount
     } // if (achiev)
     
     Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
@@ -504,7 +504,7 @@ void World::terminateRace()
                                                             "wins", 1);
                 }
                 else
-                {     
+                {
                       //Set number of consecutive wins to 0
                       win->reset();
                 }
