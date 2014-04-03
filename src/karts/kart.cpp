@@ -1757,6 +1757,8 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
             impulse.normalize();
         else
             impulse = Vec3(0, 0, -1); // Arbitrary
+        // impulse depends of kart speed
+        impulse *= 0.2f * m_body->getLinearVelocity().length();
         impulse *= m_kart_properties->getCollisionTerrainImpulse();
         m_bounce_back_time = 0.2f;
         m_vehicle->setTimedCentralImpulse(0.1f, impulse);
