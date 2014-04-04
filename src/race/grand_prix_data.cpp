@@ -293,7 +293,9 @@ void GrandPrixData::moveUp(const unsigned int track)
 
     std::swap(m_tracks[track], m_tracks[track - 1]);
     std::swap(m_laps[track], m_laps[track - 1]);
-    m_reversed.swap(m_reversed[track], m_reversed[track - 1]);
+    bool tmp              = m_reversed[track    ];
+    m_reversed[track]     = m_reversed[track - 1];
+    m_reversed[track - 1] = tmp;
 }
 
 // ----------------------------------------------------------------------------
@@ -303,7 +305,9 @@ void GrandPrixData::moveDown(const unsigned int track)
 
     std::swap(m_tracks[track], m_tracks[track + 1]);
     std::swap(m_laps[track], m_laps[track + 1]);
-    m_reversed.swap(m_reversed[track], m_reversed[track + 1]);
+    bool tmp              = m_reversed[track    ];
+    m_reversed[track    ] = m_reversed[track + 1];
+    m_reversed[track + 1] = tmp;
 }
 
 // ----------------------------------------------------------------------------
