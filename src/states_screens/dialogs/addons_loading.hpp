@@ -55,8 +55,6 @@ private:
      *  to the progress of a download. */
     Online::HTTPRequest *m_download_request;
 
-    bool m_vote_clicked;
-
 public:
     AddonsLoading(const std::string &addon_name);
 

@@ -46,8 +46,6 @@ using namespace irr::gui;
 AddonsLoading::AddonsLoading(const std::string &id)
              : ModalDialog(0.8f, 0.8f)
 {
-    m_vote_clicked     = false;
-
     m_addon            = *(addons_manager->getAddon(id));
     m_icon_shown       = false;
     m_download_request = NULL;
@@ -267,12 +265,6 @@ void AddonsLoading::voteClicked()
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
-    if(m_vote_clicked)
-    {
-        voteClicked();
-        return;
-    }
-
     if(m_progress->isVisible())
     {
         float progress = m_download_request->getProgress();
