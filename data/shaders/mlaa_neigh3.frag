@@ -26,16 +26,16 @@ void main() {
 	vec4 color = vec4(0.0);
 
 	// Add the contributions of the possible 4 lines that can cross this pixel:
-	vec4 C = texture(colorMap, uv);
-	vec4 Cleft = texture(colorMap, offset[0].xy);
-	vec4 Ctop = texture(colorMap, offset[0].zw);
-	vec4 Cright = texture(colorMap, offset[1].xy);
-	vec4 Cbottom = texture(colorMap, offset[1].zw);
+	vec4 C = pow(texture(colorMap, uv), vec4(1./2.2));
+	vec4 Cleft = pow(texture(colorMap, offset[0].xy), vec4(1./2.2));
+	vec4 Ctop = pow(texture(colorMap, offset[0].zw), vec4(1./2.2));
+	vec4 Cright = pow(texture(colorMap, offset[1].xy), vec4(1./2.2));
+	vec4 Cbottom = pow(texture(colorMap, offset[1].zw), vec4(1./2.2));
 	color = mix(C, Ctop, a.r) * w.r + color;
 	color = mix(C, Cbottom, a.g) * w.g + color;
 	color = mix(C, Cleft, a.b) * w.b + color;
 	color = mix(C, Cright, a.a) * w.a + color;
 
 	// Normalize the resulting color and we are finished!
-	FragColor = color / sum;
+	FragColor = vec4(pow(color / sum, vec4(2.2)));
 }

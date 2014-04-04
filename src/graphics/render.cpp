@@ -172,21 +172,10 @@ void IrrDriver::renderGLSL(float dt)
         }*/
 
         // Fire up the MRT
-		irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
-		PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
-        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
-		glDepthFunc(GL_LEQUAL);
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_TRUE);
-		glDisable(GL_BLEND);
-        glEnable(GL_CULL_FACE);
-        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-        m_scene_manager->drawAll(m_renderpass);
-        irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
-        irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
-        irr_driver->genProjViewMatrix();
-		PROFILER_POP_CPU_MARKER();
+        PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
+        renderSolidFirstPass();
+        PROFILER_POP_CPU_MARKER();
+
 
         // Todo : reenable glow and shadows
         //ShadowImportanceProvider * const sicb = (ShadowImportanceProvider *)
@@ -212,21 +201,7 @@ void IrrDriver::renderGLSL(float dt)
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-        irr_driver->setPhase(SOLID_LIT_PASS);
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_FALSE);
-		glDisable(GL_BLEND);
-        m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
-        setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
-        setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
-        setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
-        if (!UserConfigParams::m_ssao)
-        {
-            GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-        }
-        m_scene_manager->drawAll(m_renderpass);
+        renderSolidSecondPass();
         PROFILER_POP_CPU_MARKER();
 
         if (World::getWorld()->getTrack()->isFogEnabled())
@@ -284,25 +259,11 @@ void IrrDriver::renderGLSL(float dt)
 
         // We need to re-render camera due to the per-cam-node hack.
         PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
-		irr_driver->setPhase(TRANSPARENT_PASS);
-		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
-		glEnable(GL_DEPTH_TEST);
-		glDisable(GL_ALPHA_TEST);
-		glDepthMask(GL_FALSE);
-		glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDisable(GL_CULL_FACE);
-        m_scene_manager->drawAll(m_renderpass);
+        renderTransparent();
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
-		m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
-		glDepthMask(GL_FALSE);
-		glDisable(GL_CULL_FACE);
-		glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		m_scene_manager->drawAll(m_renderpass);
+        renderParticles();
 		PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Displacement", 0x00, 0x00, 0xFF);
@@ -444,6 +405,67 @@ void IrrDriver::renderFixed(float dt)
 }
 
 // ----------------------------------------------------------------------------
+
+void IrrDriver::renderSolidFirstPass()
+{
+    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH), false, false);
+
+    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+    glDepthFunc(GL_LEQUAL);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
+    glEnable(GL_CULL_FACE);
+    irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
+    m_scene_manager->drawAll(m_renderpass);
+    irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
+    irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+    irr_driver->genProjViewMatrix();
+}
+
+void IrrDriver::renderSolidSecondPass()
+{
+    irr_driver->setPhase(SOLID_LIT_PASS);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
+    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
+    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_TMP1)), GL_NEAREST, GL_NEAREST);
+    setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP2)), GL_NEAREST, GL_NEAREST);
+    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_SSAO)), GL_NEAREST, GL_NEAREST);
+    if (!UserConfigParams::m_ssao)
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    m_scene_manager->drawAll(m_renderpass);
+}
+
+void IrrDriver::renderTransparent()
+{
+    irr_driver->setPhase(TRANSPARENT_PASS);
+    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_CULL_FACE);
+    m_scene_manager->drawAll(m_renderpass);
+}
+
+void IrrDriver::renderParticles()
+{
+    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
+    glDepthMask(GL_FALSE);
+    glDisable(GL_CULL_FACE);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    m_scene_manager->drawAll(m_renderpass);
+}
 
 void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
                               scene::ICameraSceneNode * const camnode,
