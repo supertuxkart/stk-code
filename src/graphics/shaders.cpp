@@ -2585,7 +2585,7 @@ namespace FullScreenShader
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_blend2.frag").c_str());
         uniform_edgesMap = glGetUniformLocation(Program, "edgesMap");
         uniform_areaMap = glGetUniformLocation(Program, "areaMap");
         uniform_PIXEL_SIZE = glGetUniformLocation(Program, "PIXEL_SIZE");
