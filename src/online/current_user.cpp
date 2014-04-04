@@ -263,21 +263,6 @@ namespace Online
     }   // ServerJoinRequest::callback
 
     // ------------------------------------------------------------------------
-    const XMLRequest*
-           CurrentUser::requestGetAddonVote(const std::string & addon_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        XMLRequest * request = new XMLRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "get-addon-vote");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("addonid", addon_id.substr(6));
-        request->queue();
-        return request;
-    }   // requestGetAddonVote
-
-    // ------------------------------------------------------------------------
     /** A request to the server, to perform a vote on an addon.
      *  \param addon_id the id of the addon to vote for.
      *  \param rating the voted rating.

@@ -34,7 +34,7 @@ class VoteDialog : public GUIEngine::ModalDialog
 private:
     const std::string m_addon_id;
     bool m_self_destroy;
-    const Online::XMLRequest * m_fetch_vote_request;
+    Online::XMLRequest * m_fetch_vote_request;
     const Online::CurrentUser::SetAddonVoteRequest * m_perform_vote_request;
 
     GUIEngine::LabelWidget * m_info_widget;
@@ -44,6 +44,7 @@ private:
     GUIEngine::RibbonWidget * m_options_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
+    void updateFetchVote();
 public:
     VoteDialog(const std::string & addon_id);
     ~VoteDialog();
