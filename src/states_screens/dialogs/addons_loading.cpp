@@ -255,7 +255,13 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 void AddonsLoading::voteClicked()
 {
     if (Online::CurrentUser::get()->isRegisteredUser())
-        new VoteDialog(m_addon.getId());
+    {
+        // We need to keep a copy of the addon, since dismiss() will 
+        // delete this object.
+        Addon addon = m_addon;
+        dismiss();
+        new VoteDialog(addon.getId());
+    }
 }   // voteClicked
 
 // ----------------------------------------------------------------------------
