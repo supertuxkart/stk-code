@@ -429,7 +429,9 @@ public:
         return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
     }
     // ------------------------------------------------------------------------
-    inline video::ITexture* getRTT(TypeRTT which)  {return m_rtts->getRTT(which);}
+    inline GLuint getRenderTargetTexture(TypeRTT which)  { return m_rtts->getRenderTarget(which); }
+    inline GLuint getFBO(TypeFBO which)  { return m_rtts->getFBO(which); }
+    inline GLuint getDepthStencilTexture()  { return m_rtts->getDepthStencilTexture(); }
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------

@@ -72,7 +72,7 @@ vec2 Area(vec2 distance, float e1, float e2) {
 	float areaSize = MAX_DISTANCE * 5.0;
 	vec2 pixcoord = MAX_DISTANCE * round(4.0 * vec2(e1, e2)) + distance;
 	vec2 texcoord = pixcoord / (areaSize - 1.0);
-	return texture2DLod(areaMap, texcoord, 0.0).ra;
+	return textureLod(areaMap, texcoord, 0.0).ra;
 }
 
 void main() {
@@ -83,13 +83,13 @@ void main() {
 	if (e.g != 0.0) { // Edge at north
 
 		// Search distances to the left and to the right:
-		vec2 d = vec2(SearchXLeft(uv), SearchXRight(uv);
+		vec2 d = vec2(SearchXLeft(uv), SearchXRight(uv));
 
 		// Now fetch the crossing edges. Instead of sampling between edgels, we
 		// sample at 0.25, to be able to discern what value has each edgel:
 		vec4 coords = vec4(d.x, 0.25, d.y + 1.0, 0.25) * PIXEL_SIZE.xyxy + uv.xyxy;
-		float e1 = texture2DLod(edgesMap, coords.xy, 0.0).r;
-		float e2 = texture2DLod(edgesMap, coords.zw, 0.0).r;
+		float e1 = textureLod(edgesMap, coords.xy, 0.0).r;
+		float e2 = textureLod(edgesMap, coords.zw, 0.0).r;
 
 		// Ok, we know how this pattern looks like, now it is time for getting
 		// the actual area:
@@ -103,8 +103,8 @@ void main() {
 
 		// Now fetch the crossing edges (yet again):
 		vec4 coords = vec4(-0.25, d.x, -0.25, d.y - 1.0) * PIXEL_SIZE.xyxy + uv.xyxy;
-		float e1 = texture2DLod(edgesMap, coords.xy, 0.0).g;
-		float e2 = texture2DLod(edgesMap, coords.zw, 0.0).g;
+		float e1 = textureLod(edgesMap, coords.xy, 0.0).g;
+		float e2 = textureLod(edgesMap, coords.zw, 0.0).g;
 
 		// Get the area for this direction:
 		areas.ba = Area(abs(d), e1, e2);

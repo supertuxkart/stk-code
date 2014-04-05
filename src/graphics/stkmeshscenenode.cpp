@@ -147,7 +147,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
 
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
-    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_TMP4), false, false);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP4));
 
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
     MeshShader::DisplaceMaskShader::setUniforms(ModelViewProjectionMatrix);
@@ -159,10 +159,10 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     // Render the effect
     if (!displaceTex)
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
-    irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_DISPLACE), false, false);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_DISPLACE));
     setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
-    setTexture(1, getTextureGLuint(irr_driver->getRTT(RTT_TMP4)), GL_LINEAR, GL_LINEAR, true);
-    setTexture(2, getTextureGLuint(irr_driver->getRTT(RTT_COLOR)), GL_LINEAR, GL_LINEAR, true);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP4), GL_LINEAR, GL_LINEAR, true);
+    setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
     MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix, core::vector2df(cb->getDirX(), cb->getDirY()), core::vector2df(cb->getDir2X(), cb->getDir2Y()), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1, 2);
 
