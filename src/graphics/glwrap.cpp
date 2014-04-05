@@ -309,7 +309,7 @@ void transformTexturesTosRGB(irr::video::ITexture *tex)
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-    if (irr_driver->getGLSLVersion() < 320)
+    if (irr_driver->getGLSLVersion() < 150)
     {
         if (tex->hasAlpha())
             glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
