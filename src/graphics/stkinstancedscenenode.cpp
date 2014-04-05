@@ -77,9 +77,12 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectPass1Shader>();
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
-        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-        setInstanceAttribPointer<MeshShader::InstancedShadowShader>();
+        if (irr_driver->getGLSLVersion() >= 150)
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+            glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+            setInstanceAttribPointer<MeshShader::InstancedShadowShader>();
+        }
         break;
     case FPSM_ALPHA_REF_TEXTURE:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -88,9 +91,12 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectRefPass1Shader>();
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedRefShadowShader::attrib_position, MeshShader::InstancedRefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-        setInstanceAttribPointer<MeshShader::InstancedRefShadowShader>();
+        if (irr_driver->getGLSLVersion() >= 150)
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedRefShadowShader::attrib_position, MeshShader::InstancedRefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+            glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+            setInstanceAttribPointer<MeshShader::InstancedRefShadowShader>();
+        }
         break;
     case FPSM_GRASS:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
