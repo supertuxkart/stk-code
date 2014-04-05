@@ -309,10 +309,20 @@ void transformTexturesTosRGB(irr::video::ITexture *tex)
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-    if (tex->hasAlpha())
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    if (irr_driver->getGLSLVersion() < 320)
+    {
+        if (tex->hasAlpha())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    }
     else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    {
+        if (tex->hasAlpha())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    }
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 }
