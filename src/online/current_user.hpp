@@ -87,15 +87,6 @@ namespace Online
                 PollRequest() : XMLRequest(true) {}
             };   // PollRequest
 
-            // ----------------------------------------------------------------
-            class ChangePasswordRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                ChangePasswordRequest() : XMLRequest(true) {}
-            };   // ChangePasswordRequest
-
-
         private:
             std::string                 m_token;
             bool                        m_save_session;
@@ -124,12 +115,6 @@ namespace Online
             ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
             void                            requestFriendRequest(const uint32_t friend_id) const;
-            void                            requestPasswordChange(  const irr::core::stringw &current_password,
-                                                                    const irr::core::stringw &new_password,
-                                                                    const irr::core::stringw &new_password_ver) const;
-
-            XMLRequest *                    requestUserSearch(const irr::core::stringw & search_string) const;
-
             void                            onSTKQuit() const;
             void                            onAchieving(uint32_t achievement_id) const;
             void                            requestPoll() const;

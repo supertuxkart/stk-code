@@ -20,8 +20,6 @@
 #include "online/current_user.hpp"
 
 #include "achievements/achievements_manager.hpp"
-#include "addons/addon.hpp"
-#include "addons/addons_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -261,68 +259,6 @@ namespace Online
         }
         //FIXME needs changes for actual valid joining
     }   // ServerJoinRequest::callback
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to fetch matching results for the supplied
-     *  search term.
-     *  \param search_string the string to search for.
-     */
-    XMLRequest*
-        CurrentUser::requestUserSearch(const core::stringw &search_string) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        XMLRequest * request = new XMLRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "user-search");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("search-string", search_string);
-        request->queue();
-        return request;
-    }   // requestUserSearch
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to change the password of the signed in user.
-     *  \param current_password The active password of the currently signed in
-     *         user.
-     *  \param new_password     The password the user wants to change to.
-     *  \param new_password_ver Confirmation of that password. Has to be the
-     *         exact same.
-     */
-    void CurrentUser::requestPasswordChange(const core::stringw &current_password,
-                                            const core::stringw &new_password,
-                                     const core::stringw &new_password_ver) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        ChangePasswordRequest * request = new ChangePasswordRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "change_password");
-        request->addParameter("userid", getID());
-        request->addParameter("current", current_password);
-        request->addParameter("new1", new_password);
-        request->addParameter("new2", new_password_ver);
-        request->queue();
-    }   // requestPasswordChange
-    // ------------------------------------------------------------------------
-    /** Callback for the change password request. If the matching dialog is
-     *  still open, show a confirmation message.
-     */
-    void CurrentUser::ChangePasswordRequest::callback()
-    {
-        if(GUIEngine::ModalDialog::isADialogActive())
-        {
-            ChangePasswordDialog * dialog  =
-                dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog
-                                                             ::getCurrent());
-            if(dialog != NULL)
-            {
-                if(isSuccess())
-                    dialog->success();
-                else
-                    dialog->error(getInfo());
-            }
-        }
-    }   // ChangePasswordRequest::callback
 
     // ------------------------------------------------------------------------
     /** Sends a request to the server to see if any new information is
