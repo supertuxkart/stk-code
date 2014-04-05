@@ -36,7 +36,7 @@ static GLuint generateFBO(GLuint ColorAttachement)
     GLuint fbo;
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, ColorAttachement, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorAttachement, 0);
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     return fbo;
@@ -45,7 +45,7 @@ static GLuint generateFBO(GLuint ColorAttachement)
 static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 {
     GLuint fbo = generateFBO(ColorAttachement);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, DepthAttachement, 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthAttachement, 0);
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     return fbo;
@@ -116,9 +116,9 @@ RTT::RTT()
     FrameBuffers[FBO_EIGHTH2] = generateFBO(RenderTargetTextures[RTT_EIGHTH2]);
 
     FrameBuffers[FBO_COMBINED_TMP1_TMP2] = generateFBO(RenderTargetTextures[RTT_TMP1]);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, RenderTargetTextures[RTT_TMP2], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, RenderTargetTextures[RTT_TMP2], 0);
 
-    if (irr_driver->getGLSLVersion() < 150)
+    if (irr_driver->getGLSLVersion() >= 150)
     {
         glGenFramebuffers(1, &shadowFBO);
         glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
@@ -128,8 +128,8 @@ RTT::RTT()
         glGenTextures(1, &shadowDepthTex);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D_ARRAY, shadowColorTex, 0);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D_ARRAY, shadowDepthTex, 0);
         GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
         assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     }
