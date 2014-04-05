@@ -40,6 +40,7 @@ RecoveryDialog::RecoveryDialog() : ModalDialog(0.8f,0.8f)
     m_self_destroy        = false;
     m_show_recovery_input = true;
     m_show_recovery_info  = false;
+    doInit();
     showRecoveryInput();
 }   // RecoveryDialog
 
