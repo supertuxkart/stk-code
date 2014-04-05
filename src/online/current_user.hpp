@@ -81,13 +81,6 @@ namespace Online
             };   // ServerJoinRequest
 
             // ----------------------------------------------------------------
-            class SetAddonVoteRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                SetAddonVoteRequest() : XMLRequest() {}
-            };   // SetAddonVoteRequest
-
-            // ----------------------------------------------------------------
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
@@ -130,7 +123,6 @@ namespace Online
             void                            requestSignOut();
             ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
-            const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
             void                            requestFriendRequest(const uint32_t friend_id) const;
             void                            requestPasswordChange(  const irr::core::stringw &current_password,
                                                                     const irr::core::stringw &new_password,

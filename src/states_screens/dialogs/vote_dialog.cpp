@@ -17,8 +17,7 @@
 
 #include "states_screens/dialogs/vote_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
+#include "addons/addons_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
@@ -27,6 +26,7 @@
 #include "online/current_user.hpp"
 #include "online/messages.hpp"
 
+#include <IGUIEnvironment.h>
 
 
 using namespace GUIEngine;
@@ -88,6 +88,49 @@ bool VoteDialog::onEscapePressed()
     return false;
 }   // onEscapePressed
 
+// ----------------------------------------------------------------------------
+/** A request to the server, to perform a vote on an addon.
+ *  \param rating the voted rating.
+ */
+void VoteDialog::sendVote()
+{
+    /** A vote request. The callback will update the addon manager with the
+     *  new average. The VoteDialog polls this request till it is finished
+     *  to inform the user about the new average.
+     */
+    class SetAddonVoteRequest : public XMLRequest
+    {
+        virtual void callback()
+        {
+            if (isSuccess())
+            {
+                std::string addon_id;
+                getXMLData()->get("addon-id", &addon_id);
+                float average;
+                getXMLData()->get("new-average", &average);
+                addons_manager->getAddon(Addon::createAddonId(addon_id))
+                              ->setRating(average);
+            }   // isSuccess
+        }   // callbac
+    public:
+        SetAddonVoteRequest() : XMLRequest() {}
+    };   // SetAddonVoteRequest
+
+    // ------------------------------------------------------------------------
+
+
+    m_perform_vote_request = new SetAddonVoteRequest();
+    CurrentUser::get()->setUserDetails(m_perform_vote_request);
+    m_perform_vote_request->addParameter("action", "set-addon-vote");
+    m_perform_vote_request->addParameter("addonid", m_addon_id.substr(6));
+    m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
+    m_perform_vote_request->queue();
+
+    m_rating_widget->setDeactivated();
+    m_cancel_widget->setDeactivated();
+
+}   // sendVote
+
 // -----------------------------------------------------------------------------
 /** Callback when a user event is triggered.
  *  \param event Information about the event that was triggered.
@@ -97,11 +140,7 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& event)
 
     if (event == m_rating_widget->m_properties[PROP_ID])
     {
-        m_perform_vote_request = CurrentUser::get()
-                              ->requestSetAddonVote(m_addon_id, 
-                                                    m_rating_widget->getRating());
-        m_rating_widget->setDeactivated();
-        m_cancel_widget->setDeactivated();
+        sendVote();
         return GUIEngine::EVENT_BLOCK;
     }
 

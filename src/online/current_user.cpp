@@ -263,45 +263,6 @@ namespace Online
     }   // ServerJoinRequest::callback
 
     // ------------------------------------------------------------------------
-    /** A request to the server, to perform a vote on an addon.
-     *  \param addon_id the id of the addon to vote for.
-     *  \param rating the voted rating.
-     */
-    const CurrentUser::SetAddonVoteRequest*
-                 CurrentUser::requestSetAddonVote(const std::string & addon_id,
-                                                  float rating) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::SetAddonVoteRequest * request =
-                                        new CurrentUser::SetAddonVoteRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "set-addon-vote");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("addonid", addon_id.substr(6));
-        request->addParameter("rating", rating);
-        request->queue();
-        return request;
-    }   // requestSetAddonVote
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to vote for an addon. Updates the local
-     *  average rating.
-     */
-    void CurrentUser::SetAddonVoteRequest::callback()
-    {
-        if(isSuccess())
-        {
-            std::string addon_id;
-            getXMLData()->get("addon-id", &addon_id);
-            float average;
-            getXMLData()->get("new-average", &average);
-            addons_manager->getAddon(Addon::createAddonId(addon_id))
-                          ->setRating(average);
-        }
-    }   // SetAddonVoteRequest::callback
-
-    // ------------------------------------------------------------------------
     /** A request to the server, to fetch matching results for the supplied
      *  search term.
      *  \param search_string the string to search for.

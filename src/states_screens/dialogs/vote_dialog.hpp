@@ -32,25 +32,40 @@
 class VoteDialog : public GUIEngine::ModalDialog
 {
 private:
+    /** Stores the id of the addon being voted on. */
     const std::string m_addon_id;
-    bool m_self_destroy;
-    Online::XMLRequest * m_fetch_vote_request;
-    const Online::CurrentUser::SetAddonVoteRequest * m_perform_vote_request;
 
+    /** True if the dialog should be removed (which needs to be done
+     *  in the update call each frame). */
+    bool m_self_destroy;
+
+    /** The request to fetch the current vote, which is submitted
+     *  immediately when this dialog is opened. */
+    Online::XMLRequest * m_fetch_vote_request;
+
+    /** The request to perform a vote. */
+    Online::XMLRequest* m_perform_vote_request;
+
+    /** Pointer to the info widget of this dialog. */
     GUIEngine::LabelWidget * m_info_widget;
 
+    /** Pointer to the rating widget of this dialog */
     GUIEngine::RatingBarWidget * m_rating_widget;
 
+    /** Pointer to the options widget, which contains the canel button. */
     GUIEngine::RibbonWidget * m_options_widget;
+
+    /** Pointer to the cancel button. */
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
     void updateFetchVote();
+    void sendVote();
 public:
     VoteDialog(const std::string & addon_id);
     ~VoteDialog();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
     virtual void onUpdate(float dt);
     virtual bool onEscapePressed();
-};
+};   // VoteDialog
 
 #endif
