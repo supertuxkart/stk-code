@@ -254,11 +254,11 @@ void AddonsLoading::voteClicked()
 {
     if (Online::CurrentUser::get()->isRegisteredUser())
     {
-        // We need to keep a copy of the addon, since dismiss() will 
-        // delete this object.
-        Addon addon = m_addon;
+        // We need to keep a copy of the addon id, since dismiss() will
+        // delete this object (and the copy of the addon).
+        std::string addon_id = m_addon.getId();
         dismiss();
-        new VoteDialog(addon.getId());
+        new VoteDialog(addon_id);
     }
 }   // voteClicked
 
