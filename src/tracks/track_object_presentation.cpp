@@ -160,6 +160,8 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     scene::ISceneNode* parent,
     ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_instancing_group = NULL;
+
     std::string instancing_model;
     xml_node.get("instancing_model", &instancing_model);
 
@@ -168,9 +170,12 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
     m_node->updateAbsolutePosition();
-    m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
-        m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
-        instancing_model);
+    if (irr_driver->isGLSL())
+    {
+        m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
+            m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
+            instancing_model);
+    }
 }
 
 TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
