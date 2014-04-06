@@ -64,6 +64,7 @@ void main() {
 	xpos.xyz /= xpos.w;
 
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+    float roughness =texture(ntex, uv).z;
     vec3 eyedir = -normalize(xpos.xyz);
 
 	// Normalized on the cpu
@@ -74,7 +75,9 @@ void main() {
     float NdotL = max(0., dot(norm, L));
     float NdotH = max(0., dot(norm, H));
 
-	float Specular = pow(NdotH, 200) * NdotL;
+    float normalisationFactor = (roughness + 2.) / 8.;
+	float Specular = pow(NdotH, roughness) * NdotL * normalisationFactor;
+
 
 	vec3 outcol = NdotL * col;
 

@@ -19,7 +19,7 @@ void main()
     vec2 texc = gl_FragCoord.xy / screen;
     float z = texture(dtex, texc).x;
     vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
-    //float roughness = texture(ntex, texc).z;
+    float roughness = texture(ntex, texc).z;
 
     vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
     xpos = invproj * xpos;
@@ -41,7 +41,8 @@ void main()
 
     float NdotL = max(0., dot(norm, L));
     float NdotH = max(0., dot(norm, H));
+    float normalisationFactor = (roughness + 2.) / 8.;
 
     Diffuse = vec4(NdotL * light_col * att, 1.);
-    Specular = vec4(pow(NdotH, spec) * light_col * NdotL * spec_att, 1.);
+    Specular = vec4(pow(NdotH, roughness) * light_col * NdotL * spec_att * normalisationFactor, 1.);
 }

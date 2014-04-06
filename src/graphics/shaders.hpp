@@ -37,11 +37,11 @@ class ObjectPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal;
-    static GLuint uniform_MVP, uniform_TIMV;
+    static GLuint attrib_position, attrib_texcoord, attrib_normal;
+    static GLuint uniform_MVP, uniform_TIMV, uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, unsigned TU_tex);
 };
 
 class ObjectRefPass1Shader
