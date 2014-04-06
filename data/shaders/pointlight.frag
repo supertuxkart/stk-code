@@ -13,6 +13,7 @@ out vec4 Diffuse;
 out vec4 Specular;
 
 vec3 DecodeNormal(vec2 n);
+vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 
 void main()
 {
@@ -36,13 +37,9 @@ void main()
 
     // Light Direction
     vec3 L = -normalize(xpos.xyz - light_pos);
-    // Half Light View direction
-    vec3 H = normalize(eyedir + L);
 
     float NdotL = max(0., dot(norm, L));
-    float NdotH = max(0., dot(norm, H));
-    float normalisationFactor = (roughness + 2.) / 8.;
 
     Diffuse = vec4(NdotL * light_col * att, 1.);
-    Specular = vec4(pow(NdotH, roughness) * light_col * NdotL * spec_att * normalisationFactor, 1.);
+    Specular = vec4(getSpecular(norm, eyedir, L, light_col, roughness) * NdotL * spec_att, 1.);
 }

@@ -24,6 +24,7 @@ varying vec2 uv;
 
 
 vec3 DecodeNormal(vec2 n);
+vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 
 float getShadowFactor(vec3 pos, float bias, int index)
 {
@@ -69,14 +70,10 @@ void main() {
 
 	// Normalized on the cpu
     vec3 L = direction;
-    // Half Light View direction
-    vec3 H = normalize(eyedir + L);
 
     float NdotL = max(0., dot(norm, L));
-    float NdotH = max(0., dot(norm, H));
 
-    float normalisationFactor = (roughness + 2.) / 8.;
-	float Specular = pow(NdotH, roughness) * NdotL * normalisationFactor;
+    vec3 Specular = getSpecular(norm, eyedir, L, col, roughness) * NdotL;
 
 
 	vec3 outcol = NdotL * col;
@@ -118,7 +115,7 @@ void main() {
 	else
 		factor = getShadowFactor(xpos.xyz, bias, 3);
 	Diff = vec4(factor * NdotL * col, 1.);
-	Spec = vec4(factor * Specular * col, 1.);
+	Spec = vec4(factor * Specular, 1.);
 	return;
 
 //	float moved = (abs(dx) + abs(dy)) * 0.5;
