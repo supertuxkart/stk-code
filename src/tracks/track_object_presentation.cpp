@@ -26,6 +26,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -175,6 +176,11 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
         m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
             m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
             instancing_model);
+    }
+    else
+    {
+        m_instancing_group = new STKInstancedSceneNode(model_def_loader.getFirstMeshFor(instancing_model),
+            m_node, irr_driver->getSceneManager(), -1);
     }
 }
 
