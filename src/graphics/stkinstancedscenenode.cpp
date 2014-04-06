@@ -8,8 +8,11 @@ STKInstancedSceneNode::STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-    createGLMeshes();
-    setAutomaticCulling(0);
+    if (irr_driver->isGLSL())
+    {
+        createGLMeshes();
+        setAutomaticCulling(0);
+    }
 }
 
 void STKInstancedSceneNode::cleanGL()
@@ -39,7 +42,8 @@ void STKInstancedSceneNode::cleanGL()
 
 STKInstancedSceneNode::~STKInstancedSceneNode()
 {
-    cleanGL();
+    if (irr_driver->isGLSL())
+        cleanGL();
 }
 
 void STKInstancedSceneNode::createGLMeshes()
@@ -306,6 +310,12 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
 
 void STKInstancedSceneNode::render()
 {
+    if (!irr_driver->isGLSL())
+    {
+        CMeshSceneNode::render();
+        return;
+    }
+
     setFirstTimeMaterial();
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)

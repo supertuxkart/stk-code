@@ -90,6 +90,8 @@ public:
 
     void clear();
 
+
+    scene::IMesh* getFirstMeshFor(const std::string& name);
 };  // ModelDefinitionLoader
 
 #endif // HEADER_LOD_NODE_LOADER_HPP

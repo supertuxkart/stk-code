@@ -26,6 +26,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -160,6 +161,8 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     scene::ISceneNode* parent,
     ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
 {
+    m_instancing_group = NULL;
+
     std::string instancing_model;
     xml_node.get("instancing_model", &instancing_model);
 
@@ -168,9 +171,17 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     m_node->setRotation(m_init_hpr);
     m_node->setScale(m_init_scale);
     m_node->updateAbsolutePosition();
-    m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
-        m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
-        instancing_model);
+    if (irr_driver->isGLSL())
+    {
+        m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
+            m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
+            instancing_model);
+    }
+    else
+    {
+        m_instancing_group = new STKInstancedSceneNode(model_def_loader.getFirstMeshFor(instancing_model),
+            m_node, irr_driver->getSceneManager(), -1);
+    }
 }
 
 TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
