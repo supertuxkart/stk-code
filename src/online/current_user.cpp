@@ -66,15 +66,20 @@ namespace Online
      *  to allow for shorter request creation code. It sets the name of
      *  the script to invokce, token, and user id.
      *  \param request The http request.
+     *  \param action If not empty, the action to be set.
      */
-    void CurrentUser::setUserDetails(HTTPRequest *request)
+    void CurrentUser::setUserDetails(HTTPRequest *request,
+                                     const std::string &action)
     {
         CurrentUser *cu = CurrentUser::get();
-        assert(cu && cu->m_state == US_SIGNED_IN);
-        assert(cu->m_profile);
         request->setServerURL("client-user.php");
-        request->addParameter("token", cu->m_token);
-        request->addParameter("userid", cu->m_profile->getID());
+
+        if (cu && cu->m_profile)
+            request->addParameter("userid", cu->m_profile->getID());
+        if(cu->m_state == US_SIGNED_IN)
+            request->addParameter("token", cu->m_token);
+        if (action.size() > 0)
+            request->addParameter("action", action);
     }   // setUserDetails
 
     // ========================================================================

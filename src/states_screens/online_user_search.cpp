@@ -192,8 +192,7 @@ void OnlineUserSearch::search()
     if (m_search_string != "" && m_last_search_string != m_search_string)
     {
         m_search_request = new XMLRequest();
-        CurrentUser::get()->setUserDetails(m_search_request);
-        m_search_request->addParameter("action", "user-search");
+        CurrentUser::setUserDetails(m_search_request, "user-search");
         m_search_request->addParameter("search-string", m_search_string);
         m_search_request->queue();
 

@@ -110,9 +110,7 @@ void ChangePasswordDialog::changePassword(const stringw &current_password,
     // ------------------------------------------------------------------------
 
     ChangePasswordRequest * request = new ChangePasswordRequest();
-    CurrentUser::get()->setUserDetails(request);
-    request->setServerURL("client-user.php");
-    request->addParameter("action", "change_password");
+    CurrentUser::setUserDetails(request, "change_password");
     request->addParameter("userid", CurrentUser::get()->getID());
     request->addParameter("current", current_password);
     // The server code expects two passwords (and verifies again that they

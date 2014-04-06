@@ -60,8 +60,7 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
 
     m_fetch_vote_request = new XMLRequest();
-    CurrentUser::get()->setUserDetails(m_fetch_vote_request);
-    m_fetch_vote_request->addParameter("action", "get-addon-vote");
+    CurrentUser::setUserDetails(m_fetch_vote_request, "get-addon-vote");
     m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
     m_fetch_vote_request->queue();
 
@@ -120,8 +119,7 @@ void VoteDialog::sendVote()
 
 
     m_perform_vote_request = new SetAddonVoteRequest();
-    CurrentUser::get()->setUserDetails(m_perform_vote_request);
-    m_perform_vote_request->addParameter("action", "set-addon-vote");
+    CurrentUser::setUserDetails(m_perform_vote_request, "set-addon-vote");
     m_perform_vote_request->addParameter("addonid", m_addon_id.substr(6));
     m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
     m_perform_vote_request->queue();

@@ -104,7 +104,8 @@ namespace Online
             /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
-            static void setUserDetails(HTTPRequest *request);
+            static void setUserDetails(HTTPRequest *request, 
+                                       const std::string &action);
 
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
