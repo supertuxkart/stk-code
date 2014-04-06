@@ -64,14 +64,17 @@ void main() {
 	xpos.xyz /= xpos.w;
 
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+    vec3 eyedir = -normalize(xpos.xyz);
 
 	// Normalized on the cpu
-	vec3 L = direction;
+    vec3 L = direction;
+    // Half Light View direction
+    vec3 H = normalize(eyedir + L);
 
-	float NdotL = max(0.0, dot(norm, L));
-	vec3 R = reflect(L, norm);
-	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
-	float Specular = pow(RdotE, 200);
+    float NdotL = max(0., dot(norm, L));
+    float NdotH = max(0., dot(norm, H));
+
+	float Specular = pow(NdotH, 200) * NdotL;
 
 	vec3 outcol = NdotL * col;
 
