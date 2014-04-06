@@ -441,11 +441,6 @@ void IrrDriver::renderSolidSecondPass()
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
-    if (!UserConfigParams::m_ssao)
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
     m_scene_manager->drawAll(m_renderpass);
 }
 
@@ -771,6 +766,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2));
+    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    gl_driver->extGlDrawBuffers(2, bufs);
     glClear(GL_COLOR_BUFFER_BIT);
 
     const u32 lightcount = m_lights.size();

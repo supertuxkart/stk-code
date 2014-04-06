@@ -57,6 +57,7 @@ PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLTEXIMAGE3DPROC glTexImage3D;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
@@ -199,6 +200,7 @@ void initGL()
 	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
     glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenFramebuffers");
     glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindFramebuffer");
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture2D");
     glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
     glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
     glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
@@ -309,7 +311,7 @@ void transformTexturesTosRGB(irr::video::ITexture *tex)
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-    if (irr_driver->getGLSLVersion() < 320)
+    if (irr_driver->getGLSLVersion() < 150)
     {
         if (tex->hasAlpha())
             glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);

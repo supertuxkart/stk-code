@@ -145,3 +145,10 @@ void ModelDefinitionLoader::clear()
 {
     m_lod_groups.clear();
 }
+
+// ----------------------------------------------------------------------------
+
+scene::IMesh* ModelDefinitionLoader::getFirstMeshFor(const std::string& name)
+{
+    return irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
+}
