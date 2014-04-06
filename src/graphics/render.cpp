@@ -766,6 +766,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2));
+    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    gl_driver->extGlDrawBuffers(2, bufs);
     glClear(GL_COLOR_BUFFER_BIT);
 
     const u32 lightcount = m_lights.size();
