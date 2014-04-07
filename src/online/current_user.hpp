@@ -73,14 +73,6 @@ namespace Online
             };   // SignOutRequest
 
             // ----------------------------------------------------------------
-
-            class ServerJoinRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                ServerJoinRequest() : XMLRequest() {}
-            };   // ServerJoinRequest
-
-            // ----------------------------------------------------------------
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
@@ -113,7 +105,6 @@ namespace Online
                                                             bool save_session,
                                                             bool request_now = true);
             void                            requestSignOut();
-            ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
             void                            requestFriendRequest(const uint32_t friend_id) const;
             void                            onSTKQuit() const;

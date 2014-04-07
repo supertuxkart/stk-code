@@ -237,35 +237,6 @@ namespace Online
     }   // signOut
 
     // ------------------------------------------------------------------------
-    CurrentUser::ServerJoinRequest*
-                             CurrentUser::requestServerJoin(uint32_t server_id,
-                                                            bool request_now)
-    {
-        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
-        ServerJoinRequest * request = new ServerJoinRequest();
-        request->setServerURL("address-management.php");
-        request->addParameter("action","request-connection");
-        request->addParameter("token", getToken());
-        request->addParameter("id", getID());
-        request->addParameter("server_id", server_id);
-        if (request_now)
-            request->queue();
-        return request;
-    }   // requestServerJoin
-
-    // ------------------------------------------------------------------------
-    void CurrentUser::ServerJoinRequest::callback()
-    {
-        if(isSuccess())
-        {
-            uint32_t server_id;
-            getXMLData()->get("serverid", &server_id);
-            ServersManager::get()->setJoinedServer(server_id);
-        }
-        //FIXME needs changes for actual valid joining
-    }   // ServerJoinRequest::callback
-
-    // ------------------------------------------------------------------------
     /** Sends a request to the server to see if any new information is
      *  available. (online friends, notifications, etc.).
      */
