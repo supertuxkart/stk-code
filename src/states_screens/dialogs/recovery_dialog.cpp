@@ -40,7 +40,6 @@ RecoveryDialog::RecoveryDialog() : ModalDialog(0.8f,0.8f)
     m_self_destroy        = false;
     m_show_recovery_input = true;
     m_show_recovery_info  = false;
-    doInit();
     showRecoveryInput();
 }   // RecoveryDialog
 
@@ -58,7 +57,8 @@ RecoveryDialog::~RecoveryDialog()
 void RecoveryDialog::showRecoveryInput()
 {
     m_show_recovery_input = false;
-    clearWindow();
+    if (m_irrlicht_window)
+        clearWindow();
     m_phase = Input;
     loadFromFile("online/recovery_input.stkgui");
 
