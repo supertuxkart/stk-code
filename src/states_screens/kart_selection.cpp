@@ -1104,7 +1104,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
                           kartsAreaWidget->m_y + kartsAreaWidget->m_h);
 
     // ---- Create new active player
-    PlayerProfile* profile_to_use = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
 
     if (!firstPlayer)
     {
@@ -2013,7 +2013,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         {
             const KartProperties* prop =
                 kart_properties_manager->getKartById(n);
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(prop->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
             {
                 w->addItem(
                     _("Locked : solve active challenges to gain access "
@@ -2045,7 +2045,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 kart_properties_manager->getKartById(group[n]);
             const std::string &icon_path = prop->getAbsoluteIconFile();
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(prop->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
             {
                 w->addItem(
                     _("Locked : solve active challenges to gain access "

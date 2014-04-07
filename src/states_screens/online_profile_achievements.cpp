@@ -97,7 +97,7 @@ void OnlineProfileAchievements::init()
         m_waiting_for_achievements = false;
         m_achievements_list_widget->clear();
         const std::map<uint32_t, Achievement *> & all_achievements =
-            PlayerManager::get()->getCurrentPlayer()->getAchievementsStatus()
+            PlayerManager::getCurrentPlayer()->getAchievementsStatus()
                                                     ->getAllAchievements();
         std::map<uint32_t, Achievement *>::const_iterator it;
         for (it = all_achievements.begin(); it != all_achievements.end(); ++it)

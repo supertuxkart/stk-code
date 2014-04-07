@@ -240,7 +240,7 @@ void LinearWorld::newLap(unsigned int kart_index)
 
     // Reset reset-after-lap achievements
     StateManager::ActivePlayer *c = kart->getController()->getPlayer();
-    PlayerProfile *p = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *p = PlayerManager::getCurrentPlayer();
     if (c && c->getConstProfile() == p)
     {
         p->getAchievementsStatus()->onLapEnd();

@@ -694,7 +694,7 @@ int handleCmdLine()
 
     if(CommandLine::has("--kart", &s))
     {
-        const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        const PlayerProfile *player = PlayerManager::getCurrentPlayer();
 
         if(player && !player->isLocked(s))
         {
@@ -766,7 +766,7 @@ int handleCmdLine()
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
-        const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        const PlayerProfile *player = PlayerManager::getCurrentPlayer();
         if (player && !player->isLocked(s))
         {
             race_manager->setTrack(s);

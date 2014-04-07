@@ -238,7 +238,7 @@ void TracksScreen::init()
             sshot_files.push_back("gui/main_help.png");
         }
 
-        if (PlayerManager::get()->getCurrentPlayer()->isLocked(gp->getId()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem(_("Locked!"),
                                         "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
@@ -303,7 +303,7 @@ void TracksScreen::buildTrackList()
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if(PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if(PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,
@@ -334,7 +334,7 @@ void TracksScreen::buildTrackList()
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,

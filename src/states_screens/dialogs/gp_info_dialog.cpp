@@ -221,7 +221,7 @@ void GPInfoDialog::onEnterPressedInternal()
     std::string gp_id = m_gp_ident;
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
-    PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge("");
+    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 

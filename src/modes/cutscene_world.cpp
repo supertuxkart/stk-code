@@ -380,7 +380,7 @@ void CutsceneWorld::enterRaceOverState()
         else if (race_manager->getTrackName() == "introcutscene" ||
                  race_manager->getTrackName() == "introcutscene2")
         {
-            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+            PlayerProfile *player = PlayerManager::getCurrentPlayer();
             if (player->isFirstTime())
             {
                 race_manager->exitRace();
