@@ -526,6 +526,7 @@ namespace MeshShader
     GLuint InstancedObjectPass1Shader::attrib_scale;
     GLuint InstancedObjectPass1Shader::uniform_MP;
     GLuint InstancedObjectPass1Shader::uniform_VM;
+    GLuint InstancedObjectPass1Shader::uniform_tex;
 
     void InstancedObjectPass1Shader::init()
     {
@@ -541,12 +542,14 @@ namespace MeshShader
         attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
         uniform_VM = glGetUniformLocation(Program, "InverseViewMatrix");
+        uniform_tex = glGetUniformLocation(Program, "tex");
     }
 
-    void InstancedObjectPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix)
+    void InstancedObjectPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
+        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint InstancedObjectRefPass1Shader::Program;

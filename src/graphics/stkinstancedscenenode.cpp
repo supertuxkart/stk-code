@@ -189,7 +189,8 @@ static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjecti
   core::matrix4 InverseViewMatrix;
   irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW).getInverse(InverseViewMatrix);
 
-  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix);
+  setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix, 0);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
