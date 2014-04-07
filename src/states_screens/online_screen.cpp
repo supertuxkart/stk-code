@@ -135,9 +135,8 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::get()->getUserName()), false);
-    core::stringw m = _("Signed in as: %s.", CurrentUser::get()->getUserName());
-    //m_online_status_widget->setText(-_("Signed in as: %s.", CurrentUser::get()->getUserName().c_str()), false);
+    core::stringw m = _("Signed in as: %s.",CurrentUser::get()->getUserName());
+    m_online_status_widget->setText(m, false);
 }   // init
 
 // ----------------------------------------------------------------------------
