@@ -34,12 +34,11 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-NotificationDialog::NotificationDialog(Type type, const core::stringw info, bool from_queue)
+NotificationDialog::NotificationDialog(Type type, const core::stringw info)
         : ModalDialog(0.8f,0.5f)
 {
     m_info = info;
     m_type = type;
-    if(!from_queue) load();
 }
 
 void NotificationDialog::load()
