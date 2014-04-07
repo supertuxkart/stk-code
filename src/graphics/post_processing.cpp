@@ -772,17 +772,3 @@ void PostProcessing::render()
         glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }   // render
-
-void PostProcessing::drawQuad(u32 cam, const SMaterial &mat)
-{
-    const u16 indices[6] = {0, 1, 2, 3, 0, 2};
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-    drv->setTransform(ETS_WORLD, core::IdentityMatrix);
-    drv->setTransform(ETS_VIEW, core::IdentityMatrix);
-    drv->setTransform(ETS_PROJECTION, core::IdentityMatrix);
-
-    drv->setMaterial(mat);
-    drv->drawIndexedTriangleList(&(m_vertices[cam].v0),
-                                      4, indices, 2);
-}

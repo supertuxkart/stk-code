@@ -167,6 +167,12 @@ void IrrDriver::renderGLSL(float dt)
             m_video_driver->setRenderTarget(m_rtts->getRTT(RTT_COLOR), false, true);
         }*/
 
+        // Get Projection and view matrix
+        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
+        m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+        irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
+        irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+
         // Fire up the MRT
         PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
         renderSolidFirstPass();
@@ -431,24 +437,25 @@ void IrrDriver::renderSolidFirstPass()
 void IrrDriver::renderSolidSecondPass()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
+    SColor clearColor = World::getWorld()->getClearColor();
+    glClearColor(clearColor.getRed() / 255., clearColor.getGreen() / 255., clearColor.getBlue() / 255., clearColor.getAlpha() / 255.);
+    glClear(GL_COLOR_BUFFER_BIT);
     glDepthMask(GL_FALSE);
 
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
-    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
-    m_scene_manager->drawAll(m_renderpass);
+    m_scene_manager->drawAll(scene::ESNRP_SOLID);
 }
 
 void IrrDriver::renderTransparent()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
     irr_driver->setPhase(TRANSPARENT_PASS);
-    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT;
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDepthMask(GL_FALSE);
@@ -456,17 +463,16 @@ void IrrDriver::renderTransparent()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_CULL_FACE);
-    m_scene_manager->drawAll(m_renderpass);
+    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
 }
 
 void IrrDriver::renderParticles()
 {
-    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_TRANSPARENT_EFFECT;
     glDepthMask(GL_FALSE);
     glDisable(GL_CULL_FACE);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
-    m_scene_manager->drawAll(m_renderpass);
+    m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
 void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,

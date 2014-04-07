@@ -142,7 +142,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     size_t count = mesh.IndexCount;
 
     computeMVP(ModelViewProjectionMatrix);
-    core::matrix4 ModelViewMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+    core::matrix4 ModelViewMatrix = irr_driver->getViewMatrix();
     ModelViewMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 
     // Generate displace mask

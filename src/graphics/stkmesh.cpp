@@ -195,14 +195,14 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 
 void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
 {
-	ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	ModelViewProjectionMatrix = irr_driver->getProjMatrix();
+	ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
 	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 }
 
 void computeTIMV(core::matrix4 &TransposeInverseModelView)
 {
-	TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+	TransposeInverseModelView = irr_driver->getViewMatrix();
 	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
 	TransposeInverseModelView.makeInverse();
 	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
