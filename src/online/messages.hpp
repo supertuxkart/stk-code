@@ -30,7 +30,7 @@ namespace Online
       */
     namespace Messages
     {
-        irr::core::stringw loadingDots          (bool spaces = true, float interval = 0.5f, int max_dots = 3);
+        irr::core::stringw loadingDots          (float interval = 0.5f, int max_dots = 3);
         irr::core::stringw signingIn            ();
         irr::core::stringw signingOut           ();
         irr::core::stringw validatingInfo       ();
