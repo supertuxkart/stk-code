@@ -117,7 +117,6 @@ namespace Online
 
             void                            requestFriendRequest(const uint32_t friend_id) const;
             void                            onSTKQuit() const;
-            void                            onAchieving(uint32_t achievement_id) const;
             void                            requestPoll() const;
 
             irr::core::stringw              getUserName()           const;

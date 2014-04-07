@@ -435,25 +435,6 @@ namespace Online
     }
 
     // ------------------------------------------------------------------------
-    /** Sends a confirmation to the server that an achievement has been
-     *  completed, if a user is signed in.
-     *  \param achievement_id the id of the achievement that got completed.
-     */
-    void CurrentUser::onAchieving(uint32_t achievement_id) const
-    {
-        if(isRegisteredUser())
-        {
-            HTTPRequest * request = new HTTPRequest(true);
-            request->setServerURL("client-user.php");
-            request->addParameter("action", "achieving");
-            request->addParameter("token", getToken());
-            request->addParameter("userid", getID());
-            request->addParameter("achievementid", achievement_id);
-            request->queue();
-        }
-    }   // onAchieving
-
-    // ------------------------------------------------------------------------
     /** \return the username if signed in. */
     core::stringw CurrentUser::getUserName() const
     {
