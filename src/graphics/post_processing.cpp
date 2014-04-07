@@ -626,27 +626,23 @@ void PostProcessing::render()
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
                 glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_TMP2));
+                renderGaussian6Blur(irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1),
+                    irr_driver->getFBO(FBO_HALF2), irr_driver->getRenderTargetTexture(RTT_HALF2), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
 
                 // To quarter
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
                 glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_HALF1));
+                renderGaussian6Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                    irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2), UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
 
                 // To eighth
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_EIGHTH1));
                 glViewport(0, 0, UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER1));
-
-                // Blur it for distribution.
-                glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1),
-                    irr_driver->getFBO(FBO_HALF2), irr_driver->getRenderTargetTexture(RTT_HALF2), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-                glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                    irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2), UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-                glViewport(0, 0, UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
                 renderGaussian6Blur(irr_driver->getFBO(FBO_EIGHTH1), irr_driver->getRenderTargetTexture(RTT_EIGHTH1),
                     irr_driver->getFBO(FBO_EIGHTH2), irr_driver->getRenderTargetTexture(RTT_EIGHTH2), UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
+
                 glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
                 // Additively blend on top of tmp1
