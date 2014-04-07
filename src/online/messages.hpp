@@ -41,7 +41,6 @@ namespace Online
         irr::core::stringw fetchingFriends      ();
         irr::core::stringw fetchingAchievements ();
         irr::core::stringw processing           ();
-        irr::core::stringw signedInAs           (const irr::core::stringw & name);
     } // namespace Messages
 }// namespace Online
 #endif

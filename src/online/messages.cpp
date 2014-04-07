@@ -46,12 +46,6 @@ namespace Online
         }
         // ------------------------------------------------------------------------
 
-        irr::core::stringw signedInAs(const irr::core::stringw & name)
-        {
-            return irr::core::stringw(_("Signed in as : ")) + name + ".";
-        }
-        // ------------------------------------------------------------------------
-
         irr::core::stringw joiningServer()
         {
             return irr::core::stringw(_("Joining server")) + loadingDots();
