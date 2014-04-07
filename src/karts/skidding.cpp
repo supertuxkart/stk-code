@@ -416,7 +416,7 @@ void Skidding::update(float dt, bool is_on_ground,
                                              /*fade-out-time*/ 1.0f);
                     
                     StateManager::ActivePlayer *c = m_kart->getController()->getPlayer();
-                    if (c && c->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+                    if (c && c->getConstProfile() == PlayerManager::getCurrentPlayer())
                     {
                         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_SKIDDING, "skidding");
                     }

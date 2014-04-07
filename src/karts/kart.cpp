@@ -806,7 +806,7 @@ void Kart::finishedRace(float time)
                                         m_controller));
         if (m_controller->isPlayerController()) // if player is on this computer
         {
-            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+            PlayerProfile *player = PlayerManager::getCurrentPlayer();
             const ChallengeStatus *challenge = player->getCurrentChallengeStatus();
             // In case of a GP challenge don't make the end animation depend
             // on if the challenge is fulfilled

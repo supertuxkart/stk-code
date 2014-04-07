@@ -469,7 +469,7 @@ void World::terminateRace()
         {
             // Retrieve the current player
             StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
@@ -494,7 +494,7 @@ void World::terminateRace()
         {
             // Retrieve the current player
             StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == 1 )
@@ -511,7 +511,7 @@ void World::terminateRace()
             }
          }
     }
-    PlayerManager::get()->getCurrentPlayer()->raceFinished();
+    PlayerManager::getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -815,7 +815,7 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
+                StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                                         device, NULL);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))

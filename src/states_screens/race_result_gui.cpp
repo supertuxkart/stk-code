@@ -157,7 +157,7 @@ void RaceResultGUI::enableAllButtons()
 
     // If something was unlocked
     // -------------------------
-    int n = PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges().size();
+    int n = PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
         top->setText(n==1 ? _("You completed a challenge!")
@@ -226,7 +226,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     // If something was unlocked, the 'continue' button was
     // actually used to display "Show unlocked feature(s)" text.
     // ---------------------------------------------------------
-    int n = PlayerManager::get()->getCurrentPlayer()
+    int n = PlayerManager::getCurrentPlayer()
                                 ->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
@@ -238,7 +238,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
 
             std::vector<const ChallengeData*> unlocked =
-                PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
+                PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
 
             bool gameCompleted = false;
             for (unsigned int n = 0; n < unlocked.size(); n++)
@@ -250,7 +250,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 }
             }
 
-            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
+            PlayerManager::getCurrentPlayer()->clearUnlocked();
 
             if (gameCompleted)
             {

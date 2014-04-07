@@ -271,7 +271,7 @@ void Physics::update(float dt)
                 // to the kart, and it's the current player. At this stage
                 // only the current player can get achievements.
                 if (target_kart != kart && c &&
-                    c->getPlayer()->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+                    c->getPlayer()->getConstProfile() == PlayerManager::getCurrentPlayer())
                 {
                     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
                                                        target_kart->getIdent(), 1);

@@ -167,7 +167,7 @@ void PlayerInfoDialog::showConfirmDialog()
         _("Do you really want to delete player '%s' ?", m_player->getName());
 
 
-    if (PlayerManager::get()->getCurrentPlayer() == m_player)
+    if (PlayerManager::getCurrentPlayer() == m_player)
     {
         message = _("You cannot delete this player "
                     "because it is currently in use.");
@@ -184,7 +184,7 @@ void PlayerInfoDialog::showConfirmDialog()
                                               m_irrlicht_window);
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
-    if (PlayerManager::get()->getCurrentPlayer() != m_player)
+    if (PlayerManager::getCurrentPlayer() != m_player)
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";

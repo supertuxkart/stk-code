@@ -236,7 +236,7 @@ void EasterEggScreen::buildTrackList()
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,
@@ -267,7 +267,7 @@ void EasterEggScreen::buildTrackList()
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,

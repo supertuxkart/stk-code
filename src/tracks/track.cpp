@@ -156,7 +156,7 @@ Track::~Track()
 unsigned int Track::getNumOfCompletedChallenges()
 {
     unsigned int unlocked_challenges = 0;
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     for (unsigned int i=0; i<m_challenges.size(); i++)
     {
         if (m_challenges[i].m_challenge_id == "tutorial")
@@ -971,7 +971,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             }
 
             const unsigned int val = challenge->getNumTrophies();
-            bool shown = (PlayerManager::get()->getCurrentPlayer()->getPoints() < val);
+            bool shown = (PlayerManager::getCurrentPlayer()->getPoints() < val);
             m_force_fields.push_back(OverworldForceField(xyz, shown, val));
 
             m_challenges[closest_challenge_id].setForceField(
