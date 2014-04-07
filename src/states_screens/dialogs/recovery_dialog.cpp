@@ -126,10 +126,10 @@ void RecoveryDialog::processInput()
         m_info_widget->setDefaultColor();
         m_options_widget->setDeactivated();
         m_recovery_request = new XMLRequest();
-        m_recovery_request->setServerURL("client-user.php");
-        m_recovery_request->addParameter("action", "recovery");
+        // This function also works when the current user is not logged in
+        CurrentUser::setUserDetails(m_recovery_request, "recovery");
         m_recovery_request->addParameter("username", username);
-        m_recovery_request->addParameter("email", email);
+        m_recovery_request->addParameter("email",    email   );
         m_recovery_request->queue();
     }
 }   // processInput

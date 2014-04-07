@@ -201,21 +201,26 @@ namespace Online
         {
             // Avoid printing the password or token, just replace them with *s
             std::string param = m_parameters;
-            for (unsigned int j = 0; j < 2; j++)
+            // List of strings whose values should not be printed. "" is the
+            // end indicator.
+            static std::string dont_print[] = { "&password=", "&token=", "&current=",
+                                                "&new1=", "&new2=", ""};
+            unsigned int j = 0;
+            while (dont_print[j].size()>0)
             {
                 // Get the string that should be replaced.
-                std::string s = (j == 0 ? "&password=" : "&token=");
-                std::size_t pos = param.find(s);
+                std::size_t pos = param.find(dont_print[j]);
                 if (pos != std::string::npos)
                 {
-                    pos += s.size();
+                    pos += dont_print[j].size();
                     while (pos < param.size() && param[pos] != '&')
                     {
                         param[pos] = '*';
                         pos++;
                     }   // while not end
                 }   // if string found
-            }   // for j < 2
+                j++;
+            }   // while dont_print[j].size()>0
             Log::info("HTTPRequest", "Sending %s to %s",
                       param.c_str(), m_url.c_str());
         }

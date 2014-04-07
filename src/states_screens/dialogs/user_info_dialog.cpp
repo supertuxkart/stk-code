@@ -169,8 +169,7 @@ void UserInfoDialog::sendFriendRequest()
     // ------------------------------------------------------------------------
 
     FriendRequest *request = new FriendRequest();
-    CurrentUser::setUserDetails(request);
-    request->addParameter("action", "friend-request");
+    CurrentUser::setUserDetails(request, "friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
 
@@ -221,8 +220,7 @@ void UserInfoDialog::acceptFriendRequest()
     // ------------------------------------------------------------------------
 
     AcceptFriendRequest *request = new AcceptFriendRequest();
-    CurrentUser::setUserDetails(request);
-    request->addParameter("action", "accept-friend-request");
+    CurrentUser::setUserDetails(request, "accept-friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
     m_processing = true;
@@ -268,8 +266,7 @@ void UserInfoDialog::declineFriendRequest()
     };   // DeclineFriendRequest
     // ----------------------------------------------------------------
     DeclineFriendRequest *request = new DeclineFriendRequest();
-    CurrentUser::setUserDetails(request);
-    request->addParameter("action", "decline-friend-request");
+    CurrentUser::setUserDetails(request, "decline-friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
 
@@ -316,8 +313,7 @@ void UserInfoDialog::removeExistingFriend()
 
     int friend_id = m_profile->getID();
     RemoveFriendRequest * request = new RemoveFriendRequest(friend_id);
-    CurrentUser::get()->setUserDetails(request);
-    request->addParameter("action", "remove-friend");
+    CurrentUser::setUserDetails(request, "remove-friend");
     request->addParameter("friendid", friend_id);
     request->queue();
 }   // removeExistingFriend
@@ -361,8 +357,7 @@ void UserInfoDialog::removePendingFriend()
     // ------------------------------------------------------------------------
 
     CancelFriendRequest * request = new CancelFriendRequest();
-    CurrentUser::get()->setUserDetails(request);
-    request->addParameter("action", "cancel-friend-request");
+    CurrentUser::setUserDetails(request, "cancel-friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
 }   // removePendingFriend
