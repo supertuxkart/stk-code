@@ -13,6 +13,6 @@ vec3 getLightFactor(float specMapValue);
 void main(void)
 {
     vec4 color = texture(Albedo, uv);
-    vec3 LightFactor = getLightFactor(1. - color.a);
+    vec3 LightFactor = getLightFactor(1.);
     FragColor = vec4(color.xyz * LightFactor, 1.);
 }

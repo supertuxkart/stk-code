@@ -84,7 +84,7 @@ RTT::RTT()
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RG16F, GL_RG, GL_FLOAT);
+    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB16F, GL_RGB, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
@@ -119,7 +119,7 @@ RTT::RTT()
     FrameBuffers[FBO_EIGHTH1] = generateFBO(RenderTargetTextures[RTT_EIGHTH1]);
     FrameBuffers[FBO_EIGHTH2] = generateFBO(RenderTargetTextures[RTT_EIGHTH2]);
 
-    FrameBuffers[FBO_COMBINED_TMP1_TMP2] = generateFBO(RenderTargetTextures[RTT_TMP1]);
+    FrameBuffers[FBO_COMBINED_TMP1_TMP2] = generateFBO(RenderTargetTextures[RTT_TMP1], DepthStencilTexture);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, RenderTargetTextures[RTT_TMP2], 0);
 
     if (irr_driver->getGLSLVersion() >= 150)

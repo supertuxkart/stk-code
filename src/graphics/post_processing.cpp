@@ -318,6 +318,8 @@ void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -330,6 +332,8 @@ void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -347,6 +351,8 @@ void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian6VBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -359,6 +365,8 @@ void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian6HBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -626,27 +634,23 @@ void PostProcessing::render()
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
                 glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_TMP2));
+                renderGaussian6Blur(irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1),
+                    irr_driver->getFBO(FBO_HALF2), irr_driver->getRenderTargetTexture(RTT_HALF2), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
 
                 // To quarter
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
                 glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_HALF1));
+                renderGaussian6Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                    irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2), UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
 
                 // To eighth
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_EIGHTH1));
                 glViewport(0, 0, UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER1));
-
-                // Blur it for distribution.
-                glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1),
-                    irr_driver->getFBO(FBO_HALF2), irr_driver->getRenderTargetTexture(RTT_HALF2), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-                glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                    irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2), UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-                glViewport(0, 0, UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
                 renderGaussian6Blur(irr_driver->getFBO(FBO_EIGHTH1), irr_driver->getRenderTargetTexture(RTT_EIGHTH1),
                     irr_driver->getFBO(FBO_EIGHTH2), irr_driver->getRenderTargetTexture(RTT_EIGHTH2), UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
+
                 glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
                 // Additively blend on top of tmp1

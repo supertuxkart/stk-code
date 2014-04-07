@@ -225,7 +225,8 @@ void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjecti
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView);
+  setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
 
   assert(mesh.vao_first_pass);
   glBindVertexArray(mesh.vao_first_pass);
@@ -743,7 +744,7 @@ void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedM
     {
     case FPSM_DEFAULT:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+            MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
         mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
         break;
     case FPSM_ALPHA_REF_TEXTURE:
