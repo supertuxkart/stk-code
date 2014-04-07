@@ -119,7 +119,7 @@ RTT::RTT()
     FrameBuffers[FBO_EIGHTH1] = generateFBO(RenderTargetTextures[RTT_EIGHTH1]);
     FrameBuffers[FBO_EIGHTH2] = generateFBO(RenderTargetTextures[RTT_EIGHTH2]);
 
-    FrameBuffers[FBO_COMBINED_TMP1_TMP2] = generateFBO(RenderTargetTextures[RTT_TMP1]);
+    FrameBuffers[FBO_COMBINED_TMP1_TMP2] = generateFBO(RenderTargetTextures[RTT_TMP1], DepthStencilTexture);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, RenderTargetTextures[RTT_TMP2], 0);
 
     if (irr_driver->getGLSLVersion() >= 150)
