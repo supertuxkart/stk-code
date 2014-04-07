@@ -318,6 +318,8 @@ void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -330,6 +332,8 @@ void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -347,6 +351,8 @@ void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian6VBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -359,6 +365,8 @@ void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
         glUniform2f(FullScreenShader::Gaussian6HBlurShader::uniform_pixel, inv_width, inv_height);
 
         setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
 
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
