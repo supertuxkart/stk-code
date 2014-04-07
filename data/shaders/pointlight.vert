@@ -16,23 +16,24 @@ const float zNear = 1.;
 void main(void)
 {
     // Beyond that value, light is too attenuated
-    float r = 40 * Energy;
+    float r = 50 * Energy;
     center = Position;
     energy = Energy;
     vec4 Center = ViewMatrix * vec4(Position, 1.);
+    vec4 ProjectedCornerPosition = ProjectionMatrix * (Center + r * vec4(Corner, 0., 0.));
+    float adjustedDepth = ProjectedCornerPosition.z;
     if (Center.z > zNear) // Light is in front of the cam
     {
-        vec3 UnitCenter = normalize(-Center.xyz);
-        float clampedR = min(r, Center.z - 1.);
-        float cosTheta = dot(UnitCenter, vec3(0., 0., -1));
-        float d = clampedR / cosTheta;
-        Center.xyz += d * UnitCenter;
+        adjustedDepth = max(Center.z - r, zNear);
     }
     else if (Center.z + r > zNear) // Light is behind the cam but in range
     {
-        Center.z = zNear;
-        // TODO: Change r so that we make the screen aligned quad fits light range.
+        adjustedDepth = zNear;
     }
+
+    ProjectedCornerPosition /= ProjectedCornerPosition.w;
+    ProjectedCornerPosition.zw = (ProjectionMatrix * vec4(0., 0., adjustedDepth, 1.)).zw;
+    ProjectedCornerPosition.xy *= ProjectedCornerPosition.w;
     col = Color;
-    gl_Position = ProjectionMatrix * (Center + r * vec4(Corner, 0., 0.));
+    gl_Position = ProjectedCornerPosition;
 }
