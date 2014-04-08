@@ -30,6 +30,7 @@ class SharedObject
 public:
     static GLuint billboardvbo;
     static GLuint cubevbo, cubeindexes;
+    static GLuint ViewProjectionMatrixesUBO;
 };
 namespace MeshShader
 {
@@ -326,10 +327,10 @@ class ShadowShader
 public:
     static GLuint Program;
     static GLuint attrib_position;
-    static GLuint uniform_VP, uniform_MM;
+    static GLuint uniform_MM, uniform_ViewProjectionMatrixesUBO;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const std::vector<core::matrix4> &ViewProjectionMatrix);
+    static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
 class InstancedShadowShader
@@ -337,10 +338,9 @@ class InstancedShadowShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_origin, attrib_orientation, attrib_scale;
-    static GLuint uniform_VP;
 
     static void init();
-    static void setUniforms(const std::vector<core::matrix4> &ViewProjectionMatrix);
+    static void setUniforms();
 };
 
 class RefShadowShader
@@ -348,10 +348,10 @@ class RefShadowShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_VP, uniform_MM, uniform_tex;
+    static GLuint uniform_MM, uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, unsigned TU_tex);
 };
 
 class InstancedRefShadowShader
@@ -359,10 +359,10 @@ class InstancedRefShadowShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
-    static GLuint uniform_VP, uniform_tex;
+    static GLuint uniform_tex;
 
     static void init();
-    static void setUniforms(const std::vector<core::matrix4> &ModelViewProjectionMatrix, unsigned TU_tex);
+    static void setUniforms(unsigned TU_tex);
 };
 
 class GrassShadowShader

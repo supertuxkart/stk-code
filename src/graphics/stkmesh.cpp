@@ -667,10 +667,8 @@ void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::RefShadowShader::setUniforms(ModelMatrix, ShadowMVP, 0);
+    MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
@@ -684,16 +682,7 @@ void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-
-    /*    if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-    {
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    glUseProgram(MeshShader::GrassShadowShader::Program);
-    MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
-    }*/
-
-    MeshShader::ShadowShader::setUniforms(ModelMatrix, ShadowMVP);
+    MeshShader::ShadowShader::setUniforms(ModelMatrix);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);

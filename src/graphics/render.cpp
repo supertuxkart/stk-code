@@ -565,7 +565,19 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     glViewport(0, 0, 1024, 1024);
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
+
+    size_t size = irr_driver->getShadowViewProj().size();
+    float *tmp = new float[16 * size];
+    for (unsigned i = 0; i < size; i++) {
+        memcpy(&tmp[16 * i], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+    }
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 4 * sizeof(float), tmp);
+    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+    delete tmp;
+
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glCullFace(GL_BACK);
 
     camnode->setNearValue(oldnear);
