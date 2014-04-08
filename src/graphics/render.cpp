@@ -164,11 +164,8 @@ void IrrDriver::renderGLSL(float dt)
         }*/
 
         // Get Projection and view matrix
-        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-        m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-        irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
-        irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
-        irr_driver->genProjViewMatrix();
+        computeCameraMatrix(camnode, camera);
+
 
         // Fire up the MRT
         PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -469,10 +466,8 @@ void IrrDriver::renderParticles()
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
-void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
-                              scene::ICameraSceneNode * const camnode,
-                              //video::SOverrideMaterial &overridemat,
-                              Camera * const camera)
+void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode,
+    Camera * const camera)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
 
@@ -556,6 +551,35 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
     assert(sun_ortho_matrix.size() == 4);
+    camnode->setNearValue(oldnear);
+    camnode->setFarValue(oldfar);
+    camnode->render();
+    camera->activate();
+    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+    irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
+    irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+    irr_driver->genProjViewMatrix();
+
+    float *tmp = new float[16 * 8];
+
+    memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
+    size_t size = irr_driver->getShadowViewProj().size();
+    for (unsigned i = 0; i < size; i++)
+        memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
+    delete tmp;
+}
+
+void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
+                              scene::ICameraSceneNode * const camnode,
+                              //video::SOverrideMaterial &overridemat,
+                              Camera * const camera)
+{
 
     irr_driver->setPhase(SHADOW_PASS);
     glDisable(GL_BLEND);
@@ -566,25 +590,12 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
 
-    size_t size = irr_driver->getShadowViewProj().size();
-    float *tmp = new float[16 * size];
-    for (unsigned i = 0; i < size; i++) {
-        memcpy(&tmp[16 * i], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
-    }
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 4 * sizeof(float), tmp);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
-    delete tmp;
-
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glCullFace(GL_BACK);
 
-    camnode->setNearValue(oldnear);
-    camnode->setFarValue(oldfar);
-    camnode->render();
-    camera->activate();
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
 

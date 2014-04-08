@@ -1,6 +1,10 @@
 layout (std140) uniform MatrixesData
 {
-    mat4 ViewProjectionMatrix[4];
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
 };
 
 #if __VERSION__ >= 400
@@ -20,7 +24,7 @@ void emitToLayer(int layerId)
   for(int i=0; i<3; i++)
   {
     uv = tc[i];
-    gl_Position = ViewProjectionMatrix[layerId] * gl_in[i].gl_Position;
+    gl_Position = ShadowViewProjMatrixes[layerId] * gl_in[i].gl_Position;
     EmitVertex();
   }
   EndPrimitive();

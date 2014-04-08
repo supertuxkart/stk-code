@@ -170,7 +170,7 @@ static void initShadowVPMUBO()
 {
     glGenBuffers(1, &SharedObject::ViewProjectionMatrixesUBO);
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferData(GL_UNIFORM_BUFFER, 16 * 4 * sizeof(float), 0, GL_STATIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, 16 * 8 * sizeof(float), 0, GL_STATIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
