@@ -54,47 +54,6 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
-void STKAnimatedMesh::drawSolidPass1(const GLMesh &mesh, GeometricMaterial type)
-{
-    switch (type)
-    {
-    case FPSM_ALPHA_REF_TEXTURE:
-        drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, mesh.TextureMatrix);
-        break;
-    case FPSM_DEFAULT:
-        drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-        break;
-    default:
-        assert(0 && "Wrong geometric material");
-        break;
-    }
-}
-
-void STKAnimatedMesh::drawSolidPass2(const GLMesh &mesh, ShadedMaterial type)
-{
-    switch (type)
-    {
-    case SM_ALPHA_REF_TEXTURE:
-        drawObjectRefPass2(mesh, ModelViewProjectionMatrix, mesh.TextureMatrix);
-        break;
-    case SM_RIMLIT:
-        drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, mesh.TextureMatrix);
-        break;
-    case SM_UNLIT:
-        drawObjectUnlit(mesh, ModelViewProjectionMatrix);
-        break;
-    case SM_DETAILS:
-        drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
-        break;
-    case SM_DEFAULT:
-        drawObjectPass2(mesh, ModelViewProjectionMatrix, mesh.TextureMatrix);
-        break;
-    default:
-        assert(0 && "Wrong shaded material");
-        break;
-    }
-}
-
 void STKAnimatedMesh::render()
 {
     video::IVideoDriver* driver = SceneManager->getVideoDriver();
@@ -187,45 +146,59 @@ void STKAnimatedMesh::render()
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
 
-        if (!GeometricMesh[FPSM_DEFAULT].empty())
-            glUseProgram(MeshShader::ObjectPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawSolidPass1(*GeometricMesh[FPSM_DEFAULT][i], FPSM_DEFAULT);
+        {
+            GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(GeometricMesh[FPSM_DEFAULT][i]);
+            GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
-        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
-            drawSolidPass1(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], FPSM_ALPHA_REF_TEXTURE);
+        {
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
-        if (!ShadedMesh[SM_DEFAULT].empty())
-            glUseProgram(MeshShader::ObjectPass2Shader::Program);
         for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT].size(); i++)
-            drawSolidPass2(*ShadedMesh[SM_DEFAULT][i], SM_DEFAULT);
+        {
+            GroupedSM<SM_DEFAULT>::MeshSet.push_back(ShadedMesh[SM_DEFAULT][i]);
+            GroupedSM<SM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedSM<SM_DEFAULT>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
-        if (!ShadedMesh[SM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
         for (unsigned i = 0; i < ShadedMesh[SM_ALPHA_REF_TEXTURE].size(); i++)
-            drawSolidPass2(*ShadedMesh[SM_ALPHA_REF_TEXTURE][i], SM_ALPHA_REF_TEXTURE);
+        {
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(ShadedMesh[SM_ALPHA_REF_TEXTURE][i]);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
-        if (!ShadedMesh[SM_RIMLIT].empty())
-            glUseProgram(MeshShader::ObjectRimLimitShader::Program);
         for (unsigned i = 0; i < ShadedMesh[SM_RIMLIT].size(); i++)
-            drawSolidPass2(*ShadedMesh[SM_RIMLIT][i], SM_RIMLIT);
+        {
+            GroupedSM<SM_RIMLIT>::MeshSet.push_back(ShadedMesh[SM_RIMLIT][i]);
+            GroupedSM<SM_RIMLIT>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedSM<SM_RIMLIT>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
-        if (!ShadedMesh[SM_UNLIT].empty())
-            glUseProgram(MeshShader::ObjectUnlitShader::Program);
-        for (unsigned i = 0; i < ShadedMesh[SM_UNLIT].size(); i++)
-            drawSolidPass2(*ShadedMesh[SM_UNLIT][i], SM_UNLIT);
+        for (GLMesh *mesh : ShadedMesh[SM_UNLIT])
+        {
+            GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
+            GroupedSM<SM_UNLIT>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedSM<SM_UNLIT>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
-        if (!ShadedMesh[SM_DETAILS].empty())
-            glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
-        for (unsigned i = 0; i < ShadedMesh[SM_DETAILS].size(); i++)
-            drawSolidPass2(*ShadedMesh[SM_DETAILS][i], SM_DETAILS);
+        for (GLMesh *mesh : ShadedMesh[SM_DETAILS])
+        {
+            GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DETAILS>::MVPSet.push_back(ModelViewProjectionMatrix);
+            GroupedSM<SM_DETAILS>::TIMVSet.push_back(TransposeInverseModelView);
+        }
 
         return;
     }

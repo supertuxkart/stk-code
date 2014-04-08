@@ -67,12 +67,56 @@ bool isObject(video::E_MATERIAL_TYPE type);
 core::vector3df getWind();
 
 // Pass 1 shader (ie shaders that outputs normals and depth)
+template<enum GeometricMaterial T>
+class GroupedFPSM
+{
+public:
+    static std::vector<GLMesh *> MeshSet;
+    static std::vector<core::matrix4> MVPSet, TIMVSet;
+
+    static void reset()
+    {
+        MeshSet.clear();
+        MVPSet.clear();
+        TIMVSet.clear();
+    }
+};
+
+template<enum GeometricMaterial T>
+std::vector<GLMesh *> GroupedFPSM<T>::MeshSet;
+template<enum GeometricMaterial T>
+std::vector<core::matrix4> GroupedFPSM<T>::MVPSet;
+template<enum GeometricMaterial T>
+std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
+
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)
+template<enum ShadedMaterial T>
+class GroupedSM
+{
+public:
+    static std::vector<GLMesh *> MeshSet;
+    static std::vector<core::matrix4> MVPSet, TIMVSet;
+
+    static void reset()
+    {
+        MeshSet.clear();
+        MVPSet.clear();
+        TIMVSet.clear();
+    }
+};
+
+template<enum ShadedMaterial T>
+std::vector<GLMesh *> GroupedSM<T>::MeshSet;
+template<enum ShadedMaterial T>
+std::vector<core::matrix4> GroupedSM<T>::MVPSet;
+template<enum ShadedMaterial T>
+std::vector<core::matrix4> GroupedSM<T>::TIMVSet;
+
 void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);

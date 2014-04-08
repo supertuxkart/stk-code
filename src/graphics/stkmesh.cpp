@@ -219,6 +219,8 @@ core::vector3df getWind()
     return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
 
+
+
 void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
 {
     irr_driver->IncreaseObjectCount();

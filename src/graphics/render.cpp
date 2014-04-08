@@ -421,8 +421,27 @@ void IrrDriver::renderSolidFirstPass()
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
+    GroupedFPSM<FPSM_DEFAULT>::reset();
+    GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::reset();
+    GroupedFPSM<FPSM_NORMAL_MAP>::reset();
+
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
+    glUseProgram(MeshShader::ObjectPass1Shader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
+    {
+        drawObjectPass1(*GroupedFPSM<FPSM_DEFAULT>::MeshSet[i], GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i]);
+    }
+    glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
+    {
+        drawObjectRefPass1(*GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
+    }
+    glUseProgram(MeshShader::NormalMapShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
+    {
+        drawNormalPass(*GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i]);
+    }
 }
 
 void IrrDriver::renderSolidSecondPass()
@@ -437,10 +456,46 @@ void IrrDriver::renderSolidSecondPass()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
+    GroupedSM<SM_DEFAULT>::reset();
+    GroupedSM<SM_ALPHA_REF_TEXTURE>::reset();
+    GroupedSM<SM_RIMLIT>::reset();
+    GroupedSM<SM_SPHEREMAP>::reset();
+    GroupedSM<SM_SPLATTING>::reset();
+    GroupedSM<SM_UNLIT>::reset();
+    GroupedSM<SM_DETAILS>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
+
+    glUseProgram(MeshShader::ObjectPass2Shader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_DEFAULT>::MeshSet.size(); i++)
+        drawObjectPass2(*GroupedSM<SM_DEFAULT>::MeshSet[i], GroupedSM<SM_DEFAULT>::MVPSet[i], GroupedSM<SM_DEFAULT>::MeshSet[i]->TextureMatrix);
+
+    glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.size(); i++)
+        drawObjectRefPass2(*GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
+
+    glUseProgram(MeshShader::ObjectRimLimitShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_RIMLIT>::MeshSet.size(); i++)
+        drawObjectRimLimit(*GroupedSM<SM_RIMLIT>::MeshSet[i], GroupedSM<SM_RIMLIT>::MVPSet[i], GroupedSM<SM_RIMLIT>::TIMVSet[i], GroupedSM<SM_RIMLIT>::MeshSet[i]->TextureMatrix);
+
+    glUseProgram(MeshShader::SphereMapShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_SPHEREMAP>::MeshSet.size(); i++)
+        drawSphereMap(*GroupedSM<SM_SPHEREMAP>::MeshSet[i], GroupedSM<SM_SPHEREMAP>::MVPSet[i], GroupedSM<SM_SPHEREMAP>::TIMVSet[i]);
+
+    glUseProgram(MeshShader::SplattingShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_SPLATTING>::MeshSet.size(); i++)
+        drawSplatting(*GroupedSM<SM_SPLATTING>::MeshSet[i], GroupedSM<SM_SPLATTING>::MVPSet[i]);
+
+    glUseProgram(MeshShader::ObjectUnlitShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_UNLIT>::MeshSet.size(); i++)
+        drawObjectUnlit(*GroupedSM<SM_UNLIT>::MeshSet[i], GroupedSM<SM_UNLIT>::MVPSet[i]);
+
+    glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_DETAILS>::MeshSet.size(); i++)
+        drawDetailledObjectPass2(*GroupedSM<SM_DETAILS>::MeshSet[i], GroupedSM<SM_DETAILS>::MVPSet[i]);
+
 }
 
 void IrrDriver::renderTransparent()
