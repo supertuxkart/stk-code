@@ -50,26 +50,52 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
-/** Constructor to deserialize a player that was saved to a XML file.
+/** Constructor to deserialize player data that was saved to a XML file. The
+ *  constructor will only load the main player data (like name, id, saved
+ *  online data), but not the achievements and story mode data. Reason is
+ *  that the achievement and story mode data depends on other data to be
+ *  read first (challenges and achievement files), which in turn can only be
+ *  created later in the startup process (they depend on e.g. all tracks to
+ *  be known). On the other hand, automatic login needs to happen asap
+ *  (i.e. as soon as the network thread is started), which needs the main
+ *  player data (i.e. the default player, and saved session data). So the
+ *  constructor only reads this data, the rest of the player data is handled
+ *  in loadRemainingData later in the initialisation process.
  *  \param node The XML node representing this player.
 */
 PlayerProfile::PlayerProfile(const XMLNode* node)
 {
+    m_saved_session       = false;
+    m_saved_token         = "";
+    m_saved_user_id       = 0;
+    m_story_mode_status   = NULL;
+    m_achievements_status = NULL;
+
     node->get("name",          &m_name            );
     node->get("guest",         &m_is_guest_account);
     node->get("use-frequency", &m_use_frequency   );
     node->get("unique-id",     &m_unique_id       );
     node->get("is-default",    &m_is_default      );
+    node->get("saved-session", &m_saved_session   );
+    node->get("saved-user",    &m_saved_user_id   );
+    node->get("saved-token",   &m_saved_token     );
+
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
+}   // PlayerProfile
+
+//------------------------------------------------------------------------------
+/** This function loads the achievement and story mode data. This 
+*/
+void PlayerProfile::loadRemainingData(const XMLNode *node)
+{
     const XMLNode *xml_story_mode = node->getNode("story-mode");
     m_story_mode_status = unlock_manager->createStoryModeStatus(xml_story_mode);
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
-                          ->createAchievementsStatus(xml_achievements);
-
-}   // PlayerProfile
+        ->createAchievementsStatus(xml_achievements);
+}   // loadRemainingData
 
 //------------------------------------------------------------------------------
 /** Writes the data for this player to the specified UTFWriter.
@@ -79,9 +105,15 @@ void PlayerProfile::save(UTFWriter &out)
 {
     out << L"    <player name=\"" << m_name
         << L"\" guest=\""         << m_is_guest_account
-        << L"\" use-frequency=\"" << m_use_frequency
-        << L"\" is-default=\""    << m_is_default
-        << L"\" unique-id=\"" << m_unique_id << L"\">\n";
+        << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
+
+    out << L"            is-default=\"" << m_is_default
+        << L"\" unique-id=\""           << m_unique_id
+        << L"\" saved-session=\""       << m_saved_session << L"\"\n";
+
+    out << L"            saved-user=\"" << m_saved_user_id 
+        << L"\" saved-token=\""         << m_saved_token << L"\">\n";
+
     {
         assert(m_story_mode_status);
         m_story_mode_status->save(out);
@@ -91,6 +123,31 @@ void PlayerProfile::save(UTFWriter &out)
     }
     out << L"    </player>\n";
 }   // save
+
+//------------------------------------------------------------------------------
+// ------------------------------------------------------------------------
+/** Saves the online data, so that it will automatically re-connect
+*  next time this profile is loaded.
+*  \param user_id Id of the online profile.
+*  \param token Token used for authentication.
+*/
+void PlayerProfile::saveSession(int user_id, const std::string &token)
+{
+    m_saved_session = true;
+    m_saved_user_id = user_id;
+    m_saved_token   = token;
+    PlayerManager::get()->save();
+}   // saveSession
+
+// ------------------------------------------------------------------------
+/** Unsets any saved session data. */
+void PlayerProfile::clearSession()
+{
+    m_saved_session = false;
+    m_saved_user_id = 0;
+    m_saved_token   = "";
+    PlayerManager::get()->save();
+}   // clearSession
 
 //------------------------------------------------------------------------------
 /** Increments how often that account was used. Guest accounts are not counted.

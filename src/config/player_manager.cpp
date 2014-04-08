@@ -71,31 +71,47 @@ void PlayerManager::load()
 {
     std::string filename = file_manager->getUserConfigFile("players.xml");
 
-    const XMLNode *players = file_manager->createXMLTree(filename);
-    if(!players)
+    m_player_data = file_manager->createXMLTree(filename);
+    if(!m_player_data)
     {
         Log::info("player_manager", "A new players.xml file will be created.");
         return;
     }
-    else if(players->getName()!="players")
+    else if(m_player_data->getName()!="players")
     {
         Log::info("player_manager", "The players.xml file is invalid.");
         return;
     }
 
     m_current_player = NULL;
-    for(unsigned int i=0; i<players->getNumNodes(); i++)
+    for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
     {
-        const XMLNode *player_xml = players->getNode(i);
+        const XMLNode *player_xml = m_player_data->getNode(i);
         PlayerProfile *player = new PlayerProfile(player_xml);
         m_all_players.push_back(player);
         if(player->isDefault())
             m_current_player = player;
     }
-    m_all_players.insertionSort(/*start*/0, /*desc*/true);
 
-    delete players;
 }   // load
+
+// ----------------------------------------------------------------------------
+/** The 2nd loading stage. During this stage achievements and story mode
+ *  data is read for each player.
+ */
+void PlayerManager::loadRemainingData()
+{
+    for (unsigned int i = 0; i<m_player_data->getNumNodes(); i++)
+    {
+        const XMLNode *player_xml = m_player_data->getNode(i);
+        m_all_players[i].loadRemainingData(player_xml);
+    }
+    delete m_player_data;
+    m_player_data = NULL;
+
+    // Sort player by frequency
+    m_all_players.insertionSort(/*start*/0, /*desc*/true);
+}   // loadRemainingData
 
 // ----------------------------------------------------------------------------
 /** Saves all player profiles to players.xml.
