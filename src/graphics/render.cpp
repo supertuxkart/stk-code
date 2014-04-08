@@ -168,6 +168,7 @@ void IrrDriver::renderGLSL(float dt)
         m_scene_manager->drawAll(scene::ESNRP_CAMERA);
         irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
         irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+        irr_driver->genProjViewMatrix();
 
         // Fire up the MRT
         PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -424,9 +425,7 @@ void IrrDriver::renderSolidFirstPass()
     glEnable(GL_CULL_FACE);
     irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
-    irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
-    irr_driver->genProjViewMatrix();
+
 }
 
 void IrrDriver::renderSolidSecondPass()

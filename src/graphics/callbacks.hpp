@@ -395,7 +395,7 @@ public:
     {
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
         // Sun "position" is actually a direction and not a position
-        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
+        core::matrix4 m_view = irr_driver->getViewMatrix();
         m_view.makeInverse();
         m_view = m_view.getTransposed();
         core::vector3df pos(x, y, z);

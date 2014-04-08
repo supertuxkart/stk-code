@@ -193,24 +193,25 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 }
 
 
-void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
+core::matrix4 computeMVP(const core::matrix4 &ModelMatrix)
 {
-	ModelViewProjectionMatrix = irr_driver->getProjMatrix();
-	ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
-	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+    core::matrix4 ModelViewProjectionMatrix = irr_driver->getProjMatrix();
+    ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
+    ModelViewProjectionMatrix *= ModelMatrix;
+    return ModelViewProjectionMatrix;
 }
 
-void computeTIMV(core::matrix4 &TransposeInverseModelView)
+core::matrix4 computeTIMV(const core::matrix4 &ModelMatrix)
 {
-	TransposeInverseModelView = irr_driver->getViewMatrix();
-	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-	TransposeInverseModelView.makeInverse();
-	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+    core::matrix4 TransposeInverseModelView = irr_driver->getViewMatrix();
+    TransposeInverseModelView *= ModelMatrix;
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+    return TransposeInverseModelView;
 }
 
 core::vector3df getWind()
 {
-    const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
     GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
     float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
@@ -659,7 +660,7 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawShadowRef(const GLMesh &mesh)
+void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
@@ -669,14 +670,14 @@ void drawShadowRef(const GLMesh &mesh)
     std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
 
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::RefShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP, 0);
+    MeshShader::RefShadowShader::setUniforms(ModelMatrix, ShadowMVP, 0);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElements(ptype, count, itype, 0);
 }
 
-void drawShadow(const GLMesh &mesh)
+void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
@@ -692,7 +693,7 @@ void drawShadow(const GLMesh &mesh)
     MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
     }*/
 
-    MeshShader::ShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP);
+    MeshShader::ShadowShader::setUniforms(ModelMatrix, ShadowMVP);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
