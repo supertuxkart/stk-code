@@ -48,6 +48,10 @@ private:
     /** A pointer to the current player. */
     PlayerProfile* m_current_player;
 
+    /** Saves the XML tree from players.xml for use in the 2nd
+     * loading stage (loadRemainingData). */
+    const XMLNode *m_player_data;
+
     void load();
      PlayerManager();
     ~PlayerManager();
@@ -72,6 +76,7 @@ public:
     // ------------------------------------------------------------------------
     
     void save();
+    void loadRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);

@@ -1030,6 +1030,11 @@ void initRest()
     addons_manager          = new AddonsManager();
     Online::ProfileManager::create();
 
+    // The request manager will start the login process in case of a saved
+    // session, so we need to read the main data from the players.xml file.
+    // The rest will be read later (since the rest needs the unlock- and
+    // achievement managers to be created, which can only be created later).
+    PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
 
@@ -1165,13 +1170,15 @@ int main(int argc, char *argv[] )
         handleXmasMode();
 
         // Needs the kart and track directories to load potential challenges
-        // in those dirs.
+        // in those dirs, so it can only be created after reading tracks
+        // and karts.
         unlock_manager = new UnlockManager();
         AchievementsManager::create();
 
-        // Needs the unlock manager to initialise the game slots of all players
-        // and the AchievementsManager to initialise the AchievementsStatus.
-        PlayerManager::create();
+        // Reading the rest of the player data needs the unlock manager to
+        // initialise the game slots of all players and the AchievementsManager
+        // to initialise the AchievementsStatus, so it is done only now.
+        PlayerManager::get()->loadRemainingData();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gui_lock.png"  ) );
