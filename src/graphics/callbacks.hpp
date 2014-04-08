@@ -426,30 +426,6 @@ private:
 
 //
 
-class MLAAColor1Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAABlend2Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAANeigh3Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
 class ShadowPassProvider: public CallBase
 {
 public:

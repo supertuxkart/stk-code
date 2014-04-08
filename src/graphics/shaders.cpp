@@ -42,9 +42,6 @@ Shaders::Shaders()
     m_callbacks[ES_MIPVIZ] = new MipVizProvider();
     m_callbacks[ES_COLORIZE] = new ColorizeProvider();
     m_callbacks[ES_SUNLIGHT] = new SunLightProvider();
-    m_callbacks[ES_MLAA_COLOR1] = new MLAAColor1Provider();
-    m_callbacks[ES_MLAA_BLEND2] = new MLAABlend2Provider();
-    m_callbacks[ES_MLAA_NEIGH3] = new MLAANeigh3Provider();
     m_callbacks[ES_SHADOWPASS] = new ShadowPassProvider();
     m_callbacks[ES_SHADOW_IMPORTANCE] = new ShadowImportanceProvider();
     m_callbacks[ES_COLLAPSE] = new CollapseProvider();
@@ -228,13 +225,6 @@ void Shaders::loadShaders()
     m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
     m_shaders[ES_SUNLIGHT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-
-    m_shaders[ES_MLAA_COLOR1] = glsl(dir + "pass.vert", dir + "pass.frag",
-                                    m_callbacks[ES_MLAA_COLOR1]);
-    m_shaders[ES_MLAA_BLEND2] = glsl(dir + "pass.vert", dir + "pass.frag",
-                                    m_callbacks[ES_MLAA_BLEND2]);
-    m_shaders[ES_MLAA_NEIGH3] = glsl(dir + "pass.vert", dir + "pass.frag",
-                                    m_callbacks[ES_MLAA_NEIGH3]);
 
     m_shaders[ES_SHADOWPASS] = glsl(dir + "pass.vert", dir + "pass.frag",
                                     m_callbacks[ES_SHADOWPASS]);

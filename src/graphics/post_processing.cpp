@@ -593,9 +593,6 @@ void PostProcessing::render()
     if (!irr_driver->isGLSL()) return;
 
     IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setTransform(ETS_WORLD, core::IdentityMatrix);
-    drv->setTransform(ETS_VIEW, core::IdentityMatrix);
-    drv->setTransform(ETS_PROJECTION, core::IdentityMatrix);
 
     MotionBlurProvider * const mocb = (MotionBlurProvider *) irr_driver->
                                                            getCallback(ES_MOTIONBLUR);
