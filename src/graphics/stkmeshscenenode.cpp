@@ -318,7 +318,6 @@ void STKMeshSceneNode::render()
 
     ++PassCount;
 
-    driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
     Box = Mesh->getBoundingBox();
 
     setFirstTimeMaterial();

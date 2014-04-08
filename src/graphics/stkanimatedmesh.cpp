@@ -116,8 +116,6 @@ void STKAnimatedMesh::render()
         return;
     }
 
-    driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-
     if (firstTime)
     {
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -182,12 +180,6 @@ void STKAnimatedMesh::render()
        // and solid only in solid pass
        if (transparent != isTransparentPass)
           continue;
-
-       if (RenderFromIdentity)
-         driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
-       else if (Mesh->getMeshType() == scene::EAMT_SKINNED)
-         driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
-
     }
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
