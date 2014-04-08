@@ -120,10 +120,6 @@ void IrrDriver::renderGLSL(float dt)
     // because of tracks that do not have skyboxes (generally add-on tracks)
     m_post_processing->begin();
 
-    m_video_driver->beginScene(/*backBuffer clear*/ true, /*zBuffer*/ true,
-                               world->getClearColor());
-
-    irr_driver->getVideoDriver()->enableMaterial2D();
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
 
@@ -418,13 +414,13 @@ void IrrDriver::renderSolidFirstPass()
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS));
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
     glClearColor(0., 0., 0., 0.);
+    glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
-    glDepthMask(GL_TRUE);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
