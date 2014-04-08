@@ -88,7 +88,6 @@ namespace Online
         // ------------------------------------------------------------------------
         /**
           * Shows a increasing number of dots.
-          * \param spaces   Flag if unshowed dots should be replaced by spaces
           * \param interval A float representing the time it takes to add a new dot
           * \param max_dots The number of dots used. Defaults to 3.
           */
