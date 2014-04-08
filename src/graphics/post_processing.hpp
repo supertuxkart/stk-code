@@ -94,9 +94,6 @@ public:
     /** Render the post-processed scene */
     void         render();
 
-    /** Draw the quad for this camera */
-    void         drawQuad(u32 cam, const video::SMaterial &mat);
-
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);
 
