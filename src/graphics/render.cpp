@@ -417,14 +417,13 @@ void IrrDriver::renderSolidFirstPass()
     glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-    m_renderpass = scene::ESNRP_CAMERA | scene::ESNRP_SOLID;
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-    m_scene_manager->drawAll(m_renderpass);
+    m_scene_manager->drawAll(scene::ESNRP_SOLID);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
