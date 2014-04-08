@@ -123,7 +123,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    computeMVP(ModelViewProjectionMatrix);
+    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
     MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
 
     assert(mesh.vao_glow_pass);
@@ -141,9 +141,9 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    computeMVP(ModelViewProjectionMatrix);
+    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
     core::matrix4 ModelViewMatrix = irr_driver->getViewMatrix();
-    ModelViewMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+    ModelViewMatrix *= AbsoluteTransformation;
 
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
@@ -175,7 +175,7 @@ void STKMeshSceneNode::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYP
 {
     assert(irr_driver->getPhase() == TRANSPARENT_PASS);
 
-    computeMVP(ModelViewProjectionMatrix);
+    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
 
     if (type == irr_driver->getShader(ES_BUBBLES))
         drawBubble(mesh, ModelViewProjectionMatrix);
@@ -318,7 +318,6 @@ void STKMeshSceneNode::render()
 
     ++PassCount;
 
-    driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
     Box = Mesh->getBoundingBox();
 
     setFirstTimeMaterial();
@@ -335,8 +334,8 @@ void STKMeshSceneNode::render()
     {
         if (reload_each_frame)
             glDisable(GL_CULL_FACE);
-        computeMVP(ModelViewProjectionMatrix);
-        computeTIMV(TransposeInverseModelView);
+        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
+        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
 
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::ObjectPass1Shader::Program);
@@ -431,12 +430,12 @@ void STKMeshSceneNode::render()
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::ShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawShadow(*GeometricMesh[FPSM_DEFAULT][i]);
+            drawShadow(*GeometricMesh[FPSM_DEFAULT][i], AbsoluteTransformation);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::RefShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
-            drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
+            drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], AbsoluteTransformation);
 
         if (reload_each_frame)
             glEnable(GL_CULL_FACE);
@@ -457,7 +456,7 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == TRANSPARENT_PASS)
     {
-        computeMVP(ModelViewProjectionMatrix);
+        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);

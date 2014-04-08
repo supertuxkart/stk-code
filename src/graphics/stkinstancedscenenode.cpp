@@ -200,8 +200,7 @@ static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    MeshShader::InstancedShadowShader::setUniforms(ShadowMVP);
+    MeshShader::InstancedShadowShader::setUniforms();
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
@@ -229,10 +228,8 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedRefShadowShader::setUniforms(ShadowMVP, 0);
+    MeshShader::InstancedRefShadowShader::setUniforms(0);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);

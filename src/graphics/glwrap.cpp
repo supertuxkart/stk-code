@@ -64,6 +64,8 @@ PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
 PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
 PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
+PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
+PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
 #endif
 
 static bool is_gl_init = false;
@@ -207,6 +209,8 @@ void initGL()
     glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
     glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)IRR_OGL_LOAD_EXTENSION("glTexImage2DMultisample");
     glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBlitFramebuffer");
+    glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformBlockIndex");
+    glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)IRR_OGL_LOAD_EXTENSION("glUniformBlockBinding");
 #ifdef DEBUG
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif

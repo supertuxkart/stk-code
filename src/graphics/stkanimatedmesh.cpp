@@ -116,8 +116,6 @@ void STKAnimatedMesh::render()
         return;
     }
 
-    driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
-
     if (firstTime)
     {
         for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
@@ -182,18 +180,12 @@ void STKAnimatedMesh::render()
        // and solid only in solid pass
        if (transparent != isTransparentPass)
           continue;
-
-       if (RenderFromIdentity)
-         driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
-       else if (Mesh->getMeshType() == scene::EAMT_SKINNED)
-         driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
-
     }
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
-        computeMVP(ModelViewProjectionMatrix);
-        computeTIMV(TransposeInverseModelView);
+        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
+        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
 
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::ObjectPass1Shader::Program);
@@ -243,18 +235,18 @@ void STKAnimatedMesh::render()
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::ShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawShadow(*GeometricMesh[FPSM_DEFAULT][i]);
+            drawShadow(*GeometricMesh[FPSM_DEFAULT][i], AbsoluteTransformation);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::RefShadowShader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
-            drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
+            drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], AbsoluteTransformation);
         return;
     }
 
     if (irr_driver->getPhase() == TRANSPARENT_PASS)
     {
-        computeMVP(ModelViewProjectionMatrix);
+        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
