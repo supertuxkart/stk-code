@@ -525,8 +525,6 @@ namespace MeshShader
     GLuint InstancedObjectPass1Shader::attrib_orientation;
     GLuint InstancedObjectPass1Shader::attrib_origin;
     GLuint InstancedObjectPass1Shader::attrib_scale;
-    GLuint InstancedObjectPass1Shader::uniform_MP;
-    GLuint InstancedObjectPass1Shader::uniform_VM;
     GLuint InstancedObjectPass1Shader::uniform_tex;
 
     void InstancedObjectPass1Shader::init()
@@ -541,15 +539,13 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_scale = glGetAttribLocation(Program, "Scale");
         attrib_normal = glGetAttribLocation(Program, "Normal");
-        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
-        uniform_VM = glGetUniformLocation(Program, "InverseViewMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void InstancedObjectPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex)
+    void InstancedObjectPass1Shader::setUniforms(unsigned TU_tex)
     {
-        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
 
@@ -560,8 +556,6 @@ namespace MeshShader
     GLuint InstancedObjectRefPass1Shader::attrib_orientation;
     GLuint InstancedObjectRefPass1Shader::attrib_origin;
     GLuint InstancedObjectRefPass1Shader::attrib_scale;
-    GLuint InstancedObjectRefPass1Shader::uniform_MP;
-    GLuint InstancedObjectRefPass1Shader::uniform_VM;
     GLuint InstancedObjectRefPass1Shader::uniform_tex;
 
     void InstancedObjectRefPass1Shader::init()
@@ -577,15 +571,13 @@ namespace MeshShader
         attrib_scale = glGetAttribLocation(Program, "Scale");
         attrib_normal = glGetAttribLocation(Program, "Normal");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
-        uniform_VM = glGetUniformLocation(Program, "InverseViewMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void InstancedObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex)
+    void InstancedObjectRefPass1Shader::setUniforms(unsigned TU_tex)
     {
-        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
 
@@ -597,8 +589,6 @@ namespace MeshShader
     GLuint InstancedGrassPass1Shader::attrib_scale;
     GLuint InstancedGrassPass1Shader::attrib_texcoord;
     GLuint InstancedGrassPass1Shader::attrib_color;
-    GLuint InstancedGrassPass1Shader::uniform_MP;
-    GLuint InstancedGrassPass1Shader::uniform_IVM;
     GLuint InstancedGrassPass1Shader::uniform_windDir;
     GLuint InstancedGrassPass1Shader::uniform_tex;
 
@@ -616,16 +606,14 @@ namespace MeshShader
         attrib_normal = glGetAttribLocation(Program, "Normal");
         attrib_color = glGetAttribLocation(Program, "Color");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        uniform_MP = glGetUniformLocation(Program, "ViewProjectionMatrix");
-        uniform_IVM = glGetUniformLocation(Program, "InverseViewMatrix");
         uniform_windDir = glGetUniformLocation(Program, "windDir");
         uniform_tex = glGetUniformLocation(Program, "tex");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void InstancedGrassPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::vector3df &windDir, unsigned TU_tex)
+    void InstancedGrassPass1Shader::setUniforms(const core::vector3df &windDir, unsigned TU_tex)
     {
-        glUniformMatrix4fv(uniform_MP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_IVM, 1, GL_FALSE, InverseViewMatrix.pointer());
         glUniform3f(uniform_windDir, windDir.X, windDir.Y, windDir.Z);
         glUniform1i(uniform_tex, TU_tex);
     }
@@ -716,6 +704,9 @@ namespace MeshShader
         glUniform1i(uniform_SSAO, 2);
         glUniform1i(uniform_Albedo, TU_Albedo);
         glUseProgram(0);
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     void InstancedObjectPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
@@ -767,6 +758,9 @@ namespace MeshShader
         glUniform1i(uniform_SSAO, 2);
         glUniform1i(uniform_Albedo, TU_Albedo);
         glUseProgram(0);
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     void InstancedObjectRefPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
@@ -1083,6 +1077,9 @@ namespace MeshShader
         glUniform1i(uniform_Albedo, TU_Albedo);
         glUniform1i(uniform_dtex, TU_dtex);
         glUseProgram(0);
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     void InstancedGrassPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir)

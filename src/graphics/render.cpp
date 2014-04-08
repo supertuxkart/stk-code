@@ -165,6 +165,7 @@ void IrrDriver::renderGLSL(float dt)
 
         // Get Projection and view matrix
         computeCameraMatrix(camnode, camera);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
 
         // Fire up the MRT
@@ -647,7 +648,6 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glCullFace(GL_BACK);
 
 

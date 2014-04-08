@@ -83,10 +83,10 @@ class InstancedObjectPass1Shader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_normal, attrib_origin, attrib_orientation, attrib_scale;
-    static GLuint uniform_MP, uniform_VM, uniform_tex;
+    static GLuint uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex);
+    static void setUniforms(unsigned TU_tex);
 };
 
 class InstancedObjectRefPass1Shader
@@ -94,10 +94,10 @@ class InstancedObjectRefPass1Shader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_normal, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
-    static GLuint uniform_MP, uniform_VM, uniform_tex;
+    static GLuint uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &ViewMatrix, unsigned TU_tex);
+    static void setUniforms(unsigned TU_tex);
 };
 
 class InstancedGrassPass1Shader
@@ -105,10 +105,10 @@ class InstancedGrassPass1Shader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_normal, attrib_origin, attrib_orientation, attrib_scale, attrib_color, attrib_texcoord;
-    static GLuint uniform_MP, uniform_IVM, uniform_windDir, uniform_tex;
+    static GLuint uniform_windDir, uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::vector3df &windDir, unsigned TU_tex);
+    static void setUniforms(const core::vector3df &windDir, unsigned TU_tex);
 };
 
 class ObjectPass2Shader
