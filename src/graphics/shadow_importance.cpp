@@ -45,8 +45,8 @@ public:
         mat.ZWriteEnable = false;
         mat.MaterialType = irr_driver->getShader(ES_SHADOW_IMPORTANCE);
 
-        mat.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-        mat.setTexture(2, irr_driver->getRTT(RTT_COLOR));
+//        mat.setTexture(0, irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
+//        mat.setTexture(2, irr_driver->getRTT(RTT_COLOR));
 
         mat.setFlag(EMF_BILINEAR_FILTER, false);
 

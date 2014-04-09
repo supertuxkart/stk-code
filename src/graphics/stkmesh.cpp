@@ -193,24 +193,25 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 }
 
 
-void computeMVP(core::matrix4 &ModelViewProjectionMatrix)
+core::matrix4 computeMVP(const core::matrix4 &ModelMatrix)
 {
-	ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
+    core::matrix4 ModelViewProjectionMatrix = irr_driver->getProjMatrix();
+    ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
+    ModelViewProjectionMatrix *= ModelMatrix;
+    return ModelViewProjectionMatrix;
 }
 
-void computeTIMV(core::matrix4 &TransposeInverseModelView)
+core::matrix4 computeTIMV(const core::matrix4 &ModelMatrix)
 {
-	TransposeInverseModelView = irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
-	TransposeInverseModelView *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-	TransposeInverseModelView.makeInverse();
-	TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+    core::matrix4 TransposeInverseModelView = irr_driver->getViewMatrix();
+    TransposeInverseModelView *= ModelMatrix;
+    TransposeInverseModelView.makeInverse();
+    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
+    return TransposeInverseModelView;
 }
 
 core::vector3df getWind()
 {
-    const core::vector3df pos = irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD).getTranslation();
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
     GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
     float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
@@ -225,7 +226,8 @@ void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjecti
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView);
+  setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
 
   assert(mesh.vao_first_pass);
   glBindVertexArray(mesh.vao_first_pass);
@@ -658,40 +660,29 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawShadowRef(const GLMesh &mesh)
+void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::RefShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP, 0);
+    MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElements(ptype, count, itype, 0);
 }
 
-void drawShadow(const GLMesh &mesh)
+void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-
-    /*    if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-    {
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    glUseProgram(MeshShader::GrassShadowShader::Program);
-    MeshShader::GrassShadowShader::setUniforms(ShadowMVP, windDir, 0);
-    }*/
-
-    MeshShader::ShadowShader::setUniforms(irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD), ShadowMVP);
+    MeshShader::ShadowShader::setUniforms(ModelMatrix);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
@@ -743,7 +734,7 @@ void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedM
     {
     case FPSM_DEFAULT:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectPass1Shader::attrib_position, -1, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+            MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
         mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
         break;
     case FPSM_ALPHA_REF_TEXTURE:

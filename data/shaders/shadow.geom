@@ -1,4 +1,7 @@
-uniform mat4 ViewProjectionMatrix[4];
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewProjectionMatrix[4];
+};
 
 #if __VERSION__ >= 400
 layout(triangles, invocations=4) in;

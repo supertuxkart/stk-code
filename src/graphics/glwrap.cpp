@@ -57,10 +57,15 @@ PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLTEXIMAGE3DPROC glTexImage3D;
 PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
+PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
+PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
+PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
 #endif
 
 static bool is_gl_init = false;
@@ -197,10 +202,15 @@ void initGL()
 	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
     glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenFramebuffers");
     glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindFramebuffer");
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture2D");
     glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
     glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
     glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
     glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
+    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)IRR_OGL_LOAD_EXTENSION("glTexImage2DMultisample");
+    glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBlitFramebuffer");
+    glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformBlockIndex");
+    glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)IRR_OGL_LOAD_EXTENSION("glUniformBlockBinding");
 #ifdef DEBUG
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
@@ -305,10 +315,20 @@ void transformTexturesTosRGB(irr::video::ITexture *tex)
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-    if (tex->hasAlpha())
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    if (irr_driver->getGLSLVersion() < 150)
+    {
+        if (tex->hasAlpha())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    }
     else
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    {
+        if (tex->hasAlpha())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    }
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 }
@@ -331,6 +351,15 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     {
         Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
     }
+}
+
+void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, Src);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,

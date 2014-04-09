@@ -73,42 +73,11 @@ namespace Online
             };   // SignOutRequest
 
             // ----------------------------------------------------------------
-
-            class ServerJoinRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                ServerJoinRequest() : XMLRequest() {}
-            };   // ServerJoinRequest
-
-            // ----------------------------------------------------------------
-            class SetAddonVoteRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                SetAddonVoteRequest() : XMLRequest() {}
-            };   // SetAddonVoteRequest
-
-            // ----------------------------------------------------------------
-            class CancelFriendRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                CancelFriendRequest() : XMLRequest(true) {}
-            };   // CancelFriendRequest
-
-            // ----------------------------------------------------------------
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 PollRequest() : XMLRequest(true) {}
             };   // PollRequest
-
-            // ----------------------------------------------------------------
-            class ChangePasswordRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                ChangePasswordRequest() : XMLRequest(true) {}
-            };   // ChangePasswordRequest
-
 
         private:
             std::string                 m_token;
@@ -127,7 +96,8 @@ namespace Online
             /**Singleton */
             static CurrentUser *            get();
             static void                     deallocate();
-            static void setUserDetails(HTTPRequest *request);
+            static void setUserDetails(HTTPRequest *request, 
+                                       const std::string &action);
 
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
@@ -135,20 +105,9 @@ namespace Online
                                                             bool save_session,
                                                             bool request_now = true);
             void                            requestSignOut();
-            ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
-            const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
-            const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
             void                            requestFriendRequest(const uint32_t friend_id) const;
-            void                            requestCancelFriend(const uint32_t friend_id) const;
-            void                            requestPasswordChange(  const irr::core::stringw &current_password,
-                                                                    const irr::core::stringw &new_password,
-                                                                    const irr::core::stringw &new_password_ver) const;
-
-            XMLRequest *                    requestUserSearch(const irr::core::stringw & search_string) const;
-
             void                            onSTKQuit() const;
-            void                            onAchieving(uint32_t achievement_id) const;
             void                            requestPoll() const;
 
             irr::core::stringw              getUserName()           const;

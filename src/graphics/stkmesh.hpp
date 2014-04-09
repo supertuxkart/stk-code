@@ -60,8 +60,8 @@ GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_t
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
 void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
 void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat);
-void computeMVP(core::matrix4 &ModelViewProjectionMatrix);
-void computeTIMV(core::matrix4 &TransposeInverseModelView);
+core::matrix4 computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
+core::matrix4 computeTIMV(const core::matrix4 &TransposeInverseModelView);
 bool isObject(video::E_MATERIAL_TYPE type);
 
 core::vector3df getWind();
@@ -85,8 +85,8 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 // Shadow pass
-void drawShadowRef(const GLMesh &mesh);
-void drawShadow(const GLMesh &mesh);
+void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
+void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
 
 // Forward pass (for transparents meshes)
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);

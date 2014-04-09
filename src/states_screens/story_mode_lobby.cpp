@@ -55,7 +55,7 @@ void StoryModeLobbyScreen::init()
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
 
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(player)
     {
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());

@@ -8,8 +8,11 @@ STKInstancedSceneNode::STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-    createGLMeshes();
-    setAutomaticCulling(0);
+    if (irr_driver->isGLSL())
+    {
+        createGLMeshes();
+        setAutomaticCulling(0);
+    }
 }
 
 void STKInstancedSceneNode::cleanGL()
@@ -39,7 +42,8 @@ void STKInstancedSceneNode::cleanGL()
 
 STKInstancedSceneNode::~STKInstancedSceneNode()
 {
-    cleanGL();
+    if (irr_driver->isGLSL())
+        cleanGL();
 }
 
 void STKInstancedSceneNode::createGLMeshes()
@@ -77,9 +81,12 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectPass1Shader>();
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
-        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-        setInstanceAttribPointer<MeshShader::InstancedShadowShader>();
+        if (irr_driver->getGLSLVersion() >= 150)
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+            glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+            setInstanceAttribPointer<MeshShader::InstancedShadowShader>();
+        }
         break;
     case FPSM_ALPHA_REF_TEXTURE:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -88,9 +95,12 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectRefPass1Shader>();
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedRefShadowShader::attrib_position, MeshShader::InstancedRefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-        setInstanceAttribPointer<MeshShader::InstancedRefShadowShader>();
+        if (irr_driver->getGLSLVersion() >= 150)
+        {
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedRefShadowShader::attrib_position, MeshShader::InstancedRefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+            glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+            setInstanceAttribPointer<MeshShader::InstancedRefShadowShader>();
+        }
         break;
     case FPSM_GRASS:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
@@ -176,10 +186,8 @@ static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjecti
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  core::matrix4 InverseViewMatrix;
-  irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW).getInverse(InverseViewMatrix);
-
-  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix);
+  setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), 0);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -192,8 +200,7 @@ static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    MeshShader::InstancedShadowShader::setUniforms(ShadowMVP);
+    MeshShader::InstancedShadowShader::setUniforms();
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
@@ -207,11 +214,8 @@ static void drawFSPMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelView
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    core::matrix4 InverseViewMatrix;
-    irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW).getInverse(InverseViewMatrix);
-
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix, 0);
+    MeshShader::InstancedObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), 0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -224,10 +228,8 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedRefShadowShader::setUniforms(ShadowMVP, 0);
+    MeshShader::InstancedRefShadowShader::setUniforms(0);
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
@@ -241,11 +243,8 @@ static void drawFSPMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjection
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    core::matrix4 InverseViewMatrix;
-    irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW).getInverse(InverseViewMatrix);
-
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedGrassPass1Shader::setUniforms(ModelViewProjectionMatrix, InverseViewMatrix, windDir, 0);
+    MeshShader::InstancedGrassPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), windDir, 0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -289,7 +288,7 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
     size_t count = mesh.IndexCount;
 
     setTexture(MeshShader::InstancedGrassPass2Shader::TU_Albedo, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    setTexture(MeshShader::InstancedGrassPass2Shader::TU_dtex, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(MeshShader::InstancedGrassPass2Shader::TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
     MeshShader::InstancedGrassPass2Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), irr_driver->getInvProjMatrix(), windDir, cb->getPosition());
@@ -300,12 +299,18 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
 
 void STKInstancedSceneNode::render()
 {
+    if (!irr_driver->isGLSL())
+    {
+        CMeshSceneNode::render();
+        return;
+    }
+
     setFirstTimeMaterial();
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
-        ModelViewProjectionMatrix = irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION);
-        ModelViewProjectionMatrix *= irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW);
+        ModelViewProjectionMatrix = irr_driver->getProjMatrix();
+        ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
 
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::InstancedObjectPass1Shader::Program);

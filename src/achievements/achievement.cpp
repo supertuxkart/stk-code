@@ -23,6 +23,7 @@
 #include "achievements/achievement_info.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "io/utf_writer.hpp"
+#include "online/current_user.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -204,8 +205,17 @@ void Achievement::check()
         GUIEngine::DialogQueue::get()->pushDialog(
             new NotificationDialog(NotificationDialog::T_Achievements, s));
 
-        //send to server
-        Online::CurrentUser::get()->onAchieving(m_id);
+        // Sends a confirmation to the server that an achievement has been
+        // completed, if a user is signed in.
+        Online::CurrentUser *cu = Online::CurrentUser::get();
+        if (cu->isRegisteredUser())
+        {
+            Online::HTTPRequest * request = new Online::HTTPRequest(true);
+            Online::CurrentUser::setUserDetails(request, "achieving");
+            request->addParameter("achievementid", m_id);
+            request->queue();
+        }
+
         m_achieved = true;
     }
 }   // check

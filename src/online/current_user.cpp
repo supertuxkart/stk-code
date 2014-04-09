@@ -20,8 +20,6 @@
 #include "online/current_user.hpp"
 
 #include "achievements/achievements_manager.hpp"
-#include "addons/addon.hpp"
-#include "addons/addons_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/dialog_queue.hpp"
@@ -68,15 +66,20 @@ namespace Online
      *  to allow for shorter request creation code. It sets the name of
      *  the script to invokce, token, and user id.
      *  \param request The http request.
+     *  \param action If not empty, the action to be set.
      */
-    void CurrentUser::setUserDetails(HTTPRequest *request)
+    void CurrentUser::setUserDetails(HTTPRequest *request,
+                                     const std::string &action)
     {
         CurrentUser *cu = CurrentUser::get();
-        assert(cu && cu->m_state == US_SIGNED_IN);
-        assert(cu->m_profile);
         request->setServerURL("client-user.php");
-        request->addParameter("token", cu->m_token);
-        request->addParameter("userid", cu->m_profile->getID());
+
+        if (cu && cu->m_profile)
+            request->addParameter("userid", cu->m_profile->getID());
+        if(cu->m_state == US_SIGNED_IN)
+            request->addParameter("token", cu->m_token);
+        if (action.size() > 0)
+            request->addParameter("action", action);
     }   // setUserDetails
 
     // ========================================================================
@@ -94,14 +97,14 @@ namespace Online
     void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if(m_state == US_SIGNED_OUT  && UserConfigParams::m_saved_session)
+        const PlayerProfile *cp = PlayerManager::getCurrentPlayer();
+        if (m_state == US_SIGNED_OUT  && cp->hasSavedSession() )
         {
             request = new SignInRequest(true);
             request->setServerURL("client-user.php");
             request->addParameter("action","saved-session");
-            request->addParameter("userid", UserConfigParams::m_saved_user);
-            request->addParameter("token",
-                                  UserConfigParams::m_saved_token.c_str());
+            request->addParameter("userid", cp->getSavedUserId());
+            request->addParameter("token", cp->getSavedToken());
             request->queue();
             m_state = US_SIGNING_IN;
         }
@@ -176,9 +179,8 @@ namespace Online
             m_state = US_SIGNED_IN;
             if(saveSession())
             {
-                UserConfigParams::m_saved_user    = getID();
-                UserConfigParams::m_saved_token   = getToken();
-                UserConfigParams::m_saved_session = true;
+                PlayerManager::getCurrentPlayer()->saveSession(getID(), 
+                                                               getToken() );
             }
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
@@ -228,194 +230,8 @@ namespace Online
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         m_state = US_SIGNED_OUT;
-        UserConfigParams::m_saved_user = 0;
-        UserConfigParams::m_saved_token = "";
-        UserConfigParams::m_saved_session = false;
+        PlayerManager::getCurrentPlayer()->clearSession();
     }   // signOut
-
-    // ------------------------------------------------------------------------
-    CurrentUser::ServerJoinRequest*
-                             CurrentUser::requestServerJoin(uint32_t server_id,
-                                                            bool request_now)
-    {
-        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
-        ServerJoinRequest * request = new ServerJoinRequest();
-        request->setServerURL("address-management.php");
-        request->addParameter("action","request-connection");
-        request->addParameter("token", getToken());
-        request->addParameter("id", getID());
-        request->addParameter("server_id", server_id);
-        if (request_now)
-            request->queue();
-        return request;
-    }   // requestServerJoin
-
-    // ------------------------------------------------------------------------
-    void CurrentUser::ServerJoinRequest::callback()
-    {
-        if(isSuccess())
-        {
-            uint32_t server_id;
-            getXMLData()->get("serverid", &server_id);
-            ServersManager::get()->setJoinedServer(server_id);
-        }
-        //FIXME needs changes for actual valid joining
-    }   // ServerJoinRequest::callback
-
-    // ------------------------------------------------------------------------
-    const XMLRequest*
-           CurrentUser::requestGetAddonVote(const std::string & addon_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        XMLRequest * request = new XMLRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "get-addon-vote");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("addonid", addon_id.substr(6));
-        request->queue();
-        return request;
-    }   // requestGetAddonVote
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to perform a vote on an addon.
-     *  \param addon_id the id of the addon to vote for.
-     *  \param rating the voted rating.
-     */
-    const CurrentUser::SetAddonVoteRequest*
-                 CurrentUser::requestSetAddonVote(const std::string & addon_id,
-                                                  float rating) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::SetAddonVoteRequest * request =
-                                        new CurrentUser::SetAddonVoteRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "set-addon-vote");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("addonid", addon_id.substr(6));
-        request->addParameter("rating", rating);
-        request->queue();
-        return request;
-    }   // requestSetAddonVote
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to vote for an addon. Updates the local
-     *  average rating.
-     */
-    void CurrentUser::SetAddonVoteRequest::callback()
-    {
-        if(isSuccess())
-        {
-            std::string addon_id;
-            getXMLData()->get("addon-id", &addon_id);
-            float average;
-            getXMLData()->get("new-average", &average);
-            addons_manager->getAddon(Addon::createAddonId(addon_id))
-                          ->setRating(average);
-        }
-    }   // SetAddonVoteRequest::callback
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to fetch matching results for the supplied
-     *  search term.
-     *  \param search_string the string to search for.
-     */
-    XMLRequest*
-        CurrentUser::requestUserSearch(const core::stringw &search_string) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        XMLRequest * request = new XMLRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "user-search");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("search-string", search_string);
-        request->queue();
-        return request;
-    }   // requestUserSearch
-
-    // ------------------------------------------------------------------------
-    void CurrentUser::requestCancelFriend(const uint32_t friend_id) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        CurrentUser::CancelFriendRequest * request =
-                                        new CurrentUser::CancelFriendRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "cancel-friend-request");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
-        request->addParameter("friendid", friend_id);
-        request->queue();
-    }   // requestCancelFriend
-
-    // ------------------------------------------------------------------------
-    /** Callback for the request to cancel a friend invitation. Shows a
-     *  confirmation message and takes care of updating all the cached
-     *  information.
-     */
-    void CurrentUser::CancelFriendRequest::callback()
-    {
-        uint32_t id(0);
-        getXMLData()->get("friendid", &id);
-        core::stringw info_text("");
-        if(isSuccess())
-        {
-            CurrentUser::get()->getProfile()->removeFriend(id);
-            ProfileManager::get()->moveToCache(id);
-            ProfileManager::get()->getProfileByID(id)->deleteRelationalInfo();
-            OnlineProfileFriends::getInstance()->refreshFriendsList();
-            info_text = _("Friend request cancelled!");
-        }
-        else
-            info_text = getInfo();
-        UserInfoDialog *dia = new UserInfoDialog(id, info_text,!isSuccess(),
-                                                 true);
-        GUIEngine::DialogQueue::get()->pushDialog(dia, true);
-    }   // CancelFriendRequest::callback
-
-    // ------------------------------------------------------------------------
-    /** A request to the server, to change the password of the signed in user.
-     *  \param current_password The active password of the currently signed in
-     *         user.
-     *  \param new_password     The password the user wants to change to.
-     *  \param new_password_ver Confirmation of that password. Has to be the
-     *         exact same.
-     */
-    void CurrentUser::requestPasswordChange(const core::stringw &current_password,
-                                            const core::stringw &new_password,
-                                     const core::stringw &new_password_ver) const
-    {
-        assert(m_state == US_SIGNED_IN);
-        ChangePasswordRequest * request = new ChangePasswordRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "change_password");
-        request->addParameter("userid", getID());
-        request->addParameter("current", current_password);
-        request->addParameter("new1", new_password);
-        request->addParameter("new2", new_password_ver);
-        request->queue();
-    }   // requestPasswordChange
-    // ------------------------------------------------------------------------
-    /** Callback for the change password request. If the matching dialog is
-     *  still open, show a confirmation message.
-     */
-    void CurrentUser::ChangePasswordRequest::callback()
-    {
-        if(GUIEngine::ModalDialog::isADialogActive())
-        {
-            ChangePasswordDialog * dialog  =
-                dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog
-                                                             ::getCurrent());
-            if(dialog != NULL)
-            {
-                if(isSuccess())
-                    dialog->success();
-                else
-                    dialog->error(getInfo());
-            }
-        }
-    }   // ChangePasswordRequest::callback
 
     // ------------------------------------------------------------------------
     /** Sends a request to the server to see if any new information is
@@ -585,25 +401,6 @@ namespace Online
             request->queue();
         }
     }
-
-    // ------------------------------------------------------------------------
-    /** Sends a confirmation to the server that an achievement has been
-     *  completed, if a user is signed in.
-     *  \param achievement_id the id of the achievement that got completed.
-     */
-    void CurrentUser::onAchieving(uint32_t achievement_id) const
-    {
-        if(isRegisteredUser())
-        {
-            HTTPRequest * request = new HTTPRequest(true);
-            request->setServerURL("client-user.php");
-            request->addParameter("action", "achieving");
-            request->addParameter("token", getToken());
-            request->addParameter("userid", getID());
-            request->addParameter("achievementid", achievement_id);
-            request->queue();
-        }
-    }   // onAchieving
 
     // ------------------------------------------------------------------------
     /** \return the username if signed in. */

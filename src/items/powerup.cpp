@@ -176,7 +176,7 @@ void Powerup::use()
     // The player gets an achievement point for using a powerup
     StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
     if (m_type != PowerupManager::POWERUP_NOTHING &&
-        player != NULL && player->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+        player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
     {
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
     }

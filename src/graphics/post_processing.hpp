@@ -81,22 +81,18 @@ public:
     void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
 
     /** Blur the in texture */
-    void renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
-    void renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height);
+    void renderGaussian3Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t inv_width, size_t inv_height);
+    void renderGaussian6Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
 
     /** Render tex. Used for blit/texture resize */
-    void renderPassThrough(video::ITexture *tex);
     void renderPassThrough(unsigned tex);
-    void applyMLAA(video::ITexture *in, video::ITexture *out);
+    void applyMLAA();
 
-    void renderMotionBlur(unsigned cam, video::ITexture *in, video::ITexture *out);
-    void renderGlow(video::ITexture *tex);
+    void renderMotionBlur(unsigned cam, unsigned in_rtt, unsigned out_fbo);
+    void renderGlow(unsigned tex);
 
     /** Render the post-processed scene */
     void         render();
-
-    /** Draw the quad for this camera */
-    void         drawQuad(u32 cam, const video::SMaterial &mat);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);

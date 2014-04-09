@@ -38,7 +38,7 @@ public:
         Info  = 2,
     };
     RecoveryDialog();
-    ~RecoveryDialog();
+    virtual ~RecoveryDialog();
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

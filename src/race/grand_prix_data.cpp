@@ -223,7 +223,7 @@ bool GrandPrixData::checkConsistency(bool chatty) const
 bool GrandPrixData::isTrackAvailable(const std::string &id) const
 {
     return id!="fortmagma" ||
-           !PlayerManager::get()->getCurrentPlayer()->isLocked("fortmagma");
+           !PlayerManager::getCurrentPlayer()->isLocked("fortmagma");
 }   // isTrackAvailable
 
 // ----------------------------------------------------------------------------

@@ -444,7 +444,7 @@ void ParticleSystemProxy::drawFlip()
     };
 
     setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(1, static_cast<video::COpenGLFBOTexture *>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
 
     ParticleShader::FlipParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
 
@@ -466,7 +466,7 @@ void ParticleSystemProxy::drawNotFlip()
     };
 
     setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(1, static_cast<video::COpenGLFBOTexture *>(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH))->DepthBufferTexture, GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
 
     ParticleShader::SimpleParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(),
         irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1, this);

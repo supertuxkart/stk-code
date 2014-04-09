@@ -80,7 +80,7 @@ void OptionsScreenPlayers::init()
     refreshPlayerList();
 
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
-    unsigned int playerID = PlayerManager::get()->getCurrentPlayer()->getUniqueID();
+    unsigned int playerID = PlayerManager::getCurrentPlayer()->getUniqueID();
     core::stringw player_name = L"-";
     const PlayerProfile* curr = PlayerManager::get()->getPlayerById(playerID);
     if(curr)

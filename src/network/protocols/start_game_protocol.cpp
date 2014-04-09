@@ -115,7 +115,7 @@ void StartGameProtocol::update()
                 rki.setGlobalPlayerId(profile->race_id);
                 rki.setLocalPlayerId(is_me?0:1);
                 rki.setHostId(profile->race_id);
-                PlayerProfile* profile_to_use = PlayerManager::get()->getCurrentPlayer();
+                PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
                 assert(profile_to_use);
                 InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
                 int new_player_id = 0;

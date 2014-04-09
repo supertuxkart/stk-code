@@ -191,7 +191,11 @@ void OnlineUserSearch::search()
 {
     if (m_search_string != "" && m_last_search_string != m_search_string)
     {
-        m_search_request = CurrentUser::get()->requestUserSearch(m_search_string);
+        m_search_request = new XMLRequest();
+        CurrentUser::setUserDetails(m_search_request, "user-search");
+        m_search_request->addParameter("search-string", m_search_string);
+        m_search_request->queue();
+
         m_user_list_widget->clear();
         m_user_list_widget->addItem("spacer", L"");
         m_user_list_widget->addItem("loading", Messages::searching());
@@ -199,7 +203,7 @@ void OnlineUserSearch::search()
         m_search_box_widget->setDeactivated();
         m_search_button_widget->setDeactivated();
     }
-}   // sarch
+}   // search
 
 
 // ----------------------------------------------------------------------------

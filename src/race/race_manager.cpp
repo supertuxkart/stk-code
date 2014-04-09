@@ -632,7 +632,7 @@ void RaceManager::exitRace(bool delete_world)
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
     {
-        PlayerManager::get()->getCurrentPlayer()->grandPrixFinished();
+        PlayerManager::getCurrentPlayer()->grandPrixFinished();
         if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
         {
             //Delete saved GP

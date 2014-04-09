@@ -62,9 +62,30 @@ enum TypeRTT
     RTT_HALF_SOFT,
 
     RTT_DISPLACE,
-    RTT_FINAL_COLOR,
+    RTT_MLAA_COLORS,
 
     RTT_COUNT
+};
+
+enum TypeFBO
+{
+    FBO_SSAO,
+    FBO_NORMAL_AND_DEPTHS,
+    FBO_COMBINED_TMP1_TMP2,
+    FBO_COLORS,
+    FBO_LOG_LUMINANCE,
+    FBO_MLAA_COLORS,
+    FBO_TMP1_WITH_DS,
+    FBO_TMP2_WITH_DS,
+    FBO_TMP4,
+    FBO_HALF1,
+    FBO_HALF2,
+    FBO_QUARTER1,
+    FBO_QUARTER2,
+    FBO_EIGHTH1,
+    FBO_EIGHTH2,
+    FBO_DISPLACE,
+    FBO_COUNT
 };
 
 class RTT
@@ -73,12 +94,16 @@ public:
     RTT();
     ~RTT();
 
-    ITexture *getRTT(TypeRTT which);
     unsigned getShadowFBO() const { return shadowFBO; }
     unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
+    unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
+    unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
+    unsigned getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
-    ITexture *rtts[RTT_COUNT];
+    unsigned RenderTargetTextures[RTT_COUNT], FrameBuffers[FBO_COUNT];
+    unsigned DepthStencilTexture;
+
     unsigned shadowFBO, shadowColorTex, shadowDepthTex;
 };
 

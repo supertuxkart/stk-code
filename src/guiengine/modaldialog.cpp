@@ -174,6 +174,8 @@ ModalDialog::~ModalDialog()
 
 void ModalDialog::clearWindow()
 {
+    assert(m_irrlicht_window != NULL);
+
     Widget* w;
     for_in (w, m_widgets)
     {
@@ -182,8 +184,7 @@ void ModalDialog::clearWindow()
     elementsWereDeleted();
     m_widgets.clearAndDeleteAll();
 
-    if(m_irrlicht_window)
-        m_irrlicht_window->remove();
+    m_irrlicht_window->remove();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
 }   // clearWindow
 

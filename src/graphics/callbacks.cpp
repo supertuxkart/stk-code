@@ -91,35 +91,6 @@ void WaterShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void GrassShaderProvider::OnSetConstants(IMaterialRendererServices *srv, int userData)
 {
-    IVideoDriver * const drv = srv->getVideoDriver();
-    const core::vector3df pos = drv->getTransform(ETS_WORLD).getTranslation();
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-
-    float strength = (pos.X + pos.Y + pos.Z) * 1.2f + time * m_speed;
-    strength = noise2d(strength / 10.0f) * m_amplitude * 5;
-    // * 5 is to work with the existing amplitude values.
-
-    // Pre-multiply on the cpu
-    vector3df wind = irr_driver->getWind() * strength;
-    core::matrix4 ModelViewProjectionMatrix = drv->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= drv->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= drv->getTransform(ETS_WORLD);
-    core::matrix4 TransposeInverseModelView = drv->getTransform(ETS_VIEW);
-    TransposeInverseModelView *= drv->getTransform(ETS_WORLD);
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-    srv->setVertexShaderConstant("windDir", &wind.X, 3);
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
-
-    if (!firstdone)
-    {
-        s32 tex = 0;
-        srv->setVertexShaderConstant("tex", &tex, 1);
-
-        firstdone = true;
-    }
 }
 
 //-------------------------------------
@@ -150,32 +121,6 @@ void SkyboxProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void BubbleEffectProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    const float start = fabsf(mat.MaterialTypeParam2);
-    const bool visible = mat.MaterialTypeParam2 > 0;
-    const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-    float transparency;
-
-    const float diff = (time - start) / 3.0f;
-
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-
-    if (visible)
-    {
-        transparency = diff;
-    }
-    else
-    {
-        transparency = 1.0f - diff;
-    }
-
-    transparency = clampf(transparency, 0, 1);
-
-    srv->setVertexShaderConstant("time", &time, 1);
-    srv->setVertexShaderConstant("transparency", &transparency, 1);
 }
 
 //-------------------------------------
@@ -244,46 +189,12 @@ void MipVizProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void ColorizeProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("col", m_color, 3);
 }
 
 //-------------------------------------
 
 void ObjectPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    core::matrix4 TransposeInverseModelView = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    TransposeInverseModelView *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("TransposeInverseModelView", TransposeInverseModelView.pointer(), 16);
-    srv->setVertexShaderConstant("TextureMatrix0", mat.getTextureMatrix(0).pointer(), 16);
-    srv->setVertexShaderConstant("TextureMatrix1", mat.getTextureMatrix(1).pointer(), 16);
-
-    const int hastex = mat.TextureLayer[0].Texture != NULL;
-    srv->setVertexShaderConstant("hastex", &hastex, 1);
-
-    const int haslightmap = mat.TextureLayer[1].Texture != NULL;
-    srv->setVertexShaderConstant("haslightmap", &haslightmap, 1);
-
-    //if (!firstdone)
-    // Can't use the firstdone optimization, as this callback is used for multiple shaders
-    {
-        int tex = 0;
-        srv->setVertexShaderConstant("tex", &tex, 1);
-
-        tex = 1;
-        srv->setVertexShaderConstant("lighttex", &tex, 1);
-    }
 }
 
 //-------------------------------------
@@ -344,83 +255,6 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 //-------------------------------------
 
-void MLAAColor1Provider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-
-    if (!firstdone)
-    {
-        const float pixels[2] = {
-            1.0f / UserConfigParams::m_width,
-            1.0f / UserConfigParams::m_height
-        };
-
-        srv->setPixelShaderConstant("PIXEL_SIZE", pixels, 2);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void MLAABlend2Provider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    if (!firstdone)
-    {
-        const float pixels[2] = {
-            1.0f / UserConfigParams::m_width,
-            1.0f / UserConfigParams::m_height
-        };
-
-        srv->setPixelShaderConstant("PIXEL_SIZE", pixels, 2);
-
-
-        int tex = 0;
-        srv->setPixelShaderConstant("edgesMap", &tex, 1);
-
-        tex = 1;
-        srv->setPixelShaderConstant("areaMap", &tex, 1);
-
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
-
-void MLAANeigh3Provider::OnSetConstants(IMaterialRendererServices *srv, int)
-{
-    core::matrix4 ModelViewProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewProjectionMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
-
-    srv->setVertexShaderConstant("ModelViewProjectionMatrix", ModelViewProjectionMatrix.pointer(), 16);
-
-    if (!firstdone)
-    {
-        const float pixels[2] = {
-            1.0f / UserConfigParams::m_width,
-            1.0f / UserConfigParams::m_height
-        };
-
-        srv->setPixelShaderConstant("PIXEL_SIZE", pixels, 2);
-
-
-        int tex = 0;
-        srv->setPixelShaderConstant("blendMap", &tex, 1);
-
-        tex = 1;
-        srv->setPixelShaderConstant("colorMap", &tex, 1);
-
-        firstdone = true;
-    }
-}
-
-//-------------------------------------
 
 void ShadowPassProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
@@ -543,17 +377,7 @@ void ShadowGenProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 {
-    core::matrix4 ProjectionMatrix = srv->getVideoDriver()->getTransform(ETS_PROJECTION);
-    core::matrix4 ModelViewMatrix = srv->getVideoDriver()->getTransform(ETS_VIEW);
-    ModelViewMatrix *= srv->getVideoDriver()->getTransform(ETS_WORLD);
 
-    srv->setVertexShaderConstant("ProjectionMatrix", ProjectionMatrix.pointer(), 16);
-    srv->setVertexShaderConstant("ModelViewMatrix", ModelViewMatrix.pointer(), 16);
-
-    srv->setVertexShaderConstant("dir", m_dir, 2);
-    srv->setVertexShaderConstant("dir2", m_dir2, 2);
-
-    srv->setVertexShaderConstant("screen", m_screen, 2);
 }
 
 void DisplaceProvider::update()

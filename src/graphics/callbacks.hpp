@@ -395,7 +395,7 @@ public:
     {
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
         // Sun "position" is actually a direction and not a position
-        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
+        core::matrix4 m_view = irr_driver->getViewMatrix();
         m_view.makeInverse();
         m_view = m_view.getTransposed();
         core::vector3df pos(x, y, z);
@@ -422,30 +422,6 @@ private:
     float m_pos[3];
     float m_screen[2];
     float m_wind[2];
-};
-
-//
-
-class MLAAColor1Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAABlend2Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAANeigh3Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 };
 
 //

@@ -355,7 +355,7 @@ bool KartPropertiesManager::kartAvailable(int kartid)
         if ( kartid == *it) return false;
     }
     const KartProperties *kartprop = getKartById(kartid);
-    if( PlayerManager::get()->getCurrentPlayer()->isLocked(kartprop->getIdent()) )
+    if( PlayerManager::getCurrentPlayer()->isLocked(kartprop->getIdent()) )
         return false;
     return true;
 }   // kartAvailable
@@ -464,7 +464,7 @@ void KartPropertiesManager::getRandomKartList(int count,
                 const KartProperties &kp=m_karts_properties[karts_in_group[i]];
                 if (!used[karts_in_group[i]]                 &&
                     m_kart_available[karts_in_group[i]]      &&
-                    !PlayerManager::get()->getCurrentPlayer()->isLocked(kp.getIdent())   )
+                    !PlayerManager::getCurrentPlayer()->isLocked(kp.getIdent())   )
                 {
                     random_kart_queue.push_back(kp.getIdent());
                 }
