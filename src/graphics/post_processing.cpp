@@ -309,7 +309,7 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
 
 void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tmp_fbo, GLuint tmp_tex, size_t width, size_t height)
 {
-    float inv_width = 1. / width, inv_height = 1. / height;
+    float inv_width = 1.0f / width, inv_height = 1.0f / height;
     {
         glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
         glUseProgram(FullScreenShader::Gaussian3VBlurShader::Program);
@@ -342,7 +342,7 @@ void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
 
 void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tmp_fbo, GLuint tmp_tex, size_t width, size_t height)
 {
-    float inv_width = 1. / width, inv_height = 1. / height;
+    float inv_width = 1.f / width, inv_height = 1.f / height;
     {
         glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
         glUseProgram(FullScreenShader::Gaussian6VBlurShader::Program);
@@ -489,7 +489,10 @@ void PostProcessing::renderMotionBlur(unsigned cam, GLuint in_rtt, GLuint out_fb
     setTexture(0, in_rtt, GL_NEAREST, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    FullScreenShader::MotionBlurShader::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam), cb->getDirection(cam), 0.15, cb->getMaxHeight(cam) * 0.7, 0);
+    FullScreenShader::MotionBlurShader
+                    ::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam),
+                                  cb->getDirection(cam), 0.15f, 
+                                  cb->getMaxHeight(cam) * 0.7f, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

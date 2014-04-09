@@ -164,7 +164,12 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP4), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
-    MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix, core::vector2df(cb->getDirX(), cb->getDirY()), core::vector2df(cb->getDir2X(), cb->getDir2Y()), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1, 2);
+    MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix,
+                                            core::vector2df(cb->getDirX(), cb->getDirY()),
+                                            core::vector2df(cb->getDir2X(), cb->getDir2Y()),
+                                            core::vector2df(float(UserConfigParams::m_width),
+                                                            float(UserConfigParams::m_height)), 
+                                            0, 1, 2);
 
     assert(mesh.vao_displace_pass);
     glBindVertexArray(mesh.vao_displace_pass);

@@ -671,7 +671,7 @@ namespace MeshShader
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
@@ -722,7 +722,7 @@ namespace MeshShader
     {
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
@@ -773,7 +773,7 @@ namespace MeshShader
     {
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
@@ -820,7 +820,7 @@ namespace MeshShader
 	void DetailledObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
@@ -895,7 +895,7 @@ namespace MeshShader
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
 		glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
@@ -932,7 +932,7 @@ namespace MeshShader
 	void UntexturedObjectShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
 	{
 	  glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-	  glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+	  glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 	  const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 	  glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
@@ -978,7 +978,7 @@ namespace MeshShader
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
@@ -1023,7 +1023,7 @@ namespace MeshShader
 	void GrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 		glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
@@ -1090,7 +1090,7 @@ namespace MeshShader
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
         glUniformMatrix4fv(uniform_IVM, 1, GL_FALSE, InverseViewMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
         glUniform3f(uniform_SunDir, SunDir.X, SunDir.Y, SunDir.Z);
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
@@ -1189,7 +1189,7 @@ namespace MeshShader
 	void SplattingShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
 	{
 		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
 		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
 		glUniform3f(uniform_ambient, s.r, s.g, s.b);
 	}
@@ -1348,7 +1348,7 @@ namespace MeshShader
         glUniform1f(uniform_start, start);
         glUniform1f(uniform_end, end);
         glUniform3f(uniform_col, col.X, col.Y, col.Z);
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
         glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
@@ -2496,7 +2496,7 @@ namespace FullScreenShader
 
     void GodFadeShader::setUniforms(const SColor &col, unsigned TU_tex)
     {
-        glUniform3f(uniform_col, col.getRed() / 255., col.getGreen() / 255., col.getBlue() / 255.);
+        glUniform3f(uniform_col, col.getRed() / 255.f, col.getGreen() / 255.f, col.getBlue() / 255.f);
         glUniform1i(uniform_tex, TU_tex);
     }
 

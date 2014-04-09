@@ -427,26 +427,26 @@ float &tex_center_pos_x, float &tex_center_pos_y
         irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
     const int screen_w = frame_size.Width;
     const int screen_h = frame_size.Height;
-    center_pos_x = destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X;
+    center_pos_x = float(destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X);
     center_pos_x /= screen_w;
     center_pos_x -= 1.;
-    center_pos_y = destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y;
+    center_pos_y = float(destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y);
     center_pos_y /= screen_h;
-    center_pos_y = 1. - center_pos_y;
-    width = destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X;
+    center_pos_y = float(1.f - center_pos_y);
+    width = float(destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X);
     width /= screen_w;
-    height = destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y;
+    height = float(destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y);
     height /= screen_h;
 
     const core::dimension2d<u32>& ss = texture->getOriginalSize();
-    tex_center_pos_x = sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X;
-    tex_center_pos_x /= ss.Width * 2.;
-    tex_center_pos_y = sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y;
-    tex_center_pos_y /= ss.Height * 2.;
-    tex_width = sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X;
-    tex_width /= ss.Width * 2.;
-    tex_height = sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y;
-    tex_height /= ss.Height * 2.;
+    tex_center_pos_x = float(sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X);
+    tex_center_pos_x /= ss.Width * 2.f;
+    tex_center_pos_y = float(sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y);
+    tex_center_pos_y /= ss.Height * 2.f;
+    tex_width = float(sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X);
+    tex_width /= ss.Width * 2.f;
+    tex_height = float(sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y);
+    tex_height /= ss.Height * 2.f;
 
     if (texture->isRenderTarget())
     {
@@ -590,15 +590,15 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
 	const int screen_w = frame_size.Width;
 	const int screen_h = frame_size.Height;
-	float center_pos_x = position.UpperLeftCorner.X + position.LowerRightCorner.X;
+	float center_pos_x = float(position.UpperLeftCorner.X + position.LowerRightCorner.X);
 	center_pos_x /= screen_w;
 	center_pos_x -= 1;
-	float center_pos_y = position.UpperLeftCorner.Y + position.LowerRightCorner.Y;
+	float center_pos_y = float(position.UpperLeftCorner.Y + position.LowerRightCorner.Y);
 	center_pos_y /= screen_h;
 	center_pos_y = 1 - center_pos_y;
-	float width = position.LowerRightCorner.X - position.UpperLeftCorner.X;
+	float width = float(position.LowerRightCorner.X - position.UpperLeftCorner.X);
 	width /= screen_w;
-	float height = position.LowerRightCorner.Y - position.UpperLeftCorner.Y;
+	float height = float(position.LowerRightCorner.Y - position.UpperLeftCorner.Y);
 	height /= screen_h;
 
 	if (color.getAlpha() < 255)

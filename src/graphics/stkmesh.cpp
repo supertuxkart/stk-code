@@ -304,7 +304,10 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   }
 
-  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getViewMatrix().getTransposed(), TransposeInverseModelView, irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
+  MeshShader::SphereMapShader
+            ::setUniforms(ModelViewProjectionMatrix, irr_driver->getViewMatrix().getTransposed(),
+                          TransposeInverseModelView, irr_driver->getInvProjMatrix(),
+                          core::vector2df(float(UserConfigParams::m_width), float(UserConfigParams::m_height)));
 
   assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
@@ -441,7 +444,9 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
         CausticTex = irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str());
     setTexture(MeshShader::CausticsShader::TU_caustictex, getTextureGLuint(CausticTex), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
+    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2,
+                                            core::vector2df(float(UserConfigParams::m_width),
+                                                            float(UserConfigParams::m_height)));
 
     assert(mesh.vao_second_pass);
     glBindVertexArray(mesh.vao_second_pass);
