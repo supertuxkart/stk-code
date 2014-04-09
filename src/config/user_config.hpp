@@ -669,25 +669,6 @@ namespace UserConfigParams
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
 
-    PARAM_PREFIX BoolUserConfigParam        m_saved_session
-            PARAM_DEFAULT(  BoolUserConfigParam(    false,
-                                                    "saved_session",
-                                                    &m_online_group,
-                                                    "Is there a saved session?") );
-
-    PARAM_PREFIX IntUserConfigParam         m_saved_user
-            PARAM_DEFAULT(  IntUserConfigParam(     0,
-                                                    "saved_user",
-                                                    &m_online_group,
-                                                    "User ID of the saved session.") );
-
-    PARAM_PREFIX StringUserConfigParam      m_saved_token
-            PARAM_DEFAULT(  StringUserConfigParam(  "",
-                                                    "saved_token",
-                                                    &m_online_group,
-                                                    "Token of the saved session.") );
-
-
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
             PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",

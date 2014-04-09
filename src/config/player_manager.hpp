@@ -48,6 +48,10 @@ private:
     /** A pointer to the current player. */
     PlayerProfile* m_current_player;
 
+    /** Saves the XML tree from players.xml for use in the 2nd
+     * loading stage (loadRemainingData). */
+    const XMLNode *m_player_data;
+
     void load();
      PlayerManager();
     ~PlayerManager();
@@ -72,6 +76,7 @@ public:
     // ------------------------------------------------------------------------
     
     void save();
+    void loadRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
@@ -81,7 +86,10 @@ public:
     void enforceCurrentPlayer();
     // ------------------------------------------------------------------------
     /** Returns the current player. */
-    PlayerProfile* getCurrentPlayer() { return m_current_player; }
+    static PlayerProfile* getCurrentPlayer() 
+    {
+        return get()->m_current_player; 
+    }   // getCurrentPlayer
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------
@@ -100,7 +108,7 @@ public:
     /** A handy shortcut funtion. */
     static AchievementsStatus* getCurrentAchievementsStatus()
     {
-        return get()->getCurrentPlayer()->getAchievementsStatus();
+        return PlayerManager::getCurrentPlayer()->getAchievementsStatus();
     }   // getCurrentAchievementsStatus
     // ------------------------------------------------------------------------
     /** A handy shortcut to increase points for an achievement key of the

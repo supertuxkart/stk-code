@@ -144,7 +144,7 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
 {
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     int points_before = player->getPoints();
     int points_now = points_before + CHALLENGE_POINTS[difficulty];
 
@@ -410,7 +410,7 @@ void FeatureUnlockedCutScene::tearDown()
     m_all_kart_models.clearAndDeleteAll();
 
     // update point count and the list of locked/unlocked stuff
-    PlayerManager::get()->getCurrentPlayer()->computeActive();
+    PlayerManager::getCurrentPlayer()->computeActive();
 }   // tearDown
 
 // ----------------------------------------------------------------------------

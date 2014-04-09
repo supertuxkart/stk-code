@@ -97,14 +97,14 @@ namespace Online
     void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if(m_state == US_SIGNED_OUT  && UserConfigParams::m_saved_session)
+        const PlayerProfile *cp = PlayerManager::getCurrentPlayer();
+        if (m_state == US_SIGNED_OUT  && cp->hasSavedSession() )
         {
             request = new SignInRequest(true);
             request->setServerURL("client-user.php");
             request->addParameter("action","saved-session");
-            request->addParameter("userid", UserConfigParams::m_saved_user);
-            request->addParameter("token",
-                                  UserConfigParams::m_saved_token.c_str());
+            request->addParameter("userid", cp->getSavedUserId());
+            request->addParameter("token", cp->getSavedToken());
             request->queue();
             m_state = US_SIGNING_IN;
         }
@@ -179,9 +179,8 @@ namespace Online
             m_state = US_SIGNED_IN;
             if(saveSession())
             {
-                UserConfigParams::m_saved_user    = getID();
-                UserConfigParams::m_saved_token   = getToken();
-                UserConfigParams::m_saved_session = true;
+                PlayerManager::getCurrentPlayer()->saveSession(getID(), 
+                                                               getToken() );
             }
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
@@ -231,39 +230,8 @@ namespace Online
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         m_state = US_SIGNED_OUT;
-        UserConfigParams::m_saved_user = 0;
-        UserConfigParams::m_saved_token = "";
-        UserConfigParams::m_saved_session = false;
+        PlayerManager::getCurrentPlayer()->clearSession();
     }   // signOut
-
-    // ------------------------------------------------------------------------
-    CurrentUser::ServerJoinRequest*
-                             CurrentUser::requestServerJoin(uint32_t server_id,
-                                                            bool request_now)
-    {
-        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
-        ServerJoinRequest * request = new ServerJoinRequest();
-        request->setServerURL("address-management.php");
-        request->addParameter("action","request-connection");
-        request->addParameter("token", getToken());
-        request->addParameter("id", getID());
-        request->addParameter("server_id", server_id);
-        if (request_now)
-            request->queue();
-        return request;
-    }   // requestServerJoin
-
-    // ------------------------------------------------------------------------
-    void CurrentUser::ServerJoinRequest::callback()
-    {
-        if(isSuccess())
-        {
-            uint32_t server_id;
-            getXMLData()->get("serverid", &server_id);
-            ServersManager::get()->setJoinedServer(server_id);
-        }
-        //FIXME needs changes for actual valid joining
-    }   // ServerJoinRequest::callback
 
     // ------------------------------------------------------------------------
     /** Sends a request to the server to see if any new information is

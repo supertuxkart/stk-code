@@ -62,6 +62,15 @@ private:
     /** True if this is the default (last used) player. */
     bool m_is_default;
 
+    /** True if this user has a saved session. */
+    bool m_saved_session;
+
+    /** If a session was saved, this will be the online user id to use. */
+    int m_saved_user_id;
+
+    /** The token of the saved session. */
+    std::string m_saved_token;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -69,15 +78,18 @@ private:
 
 public:
 
-    PlayerProfile(const core::stringw& name, bool is_guest = false);
+    PlayerProfile(const core::stringw &name, bool is_guest = false);
 
-    PlayerProfile(const XMLNode* node);
+    PlayerProfile(const XMLNode *node);
 
     void save(UTFWriter &out);
+    void loadRemainingData(const XMLNode *node);
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
     bool operator>(const PlayerProfile &other);
     void raceFinished();
+    void saveSession(int user_id, const std::string &token);
+    void clearSession();
 
     // ------------------------------------------------------------------------
     ~PlayerProfile()
@@ -190,7 +202,24 @@ public:
     {
         return m_achievements_status;
     }   // getAchievementsStatus
-
+    // ------------------------------------------------------------------------
+    /** Returns true if a session was saved for this player. */
+    bool hasSavedSession() const { return m_saved_session;  }
+    // ------------------------------------------------------------------------
+    /** If a session was saved, return the id of the saved user. */
+    int getSavedUserId() const
+    { 
+        assert(m_saved_session);
+        return m_saved_user_id;
+    }   // getSavedUserId
+    // ------------------------------------------------------------------------
+    /** If a session was saved, return the token to use. */
+    const std::string& getSavedToken() const
+    {
+        assert(m_saved_session);
+        return m_saved_token;
+    }   // getSavedToken
+    // ------------------------------------------------------------------------
 };   // class PlayerProfile
 
 #endif

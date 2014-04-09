@@ -278,7 +278,7 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
 
         std::vector<const ChallengeData*> unlocked =
-            PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
+            PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
         if (unlocked.size() > 0)
         {
 
@@ -289,7 +289,7 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
             scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
             StateManager::get()->replaceTopMostScreen(scene);
-            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
+            PlayerManager::getCurrentPlayer()->clearUnlocked();
         }
         else
         {

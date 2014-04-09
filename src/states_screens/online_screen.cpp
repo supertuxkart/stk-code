@@ -29,24 +29,21 @@
 #include "input/input_manager.hpp"
 #include "io/file_manager.hpp"
 #include "main_loop.hpp"
+#include "modes/demo_world.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/connect_to_server.hpp"
+#include "network/protocols/request_connection.hpp"
+#include "online/messages.hpp"
+#include "online/profile_manager.hpp"
+#include "online/request.hpp"
+#include "online/servers_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
 #include "states_screens/server_selection.hpp"
 #include "states_screens/create_server_screen.hpp"
 #include "states_screens/online_profile_overview.hpp"
-#include "online/servers_manager.hpp"
-#include "online/messages.hpp"
-#include "online/profile_manager.hpp"
-#include "online/request.hpp"
-#include "modes/demo_world.hpp"
-
-#include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
-
-#include "network/protocol_manager.hpp"
-#include "network/protocols/connect_to_server.hpp"
-
 
 using namespace GUIEngine;
 using namespace Online;
@@ -95,6 +92,8 @@ void OnlineScreen::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
+/** Checks if the recorded state differs from the actual state and sets it.
+ */
 bool OnlineScreen::hasStateChanged()
 {
     CurrentUser::UserState previous_state = m_recorded_state;
@@ -102,7 +101,7 @@ bool OnlineScreen::hasStateChanged()
     if (previous_state != m_recorded_state)
         return true;
     return false;
-}
+}   // hasStateChanged
 
 // ----------------------------------------------------------------------------
 void OnlineScreen::beforeAddingWidget()
@@ -130,15 +129,14 @@ void OnlineScreen::beforeAddingWidget()
 
 } // beforeAddingWidget
 
-
-
 // ----------------------------------------------------------------------------
 void OnlineScreen::init()
 {
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    m_online_status_widget->setText(Messages::signedInAs(CurrentUser::get()->getUserName()), false);
+    core::stringw m = _("Signed in as: %s.",CurrentUser::get()->getUserName());
+    m_online_status_widget->setText(m, false);
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -161,8 +159,57 @@ void OnlineScreen::onUpdate(float delta)
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
+/** Executes the quick play selection. Atm this is all blocking.
+ */
+void OnlineScreen::doQuickPlay()
+{
+    // Refresh server list.
+    HTTPRequest* request = ServersManager::get()->refreshRequest(false);
+    if (request != NULL) // consider request done
+    {
+        request->executeNow();
+        delete request;
+    }
+    else
+    {
+        Log::error("OnlineScreen", "Could not get the server list.");
+        return;
+    }
+    // select first one
+    const Server * server = ServersManager::get()->getQuickPlay();
 
-void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+
+    XMLRequest *request2 = new RequestConnection::ServerJoinRequest();
+    if (!request2)
+    {
+        sfx_manager->quickSound("anvil");
+        return;
+    }
+
+    CurrentUser::setUserDetails(request2, "request-connection");
+    request2->setServerURL("address-management.php");
+    request2->addParameter("server_id", server->getServerId());
+
+    request2->executeNow();
+    if (request2->isSuccess())
+    {
+        delete request2;
+        StateManager::get()->pushScreen(NetworkingLobby::getInstance());
+        ConnectToServer *cts = new ConnectToServer(server->getServerId(), 
+                                                   server->getHostId());
+        ProtocolManager::getInstance()->requestStart(cts);
+    }
+    else
+    {
+        sfx_manager->quickSound("anvil");
+    }
+
+}   // doQuickPlay
+
+// ----------------------------------------------------------------------------
+
+void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
+                                 const int playerID)
 {
     if (name == m_back_widget->m_properties[PROP_ID])
     {
@@ -194,41 +241,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name, const 
     }
     else if (selection == m_quick_play_widget->m_properties[PROP_ID])
     {
-        //FIXME temporary and the request join + join sequence should be placed in one method somewhere
-        // refresh server list
-        Online::ServersManager::RefreshRequest* request = ServersManager::get()->refreshRequest(false);
-        if (request != NULL) // consider request done
-        {
-            request->executeNow();
-            delete request;
-        }
-        else
-        {
-            Log::error("OnlineScreen", "Could not get the server list.");
-            return;
-        }
-        // select first one
-        const Server * server = ServersManager::get()->getQuickPlay();
-
-        Online::CurrentUser::ServerJoinRequest* request2 = Online::CurrentUser::get()->requestServerJoin( server->getServerId(), false);
-        if (request2)
-        {
-            request2->executeNow();
-            if (request2->isSuccess())
-            {
-                delete request2;
-                StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-                ProtocolManager::getInstance()->requestStart(new ConnectToServer(server->getServerId(), server->getHostId()));
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-            }
-        }
-        else
-        {
-            sfx_manager->quickSound( "anvil" );
-        }
+        doQuickPlay();
     }
 
 }   // eventCallback
@@ -239,6 +252,8 @@ void OnlineScreen::tearDown()
 }
 
 // ----------------------------------------------------------------------------
+/** Sets which widget has to be focused. Depends on the user state. 
+ */
 void OnlineScreen::setInitialFocus()
 {
     if(m_recorded_state == CurrentUser::US_SIGNED_IN)

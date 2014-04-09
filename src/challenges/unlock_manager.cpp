@@ -247,12 +247,12 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
         {
             if (c->getMode() == ChallengeData::CM_SINGLE_RACE && c->getTrackId() != "")
             {
-                if (!PlayerManager::get()->getCurrentPlayer()->isLocked(c->getTrackId()))
+                if (!PlayerManager::getCurrentPlayer()->isLocked(c->getTrackId()))
                     tracks.push_back(c->getTrackId());
             }
             else if (c->getMode() == ChallengeData::CM_GRAND_PRIX && c->getGPId() != "")
             {
-                if (!PlayerManager::get()->getCurrentPlayer()->isLocked(c->getGPId()))
+                if (!PlayerManager::getCurrentPlayer()->isLocked(c->getGPId()))
                     gps.push_back(c->getGPId());
             }
         }
