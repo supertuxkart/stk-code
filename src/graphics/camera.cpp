@@ -234,17 +234,12 @@ void Camera::setMode(Mode mode)
 {
     // If we switch from reverse view, move the camera immediately to the
     // correct position.
-    if(m_mode==CM_REVERSE && mode==CM_NORMAL)
+    if((m_mode==CM_REVERSE && mode==CM_NORMAL) || (m_mode==CM_FALLING && mode==CM_NORMAL))
     {
-        Vec3 wanted_position, wanted_target;
-        computeNormalCameraPosition(&wanted_position, &wanted_target);
-        m_camera->setPosition(wanted_position.toIrrVector());
-        m_camera->setTarget(wanted_target.toIrrVector());
-
-        assert(!isnan(m_camera->getPosition().X));
-        assert(!isnan(m_camera->getPosition().Y));
-        assert(!isnan(m_camera->getPosition().Z));
-
+        Vec3 start_offset(0, 1.6, -3);
+        Vec3 current_position = m_kart->getTrans()(start_offset);
+        m_camera->setPosition(  current_position.toIrrVector());
+        m_camera->setTarget(m_camera->getPosition());
     }
     if(mode==CM_FINAL)
     {
@@ -288,8 +283,8 @@ void Camera::setInitialTransform()
 {
     if (m_kart == NULL) return;
     Vec3 start_offset(0, 1.6, -3);
-    Vec3 xx = m_kart->getTrans()(start_offset);
-    m_camera->setPosition(  xx.toIrrVector());
+    Vec3 current_position = m_kart->getTrans()(start_offset);
+    m_camera->setPosition(  current_position.toIrrVector());
     // Reset the target from the previous target (in case of a restart
     // of a race) - otherwise the camera will initially point in the wrong
     // direction till smoothMoveCamera has corrected this. Setting target
@@ -321,7 +316,6 @@ void Camera::smoothMoveCamera(float dt)
     float max_speed_without_zipper = kp->getMaxSpeed();
     float current_speed = m_kart->getSpeed();
 
-    float steer = m_kart->getSteerPercent();
     const Skidding *ks = m_kart->getSkidding();
     float skid_factor = ks->getVisualSkidRotation();
 
@@ -337,8 +331,14 @@ void Camera::smoothMoveCamera(float dt)
     core::vector3df current_target = m_kart->getXYZ().toIrrVector();// next target
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();// new required position of camera
     
-    current_position += ((wanted_position - current_position) * dt * (m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 : -1 * m_kart->getSpeed() * 1.5 ) );
-    
+    if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
+    {
+        current_position += ((wanted_position - current_position) * dt * (m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 + 1.0f : -1 * m_kart->getSpeed() * 1.5 + 2.0f));
+    }
+    else
+    {
+        current_position += (wanted_position - current_position) * dt * 5;
+    }
     if(m_mode!=CM_FALLING)
         m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);//set new target
