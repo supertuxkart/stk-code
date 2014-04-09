@@ -839,17 +839,21 @@ bool Track::loadMainTrack(const XMLNode &root)
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
 
-    adjustForFog(merged_mesh, NULL);
+    scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+    // TODO: memory leak?
+    scene::IMesh* tangent_mesh = manip->createMeshWithTangents(merged_mesh);
+
+    adjustForFog(tangent_mesh, NULL);
 
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(tangent_mesh);
     //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
-    m_all_cached_meshes.push_back(merged_mesh);
-    irr_driver->grabAllTextures(merged_mesh);
+    m_all_cached_meshes.push_back(tangent_mesh);
+    irr_driver->grabAllTextures(tangent_mesh);
 
     // The reference count of the mesh is 1, since it is in irrlicht's
     // cache. So we only have to remove it from the cache.
