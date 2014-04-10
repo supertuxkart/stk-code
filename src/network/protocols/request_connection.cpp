@@ -18,10 +18,11 @@
 
 #include "network/protocols/request_connection.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "online/current_user.hpp"
-#include "config/user_config.hpp"
 
 using namespace Online;
 
@@ -72,8 +73,8 @@ void RequestConnection::asynchronousUpdate()
         case NONE:
         {
             m_request = new ServerJoinRequest();
-            CurrentUser::setUserDetails(m_request, "request-connection");
-            m_request->setServerURL("address-management.php");
+            PlayerManager::setUserDetails(m_request, "request-connection", 
+                                          "address-management.php");
             m_request->addParameter("server_id",m_server_id);
             m_request->queue();
             m_state = REQUEST_PENDING;

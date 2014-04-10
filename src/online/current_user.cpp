@@ -45,39 +45,25 @@ using namespace Online;
 
 namespace Online
 {
-    static CurrentUser* current_user_singleton(NULL);
-
-    /** Singleton create function. */
-    CurrentUser* CurrentUser::get()
-    {
-        if (current_user_singleton == NULL)
-            current_user_singleton = new CurrentUser();
-        return current_user_singleton;
-    }   // get
-
     // ------------------------------------------------------------------------
-    void CurrentUser::deallocate()
-    {
-        delete current_user_singleton;
-        current_user_singleton = NULL;
-    }   // deallocate
-    // ------------------------------------------------------------------------
-    /** Adds the login credential to a http request. A handy static function
-     *  to allow for shorter request creation code. It sets the name of
+    /** Adds the login credential to a http request. It sets the name of
      *  the script to invokce, token, and user id.
      *  \param request The http request.
      *  \param action If not empty, the action to be set.
      */
     void CurrentUser::setUserDetails(HTTPRequest *request,
-                                     const std::string &action)
+                                     const std::string &action,
+                                     const std::string &php_script)
     {
-        CurrentUser *cu = CurrentUser::get();
-        request->setServerURL("client-user.php");
+        if (php_script.size()>0)
+            request->setServerURL(php_script);
+        else
+            request->setServerURL("client-user.php");
 
-        if (cu && cu->m_profile)
-            request->addParameter("userid", cu->m_profile->getID());
-        if(cu->m_state == US_SIGNED_IN)
-            request->addParameter("token", cu->m_token);
+        if (m_profile)
+            request->addParameter("userid", m_profile->getID());
+        if(m_state == US_SIGNED_IN)
+            request->addParameter("token", m_token);
         if (action.size() > 0)
             request->addParameter("action", action);
     }   // setUserDetails
@@ -145,7 +131,7 @@ namespace Online
      */
     void CurrentUser::SignInRequest::callback()
     {
-        CurrentUser::get()->signIn(isSuccess(), getXMLData());
+        PlayerManager::getCurrentUser()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
         LoginScreen *login = dynamic_cast<LoginScreen*>(screen);
         if(login)
@@ -214,7 +200,7 @@ namespace Online
     // --------------------------------------------------------------------
     void CurrentUser::SignOutRequest::callback()
     {
-        CurrentUser::get()->signOut(isSuccess(), getXMLData());
+        PlayerManager::getCurrentUser()->signOut(isSuccess(), getXMLData());
     }   // SignOutRequest::callback
 
     // ------------------------------------------------------------------------
@@ -256,9 +242,9 @@ namespace Online
     {
         if(isSuccess())
         {
-            if(!CurrentUser::get()->isRegisteredUser())
+            if (!PlayerManager::getCurrentUser()->isRegisteredUser())
                 return;
-            if(CurrentUser::get()->getProfile()->hasFetchedFriends())
+            if (PlayerManager::getCurrentUser()->getProfile()->hasFetchedFriends())
             {
                 std::string online_friends_string("");
                 if(getXMLData()->get("online", &online_friends_string) == 1)
@@ -267,7 +253,7 @@ namespace Online
                           StringUtils::splitToUInt(online_friends_string, ' ');
                     bool went_offline = false;
                     std::vector<uint32_t> friends =
-                                CurrentUser::get()->getProfile()->getFriends();
+                        PlayerManager::getCurrentUser()->getProfile()->getFriends();
                     std::vector<core::stringw> to_notify;
                     for(unsigned int i = 0; i < friends.size(); ++i)
                     {
@@ -343,7 +329,7 @@ namespace Online
             }
             else
             {
-                CurrentUser::get()->getProfile()->fetchFriends();
+                PlayerManager::getCurrentUser()->getProfile()->fetchFriends();
             }
 
             int friend_request_count = 0;

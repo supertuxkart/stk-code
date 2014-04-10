@@ -30,6 +30,12 @@
 #include <cstddef>  // NULL
 
 class AchievementsStatus;
+
+namespace online 
+{
+    class HTTPRequest; 
+    class CurrentUser; 
+}
 class PlayerProfile;
 
 /** A special class that manages all local player accounts. It reads all player
@@ -74,7 +80,11 @@ public:
         m_player_manager = NULL;
     }   // destroy
     // ------------------------------------------------------------------------
-    
+    static void setUserDetails(Online::HTTPRequest *request,
+                               const std::string &action,
+                               const std::string &php_name="");
+    // ------------------------------------------------------------------------
+
     void save();
     void loadRemainingData();
     unsigned int getUniqueId() const;
@@ -90,6 +100,11 @@ public:
     {
         return get()->m_current_player; 
     }   // getCurrentPlayer
+    // ------------------------------------------------------------------------
+    static Online::CurrentUser* getCurrentUser()
+    {
+        return get()->m_current_player->getCurrentUser();
+    }   // getCurrentUser
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------

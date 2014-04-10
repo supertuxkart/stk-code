@@ -19,10 +19,8 @@
 
 #include "states_screens/online_screen.hpp"
 
-#include <string>
-#include <iostream>
-
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "input/device_manager.hpp"
@@ -45,8 +43,12 @@
 #include "states_screens/create_server_screen.hpp"
 #include "states_screens/online_profile_overview.hpp"
 
+#include <string>
+#include <iostream>
+
 using namespace GUIEngine;
 using namespace Online;
+
 
 DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
@@ -97,7 +99,7 @@ void OnlineScreen::loadedFromFile()
 bool OnlineScreen::hasStateChanged()
 {
     CurrentUser::UserState previous_state = m_recorded_state;
-    m_recorded_state = CurrentUser::get()->getUserState();
+    m_recorded_state = PlayerManager::getCurrentUser()->getUserState();
     if (previous_state != m_recorded_state)
         return true;
     return false;
@@ -135,7 +137,8 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    core::stringw m = _("Signed in as: %s.",CurrentUser::get()->getUserName());
+    core::stringw m = _("Signed in as: %s.", 
+                        PlayerManager::getCurrentUser()->getUserName());
     m_online_status_widget->setText(m, false);
 }   // init
 
@@ -186,7 +189,7 @@ void OnlineScreen::doQuickPlay()
         return;
     }
 
-    CurrentUser::setUserDetails(request2, "request-connection");
+    PlayerManager::setUserDetails(request2, "request-connection");
     request2->setServerURL("address-management.php");
     request2->addParameter("server_id", server->getServerId());
 
@@ -223,12 +226,12 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 
     if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
-        CurrentUser::get()->requestSignOut();
+        PlayerManager::getCurrentUser()->requestSignOut();
         StateManager::get()->popMenu();
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
-        ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
+        ProfileManager::get()->setVisiting(PlayerManager::getCurrentUser()->getID());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
     else if (selection == m_find_server_widget->m_properties[PROP_ID])

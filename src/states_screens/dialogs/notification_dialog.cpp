@@ -20,6 +20,7 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/online_profile_achievements.hpp"
@@ -138,12 +139,12 @@ void NotificationDialog::onUpdate(float dt)
         {
             if(type == T_Friends)
             {
-                ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
+                ProfileManager::get()->setVisiting(PlayerManager::getCurrentUser()->getID());
                 StateManager::get()->pushScreen(OnlineProfileFriends::getInstance());
             }
             else if (type == T_Achievements)
             {
-                ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
+                ProfileManager::get()->setVisiting(PlayerManager::getCurrentUser()->getID());
                 StateManager::get()->pushScreen(OnlineProfileAchievements::getInstance());
             }
         }

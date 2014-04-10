@@ -24,8 +24,9 @@
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/xml_request.hpp"
-#include "utils/types.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 
@@ -45,6 +46,8 @@ namespace Online
       */
     class CurrentUser
     {
+        private:
+            LEAK_CHECK()
         public:
             enum UserState
             {
@@ -87,17 +90,15 @@ namespace Online
 
             bool saveSession()  const   { return m_save_session;      }
 
-            CurrentUser();
 
             void signIn                 (bool success, const XMLNode * input);
             void signOut                (bool success, const XMLNode * input);
 
         public:
-            /**Singleton */
-            static CurrentUser *            get();
-            static void                     deallocate();
-            static void setUserDetails(HTTPRequest *request, 
-                                       const std::string &action);
+            CurrentUser();
+            void setUserDetails(HTTPRequest *request,
+                                const std::string &action,
+                                const std::string &php_script="");
 
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,

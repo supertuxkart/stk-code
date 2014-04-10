@@ -20,6 +20,7 @@
 
 #include "online/request_manager.hpp"
 
+#include "config/player_manager.hpp"
 #include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -128,7 +129,7 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        CurrentUser::get()->requestSavedSession();
+        PlayerManager::getCurrentUser()->requestSavedSession();
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -146,7 +147,7 @@ namespace Online
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
         //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
-        CurrentUser::get()->onSTKQuit();
+        PlayerManager::getCurrentUser()->onSTKQuit();
         addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
@@ -277,7 +278,7 @@ namespace Online
         handleResultQueue();
 
         //Database polling starts here, only needed for registered users
-        if(!CurrentUser::get()->isRegisteredUser())
+        if (!PlayerManager::getCurrentUser()->isRegisteredUser())
             return;
 
         m_time_since_poll += dt;
@@ -287,7 +288,7 @@ namespace Online
         if(m_time_since_poll > interval)
         {
             m_time_since_poll = 0;
-            CurrentUser::get()->requestPoll();
+            PlayerManager::getCurrentUser()->requestPoll();
         }
 
     }   // update

@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/change_password_dialog.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -110,8 +111,7 @@ void ChangePasswordDialog::changePassword(const stringw &current_password,
     // ------------------------------------------------------------------------
 
     ChangePasswordRequest * request = new ChangePasswordRequest();
-    CurrentUser::setUserDetails(request, "change_password");
-    request->addParameter("userid", CurrentUser::get()->getID());
+    PlayerManager::setUserDetails(request, "change_password");
     request->addParameter("current", current_password);
     // The server code expects two passwords (and verifies again that they
     // are identical), so send the passwod twice.

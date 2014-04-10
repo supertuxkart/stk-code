@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
+#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -44,6 +45,14 @@ void PlayerManager::create()
     }
 
 }   // create
+
+// ============================================================================
+void PlayerManager::setUserDetails(Online::HTTPRequest *request,
+    const std::string &action,
+    const std::string &php_name)
+{
+    get()->getCurrentUser()->setUserDetails(request, action, php_name);
+}
 
 // ============================================================================
 /** Constructor.

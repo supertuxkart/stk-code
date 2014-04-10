@@ -18,6 +18,7 @@
 #include "states_screens/online_user_search.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "online/current_user.hpp"
 #include "online/messages.hpp"
@@ -192,7 +193,7 @@ void OnlineUserSearch::search()
     if (m_search_string != "" && m_last_search_string != m_search_string)
     {
         m_search_request = new XMLRequest();
-        CurrentUser::setUserDetails(m_search_request, "user-search");
+        PlayerManager::setUserDetails(m_search_request, "user-search");
         m_search_request->addParameter("search-string", m_search_string);
         m_search_request->queue();
 

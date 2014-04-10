@@ -21,6 +21,7 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -252,7 +253,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 // ----------------------------------------------------------------------------
 void AddonsLoading::voteClicked()
 {
-    if (Online::CurrentUser::get()->isRegisteredUser())
+    if (PlayerManager::getCurrentUser()->isRegisteredUser())
     {
         // We need to keep a copy of the addon id, since dismiss() will
         // delete this object (and the copy of the addon).

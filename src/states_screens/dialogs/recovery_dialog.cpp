@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/recovery_dialog.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -127,7 +128,7 @@ void RecoveryDialog::processInput()
         m_options_widget->setDeactivated();
         m_recovery_request = new XMLRequest();
         // This function also works when the current user is not logged in
-        CurrentUser::setUserDetails(m_recovery_request, "recovery");
+        PlayerManager::setUserDetails(m_recovery_request, "recovery");
         m_recovery_request->addParameter("username", username);
         m_recovery_request->addParameter("email",    email   );
         m_recovery_request->queue();

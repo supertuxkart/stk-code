@@ -21,6 +21,7 @@
 #include "achievements/achievements_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "online/current_user.hpp"
 #include "io/xml_node.hpp"
 #include "io/utf_writer.hpp"
 #include "utils/string_utils.hpp"
@@ -45,6 +46,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_unique_id           = PlayerManager::get()->getUniqueId();
     m_story_mode_status   = unlock_manager->createStoryModeStatus();
     m_is_default          = false;
+    m_current_user        = new Online::CurrentUser();
     m_achievements_status =
                         AchievementsManager::get()->createAchievementsStatus();
 }   // PlayerProfile
@@ -70,6 +72,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_saved_user_id       = 0;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
+    m_current_user        = new Online::CurrentUser();
 
     node->get("name",          &m_name            );
     node->get("guest",         &m_is_guest_account);
@@ -86,7 +89,17 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
-/** This function loads the achievement and story mode data. This 
+PlayerProfile::~PlayerProfile()
+{
+#ifdef DEBUG
+    m_magic_number = 0xDEADBEEF;
+#endif
+    delete m_current_user;
+}   // ~PlayerProfile
+
+
+//------------------------------------------------------------------------------
+/** This function loads the achievement and story mode data. This
 */
 void PlayerProfile::loadRemainingData(const XMLNode *node)
 {

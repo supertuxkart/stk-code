@@ -28,8 +28,9 @@ using namespace irr;
 
 #include <string>
 
-class UTFWriter;
 class AchievementsStatus;
+namespace Online { class CurrentUser; }
+class UTFWriter;
 
 /** Class for managing player profiles (name, usage frequency,
  *  etc.). All PlayerProfiles are managed by the PlayerManager.
@@ -41,6 +42,8 @@ class AchievementsStatus;
 class PlayerProfile : public NoCopy
 {
 private:
+
+    Online::CurrentUser *m_current_user;
 
     /** The name of the player (wide string, so it can be in native
      *  language). */
@@ -78,10 +81,9 @@ private:
 
 public:
 
-    PlayerProfile(const core::stringw &name, bool is_guest = false);
-
-    PlayerProfile(const XMLNode *node);
-
+         PlayerProfile(const core::stringw &name, bool is_guest = false);
+         PlayerProfile(const XMLNode *node);
+         ~PlayerProfile();
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);
     void incrementUseFrequency();
@@ -92,13 +94,7 @@ public:
     void clearSession();
 
     // ------------------------------------------------------------------------
-    ~PlayerProfile()
-    {
-        #ifdef DEBUG
-        m_magic_number = 0xDEADBEEF;
-        #endif
-    }   // ~PlayerProfile
-
+    Online::CurrentUser* getCurrentUser() { return m_current_user; }
     // ------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)
@@ -113,9 +109,7 @@ public:
     /** Returns the name of this player. */
     core::stringw getName() const
     {
-        #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
-        #endif
         return m_name.c_str();
     }   // getName
 

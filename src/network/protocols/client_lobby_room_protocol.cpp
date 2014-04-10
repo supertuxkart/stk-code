@@ -18,6 +18,7 @@
 
 #include "network/protocols/client_lobby_room_protocol.hpp"
 
+#include "config/player_manager.hpp"
 #include "modes/world_with_rank.hpp"
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
@@ -233,7 +234,7 @@ void ClientLobbyRoomProtocol::update()
     {
         NetworkString ns;
         // 1 (connection request), 4 (size of id), global id
-        ns.ai8(1).ai8(4).ai32(Online::CurrentUser::get()->getID());
+        ns.ai8(1).ai8(4).ai32(PlayerManager::getCurrentUser()->getID());
         m_listener->sendMessage(this, ns);
         m_state = REQUESTING_CONNECTION;
     }
@@ -295,7 +296,7 @@ void ClientLobbyRoomProtocol::newPlayer(Event* event)
     uint32_t global_id = data.gui32(1);
     uint8_t race_id = data.gui8(6);
 
-    if (global_id == Online::CurrentUser::get()->getID())
+    if (global_id == PlayerManager::getCurrentUser()->getID())
     {
         Log::error("ClientLobbyRoomProtocol", "The server notified me that i'm a new player in the room (not normal).");
     }
@@ -368,7 +369,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
     STKPeer* peer = *(event->peer);
 
     uint32_t global_id = data.gui32(8);
-    if (global_id == Online::CurrentUser::get()->getID())
+    if (global_id == PlayerManager::getCurrentUser()->getID())
     {
         Log::info("ClientLobbyRoomProtocol", "The server accepted the connection.");
 
@@ -376,7 +377,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->kart_name = "";
         profile->race_id = data.gui8(1);
-        profile->user_profile = Online::CurrentUser::get()->getProfile();
+        profile->user_profile = PlayerManager::getCurrentUser()->getProfile();
         m_setup->addPlayer(profile);
         // connection token
         uint32_t token = data.gui32(3);
