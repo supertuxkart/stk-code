@@ -15,6 +15,9 @@ before_install:
   - sudo apt-get update -qq
   # INSTALL DEPENDENCIES
   - sudo apt-get install build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libgl1-mesa-dev libglu1-mesa-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
+  - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu quantal main restricted"
+  - sudo apt-get update -qq
+  - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
 script:
   #  BUILD COMMANDS
   - mkdir build
