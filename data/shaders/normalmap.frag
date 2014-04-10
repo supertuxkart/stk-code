@@ -25,7 +25,7 @@ void main()
 	vec3 Frag_normal = normalize(cross(Frag_tangent, bitangent));
 	vec3 Frag_bitangent = cross(Frag_normal, Frag_tangent);
 
-	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;	
+	vec3 FragmentNormal = TS_normal.x * Frag_tangent + TS_normal.y * Frag_bitangent - TS_normal.z * Frag_normal;
 	EncodedNormal.xy = 0.5 * EncodeNormal(normalize(FragmentNormal)) + 0.5;
 	EncodedNormal.z = 1.;
 }

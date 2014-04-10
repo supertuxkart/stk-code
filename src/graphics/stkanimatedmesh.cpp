@@ -145,19 +145,21 @@ void STKAnimatedMesh::render()
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
+        core::matrix4 invmodel;
+        AbsoluteTransformation.getInverse(invmodel);
 
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
         {
             GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(GeometricMesh[FPSM_DEFAULT][i]);
-            GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(invmodel);
         }
 
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
         {
             GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
         return;
@@ -165,39 +167,42 @@ void STKAnimatedMesh::render()
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
+        core::matrix4 invmodel;
+        AbsoluteTransformation.getInverse(invmodel);
+
         for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT].size(); i++)
         {
             GroupedSM<SM_DEFAULT>::MeshSet.push_back(ShadedMesh[SM_DEFAULT][i]);
-            GroupedSM<SM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedSM<SM_DEFAULT>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedSM<SM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DEFAULT>::TIMVSet.push_back(invmodel);
         }
 
         for (unsigned i = 0; i < ShadedMesh[SM_ALPHA_REF_TEXTURE].size(); i++)
         {
             GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(ShadedMesh[SM_ALPHA_REF_TEXTURE][i]);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
         for (unsigned i = 0; i < ShadedMesh[SM_RIMLIT].size(); i++)
         {
             GroupedSM<SM_RIMLIT>::MeshSet.push_back(ShadedMesh[SM_RIMLIT][i]);
-            GroupedSM<SM_RIMLIT>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedSM<SM_RIMLIT>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedSM<SM_RIMLIT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_RIMLIT>::TIMVSet.push_back(invmodel);
         }
 
         for (GLMesh *mesh : ShadedMesh[SM_UNLIT])
         {
             GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_UNLIT>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedSM<SM_UNLIT>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedSM<SM_UNLIT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_UNLIT>::TIMVSet.push_back(invmodel);
         }
 
         for (GLMesh *mesh : ShadedMesh[SM_DETAILS])
         {
             GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DETAILS>::MVPSet.push_back(ModelViewProjectionMatrix);
-            GroupedSM<SM_DETAILS>::TIMVSet.push_back(TransposeInverseModelView);
+            GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
         }
 
         return;

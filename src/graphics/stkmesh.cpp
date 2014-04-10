@@ -269,7 +269,7 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const core::matrix4 &InverseModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
 	GLenum ptype = mesh.PrimitiveType;
@@ -279,14 +279,14 @@ void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 	assert(mesh.textures[1]);
 	setTexture(0, mesh.textures[1], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-	MeshShader::NormalMapShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
+    MeshShader::NormalMapShader::setUniforms(ModelMatrix, InverseModelMatrix, 0);
 
     assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
+void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
   GLenum ptype = mesh.PrimitiveType;
@@ -306,7 +306,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
       glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   }
 
-  MeshShader::SphereMapShader::setUniforms(ModelViewProjectionMatrix, irr_driver->getViewMatrix().getTransposed(), TransposeInverseModelView, irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
+  MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height));
 
   assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
@@ -476,14 +476,14 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 	glDrawElements(ptype, count, itype, 0);
 }
 
-void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
+void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 {
     irr_driver->IncreaseObjectCount();
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  MeshShader::UntexturedObjectShader::setUniforms(ModelViewProjectionMatrix);
+  MeshShader::UntexturedObjectShader::setUniforms(ModelMatrix);
 
   assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);

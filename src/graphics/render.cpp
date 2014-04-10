@@ -464,6 +464,7 @@ void IrrDriver::renderSolidSecondPass()
     GroupedSM<SM_SPLATTING>::reset();
     GroupedSM<SM_UNLIT>::reset();
     GroupedSM<SM_DETAILS>::reset();
+    GroupedSM<SM_UNTEXTURED>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
@@ -496,6 +497,10 @@ void IrrDriver::renderSolidSecondPass()
     glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
     for (unsigned i = 0; i < GroupedSM<SM_DETAILS>::MeshSet.size(); i++)
         drawDetailledObjectPass2(*GroupedSM<SM_DETAILS>::MeshSet[i], GroupedSM<SM_DETAILS>::MVPSet[i]);
+
+    glUseProgram(MeshShader::UntexturedObjectShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
+        drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
 
 }
 
@@ -1328,7 +1333,7 @@ void IrrDriver::renderSkybox()
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
 	glDisable(GL_CULL_FACE);
 	assert(SkyboxTextures.size() == 6);
-	core::matrix4 transform = irr_driver->getProjViewMatrix();
+
 	core::matrix4 translate;
 	translate.setTranslation(camera->getAbsolutePosition());
 
@@ -1336,7 +1341,7 @@ void IrrDriver::renderSkybox()
 	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
 	core::matrix4 scale;
 	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
-	transform *= translate * scale;
+    core::matrix4 transform = translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
 
@@ -1345,7 +1350,7 @@ void IrrDriver::renderSkybox()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glUseProgram(MeshShader::SkyboxShader::Program);
-    MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
+    MeshShader::SkyboxShader::setUniforms(transform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

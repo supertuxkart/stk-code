@@ -1,4 +1,13 @@
-uniform mat4 ModelViewProjectionMatrix;
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
+
+uniform mat4 ModelMatrix;
 
 #if __VERSION__ >= 130
 in vec3 Position;
@@ -14,5 +23,5 @@ varying vec4 color;
 void main(void)
 {
     color = Color.zyxw;
-    gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+    gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(Position, 1.);
 }
