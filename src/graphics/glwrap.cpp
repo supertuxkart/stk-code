@@ -229,6 +229,7 @@ GLuint LoadShader(const char * file, unsigned type)
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
 	std::ifstream Stream(file, std::ios::in);
+    Code += "//" + std::string(file) + "\n";
 	if (Stream.is_open())
 	{
 		std::string Line = "";
