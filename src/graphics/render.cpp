@@ -1286,11 +1286,11 @@ void IrrDriver::generateSkyboxCubemap()
 
     glGenTextures(1, &SkyboxCubeMap);
 
-    GLint w = 0, h = 0;
+    unsigned w = 0, h = 0;
     for (unsigned i = 0; i < 6; i++)
     {
-        w = MAX2(unsigned int(w), SkyboxTextures[i]->getOriginalSize().Width);
-        h = MAX2(unsigned int(h), SkyboxTextures[i]->getOriginalSize().Height);
+        w = MAX2(w, SkyboxTextures[i]->getOriginalSize().Width);
+        h = MAX2(h, SkyboxTextures[i]->getOriginalSize().Height);
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
