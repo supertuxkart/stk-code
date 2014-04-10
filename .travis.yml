@@ -17,6 +17,7 @@ before_install:
   - sudo apt-get install build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
   # Install mesa from an other repo (a newer version is required)
   - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu quantal main restricted"
+  - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
   - sudo apt-get update -qq
   - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
 script:
