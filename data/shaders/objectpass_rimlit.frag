@@ -6,17 +6,17 @@ uniform vec2 screen;
 uniform vec3 ambient;
 
 #if __VERSION__ >= 130
-in vec3 normal;
+in vec3 nor;
 in vec2 uv;
 out vec4 FragColor;
 #else
-varying vec3 normal;
+varying vec3 nor;
 varying vec2 uv;
 #define FragColor gl_FragColor
 #endif
 
 void main() {
-	float rim = 1.0 - dot(normal, vec3(0., 0., -1));
+	float rim = 1.0 - dot(nor, vec3(0., 0., -1));
 	rim = smoothstep(0.5, 1.5, rim) * 0.35;
 
 	vec4 color = texture(Albedo, uv);

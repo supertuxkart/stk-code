@@ -179,7 +179,7 @@ void STKInstancedSceneNode::addInstance(const core::vector3df &origin, const cor
     instance_pos.push_back(scale.Z);
 }
 
-static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, size_t instance_count)
+static void drawFSPMDefault(GLMesh &mesh, size_t instance_count)
 {
   irr_driver->IncreaseObjectCount();
   GLenum ptype = mesh.PrimitiveType;
@@ -187,7 +187,7 @@ static void drawFSPMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjecti
   size_t count = mesh.IndexCount;
 
   setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  MeshShader::InstancedObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), 0);
+  MeshShader::InstancedObjectPass1Shader::setUniforms(0);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -207,7 +207,7 @@ static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
 }
 
-static void drawFSPMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, size_t instance_count)
+static void drawFSPMAlphaRefTexture(GLMesh &mesh, size_t instance_count)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
@@ -215,7 +215,7 @@ static void drawFSPMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelView
     size_t count = mesh.IndexCount;
 
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), 0);
+    MeshShader::InstancedObjectRefPass1Shader::setUniforms(0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -236,7 +236,7 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
 }
 
-static void drawFSPMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDir, size_t instance_count)
+static void drawFSPMGrass(GLMesh &mesh, const core::vector3df &windDir, size_t instance_count)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
@@ -244,7 +244,7 @@ static void drawFSPMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjection
     size_t count = mesh.IndexCount;
 
     setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedGrassPass1Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), windDir, 0);
+    MeshShader::InstancedGrassPass1Shader::setUniforms(windDir, 0);
 
     glBindVertexArray(mesh.vao_first_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -315,18 +315,18 @@ void STKInstancedSceneNode::render()
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::InstancedObjectPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT][i], ModelViewProjectionMatrix, instance_pos.size() / 9);
+            drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT][i], instance_pos.size() / 9);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::InstancedObjectRefPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
-            drawFSPMAlphaRefTexture(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], ModelViewProjectionMatrix, instance_pos.size() / 9);
+            drawFSPMAlphaRefTexture(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], instance_pos.size() / 9);
 
         windDir = getWind();
         if (!GeometricMesh[FPSM_GRASS].empty())
             glUseProgram(MeshShader::InstancedGrassPass1Shader::Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_GRASS].size(); i++)
-            drawFSPMGrass(*GeometricMesh[FPSM_GRASS][i], ModelViewProjectionMatrix, windDir, instance_pos.size() / 9);
+            drawFSPMGrass(*GeometricMesh[FPSM_GRASS][i], windDir, instance_pos.size() / 9);
         return;
     }
 
