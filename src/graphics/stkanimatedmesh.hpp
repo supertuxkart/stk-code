@@ -16,8 +16,6 @@ protected:
     std::vector<GLMesh *> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
-    void drawSolidPass1(const GLMesh &mesh, GeometricMaterial type);
-    void drawSolidPass2(const GLMesh &mesh, ShadedMaterial type);
     void cleanGLMeshes();
 public:
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
