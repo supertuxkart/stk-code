@@ -21,15 +21,15 @@ script:
   - cd build
   - cmake .. -DCMAKE_BUILD_TYPE=Debug
   - make VERBOSE=1 -j 4 
-notifications:
-  irc:
-    channels:
-      - "irc.freenode.org#stk"
-    skip_join: false
-    use_notice: true
-    template:
-      #- "[%{commit}: %{author}] %{message}"
-      #- "%{build_url}"
-      - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
-      - "Diff: %{compare_url}"
-      - "Build: %{build_url}"
+# notifications:
+  # irc:
+    # channels:
+      # - "irc.freenode.org#stk"
+    # skip_join: false
+    # use_notice: true
+    # template:
+      # #- "[%{commit}: %{author}] %{message}"
+      # #- "%{build_url}"
+      # - "[%{repository}#%{branch} @%{commit}] %{author}): %{message}"
+      # - "Diff: %{compare_url}"
+      # - "Build: %{build_url}"
