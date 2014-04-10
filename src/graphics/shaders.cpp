@@ -819,33 +819,13 @@ namespace MeshShader
         glUniform1i(uniform_Albedo, TU_Albedo);
         glUniform1i(uniform_Detail, TU_detail);
         glUseProgram(0);
-<<<<<<< HEAD
-	}
-
-	void DetailledObjectPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-
-	GLuint ObjectUnlitShader::Program;
-	GLuint ObjectUnlitShader::attrib_position;
-	GLuint ObjectUnlitShader::attrib_texcoord;
-	GLuint ObjectUnlitShader::uniform_MVP;
-	GLuint ObjectUnlitShader::TU_tex;
-
-	void ObjectUnlitShader::init()
-	{
-		Program = LoadProgram(
-=======
     }
 
     void DetailledObjectPass2Shader::setUniforms(const core::matrix4 &ModelMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width),
+                                    float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
@@ -859,7 +839,6 @@ namespace MeshShader
     void ObjectUnlitShader::init()
     {
         Program = LoadProgram(
->>>>>>> cbc677febb2646c09ebc13a778ce0bdf4f7a2442
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
@@ -921,61 +900,15 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-    void ObjectRimLimitShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix)
+    void ObjectRimLimitShader::setUniforms(const core::matrix4 &ModelMatrix, 
+                                           const core::matrix4 &InverseModelMatrix,
+                                           const core::matrix4 &TextureMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-<<<<<<< HEAD
-		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-
-	GLuint UntexturedObjectShader::Program;
-	GLuint UntexturedObjectShader::attrib_position;
-	GLuint UntexturedObjectShader::attrib_color;
-	GLuint UntexturedObjectShader::uniform_MVP;
-	GLuint UntexturedObjectShader::uniform_screen;
-	GLuint UntexturedObjectShader::uniform_ambient;
-
-	void UntexturedObjectShader::init()
-	{
-	  Program = LoadProgram(
-          GL_VERTEX_SHADER, file_manager->getAsset("shaders/untextured_object.vert").c_str(),
-          GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-          GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/untextured_object.frag").c_str());
-	  attrib_position = glGetAttribLocation(Program, "Position");
-	  attrib_color = glGetAttribLocation(Program, "Color");
-	  uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-      GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
-      GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
-      GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
-	  uniform_screen = glGetUniformLocation(Program, "screen");
-	  uniform_ambient = glGetUniformLocation(Program, "ambient");
-
-      glUseProgram(Program);
-      glUniform1i(uniform_DiffuseMap, 0);
-      glUniform1i(uniform_SpecularMap, 1);
-      glUniform1i(uniform_SSAO, 2);
-      glUseProgram(0);
-	}
-
-	void UntexturedObjectShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
-	{
-	  glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-	  glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
-	  const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-	  glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-
-
-	GLuint ObjectRefPass2Shader::Program;
-	GLuint ObjectRefPass2Shader::attrib_position;
-	GLuint ObjectRefPass2Shader::attrib_texcoord;
-	GLuint ObjectRefPass2Shader::uniform_MVP;
-=======
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), 
+                                    float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
@@ -1014,7 +947,8 @@ namespace MeshShader
     void UntexturedObjectShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width),
+                                    float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
@@ -1024,7 +958,6 @@ namespace MeshShader
     GLuint ObjectRefPass2Shader::attrib_position;
     GLuint ObjectRefPass2Shader::attrib_texcoord;
     GLuint ObjectRefPass2Shader::uniform_MM;
->>>>>>> cbc677febb2646c09ebc13a778ce0bdf4f7a2442
     GLuint ObjectRefPass2Shader::uniform_TM;
     GLuint ObjectRefPass2Shader::uniform_screen;
     GLuint ObjectRefPass2Shader::uniform_ambient;
@@ -1059,26 +992,13 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-    void ObjectRefPass2Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix)
+    void ObjectRefPass2Shader::setUniforms(const core::matrix4 &ModelMatrix, 
+                                           const core::matrix4 &TextureMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-<<<<<<< HEAD
-		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-
-	GLuint GrassPass2Shader::Program;
-	GLuint GrassPass2Shader::attrib_position;
-	GLuint GrassPass2Shader::attrib_texcoord;
-	GLuint GrassPass2Shader::attrib_color;
-	GLuint GrassPass2Shader::uniform_MVP;
-	GLuint GrassPass2Shader::uniform_screen;
-	GLuint GrassPass2Shader::uniform_ambient;
-	GLuint GrassPass2Shader::uniform_windDir;
-=======
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), 
+                                    float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
@@ -1091,7 +1011,6 @@ namespace MeshShader
     GLuint GrassPass2Shader::uniform_screen;
     GLuint GrassPass2Shader::uniform_ambient;
     GLuint GrassPass2Shader::uniform_windDir;
->>>>>>> cbc677febb2646c09ebc13a778ce0bdf4f7a2442
     GLuint GrassPass2Shader::TU_Albedo;
 
     void GrassPass2Shader::init()
@@ -1121,25 +1040,16 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-<<<<<<< HEAD
-	void GrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-		glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-		glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
-	}
-=======
-    void GrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection)
+    void GrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, 
+                                       const core::vector3df &windDirection)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), 
+                                    float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
         glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
     }
->>>>>>> cbc677febb2646c09ebc13a778ce0bdf4f7a2442
 
     GLuint InstancedGrassPass2Shader::Program;
     GLuint InstancedGrassPass2Shader::attrib_position;
@@ -1295,23 +1205,14 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-<<<<<<< HEAD
-	void SplattingShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
-	{
-		glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
-		const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-		glUniform3f(uniform_ambient, s.r, s.g, s.b);
-	}
-=======
     void SplattingShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform2f(uniform_screen, UserConfigParams::m_width, UserConfigParams::m_height);
+        glUniform2f(uniform_screen, float(UserConfigParams::m_width), 
+                                    float(UserConfigParams::m_height));
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
->>>>>>> cbc677febb2646c09ebc13a778ce0bdf4f7a2442
 
     GLuint CausticsShader::Program;
     GLuint CausticsShader::attrib_position;
@@ -1495,7 +1396,11 @@ namespace MeshShader
         uniform_tex = glGetUniformLocation(Program, "tex");
     }
 
-    void BillboardShader::setUniforms(const core::matrix4 &ModelViewMatrix, const core::matrix4 &ProjectionMatrix, const core::vector3df &Position, const core::dimension2d<float> &size, unsigned TU_tex)
+    void BillboardShader::setUniforms(const core::matrix4 &ModelViewMatrix, 
+                                      const core::matrix4 &ProjectionMatrix, 
+                                      const core::vector3df &Position, 
+                                      const core::dimension2d<float> &size,
+                                      unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
         glUniformMatrix4fv(uniform_P, 1, GL_FALSE, ProjectionMatrix.pointer());
