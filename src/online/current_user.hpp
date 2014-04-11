@@ -89,7 +89,11 @@ namespace Online
             // For now declare functions that will become part of PlayerManager
             // or Playerprofile to be private, and give only PlayerManager
             // access to them. FIXME
-            friend class PlayerManager;
+
+            // FIXME: This apparently does not compile on linux :(
+            // So I'll make this all public for now again
+            // friend class PlayerManager;
+    public:
             uint32_t getID() const;
             void setUserDetails(HTTPRequest *request,
                                 const std::string &action,
