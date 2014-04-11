@@ -5,15 +5,15 @@
 #include <IAnimatedMesh.h>
 #include <irrTypes.h>
 #include "graphics/stkmesh.hpp"
-
+#include "utils/ptr_vector.hpp"
 
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode
 {
 protected:
     bool firstTime;
-    std::vector<GLMesh *> GeometricMesh[FPSM_COUNT];
-    std::vector<GLMesh *> ShadedMesh[SM_COUNT];
-    std::vector<GLMesh *> TransparentMesh[TM_COUNT];
+    PtrVector<GLMesh, REF> GeometricMesh[FPSM_COUNT];
+    PtrVector<GLMesh, REF> ShadedMesh[SM_COUNT];
+    PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
     void cleanGLMeshes();

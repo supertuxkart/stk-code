@@ -48,9 +48,9 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
     firstTime = true;
     GLmeshes.clear();
     for (unsigned i = 0; i < FPSM_COUNT; i++)
-        GeometricMesh[i].clear();
+        GeometricMesh[i].clearWithoutDeleting();
     for (unsigned i = 0; i < SM_COUNT; i++)
-        ShadedMesh[i].clear();
+        ShadedMesh[i].clearWithoutDeleting();
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
@@ -148,16 +148,17 @@ void STKAnimatedMesh::render()
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
-        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
+        GLMesh* mesh;
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
         {
-            GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(GeometricMesh[FPSM_DEFAULT][i]);
+            GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(mesh);
             GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
             GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(invmodel);
         }
 
-        for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
+        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
         {
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i]);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
             GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
             GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
@@ -170,35 +171,36 @@ void STKAnimatedMesh::render()
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
-        for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT].size(); i++)
+        GLMesh* mesh;
+        for_in(mesh, ShadedMesh[SM_DEFAULT])
         {
-            GroupedSM<SM_DEFAULT>::MeshSet.push_back(ShadedMesh[SM_DEFAULT][i]);
+            GroupedSM<SM_DEFAULT>::MeshSet.push_back(mesh);
             GroupedSM<SM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
             GroupedSM<SM_DEFAULT>::TIMVSet.push_back(invmodel);
         }
 
-        for (unsigned i = 0; i < ShadedMesh[SM_ALPHA_REF_TEXTURE].size(); i++)
+        for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
         {
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(ShadedMesh[SM_ALPHA_REF_TEXTURE][i]);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
             GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
             GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
-        for (unsigned i = 0; i < ShadedMesh[SM_RIMLIT].size(); i++)
+        for_in(mesh, ShadedMesh[SM_RIMLIT])
         {
-            GroupedSM<SM_RIMLIT>::MeshSet.push_back(ShadedMesh[SM_RIMLIT][i]);
+            GroupedSM<SM_RIMLIT>::MeshSet.push_back(mesh);
             GroupedSM<SM_RIMLIT>::MVPSet.push_back(AbsoluteTransformation);
             GroupedSM<SM_RIMLIT>::TIMVSet.push_back(invmodel);
         }
 
-        for (GLMesh *mesh : ShadedMesh[SM_UNLIT])
+        for_in (mesh, ShadedMesh[SM_UNLIT])
         {
             GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
             GroupedSM<SM_UNLIT>::MVPSet.push_back(AbsoluteTransformation);
             GroupedSM<SM_UNLIT>::TIMVSet.push_back(invmodel);
         }
 
-        for (GLMesh *mesh : ShadedMesh[SM_DETAILS])
+        for_in(mesh, ShadedMesh[SM_DETAILS])
         {
             GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
             GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
@@ -212,13 +214,16 @@ void STKAnimatedMesh::render()
     {
         if (!GeometricMesh[FPSM_DEFAULT].empty())
             glUseProgram(MeshShader::ShadowShader::Program);
-        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawShadow(*GeometricMesh[FPSM_DEFAULT][i], AbsoluteTransformation);
+
+        GLMesh* mesh;
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
+            drawShadow(*mesh, AbsoluteTransformation);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::RefShadowShader::Program);
-        for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
-            drawShadowRef(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], AbsoluteTransformation);
+
+        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
+            drawShadowRef(*mesh, AbsoluteTransformation);
         return;
     }
 
@@ -228,22 +233,26 @@ void STKAnimatedMesh::render()
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
-        for (unsigned i = 0; i < TransparentMesh[TM_BUBBLE].size(); i++)
-            drawBubble(*TransparentMesh[TM_BUBBLE][i], ModelViewProjectionMatrix);
+
+        GLMesh* mesh;
+        for_in(mesh, TransparentMesh[TM_BUBBLE])
+            drawBubble(*mesh, ModelViewProjectionMatrix);
 
         if (World::getWorld()->getTrack()->isFogEnabled())
         {
             if (!TransparentMesh[TM_DEFAULT].empty())
                 glUseProgram(MeshShader::TransparentFogShader::Program);
-            for (unsigned i = 0; i < TransparentMesh[TM_DEFAULT].size(); i++)
-                drawTransparentFogObject(*TransparentMesh[TM_DEFAULT][i], ModelViewProjectionMatrix, (*TransparentMesh[TM_DEFAULT][i]).TextureMatrix);
+
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
         }
         else
         {
             if (!TransparentMesh[TM_DEFAULT].empty())
                 glUseProgram(MeshShader::TransparentShader::Program);
-            for (unsigned i = 0; i < TransparentMesh[TM_DEFAULT].size(); i++)
-                drawTransparentObject(*TransparentMesh[TM_DEFAULT][i], ModelViewProjectionMatrix, (*TransparentMesh[TM_DEFAULT][i]).TextureMatrix);
+
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
         }
         return;
     }
