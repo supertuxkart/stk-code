@@ -99,6 +99,19 @@ public:
                                const std::string &php_name = "");
     static unsigned int getCurrentOnlineId();
     static bool isCurrentLoggedIn();
+
+    /** The online state a player can be in. */
+    enum OnlineState
+    {
+        OS_SIGNED_OUT = 0,
+        OS_SIGNED_IN,
+        OS_GUEST,
+        OS_SIGNING_IN,
+        OS_SIGNING_OUT
+    };
+
+    static OnlineState getCurrentOnlineState();
+
     // ------------------------------------------------------------------------
     /** Returns the current player. */
     static PlayerProfile* getCurrentPlayer() 

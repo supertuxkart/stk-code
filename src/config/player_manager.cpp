@@ -46,7 +46,7 @@ void PlayerManager::create()
 
 }   // create
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Adds the login credential to a http request. It sets the name of
  *  the script to invokce, token, and user id.
  *  \param request The http request.
@@ -59,14 +59,14 @@ void PlayerManager::setUserDetails(Online::HTTPRequest *request,
     get()->getCurrentUser()->setUserDetails(request, action, php_name);
 }   // setUserDetails
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns whether a user is signed in or not. */
 bool PlayerManager::isCurrentLoggedIn()
 {
     return getCurrentUser()->isRegisteredUser();
 }   // isCurrentLoggedIn
 
-// ------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 /** Returns the online id of the current player.
 *  \pre User logged in (which is asserted in getID()).
 */
@@ -74,6 +74,15 @@ unsigned int PlayerManager::getCurrentOnlineId()
 {
     return getCurrentUser()->getID();
 }   // getCurrentOnlineId
+
+// ----------------------------------------------------------------------------
+/** Returns the online state of the current player. It can be logged out,
+ *  logging in, logged in, logging out, logged out, or guest.
+ */
+PlayerManager::OnlineState PlayerManager::getCurrentOnlineState()
+{
+    return (OnlineState)getCurrentUser()->getUserState();
+}   // getCurrentOnlineState
 
 // ============================================================================
 /** Constructor.

@@ -51,15 +51,6 @@ namespace Online
         private:
             LEAK_CHECK()
         public:
-            enum UserState
-            {
-                US_SIGNED_OUT = 0,
-                US_SIGNED_IN,
-                US_GUEST,
-                US_SIGNING_IN,
-                US_SIGNING_OUT
-            };
-
             // ----------------------------------------------------------------
             class SignInRequest : public XMLRequest
             {
@@ -87,7 +78,6 @@ namespace Online
         private:
             std::string                 m_token;
             bool                        m_save_session;
-            UserState                   m_state;
             OnlineProfile              *m_profile;
 
             bool saveSession()  const   { return m_save_session;      }
@@ -105,6 +95,18 @@ namespace Online
                                 const std::string &action,
                                 const std::string &php_script = "");
             bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
+            /** Returns the user state. */
+            enum UserState
+            {
+                US_SIGNED_OUT = 0,
+                US_SIGNED_IN,
+                US_GUEST,
+                US_SIGNING_IN,
+                US_SIGNING_OUT
+            };
+            UserState                   m_state;
+            const UserState getUserState() const { return m_state; }
+
 
         public:
             CurrentUser();
@@ -121,8 +123,6 @@ namespace Online
 
             irr::core::stringw              getUserName()           const;
             // ----------------------------------------------------------------
-            /** Returns the user state. */
-            const UserState getUserState() const { return m_state; }
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }
