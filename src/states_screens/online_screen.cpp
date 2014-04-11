@@ -231,7 +231,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
-        ProfileManager::get()->setVisiting(PlayerManager::getCurrentUser()->getID());
+        ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
     else if (selection == m_find_server_widget->m_properties[PROP_ID])

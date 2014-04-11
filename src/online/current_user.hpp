@@ -33,6 +33,8 @@
 #include <string>
 #include <assert.h>
 
+class PlayerManager;
+
 namespace Online
 {
 
@@ -94,6 +96,12 @@ namespace Online
             void signIn                 (bool success, const XMLNode * input);
             void signOut                (bool success, const XMLNode * input);
 
+            // For now declare functions that will become part of PlayerManager
+            // or Playerprofile to be private, and give only PlayerManager
+            // access to them. FIXME
+            friend class PlayerManager;
+            uint32_t getID() const;
+
         public:
             CurrentUser();
             void setUserDetails(HTTPRequest *request,
@@ -112,7 +120,6 @@ namespace Online
             void                            requestPoll() const;
 
             irr::core::stringw              getUserName()           const;
-            uint32_t                        getID()                 const;
             // ----------------------------------------------------------------
             /** Returns the user state. */
             const UserState getUserState() const { return m_state; }

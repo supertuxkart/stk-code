@@ -114,7 +114,7 @@ OnlineProfile::OnlineProfile(const XMLNode * xml, ConstructorType type)
 
     xml->get("id",        &m_id      );
     xml->get("user_name", &m_username);
-    m_is_current_user          = (m_id == PlayerManager::getCurrentUser()->getID());
+    m_is_current_user          = (m_id == PlayerManager::getCurrentOnlineId());
     m_state = S_READY;
 }   // OnlineProfile(XMLNode)
 

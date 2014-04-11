@@ -160,8 +160,8 @@ void MainMenuScreen::onUpdate(float delta)
     else // now must be either logging in or logging out
         m_online->setDeactivated();
 
-    m_online->setLabel(PlayerManager::getCurrentUser()->getID() ? _("Online")
-                                                                : _("Login" )  );
+    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
+                                                           : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -405,7 +405,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Allow STK to connect to the Internet\"."));
             return;
         }
-        if (PlayerManager::getCurrentUser()->getID())
+        if (PlayerManager::getCurrentOnlineId())
             StateManager::get()->pushScreen(OnlineScreen::getInstance());
         else
             StateManager::get()->pushScreen(LoginScreen::getInstance());

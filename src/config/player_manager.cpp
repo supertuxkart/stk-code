@@ -53,6 +53,10 @@ void PlayerManager::setUserDetails(Online::HTTPRequest *request,
 {
     get()->getCurrentUser()->setUserDetails(request, action, php_name);
 }
+unsigned int PlayerManager::getCurrentOnlineId()
+{
+    return getCurrentUser()->getID();
+}   // getCurrentOnlineId
 
 // ============================================================================
 /** Constructor.
