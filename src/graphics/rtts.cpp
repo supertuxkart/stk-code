@@ -142,5 +142,13 @@ RTT::RTT()
 
 RTT::~RTT()
 {
-
+    glDeleteFramebuffers(FBO_COUNT, FrameBuffers);
+    glDeleteTextures(RTT_COUNT, RenderTargetTextures);
+    glDeleteTextures(1, &DepthStencilTexture);
+    if (irr_driver->getGLSLVersion() >= 150)
+    {
+        glDeleteFramebuffers(1, &shadowFBO);
+        glDeleteTextures(1, &shadowColorTex);
+        glDeleteTextures(1, &shadowDepthTex);
+    }
 }
