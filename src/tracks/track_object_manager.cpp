@@ -25,6 +25,7 @@
 #include "io/xml_node.hpp"
 #include "physics/physical_object.hpp"
 #include "tracks/track_object.hpp"
+#include "utils/log.hpp"
 
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>

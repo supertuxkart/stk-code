@@ -30,6 +30,7 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 MusicOggStream::MusicOggStream()
 {
