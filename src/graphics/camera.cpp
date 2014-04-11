@@ -236,7 +236,7 @@ void Camera::setMode(Mode mode)
     // correct position.
     if((m_mode==CM_REVERSE && mode==CM_NORMAL) || (m_mode==CM_FALLING && mode==CM_NORMAL))
     {
-        Vec3 start_offset(0, 1.6, -3);
+        Vec3 start_offset(0, 1.6f, -3);
         Vec3 current_position = m_kart->getTrans()(start_offset);
         m_camera->setPosition(  current_position.toIrrVector());
         m_camera->setTarget(m_camera->getPosition());
@@ -282,7 +282,7 @@ void Camera::reset()
 void Camera::setInitialTransform()
 {
     if (m_kart == NULL) return;
-    Vec3 start_offset(0, 1.6, -3);
+    Vec3 start_offset(0, 1.6f, -3);
     Vec3 current_position = m_kart->getTrans()(start_offset);
     m_camera->setPosition(  current_position.toIrrVector());
     // Reset the target from the previous target (in case of a restart
@@ -321,9 +321,11 @@ void Camera::smoothMoveCamera(float dt)
 
     float skid_angle = asin(skid_factor);
     float ratio = (current_speed - max_speed_without_zipper) / max_increase_with_zipper;
-    ratio = ratio > -0.12 ? ratio : -0.12;
+    ratio = ratio > -0.12f ? ratio : -0.12f;
     float camera_distance = -3 * (1 + ratio);// distance of camera from kart in x and z plane
-    Vec3 camera_offset(camera_distance * sin(skid_angle / 2), 1.6 * (1 + ratio / 2),camera_distance * cos(skid_angle / 2));// defines how far camera should be from player kart.
+    Vec3 camera_offset(camera_distance * sin(skid_angle / 2),
+                       1.6f * (1 + ratio / 2),
+                       camera_distance * cos(skid_angle / 2));// defines how far camera should be from player kart.
     Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
     
     
@@ -333,7 +335,9 @@ void Camera::smoothMoveCamera(float dt)
     
     if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
     {
-        current_position += ((wanted_position - current_position) * dt * (m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 + 1.0f : -1 * m_kart->getSpeed() * 1.5 + 2.0f));
+        current_position += ((wanted_position - current_position) * dt 
+                          * (m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 + 1.0f
+                                                 : -1.5f * m_kart->getSpeed() + 2.0f));
     }
     else
     {
