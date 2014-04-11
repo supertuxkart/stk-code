@@ -21,6 +21,7 @@
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #if HAVE_OGGVORBIS
 #  include <vorbis/codec.h>
