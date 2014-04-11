@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/user_info_dialog.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
@@ -62,7 +63,7 @@ void UserInfoDialog::beforeAddingWidgets()
     // Avoid a crash in case that an invalid m_showing_id is given
     // (which can only happen if there's a problem on the server).
     if (!m_profile)
-        m_profile = CurrentUser::get()->getProfile();
+        m_profile = PlayerManager::getCurrentUser()->getProfile();
     m_self_destroy = false;
     m_enter_profile = false;
     m_processing = false;
@@ -147,7 +148,7 @@ void UserInfoDialog::sendFriendRequest()
             core::stringw info_text("");
             if (isSuccess())
             {
-                CurrentUser::get()->getProfile()->addFriend(id);
+                PlayerManager::getCurrentUser()->getProfile()->addFriend(id);
                 OnlineProfile::RelationInfo *info =
                              new OnlineProfile::RelationInfo(_("Today"), false,
                                                              true, false);
@@ -169,7 +170,7 @@ void UserInfoDialog::sendFriendRequest()
     // ------------------------------------------------------------------------
 
     FriendRequest *request = new FriendRequest();
-    CurrentUser::setUserDetails(request, "friend-request");
+    PlayerManager::setUserDetails(request, "friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
 
@@ -220,7 +221,7 @@ void UserInfoDialog::acceptFriendRequest()
     // ------------------------------------------------------------------------
 
     AcceptFriendRequest *request = new AcceptFriendRequest();
-    CurrentUser::setUserDetails(request, "accept-friend-request");
+    PlayerManager::setUserDetails(request, "accept-friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
     m_processing = true;
@@ -248,7 +249,7 @@ void UserInfoDialog::declineFriendRequest()
             core::stringw info_text("");
             if (isSuccess())
             {
-                CurrentUser::get()->getProfile()->removeFriend(id);
+                PlayerManager::getCurrentUser()->getProfile()->removeFriend(id);
                 ProfileManager::get()->moveToCache(id);
                 ProfileManager::get()->getProfileByID(id)
                                      ->deleteRelationalInfo();
@@ -266,7 +267,7 @@ void UserInfoDialog::declineFriendRequest()
     };   // DeclineFriendRequest
     // ----------------------------------------------------------------
     DeclineFriendRequest *request = new DeclineFriendRequest();
-    CurrentUser::setUserDetails(request, "decline-friend-request");
+    PlayerManager::setUserDetails(request, "decline-friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
 
@@ -289,7 +290,7 @@ void UserInfoDialog::removeExistingFriend()
             core::stringw info_text("");
             if (isSuccess())
             {
-                CurrentUser::get()->getProfile()->removeFriend(m_id);
+                PlayerManager::getCurrentUser()->getProfile()->removeFriend(m_id);
                 ProfileManager *pm = ProfileManager::get();
                 pm->moveToCache(m_id);
                 pm->getProfileByID(m_id)->deleteRelationalInfo();
@@ -313,7 +314,7 @@ void UserInfoDialog::removeExistingFriend()
 
     int friend_id = m_profile->getID();
     RemoveFriendRequest * request = new RemoveFriendRequest(friend_id);
-    CurrentUser::setUserDetails(request, "remove-friend");
+    PlayerManager::setUserDetails(request, "remove-friend");
     request->addParameter("friendid", friend_id);
     request->queue();
 }   // removeExistingFriend
@@ -337,7 +338,7 @@ void UserInfoDialog::removePendingFriend()
             core::stringw info_text("");
             if (isSuccess())
             {
-                CurrentUser::get()->getProfile()->removeFriend(id);
+                PlayerManager::getCurrentUser()->getProfile()->removeFriend(id);
                 ProfileManager *pm = ProfileManager::get();
                 pm->moveToCache(id);
                 pm->getProfileByID(id)->deleteRelationalInfo();
@@ -357,7 +358,7 @@ void UserInfoDialog::removePendingFriend()
     // ------------------------------------------------------------------------
 
     CancelFriendRequest * request = new CancelFriendRequest();
-    CurrentUser::setUserDetails(request, "cancel-friend-request");
+    PlayerManager::setUserDetails(request, "cancel-friend-request");
     request->addParameter("friendid", m_profile->getID());
     request->queue();
 }   // removePendingFriend

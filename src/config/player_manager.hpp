@@ -30,13 +30,24 @@
 #include <cstddef>  // NULL
 
 class AchievementsStatus;
+
+namespace online 
+{
+    class CurrentUser;
+    class HTTPRequest;
+}
 class PlayerProfile;
 
 /** A special class that manages all local player accounts. It reads all player
- *  accounts from the players.xml file in the user config directory. It also
- *  keeps track of the currently logged in player. For each player an instance
- *  of PlayerProfile is created, which keeps track of story mode progress,
- *  achievements and other data.
+ *  accounts from the players.xml file in the user config directory. For each
+ *  player an instance of PlayerProfile is created, which keeps track of 
+ *  story mode progress, achievements and other data. It also keeps track of
+ *  the currently logged in player.
+ *  It includes several handy static functions which avoid long call 
+ *  sequences, e.g.:
+ *    PlayerManager::getCurrentOnlineId()
+ *  which is just:
+ *    PlayerManager::get()->getCurrentUser()->getID();
  */
 class PlayerManager : public NoCopy
 {
@@ -73,8 +84,7 @@ public:
         delete m_player_manager;
         m_player_manager = NULL;
     }   // destroy
-    // ------------------------------------------------------------------------
-    
+
     void save();
     void loadRemainingData();
     unsigned int getUniqueId() const;
@@ -84,12 +94,35 @@ public:
     void setCurrentPlayer(PlayerProfile *player, bool remember_me);
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
+    static void setUserDetails(Online::HTTPRequest *request,
+                               const std::string &action,
+                               const std::string &php_name = "");
+    static unsigned int getCurrentOnlineId();
+    static bool isCurrentLoggedIn();
+
+    /** The online state a player can be in. */
+    enum OnlineState
+    {
+        OS_SIGNED_OUT = 0,
+        OS_SIGNED_IN,
+        OS_GUEST,
+        OS_SIGNING_IN,
+        OS_SIGNING_OUT
+    };
+
+    static OnlineState getCurrentOnlineState();
+
     // ------------------------------------------------------------------------
     /** Returns the current player. */
     static PlayerProfile* getCurrentPlayer() 
     {
         return get()->m_current_player; 
     }   // getCurrentPlayer
+    // ------------------------------------------------------------------------
+    static Online::CurrentUser* getCurrentUser()
+    {
+        return get()->m_current_player->getCurrentUser();
+    }   // getCurrentUser
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------

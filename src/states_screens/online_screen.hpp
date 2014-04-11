@@ -18,11 +18,11 @@
 #ifndef HEADER_ONLINE_SCREEN_HPP
 #define HEADER_ONLINE_SCREEN_HPP
 
+#include "config/player_manager.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
-#include "online/current_user.hpp"
 #include "utils/ptr_vector.hpp"
 
 namespace GUIEngine { class Widget; class ListWidget; }
@@ -54,7 +54,7 @@ private:
     GUIEngine::IconButtonWidget * m_profile_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
 
-    Online::CurrentUser::UserState m_recorded_state;
+    PlayerManager::OnlineState m_recorded_state;
 
     bool hasStateChanged();
     void setInitialFocus();

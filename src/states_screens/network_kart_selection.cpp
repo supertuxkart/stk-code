@@ -2,6 +2,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
@@ -67,7 +68,7 @@ void NetworkKartSelectionScreen::init()
 
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        if (players[i]->user_profile == Online::CurrentUser::get()->getProfile())
+        if (players[i]->user_profile == PlayerManager::getCurrentUser()->getProfile())
         {
             m_id_mapping.insert(m_id_mapping.begin(),players[i]->race_id); //!< first kart widget always me
             Log::info("NKSS", "Insert %d at pos 0", players[i]->race_id);

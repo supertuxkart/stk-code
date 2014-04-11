@@ -20,10 +20,10 @@
 #ifndef HEADER_ACHIEVEMENTS_SLOT_HPP
 #define HEADER_ACHIEVEMENTS_SLOT_HPP
 
-#include "utils/types.hpp"
 #include "achievements/achievement.hpp"
 #include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 #include <string>

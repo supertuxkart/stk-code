@@ -146,13 +146,13 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 
 {
-    if(CurrentUser::get()->getUserState()==CurrentUser::US_GUEST ||
-        CurrentUser::get()->getUserState()==CurrentUser::US_SIGNED_IN)
+    if(PlayerManager::getCurrentOnlineState() == PlayerManager::OS_GUEST  ||
+       PlayerManager::getCurrentOnlineState() == PlayerManager::OS_SIGNED_IN)
     {
         m_online->setActivated();
         m_online->setLabel( _("Online"));
     }
-    else if(CurrentUser::get()->getUserState()==CurrentUser::US_SIGNED_OUT)
+    else if (PlayerManager::getCurrentOnlineState() == PlayerManager::OS_SIGNED_OUT)
     {
         m_online->setActivated();
         m_online->setLabel( _("Login" ));
@@ -160,8 +160,8 @@ void MainMenuScreen::onUpdate(float delta)
     else // now must be either logging in or logging out
         m_online->setDeactivated();
 
-    m_online->setLabel(CurrentUser::get()->getID() ? _("Online")
-                                                   : _("Login" )  );
+    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
+                                                           : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -405,7 +405,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Allow STK to connect to the Internet\"."));
             return;
         }
-        if(CurrentUser::get()->getID())
+        if (PlayerManager::getCurrentOnlineId())
             StateManager::get()->pushScreen(OnlineScreen::getInstance());
         else
             StateManager::get()->pushScreen(LoginScreen::getInstance());

@@ -23,7 +23,7 @@
 #include "achievements/achievement_info.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "io/utf_writer.hpp"
-#include "online/current_user.hpp"
+#include "config/player_manager.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -207,11 +207,10 @@ void Achievement::check()
 
         // Sends a confirmation to the server that an achievement has been
         // completed, if a user is signed in.
-        Online::CurrentUser *cu = Online::CurrentUser::get();
-        if (cu->isRegisteredUser())
+        if (PlayerManager::isCurrentLoggedIn())
         {
             Online::HTTPRequest * request = new Online::HTTPRequest(true);
-            Online::CurrentUser::setUserDetails(request, "achieving");
+            PlayerManager::setUserDetails(request, "achieving");
             request->addParameter("achievementid", m_id);
             request->queue();
         }

@@ -18,10 +18,11 @@
 
 #include "network/protocols/start_server.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "network/network_manager.hpp"
 #include "online/current_user.hpp"
 #include "online/request_manager.hpp"
-#include "config/user_config.hpp"
 
 StartServer::StartServer() : Protocol(NULL, PROTOCOL_SILENT)
 {
@@ -42,14 +43,12 @@ void StartServer::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        m_request->setServerURL("address-management.php");
-        m_request->addParameter("id",Online::CurrentUser::get()->getID());
-        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+        PlayerManager::setUserDetails(m_request, "start-server",
+                                     "address-management.php");
         m_request->addParameter("address",addr.ip);
         m_request->addParameter("port",addr.port);
         m_request->addParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
         m_request->addParameter("max_players",UserConfigParams::m_server_max_players);
-        m_request->addParameter("action","start-server");
         Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
 
         Online::RequestManager::get()->addRequest(m_request);

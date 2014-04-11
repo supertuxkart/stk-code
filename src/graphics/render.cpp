@@ -164,11 +164,9 @@ void IrrDriver::renderGLSL(float dt)
         }*/
 
         // Get Projection and view matrix
-        irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-        m_scene_manager->drawAll(scene::ESNRP_CAMERA);
-        irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
-        irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
-        irr_driver->genProjViewMatrix();
+        computeCameraMatrix(camnode, camera);
+        glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+
 
         // Fire up the MRT
         PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -424,15 +422,35 @@ void IrrDriver::renderSolidFirstPass()
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
+    GroupedFPSM<FPSM_DEFAULT>::reset();
+    GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::reset();
+    GroupedFPSM<FPSM_NORMAL_MAP>::reset();
+
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
+    glUseProgram(MeshShader::ObjectPass1Shader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
+    {
+        drawObjectPass1(*GroupedFPSM<FPSM_DEFAULT>::MeshSet[i], GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i]);
+    }
+    glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
+    {
+        drawObjectRefPass1(*GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
+    }
+    glUseProgram(MeshShader::NormalMapShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
+    {
+        drawNormalPass(*GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i]);
+    }
 }
 
 void IrrDriver::renderSolidSecondPass()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
     SColor clearColor = World::getWorld()->getClearColor();
-    glClearColor(clearColor.getRed() / 255., clearColor.getGreen() / 255., clearColor.getBlue() / 255., clearColor.getAlpha() / 255.);
+    glClearColor(clearColor.getRed()  / 255.f, clearColor.getGreen() / 255.f,
+                 clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
     glDepthMask(GL_FALSE);
 
@@ -440,10 +458,51 @@ void IrrDriver::renderSolidSecondPass()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
+    GroupedSM<SM_DEFAULT>::reset();
+    GroupedSM<SM_ALPHA_REF_TEXTURE>::reset();
+    GroupedSM<SM_RIMLIT>::reset();
+    GroupedSM<SM_SPHEREMAP>::reset();
+    GroupedSM<SM_SPLATTING>::reset();
+    GroupedSM<SM_UNLIT>::reset();
+    GroupedSM<SM_DETAILS>::reset();
+    GroupedSM<SM_UNTEXTURED>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
+
+    glUseProgram(MeshShader::ObjectPass2Shader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_DEFAULT>::MeshSet.size(); i++)
+        drawObjectPass2(*GroupedSM<SM_DEFAULT>::MeshSet[i], GroupedSM<SM_DEFAULT>::MVPSet[i], GroupedSM<SM_DEFAULT>::MeshSet[i]->TextureMatrix);
+
+    glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.size(); i++)
+        drawObjectRefPass2(*GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
+
+    glUseProgram(MeshShader::ObjectRimLimitShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_RIMLIT>::MeshSet.size(); i++)
+        drawObjectRimLimit(*GroupedSM<SM_RIMLIT>::MeshSet[i], GroupedSM<SM_RIMLIT>::MVPSet[i], GroupedSM<SM_RIMLIT>::TIMVSet[i], GroupedSM<SM_RIMLIT>::MeshSet[i]->TextureMatrix);
+
+    glUseProgram(MeshShader::SphereMapShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_SPHEREMAP>::MeshSet.size(); i++)
+        drawSphereMap(*GroupedSM<SM_SPHEREMAP>::MeshSet[i], GroupedSM<SM_SPHEREMAP>::MVPSet[i], GroupedSM<SM_SPHEREMAP>::TIMVSet[i]);
+
+    glUseProgram(MeshShader::SplattingShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_SPLATTING>::MeshSet.size(); i++)
+        drawSplatting(*GroupedSM<SM_SPLATTING>::MeshSet[i], GroupedSM<SM_SPLATTING>::MVPSet[i]);
+
+    glUseProgram(MeshShader::ObjectUnlitShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_UNLIT>::MeshSet.size(); i++)
+        drawObjectUnlit(*GroupedSM<SM_UNLIT>::MeshSet[i], GroupedSM<SM_UNLIT>::MVPSet[i]);
+
+    glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_DETAILS>::MeshSet.size(); i++)
+        drawDetailledObjectPass2(*GroupedSM<SM_DETAILS>::MeshSet[i], GroupedSM<SM_DETAILS>::MVPSet[i]);
+
+    glUseProgram(MeshShader::UntexturedObjectShader::Program);
+    for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
+        drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
+
 }
 
 void IrrDriver::renderTransparent()
@@ -469,10 +528,8 @@ void IrrDriver::renderParticles()
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
-void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
-                              scene::ICameraSceneNode * const camnode,
-                              //video::SOverrideMaterial &overridemat,
-                              Camera * const camera)
+void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode,
+    Camera * const camera)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
 
@@ -556,6 +613,35 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
     assert(sun_ortho_matrix.size() == 4);
+    camnode->setNearValue(oldnear);
+    camnode->setFarValue(oldfar);
+    camnode->render();
+    camera->activate();
+    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+    irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
+    irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
+    irr_driver->genProjViewMatrix();
+
+    float *tmp = new float[16 * 8];
+
+    memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(), 16 * sizeof(float));
+    memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
+    size_t size = irr_driver->getShadowViewProj().size();
+    for (unsigned i = 0; i < size; i++)
+        memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+
+    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
+    delete tmp;
+}
+
+void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
+                              scene::ICameraSceneNode * const camnode,
+                              //video::SOverrideMaterial &overridemat,
+                              Camera * const camera)
+{
 
     irr_driver->setPhase(SHADOW_PASS);
     glDisable(GL_BLEND);
@@ -566,25 +652,11 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
 
-    size_t size = irr_driver->getShadowViewProj().size();
-    float *tmp = new float[16 * size];
-    for (unsigned i = 0; i < size; i++) {
-        memcpy(&tmp[16 * i], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
-    }
-    glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 4 * sizeof(float), tmp);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
-    delete tmp;
-
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    glBindBuffer(GL_UNIFORM_BUFFER, 0);
     glCullFace(GL_BACK);
 
-    camnode->setNearValue(oldnear);
-    camnode->setFarValue(oldfar);
-    camnode->render();
-    camera->activate();
-    m_scene_manager->drawAll(scene::ESNRP_CAMERA);
+
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
 
@@ -763,7 +835,12 @@ static void renderPointLights(unsigned count)
 
     setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    LightShader::PointLightShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 200, 0, 1);
+    LightShader::PointLightShader
+               ::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(),
+                            irr_driver->getInvProjMatrix(), 
+                            core::vector2df(float(UserConfigParams::m_width),
+                                            float(UserConfigParams::m_height) ), 
+                            200, 0, 1);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
@@ -916,21 +993,21 @@ static void getYml(GLenum face, size_t width, size_t height,
         for (unsigned j = 0; j < height; j++)
         {
             float x, y, z;
-            float fi = i, fj = j;
+            float fi = float(i), fj = float(j);
             fi /= width, fj /= height;
             fi = 2 * fi - 1, fj = 2 * fj - 1;
             getXYZ(face, fi, fj, x, y, z);
 
             // constant part of Ylm
-            float c00 = 0.282095;
-            float c1minus1 = 0.488603;
-            float c10 = 0.488603;
-            float c11 = 0.488603;
-            float c2minus2 = 1.092548;
-            float c2minus1 = 1.092548;
-            float c21 = 1.092548;
-            float c20 = 0.315392;
-            float c22 = 0.546274;
+            float c00 = 0.282095f;
+            float c1minus1 = 0.488603f;
+            float c10 = 0.488603f;
+            float c11 = 0.488603f;
+            float c2minus2 = 1.092548f;
+            float c2minus1 = 1.092548f;
+            float c21 = 1.092548f;
+            float c20 = 0.315392f;
+            float c22 = 0.546274f;
 
             size_t idx = i * height + j;
 
@@ -957,7 +1034,7 @@ static float getTexelValue(unsigned i, unsigned j, size_t width, size_t height, 
     reconstructedVal += Y1minus1[i * height + j] * Coeff[1] + Y10[i * height + j] * Coeff[2] +  Y11[i * height + j] * Coeff[3];
     reconstructedVal += Y2minus2[idx] * Coeff[4] + Y2minus1[idx] * Coeff[5] + Y20[idx] * Coeff[6] + Y21[idx] * Coeff[7] + Y22[idx] * Coeff[8];
     reconstructedVal /= solidangle;
-    return MAX2(255 * reconstructedVal, 0.);
+    return MAX2(255.0f * reconstructedVal, 0.f);
 }
 
 static void unprojectSH(float *output[], size_t width, size_t height,
@@ -972,7 +1049,7 @@ static void unprojectSH(float *output[], size_t width, size_t height,
         {
             for (unsigned j = 0; j < height; j++)
             {
-                float fi = i, fj = j;
+                float fi = float(i), fj = float(j);
                 fi /= width, fj /= height;
                 fi = 2 * fi - 1, fj = 2 * fj - 1;
 
@@ -1003,7 +1080,7 @@ static void projectSH(float *color[], size_t width, size_t height,
         greenSHCoeff[i] = 0;
         redSHCoeff[i] = 0;
     }
-    float wh = width * height;
+    float wh = float(width * height);
     for (unsigned face = 0; face < 6; face++)
     {
         for (unsigned i = 0; i < width; i++)
@@ -1011,7 +1088,7 @@ static void projectSH(float *color[], size_t width, size_t height,
             for (unsigned j = 0; j < height; j++)
             {
                 size_t idx = i * height + j;
-                float fi = i, fj = j;
+                float fi = float(i), fj = float(j);
                 fi /= width, fj /= height;
                 fi = 2 * fi - 1, fj = 2 * fj - 1;
 
@@ -1019,11 +1096,11 @@ static void projectSH(float *color[], size_t width, size_t height,
                 float d = sqrt(fi * fi + fj * fj + 1);
 
                 // Constant obtained by projecting unprojected ref values
-                float solidangle = 2.75 / (wh * pow(d, 1.5f));
+                float solidangle = 2.75f / (wh * pow(d, 1.5f));
                 // pow(., 2.2) to convert from srgb
-                float b = pow(color[face][4 * height * i + 4 * j] / 255., 2.2);
-                float g = pow(color[face][4 * height * i + 4 * j + 1] / 255., 2.2);
-                float r = pow(color[face][4 * height * i + 4 * j + 2] / 255., 2.2);
+                float b = pow(color[face][4 * height * i + 4 * j    ] / 255.f, 2.2f);
+                float g = pow(color[face][4 * height * i + 4 * j + 1] / 255.f, 2.2f);
+                float r = pow(color[face][4 * height * i + 4 * j + 2] / 255.f, 2.2f);
 
                 assert(b >= 0.);
 
@@ -1089,9 +1166,9 @@ static void testSH(char *color[6], size_t width, size_t height,
         testoutput[i] = new float[width * height * 4];
         for (unsigned j = 0; j < width * height; j++)
         {
-            testoutput[i][4 * j] = 0xFF & color[i][4 * j];
-            testoutput[i][4 * j + 1] = 0xFF & color[i][4 * j + 1];
-            testoutput[i][4 * j + 2] = 0xFF & color[i][4 * j + 2];
+            testoutput[i][4 * j    ] = float(0xFF & color[i][4 * j]);
+            testoutput[i][4 * j + 1] = float(0xFF & color[i][4 * j + 1]);
+            testoutput[i][4 * j + 2] = float(0xFF & color[i][4 * j + 2]);
         }
     }
 
@@ -1187,9 +1264,9 @@ static void testSH(char *color[6], size_t width, size_t height,
     {
         for (unsigned j = 0; j < width * height; j++)
         {
-            color[i][4 * j] = MIN2(testoutput[i][4 * j], 255);
-            color[i][4 * j + 1] = MIN2(testoutput[i][4 * j + 1], 255);
-            color[i][4 * j + 2] = MIN2(testoutput[i][4 * j + 2], 255);
+            color[i][4 * j    ] = char(MIN2(testoutput[i][4 * j], 255));
+            color[i][4 * j + 1] = char(MIN2(testoutput[i][4 * j + 1], 255));
+            color[i][4 * j + 2] = char(MIN2(testoutput[i][4 * j + 2], 255));
         }
     }
 
@@ -1209,7 +1286,7 @@ void IrrDriver::generateSkyboxCubemap()
 
     glGenTextures(1, &SkyboxCubeMap);
 
-    GLint w = 0, h = 0;
+    unsigned w = 0, h = 0;
     for (unsigned i = 0; i < 6; i++)
     {
         w = MAX2(w, SkyboxTextures[i]->getOriginalSize().Width);
@@ -1262,7 +1339,7 @@ void IrrDriver::renderSkybox()
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
 	glDisable(GL_CULL_FACE);
 	assert(SkyboxTextures.size() == 6);
-	core::matrix4 transform = irr_driver->getProjViewMatrix();
+
 	core::matrix4 translate;
 	translate.setTranslation(camera->getAbsolutePosition());
 
@@ -1270,7 +1347,7 @@ void IrrDriver::renderSkybox()
 	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
 	core::matrix4 scale;
 	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
-	transform *= translate * scale;
+    core::matrix4 transform = translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
 
@@ -1279,7 +1356,10 @@ void IrrDriver::renderSkybox()
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glUseProgram(MeshShader::SkyboxShader::Program);
-    MeshShader::SkyboxShader::setUniforms(transform, invtransform, core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0);
+    MeshShader::SkyboxShader::setUniforms(transform, 
+                                          core::vector2df(float(UserConfigParams::m_width),
+                                                          float(UserConfigParams::m_height)),
+                                          0);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }

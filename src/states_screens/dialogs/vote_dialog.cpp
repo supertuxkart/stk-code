@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/vote_dialog.hpp"
 
 #include "addons/addons_manager.hpp"
+#include "config/player_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
@@ -60,7 +61,7 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
 
     m_fetch_vote_request = new XMLRequest();
-    CurrentUser::setUserDetails(m_fetch_vote_request, "get-addon-vote");
+    PlayerManager::setUserDetails(m_fetch_vote_request, "get-addon-vote");
     m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
     m_fetch_vote_request->queue();
 
@@ -119,7 +120,7 @@ void VoteDialog::sendVote()
 
 
     m_perform_vote_request = new SetAddonVoteRequest();
-    CurrentUser::setUserDetails(m_perform_vote_request, "set-addon-vote");
+    PlayerManager::setUserDetails(m_perform_vote_request, "set-addon-vote");
     m_perform_vote_request->addParameter("addonid", m_addon_id.substr(6));
     m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
     m_perform_vote_request->queue();

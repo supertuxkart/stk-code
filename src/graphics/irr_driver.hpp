@@ -226,6 +226,8 @@ private:
     void renderSolidSecondPass();
     void renderTransparent();
     void renderParticles();
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode,
+        Camera * const camera);
     void renderShadows(//ShadowImportanceProvider * const sicb,
                        scene::ICameraSceneNode * const camnode,
                        //video::SOverrideMaterial &overridemat,

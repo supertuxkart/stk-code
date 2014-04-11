@@ -1,5 +1,11 @@
-uniform mat4 ViewProjectionMatrix;
-uniform mat4 InverseViewMatrix;
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
 
 in vec3 Origin;
 in vec3 Orientation;
@@ -19,7 +25,7 @@ void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
-    gl_Position = ViewProjectionMatrix *  ModelMatrix * vec4(Position, 1.);
+    gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
 }

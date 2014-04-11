@@ -19,10 +19,8 @@
 
 #include "states_screens/online_screen.hpp"
 
-#include <string>
-#include <iostream>
-
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "input/device_manager.hpp"
@@ -45,8 +43,12 @@
 #include "states_screens/create_server_screen.hpp"
 #include "states_screens/online_profile_overview.hpp"
 
+#include <string>
+#include <iostream>
+
 using namespace GUIEngine;
 using namespace Online;
+
 
 DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
@@ -54,7 +56,7 @@ DEFINE_SCREEN_SINGLETON( OnlineScreen );
 
 OnlineScreen::OnlineScreen() : Screen("online/main.stkgui")
 {
-    m_recorded_state = CurrentUser::US_SIGNED_OUT;
+    m_recorded_state = PlayerManager::OS_SIGNED_OUT;
 }   // OnlineScreen
 
 // ----------------------------------------------------------------------------
@@ -96,8 +98,8 @@ void OnlineScreen::loadedFromFile()
  */
 bool OnlineScreen::hasStateChanged()
 {
-    CurrentUser::UserState previous_state = m_recorded_state;
-    m_recorded_state = CurrentUser::get()->getUserState();
+    PlayerManager::OnlineState previous_state = m_recorded_state;
+    m_recorded_state = PlayerManager::getCurrentOnlineState();
     if (previous_state != m_recorded_state)
         return true;
     return false;
@@ -110,9 +112,9 @@ void OnlineScreen::beforeAddingWidget()
     m_bottom_menu_widget->setVisible(true);
     m_top_menu_widget->setVisible(true);
     hasStateChanged();
-    if (m_recorded_state == CurrentUser::US_SIGNED_OUT ||
-        m_recorded_state == CurrentUser::US_SIGNING_IN ||
-        m_recorded_state == CurrentUser::US_SIGNING_OUT    )
+    if (m_recorded_state == PlayerManager::OS_SIGNED_OUT ||
+        m_recorded_state == PlayerManager::OS_SIGNING_IN ||
+        m_recorded_state == PlayerManager::OS_SIGNING_OUT)
     {
         m_quick_play_widget->setDeactivated();
         m_find_server_widget->setDeactivated();
@@ -120,7 +122,7 @@ void OnlineScreen::beforeAddingWidget()
         m_sign_out_widget->setVisible(false);
         m_profile_widget->setVisible(false);
     }
-    else if (m_recorded_state == CurrentUser::US_GUEST)
+    else if (m_recorded_state == PlayerManager::OS_GUEST)
     {
         m_find_server_widget->setDeactivated();
         m_create_server_widget->setDeactivated();
@@ -135,7 +137,8 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    core::stringw m = _("Signed in as: %s.",CurrentUser::get()->getUserName());
+    core::stringw m = _("Signed in as: %s.", 
+                        PlayerManager::getCurrentUser()->getUserName());
     m_online_status_widget->setText(m, false);
 }   // init
 
@@ -148,11 +151,11 @@ void OnlineScreen::onUpdate(float delta)
         return;
     }
 
-    if (m_recorded_state == CurrentUser::US_SIGNING_IN)
+    if (m_recorded_state == PlayerManager::OS_SIGNING_IN)
     {
         m_online_status_widget->setText(Messages::signingIn(), false);
     }
-    else if (m_recorded_state == CurrentUser::US_SIGNING_OUT)
+    else if (m_recorded_state == PlayerManager::OS_SIGNING_OUT)
     {
         m_online_status_widget->setText(Messages::signingOut(), false);
     }
@@ -186,7 +189,7 @@ void OnlineScreen::doQuickPlay()
         return;
     }
 
-    CurrentUser::setUserDetails(request2, "request-connection");
+    PlayerManager::setUserDetails(request2, "request-connection");
     request2->setServerURL("address-management.php");
     request2->addParameter("server_id", server->getServerId());
 
@@ -223,12 +226,12 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 
     if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
-        CurrentUser::get()->requestSignOut();
+        PlayerManager::getCurrentUser()->requestSignOut();
         StateManager::get()->popMenu();
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])
     {
-        ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
+        ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
         StateManager::get()->pushScreen(OnlineProfileOverview::getInstance());
     }
     else if (selection == m_find_server_widget->m_properties[PROP_ID])
@@ -256,7 +259,7 @@ void OnlineScreen::tearDown()
  */
 void OnlineScreen::setInitialFocus()
 {
-    if(m_recorded_state == CurrentUser::US_SIGNED_IN)
+    if (m_recorded_state == PlayerManager::OS_SIGNED_IN)
         m_top_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
     else
         m_bottom_menu_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);

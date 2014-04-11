@@ -18,6 +18,7 @@
 #include "states_screens/login_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -98,7 +99,7 @@ void LoginScreen::login()
         m_options_widget->setDeactivated();
         info_widget->setDefaultColor();
         bool remember = getWidget<CheckBoxWidget>("remember")->getState();
-        Online::CurrentUser::get()->requestSignIn(username,password,
+        PlayerManager::getCurrentUser()->requestSignIn(username, password,
                                                   remember           );
     }
 }   // login

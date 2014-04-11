@@ -966,7 +966,7 @@ int handleCmdLine()
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
-                Online::CurrentUser::get()->requestSignIn(login, password, false, false);
+                PlayerManager::getCurrentUser()->requestSignIn(login, password, false, false);
         request->executeNow();
 
         if (request->isSuccess())
@@ -1425,7 +1425,6 @@ static void cleanSuperTuxKart()
     Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
     Online::ProfileManager::destroy();
-    Online::CurrentUser::deallocate();
     GUIEngine::DialogQueue::deallocate();
 
     AchievementsManager::destroy();

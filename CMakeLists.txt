@@ -13,9 +13,6 @@ endif()
 
 option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
-if(UNIX)
-    option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
-endif()
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
     # on the installation of the Windows DDK (Driver Developer Kit), 
@@ -116,9 +113,7 @@ if(USE_FRIBIDI)
 endif()
 
 if(UNIX)
-    if(USE_CPP2011)
-        add_definitions("-std=gnu++11")
-    endif()
+    add_definitions("-std=c++0x")
 endif()
 
 # OpenGL

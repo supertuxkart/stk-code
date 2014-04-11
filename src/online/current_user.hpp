@@ -24,13 +24,16 @@
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/xml_request.hpp"
-#include "utils/types.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 
 #include <string>
 #include <assert.h>
+
+class PlayerManager;
 
 namespace Online
 {
@@ -45,16 +48,9 @@ namespace Online
       */
     class CurrentUser
     {
+        private:
+            LEAK_CHECK()
         public:
-            enum UserState
-            {
-                US_SIGNED_OUT = 0,
-                US_SIGNED_IN,
-                US_GUEST,
-                US_SIGNING_IN,
-                US_SIGNING_OUT
-            };
-
             // ----------------------------------------------------------------
             class SignInRequest : public XMLRequest
             {
@@ -82,23 +78,38 @@ namespace Online
         private:
             std::string                 m_token;
             bool                        m_save_session;
-            UserState                   m_state;
             OnlineProfile              *m_profile;
 
             bool saveSession()  const   { return m_save_session;      }
 
-            CurrentUser();
 
             void signIn                 (bool success, const XMLNode * input);
             void signOut                (bool success, const XMLNode * input);
 
-        public:
-            /**Singleton */
-            static CurrentUser *            get();
-            static void                     deallocate();
-            static void setUserDetails(HTTPRequest *request, 
-                                       const std::string &action);
+            // For now declare functions that will become part of PlayerManager
+            // or Playerprofile to be private, and give only PlayerManager
+            // access to them. FIXME
+            friend class PlayerManager;
+            uint32_t getID() const;
+            void setUserDetails(HTTPRequest *request,
+                                const std::string &action,
+                                const std::string &php_script = "");
+            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
+            /** Returns the user state. */
+            enum UserState
+            {
+                US_SIGNED_OUT = 0,
+                US_SIGNED_IN,
+                US_GUEST,
+                US_SIGNING_IN,
+                US_SIGNING_OUT
+            };
+            UserState                   m_state;
+            const UserState getUserState() const { return m_state; }
 
+
+        public:
+            CurrentUser();
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
@@ -111,13 +122,7 @@ namespace Online
             void                            requestPoll() const;
 
             irr::core::stringw              getUserName()           const;
-            uint32_t                        getID()                 const;
             // ----------------------------------------------------------------
-            /** Returns the user state. */
-            const UserState getUserState() const { return m_state; }
-            // ----------------------------------------------------------------
-            /** Returns whether a user is signed in or not. */
-            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }

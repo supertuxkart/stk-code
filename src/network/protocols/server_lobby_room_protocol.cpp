@@ -18,6 +18,7 @@
 
 #include "network/protocols/server_lobby_room_protocol.hpp"
 
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "network/network_world.hpp"
@@ -183,12 +184,10 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         last_poll_time = StkTime::getRealTime();
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
-        request->setServerURL("address-management.php");
-        request->addParameter("id",Online::CurrentUser::get()->getProfile()->getID());
-        request->addParameter("token",Online::CurrentUser::get()->getToken());
+        PlayerManager::setUserDetails(request, "poll-connection-requests",
+                                      "address-management.php");
         request->addParameter("address",addr.ip);
         request->addParameter("port",addr.port);
-        request->addParameter("action","poll-connection-requests");
 
         request->executeNow();
         assert(request->isDone());
