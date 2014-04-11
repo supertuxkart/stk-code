@@ -84,11 +84,6 @@ public:
         delete m_player_manager;
         m_player_manager = NULL;
     }   // destroy
-    // ------------------------------------------------------------------------
-    static void setUserDetails(Online::HTTPRequest *request,
-                               const std::string &action,
-                               const std::string &php_name="");
-    // ------------------------------------------------------------------------
 
     void save();
     void loadRemainingData();
@@ -99,6 +94,11 @@ public:
     void setCurrentPlayer(PlayerProfile *player, bool remember_me);
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
+    static void setUserDetails(Online::HTTPRequest *request,
+                               const std::string &action,
+                               const std::string &php_name = "");
+    static unsigned int getCurrentOnlineId();
+    static bool isCurrentLoggedIn();
     // ------------------------------------------------------------------------
     /** Returns the current player. */
     static PlayerProfile* getCurrentPlayer() 
@@ -110,11 +110,6 @@ public:
     {
         return get()->m_current_player->getCurrentUser();
     }   // getCurrentUser
-    // ------------------------------------------------------------------------
-    /** Returns the online id of the current player.
-     *  \pre User logged in (which is asserted in getID()).
-     */
-    static unsigned int getCurrentOnlineId();
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------

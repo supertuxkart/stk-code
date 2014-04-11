@@ -278,7 +278,7 @@ namespace Online
         handleResultQueue();
 
         //Database polling starts here, only needed for registered users
-        if (!PlayerManager::getCurrentUser()->isRegisteredUser())
+        if (!PlayerManager::isCurrentLoggedIn())
             return;
 
         m_time_since_poll += dt;

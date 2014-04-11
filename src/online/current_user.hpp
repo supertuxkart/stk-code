@@ -101,13 +101,13 @@ namespace Online
             // access to them. FIXME
             friend class PlayerManager;
             uint32_t getID() const;
+            void setUserDetails(HTTPRequest *request,
+                                const std::string &action,
+                                const std::string &php_script = "");
+            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
 
         public:
             CurrentUser();
-            void setUserDetails(HTTPRequest *request,
-                                const std::string &action,
-                                const std::string &php_script="");
-
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
@@ -123,9 +123,6 @@ namespace Online
             // ----------------------------------------------------------------
             /** Returns the user state. */
             const UserState getUserState() const { return m_state; }
-            // ----------------------------------------------------------------
-            /** Returns whether a user is signed in or not. */
-            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }

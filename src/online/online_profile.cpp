@@ -23,7 +23,6 @@
 #include "config/user_config.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -131,7 +130,7 @@ OnlineProfile::~OnlineProfile()
  */
 void OnlineProfile::fetchAchievements()
 {
-    assert(PlayerManager::getCurrentUser()->isRegisteredUser());
+    assert(PlayerManager::isCurrentLoggedIn());
     if (m_has_fetched_achievements || m_is_current_user)
         return;
     m_state = S_FETCHING;
@@ -185,7 +184,7 @@ void OnlineProfile::storeAchievements(const XMLNode * input)
  */
 void OnlineProfile::fetchFriends()
 {
-    assert(PlayerManager::getCurrentUser()->isRegisteredUser());
+    assert(PlayerManager::isCurrentLoggedIn());
     if (m_has_fetched_friends)
         return;
     m_state = S_FETCHING;

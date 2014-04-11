@@ -253,7 +253,7 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 // ----------------------------------------------------------------------------
 void AddonsLoading::voteClicked()
 {
-    if (PlayerManager::getCurrentUser()->isRegisteredUser())
+    if (PlayerManager::isCurrentLoggedIn())
     {
         // We need to keep a copy of the addon id, since dismiss() will
         // delete this object (and the copy of the addon).
