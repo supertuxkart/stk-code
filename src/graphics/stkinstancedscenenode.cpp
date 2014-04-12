@@ -186,7 +186,7 @@ static void drawFSPMDefault(GLMesh &mesh, size_t instance_count)
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   MeshShader::InstancedObjectPass1Shader::setUniforms(0);
 
   glBindVertexArray(mesh.vao_first_pass);
@@ -214,7 +214,7 @@ static void drawFSPMAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::InstancedObjectRefPass1Shader::setUniforms(0);
 
     glBindVertexArray(mesh.vao_first_pass);
@@ -228,7 +228,7 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::InstancedRefShadowShader::setUniforms(0);
 
     assert(mesh.vao_shadow_pass);
@@ -243,7 +243,7 @@ static void drawFSPMGrass(GLMesh &mesh, const core::vector3df &windDir, size_t i
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(0, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::InstancedGrassPass1Shader::setUniforms(windDir, 0);
 
     glBindVertexArray(mesh.vao_first_pass);
@@ -257,7 +257,7 @@ static void drawSMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjection
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  setTexture(MeshShader::InstancedObjectPass2Shader::TU_Albedo, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  setTexture(MeshShader::InstancedObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   MeshShader::InstancedObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
 
@@ -272,7 +272,7 @@ static void drawSMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelViewPr
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(MeshShader::InstancedObjectRefPass2Shader::TU_Albedo, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(MeshShader::InstancedObjectRefPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::InstancedObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
 
@@ -287,7 +287,7 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    setTexture(MeshShader::InstancedGrassPass2Shader::TU_Albedo, mesh.textures[0], GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(MeshShader::InstancedGrassPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     setTexture(MeshShader::InstancedGrassPass2Shader::TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
