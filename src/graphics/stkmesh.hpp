@@ -48,7 +48,7 @@ struct GLMesh {
     GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
-    GLuint textures[6];
+    video::ITexture *textures[6];
     GLenum PrimitiveType;
     GLenum IndexType;
     size_t IndexCount;
@@ -138,7 +138,7 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE);
-ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, GLuint *textures);
+ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE);
 
 #endif // STKMESH_H
