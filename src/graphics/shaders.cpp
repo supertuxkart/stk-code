@@ -1141,6 +1141,8 @@ namespace MeshShader
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_screen = glGetUniformLocation(Program, "screen");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         TU_tex = 3;
 
         glUseProgram(Program);
@@ -1411,7 +1413,7 @@ namespace MeshShader
 
     GLuint ColorizeShader::Program;
     GLuint ColorizeShader::attrib_position;
-    GLuint ColorizeShader::uniform_MVP;
+    GLuint ColorizeShader::uniform_MM;
     GLuint ColorizeShader::uniform_col;
 
     void ColorizeShader::init()
@@ -1420,13 +1422,15 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_col = glGetUniformLocation(Program, "col");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void ColorizeShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b)
+    void ColorizeShader::setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform3f(uniform_col, r, g, b);
     }
 

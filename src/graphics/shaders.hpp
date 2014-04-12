@@ -316,10 +316,10 @@ class ColorizeShader
 public:
     static GLuint Program;
     static GLuint attrib_position;
-    static GLuint uniform_MVP, uniform_col;
+    static GLuint uniform_MM, uniform_col;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, float r, float g, float b);
+    static void setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b);
 };
 
 class ShadowShader

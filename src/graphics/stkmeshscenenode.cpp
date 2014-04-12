@@ -123,8 +123,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-    MeshShader::ColorizeShader::setUniforms(ModelViewProjectionMatrix, cb->getRed(), cb->getGreen(), cb->getBlue());
+    MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
 
     assert(mesh.vao_glow_pass);
     glBindVertexArray(mesh.vao_glow_pass);
