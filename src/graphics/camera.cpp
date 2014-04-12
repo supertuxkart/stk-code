@@ -325,14 +325,14 @@ void Camera::smoothMoveCamera(float dt)
     float camera_distance = -3 * (0.5f + ratio);// distance of camera from kart in x and z plane
     if (camera_distance > -2.0f) camera_distance = -2.0f;
     Vec3 camera_offset(camera_distance * sin(skid_angle / 2),
-                       1.6f * (1 + ratio / 2),
+                       1.1f * (1 + ratio / 2),
                        camera_distance * cos(skid_angle / 2));// defines how far camera should be from player kart.
     Vec3 m_kart_camera_position_with_offset = m_kart->getTrans()(camera_offset);
     
     
 
     core::vector3df current_target = m_kart->getXYZ().toIrrVector();// next target
-    current_target.Y += 1.2f;
+    current_target.Y += 0.5f;
     core::vector3df wanted_position = m_kart_camera_position_with_offset.toIrrVector();// new required position of camera
     
     if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
