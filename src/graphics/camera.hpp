@@ -188,8 +188,7 @@ private:
     unsigned int  m_next_end_camera;
 
     void setupCamera();
-    void smoothMoveCamera(float dt, const Vec3 &wanted_position,
-                          const Vec3 &wanted_target);
+    void smoothMoveCamera(float dt);
     void computeNormalCameraPosition(Vec3 *wanted_position,
                                      Vec3 *wanted_target);
     void handleEndCamera(float dt);
