@@ -171,7 +171,7 @@ void GrandPrixEditorScreen::loadTrackList (const std::string& gpname)
     assert(tracks_widget != NULL);
 
     const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gpname);
-    const std::vector<std::string>& tracks = gp->getTrackNames();
+    const std::vector<std::string> tracks = gp->getTrackNames(true);
 
     tracks_widget->clearItems();
     tracks_widget->setItemCountHint(tracks.size());
@@ -209,7 +209,7 @@ void GrandPrixEditorScreen::loadGPList()
     for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(i);
-        const std::vector<std::string>& tracks = gp->getTrackNames();
+        const std::vector<std::string> tracks = gp->getTrackNames(true);
 
         std::vector<std::string> sshot_files;
         for (unsigned int t=0; t<tracks.size(); t++)

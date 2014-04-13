@@ -625,7 +625,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
     }
     else
     {
-        const std::vector<std::string>& gptracks = gp->getTrackNames();
+        const std::vector<std::string> gptracks = gp->getTrackNames();
         const int trackAmount = gptracks.size();
 
         if (trackAmount == 0)

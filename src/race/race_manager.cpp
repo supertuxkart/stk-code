@@ -284,8 +284,8 @@ void RaceManager::startNew(bool from_overworld)
     {
         // GP: get tracks, laps and reverse info from grand prix
         m_tracks        = m_grand_prix.getTrackNames();
-        m_grand_prix.getLaps(&m_num_laps);
-        m_grand_prix.getReverse(&m_reverse_track);
+        m_num_laps      = m_grand_prix.getLaps();
+        m_reverse_track = m_grand_prix.getReverse();
     }
     //assert(m_player_karts.size() > 0);
 
