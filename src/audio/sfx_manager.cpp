@@ -262,7 +262,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     // Only use the filename if no full path is specified. This is used
     // to load terrain specific sfx.
-    const std::string full_path = (path == "") 
+    const std::string full_path = (path == "")
                                 ? file_manager->getAsset(FileManager::SFX,filename)
                                 : path;
 

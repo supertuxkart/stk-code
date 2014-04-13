@@ -46,6 +46,7 @@ PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
 PFNGLBLENDEQUATIONPROC glBlendEquation;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
+PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
 PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
@@ -55,16 +56,25 @@ PFNGLBUFFERSUBDATAPROC glBufferSubData;
 PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
 PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
+PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
 PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
+PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
 PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
 PFNGLTEXIMAGE3DPROC glTexImage3D;
+PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
+PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
+PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
+PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
+PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
 #endif
 
 static bool is_gl_init = false;
 
 #ifdef DEBUG
+#ifdef WIN32
 #define ARB_DEBUG_OUTPUT
+#endif
 #endif
 
 #ifdef ARB_DEBUG_OUTPUT
@@ -181,6 +191,7 @@ void initGL()
 	glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
 	glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
 	glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
+    glDrawElementsInstanced = (PFNGLDRAWELEMENTSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawElementsInstanced");
 	glDeleteBuffers = (PFNGLDELETEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteBuffers");
 	glGenVertexArrays = (PFNGLGENVERTEXARRAYSPROC)IRR_OGL_LOAD_EXTENSION("glGenVertexArrays");
 	glBindVertexArray = (PFNGLBINDVERTEXARRAYPROC)IRR_OGL_LOAD_EXTENSION("glBindVertexArray");
@@ -191,25 +202,36 @@ void initGL()
 	glBufferSubData = (PFNGLBUFFERSUBDATAPROC)IRR_OGL_LOAD_EXTENSION("glBufferSubData");
 	glVertexAttribIPointer = (PFNGLVERTEXATTRIBIPOINTERPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribIPointer");
     glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glGenFramebuffers");
+    glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteFramebuffers");
     glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBindFramebuffer");
+    glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture2D");
     glFramebufferTexture = (PFNGLFRAMEBUFFERTEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glFramebufferTexture");
     glTexImage3D = (PFNGLTEXIMAGE3DPROC)IRR_OGL_LOAD_EXTENSION("glTexImage3D");
+    glGenerateMipmap = (PFNGLGENERATEMIPMAPPROC)IRR_OGL_LOAD_EXTENSION("glGenerateMipmap");
     glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)IRR_OGL_LOAD_EXTENSION("glCheckFramebufferStatus");
+    glTexImage2DMultisample = (PFNGLTEXIMAGE2DMULTISAMPLEPROC)IRR_OGL_LOAD_EXTENSION("glTexImage2DMultisample");
+    glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBlitFramebuffer");
+    glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformBlockIndex");
+    glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)IRR_OGL_LOAD_EXTENSION("glUniformBlockBinding");
 #ifdef DEBUG
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
 #endif
 #ifdef ARB_DEBUG_OUTPUT
-// FIXME!!!	glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
+    if (glDebugMessageCallbackARB)
+        glDebugMessageCallbackARB((GLDEBUGPROCARB)debugCallback, NULL);
 #endif
 }
 
 // Mostly from shader tutorial
-static GLuint LoadShader(const char * file, unsigned type)
+GLuint LoadShader(const char * file, unsigned type)
 {
 	GLuint Id = glCreateShader(type);
-    std::string Code = "#version 330\n";
+    char versionString[20];
+    sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
+    std::string Code = versionString;
 	std::ifstream Stream(file, std::ios::in);
+    Code += "//" + std::string(file) + "\n";
 	if (Stream.is_open())
 	{
 		std::string Line = "";
@@ -228,10 +250,11 @@ static GLuint LoadShader(const char * file, unsigned type)
 	glGetShaderiv(Id, GL_COMPILE_STATUS, &Result);
 	if (Result == GL_FALSE)
     {
+        Log::error("GLWrap", "Error in shader %s", file);
 		glGetShaderiv(Id, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		char *ErrorMessage = new char[InfoLogLength];
 		glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
-		printf(ErrorMessage);
+        Log::error("GLWrap", ErrorMessage);
 		delete[] ErrorMessage;
 	}
 
@@ -244,80 +267,10 @@ static GLuint LoadShader(const char * file, unsigned type)
 	return Id;
 }
 
-GLuint LoadProgram(const char * vertex_file_path, const char * fragment_file_path)
-{
-	GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
-	GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
-
-	GLuint ProgramID = glCreateProgram();
-	glAttachShader(ProgramID, VertexShaderID);
-	glAttachShader(ProgramID, FragmentShaderID);
-	glLinkProgram(ProgramID);
-
-	GLint Result = GL_FALSE;
-	int InfoLogLength;
-	glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-	if (Result == GL_FALSE) {
-		glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-		char *ErrorMessage = new char[InfoLogLength];
-		glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
-		printf(ErrorMessage);
-		delete[] ErrorMessage;
-	}
-
-	glDeleteShader(VertexShaderID);
-	glDeleteShader(FragmentShaderID);
-
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
-
-	return ProgramID;
-}
-
-GLuint LoadProgram(const char * vertex_file_path, const char * geometry_file_path, const char * fragment_file_path)
-{
-    GLuint VertexShaderID = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = LoadShader(fragment_file_path, GL_FRAGMENT_SHADER);
-    GLuint GeometryShaderID = LoadShader(geometry_file_path, GL_GEOMETRY_SHADER);
-
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, GeometryShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
-
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-    if (Result == GL_FALSE) {
-        glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-        char *ErrorMessage = new char[InfoLogLength];
-        glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
-        delete[] ErrorMessage;
-    }
-
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(GeometryShaderID);
-    glDeleteShader(FragmentShaderID);
-    
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
-
-    return ProgramID;
-}
-
 GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsigned varyingscount)
 {
-	GLuint Shader = LoadShader(vertex_file_path, GL_VERTEX_SHADER);
 	GLuint Program = glCreateProgram();
-	glAttachShader(Program, Shader);
+    loadAndAttach(Program, GL_VERTEX_SHADER, vertex_file_path);
 	glTransformFeedbackVaryings(Program, varyingscount, varyings, GL_INTERLEAVED_ATTRIBS);
 	glLinkProgram(Program);
 
@@ -332,7 +285,6 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 		printf(ErrorMessage);
 		delete[] ErrorMessage;
 	}
-	glDeleteShader(Shader);
 
     GLenum glErr = glGetError();
     if (glErr != GL_NO_ERROR)
@@ -354,6 +306,36 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
     return static_cast<irr::video::COpenGLFBOTexture*>(tex)->DepthBufferTexture;
 }
 
+std::set<irr::video::ITexture *> AlreadyTransformedTexture;
+
+void transformTexturesTosRGB(irr::video::ITexture *tex)
+{
+    if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
+        return;
+    AlreadyTransformedTexture.insert(tex);
+    size_t w = tex->getSize().Width, h = tex->getSize().Height;
+    char *data = new char[w * h * 4];
+    memcpy(data, tex->lock(), w * h * 4);
+    tex->unlock();
+    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
+    if (irr_driver->getGLSLVersion() < 150)
+    {
+        if (tex->hasAlpha())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    }
+    else
+    {
+        if (tex->hasAlpha())
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        else
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+    }
+    glGenerateMipmap(GL_TEXTURE_2D);
+    delete[] data;
+}
+
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
 {
 	glActiveTexture(GL_TEXTURE0 + TextureUnit);
@@ -372,6 +354,15 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     {
         Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
     }
+}
+
+void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, Src);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
@@ -426,6 +417,114 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
     }
 }
 
+static void
+getSize(const video::ITexture* texture, const core::rect<s32>& destRect,
+const core::rect<s32>& sourceRect,
+float &width, float &height,
+float &center_pos_x, float &center_pos_y,
+float &tex_width, float &tex_height,
+float &tex_center_pos_x, float &tex_center_pos_y
+)
+{
+    core::dimension2d<u32> frame_size =
+        irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+    const int screen_w = frame_size.Width;
+    const int screen_h = frame_size.Height;
+    center_pos_x = float(destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X);
+    center_pos_x /= screen_w;
+    center_pos_x -= 1.;
+    center_pos_y = float(destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y);
+    center_pos_y /= screen_h;
+    center_pos_y = float(1.f - center_pos_y);
+    width = float(destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X);
+    width /= screen_w;
+    height = float(destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y);
+    height /= screen_h;
+
+    const core::dimension2d<u32>& ss = texture->getOriginalSize();
+    tex_center_pos_x = float(sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X);
+    tex_center_pos_x /= ss.Width * 2.f;
+    tex_center_pos_y = float(sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y);
+    tex_center_pos_y /= ss.Height * 2.f;
+    tex_width = float(sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X);
+    tex_width /= ss.Width * 2.f;
+    tex_height = float(sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y);
+    tex_height /= ss.Height * 2.f;
+
+    if (texture->isRenderTarget())
+    {
+        tex_height = -tex_height;
+    }
+
+    const f32 invW = 1.f / static_cast<f32>(ss.Width);
+    const f32 invH = 1.f / static_cast<f32>(ss.Height);
+    const core::rect<f32> tcoords(
+        sourceRect.UpperLeftCorner.X * invW,
+        sourceRect.UpperLeftCorner.Y * invH,
+        sourceRect.LowerRightCorner.X * invW,
+        sourceRect.LowerRightCorner.Y *invH);
+}
+
+void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    const video::SColor &colors, bool useAlphaChannelOfTexture)
+{
+    if (!irr_driver->isGLSL()) {
+        video::SColor duplicatedArray[4] = {
+            colors, colors, colors, colors
+        };
+        draw2DImage(texture, destRect, sourceRect, clipRect, duplicatedArray, useAlphaChannelOfTexture);
+        return;
+    }
+
+    float width, height,
+        center_pos_x, center_pos_y,
+        tex_width, tex_height,
+        tex_center_pos_x, tex_center_pos_y;
+
+    getSize(texture, destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+        tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
+
+    if (useAlphaChannelOfTexture)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    else
+    {
+        glDisable(GL_BLEND);
+    }
+    if (clipRect)
+    {
+        if (!clipRect->isValid())
+            return;
+
+        glEnable(GL_SCISSOR_TEST);
+        const core::dimension2d<u32>& renderTargetSize = irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
+        glScissor(clipRect->UpperLeftCorner.X, renderTargetSize.Height - clipRect->LowerRightCorner.Y,
+            clipRect->getWidth(), clipRect->getHeight());
+    }
+
+    glUseProgram(UIShader::UniformColoredTextureRectShader::Program);
+    glBindVertexArray(UIShader::UniformColoredTextureRectShader::vao);
+
+    setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height,colors, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (clipRect)
+        glDisable(GL_SCISSOR_TEST);
+    glUseProgram(0);
+
+    GLenum glErr = glGetError();
+    if (glErr != GL_NO_ERROR)
+    {
+        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
+    }
+}
+
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
 	const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
 	const video::SColor* const colors, bool useAlphaChannelOfTexture)
@@ -436,46 +535,13 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 		return;
 	}
 
-	core::dimension2d<u32> frame_size =
-		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
-	const int screen_w = frame_size.Width;
-	const int screen_h = frame_size.Height;
-	float center_pos_x = destRect.UpperLeftCorner.X + destRect.LowerRightCorner.X;
-	center_pos_x /= screen_w;
-	center_pos_x -= 1.;
-	float center_pos_y = destRect.UpperLeftCorner.Y + destRect.LowerRightCorner.Y;
-	center_pos_y /= screen_h;
-	center_pos_y = 1. - center_pos_y;
-	float width = destRect.LowerRightCorner.X - destRect.UpperLeftCorner.X;
-	width /= screen_w;
-	float height = destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y;
-	height /= screen_h;
+    float width, height,
+        center_pos_x, center_pos_y,
+        tex_width, tex_height,
+        tex_center_pos_x, tex_center_pos_y;
 
-	const core::dimension2d<u32>& ss = texture->getOriginalSize();
-
-	float tex_center_pos_x = sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X;
-	tex_center_pos_x /= ss.Width * 2.;
-	//tex_center_pos_x -= 1.;
-	float tex_center_pos_y = sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y;
-	tex_center_pos_y /= ss.Height * 2.;
-	//tex_center_pos_y -= 1.;
-	float tex_width = sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X;
-	tex_width /= ss.Width * 2.;
-	float tex_height = sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y;
-	tex_height /= ss.Height * 2.;
-
-	if (texture->isRenderTarget())
-    {
-		tex_height = - tex_height;
-	}
-
-	const f32 invW = 1.f / static_cast<f32>(ss.Width);
-	const f32 invH = 1.f / static_cast<f32>(ss.Height);
-	const core::rect<f32> tcoords(
-		sourceRect.UpperLeftCorner.X * invW,
-		sourceRect.UpperLeftCorner.Y * invH,
-		sourceRect.LowerRightCorner.X * invW,
-		sourceRect.LowerRightCorner.Y *invH);
+    getSize(texture, destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+        tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
 	if (useAlphaChannelOfTexture)
 	{
@@ -527,15 +593,15 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 		irr_driver->getVideoDriver()->getCurrentRenderTargetSize();
 	const int screen_w = frame_size.Width;
 	const int screen_h = frame_size.Height;
-	float center_pos_x = position.UpperLeftCorner.X + position.LowerRightCorner.X;
+	float center_pos_x = float(position.UpperLeftCorner.X + position.LowerRightCorner.X);
 	center_pos_x /= screen_w;
 	center_pos_x -= 1;
-	float center_pos_y = position.UpperLeftCorner.Y + position.LowerRightCorner.Y;
+	float center_pos_y = float(position.UpperLeftCorner.Y + position.LowerRightCorner.Y);
 	center_pos_y /= screen_h;
 	center_pos_y = 1 - center_pos_y;
-	float width = position.LowerRightCorner.X - position.UpperLeftCorner.X;
+	float width = float(position.LowerRightCorner.X - position.UpperLeftCorner.X);
 	width /= screen_w;
-	float height = position.LowerRightCorner.Y - position.UpperLeftCorner.Y;
+	float height = float(position.LowerRightCorner.Y - position.UpperLeftCorner.Y);
 	height /= screen_h;
 
 	if (color.getAlpha() < 255)

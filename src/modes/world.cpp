@@ -459,7 +459,7 @@ void World::terminateRace()
     {
         std::string mode_name = getIdent(); // Get the race mode name
         int winner_position = 1;
-        int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
+        unsigned int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
         if (mode_name == IDENT_FTL)
         {
             winner_position = 2;
@@ -469,7 +469,7 @@ void World::terminateRace()
         {
             // Retrieve the current player
             StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
-            if (p && p->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
             {
                 // Check if the player has won
                 if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
@@ -483,10 +483,35 @@ void World::terminateRace()
                                                         mode_name, 1);
                 }
             }
-	    } // for i < kart_amount
+        } // for i < kart_amount
     } // if (achiev)
-
-    PlayerManager::get()->getCurrentPlayer()->raceFinished();
+    
+    Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
+    //if achivement has been unlocked
+    if (win->getValue("wins") < 5 )
+    {
+        for(unsigned int i = 0; i < kart_amount; i++)
+        {
+            // Retrieve the current player
+            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
+            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            {
+                // Check if the player has won
+                if (m_karts[i]->getPosition() == 1 )
+                {
+                    // Increase number of consecutive wins
+                       PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE,
+                                                            "wins", 1);
+                }
+                else
+                {
+                      //Set number of consecutive wins to 0
+                      win->reset();
+                }
+            }
+         }
+    }
+    PlayerManager::getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -790,7 +815,7 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
+                StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                                         device, NULL);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))

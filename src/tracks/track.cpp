@@ -52,7 +52,7 @@
 #include "race/race_manager.hpp"
 #include "tracks/bezier_curve.hpp"
 #include "tracks/check_manager.hpp"
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
@@ -156,7 +156,7 @@ Track::~Track()
 unsigned int Track::getNumOfCompletedChallenges()
 {
     unsigned int unlocked_challenges = 0;
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     for (unsigned int i=0; i<m_challenges.size(); i++)
     {
         if (m_challenges[i].m_challenge_id == "tutorial")
@@ -441,21 +441,21 @@ void Track::loadTrackInfo()
     std::string dir = StringUtils::getPath(m_filename);
     std::string easter_name = dir+"/easter_eggs.xml";
 
-    XMLNode *easter = file_manager->createXMLTree(easter_name); 
+    XMLNode *easter = file_manager->createXMLTree(easter_name);
   
-    if(easter) 
+    if(easter)
     {
-        for(unsigned int i=0; i<easter->getNumNodes(); i++) 
-        { 
-            const XMLNode *eggs = easter->getNode(i); 
-            if(eggs->getNumNodes() > 0) 
-            { 
-                m_has_easter_eggs = true; 
-                break; 
-            } 
-        } 
+        for(unsigned int i=0; i<easter->getNumNodes(); i++)
+        {
+            const XMLNode *eggs = easter->getNode(i);
+            if(eggs->getNumNodes() > 0)
+            {
+                m_has_easter_eggs = true;
+                break;
+            }
+        }
         delete easter;
-    } 
+    }
 }   // loadTrackInfo
 
 //-----------------------------------------------------------------------------
@@ -839,17 +839,21 @@ bool Track::loadMainTrack(const XMLNode &root)
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
 
-    adjustForFog(merged_mesh, NULL);
+    scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+    // TODO: memory leak?
+    scene::IMesh* tangent_mesh = manip->createMeshWithTangents(merged_mesh);
+
+    adjustForFog(tangent_mesh, NULL);
 
     // The merged mesh is grabbed by the octtree, so we don't need
     // to keep a reference to it.
-    scene::ISceneNode *scene_node = irr_driver->addMesh(merged_mesh);
+    scene::ISceneNode *scene_node = irr_driver->addMesh(tangent_mesh);
     //scene::IMeshSceneNode *scene_node = irr_driver->addOctTree(merged_mesh);
     // We should drop the merged mesh (since it's now referred to in the
     // scene node), but then we need to grab it since it's in the
     // m_all_cached_meshes.
-    m_all_cached_meshes.push_back(merged_mesh);
-    irr_driver->grabAllTextures(merged_mesh);
+    m_all_cached_meshes.push_back(tangent_mesh);
+    irr_driver->grabAllTextures(tangent_mesh);
 
     // The reference count of the mesh is 1, since it is in irrlicht's
     // cache. So we only have to remove it from the cache.
@@ -880,7 +884,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     m_aabb_max.setY(m_aabb_max.getY()+30.0f);
     World::getWorld()->getPhysics()->init(m_aabb_min, m_aabb_max);
 
-    LodNodeLoader lodLoader(this);
+    ModelDefinitionLoader lodLoader(this);
 
     // Load LOD groups
     const XMLNode *lod_xml_node = root.getNode("lod");
@@ -891,7 +895,21 @@ bool Track::loadMainTrack(const XMLNode &root)
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                lodLoader.addLODModelDefinition(lod_group_xml->getNode(j));
+                lodLoader.addModelDefinition(lod_group_xml->getNode(j));
+            }
+        }
+    }
+
+    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
+    const XMLNode *instancing_xml_node = root.getNode("instancing");
+    if (instancing_xml_node != NULL)
+    {
+        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
+        {
+            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                lodLoader.addModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
@@ -957,7 +975,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             }
 
             const unsigned int val = challenge->getNumTrophies();
-            bool shown = (PlayerManager::get()->getCurrentPlayer()->getPoints() < val);
+            bool shown = (PlayerManager::getCurrentPlayer()->getPoints() < val);
             m_force_fields.push_back(OverworldForceField(xyz, shown, val));
 
             m_challenges[closest_challenge_id].setForceField(
@@ -969,7 +987,7 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
-			// TODO: Add support in the engine for BillboardText or find a replacement
+            // TODO: Add support in the engine for BillboardText or find a replacement
 /*          scene::ISceneManager* sm = irr_driver->getSceneManager();
             scene::ISceneNode* sn =
                 sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
@@ -978,7 +996,7 @@ bool Track::loadMainTrack(const XMLNode &root)
                                               core::dimension2df(textsize.Width/45.0f,
                                                                  textsize.Height/45.0f),
                                               xyz,
-                                              -1, // id 
+                                              -1, // id
                                               video::SColor(255, 255, 225, 0),
                                               video::SColor(255, 255, 89, 0));
             m_all_nodes.push_back(sn);*/
@@ -1075,7 +1093,7 @@ bool Track::loadMainTrack(const XMLNode &root)
         }
         else if (lod_instance)
         {
-            LODNode* node = lodLoader.instanciate(n, NULL);
+            LODNode* node = lodLoader.instanciateAsLOD(n, NULL);
             if (node != NULL)
             {
                 node->setPosition(xyz);
@@ -1524,7 +1542,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     loadMainTrack(*root);
     unsigned int main_track_count = m_all_nodes.size();
 
-    LodNodeLoader lod_loader(this);
+    ModelDefinitionLoader model_def_loader(this);
 
     // Load LOD groups
     const XMLNode *lod_xml_node = root->getNode("lod");
@@ -1535,13 +1553,27 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
             const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
             for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
             {
-                lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
+                model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
+            }
+        }
+    }
+
+    // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
+    const XMLNode *instancing_xml_node = root->getNode("instancing");
+    if (instancing_xml_node != NULL)
+    {
+        for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
+        {
+            const XMLNode* lod_group_xml = instancing_xml_node->getNode(i);
+            for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
+            {
+                model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
             }
         }
     }
 
     std::map<std::string, XMLNode*> library_nodes;
-    loadObjects(root, path, lod_loader, true, NULL, library_nodes);
+    loadObjects(root, path, model_def_loader, true, NULL, library_nodes);
 
     // Cleanup library nodes
     for (std::map<std::string, XMLNode*>::iterator it = library_nodes.begin();
@@ -1581,7 +1613,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
     // Sky dome and boxes support
     // --------------------------
-	irr_driver->suppressSkyBox();
+    irr_driver->suppressSkyBox();
     if(m_sky_type==SKY_DOME && m_sky_textures.size() > 0)
     {
         scene::ISceneNode *node = irr_driver->addSkyDome(m_sky_textures[0],
@@ -1709,7 +1741,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
 
 //-----------------------------------------------------------------------------
 
-void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoader& lod_loader,
+void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefinitionLoader& model_def_loader,
                         bool create_lod_definitions, scene::ISceneNode* parent,
                         std::map<std::string, XMLNode*>& library_nodes)
 {
@@ -1725,7 +1757,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         if (name == "track" || name == "default-start") continue;
         if (name == "object")
         {
-            m_track_object_manager->add(*node, parent, lod_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader);
         }
         else if (name == "library")
         {
@@ -1770,7 +1802,21 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
                         const XMLNode* lod_group_xml = lod_xml_node->getNode(i);
                         for (unsigned int j = 0; j < lod_group_xml->getNumNodes(); j++)
                         {
-                            lod_loader.addLODModelDefinition(lod_group_xml->getNode(j));
+                            model_def_loader.addModelDefinition(lod_group_xml->getNode(j));
+                        }
+                    }
+                }
+
+                // Load instancing definitions
+                const XMLNode *instancing_xml_node = libroot->getNode("instancing");
+                if (instancing_xml_node != NULL)
+                {
+                    for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
+                    {
+                        const XMLNode* instancing_group_xml = instancing_xml_node->getNode(i);
+                        for (unsigned int j = 0; j < instancing_group_xml->getNumNodes(); j++)
+                        {
+                            model_def_loader.addModelDefinition(instancing_group_xml->getNode(j));
                         }
                     }
                 }
@@ -1786,7 +1832,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
             parent->setRotation(hpr);
             parent->setScale(scale);
             parent->updateAbsolutePosition();
-            loadObjects(libroot, lib_path, lod_loader, create_lod_definitions, parent, library_nodes);
+            loadObjects(libroot, lib_path, model_def_loader, create_lod_definitions, parent, library_nodes);
         }
         else if (name == "water")
         {
@@ -1830,7 +1876,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         {
             if (UserConfigParams::m_graphical_effects)
             {
-                m_track_object_manager->add(*node, parent, lod_loader);
+                m_track_object_manager->add(*node, parent, model_def_loader);
             }
         }
         else if (name == "sky-dome" || name == "sky-box" || name == "sky-color")
@@ -1843,7 +1889,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
         }
         else if (name == "light")
         {
-            m_track_object_manager->add(*node, parent, lod_loader);
+            m_track_object_manager->add(*node, parent, model_def_loader);
         }
         else if (name == "weather")
         {
@@ -1880,6 +1926,10 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, LodNodeLoa
             // handled above
         }
         else if (name == "lod")
+        {
+            // handled above
+        }
+        else if (name == "instancing")
         {
             // handled above
         }

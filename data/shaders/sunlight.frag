@@ -19,12 +19,8 @@ varying vec2 uv;
 #endif
 
 
-vec3 DecodeNormal(vec2 n)
-{
-  float z = dot(n, n) * 2. - 1.;
-  vec2 xy = normalize(n) * sqrt(1. - z * z);
-  return vec3(xy,z);
-}
+vec3 DecodeNormal(vec2 n);
+vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 
 void main() {
 	float z = texture(dtex, uv).x;
@@ -41,14 +37,15 @@ void main() {
 	}
 
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+    float roughness = texture(ntex, uv).z;
+    vec3 eyedir = -normalize(xpos.xyz);
 
 	// Normalized on the cpu
-	vec3 L = direction;
+    vec3 L = direction;
 
-	float NdotL = max(0.0, dot(norm, L));
-	vec3 R = reflect(L, norm);
-	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
-	float Specular = pow(RdotE, 200);
+    float NdotL = max(0., dot(norm, L));
+
+    vec3 Specular = getSpecular(norm, eyedir, L, col, roughness) * NdotL;
 
 	vec3 outcol = NdotL * col;
 
@@ -62,5 +59,5 @@ void main() {
 	}*/
 
 	Diff = vec4(NdotL * col, 1.);
-	Spec = vec4(Specular * col, 1.);
+	Spec = vec4(Specular, 1.);
 }

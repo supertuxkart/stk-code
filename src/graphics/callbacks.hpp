@@ -121,15 +121,15 @@ public:
         m_amplitude = amp;
     }
 
-	float getSpeed() const
-	{
-		return m_speed;
-	}
+    float getSpeed() const
+    {
+        return m_speed;
+    }
 
-	float getAmplitude() const
-	{
-		return m_amplitude;
-	}
+    float getAmplitude() const
+    {
+        return m_amplitude;
+    }
 
 private:
     float m_amplitude, m_speed;
@@ -327,20 +327,20 @@ public:
         m_color[2] = b;
     }
 
-	float getRed() const
-	{
-		return m_color[0];
-	}
+    float getRed() const
+    {
+        return m_color[0];
+    }
 
-	float getGreen() const
-	{
-		return m_color[1];
-	}
+    float getGreen() const
+    {
+        return m_color[1];
+    }
 
-	float getBlue() const
-	{
-		return m_color[2];
-	}
+    float getBlue() const
+    {
+        return m_color[2];
+    }
 
 private:
     float m_color[3];
@@ -395,7 +395,7 @@ public:
     {
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
         // Sun "position" is actually a direction and not a position
-        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
+        core::matrix4 m_view = irr_driver->getViewMatrix();
         m_view.makeInverse();
         m_view = m_view.getTransposed();
         core::vector3df pos(x, y, z);
@@ -422,30 +422,6 @@ private:
     float m_pos[3];
     float m_screen[2];
     float m_wind[2];
-};
-
-//
-
-class MLAAColor1Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAABlend2Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAANeigh3Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
 };
 
 //
@@ -555,27 +531,27 @@ public:
         m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0;
     }
 
-	void update();
+    void update();
 
-	float getDirX() const
-	{
-		return m_dir[0];
-	}
+    float getDirX() const
+    {
+        return m_dir[0];
+    }
 
-	float getDirY() const
-	{
-		return m_dir[1];
-	}
+    float getDirY() const
+    {
+        return m_dir[1];
+    }
 
-	float getDir2X() const
-	{
-		return m_dir2[0];
-	}
+    float getDir2X() const
+    {
+        return m_dir2[0];
+    }
 
-	float getDir2Y() const
-	{
-		return m_dir2[1];
-	}
+    float getDir2Y() const
+    {
+        return m_dir2[1];
+    }
 
 private:
     float m_screen[2];

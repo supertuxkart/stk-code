@@ -18,6 +18,7 @@
 #include "states_screens/dialogs/recovery_dialog.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
@@ -57,7 +58,8 @@ RecoveryDialog::~RecoveryDialog()
 void RecoveryDialog::showRecoveryInput()
 {
     m_show_recovery_input = false;
-    clearWindow();
+    if (m_irrlicht_window)
+        clearWindow();
     m_phase = Input;
     loadFromFile("online/recovery_input.stkgui");
 
@@ -80,7 +82,7 @@ void RecoveryDialog::showRecoveryInput()
 }   // showRecoveryInput
 
 // -----------------------------------------------------------------------------
-/** Informs the user that an email will be sent. 
+/** Informs the user that an email will be sent.
  */
 void RecoveryDialog::showRecoveryInfo()
 {
@@ -112,7 +114,7 @@ void RecoveryDialog::processInput()
 {
     const core::stringw username = m_username_widget->getText().trim();
     const core::stringw email = m_email_widget->getText().trim();
-    if (username.size() < 4 || username.size() > 30 || 
+    if (username.size() < 4 || username.size() > 30 ||
         email.size() < 4    || email.size() > 50       )
     {
         sfx_manager->quickSound("anvil");
@@ -125,10 +127,10 @@ void RecoveryDialog::processInput()
         m_info_widget->setDefaultColor();
         m_options_widget->setDeactivated();
         m_recovery_request = new XMLRequest();
-        m_recovery_request->setServerURL("client-user.php");
-        m_recovery_request->addParameter("action", "recovery");
+        // This function also works when the current user is not logged in
+        PlayerManager::setUserDetails(m_recovery_request, "recovery");
         m_recovery_request->addParameter("username", username);
-        m_recovery_request->addParameter("email", email);
+        m_recovery_request->addParameter("email",    email   );
         m_recovery_request->queue();
     }
 }   // processInput
@@ -136,12 +138,12 @@ void RecoveryDialog::processInput()
 // -----------------------------------------------------------------------------
 /** Handle a user event.
  */
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
                    RecoveryDialog::processEvent(const std::string& eventSource)
 {
     std::string selection;
     if (eventSource == m_options_widget->m_properties[PROP_ID])
-        selection = 
+        selection =
                  m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     else
         selection = eventSource;

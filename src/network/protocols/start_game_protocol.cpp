@@ -106,7 +106,7 @@ void StartGameProtocol::update()
         // have to add self first
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile == Online::CurrentUser::get()->getProfile());
+            bool is_me = (players[i]->user_profile == PlayerManager::getCurrentUser()->getProfile());
             if (is_me)
             {
                 NetworkPlayerProfile* profile = players[i];
@@ -115,7 +115,7 @@ void StartGameProtocol::update()
                 rki.setGlobalPlayerId(profile->race_id);
                 rki.setLocalPlayerId(is_me?0:1);
                 rki.setHostId(profile->race_id);
-                PlayerProfile* profile_to_use = PlayerManager::get()->getCurrentPlayer();
+                PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
                 assert(profile_to_use);
                 InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
                 int new_player_id = 0;
@@ -134,7 +134,7 @@ void StartGameProtocol::update()
         }
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile == Online::CurrentUser::get()->getProfile());
+            bool is_me = (players[i]->user_profile == PlayerManager::getCurrentUser()->getProfile());
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
                 profile->user_profile->getUserName(), profile->race_id, !is_me);

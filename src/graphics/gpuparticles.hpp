@@ -14,9 +14,7 @@ class ParticleSystemProxy : public scene::CParticleSystemSceneNode
 protected:
     GLuint tfb_buffers[2], initial_values_buffer, heighmapbuffer, heightmaptexture, quaternionsbuffer;
     GLuint current_simulation_vao, non_current_simulation_vao;
-    GLuint current_hm_simulation_vao, non_currenthm__simulation_vao;
     GLuint current_rendering_vao, non_current_rendering_vao;
-    GLuint current_rendering_flip_vao, non_current_rendering_flip_vao;
     bool m_alpha_additive, has_height_map, flip;
     float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
     float m_color_from[3];
@@ -30,6 +28,8 @@ protected:
     static void FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer);
     static void SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
     static void HeightmapSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
+
+    void generateVAOs();
 
     void simulateHeightmap();
     void simulateNoHeightmap();

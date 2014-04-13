@@ -390,21 +390,21 @@ void ParticleEmitter::setCreationRateAbsolute(float f)
 
     if (f <= 0.0f && m_node->getEmitter())
     {
-		m_node->clearParticles();
+        m_node->clearParticles();
     }
     else if (m_node->getEmitter() == NULL)
     {
         m_node->setEmitter(m_emitter);
     }
 #endif
-/*	if (f <= 0.0f)
-	{
-		m_node->setVisible(false);
-	}
-	else
-	{
-		m_node->setVisible(true);
-	}*/
+/*    if (f <= 0.0f)
+    {
+        m_node->setVisible(false);
+    }
+    else
+    {
+        m_node->setVisible(true);
+    }*/
 }   // setCreationRateAbsolute
 
 //-----------------------------------------------------------------------------
@@ -520,7 +520,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             case EMITTER_POINT:
             {
                 m_emitter = m_node->createPointEmitter(velocity,
-													   type->getMinRate(),  type->getMaxRate(),
+                                                       type->getMinRate(),  type->getMaxRate(),
                                                        type->getMinColor(), type->getMinColor(),
                                                        lifeTimeMin, lifeTimeMax,
                                                        m_particle_type->getAngleSpread() /* angle */
@@ -651,14 +651,15 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             else
             {
                 video::SColor color_from = type->getMinColor();
-                core::vector3df color_from_v = core::vector3df(color_from.getRed(),
-                    color_from.getGreen(),
-                    color_from.getBlue());
+                core::vector3df color_from_v =
+                    core::vector3df(float(color_from.getRed()),
+                                    float(color_from.getGreen()),
+                                    float(color_from.getBlue()));
 
                 video::SColor color_to = type->getMaxColor();
-                core::vector3df color_to_v = core::vector3df(color_to.getRed(),
-                    color_to.getGreen(),
-                    color_to.getBlue());
+                core::vector3df color_to_v = core::vector3df(float(color_to.getRed()),
+                                                             float(color_to.getGreen()),
+                                                             float(color_to.getBlue()));
 
                 ColorAffector* affector = new ColorAffector(color_from_v, color_to_v);
                 m_node->addAffector(affector);
@@ -680,7 +681,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         if (flips)
         {
             if (m_is_glsl)
-				static_cast<ParticleSystemProxy *>(m_node)->setFlip();
+                static_cast<ParticleSystemProxy *>(m_node)->setFlip();
         }
     }
 }   // setParticleType

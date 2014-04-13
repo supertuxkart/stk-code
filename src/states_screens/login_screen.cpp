@@ -18,6 +18,7 @@
 #include "states_screens/login_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -85,7 +86,7 @@ void LoginScreen::login()
     const core::stringw password = getWidget<TextBoxWidget>("password")
                             ->getText().trim();
 
-    if (username.size() < 4 || username.size() > 30 || 
+    if (username.size() < 4 || username.size() > 30 ||
         password.size() < 8 || password.size() > 30    )
     {
         sfx_manager->quickSound("anvil");
@@ -98,7 +99,7 @@ void LoginScreen::login()
         m_options_widget->setDeactivated();
         info_widget->setDefaultColor();
         bool remember = getWidget<CheckBoxWidget>("remember")->getState();
-        Online::CurrentUser::get()->requestSignIn(username,password, 
+        PlayerManager::getCurrentUser()->requestSignIn(username, password,
                                                   remember           );
     }
 }   // login
@@ -140,7 +141,7 @@ void LoginScreen::onUpdate(float dt)
     // Login was successful, so put the online main menu on the screen
     if(m_success)
     {
-        StateManager::get()->replaceTopMostScreen(OnlineScreen::getInstance());    
+        StateManager::get()->replaceTopMostScreen(OnlineScreen::getInstance());
     }
 }   // onUpdate
 
@@ -150,23 +151,23 @@ void LoginScreen::onUpdate(float dt)
  *  \param name Name of the widget.
  *  \param playerID The id of the player who clicked the item.
  */
-void LoginScreen::eventCallback(Widget* widget, const std::string& name, 
+void LoginScreen::eventCallback(Widget* widget, const std::string& name,
                                 const int playerID)
 {
     if (name == "login_tabs")
     {
         StateManager *sm = StateManager::get();
-        const std::string selection = 
+        const std::string selection =
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "tab_guest_login")
-            sm->replaceTopMostScreen(GuestLoginScreen::getInstance()); 
+            sm->replaceTopMostScreen(GuestLoginScreen::getInstance());
         else if (selection == "tab_register")
             sm->replaceTopMostScreen(RegisterScreen::getInstance());
     }
     else if (name=="options")
     {
-        const std::string button = 
+        const std::string button =
              getWidget<RibbonWidget>("options")
              ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if(button=="sign_in")

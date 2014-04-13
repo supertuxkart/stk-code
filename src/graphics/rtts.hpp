@@ -33,36 +33,60 @@ enum TypeRTT
     RTT_TMP4,
     RTT_NORMAL_AND_DEPTH,
     RTT_COLOR,
+    RTT_LOG_LUMINANCE,
 
     RTT_HALF1,
     RTT_HALF2,
 
     RTT_QUARTER1,
     RTT_QUARTER2,
-    RTT_QUARTER3,
-    RTT_QUARTER4,
+//    RTT_QUARTER3,
+//    RTT_QUARTER4,
 
     RTT_EIGHTH1,
     RTT_EIGHTH2,
 
-    RTT_SIXTEENTH1,
-    RTT_SIXTEENTH2,
+//    RTT_SIXTEENTH1,
+//    RTT_SIXTEENTH2,
 
     RTT_SSAO,
 
-    RTT_COLLAPSE,
-    RTT_COLLAPSEH,
-    RTT_COLLAPSEV,
-    RTT_COLLAPSEH2,
-    RTT_COLLAPSEV2,
-    RTT_WARPH,
-    RTT_WARPV,
+//    RTT_COLLAPSE,
+//    RTT_COLLAPSEH,
+//    RTT_COLLAPSEV,
+//    RTT_COLLAPSEH2,
+//    RTT_COLLAPSEV2,
+//    RTT_WARPH,
+//    RTT_WARPV,
 
-    RTT_HALF_SOFT,
+//    RTT_HALF_SOFT,
 
     RTT_DISPLACE,
+    RTT_MLAA_COLORS,
 
     RTT_COUNT
+};
+
+
+enum TypeFBO
+{
+    FBO_SSAO,
+    FBO_NORMAL_AND_DEPTHS,
+    FBO_COMBINED_TMP1_TMP2,
+    FBO_COLORS,
+    FBO_LOG_LUMINANCE,
+    FBO_MLAA_COLORS,
+    FBO_TMP1_WITH_DS,
+    FBO_TMP2_WITH_DS,
+    FBO_TMP4,
+    FBO_HALF1,
+    FBO_HALF2,
+    FBO_QUARTER1,
+    FBO_QUARTER2,
+    FBO_EIGHTH1,
+    FBO_EIGHTH2,
+    FBO_DISPLACE,
+    FBO_COUNT
 };
 
 class RTT
@@ -71,12 +95,16 @@ public:
     RTT();
     ~RTT();
 
-    ITexture *getRTT(TypeRTT which);
     unsigned getShadowFBO() const { return shadowFBO; }
     unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
+    unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
+    unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
+    unsigned getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
-    ITexture *rtts[RTT_COUNT];
+    unsigned RenderTargetTextures[RTT_COUNT], FrameBuffers[FBO_COUNT];
+    unsigned DepthStencilTexture;
+
     unsigned shadowFBO, shadowColorTex, shadowDepthTex;
 };
 

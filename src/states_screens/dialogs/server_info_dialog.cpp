@@ -17,22 +17,20 @@
 
 #include "states_screens/dialogs/server_info_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "states_screens/state_manager.hpp"
-#include "utils/translation.hpp"
-#include "utils/string_utils.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "online/current_user.hpp"
-#include "online/servers_manager.hpp"
 #include "online/messages.hpp"
+#include "online/servers_manager.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/networking_lobby.hpp"
+#include "states_screens/state_manager.hpp"
+#include "utils/string_utils.hpp"
+#include "utils/translation.hpp"
 
-
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -80,6 +78,7 @@ ServerInfoDialog::~ServerInfoDialog()
 // -----------------------------------------------------------------------------
 void ServerInfoDialog::requestJoin()
 {
+    // FIXME - without this next line, it appears that m_server_join is completely unused.
     //m_server_join_request = Online::CurrentUser::get()->requestServerJoin(m_server_id);
     Online::ServersManager::get()->setJoinedServer(m_server_id);
     ProtocolManager::getInstance()->requestStart(new ConnectToServer(m_server_id, m_host_id));

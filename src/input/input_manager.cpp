@@ -481,13 +481,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         m_mode == INPUT_SENSE_GAMEPAD)
     {
         // Do not pick disabled gamepads for input sensing
- 	    if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+         if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
         {
- 	        GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID); 
- 	        DeviceConfig *conf = gPad->getConfiguration(); 
- 	        if (!conf->isEnabled()) 
- 	            return; 
- 	    }
+             GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID);
+             DeviceConfig *conf = gPad->getConfiguration();
+             if (!conf->isEnabled())
+                 return;
+         }
 
         inputSensing(type, deviceID, button, axisDirection,  value);
         return;

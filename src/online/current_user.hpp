@@ -24,13 +24,16 @@
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/xml_request.hpp"
-#include "utils/types.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/synchronised.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 
 #include <string>
 #include <assert.h>
+
+class PlayerManager;
 
 namespace Online
 {
@@ -45,22 +48,15 @@ namespace Online
       */
     class CurrentUser
     {
+        private:
+            LEAK_CHECK()
         public:
-            enum UserState
-            {
-                US_SIGNED_OUT = 0,
-                US_SIGNED_IN,
-                US_GUEST,
-                US_SIGNING_IN,
-                US_SIGNING_OUT
-            };
-
             // ----------------------------------------------------------------
             class SignInRequest : public XMLRequest
             {
                 virtual void callback ();
             public:
-                SignInRequest(bool manage_memory = false) 
+                SignInRequest(bool manage_memory = false)
                     : XMLRequest(manage_memory, /*priority*/10) {}
             };   // SignInRequest
 
@@ -73,103 +69,64 @@ namespace Online
             };   // SignOutRequest
 
             // ----------------------------------------------------------------
-
-            class ServerJoinRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                ServerJoinRequest() : XMLRequest() {}
-            };   // ServerJoinRequest
-
-            // ----------------------------------------------------------------
-            class SetAddonVoteRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                SetAddonVoteRequest() : XMLRequest() {}
-            };   // SetAddonVoteRequest
-
-            // ----------------------------------------------------------------
-            class RemoveFriendRequest : public XMLRequest {
-                unsigned int m_id;
-                virtual void callback ();
-            public:
-                RemoveFriendRequest(unsigned int id)
-                    : XMLRequest(true), m_id(id) {}
-            };   // RemoveFriendRequest
-
-            // ----------------------------------------------------------------
-            class CancelFriendRequest : public XMLRequest {
-                virtual void callback ();
-            public:
-                CancelFriendRequest() : XMLRequest(true) {}
-            };   // CancelFriendRequest
-
-            // ----------------------------------------------------------------
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
                 PollRequest() : XMLRequest(true) {}
             };   // PollRequest
 
-            // ----------------------------------------------------------------
-            class ChangePasswordRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                ChangePasswordRequest() : XMLRequest(true) {}
-            };   // ChangePasswordRequest
-
-
         private:
             std::string                 m_token;
             bool                        m_save_session;
-            UserState                   m_state;
             OnlineProfile              *m_profile;
 
             bool saveSession()  const   { return m_save_session;      }
 
-            CurrentUser();
 
             void signIn                 (bool success, const XMLNode * input);
             void signOut                (bool success, const XMLNode * input);
 
-        public:
-            /**Singleton */
-            static CurrentUser *            get();
-            static void                     deallocate();
-            static void setUserDetails(HTTPRequest *request);
+            // For now declare functions that will become part of PlayerManager
+            // or Playerprofile to be private, and give only PlayerManager
+            // access to them. FIXME
 
+            // FIXME: This apparently does not compile on linux :(
+            // So I'll make this all public for now again
+            // friend class PlayerManager;
+    public:
+            uint32_t getID() const;
+            void setUserDetails(HTTPRequest *request,
+                                const std::string &action,
+                                const std::string &php_script = "");
+            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
+            /** Returns the user state. */
+            enum UserState
+            {
+                US_SIGNED_OUT = 0,
+                US_SIGNED_IN,
+                US_GUEST,
+                US_SIGNING_IN,
+                US_SIGNING_OUT
+            };
+            UserState                   m_state;
+            const UserState getUserState() const { return m_state; }
+
+
+        public:
+            CurrentUser();
             void                            requestSavedSession();
             SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
                                                             const irr::core::stringw &password,
                                                             bool save_session,
                                                             bool request_now = true);
             void                            requestSignOut();
-            ServerJoinRequest *             requestServerJoin(uint32_t server_id, bool request_now = true);
 
-            const XMLRequest *              requestGetAddonVote(const std::string & addon_id) const;
-            const SetAddonVoteRequest *     requestSetAddonVote(const std::string & addon_id, float rating) const;
             void                            requestFriendRequest(const uint32_t friend_id) const;
-            void                            requestAcceptFriend(const uint32_t friend_id) const;
-            void                            requestRemoveFriend(const uint32_t friend_id) const;
-            void                            requestCancelFriend(const uint32_t friend_id) const;
-            void                            requestPasswordChange(  const irr::core::stringw &current_password,
-                                                                    const irr::core::stringw &new_password,
-                                                                    const irr::core::stringw &new_password_ver) const;
-
-            XMLRequest *                    requestUserSearch(const irr::core::stringw & search_string) const;
-
             void                            onSTKQuit() const;
-            void                            onAchieving(uint32_t achievement_id) const;
             void                            requestPoll() const;
 
             irr::core::stringw              getUserName()           const;
-            uint32_t                        getID()                 const;
             // ----------------------------------------------------------------
-            /** Returns the user state. */
-            const UserState getUserState() const { return m_state; }
-            // ----------------------------------------------------------------
-            /** Returns whether a user is signed in or not. */
-            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }

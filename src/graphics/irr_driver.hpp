@@ -65,13 +65,13 @@ class ShadowImportance;
 
 enum STKRenderingPass
 {
-	SOLID_NORMAL_AND_DEPTH_PASS,
-	SOLID_LIT_PASS,
-	TRANSPARENT_PASS,
-	GLOW_PASS,
-	DISPLACEMENT_PASS,
-	SHADOW_PASS,
-	PASS_COUNT,
+    SOLID_NORMAL_AND_DEPTH_PASS,
+    SOLID_LIT_PASS,
+    TRANSPARENT_PASS,
+    GLOW_PASS,
+    DISPLACEMENT_PASS,
+    SHADOW_PASS,
+    PASS_COUNT,
 };
 
 /**
@@ -82,6 +82,7 @@ enum STKRenderingPass
 class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
+    int GLMajorVersion, GLMinorVersion;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -114,7 +115,7 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-	std::vector<video::ITexture *> SkyboxTextures;
+    std::vector<video::ITexture *> SkyboxTextures;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];
@@ -130,7 +131,7 @@ private:
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
 public:
-    GLuint SkyboxCubeMap, ConvolutedSkyboxCubeMap;
+    GLuint SkyboxCubeMap;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -147,6 +148,16 @@ public:
         scene::ISceneNode * node;
         float power;
     };
+
+    unsigned getGLSLVersion() const
+    {
+        if (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3))
+            return GLMajorVersion * 100 + GLMinorVersion * 10;
+        else if (GLMajorVersion == 3)
+            return 100 + (GLMinorVersion + 3) * 10;
+        else
+            return 120;
+    }
 
 private:
     std::vector<VideoMode> m_modes;
@@ -172,9 +183,9 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
-	/** Performance stats */
+    /** Performance stats */
     unsigned             m_last_light_bucket_distance;
-	unsigned             object_count[PASS_COUNT];
+    unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     bool                 m_query_issued;
@@ -197,7 +208,7 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
-	STKRenderingPass m_phase;
+    STKRenderingPass m_phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -211,6 +222,12 @@ private:
 
     void renderFixed(float dt);
     void renderGLSL(float dt);
+    void renderSolidFirstPass();
+    void renderSolidSecondPass();
+    void renderTransparent();
+    void renderParticles();
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode,
+        Camera * const camera);
     void renderShadows(//ShadowImportanceProvider * const sicb,
                        scene::ICameraSceneNode * const camnode,
                        //video::SOverrideMaterial &overridemat,
@@ -233,13 +250,13 @@ public:
     void reset();
     void generateSkyboxCubemap();
     void renderSkybox();
-	void setPhase(STKRenderingPass);
-	STKRenderingPass getPhase() const;
+    void setPhase(STKRenderingPass);
+    STKRenderingPass getPhase() const;
     const std::vector<core::matrix4> &getShadowViewProj() const
     {
         return sun_ortho_matrix;
     }
-	void IncreaseObjectCount();
+    void IncreaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
@@ -250,7 +267,7 @@ public:
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
-    video::ITexture      *getTexture(FileManager::AssetType type, 
+    video::ITexture      *getTexture(FileManager::AssetType type,
                                      const std::string &filename,
                                      bool is_premul=false,
                                      bool is_prediv=false,
@@ -286,7 +303,7 @@ public:
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
     scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
-	void suppressSkyBox();
+    void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
@@ -358,7 +375,7 @@ public:
                                 char *detail=NULL)
     {
         if(!detail)
-            return getTexture(filename, std::string(error_message), 
+            return getTexture(filename, std::string(error_message),
                               std::string(""));
 
         return getTexture(filename, std::string(error_message),
@@ -373,7 +390,7 @@ public:
      */
     const std::string &getTextureErrorMessage()
     {
-        return m_texture_error_message; 
+        return m_texture_error_message;
     }   // getTextureErrorMessage
 
     // ------------------------------------------------------------------------
@@ -409,12 +426,14 @@ public:
     // -----------------------------------------------------------------------
     inline void updateShaders()  {m_shaders->loadShaders();}
     // ------------------------------------------------------------------------
-    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num) 
+    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
     {
         return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
     }
     // ------------------------------------------------------------------------
-    inline video::ITexture* getRTT(TypeRTT which)  {return m_rtts->getRTT(which);}
+    inline GLuint getRenderTargetTexture(TypeRTT which)  { return m_rtts->getRenderTarget(which); }
+    inline GLuint getFBO(TypeFBO which)  { return m_rtts->getFBO(which); }
+    inline GLuint getDepthStencilTexture()  { return m_rtts->getDepthStencilTexture(); }
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------

@@ -26,6 +26,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -34,7 +35,7 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 
 #include <ISceneManager.h>
@@ -138,10 +139,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 // ----------------------------------------------------------------------------
 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
-    scene::ISceneNode* parent, LodNodeLoader& lod_loader) :
+    scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader) :
     TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = lod_loader.instanciate(&xml_node, parent);
+    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -152,6 +153,39 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 {
     if (m_node)
         irr_driver->removeNode(m_node);
+}
+
+// ----------------------------------------------------------------------------
+
+TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNode& xml_node,
+    scene::ISceneNode* parent,
+    ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
+{
+    m_instancing_group = NULL;
+
+    std::string instancing_model;
+    xml_node.get("instancing_model", &instancing_model);
+
+    m_node = irr_driver->getSceneManager()->addEmptySceneNode(parent);
+    m_node->setPosition(m_init_xyz);
+    m_node->setRotation(m_init_hpr);
+    m_node->setScale(m_init_scale);
+    m_node->updateAbsolutePosition();
+    if (irr_driver->isGLSL())
+    {
+        m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
+            m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
+            instancing_model);
+    }
+    else
+    {
+        m_instancing_group = new STKInstancedSceneNode(model_def_loader.getFirstMeshFor(instancing_model),
+            m_node, irr_driver->getSceneManager(), -1);
+    }
+}
+
+TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
+{
 }
 
 // ----------------------------------------------------------------------------
@@ -188,9 +222,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	xml_node.get("displacing", &displacing);
-	animated &= !displacing;
+    bool displacing = false;
+    xml_node.get("displacing", &displacing);
+    animated &= !displacing;
 
     if (animated)
     {
@@ -256,10 +290,10 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	if(xml_node)
+    bool displacing = false;
+    if(xml_node)
         xml_node->get("displacing", &displacing);
-	animated &= !displacing;
+    animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);

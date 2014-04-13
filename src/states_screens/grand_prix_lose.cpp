@@ -277,8 +277,8 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
         // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
         race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
 
-        std::vector<const ChallengeData*> unlocked = 
-            PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
+        std::vector<const ChallengeData*> unlocked =
+            PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
         if (unlocked.size() > 0)
         {
 
@@ -289,7 +289,7 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
             scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
             StateManager::get()->replaceTopMostScreen(scene);
-            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
+            PlayerManager::getCurrentPlayer()->clearUnlocked();
         }
         else
         {

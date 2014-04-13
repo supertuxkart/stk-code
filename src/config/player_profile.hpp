@@ -28,10 +28,11 @@ using namespace irr;
 
 #include <string>
 
-class UTFWriter;
 class AchievementsStatus;
+namespace Online { class CurrentUser; }
+class UTFWriter;
 
-/** Class for managing player profiles (name, usage frequency, 
+/** Class for managing player profiles (name, usage frequency,
  *  etc.). All PlayerProfiles are managed by the PlayerManager.
  *  A PlayerProfile keeps track of the story mode progress using an instance
  *  of StoryModeStatus, and achievements with AchievementsStatus. All data
@@ -42,7 +43,9 @@ class PlayerProfile : public NoCopy
 {
 private:
 
-    /** The name of the player (wide string, so it can be in native 
+    Online::CurrentUser *m_current_user;
+
+    /** The name of the player (wide string, so it can be in native
      *  language). */
     core::stringw m_name;
 
@@ -62,6 +65,15 @@ private:
     /** True if this is the default (last used) player. */
     bool m_is_default;
 
+    /** True if this user has a saved session. */
+    bool m_saved_session;
+
+    /** If a session was saved, this will be the online user id to use. */
+    int m_saved_user_id;
+
+    /** The token of the saved session. */
+    std::string m_saved_token;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -69,24 +81,20 @@ private:
 
 public:
 
-    PlayerProfile(const core::stringw& name, bool is_guest = false);
-
-    PlayerProfile(const XMLNode* node);
-
+         PlayerProfile(const core::stringw &name, bool is_guest = false);
+         PlayerProfile(const XMLNode *node);
+         ~PlayerProfile();
     void save(UTFWriter &out);
+    void loadRemainingData(const XMLNode *node);
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
     bool operator>(const PlayerProfile &other);
     void raceFinished();
+    void saveSession(int user_id, const std::string &token);
+    void clearSession();
 
     // ------------------------------------------------------------------------
-    ~PlayerProfile()
-    {
-        #ifdef DEBUG
-        m_magic_number = 0xDEADBEEF;
-        #endif
-    }   // ~PlayerProfile
-
+    Online::CurrentUser* getCurrentUser() { return m_current_user; }
     // ------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)
@@ -101,9 +109,7 @@ public:
     /** Returns the name of this player. */
     core::stringw getName() const
     {
-        #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
-        #endif
         return m_name.c_str();
     }   // getName
 
@@ -130,14 +136,14 @@ public:
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
     {
-        return m_story_mode_status->isLocked(feature); 
+        return m_story_mode_status->isLocked(feature);
     }   // isLocked
     // ------------------------------------------------------------------------
     /** Returns all active challenges. */
     void computeActive() { m_story_mode_status->computeActive(); }
     // ------------------------------------------------------------------------
     /** Returns the list of recently completed challenges. */
-    std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
+    std::vector<const ChallengeData*> getRecentlyCompletedChallenges()
     {
         return m_story_mode_status->getRecentlyCompletedChallenges();
     }   // getRecently Completed Challenges
@@ -173,7 +179,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getNumEasyTrophies() const
     {
-        return m_story_mode_status->getNumEasyTrophies(); 
+        return m_story_mode_status->getNumEasyTrophies();
     }   // getNumEasyTrophies
     // ------------------------------------------------------------------------
     unsigned int getNumMediumTrophies() const
@@ -183,14 +189,31 @@ public:
     // -----------------------------------------------------------------------
     unsigned int getNumHardTrophies() const
     {
-        return m_story_mode_status->getNumHardTrophies(); 
+        return m_story_mode_status->getNumHardTrophies();
     }   // getNumHardTropies
     // ------------------------------------------------------------------------
-    AchievementsStatus* getAchievementsStatus() 
+    AchievementsStatus* getAchievementsStatus()
     {
         return m_achievements_status;
     }   // getAchievementsStatus
-
+    // ------------------------------------------------------------------------
+    /** Returns true if a session was saved for this player. */
+    bool hasSavedSession() const { return m_saved_session;  }
+    // ------------------------------------------------------------------------
+    /** If a session was saved, return the id of the saved user. */
+    int getSavedUserId() const
+    { 
+        assert(m_saved_session);
+        return m_saved_user_id;
+    }   // getSavedUserId
+    // ------------------------------------------------------------------------
+    /** If a session was saved, return the token to use. */
+    const std::string& getSavedToken() const
+    {
+        assert(m_saved_session);
+        return m_saved_token;
+    }   // getSavedToken
+    // ------------------------------------------------------------------------
 };   // class PlayerProfile
 
 #endif

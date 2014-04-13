@@ -11,6 +11,7 @@ uniform vec2 screen;
 
 #if __VERSION__ >= 130
 in vec2 uv;
+in vec4 color;
 out vec4 FragColor;
 #else
 varying vec2 uv;
@@ -20,7 +21,7 @@ varying vec2 uv;
 
 void main()
 {
-	vec4 color = texture(tex, uv);
+	vec4 diffusecolor = texture(tex, uv) * color;
 	vec3 tmp = vec3(gl_FragCoord.xy / screen, gl_FragCoord.z);
 	tmp = 2. * tmp - 1.;
 
@@ -33,5 +34,6 @@ void main()
 
 	fog = min(fog, fogmax);
 
-	FragColor = vec4(vec4(col, 0.) * fog + color *(1. - fog));
+    vec4 color = vec4(vec4(col, 0.) * fog + diffusecolor *(1. - fog));
+    FragColor = vec4(color.rgb * color.a, color.a);
 }

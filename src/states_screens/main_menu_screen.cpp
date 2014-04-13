@@ -39,6 +39,7 @@
 #include "online/request_manager.hpp"
 #include "states_screens/addons_screen.hpp"
 #include "states_screens/credits.hpp"
+#include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
 #include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
@@ -145,22 +146,22 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 
 {
-    if(CurrentUser::get()->getUserState()==CurrentUser::US_GUEST ||
-        CurrentUser::get()->getUserState()==CurrentUser::US_SIGNED_IN)
+    if(PlayerManager::getCurrentOnlineState() == PlayerManager::OS_GUEST  ||
+       PlayerManager::getCurrentOnlineState() == PlayerManager::OS_SIGNED_IN)
     {
         m_online->setActivated();
         m_online->setLabel( _("Online"));
     }
-    else if(CurrentUser::get()->getUserState()==CurrentUser::US_SIGNED_OUT)
+    else if (PlayerManager::getCurrentOnlineState() == PlayerManager::OS_SIGNED_OUT)
     {
         m_online->setActivated();
         m_online->setLabel( _("Login" ));
     }
     else // now must be either logging in or logging out
         m_online->setDeactivated();
-            
-    m_online->setLabel(CurrentUser::get()->getID() ? _("Online")
-                                                   : _("Login" )  );
+
+    m_online->setLabel(PlayerManager::getCurrentOnlineId() ? _("Online")
+                                                           : _("Login" )  );
     IconButtonWidget* addons_icon = getWidget<IconButtonWidget>("addons");
     if (addons_icon != NULL)
     {
@@ -340,7 +341,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
         // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
+        StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                                 device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
@@ -363,7 +364,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (selection == "story")
     {
-        PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        PlayerProfile *player = PlayerManager::getCurrentPlayer();
         if (player->isFirstTime())
         {
             StateManager::get()->enterGameState();
@@ -404,7 +405,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                 "\"Allow STK to connect to the Internet\"."));
             return;
         }
-        if(CurrentUser::get()->getID())
+        if (PlayerManager::getCurrentOnlineId())
             StateManager::get()->pushScreen(OnlineScreen::getInstance());
         else
             StateManager::get()->pushScreen(LoginScreen::getInstance());
@@ -413,7 +414,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     {
         // Don't go to addons if there is no internet, unless some addons are
         // already installed (so that you can delete addons without being online).
-        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED && 
+        if(UserConfigParams::m_internet_status!=RequestManager::IPERM_ALLOWED &&
             !addons_manager->anyAddonsInstalled())
         {
             new MessageDialog(_("You can not download addons without internet access. "
@@ -423,6 +424,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             return;
         }
         StateManager::get()->pushScreen(AddonsScreen::getInstance());
+    }
+    else if (selection == "gpEditor")
+    {
+        StateManager::get()->pushScreen(GrandPrixEditorScreen::getInstance());
     }
 }   // eventCallback
 

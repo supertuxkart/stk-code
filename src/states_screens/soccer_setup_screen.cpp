@@ -54,7 +54,7 @@ void SoccerSetupScreen::loadedFromFile()
 }
 
 // ----------------------------------------------------------------------------
-void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name, 
+void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
                                       const int playerID)
 {
     if(m_schedule_continue)
@@ -64,7 +64,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
     {
         int nb_players = m_kart_view_info.size();
 
-        if (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+        if (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 ||
             getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0)
         {
             for(int i=0 ; i < nb_players ; i++)
@@ -77,7 +77,7 @@ void SoccerSetupScreen::eventCallback(Widget* widget, const std::string& name,
             sfx_manager->quickSound( "anvil" );
             return;
         }
-        else if(!areAllKartsConfirmed())    
+        else if(!areAllKartsConfirmed())
         {
             for(int i=0 ; i < nb_players ; i++)
             {
@@ -303,20 +303,20 @@ GUIEngine::EventPropagation SoccerSetupScreen::filterActions(PlayerAction action
         break;
     case PA_MENU_SELECT:
     {
-        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) || 
+        if (!bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) ||
             areAllKartsConfirmed())
         {
             return result;
         }
 
-        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) && 
+        if (bt_continue->isFocusedForPlayer(PLAYER_ID_GAME_MASTER) &&
             m_kart_view_info[playerId].confirmed)
         {
             return EVENT_BLOCK;
         }
 
-        if (getNumConfirmedKarts() > nb_players-2 && 
-           (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 || 
+        if (getNumConfirmedKarts() > nb_players-2 &&
+           (getNumKartsInTeam(SOCCER_TEAM_RED) == 0 ||
             getNumKartsInTeam(SOCCER_TEAM_BLUE) == 0))
         {
             sfx_manager->quickSound( "anvil" );

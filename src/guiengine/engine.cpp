@@ -487,6 +487,14 @@ namespace GUIEngine
 
 
  \n
+ \subsection prop20 PROP_KEEP_SELECTION
+ <em> Name in XML files: </em> \c "keep_selection"
+
+ Used on lists, indicates that the list should keep showing the selected item
+ even when it doesn't have the focus
+
+
+ \n
  <HR>
  \section code Using the engine in code
  <HR>
@@ -787,7 +795,7 @@ namespace GUIEngine
         return Private::small_font_height;
     }   // getSmallFontHeight
  
-    // ------------------------------------------------------------------------    
+    // ------------------------------------------------------------------------
     int getLargeFontHeight()
    {
 

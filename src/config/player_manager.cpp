@@ -23,13 +23,14 @@
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
+#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
 PlayerManager *PlayerManager::m_player_manager = NULL;
 
 
-/** Create the instance of the player manager. 
+/** Create the instance of the player manager.
  *  Also make sure that at least one player is defined (and if not,
  *  create a default player and a guest player).
  */
@@ -44,6 +45,44 @@ void PlayerManager::create()
     }
 
 }   // create
+
+// ----------------------------------------------------------------------------
+/** Adds the login credential to a http request. It sets the name of
+ *  the script to invokce, token, and user id.
+ *  \param request The http request.
+ *  \param action If not empty, the action to be set.
+ */
+void PlayerManager::setUserDetails(Online::HTTPRequest *request,
+    const std::string &action,
+    const std::string &php_name)
+{
+    get()->getCurrentUser()->setUserDetails(request, action, php_name);
+}   // setUserDetails
+
+// ----------------------------------------------------------------------------
+/** Returns whether a user is signed in or not. */
+bool PlayerManager::isCurrentLoggedIn()
+{
+    return getCurrentUser()->isRegisteredUser();
+}   // isCurrentLoggedIn
+
+// ----------------------------------------------------------------------------
+/** Returns the online id of the current player.
+*  \pre User logged in (which is asserted in getID()).
+*/
+unsigned int PlayerManager::getCurrentOnlineId()
+{
+    return getCurrentUser()->getID();
+}   // getCurrentOnlineId
+
+// ----------------------------------------------------------------------------
+/** Returns the online state of the current player. It can be logged out,
+ *  logging in, logged in, logging out, logged out, or guest.
+ */
+PlayerManager::OnlineState PlayerManager::getCurrentOnlineState()
+{
+    return (OnlineState)getCurrentUser()->getUserState();
+}   // getCurrentOnlineState
 
 // ============================================================================
 /** Constructor.
@@ -71,31 +110,47 @@ void PlayerManager::load()
 {
     std::string filename = file_manager->getUserConfigFile("players.xml");
 
-    const XMLNode *players = file_manager->createXMLTree(filename);
-    if(!players)
+    m_player_data = file_manager->createXMLTree(filename);
+    if(!m_player_data)
     {
         Log::info("player_manager", "A new players.xml file will be created.");
         return;
     }
-    else if(players->getName()!="players")
+    else if(m_player_data->getName()!="players")
     {
         Log::info("player_manager", "The players.xml file is invalid.");
         return;
     }
 
     m_current_player = NULL;
-    for(unsigned int i=0; i<players->getNumNodes(); i++)
+    for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
     {
-        const XMLNode *player_xml = players->getNode(i);
+        const XMLNode *player_xml = m_player_data->getNode(i);
         PlayerProfile *player = new PlayerProfile(player_xml);
         m_all_players.push_back(player);
         if(player->isDefault())
             m_current_player = player;
     }
-    m_all_players.insertionSort(/*start*/0, /*desc*/true);
 
-    delete players;
 }   // load
+
+// ----------------------------------------------------------------------------
+/** The 2nd loading stage. During this stage achievements and story mode
+ *  data is read for each player.
+ */
+void PlayerManager::loadRemainingData()
+{
+    for (unsigned int i = 0; i<m_player_data->getNumNodes(); i++)
+    {
+        const XMLNode *player_xml = m_player_data->getNode(i);
+        m_all_players[i].loadRemainingData(player_xml);
+    }
+    delete m_player_data;
+    m_player_data = NULL;
+
+    // Sort player by frequency
+    m_all_players.insertionSort(/*start*/0, /*desc*/true);
+}   // loadRemainingData
 
 // ----------------------------------------------------------------------------
 /** Saves all player profiles to players.xml.
@@ -137,7 +192,7 @@ void PlayerManager::addNewPlayer(const core::stringw& name)
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
-/** Deletes a player profile from the list of all profiles. 
+/** Deletes a player profile from the list of all profiles.
  */
 void PlayerManager::deletePlayer(PlayerProfile *player)
 {
@@ -146,7 +201,7 @@ void PlayerManager::deletePlayer(PlayerProfile *player)
 
 // ----------------------------------------------------------------------------
 /** This function makes sure that a current player is defined. This is called
- *  when a screen skipping command line option is given (-N, -R, ...), in 
+ *  when a screen skipping command line option is given (-N, -R, ...), in
  *  which case there might not be a current player (if no default player is
  *  set in players.xml, i.e. the 'remember be' option was not picked ). Since
  *  a lot of code depends on having a local player, just set the most

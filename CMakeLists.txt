@@ -117,7 +117,7 @@ endif()
 
 if(UNIX)
     if(USE_CPP2011)
-        add_definitions("-std=gnu++11")
+        add_definitions("-std=c++0x")
     endif()
 endif()
 
@@ -282,6 +282,7 @@ if(MSVC)
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
         $<TARGET_FILE_DIR:supertuxkart>) 
+  add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
 
 # Optional tools

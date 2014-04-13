@@ -208,7 +208,7 @@ namespace GUIEngine
         /**
           * \brief Make an item red to mark an error, for instance
           * \pre may only be called after the widget has been added to the screen with add()
-          */        
+          */
         void markItemRed(const std::string internalName, bool red=true)
         {
             const int id = getItemID(internalName);
@@ -224,8 +224,8 @@ namespace GUIEngine
         }
 
         /** Override callback from Widget */
-        virtual EventPropagation transmitEvent(Widget* w, 
-                                               const std::string& originator, 
+        virtual EventPropagation transmitEvent(Widget* w,
+                                               const std::string& originator,
                                                const int playerID);
         
         void setColumnListener(IListWidgetHeaderListener* listener)

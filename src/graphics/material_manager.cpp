@@ -183,7 +183,7 @@ void MaterialManager::loadMaterial()
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
     //
-    addSharedMaterial(file_manager->getAssetChecked(FileManager::TEXTURE, 
+    addSharedMaterial(file_manager->getAssetChecked(FileManager::TEXTURE,
                                                     "materials.xml", true));
     std::string deprecated = file_manager->getAssetChecked(FileManager::TEXTURE,
                                                            "deprecated/materials.xml");

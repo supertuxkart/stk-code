@@ -20,6 +20,7 @@
 
 #include "online/request_manager.hpp"
 
+#include "config/player_manager.hpp"
 #include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -102,6 +103,9 @@ namespace Online
      *  variable has not been assigned at that stage, and the thread might
      *  use network_http - a very subtle race condition. So the thread can
      *  only be started after the assignment (in main) has been done.
+     *  \pre PlayerManager was created and has read the main data for each
+     *                     player so that all data for automatic login is 
+     *                     availale.
      */
     void RequestManager::startNetworkThread()
     {
@@ -125,7 +129,7 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        CurrentUser::get()->requestSavedSession();
+        PlayerManager::getCurrentUser()->requestSavedSession();
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -143,7 +147,7 @@ namespace Online
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
         //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
-        CurrentUser::get()->onSTKQuit();
+        PlayerManager::getCurrentUser()->onSTKQuit();
         addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
@@ -155,7 +159,7 @@ namespace Online
     void RequestManager::cancelAllDownloads()
     {
         m_abort.setAtomic(true);
-        // FIXME doesn't get called at the moment. When using this again, 
+        // FIXME doesn't get called at the moment. When using this again,
         // be sure that HTTP_MAX_PRIORITY requests still get executed.
     }   // cancelAllDownloads
 
@@ -189,7 +193,7 @@ namespace Online
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while( me->m_request_queue.getData().empty() || 
+        while( me->m_request_queue.getData().empty() ||
                me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
         {
             bool empty = me->m_request_queue.getData().empty();
@@ -274,7 +278,7 @@ namespace Online
         handleResultQueue();
 
         //Database polling starts here, only needed for registered users
-        if(!CurrentUser::get()->isRegisteredUser())
+        if (!PlayerManager::isCurrentLoggedIn())
             return;
 
         m_time_since_poll += dt;
@@ -284,7 +288,7 @@ namespace Online
         if(m_time_since_poll > interval)
         {
             m_time_since_poll = 0;
-            CurrentUser::get()->requestPoll();
+            PlayerManager::getCurrentUser()->requestPoll();
         }
 
     }   // update

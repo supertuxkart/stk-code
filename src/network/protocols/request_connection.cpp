@@ -18,39 +18,65 @@
 
 #include "network/protocols/request_connection.hpp"
 
-#include "network/protocol_manager.hpp"
-#include "online/request_manager.hpp"
-#include "online/current_user.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/protocol_manager.hpp"
+#include "online/servers_manager.hpp"
+#include "online/current_user.hpp"
 
-RequestConnection::RequestConnection(uint32_t server_id) : Protocol(NULL, PROTOCOL_SILENT)
+using namespace Online;
+
+/** Constructor. Stores the server id.
+ *  \param server_id Id of the server.
+ */
+RequestConnection::RequestConnection(uint32_t server_id) 
+                 : Protocol(NULL, PROTOCOL_SILENT)
 {
     m_server_id = server_id;
-}
+}   // RequestConnection
 
+// ----------------------------------------------------------------------------
 RequestConnection::~RequestConnection()
 {
-}
+}   // ~RequestConnection
 
+// ----------------------------------------------------------------------------
+/** Setup of this request, sets state to none.
+ */
 void RequestConnection::setup()
 {
     m_state = NONE;
-}
+}   // setup
 
+// ----------------------------------------------------------------------------
+/** The callback for the server join request. It informs the server manager
+ *  of a successful join request.
+ */
+void RequestConnection::ServerJoinRequest::callback()
+{
+    if (isSuccess())
+    {
+        uint32_t server_id;
+        getXMLData()->get("serverid", &server_id);
+        ServersManager::get()->setJoinedServer(server_id);
+    }
+}   // ServerJoinRequest::callback
+
+// ----------------------------------------------------------------------------
+/** This implements a finite state machine to monitor the server join
+ *  request asynchronously.
+ */
 void RequestConnection::asynchronousUpdate()
 {
     switch (m_state)
     {
         case NONE:
         {
-            m_request = new Online::CurrentUser::ServerJoinRequest();
-            m_request->setServerURL("address-management.php");
-            m_request->addParameter("id",Online::CurrentUser::get()->getID());
-            m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+            m_request = new ServerJoinRequest();
+            PlayerManager::setUserDetails(m_request, "request-connection", 
+                                          "address-management.php");
             m_request->addParameter("server_id",m_server_id);
-            m_request->addParameter("action","request-connection");
-
-            Online::RequestManager::get()->addRequest(m_request);
+            m_request->queue();
             m_state = REQUEST_PENDING;
             break;
         }
@@ -65,11 +91,14 @@ void RequestConnection::asynchronousUpdate()
             {
                 if (rec_success == "yes")
                 {
-                    Log::debug("RequestConnection", "Connection Request made successfully.");
+                    Log::debug("RequestConnection",
+                               "Connection Request made successfully.");
                 }
                 else
                 {
-                    Log::error("RequestConnection", "Fail to make a request to connecto to server %d", m_server_id);
+                    Log::error("RequestConnection", 
+                             "Fail to make a request to connecto to server %d",
+                               m_server_id);
                 }
             }
             else
@@ -89,5 +118,5 @@ void RequestConnection::asynchronousUpdate()
         case EXITING:
             break;
     }
-}
+}   // asynchronousUpdate
 

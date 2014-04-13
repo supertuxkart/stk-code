@@ -19,10 +19,10 @@
 
 #include "online/online_profile.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
-#include "config/user_config.hpp"
-#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -35,7 +35,7 @@ using namespace Online;
 namespace Online
 {
 
-OnlineProfile::RelationInfo::RelationInfo(const irr::core::stringw & date, 
+OnlineProfile::RelationInfo::RelationInfo(const irr::core::stringw & date,
                                     bool is_online, bool is_pending,
                                     bool is_asker)
 {
@@ -113,7 +113,7 @@ OnlineProfile::OnlineProfile(const XMLNode * xml, ConstructorType type)
 
     xml->get("id",        &m_id      );
     xml->get("user_name", &m_username);
-    m_is_current_user          = (m_id == CurrentUser::get()->getID());
+    m_is_current_user          = (m_id == PlayerManager::getCurrentOnlineId());
     m_state = S_READY;
 }   // OnlineProfile(XMLNode)
 
@@ -130,7 +130,7 @@ OnlineProfile::~OnlineProfile()
  */
 void OnlineProfile::fetchAchievements()
 {
-    assert(CurrentUser::get()->isRegisteredUser());
+    assert(PlayerManager::isCurrentLoggedIn());
     if (m_has_fetched_achievements || m_is_current_user)
         return;
     m_state = S_FETCHING;
@@ -154,8 +154,7 @@ void OnlineProfile::fetchAchievements()
     // ------------------------------------------------------------------------
 
     AchievementsRequest * request = new AchievementsRequest();
-    CurrentUser::setUserDetails(request);
-    request->addParameter("action", "get-achievements");
+    PlayerManager::setUserDetails(request, "get-achievements");
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);
 }   // fetchAchievements
@@ -185,7 +184,7 @@ void OnlineProfile::storeAchievements(const XMLNode * input)
  */
 void OnlineProfile::fetchFriends()
 {
-    assert(CurrentUser::get()->isRegisteredUser());
+    assert(PlayerManager::isCurrentLoggedIn());
     if (m_has_fetched_friends)
         return;
     m_state = S_FETCHING;
@@ -207,8 +206,7 @@ void OnlineProfile::fetchFriends()
     // ------------------------------------------------------------------------
 
     FriendsListRequest * request = new FriendsListRequest();
-    CurrentUser::setUserDetails(request);
-    request->addParameter("action", "get-friends-list");
+    PlayerManager::setUserDetails(request, "get-friends-list");
     request->addParameter("visitingid", m_id);
     RequestManager::get()->addRequest(request);
 }   // fetchFriends
@@ -319,9 +317,9 @@ void OnlineProfile::merge(OnlineProfile *profile)
     if (this->m_relation_info == NULL && profile->m_relation_info != NULL)
     {
         this->m_relation_info = profile->m_relation_info;
-        // We don't want the destructor of the profile instance to destroy 
+        // We don't want the destructor of the profile instance to destroy
         // the relation info
-        profile->m_relation_info = NULL; 
+        profile->m_relation_info = NULL;
     }
     delete profile;
 }   // merge

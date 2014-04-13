@@ -26,6 +26,7 @@ STKModifiedSpriteBank::STKModifiedSpriteBank(IGUIEnvironment* env) :
     #endif
 
     m_scale = 1.0f;
+    m_height = 0;
 
     if (Environment)
     {
@@ -62,8 +63,8 @@ core::array< core::rect<s32> >& STKModifiedSpriteBank::getPositions()
 
     for (int n=0; n<(int)Rectangles.size(); n++)
     {
-        const int h = (int)(Rectangles[n].getHeight()*m_scale);
-        const int w = (int)(Rectangles[n].getWidth() *m_scale);
+        const int h = getScaledHeight(Rectangles[n].getHeight());
+        const int w = getScaledWidth(Rectangles[n].getWidth());
         copy.push_back( core::rect<s32>(Rectangles[n].UpperLeftCorner,
                                        core::dimension2d<s32>(w,h) )
                        );
@@ -203,8 +204,8 @@ void STKModifiedSpriteBank::draw2DSprite(u32 index,
     const core::dimension2d<s32>& dim = r.getSize();
 
     core::rect<s32> dest( pos,
-                          core::dimension2d<s32>((int)(dim.Width*m_scale),
-                                                 (int)(dim.Height*m_scale)) );
+                          core::dimension2d<s32>(getScaledWidth(dim.Width),
+                                                 getScaledHeight(dim.Height)));
     if (center)
     {
         dest -= dest.getSize() / 2;
@@ -294,6 +295,30 @@ void STKModifiedSpriteBank::draw2DSpriteBatch(const core::array<u32>& indices,
                 drawBatches[i].sourceRects, clip, color, true);
     }
 }   // draw2DSpriteBatch
+
+// ----------------------------------------------------------------------------
+void STKModifiedSpriteBank::scaleToHeight(int height)
+{
+    m_height = height;
+}
+
+// ----------------------------------------------------------------------------
+s32 STKModifiedSpriteBank::getScaledWidth(s32 width) const
+{
+    if (m_height == 0)
+        return (s32)((float)width * m_scale);
+    else
+        return m_height;
+}
+
+// ----------------------------------------------------------------------------
+s32 STKModifiedSpriteBank::getScaledHeight(s32 height) const
+{
+    if (m_height == 0)
+        return (s32)((float)height * m_scale);
+    else
+        return m_height;
+}
 
 // ----------------------------------------------------------------------------
 } // namespace gui

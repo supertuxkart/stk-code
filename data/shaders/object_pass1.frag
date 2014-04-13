@@ -1,20 +1,19 @@
+uniform sampler2D tex;
+
 #if __VERSION__ >= 130
 in vec3 nor;
-out vec2 EncodedNormal;
+in vec2 uv;
+out vec3 EncodedNormal;
 #else
 varying vec3 nor;
 #define EncodedNormal gl_FragColor.xy
 #endif
 
-
-
-// from Crytek "a bit more deferred CryEngine"
-vec2 EncodeNormal(vec3 n)
-{
-	return normalize(n.xy) * sqrt(n.z * 0.5 + 0.5);
-}
+vec2 EncodeNormal(vec3 n);
 
 void main(void)
 {
-	EncodedNormal = 0.5 * EncodeNormal(normalize(nor)) + 0.5;
+	vec4 col = texture(tex, uv);
+	EncodedNormal.xy = 0.5 * EncodeNormal(normalize(nor)) + 0.5;
+	EncodedNormal.z = exp2(10. * (1. - col.a) + 1.);
 }

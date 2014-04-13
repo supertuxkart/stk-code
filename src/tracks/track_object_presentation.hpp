@@ -40,7 +40,8 @@ class SFXBase;
 class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
-class LodNodeLoader;
+class ModelDefinitionLoader;
+class STKInstancedSceneNode;
 
 /**
  * \ingroup tracks
@@ -152,8 +153,21 @@ public:
 
     TrackObjectPresentationLOD(const XMLNode& xml_node,
                                scene::ISceneNode* parent,
-                               LodNodeLoader& lod_loader);
+                               ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLOD();
+};
+
+class TrackObjectPresentationInstancing : public TrackObjectPresentationSceneNode
+{
+    STKInstancedSceneNode* m_instancing_group;
+public:
+
+    TrackObjectPresentationInstancing(const XMLNode& xml_node,
+        scene::ISceneNode* parent,
+        ModelDefinitionLoader& model_def_loader);
+    virtual ~TrackObjectPresentationInstancing();
+
+    STKInstancedSceneNode* getInstancingGroup() { return m_instancing_group;  }
 };
 
 /**

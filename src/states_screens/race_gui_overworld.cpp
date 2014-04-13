@@ -207,7 +207,7 @@ void RaceGUIOverworld::renderPlayerView(const Camera *camera, float dt)
  */
 void RaceGUIOverworld::drawTrophyPoints()
 {
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     const int points = player->getPoints();
     std::string s = StringUtils::toString(points);
     core::stringw sw(s.c_str());
@@ -398,7 +398,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
        // bool locked = (m_locked_challenges.find(c) != m_locked_challenges.end());
         int state = (challenges[n].getForceField().m_is_locked ? LOCKED : OPEN);
 
-        const ChallengeStatus* c = PlayerManager::get()->getCurrentPlayer()
+        const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                                   ->getChallengeStatus(challenges[n].m_challenge_id);
         if      (c->isSolved(RaceManager::DIFFICULTY_HARD))   state = COMPLETED_HARD;
         else if (c->isSolved(RaceManager::DIFFICULTY_MEDIUM)) state = COMPLETED_MEDIUM;
@@ -460,7 +460,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 continue;
             }
 
-            const ChallengeData* challenge = 
+            const ChallengeData* challenge =
                 unlock_manager->getChallengeData(challenges[n].m_challenge_id);
 
             if (challenge == NULL)

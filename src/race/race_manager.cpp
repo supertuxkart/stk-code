@@ -340,7 +340,7 @@ void RaceManager::startNew(bool from_overworld)
     }
 
     m_track_number = 0;
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && 
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX &&
         !NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // offline mode only
     {
         //We look if Player 1 has a saved version of this GP.
@@ -632,7 +632,7 @@ void RaceManager::exitRace(bool delete_world)
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
     {
-        PlayerManager::get()->getCurrentPlayer()->grandPrixFinished();
+        PlayerManager::getCurrentPlayer()->grandPrixFinished();
         if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
         {
             //Delete saved GP
@@ -752,7 +752,7 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld, 
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
                           bool continue_saved_gp)
 {
     assert(gp != NULL);

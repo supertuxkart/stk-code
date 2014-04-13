@@ -53,7 +53,7 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
 public:
-    NotificationDialog(Type type, const core::stringw info, bool from_queue = true);
+    NotificationDialog(Type type, const core::stringw info);
     ~NotificationDialog();
 
     virtual void beforeAddingWidgets();

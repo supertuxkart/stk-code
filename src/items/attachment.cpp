@@ -33,7 +33,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world.hpp" 
+#include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -388,7 +388,7 @@ void Attachment::update(float dt)
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
-        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale; 
+        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale;
         m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
     }
 
@@ -416,7 +416,7 @@ void Attachment::update(float dt)
         if (f > 1.0f) f = 1.0f;   // cap fraction
         if (m_kart->getSpeed() <= m_initial_speed *
                                  (stk_config->m_parachute_lbound_fraction +
-                                  f * (  stk_config->m_parachute_ubound_fraction 
+                                  f * (  stk_config->m_parachute_ubound_fraction
                                        - stk_config->m_parachute_lbound_fraction)))
         {
             m_time_left = -1;

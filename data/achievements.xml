@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <achievements>
-  <achievement id="1" check-type="all-at-least" reset-after-race="no"
+  <achievement id="1" check-type="all-at-least" reset-type="never"
                title="Christoffel Columbus" description="Play every official track at least once." >
       <farm goal="1"/>
       <scotland goal="1"/>
@@ -13,32 +13,35 @@
       <hacienda goal="1"/>
       <jungle goal="1"/>      
   </achievement>
-  <achievement id="2" check-type="all-at-least" reset-after-race="no"
+  <achievement id="2" check-type="all-at-least" reset-type="never"
                title="Strike!" description="Hit 10 karts with a bowling-ball.">
     <ball goal="10"/>
   </achievement>
-  <achievement id="3" check-type="one-at-least" reset-after-race="yes"
+  <achievement id="3" check-type="one-at-least" reset-type="race"
                title="Arch Enemy" description="Hit the same kart at least 5 times in one race">
     <hit goal="5"/>
   </achievement>
-  <achievement id="4" check-type="all-at-least" reset-after-race="yes"
+  <achievement id="4" check-type="all-at-least" reset-type="race"
                title="Marathoner" description="Make a race with 5 laps or more">
     <laps goal="5"/>
   </achievement>
-  <achievement id="5" check-type="all-at-least" reset-after-race="yes"
-               title="Skid-row" description="Make 5 skidding in a single race">
+  <achievement id="5" check-type="all-at-least" reset-type="lap"
+               title="Skid-row" description="Make 5 skidding in a single lap">
     <skidding goal="5"/>
   </achievement>
-  <achievement id="6" check-type="all-at-least" reset-after-race="no"
+  <achievement id="6" check-type="all-at-least" reset-type="never"
                title="Gold driver" description="Win in all single player modes, against at least 3 opponents.">
     <standard goal="1"/>
     <std_timetrial goal="1"/>
     <follow_leader goal="1"/>
     <opponents goal="3"/>
   </achievement>
-  <achievement id="7" check-type="all-at-least" reset-after-race="yes"
+  <achievement id="7" check-type="all-at-least" reset-type="race"
                title="Powerup Love" description="Use 10 or more powerups in a race">
     <poweruplover goal="10"/>
   </achievement>
+  <achievement id="8" check-type="all-at-least" reset-type="never"
+               title="Unstoppable" description="Win 5 single races in a row">
+    <wins goal="5"/>
+  </achievement>
 </achievements>
-
