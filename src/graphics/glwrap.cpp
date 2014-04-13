@@ -308,7 +308,7 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 
 std::set<irr::video::ITexture *> AlreadyTransformedTexture;
 
-void transformTexturesTosRGB(irr::video::ITexture *tex)
+void compressTexture(irr::video::ITexture *tex, bool srgb)
 {
     if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
         return;
@@ -318,20 +318,27 @@ void transformTexturesTosRGB(irr::video::ITexture *tex)
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
+    unsigned internalFormat, Format;
+    if (tex->hasAlpha())
+        Format = GL_BGRA;
+    else
+        Format = GL_BGR;
+
     if (irr_driver->getGLSLVersion() < 150)
     {
-        if (tex->hasAlpha())
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        if (srgb)
+            internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;
         else
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+            internalFormat = (tex->hasAlpha()) ? GL_RGBA : GL_RGB;
     }
     else
     {
-        if (tex->hasAlpha())
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid *)data);
+        if (srgb)
+            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_SRGB_ALPHA : GL_COMPRESSED_SRGB;
         else
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_COMPRESSED_SRGB, w, h, 0, GL_BGR, GL_UNSIGNED_BYTE, (GLvoid *)data);
+            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA : GL_COMPRESSED_RGB;
     }
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, Format, GL_UNSIGNED_BYTE, (GLvoid *)data);
     glGenerateMipmap(GL_TEXTURE_2D);
     delete[] data;
 }
