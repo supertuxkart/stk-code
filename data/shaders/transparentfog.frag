@@ -21,7 +21,7 @@ varying vec2 uv;
 
 void main()
 {
-	vec4 diffusecolor = texture(tex, uv) * color;
+	vec4 diffusecolor = texture(tex, uv) * pow(color, vec4(2.2));
 	vec3 tmp = vec3(gl_FragCoord.xy / screen, gl_FragCoord.z);
 	tmp = 2. * tmp - 1.;
 
