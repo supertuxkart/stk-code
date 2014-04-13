@@ -6,6 +6,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/profiler.hpp"
 
 using namespace irr;
 
@@ -148,6 +149,8 @@ void STKAnimatedMesh::render()
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
+        PROFILER_PUSH_CPU_MARKER("GATHER SOLID MESHES", 0xFC, 0xFA, 0x68);
+
         GLMesh* mesh;
         for_in(mesh, GeometricMesh[FPSM_DEFAULT])
         {
@@ -163,11 +166,14 @@ void STKAnimatedMesh::render()
             GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
+        PROFILER_POP_CPU_MARKER();
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
+        PROFILER_PUSH_CPU_MARKER("GATHER TRANSPARENT MESHES", 0xFC, 0xFA, 0x68);
+
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
@@ -214,6 +220,7 @@ void STKAnimatedMesh::render()
             GroupedSM<SM_UNTEXTURED>::TIMVSet.push_back(invmodel);
         }
 
+        PROFILER_POP_CPU_MARKER();
         return;
     }
 

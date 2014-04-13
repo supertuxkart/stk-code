@@ -31,6 +31,8 @@
 class Profiler;
 extern Profiler profiler;
 
+double getTimeMilliseconds();
+
 #define ENABLE_PROFILER
 
 #ifdef ENABLE_PROFILER

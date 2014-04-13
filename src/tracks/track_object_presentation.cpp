@@ -615,7 +615,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
     }
     catch (std::runtime_error& e)
     {
-        fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+        Log::warn ("Track", "Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
     }
 }
 
