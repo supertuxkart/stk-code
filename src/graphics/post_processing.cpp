@@ -413,17 +413,13 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_LINEAR, GL_LINEAR);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
-    setTexture(2, getTextureGLuint(noise_tex), GL_NEAREST, GL_NEAREST);
+    setTexture(2, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
     FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
 }
 
 void PostProcessing::renderFog(const core::matrix4 &ipvmat)

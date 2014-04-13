@@ -13,8 +13,8 @@ varying vec2 uv;
 #define AO gl_FragColor.x
 #endif
 
-const float strengh = 4.;
-const float radius = .4f;
+const float strengh = 3.;
+const float radius = 1.f;
 
 #define SAMPLES 16
 
@@ -22,7 +22,7 @@ const float invSamples = strengh / SAMPLES;
 
 vec3 rand(vec2 co)
 {
-   return texture(noise_texture, co*20.16).xyz;
+   return texture(noise_texture, co * pow(3.14159265359, 2.)).xyz;
 }
 
 vec3 DecodeNormal(vec2 n);
@@ -61,7 +61,7 @@ void main(void)
 		occluderPos /= occluderPos.w;
 
 		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
-		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) : 0.;
+		bl += isOccluded ? samplePoints[i].z * smoothstep(5 * radius, 0, distance(samplePos, FragPos)) : 0.;
 	}
 
 	AO = 1.0 - bl * invSamples;

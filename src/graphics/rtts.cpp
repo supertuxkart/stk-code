@@ -64,8 +64,6 @@ RTT::RTT()
     const dimension2du eighth = res/8;
     const dimension2du sixteenth = res/16;
 
-    const dimension2du ssaosize = UserConfigParams::m_ssao == 2 ? res : quarter;
-
     const u16 shadowside = 1024;
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
@@ -88,7 +86,7 @@ RTT::RTT()
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_SSAO] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
 
     RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
