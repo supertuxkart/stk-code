@@ -17,7 +17,7 @@ varying vec2 uv;
 
 void main() {
 	float rim = 1.0 - dot(nor, vec3(0., 0., -1));
-	rim = smoothstep(0.5, 1.5, rim) * 0.35;
+	rim = smoothstep(0.5, 1.5, rim) * 0.15;
 
 	vec4 color = texture(Albedo, uv);
     vec2 tc = gl_FragCoord.xy / screen;
