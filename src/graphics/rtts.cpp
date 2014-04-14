@@ -85,7 +85,7 @@ RTT::RTT()
     RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGB16F, GL_RGB, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_RGBA8, GL_BGRA, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB, GL_BGR, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_SSAO] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);

@@ -13,11 +13,11 @@ void main() {
 	/**
 	 * Luma calculation requires gamma-corrected colors:
 	 */
-	float L = dot(pow(texture(colorMapG, uv).rgb, vec3(1./2.2)), weights);
-	float Lleft = dot(pow(texture(colorMapG, offset[0].xy).rgb, vec3(1./2.2)), weights);
-	float Ltop = dot(pow(texture(colorMapG, offset[0].zw).rgb, vec3(1./2.2)), weights);
-	float Lright = dot(pow(texture(colorMapG, offset[1].xy).rgb, vec3(1./2.2)), weights);
-	float Lbottom = dot(pow(texture(colorMapG, offset[1].zw).rgb, vec3(1./2.2)), weights);
+	float L = dot(texture(colorMapG, uv).rgb, weights);
+	float Lleft = dot(texture(colorMapG, offset[0].xy).rgb, weights);
+	float Ltop = dot(texture(colorMapG, offset[0].zw).rgb, weights);
+	float Lright = dot(texture(colorMapG, offset[1].xy).rgb, weights);
+	float Lbottom = dot(texture(colorMapG, offset[1].zw).rgb, weights);
 
 	vec4 delta = abs(vec4(L) - vec4(Lleft, Ltop, Lright, Lbottom));
 	vec4 edges = step(vec4(threshold), delta);

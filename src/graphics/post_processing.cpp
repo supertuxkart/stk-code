@@ -752,28 +752,43 @@ void PostProcessing::render()
             PROFILER_POP_CPU_MARKER();
         }
 
-        if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
-        {
-            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
-            glDisable(GL_BLEND);
-            blitFBO(in_fbo, irr_driver->getFBO(FBO_MLAA_COLORS), UserConfigParams::m_width, UserConfigParams::m_height);
-            applyMLAA();
-            in_rtt = irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS);
-            PROFILER_POP_CPU_MARKER();
-        }
-
         computeLogLuminance(in_rtt);
 
-        // Final blit
-        // TODO : Use glBlitFramebuffer
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
+        renderColorLevel(in_rtt);
+        std::swap(in_fbo, out_fbo);
+        std::swap(in_rtt, out_rtt);
+
         if (irr_driver->getNormals())
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
         else if (irr_driver->getSSAOViz())
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_SSAO));
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
+        else if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
+        {
+            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            blitFBO(in_fbo, irr_driver->getFBO(FBO_MLAA_COLORS), UserConfigParams::m_width, UserConfigParams::m_height);
+            glDisable(GL_FRAMEBUFFER_SRGB);
+            applyMLAA();
+            blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), 0, UserConfigParams::m_width, UserConfigParams::m_height);
+            PROFILER_POP_CPU_MARKER();
+        }
         else
-            renderColorLevel(in_rtt);
-        glDisable(GL_FRAMEBUFFER_SRGB);
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            renderPassThrough(in_rtt);
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
     }
 }   // render
