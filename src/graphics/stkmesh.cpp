@@ -45,12 +45,17 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
         return SM_DEFAULT;
 }
 
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type)
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
 {
     if (type == irr_driver->getShader(ES_BUBBLES))
         return TM_BUBBLE;
-    else
-        return TM_DEFAULT;
+    video::E_BLEND_FACTOR srcFact, DstFact;
+    video::E_MODULATE_FUNC mod;
+    u32 alpha;
+    unpack_textureBlendFunc(srcFact, DstFact, mod, alpha, MaterialTypeParam);
+    if (DstFact == video::EBF_ONE)
+        return TM_ADDITIVE;
+    return TM_DEFAULT;
 }
 
 GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
@@ -850,10 +855,10 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
             MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
         break;
     case TM_DEFAULT:
+    case TM_ADDITIVE:
         if (World::getWorld()->getTrack()->isFogEnabled())
             mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
                 MeshShader::TransparentFogShader::attrib_position, MeshShader::TransparentFogShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentFogShader::attrib_color, mesh.Stride);
-
         else
             mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
                 MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentShader::attrib_color, mesh.Stride);

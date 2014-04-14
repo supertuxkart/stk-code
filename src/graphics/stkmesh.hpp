@@ -35,6 +35,7 @@ enum ShadedMaterial
 enum TransparentMaterial
 {
     TM_DEFAULT,
+    TM_ADDITIVE,
     TM_BUBBLE,
     TM_COUNT
 };
@@ -139,6 +140,6 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 
 GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE);
 ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures);
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE);
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
 
 #endif // STKMESH_H

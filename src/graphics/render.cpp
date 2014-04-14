@@ -523,7 +523,6 @@ void IrrDriver::renderTransparent()
     glDepthMask(GL_FALSE);
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_CULL_FACE);
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
 }
