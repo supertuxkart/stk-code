@@ -621,31 +621,37 @@ void PostProcessing::render()
 
             if (globalbloom)
             {
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP2_WITH_DS));
-                renderBloom(out_rtt);
-
                 glClear(GL_STENCIL_BUFFER_BIT);
 
-                // To half
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
-                glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_TMP2));
-                renderGaussian6Blur(irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1),
-                    irr_driver->getFBO(FBO_HALF2), irr_driver->getRenderTargetTexture(RTT_HALF2), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
+                glViewport(0, 0, 1024, 1024);
+                renderPassThrough(out_rtt);
 
-                // To quarter
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
-                glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_HALF1));
-                renderGaussian6Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                    irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2), UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+                glViewport(0, 0, 512, 512);
+                renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
 
-                // To eighth
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_EIGHTH1));
-                glViewport(0, 0, UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER1));
-                renderGaussian6Blur(irr_driver->getFBO(FBO_EIGHTH1), irr_driver->getRenderTargetTexture(RTT_EIGHTH1),
-                    irr_driver->getFBO(FBO_EIGHTH2), irr_driver->getRenderTargetTexture(RTT_EIGHTH2), UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
+                // Downsample
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+                glViewport(0, 0, 256, 256);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
+                glViewport(0, 0, 128, 128);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+
+                // Blur
+                glViewport(0, 0, 512, 512);
+                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
+                    irr_driver->getFBO(FBO_TMP_512), irr_driver->getRenderTargetTexture(RTT_TMP_512), 512, 512);
+
+                glViewport(0, 0, 256, 256);
+                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
+                    irr_driver->getFBO(FBO_TMP_256), irr_driver->getRenderTargetTexture(RTT_TMP_256), 256, 256);
+
+                glViewport(0, 0, 128, 128);
+                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
+                    irr_driver->getFBO(FBO_TMP_128), irr_driver->getRenderTargetTexture(RTT_TMP_128), 128, 128);
 
                 glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
@@ -654,9 +660,9 @@ void PostProcessing::render()
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_ONE, GL_ONE);
                 glBlendEquation(GL_FUNC_ADD);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_HALF1));
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER1));
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_EIGHTH1));
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
                 glDisable(GL_BLEND);
             } // end if bloom
 
