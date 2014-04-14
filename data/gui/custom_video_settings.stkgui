@@ -9,43 +9,95 @@
     <div layout="horizontal-row" width="100%" height="fit">
         <checkbox id="pixelshaders"/>
         <spacer width="10" height="10"/>
-        <label text="Pixel Shaders (requires restart)" I18N="Video settings"/>
+        <label text="Pixel Shaders" I18N="Video settings"/>
     </div>
 
     <spacer height="4" width="10" />
 
     <div layout="horizontal-row" width="100%" height="fit">
         <spacer width="50" height="10" />
-        <checkbox id="motionblur"/>
+        <checkbox id="dynamiclight"/>
         <spacer width="10" height="10"/>
-        <label text="Motion blur" I18N="Video settings"/>
+        <label text="Dynamic lights" I18N="Video settings"/>
     </div>
     
     <spacer height="4" width="10" />
 
     <div layout="horizontal-row" width="100%" height="fit">
-        <spacer width="50" height="10" />
-        <checkbox id="mlaa"/>
-        <spacer width="10" height="10"/>
-        <label text="Anti-aliasing" I18N="Video settings"/>
-    </div>
-    
-    <spacer height="4" width="10" />
-    
-    <div layout="horizontal-row" width="100%" height="fit">
-        <spacer width="50" height="10" />
-        <label text="Ambient Occlusion" I18N="Video settings"/>
-        <spacer width="10" height="10"/>
-        <gauge id="ssao" min_value="0" max_value="2" width="50%"/>
-    </div>
-
-    <spacer height="4" width="10" />
-
-    <div layout="horizontal-row" width="100%" height="fit">
-        <spacer width="50" height="10" />
-        <label text="Shadows (requires restart)" I18N="Video settings"/>
+        <spacer width="110" height="10" />
+        <label text="Shadows" I18N="Video settings"/>
         <spacer width="10" height="10"/>
         <gauge id="shadows" min_value="0" max_value="2" width="50%"/>
+    </div>
+    
+    <spacer height="4" width="10" />
+
+    <div layout="horizontal-row" width="100%" height="fit">
+        <div layout="horizontal-row" width="50%" height="fit">
+            <spacer width="50" height="10" />
+            <checkbox id="bloom"/>
+            <spacer width="10" height="10"/>
+            <label text="Bloom" I18N="Video settings"/>
+        </div>
+        
+        <spacer height="4" width="10" />
+        
+        <div layout="horizontal-row" width="50%" height="fit">
+            <spacer width="50" height="10" />
+            <checkbox id="motionblur"/>
+            <spacer width="10" height="10"/>
+            <label text="Motion blur" I18N="Video settings"/>
+        </div>
+    </div>
+    
+    <spacer height="4" width="10" />
+    
+    <div layout="horizontal-row" width="100%" height="fit">
+        <div layout="horizontal-row" width="50%" height="fit">
+            <spacer width="50" height="10" />
+            <checkbox id="lightshaft"/>
+            <spacer width="10" height="10"/>
+            <label text="Light shaft (God rays)" I18N="Video settings"/>
+        </div>
+        
+        <spacer height="4" width="10" />
+        
+        <div layout="horizontal-row" width="50%" height="fit">
+            <spacer width="50" height="10" />
+            <checkbox id="texture_compression"/>
+            <spacer width="10" height="10"/>
+            <label text="Texture compression" I18N="Video settings"/>
+        </div>
+    </div>
+    
+    <spacer height="4" width="10" />
+
+    <div layout="horizontal-row" width="100%" height="fit">
+        <div layout="horizontal-row" width="50%" height="fit">
+            <spacer width="50" height="10" />
+            <checkbox id="glow"/>
+            <spacer width="10" height="10"/>
+            <label text="Glow (outlines)" I18N="Video settings"/>
+        </div>
+        
+        <spacer height="4" width="10" />
+
+        
+        <div layout="horizontal-row" width="50%" height="fit">
+            <spacer width="50" height="10" />
+            <checkbox id="mlaa"/>
+            <spacer width="10" height="10"/>
+            <label text="Anti-aliasing" I18N="Video settings"/>
+        </div>
+    </div>
+    
+    <spacer height="4" width="10" />
+    
+    <div layout="horizontal-row" width="100%" height="fit">
+        <spacer width="50" height="10" />
+        <checkbox id="ssao"/>
+        <spacer width="10" height="10"/>
+        <label text="Ambient Occlusion" I18N="Video settings"/>
     </div>
     
     <spacer height="4" width="10" />
@@ -80,20 +132,13 @@
         <gauge id="filtering" min_value="0" max_value="5" width="50%" />
     </div>
     
-    <!--
-    <div layout="horizontal-row" width="100%" height="fit">
-        <label text="Anti-aliasing (requires restart)" I18N="Video settings" width="40%" />
-        <spacer width="10" height="10"/>
-        <gauge id="antialiasing" min_value="0" max_value="3" width="50%"/>
-    </div>
-    
-    <spacer height="4" width="10" />
-    -->
+    <spacer height="10" width="10" />
 
+    <label text="* Restart STK to apply new settings" width="100%" text_align="center" I18N="Video settings"/>
     
     <spacer proportion="1"/>
     
-    <button id="close" text="Close" align="center"/>
+    <button id="close" text="Apply" align="center"/>
 </div>
 
 </stkgui>

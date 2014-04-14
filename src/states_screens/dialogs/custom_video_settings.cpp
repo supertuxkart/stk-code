@@ -33,7 +33,7 @@ using namespace irr::gui;
 
 // -----------------------------------------------------------------------------
 
-CustomVideoSettingsialog::CustomVideoSettingsialog(const float w, const float h) :
+CustomVideoSettingsDialog::CustomVideoSettingsDialog(const float w, const float h) :
         ModalDialog(w, h)
 {
     loadFromFile("custom_video_settings.stkgui");
@@ -41,13 +41,13 @@ CustomVideoSettingsialog::CustomVideoSettingsialog(const float w, const float h)
 
 // -----------------------------------------------------------------------------
 
-CustomVideoSettingsialog::~CustomVideoSettingsialog()
+CustomVideoSettingsDialog::~CustomVideoSettingsDialog()
 {
 }
 
 // -----------------------------------------------------------------------------
 
-void CustomVideoSettingsialog::beforeAddingWidgets()
+void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
     getWidget<CheckBoxWidget>("anim_gfx")->setState( UserConfigParams::m_graphical_effects );
     getWidget<CheckBoxWidget>("weather_gfx")->setState( UserConfigParams::m_weather_effects );
@@ -76,56 +76,67 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
 
     filtering->setValue( value );
 
-    /*
-    SpinnerWidget* antialias = getWidget<SpinnerWidget>("antialiasing");
-    antialias->addLabel( _("Disabled") ); // 0
-    antialias->addLabel( L"x2" );         // 1
-    antialias->addLabel( L"x4" );         // 2
-    antialias->addLabel( L"x8" );         // 3
-    antialias->setValue( UserConfigParams::m_antialiasing );
-    */
-
-    SpinnerWidget* ssao = getWidget<SpinnerWidget>("ssao");
-    ssao->addLabel( _("Disabled") );   // 0
-    ssao->addLabel( _("low") );          // 1
-    ssao->addLabel( _("high") );         // 2
-    ssao->setValue( UserConfigParams::m_ssao );
-
     SpinnerWidget* shadows = getWidget<SpinnerWidget>("shadows");
     shadows->addLabel( _("Disabled") );   // 0
-    shadows->addLabel( _("low") );          // 1
-    shadows->addLabel( _("high") );         // 2
+    shadows->addLabel( _("low") );        // 1
+    shadows->addLabel( _("high") );       // 2
     shadows->setValue( UserConfigParams::m_shadows );
     
-    getWidget<CheckBoxWidget>("motionblur")->setState( UserConfigParams::m_motionblur );
-    getWidget<CheckBoxWidget>("mlaa")->setState( UserConfigParams::m_mlaa );
-//    getWidget<CheckBoxWidget>("pixelshaders")->setState(UserConfigParams::m_pixel_shaders);
+    getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
+    getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
+    getWidget<CheckBoxWidget>("motionblur")->setState(UserConfigParams::m_motionblur);
+    getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
+    getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
+    getWidget<CheckBoxWidget>("ssao")->setState(UserConfigParams::m_ssao);
+    getWidget<CheckBoxWidget>("bloom")->setState(UserConfigParams::m_bloom);
+    getWidget<CheckBoxWidget>("texture_compression")->setState(UserConfigParams::m_texture_compression);
 }
 
 // -----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "close")
     {
+        bool dynamic_light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+        UserConfigParams::m_dynamic_lights = dynamic_light;
+
         UserConfigParams::m_graphical_effects        =
             getWidget<CheckBoxWidget>("anim_gfx")->getState();
         UserConfigParams::m_weather_effects          =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
-        //UserConfigParams::m_antialiasing  =
-        //    getWidget<SpinnerWidget>("antialiasing")->getValue();
         UserConfigParams::m_motionblur      =
             getWidget<CheckBoxWidget>("motionblur")->getState();
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
-//        UserConfigParams::m_pixel_shaders =
-//            getWidget<CheckBoxWidget>("pixelshaders")->getState();
+
+        if (dynamic_light)
+        {
+            UserConfigParams::m_shadows =
+                getWidget<SpinnerWidget>("shadows")->getValue();
+        }
+        else
+        {
+            UserConfigParams::m_shadows = 0;
+        }
+
         UserConfigParams::m_mlaa =
             getWidget<CheckBoxWidget>("mlaa")->getState();
-        UserConfigParams::m_ssao  =
-            getWidget<SpinnerWidget>("ssao")->getValue();
-        UserConfigParams::m_shadows  =
-            getWidget<SpinnerWidget>("shadows")->getValue();
+
+        UserConfigParams::m_ssao =
+            getWidget<CheckBoxWidget>("ssao")->getState();
+
+        UserConfigParams::m_light_shaft =
+            getWidget<CheckBoxWidget>("lightshaft")->getState();
+
+        UserConfigParams::m_glow =
+            getWidget<CheckBoxWidget>("glow")->getState();
+
+        UserConfigParams::m_bloom =
+            getWidget<CheckBoxWidget>("bloom")->getState();
+
+        UserConfigParams::m_texture_compression =
+            getWidget<CheckBoxWidget>("texture_compression")->getState();
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

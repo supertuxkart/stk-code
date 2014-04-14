@@ -442,7 +442,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
     }
     else if(name == "custom")
     {
-        new CustomVideoSettingsialog(0.8f, 0.8f);
+        new CustomVideoSettingsDialog(0.8f, 0.9f);
     }
     else if(name == "apply_resolution")
     {
