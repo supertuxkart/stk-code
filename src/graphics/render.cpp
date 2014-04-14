@@ -1323,13 +1323,15 @@ void IrrDriver::generateSkyboxCubemap()
 
     testSH(rgba, w, h, blueSHCoeff, greenSHCoeff, redSHCoeff);
 
+    for (unsigned i = 0; i < 6; i++)
+        delete[] rgba[i];
+
     /*for (unsigned i = 0; i < 6; i++)
     {
         glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
         glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
-    for (unsigned i = 0; i < 6; i++)
-        delete[] rgba[i];
+
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
 }
 
