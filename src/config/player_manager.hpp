@@ -60,7 +60,7 @@ private:
     PlayerProfile* m_current_player;
 
     /** Saves the XML tree from players.xml for use in the 2nd
-     * loading stage (loadRemainingData). */
+     * loading stage (initRemainingData). */
     const XMLNode *m_player_data;
 
     void load();
@@ -86,7 +86,7 @@ public:
     }   // destroy
 
     void save();
-    void loadRemainingData();
+    void initRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);

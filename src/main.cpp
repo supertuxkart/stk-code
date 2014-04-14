@@ -1178,7 +1178,7 @@ int main(int argc, char *argv[] )
         // Reading the rest of the player data needs the unlock manager to
         // initialise the game slots of all players and the AchievementsManager
         // to initialise the AchievementsStatus, so it is done only now.
-        PlayerManager::get()->loadRemainingData();
+        PlayerManager::get()->initRemainingData();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gui_lock.png"  ) );

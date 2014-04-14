@@ -129,7 +129,10 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        PlayerManager::getCurrentUser()->requestSavedSession();
+        // In case that login id was not saved (or first start of stk), 
+        // current player would not be defined at this stage.
+        if(PlayerManager::getCurrentPlayer())
+            PlayerManager::getCurrentUser()->requestSavedSession();
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -277,8 +280,12 @@ namespace Online
     {
         handleResultQueue();
 
-        //Database polling starts here, only needed for registered users
-        if (!PlayerManager::isCurrentLoggedIn())
+        // Database polling starts here, only needed for registered users. If
+        // there is no player data yet (i.e. either because first time start
+        // of stk, and loging screen hasn't finished yet, or no default player
+        // was saved), don't do anything
+        if (!PlayerManager::getCurrentPlayer() ||
+            !PlayerManager::isCurrentLoggedIn())
             return;
 
         m_time_since_poll += dt;

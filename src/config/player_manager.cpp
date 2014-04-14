@@ -136,21 +136,30 @@ void PlayerManager::load()
 
 // ----------------------------------------------------------------------------
 /** The 2nd loading stage. During this stage achievements and story mode
- *  data is read for each player.
+ *  data is initialised for each player. In case of existing player (i.e. not
+ *  first time start of stk) the data is read from the players.xml file,
+ *  in case of a first time start new/empty data structures for the players
+ *  (which were created by default) are created.
  */
-void PlayerManager::loadRemainingData()
+void PlayerManager::initRemainingData()
 {
-    for (unsigned int i = 0; i<m_player_data->getNumNodes(); i++)
+    for (unsigned int i = 0; i<m_all_players.size(); i++)
     {
-        const XMLNode *player_xml = m_player_data->getNode(i);
-        m_all_players[i].loadRemainingData(player_xml);
+        // On the first time STK is run, there is no player data,
+        // so just initialise the story and achievement data
+        // structures
+        if (!m_player_data)
+            m_all_players[i].initRemainingData();
+        else   // not a first time start, load remaining data
+            m_all_players[i].loadRemainingData(m_player_data->getNode(i));
     }
+
     delete m_player_data;
     m_player_data = NULL;
 
     // Sort player by frequency
     m_all_players.insertionSort(/*start*/0, /*desc*/true);
-}   // loadRemainingData
+}   // initRemainingData
 
 // ----------------------------------------------------------------------------
 /** Saves all player profiles to players.xml.
@@ -257,13 +266,13 @@ void PlayerManager::addDefaultPlayer()
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         username = getenv("LOGNAME");
 
-    // Set the name as the default name for all players.
+    // Set the name as the default name, but don't mark it as 'default'
+    // yet, since not having a default player forces the player selection
+    // screen to be shown.
     m_all_players.push_back(new PlayerProfile(username.c_str()) );
 
     // add default guest player
-    m_all_players.push_back( new PlayerProfile(_LTR("Guest"), /*guest*/true) );
-
-
+    m_all_players.push_back(new PlayerProfile(_LTR("Guest"), /*guest*/true));
 }   // addDefaultPlayer
 
 // ----------------------------------------------------------------------------

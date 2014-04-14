@@ -86,6 +86,7 @@ public:
          ~PlayerProfile();
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);
+    void initRemainingData();
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
     bool operator>(const PlayerProfile &other);
