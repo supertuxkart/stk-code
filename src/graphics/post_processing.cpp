@@ -777,7 +777,8 @@ void PostProcessing::render()
         {
             PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
             glEnable(GL_FRAMEBUFFER_SRGB);
-            blitFBO(in_fbo, irr_driver->getFBO(FBO_MLAA_COLORS), UserConfigParams::m_width, UserConfigParams::m_height);
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_MLAA_COLORS));
+            renderPassThrough(in_rtt);
             glDisable(GL_FRAMEBUFFER_SRGB);
             applyMLAA();
             blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), 0, UserConfigParams::m_width, UserConfigParams::m_height);
