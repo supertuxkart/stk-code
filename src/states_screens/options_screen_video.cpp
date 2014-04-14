@@ -45,19 +45,56 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( OptionsScreenVideo );
 
-// Look-up table for GFX levels
-static const bool GFX           [] = {false, true,  true,  true,  true,  true,  true};
-static const int  GFX_ANIM_KARTS[] = {0,     1,     2,     2,     2,     2,     2   };
-static const bool GFX_WEATHER   [] = {false, false, true,  true,  true,  true,  true};
-static const bool GFX_MOTIONBLUR[] = {false, false, false, false, true,  true,  true};
-static const bool GFX_PIXEL_SHADERS[] =
-                                     {false, false, true,  true,  true,  true,  true};
-static const bool GFX_MLAA[] =       {false, false, false, false, false, true,  true};
-static const int  GFX_SSAO[] =       {0,     0,     0,     1,     1,     1,     2   };
-static const int  GFX_SHADOWS[] =    {0,     0,     0,     1,     1,     2,     2   };
+struct GFXPreset
+{
+    bool lights;
+    int shadows;
+    bool bloom;
+    bool motionblur;
+    bool lightshaft;
+    bool glow;
+    bool mlaa;
+    bool ssao;
+    bool weather;
+    bool animatedScenery;
+    int animatedCharacters;
+    int anisotropy;
+};
 
+static GFXPreset GFX_PRESETS[] =
+{
+    {
+        false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
+        false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
+        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */
+    },
 
-static const int  GFX_LEVEL_AMOUNT = 7;
+    {
+        false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
+        false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
+        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */
+    },
+
+    {
+        true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
+        false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
+        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */
+    },
+
+    {
+        true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
+        true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
+        true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */
+    },
+
+    {
+        true /* light */, 2 /* shadow */, true /* bloom */, true /* motionblur */,
+        true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
+        true /* animatedScenery */, 2 /* animatedCharacters */, 8 /* anisotropy */
+    }
+};
+
+static const int  GFX_LEVEL_AMOUNT = 5;
 
 // ----------------------------------------------------------------------------
 
@@ -310,18 +347,21 @@ void OptionsScreenVideo::updateGfxSlider()
     bool found = false;
     for (int l=0; l<GFX_LEVEL_AMOUNT; l++)
     {
-        if (UserConfigParams::m_show_steering_animations == GFX_ANIM_KARTS[l]&&
-            UserConfigParams::m_graphical_effects        == GFX[l] &&
-            UserConfigParams::m_weather_effects          == GFX_WEATHER[l] &&
-            //UserConfigParams::m_antialiasing             == GFX_ANTIALIAS[l] &&
-            UserConfigParams::m_motionblur               == GFX_MOTIONBLUR[l] &&
-            UserConfigParams::m_mlaa                     == GFX_MLAA[l] &&
-            UserConfigParams::m_ssao                     == GFX_SSAO[l] &&
-            UserConfigParams::m_shadows                  == GFX_SHADOWS[l] &&
-//            UserConfigParams::m_pixel_shaders            == GFX_PIXEL_SHADERS[l])
-            true)
+        if (GFX_PRESETS[l].animatedCharacters == UserConfigParams::m_show_steering_animations &&
+            GFX_PRESETS[l].animatedScenery == UserConfigParams::m_graphical_effects &&
+            GFX_PRESETS[l].anisotropy == UserConfigParams::m_anisotropic &&
+            GFX_PRESETS[l].bloom == UserConfigParams::m_bloom &&
+            GFX_PRESETS[l].glow == UserConfigParams::m_glow &&
+            GFX_PRESETS[l].lights == UserConfigParams::m_dynamic_lights &&
+            GFX_PRESETS[l].lightshaft == UserConfigParams::m_light_shaft &&
+            GFX_PRESETS[l].mlaa == UserConfigParams::m_mlaa &&
+            GFX_PRESETS[l].motionblur == UserConfigParams::m_motionblur &&
+            //GFX_PRESETS[l].shaders == UserConfigParams::m_pixel_shaders
+            GFX_PRESETS[l].shadows == UserConfigParams::m_shadows &&
+            GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
+            GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects)
         {
-            gfx->setValue(l+1);
+            gfx->setValue(l + 1);
             found = true;
             break;
         }
@@ -359,21 +399,6 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: if no kart animations are enabled
     const core::stringw none = _LTR("None");
 
-    /*
-    core::stringw antialias_label;
-    switch ((int)UserConfigParams::m_antialiasing)
-    {
-    case 0:
-        antialias_label = disabled; break;
-    case 1:
-        antialias_label = L"x2"; break;
-    case 2:
-        antialias_label = L"x4"; break;
-    case 3:
-        antialias_label = L"x8"; break;
-    }
-    */
-
     //I18N: in graphical options
 //    tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
 //                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
@@ -389,8 +414,8 @@ void OptionsScreenVideo::updateTooltip()
         ? all
         : (UserConfigParams::m_show_steering_animations == 1 ? me : none));
     //I18N: in graphical options
-    //tooltip = tooltip + L"\n" + _("Anti-aliasing (requires restart) : %s",
-    //                              antialias_label);
+    tooltip = tooltip + L"\n" + _("Dynamic lights : %s",
+        UserConfigParams::m_dynamic_lights ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Motion blur: %s",
         UserConfigParams::m_motionblur ? enabled : disabled);
@@ -405,8 +430,17 @@ void OptionsScreenVideo::updateTooltip()
     tooltip = tooltip + L"\n" + _("Shadows: %s",
         UserConfigParams::m_shadows == 1 ? "low" : UserConfigParams::m_shadows == 2 ?
                                     "high" : disabled);
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Bloom : %s",
+        UserConfigParams::m_bloom ? enabled : disabled);
 
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Glow (outlines) : %s",
+        UserConfigParams::m_glow ? enabled : disabled);
 
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Light shaft (God rays) : %s",
+        UserConfigParams::m_light_shaft ? enabled : disabled);
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -474,17 +508,21 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
             getWidget<GUIEngine::SpinnerWidget>("gfx_level");
         assert( gfx_level != NULL );
 
-        const int level = gfx_level->getValue();
+        const int level = gfx_level->getValue() - 1;
 
-        UserConfigParams::m_show_steering_animations = GFX_ANIM_KARTS[level-1];
-        UserConfigParams::m_graphical_effects        = GFX[level-1];
-        UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
-        //UserConfigParams::m_antialiasing             = GFX_ANTIALIAS[level-1];
-        UserConfigParams::m_motionblur               = GFX_MOTIONBLUR[level-1];
-//        UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
-        UserConfigParams::m_mlaa                     = GFX_MLAA[level-1];
-        UserConfigParams::m_ssao                     = GFX_SSAO[level-1];
-        UserConfigParams::m_shadows                  = GFX_SHADOWS[level-1];
+        UserConfigParams::m_show_steering_animations = GFX_PRESETS[level].animatedCharacters;
+        UserConfigParams::m_graphical_effects = GFX_PRESETS[level].animatedScenery;
+        UserConfigParams::m_anisotropic = GFX_PRESETS[level].anisotropy;
+        UserConfigParams::m_bloom = GFX_PRESETS[level].bloom;
+        UserConfigParams::m_glow = GFX_PRESETS[level].glow;
+        UserConfigParams::m_dynamic_lights = GFX_PRESETS[level].lights;
+        UserConfigParams::m_light_shaft = GFX_PRESETS[level].lightshaft;
+        UserConfigParams::m_mlaa = GFX_PRESETS[level].mlaa;
+        UserConfigParams::m_motionblur = GFX_PRESETS[level].motionblur;
+        //UserConfigParams::m_pixel_shaders = GFX_PRESETS[level].shaders;
+        UserConfigParams::m_shadows = GFX_PRESETS[level].shadows;
+        UserConfigParams::m_ssao = GFX_PRESETS[level].ssao;
+        UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
 
         updateGfxSlider();
     }
