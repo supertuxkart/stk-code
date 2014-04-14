@@ -16,7 +16,7 @@ void main()
 	vec3 col = texture(tex, uv).xyz;
 	float luma = getCIEYxy(col).x;
 
-	col *= smoothstep(1., 2., luma);
+	col *= smoothstep(1., 10., luma);
 
 	FragColor = vec4(col, 1.0);
 }

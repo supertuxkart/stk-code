@@ -427,7 +427,7 @@ void IrrDriver::initDevice()
     glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
     glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
-    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1)) && UserConfigParams::m_pixel_shaders;
+    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);

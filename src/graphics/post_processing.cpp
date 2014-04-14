@@ -413,17 +413,13 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
 
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_LINEAR, GL_LINEAR);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
-    setTexture(2, getTextureGLuint(noise_tex), GL_NEAREST, GL_NEAREST);
+    setTexture(2, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
     FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnable(GL_DEPTH_TEST);
 }
 
 void PostProcessing::renderFog(const core::matrix4 &ipvmat)
@@ -621,46 +617,53 @@ void PostProcessing::render()
         // Blit the base to tmp1
         blitFBO(irr_driver->getFBO(FBO_COLORS), out_fbo, UserConfigParams::m_width, UserConfigParams::m_height);
 
-            const bool globalbloom = World::getWorld()->getTrack()->getBloom();
-
-            if (globalbloom)
+            if (UserConfigParams::m_bloom)
             {
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP2_WITH_DS));
-                renderBloom(out_rtt);
-
                 glClear(GL_STENCIL_BUFFER_BIT);
 
-                // To half
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
-                glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_TMP2));
-                renderGaussian6Blur(irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1),
-                    irr_driver->getFBO(FBO_HALF2), irr_driver->getRenderTargetTexture(RTT_HALF2), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
+                glViewport(0, 0, 1024, 1024);
+                renderPassThrough(out_rtt);
 
-                // To quarter
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
-                glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_HALF1));
-                renderGaussian6Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                    irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2), UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+                glViewport(0, 0, 512, 512);
+                renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
 
-                // To eighth
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_EIGHTH1));
-                glViewport(0, 0, UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER1));
-                renderGaussian6Blur(irr_driver->getFBO(FBO_EIGHTH1), irr_driver->getRenderTargetTexture(RTT_EIGHTH1),
-                    irr_driver->getFBO(FBO_EIGHTH2), irr_driver->getRenderTargetTexture(RTT_EIGHTH2), UserConfigParams::m_width / 8, UserConfigParams::m_height / 8);
+                // Downsample
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+                glViewport(0, 0, 256, 256);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
+                glViewport(0, 0, 128, 128);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+
+                // Blur
+                glViewport(0, 0, 512, 512);
+                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
+                    irr_driver->getFBO(FBO_TMP_512), irr_driver->getRenderTargetTexture(RTT_TMP_512), 512, 512);
+
+                glViewport(0, 0, 256, 256);
+                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
+                    irr_driver->getFBO(FBO_TMP_256), irr_driver->getRenderTargetTexture(RTT_TMP_256), 256, 256);
+
+                glViewport(0, 0, 128, 128);
+                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
+                    irr_driver->getFBO(FBO_TMP_128), irr_driver->getRenderTargetTexture(RTT_TMP_128), 128, 128);
 
                 glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
                 // Additively blend on top of tmp1
                 glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
                 glEnable(GL_BLEND);
-                glBlendFunc(GL_ONE, GL_ONE);
+                glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
                 glBlendEquation(GL_FUNC_ADD);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_HALF1));
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER1));
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_EIGHTH1));
+                glBlendColor(.125, .125, .125, .125);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
+                glBlendColor(.25, .25, .25, .25);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+                glBlendColor(.5, .5, .5, .5);
+                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
                 glDisable(GL_BLEND);
             } // end if bloom
 
@@ -669,7 +672,7 @@ void PostProcessing::render()
         PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
-        if (m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
+        if (UserConfigParams::m_light_shaft && m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
         {
             glEnable(GL_DEPTH_TEST);
             // Grab the sky
@@ -747,28 +750,44 @@ void PostProcessing::render()
             PROFILER_POP_CPU_MARKER();
         }
 
-        if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
-        {
-            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
-            glDisable(GL_BLEND);
-            blitFBO(in_fbo, irr_driver->getFBO(FBO_MLAA_COLORS), UserConfigParams::m_width, UserConfigParams::m_height);
-            applyMLAA();
-            in_rtt = irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS);
-            PROFILER_POP_CPU_MARKER();
-        }
-
         computeLogLuminance(in_rtt);
 
-        // Final blit
-        // TODO : Use glBlitFramebuffer
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
+        renderColorLevel(in_rtt);
+        std::swap(in_fbo, out_fbo);
+        std::swap(in_rtt, out_rtt);
+
         if (irr_driver->getNormals())
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
         else if (irr_driver->getSSAOViz())
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_SSAO));
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
+        else if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
+        {
+            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_MLAA_COLORS));
+            renderPassThrough(in_rtt);
+            glDisable(GL_FRAMEBUFFER_SRGB);
+            applyMLAA();
+            blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), 0, UserConfigParams::m_width, UserConfigParams::m_height);
+            PROFILER_POP_CPU_MARKER();
+        }
         else
-            renderColorLevel(in_rtt);
-        glDisable(GL_FRAMEBUFFER_SRGB);
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+            renderPassThrough(in_rtt);
+            glDisable(GL_FRAMEBUFFER_SRGB);
+        }
     }
 }   // render

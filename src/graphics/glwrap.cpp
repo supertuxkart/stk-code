@@ -67,6 +67,7 @@ PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
 PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
 PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
 PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
+PFNGLBLENDCOLORPROC glBlendColor;
 #endif
 
 static bool is_gl_init = false;
@@ -213,6 +214,7 @@ void initGL()
     glBlitFramebuffer = (PFNGLBLITFRAMEBUFFERPROC)IRR_OGL_LOAD_EXTENSION("glBlitFramebuffer");
     glGetUniformBlockIndex = (PFNGLGETUNIFORMBLOCKINDEXPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformBlockIndex");
     glUniformBlockBinding = (PFNGLUNIFORMBLOCKBINDINGPROC)IRR_OGL_LOAD_EXTENSION("glUniformBlockBinding");
+    glBlendColor = (PFNGLBLENDCOLORPROC)IRR_OGL_LOAD_EXTENSION("glBlendColor");
 #ifdef DEBUG
 	glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
@@ -324,7 +326,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb)
     else
         Format = GL_BGR;
 
-    if (irr_driver->getGLSLVersion() < 150)
+    if (!UserConfigParams::m_texture_compression)
     {
         if (srgb)
             internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;

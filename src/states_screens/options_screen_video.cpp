@@ -318,7 +318,8 @@ void OptionsScreenVideo::updateGfxSlider()
             UserConfigParams::m_mlaa                     == GFX_MLAA[l] &&
             UserConfigParams::m_ssao                     == GFX_SSAO[l] &&
             UserConfigParams::m_shadows                  == GFX_SHADOWS[l] &&
-            UserConfigParams::m_pixel_shaders            == GFX_PIXEL_SHADERS[l])
+//            UserConfigParams::m_pixel_shaders            == GFX_PIXEL_SHADERS[l])
+            true)
         {
             gfx->setValue(l+1);
             found = true;
@@ -374,8 +375,8 @@ void OptionsScreenVideo::updateTooltip()
     */
 
     //I18N: in graphical options
-    tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
-                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
+//    tooltip = tooltip + L"\n" + _("Pixel shaders : %s",
+//                                  UserConfigParams::m_pixel_shaders ? enabled : disabled);
     //I18N: in graphical options
     tooltip = _("Animated Scenery : %s",
         UserConfigParams::m_graphical_effects ? enabled : disabled);
@@ -480,7 +481,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_weather_effects          = GFX_WEATHER[level-1];
         //UserConfigParams::m_antialiasing             = GFX_ANTIALIAS[level-1];
         UserConfigParams::m_motionblur               = GFX_MOTIONBLUR[level-1];
-        UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
+//        UserConfigParams::m_pixel_shaders            = GFX_PIXEL_SHADERS[level-1];
         UserConfigParams::m_mlaa                     = GFX_MLAA[level-1];
         UserConfigParams::m_ssao                     = GFX_SSAO[level-1];
         UserConfigParams::m_shadows                  = GFX_SHADOWS[level-1];

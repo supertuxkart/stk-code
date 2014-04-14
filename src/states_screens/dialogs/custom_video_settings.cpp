@@ -99,7 +99,7 @@ void CustomVideoSettingsialog::beforeAddingWidgets()
     
     getWidget<CheckBoxWidget>("motionblur")->setState( UserConfigParams::m_motionblur );
     getWidget<CheckBoxWidget>("mlaa")->setState( UserConfigParams::m_mlaa );
-    getWidget<CheckBoxWidget>("pixelshaders")->setState(UserConfigParams::m_pixel_shaders);
+//    getWidget<CheckBoxWidget>("pixelshaders")->setState(UserConfigParams::m_pixel_shaders);
 }
 
 // -----------------------------------------------------------------------------
@@ -118,8 +118,8 @@ GUIEngine::EventPropagation CustomVideoSettingsialog::processEvent(const std::st
             getWidget<CheckBoxWidget>("motionblur")->getState();
         UserConfigParams::m_show_steering_animations =
             getWidget<SpinnerWidget>("steering_animations")->getValue();
-        UserConfigParams::m_pixel_shaders =
-            getWidget<CheckBoxWidget>("pixelshaders")->getState();
+//        UserConfigParams::m_pixel_shaders =
+//            getWidget<CheckBoxWidget>("pixelshaders")->getState();
         UserConfigParams::m_mlaa =
             getWidget<CheckBoxWidget>("mlaa")->getState();
         UserConfigParams::m_ssao  =

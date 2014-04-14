@@ -46,6 +46,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       if (!mb)
         continue;
       video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
+      f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
       video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
       if (!isObject(type))
       {
@@ -58,7 +59,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       GLMesh &mesh = GLmeshes[i];
       if (rnd->isTransparent())
       {
-          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type);
+          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
           initvaostate(mesh, TranspMat);
           TransparentMesh[TranspMat].push_back(&mesh);
       }
@@ -500,16 +501,24 @@ void STKMeshSceneNode::render()
 
         if (World::getWorld()->getTrack()->isFogEnabled())
         {
-            if (!TransparentMesh[TM_DEFAULT].empty())
+            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
                 glUseProgram(MeshShader::TransparentFogShader::Program);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
+            glBlendFunc(GL_ONE, GL_ONE);
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
         }
         else
         {
-            if (!TransparentMesh[TM_DEFAULT].empty())
+            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
                 glUseProgram(MeshShader::TransparentShader::Program);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
+            glBlendFunc(GL_ONE, GL_ONE);
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 drawTransparentObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
         }
         return;

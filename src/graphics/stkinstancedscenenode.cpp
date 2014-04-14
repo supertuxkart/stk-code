@@ -186,12 +186,27 @@ static void drawFSPMDefault(GLMesh &mesh, size_t instance_count)
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  compressTexture(mesh.textures[0], true);
-  setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  if (mesh.textures[0])
+  {
+      compressTexture(mesh.textures[0], true);
+      setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  }
+  else
+  {
+      setTexture(0, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
+      GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
   MeshShader::InstancedObjectPass1Shader::setUniforms(0);
 
   glBindVertexArray(mesh.vao_first_pass);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
+
+  if (!mesh.textures[0])
+  {
+      GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
 }
 
 static void drawShadowDefault(GLMesh &mesh, size_t instance_count)

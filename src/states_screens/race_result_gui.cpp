@@ -91,7 +91,7 @@ void RaceResultGUI::init()
         (m_sshot_height + SSHOT_SEPARATION))); //Show at least one
 
     // Calculate screenshot scrolling parameters
-    const std::vector<std::string>& tracks =
+    const std::vector<std::string> tracks =
         race_manager->getGrandPrix()->getTrackNames();
     int n_tracks = tracks.size();
     int currentTrack = race_manager->getTrackNumber();
@@ -103,7 +103,7 @@ void RaceResultGUI::init()
     }
     else
     {
-        m_start_track = currentTrack;
+        m_start_track = 0;
         m_end_track = tracks.size();
     }
 }   // init
@@ -1295,7 +1295,7 @@ void RaceResultGUI::displayHighScores()
 // ----------------------------------------------------------------------------
 void RaceResultGUI::displayScreenShots()
 {
-    const std::vector<std::string>& tracks =
+    const std::vector<std::string> tracks =
         race_manager->getGrandPrix()->getTrackNames();
     int currentTrack = race_manager->getTrackNumber();
 
