@@ -604,10 +604,6 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
                            "Whether vertical sync is enabled") );
-    PARAM_PREFIX BoolUserConfigParam         m_pixel_shaders
-    PARAM_DEFAULT( BoolUserConfigParam(false, "pixel_shaders",
-                                       &m_graphics_quality,
-                                       "Whether to enable pixel shaders (splatting, normal maps, ...)") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,
