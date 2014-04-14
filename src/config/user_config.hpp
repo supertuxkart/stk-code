@@ -440,6 +440,9 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
+    PARAM_PREFIX BoolUserConfigParam        m_texture_compression
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
+        &m_video_group, "Enable Texture Compression"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -601,10 +604,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "mlaa", &m_graphics_quality,
                            "Whether MLAA anti-aliasing should be enabled") );
-    PARAM_PREFIX IntUserConfigParam          m_ssao
-            PARAM_DEFAULT( IntUserConfigParam(0,
+    PARAM_PREFIX BoolUserConfigParam          m_ssao
+            PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
-                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+                           "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows", &m_graphics_quality,

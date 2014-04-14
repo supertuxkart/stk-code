@@ -326,7 +326,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb)
     else
         Format = GL_BGR;
 
-    if (irr_driver->getGLSLVersion() < 150)
+    if (!UserConfigParams::m_texture_compression)
     {
         if (srgb)
             internalFormat = (tex->hasAlpha()) ? GL_SRGB_ALPHA : GL_SRGB;
