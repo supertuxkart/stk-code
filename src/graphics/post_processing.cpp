@@ -658,10 +658,13 @@ void PostProcessing::render()
                 // Additively blend on top of tmp1
                 glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
                 glEnable(GL_BLEND);
-                glBlendFunc(GL_ONE, GL_ONE);
+                glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
                 glBlendEquation(GL_FUNC_ADD);
+                glBlendColor(.125, .125, .125, .125);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
+                glBlendColor(.25, .25, .25, .25);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+                glBlendColor(.5, .5, .5, .5);
                 renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
                 glDisable(GL_BLEND);
             } // end if bloom
