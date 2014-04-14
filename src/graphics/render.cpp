@@ -1315,7 +1315,10 @@ void IrrDriver::generateSkyboxCubemap()
         image->drop();
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
-        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+        if (UserConfigParams::m_texture_compression)
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+        else
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
 
     testSH(rgba, w, h, blueSHCoeff, greenSHCoeff, redSHCoeff);
