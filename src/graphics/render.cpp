@@ -214,7 +214,7 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
         // Render anything glowing.
-        if (!m_mipviz && !m_wireframe)
+        if (!m_mipviz && !m_wireframe && UserConfigParams::m_glow)
         {
             irr_driver->setPhase(GLOW_PASS);
             renderGlow(overridemat, glows, cambox, cam);
@@ -225,7 +225,7 @@ void IrrDriver::renderGLSL(float dt)
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-        if (true)//hasflare || hasgodrays)
+        if (UserConfigParams::m_light_shaft)//hasflare || hasgodrays)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 

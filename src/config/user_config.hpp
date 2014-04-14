@@ -443,6 +443,15 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_texture_compression
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
         &m_video_group, "Enable Texture Compression"));
+    PARAM_PREFIX BoolUserConfigParam        m_glow
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
+        &m_video_group, "Enable Glow"));
+    PARAM_PREFIX BoolUserConfigParam        m_bloom
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_bloom",
+        &m_video_group, "Enable Bloom"));
+    PARAM_PREFIX BoolUserConfigParam        m_light_shaft
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
+        &m_video_group, "Enable Light Shafts"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
