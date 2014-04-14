@@ -184,7 +184,7 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
         // Shadows
-        if (!m_mipviz && !m_wireframe && UserConfigParams::m_shadows)
+        if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights && UserConfigParams::m_shadows)
            //&& World::getWorld()->getTrack()->hasShadows())
         {
             renderShadows(camnode, camera);
@@ -428,6 +428,9 @@ void IrrDriver::renderSolidFirstPass()
 
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
+    if (!UserConfigParams::m_dynamic_lights)
+        return;
+
     glUseProgram(MeshShader::ObjectPass1Shader::Program);
     for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
     {
@@ -452,7 +455,14 @@ void IrrDriver::renderSolidSecondPass()
     glClearColor(clearColor.getRed()  / 255.f, clearColor.getGreen() / 255.f,
                  clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
-    glDepthMask(GL_FALSE);
+
+    if (UserConfigParams::m_dynamic_lights)
+        glDepthMask(GL_FALSE);
+    else
+    {
+        glDepthMask(GL_TRUE);
+        glClear(GL_DEPTH_BUFFER_BIT);
+    }
 
     irr_driver->setPhase(SOLID_LIT_PASS);
     glEnable(GL_DEPTH_TEST);
@@ -502,7 +512,6 @@ void IrrDriver::renderSolidSecondPass()
     glUseProgram(MeshShader::UntexturedObjectShader::Program);
     for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
         drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
-
 }
 
 void IrrDriver::renderTransparent()
@@ -850,15 +859,21 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
                              video::SOverrideMaterial &overridemat,
                              int cam, float dt)
 {
-    if (SkyboxCubeMap)
-        irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
+
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2));
     irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
     GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
     gl_driver->extGlDrawBuffers(2, bufs);
+    if (!UserConfigParams::m_dynamic_lights)
+        glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
+    if (!UserConfigParams::m_dynamic_lights)
+        return;
+
+    if (SkyboxCubeMap)
+        irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     const u32 lightcount = m_lights.size();
     const core::vector3df &campos =

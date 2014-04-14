@@ -452,6 +452,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_light_shaft
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
         &m_video_group, "Enable Light Shafts"));
+    PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+        &m_video_group, "Enable Dynamic Lights"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
