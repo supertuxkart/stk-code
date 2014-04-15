@@ -31,10 +31,11 @@
 
 class AchievementsStatus;
 
-namespace online 
+namespace Online 
 {
     class CurrentUser;
     class HTTPRequest;
+    class OnlineProfile;
 }
 class PlayerProfile;
 
@@ -99,6 +100,7 @@ public:
                                const std::string &php_name = "");
     static unsigned int getCurrentOnlineId();
     static bool isCurrentLoggedIn();
+    static Online::OnlineProfile* getCurrentOnlineProfile();
 
     /** The online state a player can be in. */
     enum OnlineState

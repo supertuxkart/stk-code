@@ -91,9 +91,14 @@ namespace Online
             // access to them. FIXME
 
             // FIXME: This apparently does not compile on linux :(
-            // So I'll make this all public for now again
-            // friend class PlayerManager;
+            // So for now (while this is needed) I'll only add this on
+            // windows only (where it works).
+#ifdef WIN32
+             friend class PlayerManager;
+    private:
+#else
     public:
+#endif
             uint32_t getID() const;
             void setUserDetails(HTTPRequest *request,
                                 const std::string &action,
@@ -110,6 +115,10 @@ namespace Online
             };
             UserState                   m_state;
             const UserState getUserState() const { return m_state; }
+            // ----------------------------------------------------------------
+            /** Returns a pointer to the profile associated with the current
+            *  user. */
+            OnlineProfile* getProfile() const { return m_profile; }
 
 
         public:
@@ -130,10 +139,6 @@ namespace Online
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }
-            // ----------------------------------------------------------------
-            /** Returns a pointer to the profile associated with the current
-             *  user. */
-            OnlineProfile* getProfile() const { return m_profile; }
             // ----------------------------------------------------------------
 
     };   // class CurrentUser

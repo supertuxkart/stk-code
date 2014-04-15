@@ -35,35 +35,38 @@ using namespace irr;
 using namespace irr::gui;
 using namespace Online;
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-UserInfoDialog::UserInfoDialog(uint32_t showing_id, const core::stringw info, bool error, bool from_queue)
-        : ModalDialog(0.8f,0.8f), m_showing_id(showing_id)
+UserInfoDialog::UserInfoDialog(uint32_t showing_id, const core::stringw info,
+                               bool error, bool from_queue)
+              : ModalDialog(0.8f,0.8f), m_showing_id(showing_id)
 {
     m_error = error;
     m_info = info;
     if(!from_queue) load();
-}
+}   // UserInfoDialog
 
+// ----------------------------------------------------------------------------
 void UserInfoDialog::load()
 {
     loadFromFile("online/user_info_dialog.stkgui");
     if(m_error)
         m_info_widget->setErrorColor();
-    m_name_widget->setText(m_profile->getUserName(),false);
+    m_name_widget->setText(m_online_profile->getUserName(),false);
     m_info_widget->setText(m_info, false);
-    if(m_remove_widget->isVisible() && !m_profile->isFriend())
+    if(m_remove_widget->isVisible() && !m_online_profile->isFriend())
         m_remove_widget->setLabel("Cancel Request");
-}
+}   // load
 
+// ----------------------------------------------------------------------------
 void UserInfoDialog::beforeAddingWidgets()
 {
-    m_profile = ProfileManager::get()->getProfileByID(m_showing_id);
+    m_online_profile = ProfileManager::get()->getProfileByID(m_showing_id);
 
     // Avoid a crash in case that an invalid m_showing_id is given
     // (which can only happen if there's a problem on the server).
-    if (!m_profile)
-        m_profile = PlayerManager::getCurrentUser()->getProfile();
+    if (!m_online_profile)
+        m_online_profile = PlayerManager::getCurrentOnlineProfile();
     m_self_destroy = false;
     m_enter_profile = false;
     m_processing = false;
@@ -91,17 +94,18 @@ void UserInfoDialog::beforeAddingWidgets()
     m_accept_widget->setVisible(false);
     m_decline_widget->setVisible(false);
     m_remove_widget->setVisible(false);
-    if(m_profile->isCurrentUser())
+    if(m_online_profile->isCurrentUser())
     {
         m_friend_widget->setVisible(false);
     }
-    if(m_profile->isFriend())
+    if(m_online_profile->isFriend())
     {
         m_friend_widget->setVisible(false);
         m_remove_widget->setVisible(true);
     }
 
-    OnlineProfile::RelationInfo * relation_info = m_profile->getRelationInfo();
+    OnlineProfile::RelationInfo * relation_info =
+                                          m_online_profile->getRelationInfo();
     if(relation_info != NULL)
     {
         if(relation_info->isPending())
@@ -119,14 +123,12 @@ void UserInfoDialog::beforeAddingWidgets()
         }
     }
 
-}
-
-
+}   // beforeAddingWidgets
 
 // -----------------------------------------------------------------------------
 UserInfoDialog::~UserInfoDialog()
 {
-}
+}   // ~UserInfoDialog
 
 // -----------------------------------------------------------------------------
 /** Sends a friend request to the server. When the request is finished, it
@@ -148,7 +150,7 @@ void UserInfoDialog::sendFriendRequest()
             core::stringw info_text("");
             if (isSuccess())
             {
-                PlayerManager::getCurrentUser()->getProfile()->addFriend(id);
+                PlayerManager::getCurrentOnlineProfile()->addFriend(id);
                 OnlineProfile::RelationInfo *info =
                              new OnlineProfile::RelationInfo(_("Today"), false,
                                                              true, false);
@@ -171,7 +173,7 @@ void UserInfoDialog::sendFriendRequest()
 
     FriendRequest *request = new FriendRequest();
     PlayerManager::setUserDetails(request, "friend-request");
-    request->addParameter("friendid", m_profile->getID());
+    request->addParameter("friendid", m_online_profile->getID());
     request->queue();
 
     m_processing = true;
@@ -222,7 +224,7 @@ void UserInfoDialog::acceptFriendRequest()
 
     AcceptFriendRequest *request = new AcceptFriendRequest();
     PlayerManager::setUserDetails(request, "accept-friend-request");
-    request->addParameter("friendid", m_profile->getID());
+    request->addParameter("friendid", m_online_profile->getID());
     request->queue();
     m_processing = true;
     m_options_widget->setDeactivated();
@@ -249,7 +251,7 @@ void UserInfoDialog::declineFriendRequest()
             core::stringw info_text("");
             if (isSuccess())
             {
-                PlayerManager::getCurrentUser()->getProfile()->removeFriend(id);
+                PlayerManager::getCurrentOnlineProfile()->removeFriend(id);
                 ProfileManager::get()->moveToCache(id);
                 ProfileManager::get()->getProfileByID(id)
                                      ->deleteRelationalInfo();
@@ -268,7 +270,7 @@ void UserInfoDialog::declineFriendRequest()
     // ----------------------------------------------------------------
     DeclineFriendRequest *request = new DeclineFriendRequest();
     PlayerManager::setUserDetails(request, "decline-friend-request");
-    request->addParameter("friendid", m_profile->getID());
+    request->addParameter("friendid", m_online_profile->getID());
     request->queue();
 
     m_processing = true;
@@ -290,7 +292,7 @@ void UserInfoDialog::removeExistingFriend()
             core::stringw info_text("");
             if (isSuccess())
             {
-                PlayerManager::getCurrentUser()->getProfile()->removeFriend(m_id);
+                PlayerManager::getCurrentOnlineProfile()->removeFriend(m_id);
                 ProfileManager *pm = ProfileManager::get();
                 pm->moveToCache(m_id);
                 pm->getProfileByID(m_id)->deleteRelationalInfo();
@@ -312,7 +314,7 @@ void UserInfoDialog::removeExistingFriend()
     };   // RemoveFriendRequest
     // ------------------------------------------------------------------------
 
-    int friend_id = m_profile->getID();
+    int friend_id = m_online_profile->getID();
     RemoveFriendRequest * request = new RemoveFriendRequest(friend_id);
     PlayerManager::setUserDetails(request, "remove-friend");
     request->addParameter("friendid", friend_id);
@@ -338,7 +340,7 @@ void UserInfoDialog::removePendingFriend()
             core::stringw info_text("");
             if (isSuccess())
             {
-                PlayerManager::getCurrentUser()->getProfile()->removeFriend(id);
+                PlayerManager::getCurrentOnlineProfile()->removeFriend(id);
                 ProfileManager *pm = ProfileManager::get();
                 pm->moveToCache(id);
                 pm->getProfileByID(id)->deleteRelationalInfo();
@@ -359,7 +361,7 @@ void UserInfoDialog::removePendingFriend()
 
     CancelFriendRequest * request = new CancelFriendRequest();
     PlayerManager::setUserDetails(request, "cancel-friend-request");
-    request->addParameter("friendid", m_profile->getID());
+    request->addParameter("friendid", m_online_profile->getID());
     request->queue();
 }   // removePendingFriend
 
@@ -377,7 +379,7 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_enter_widget->m_properties[PROP_ID])
         {
-            ProfileManager::get()->setVisiting(m_profile->getID());
+            ProfileManager::get()->setVisiting(m_online_profile->getID());
             m_enter_profile = true;
             m_options_widget->setDeactivated();
             return GUIEngine::EVENT_BLOCK;
@@ -389,8 +391,8 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
         else if(selection == m_remove_widget->m_properties[PROP_ID])
         {
-            if (m_profile->getRelationInfo() &&
-                m_profile->getRelationInfo()->isPending() )
+            if (m_online_profile->getRelationInfo() &&
+                m_online_profile->getRelationInfo()->isPending() )
                 removePendingFriend();
             else
                 removeExistingFriend();
@@ -411,20 +413,19 @@ GUIEngine::EventPropagation UserInfoDialog::processEvent(const std::string& even
         }
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
 void UserInfoDialog::deactivate()
 {
     m_options_widget->setDeactivated();
-}
+}   // deactivate
 
 // -----------------------------------------------------------------------------
 void UserInfoDialog::activate()
 {
 
-}
-
+}   // activate
 
 // -----------------------------------------------------------------------------
 
@@ -445,7 +446,7 @@ bool UserInfoDialog::onEscapePressed()
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
     return false;
-}
+}   // onEscapePressed
 
 // -----------------------------------------------------------------------------
 
@@ -465,4 +466,4 @@ void UserInfoDialog::onUpdate(float dt)
             StateManager::get()->replaceTopMostScreen(OnlineProfileOverview::getInstance());
         return;
     }
-}
+}   // onUpdate

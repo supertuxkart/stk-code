@@ -83,6 +83,14 @@ PlayerManager::OnlineState PlayerManager::getCurrentOnlineState()
 {
     return (OnlineState)getCurrentUser()->getUserState();
 }   // getCurrentOnlineState
+// ----------------------------------------------------------------------------
+/** Returns the current online profile (which is the list of all achievements
+ *  and friends).
+ */
+Online::OnlineProfile* PlayerManager::getCurrentOnlineProfile()
+{
+    return getCurrentUser()->getProfile();
+}   // getCurrentOnlineProfile
 
 // ============================================================================
 /** Constructor.

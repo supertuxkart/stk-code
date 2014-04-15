@@ -377,7 +377,7 @@ void ClientLobbyRoomProtocol::connectionAccepted(Event* event)
         NetworkPlayerProfile* profile = new NetworkPlayerProfile();
         profile->kart_name = "";
         profile->race_id = data.gui8(1);
-        profile->user_profile = PlayerManager::getCurrentUser()->getProfile();
+        profile->user_profile = PlayerManager::getCurrentOnlineProfile();
         m_setup->addPlayer(profile);
         // connection token
         uint32_t token = data.gui32(3);

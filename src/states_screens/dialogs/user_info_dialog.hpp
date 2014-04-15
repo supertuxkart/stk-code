@@ -44,7 +44,7 @@ private:
     irr::core::stringw m_info;
 
     const uint32_t m_showing_id;
-    Online::OnlineProfile * m_profile;
+    Online::OnlineProfile * m_online_profile;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
