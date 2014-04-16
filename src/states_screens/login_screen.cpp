@@ -24,7 +24,6 @@
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
-#include "online/current_user.hpp"
 #include "online/messages.hpp"
 #include "states_screens/guest_login_screen.hpp"
 #include "states_screens/online_screen.hpp"
@@ -99,8 +98,7 @@ void LoginScreen::login()
         m_options_widget->setDeactivated();
         info_widget->setDefaultColor();
         bool remember = getWidget<CheckBoxWidget>("remember")->getState();
-        PlayerManager::getCurrentUser()->requestSignIn(username, password,
-                                                  remember           );
+        PlayerManager::requestSignIn(username, password, remember);
     }
 }   // login
 

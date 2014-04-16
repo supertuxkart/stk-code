@@ -21,7 +21,6 @@
 #include "guiengine/engine.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
-#include "online/current_user.hpp"
 #include "online/messages.hpp"
 #include "online/servers_manager.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"

@@ -389,18 +389,6 @@ namespace Online
     }
 
     // ------------------------------------------------------------------------
-    /** \return the username if signed in. */
-    core::stringw CurrentUser::getUserName() const
-    {
-        if((m_state == US_SIGNED_IN ) || (m_state == US_GUEST))
-        {
-            assert(m_profile != NULL);
-            return m_profile->getUserName();
-        }
-        return _("Currently not signed in");
-    }   // getUserName
-
-    // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
      */
     uint32_t CurrentUser::getID() const

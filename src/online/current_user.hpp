@@ -119,26 +119,23 @@ namespace Online
             /** Returns a pointer to the profile associated with the current
             *  user. */
             OnlineProfile* getProfile() const { return m_profile; }
-
-
-        public:
-            CurrentUser();
-            void                            requestSavedSession();
-            SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
-                                                            const irr::core::stringw &password,
-                                                            bool save_session,
-                                                            bool request_now = true);
-            void                            requestSignOut();
-
-            void                            requestFriendRequest(const uint32_t friend_id) const;
-            void                            onSTKQuit() const;
-            void                            requestPoll() const;
-
-            irr::core::stringw              getUserName()           const;
-            // ----------------------------------------------------------------
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }
+            void requestPoll() const;
+            void requestSavedSession();
+            void onSTKQuit() const;
+            void requestSignOut();
+            SignInRequest *requestSignIn(const irr::core::stringw &username,
+                                         const irr::core::stringw &password,
+                                         bool save_session,
+                                         bool request_now = true);
+
+        public:
+            CurrentUser();
+
+
+            // ----------------------------------------------------------------
             // ----------------------------------------------------------------
 
     };   // class CurrentUser

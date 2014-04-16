@@ -47,7 +47,7 @@ private:
 
     /** The name of the player (wide string, so it can be in native
      *  language). */
-    core::stringw m_name;
+    core::stringw m_local_name;
 
     /** True if this account is a guest account. */
     bool m_is_guest_account;
@@ -103,7 +103,7 @@ public:
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
-        m_name = name;
+        m_local_name = name;
     }   // setName
 
     // ------------------------------------------------------------------------
@@ -111,7 +111,7 @@ public:
     core::stringw getName() const
     {
         assert(m_magic_number == 0xABCD1234);
-        return m_name.c_str();
+        return m_local_name.c_str();
     }   // getName
 
     // ------------------------------------------------------------------------

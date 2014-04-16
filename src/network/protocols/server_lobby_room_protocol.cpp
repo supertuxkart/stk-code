@@ -28,7 +28,6 @@
 #include "network/protocols/start_server.hpp"
 #include "network/protocols/start_game_protocol.hpp"
 #include "network/server_network_manager.hpp"
-#include "online/current_user.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
 #include "utils/log.hpp"

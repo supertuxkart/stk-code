@@ -36,6 +36,7 @@ namespace Online
     class CurrentUser;
     class HTTPRequest;
     class OnlineProfile;
+    class XMLRequest;
 }
 class PlayerProfile;
 
@@ -113,6 +114,15 @@ public:
     };
 
     static OnlineState getCurrentOnlineState();
+    static const irr::core::stringw& getCurrentOnlineUserName();
+    static void requestOnlinePoll();
+    static void resumeSavedSession();
+    static void onSTKQuit();
+    static void requestSignOut();
+    static Online::XMLRequest *requestSignIn(const irr::core::stringw &username,
+                                             const irr::core::stringw &password,
+                                             bool save_session,
+                                              bool request_now = true);
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */
@@ -125,6 +135,7 @@ public:
     {
         return get()->m_current_player->getCurrentUser();
     }   // getCurrentUser
+
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------

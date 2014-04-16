@@ -22,7 +22,6 @@
 #include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
-#include "online/current_user.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -124,7 +123,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         // a login (if an online login was saved). If the current player was
         // saved, this request will be started much earlier in the startup
         // sequence from the RequestManager.
-        player->getCurrentUser()->requestSavedSession();
+        PlayerManager::resumeSavedSession();
     }
 }   // eventCallback
 

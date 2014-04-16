@@ -23,7 +23,6 @@
 #include "network/network_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
-#include "online/current_user.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/network_kart_selection.hpp"
 #include "states_screens/state_manager.hpp"

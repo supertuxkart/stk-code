@@ -22,7 +22,6 @@
 #include "config/user_config.hpp"
 #include "network/network_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/current_user.hpp"
 #include "utils/log.hpp"
 
 ShowPublicAddress::ShowPublicAddress() : Protocol(NULL, PROTOCOL_SILENT)

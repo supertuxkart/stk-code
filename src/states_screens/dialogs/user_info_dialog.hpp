@@ -21,11 +21,14 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
-#include "online/profile_manager.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+
+namespace Online
+{
+    class OnlineProfile;
+}
 
 /**
  * \brief Dialog that allows a user to sign in

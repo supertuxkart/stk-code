@@ -10,7 +10,6 @@
 #include "network/game_setup.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/synchronization_protocol.hpp"
-#include "online/current_user.hpp"
 #include "online/online_profile.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
@@ -19,8 +18,8 @@
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
-StartGameProtocol::StartGameProtocol(GameSetup* game_setup) :
-        Protocol(NULL, PROTOCOL_START_GAME)
+StartGameProtocol::StartGameProtocol(GameSetup* game_setup) 
+                 : Protocol(NULL, PROTOCOL_START_GAME)
 {
     m_game_setup = game_setup;
     std::vector<NetworkPlayerProfile*> players = m_game_setup->getPlayers();

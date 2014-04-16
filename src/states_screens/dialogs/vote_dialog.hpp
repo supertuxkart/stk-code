@@ -19,12 +19,16 @@
 #ifndef HEADER_VOTE_DIALOG_HPP
 #define HEADER_VOTE_DIALOG_HPP
 
-#include <irrString.h>
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
 
+#include <irrString.h>
+
+namespace Online
+{
+    class XMLRequest;
+}
 /**
  * \brief Dialog that allows a user to sign in
  * \ingroup states_screens

@@ -20,7 +20,6 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
 #include "online/xml_request.hpp"
 
 

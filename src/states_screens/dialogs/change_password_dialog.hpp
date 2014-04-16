@@ -19,12 +19,15 @@
 #ifndef HEADER_CHANGE_PASSWORD_DIALOG_HPP
 #define HEADER_CHANGE_PASSWORD_DIALOG_HPP
 
-#include "online/current_user.hpp"
-
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
 
 #include <irrString.h>
+
+namespace GUIEngine
+{
+    class IconButtonWidget;
+    class LabelWidget;
+}
 
 /**
  * \brief Dialog that allows a user to sign in

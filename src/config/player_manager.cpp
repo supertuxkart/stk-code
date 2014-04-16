@@ -84,6 +84,72 @@ PlayerManager::OnlineState PlayerManager::getCurrentOnlineState()
     return (OnlineState)getCurrentUser()->getUserState();
 }   // getCurrentOnlineState
 // ----------------------------------------------------------------------------
+/** Returns the online name of this player.
+ */
+const irr::core::stringw& PlayerManager::getCurrentOnlineUserName()
+{
+    if (getCurrentOnlineState() == OS_SIGNED_IN ||
+        getCurrentOnlineState() == OS_GUEST         )
+        return getCurrentOnlineProfile()->getUserName();
+
+    static core::stringw not_signed_in = _("Currently not signed in");
+    return not_signed_in;
+}   // getCurrentOnlineUserName
+
+// ----------------------------------------------------------------------------
+/** Sends a request to the server to see if any new information is
+ *  available. (online friends, notifications, etc.).
+ */
+void PlayerManager::requestOnlinePoll()
+{
+    getCurrentUser()->requestPoll();
+}   // requestOnlinePoll
+
+// ----------------------------------------------------------------------------
+/** Reconnect to the server using the saved session data.
+ */
+void PlayerManager::resumeSavedSession()
+{
+    getCurrentUser()->requestSavedSession();
+}   // resumeSavedSession
+
+// ----------------------------------------------------------------------------
+/** Sends a message to the server that the client has been closed, if a
+ *  user is signed in.
+ */
+void PlayerManager::onSTKQuit()
+{
+    getCurrentUser()->onSTKQuit();
+}   // onSTKQuit
+
+// ----------------------------------------------------------------------------
+/** Create a signin request.
+ *  \param username Name of user.
+ *  \param password Password.
+ *  \param save_session If true, the login credential will be saved to
+ *         allow a password-less login.
+ *  \param request_now Immediately submit this request to the
+ *         RequestManager.
+ */
+
+Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &username,
+                                                 const irr::core::stringw &password,
+                                                 bool save_session,
+                                                 bool request_now)
+{
+    return getCurrentUser()->requestSignIn(username, password, save_session,
+                                           request_now);
+}   // requestSignIn
+
+// ----------------------------------------------------------------------------
+/** Signs the current user out.
+ */
+void PlayerManager::requestSignOut()
+{
+    getCurrentUser()->requestSignOut();
+}   // requestSignOut
+
+// ----------------------------------------------------------------------------
 /** Returns the current online profile (which is the list of all achievements
  *  and friends).
  */

@@ -35,7 +35,7 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-NotificationDialog::NotificationDialog(Type type, const core::stringw info)
+NotificationDialog::NotificationDialog(Type type, const core::stringw &info)
         : ModalDialog(0.8f,0.5f)
 {
     m_info = info;

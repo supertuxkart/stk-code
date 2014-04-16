@@ -26,7 +26,6 @@
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
-#include "online/current_user.hpp"
 
 #include <sstream>
 #include <fstream>

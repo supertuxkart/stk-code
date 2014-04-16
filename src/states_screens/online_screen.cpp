@@ -138,7 +138,7 @@ void OnlineScreen::init()
     setInitialFocus();
     DemoWorld::resetIdleTime();
     core::stringw m = _("Signed in as: %s.", 
-                        PlayerManager::getCurrentUser()->getUserName());
+                        PlayerManager::getCurrentOnlineUserName());
     m_online_status_widget->setText(m, false);
 }   // init
 
@@ -226,7 +226,7 @@ void OnlineScreen::eventCallback(Widget* widget, const std::string& name,
 
     if (selection == m_sign_out_widget->m_properties[PROP_ID])
     {
-        PlayerManager::getCurrentUser()->requestSignOut();
+        PlayerManager::requestSignOut();
         StateManager::get()->popMenu();
     }
     else if (selection == m_profile_widget->m_properties[PROP_ID])

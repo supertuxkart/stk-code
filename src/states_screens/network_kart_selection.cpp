@@ -10,7 +10,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/network_manager.hpp"
-#include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 
 static const char RANDOM_KART_ID[] = "randomkart";

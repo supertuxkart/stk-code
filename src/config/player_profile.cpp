@@ -39,7 +39,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 #ifdef DEBUG
     m_magic_number = 0xABCD1234;
 #endif
-    m_name                = name;
+    m_local_name          = name;
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
@@ -76,7 +76,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_achievements_status = NULL;
     m_current_user        = new Online::CurrentUser();
 
-    node->get("name",          &m_name            );
+    node->get("name",          &m_local_name      );
     node->get("guest",         &m_is_guest_account);
     node->get("use-frequency", &m_use_frequency   );
     node->get("unique-id",     &m_unique_id       );
@@ -132,7 +132,7 @@ void PlayerProfile::initRemainingData()
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    out << L"    <player name=\"" << m_name
+    out << L"    <player name=\"" << m_local_name
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
