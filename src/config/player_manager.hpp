@@ -103,17 +103,7 @@ public:
     static bool isCurrentLoggedIn();
     static Online::OnlineProfile* getCurrentOnlineProfile();
 
-    /** The online state a player can be in. */
-    enum OnlineState
-    {
-        OS_SIGNED_OUT = 0,
-        OS_SIGNED_IN,
-        OS_GUEST,
-        OS_SIGNING_IN,
-        OS_SIGNING_OUT
-    };
-
-    static OnlineState getCurrentOnlineState();
+    static PlayerProfile::OnlineState getCurrentOnlineState();
     static const irr::core::stringw& getCurrentOnlineUserName();
     static void requestOnlinePoll();
     static void resumeSavedSession();
@@ -130,11 +120,6 @@ public:
     {
         return get()->m_current_player; 
     }   // getCurrentPlayer
-    // ------------------------------------------------------------------------
-    static Online::CurrentUser* getCurrentUser()
-    {
-        return get()->m_current_player->getCurrentUser();
-    }   // getCurrentUser
 
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);

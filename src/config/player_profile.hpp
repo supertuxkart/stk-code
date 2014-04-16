@@ -20,6 +20,7 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -29,7 +30,13 @@ using namespace irr;
 #include <string>
 
 class AchievementsStatus;
-namespace Online { class CurrentUser; }
+namespace Online
+{
+    class CurrentUser; 
+    class HTTPRequest;
+    class OnlineProfile;
+    class XMLRequest;
+}
 class UTFWriter;
 
 /** Class for managing player profiles (name, usage frequency,
@@ -41,9 +48,20 @@ class UTFWriter;
  */
 class PlayerProfile : public NoCopy
 {
-private:
+public:
+    /** The online state a player can be in. */
+    enum OnlineState
+    {
+        OS_SIGNED_OUT = 0,
+        OS_SIGNED_IN,
+        OS_GUEST,
+        OS_SIGNING_IN,
+        OS_SIGNING_OUT
+    };
 
-    Online::CurrentUser *m_current_user;
+
+private:
+    LEAK_CHECK()
 
     /** The name of the player (wide string, so it can be in native
      *  language). */
@@ -83,7 +101,7 @@ public:
 
          PlayerProfile(const core::stringw &name, bool is_guest = false);
          PlayerProfile(const XMLNode *node);
-         ~PlayerProfile();
+    virtual ~PlayerProfile();
     void save(UTFWriter &out);
     void loadRemainingData(const XMLNode *node);
     void initRemainingData();
@@ -94,8 +112,24 @@ public:
     void saveSession(int user_id, const std::string &token);
     void clearSession();
 
-    // ------------------------------------------------------------------------
-    Online::CurrentUser* getCurrentUser() { return m_current_user; }
+    /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
+    virtual void setUserDetails(Online::HTTPRequest *request,
+                                const std::string &action,
+                                const std::string &php_script = "") = 0;
+    virtual uint32_t getOnlineId() const = 0;
+    virtual PlayerProfile::OnlineState getOnlineState() const = 0;
+    virtual Online::OnlineProfile* getProfile() const = 0;
+    virtual void requestPoll() const = 0;
+    virtual void requestSavedSession() = 0;
+    virtual void onSTKQuit() const = 0;
+    virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
+                                              const irr::core::stringw &password,
+                                              bool save_session,
+                                              bool request_now = true) = 0;
+    virtual void signIn(bool success, const XMLNode * input) = 0;
+    virtual void signOut(bool success, const XMLNode * input) = 0;
+    virtual void requestSignOut() = 0;
+    virtual bool isLoggedIn() const { return false;  }
     // ------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)

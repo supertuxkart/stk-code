@@ -62,37 +62,47 @@ namespace Online
 
         if (m_profile)
             request->addParameter("userid", m_profile->getID());
-        if(m_state == US_SIGNED_IN)
+        if(m_online_state == OS_SIGNED_IN)
             request->addParameter("token", m_token);
         if (action.size() > 0)
             request->addParameter("action", action);
     }   // setUserDetails
 
     // ========================================================================
-    CurrentUser::CurrentUser()
+    CurrentUser::CurrentUser(const XMLNode *player)
+               : PlayerProfile(player)
     {
-        m_state        = US_SIGNED_OUT;
+        m_online_state = OS_SIGNED_OUT;
         m_token        = "";
         m_save_session = false;
         m_profile      = NULL;
     }   // CurrentUser
 
     // ------------------------------------------------------------------------
+    CurrentUser::CurrentUser(const core::stringw &name, bool is_guest)
+        : PlayerProfile(name, is_guest)
+    {
+        m_online_state = OS_SIGNED_OUT;
+        m_token        = "";
+        m_save_session = false;
+        m_profile      = NULL;
+
+    }   // CurrentUser
+    // ------------------------------------------------------------------------
     /** Request a login using the saved credentials of the user.
      */
     void CurrentUser::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        const PlayerProfile *cp = PlayerManager::getCurrentPlayer();
-        if (m_state == US_SIGNED_OUT  && cp->hasSavedSession() )
+        if (m_online_state == OS_SIGNED_OUT  && hasSavedSession() )
         {
             request = new SignInRequest(true);
             request->setServerURL("client-user.php");
-            request->addParameter("action","saved-session");
-            request->addParameter("userid", cp->getSavedUserId());
-            request->addParameter("token", cp->getSavedToken());
+            request->addParameter("action", "saved-session" );
+            request->addParameter("userid", getSavedUserId());
+            request->addParameter("token",  getSavedToken() );
             request->queue();
-            m_state = US_SIGNING_IN;
+            m_online_state = OS_SIGNING_IN;
         }
     }   // requestSavedSession
 
@@ -110,7 +120,7 @@ namespace Online
                                    const core::stringw &password,
                                    bool save_session, bool request_now)
     {
-        assert(m_state == US_SIGNED_OUT);
+        assert(m_online_state == OS_SIGNED_OUT);
         m_save_session = save_session;
         SignInRequest * request = new SignInRequest(false);
         request->setServerURL("client-user.php");
@@ -121,7 +131,7 @@ namespace Online
         if (request_now)
         {
             request->queue();
-            m_state = US_SIGNING_IN;
+            m_online_state = OS_SIGNING_IN;
         }
         return request;
     }   // requestSignIn
@@ -131,7 +141,7 @@ namespace Online
      */
     void CurrentUser::SignInRequest::callback()
     {
-        PlayerManager::getCurrentUser()->signIn(isSuccess(), getXMLData());
+        PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
         LoginScreen *login = dynamic_cast<LoginScreen*>(screen);
         if(login)
@@ -162,11 +172,10 @@ namespace Online
             int userid_fetched      = input->get("userid", &userid);
             m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
-            m_state = US_SIGNED_IN;
-            if(saveSession())
+            m_online_state = OS_SIGNED_IN;
+            if(doSaveSession())
             {
-                PlayerManager::getCurrentPlayer()->saveSession(getID(), 
-                                                               getToken() );
+                saveSession(getOnlineId(), getToken() );
             }
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
@@ -180,27 +189,27 @@ namespace Online
         }   // if success
         else
         {
-            m_state = US_SIGNED_OUT;
+            m_online_state = OS_SIGNED_OUT;
         }
     }   // signIn
 
     // ------------------------------------------------------------------------
     void CurrentUser::requestSignOut()
     {
-        assert(m_state == US_SIGNED_IN || m_state == US_GUEST);
+        assert(m_online_state == OS_SIGNED_IN || m_online_state == OS_GUEST);
         SignOutRequest * request = new SignOutRequest();
         request->setServerURL("client-user.php");
         request->addParameter("action","disconnect");
         request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
+        request->addParameter("userid", getOnlineId());
         request->queue();
-        m_state = US_SIGNING_OUT;
+        m_online_state = OS_SIGNING_OUT;
     }   // requestSignOut
 
     // --------------------------------------------------------------------
     void CurrentUser::SignOutRequest::callback()
     {
-        PlayerManager::getCurrentUser()->signOut(isSuccess(), getXMLData());
+        PlayerManager::getCurrentPlayer()->signOut(isSuccess(), getXMLData());
     }   // SignOutRequest::callback
 
     // ------------------------------------------------------------------------
@@ -215,7 +224,7 @@ namespace Online
         m_token = "";
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
-        m_state = US_SIGNED_OUT;
+        m_online_state = OS_SIGNED_OUT;
         PlayerManager::getCurrentPlayer()->clearSession();
     }   // signOut
 
@@ -225,12 +234,12 @@ namespace Online
      */
     void CurrentUser::requestPoll() const
     {
-        assert(m_state == US_SIGNED_IN);
+        assert(m_online_state == OS_SIGNED_IN);
         CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
         request->setServerURL("client-user.php");
         request->addParameter("action", "poll");
         request->addParameter("token", getToken());
-        request->addParameter("userid", getID());
+        request->addParameter("userid", getOnlineId());
         request->queue();
     }   // requestPoll()
 
@@ -242,9 +251,9 @@ namespace Online
     {
         if(isSuccess())
         {
-            if (!PlayerManager::getCurrentUser()->isRegisteredUser())
+            if (!PlayerManager::getCurrentPlayer()->isLoggedIn())
                 return;
-            if (PlayerManager::getCurrentUser()->getProfile()->hasFetchedFriends())
+            if (PlayerManager::getCurrentPlayer()->getProfile()->hasFetchedFriends())
             {
                 std::string online_friends_string("");
                 if(getXMLData()->get("online", &online_friends_string) == 1)
@@ -253,7 +262,7 @@ namespace Online
                           StringUtils::splitToUInt(online_friends_string, ' ');
                     bool went_offline = false;
                     std::vector<uint32_t> friends =
-                        PlayerManager::getCurrentUser()->getProfile()->getFriends();
+                        PlayerManager::getCurrentPlayer()->getProfile()->getFriends();
                     std::vector<core::stringw> to_notify;
                     for(unsigned int i = 0; i < friends.size(); ++i)
                     {
@@ -329,7 +338,7 @@ namespace Online
             }
             else
             {
-                PlayerManager::getCurrentUser()->getProfile()->fetchFriends();
+                PlayerManager::getCurrentPlayer()->getProfile()->fetchFriends();
             }
 
             int friend_request_count = 0;
@@ -376,14 +385,14 @@ namespace Online
      */
     void CurrentUser::onSTKQuit() const
     {
-        if(isRegisteredUser())
+        if(isLoggedIn())
         {
             HTTPRequest * request =
                       new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
             request->setServerURL("client-user.php");
             request->addParameter("action", "client-quit");
             request->addParameter("token", getToken());
-            request->addParameter("userid", getID());
+            request->addParameter("userid", getOnlineId());
             request->queue();
         }
     }
@@ -391,14 +400,14 @@ namespace Online
     // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
      */
-    uint32_t CurrentUser::getID() const
+    uint32_t CurrentUser::getOnlineId() const 
     {
-        if((m_state == US_SIGNED_IN ))
+        if((m_online_state == OS_SIGNED_IN ))
         {
             assert(m_profile != NULL);
             return m_profile->getID();
         }
         return 0;
-    }   // getID
+    }   // getOnlineId
 
 } // namespace Online

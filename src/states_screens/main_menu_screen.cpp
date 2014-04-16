@@ -146,13 +146,13 @@ void MainMenuScreen::init()
 void MainMenuScreen::onUpdate(float delta)
 
 {
-    if(PlayerManager::getCurrentOnlineState() == PlayerManager::OS_GUEST  ||
-       PlayerManager::getCurrentOnlineState() == PlayerManager::OS_SIGNED_IN)
+    if(PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_GUEST  ||
+       PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN)
     {
         m_online->setActivated();
         m_online->setLabel( _("Online"));
     }
-    else if (PlayerManager::getCurrentOnlineState() == PlayerManager::OS_SIGNED_OUT)
+    else if (PlayerManager::getCurrentOnlineState() == PlayerProfile::OS_SIGNED_OUT)
     {
         m_online->setActivated();
         m_online->setLabel( _("Login" ));

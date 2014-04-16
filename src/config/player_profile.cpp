@@ -43,7 +43,6 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
-    m_current_user        = new Online::CurrentUser();
     m_is_default          = false;
     m_is_default          = false;
     m_saved_session       = false;
@@ -74,7 +73,6 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_saved_user_id       = 0;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
-    m_current_user        = new Online::CurrentUser();
 
     node->get("name",          &m_local_name      );
     node->get("guest",         &m_is_guest_account);
@@ -96,7 +94,6 @@ PlayerProfile::~PlayerProfile()
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
-    delete m_current_user;
 }   // ~PlayerProfile
 
 

@@ -56,14 +56,14 @@ void PlayerManager::setUserDetails(Online::HTTPRequest *request,
     const std::string &action,
     const std::string &php_name)
 {
-    get()->getCurrentUser()->setUserDetails(request, action, php_name);
+    get()->getCurrentPlayer()->setUserDetails(request, action, php_name);
 }   // setUserDetails
 
 // ----------------------------------------------------------------------------
 /** Returns whether a user is signed in or not. */
 bool PlayerManager::isCurrentLoggedIn()
 {
-    return getCurrentUser()->isRegisteredUser();
+    return getCurrentPlayer()->isLoggedIn();
 }   // isCurrentLoggedIn
 
 // ----------------------------------------------------------------------------
@@ -72,24 +72,25 @@ bool PlayerManager::isCurrentLoggedIn()
 */
 unsigned int PlayerManager::getCurrentOnlineId()
 {
-    return getCurrentUser()->getID();
+    return getCurrentPlayer()->getOnlineId();
 }   // getCurrentOnlineId
 
 // ----------------------------------------------------------------------------
 /** Returns the online state of the current player. It can be logged out,
  *  logging in, logged in, logging out, logged out, or guest.
  */
-PlayerManager::OnlineState PlayerManager::getCurrentOnlineState()
+PlayerProfile::OnlineState PlayerManager::getCurrentOnlineState()
 {
-    return (OnlineState)getCurrentUser()->getUserState();
+    return getCurrentPlayer()->getOnlineState();
 }   // getCurrentOnlineState
+
 // ----------------------------------------------------------------------------
 /** Returns the online name of this player.
  */
 const irr::core::stringw& PlayerManager::getCurrentOnlineUserName()
 {
-    if (getCurrentOnlineState() == OS_SIGNED_IN ||
-        getCurrentOnlineState() == OS_GUEST         )
+    if (getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN ||
+        getCurrentOnlineState() == PlayerProfile::OS_GUEST         )
         return getCurrentOnlineProfile()->getUserName();
 
     static core::stringw not_signed_in = _("Currently not signed in");
@@ -102,7 +103,7 @@ const irr::core::stringw& PlayerManager::getCurrentOnlineUserName()
  */
 void PlayerManager::requestOnlinePoll()
 {
-    getCurrentUser()->requestPoll();
+    getCurrentPlayer()->requestPoll();
 }   // requestOnlinePoll
 
 // ----------------------------------------------------------------------------
@@ -110,7 +111,7 @@ void PlayerManager::requestOnlinePoll()
  */
 void PlayerManager::resumeSavedSession()
 {
-    getCurrentUser()->requestSavedSession();
+    getCurrentPlayer()->requestSavedSession();
 }   // resumeSavedSession
 
 // ----------------------------------------------------------------------------
@@ -119,7 +120,7 @@ void PlayerManager::resumeSavedSession()
  */
 void PlayerManager::onSTKQuit()
 {
-    getCurrentUser()->onSTKQuit();
+    getCurrentPlayer()->onSTKQuit();
 }   // onSTKQuit
 
 // ----------------------------------------------------------------------------
@@ -137,8 +138,8 @@ Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &usern
                                                  bool save_session,
                                                  bool request_now)
 {
-    return getCurrentUser()->requestSignIn(username, password, save_session,
-                                           request_now);
+    return getCurrentPlayer()->requestSignIn(username, password, save_session,
+                                             request_now);
 }   // requestSignIn
 
 // ----------------------------------------------------------------------------
@@ -146,7 +147,7 @@ Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &usern
  */
 void PlayerManager::requestSignOut()
 {
-    getCurrentUser()->requestSignOut();
+    getCurrentPlayer()->requestSignOut();
 }   // requestSignOut
 
 // ----------------------------------------------------------------------------
@@ -155,7 +156,7 @@ void PlayerManager::requestSignOut()
  */
 Online::OnlineProfile* PlayerManager::getCurrentOnlineProfile()
 {
-    return getCurrentUser()->getProfile();
+    return getCurrentPlayer()->getProfile();
 }   // getCurrentOnlineProfile
 
 // ============================================================================
@@ -200,7 +201,7 @@ void PlayerManager::load()
     for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
     {
         const XMLNode *player_xml = m_player_data->getNode(i);
-        PlayerProfile *player = new PlayerProfile(player_xml);
+        PlayerProfile *player = new Online::CurrentUser(player_xml);
         m_all_players.push_back(player);
         if(player->isDefault())
             m_current_player = player;
@@ -271,7 +272,7 @@ void PlayerManager::save()
  */
 void PlayerManager::addNewPlayer(const core::stringw& name)
 {
-    m_all_players.push_back( new PlayerProfile(name) );
+    m_all_players.push_back( new Online::CurrentUser(name) );
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
@@ -343,10 +344,10 @@ void PlayerManager::addDefaultPlayer()
     // Set the name as the default name, but don't mark it as 'default'
     // yet, since not having a default player forces the player selection
     // screen to be shown.
-    m_all_players.push_back(new PlayerProfile(username.c_str()) );
+    m_all_players.push_back(new Online::CurrentUser(username.c_str()) );
 
     // add default guest player
-    m_all_players.push_back(new PlayerProfile(_LTR("Guest"), /*guest*/true));
+    m_all_players.push_back(new Online::CurrentUser(_LTR("Guest"), /*guest*/true));
 }   // addDefaultPlayer
 
 // ----------------------------------------------------------------------------
