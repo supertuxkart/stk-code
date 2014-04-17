@@ -17,7 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#include "online/current_user.hpp"
+#include "online/online_player_profile.hpp"
 
 #include "achievements/achievements_manager.hpp"
 #include "config/player_manager.hpp"
@@ -51,7 +51,7 @@ namespace Online
      *  \param request The http request.
      *  \param action If not empty, the action to be set.
      */
-    void CurrentUser::setUserDetails(HTTPRequest *request,
+    void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
                                      const std::string &action,
                                      const std::string &php_script)
     {
@@ -69,17 +69,17 @@ namespace Online
     }   // setUserDetails
 
     // ========================================================================
-    CurrentUser::CurrentUser(const XMLNode *player)
+    OnlinePlayerProfile::OnlinePlayerProfile(const XMLNode *player)
                : PlayerProfile(player)
     {
         m_online_state = OS_SIGNED_OUT;
         m_token        = "";
         m_save_session = false;
         m_profile      = NULL;
-    }   // CurrentUser
+    }   // OnlinePlayerProfile
 
     // ------------------------------------------------------------------------
-    CurrentUser::CurrentUser(const core::stringw &name, bool is_guest)
+    OnlinePlayerProfile::OnlinePlayerProfile(const core::stringw &name, bool is_guest)
         : PlayerProfile(name, is_guest)
     {
         m_online_state = OS_SIGNED_OUT;
@@ -87,11 +87,11 @@ namespace Online
         m_save_session = false;
         m_profile      = NULL;
 
-    }   // CurrentUser
+    }   // OnlinePlayerProfile
     // ------------------------------------------------------------------------
     /** Request a login using the saved credentials of the user.
      */
-    void CurrentUser::requestSavedSession()
+    void OnlinePlayerProfile::requestSavedSession()
     {
         SignInRequest * request = NULL;
         if (m_online_state == OS_SIGNED_OUT  && hasSavedSession() )
@@ -115,8 +115,8 @@ namespace Online
      *  \param request_now Immediately submit this request to the
      *         RequestManager.
      */
-    CurrentUser::SignInRequest*
-        CurrentUser::requestSignIn(const core::stringw &username,
+    OnlinePlayerProfile::SignInRequest*
+        OnlinePlayerProfile::requestSignIn(const core::stringw &username,
                                    const core::stringw &password,
                                    bool save_session, bool request_now)
     {
@@ -139,7 +139,7 @@ namespace Online
     // ------------------------------------------------------------------------
     /** Called when the signin request is finished.
      */
-    void CurrentUser::SignInRequest::callback()
+    void OnlinePlayerProfile::SignInRequest::callback()
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
@@ -161,7 +161,7 @@ namespace Online
      *         successful login attemp.
      *  \param input Xml tree with the complete server response.
      */
-    void CurrentUser::signIn(bool success, const XMLNode * input)
+    void OnlinePlayerProfile::signIn(bool success, const XMLNode * input)
     {
         if (success)
         {
@@ -194,7 +194,7 @@ namespace Online
     }   // signIn
 
     // ------------------------------------------------------------------------
-    void CurrentUser::requestSignOut()
+    void OnlinePlayerProfile::requestSignOut()
     {
         assert(m_online_state == OS_SIGNED_IN || m_online_state == OS_GUEST);
         SignOutRequest * request = new SignOutRequest();
@@ -207,17 +207,17 @@ namespace Online
     }   // requestSignOut
 
     // --------------------------------------------------------------------
-    void CurrentUser::SignOutRequest::callback()
+    void OnlinePlayerProfile::SignOutRequest::callback()
     {
         PlayerManager::getCurrentPlayer()->signOut(isSuccess(), getXMLData());
     }   // SignOutRequest::callback
 
     // ------------------------------------------------------------------------
-    void CurrentUser::signOut(bool success, const XMLNode * input)
+    void OnlinePlayerProfile::signOut(bool success, const XMLNode * input)
     {
         if(!success)
         {
-            Log::warn("CurrentUser::signOut", "%s",
+            Log::warn("OnlinePlayerProfile::signOut", "%s",
                       "There were some connection issues while signing out. "
                       "Report a bug if this caused issues.");
         }
@@ -232,10 +232,10 @@ namespace Online
     /** Sends a request to the server to see if any new information is
      *  available. (online friends, notifications, etc.).
      */
-    void CurrentUser::requestPoll() const
+    void OnlinePlayerProfile::requestPoll() const
     {
         assert(m_online_state == OS_SIGNED_IN);
-        CurrentUser::PollRequest * request = new CurrentUser::PollRequest();
+        OnlinePlayerProfile::PollRequest * request = new OnlinePlayerProfile::PollRequest();
         request->setServerURL("client-user.php");
         request->addParameter("action", "poll");
         request->addParameter("token", getToken());
@@ -247,7 +247,7 @@ namespace Online
     /** Callback for the poll request. Parses the information and spawns
      *  notifications accordingly.
      */
-    void CurrentUser::PollRequest::callback()
+    void OnlinePlayerProfile::PollRequest::callback()
     {
         if(isSuccess())
         {
@@ -383,7 +383,7 @@ namespace Online
     /** Sends a message to the server that the client has been closed, if a
      *  user is signed in.
      */
-    void CurrentUser::onSTKQuit() const
+    void OnlinePlayerProfile::onSTKQuit() const
     {
         if(isLoggedIn())
         {
@@ -400,7 +400,7 @@ namespace Online
     // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
      */
-    uint32_t CurrentUser::getOnlineId() const 
+    uint32_t OnlinePlayerProfile::getOnlineId() const 
     {
         if((m_online_state == OS_SIGNED_IN ))
         {

@@ -23,7 +23,7 @@
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
-#include "online/current_user.hpp"
+#include "online/online_player_profile.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -201,7 +201,7 @@ void PlayerManager::load()
     for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
     {
         const XMLNode *player_xml = m_player_data->getNode(i);
-        PlayerProfile *player = new Online::CurrentUser(player_xml);
+        PlayerProfile *player = new Online::OnlinePlayerProfile(player_xml);
         m_all_players.push_back(player);
         if(player->isDefault())
             m_current_player = player;
@@ -272,7 +272,7 @@ void PlayerManager::save()
  */
 void PlayerManager::addNewPlayer(const core::stringw& name)
 {
-    m_all_players.push_back( new Online::CurrentUser(name) );
+    m_all_players.push_back( new Online::OnlinePlayerProfile(name) );
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
@@ -344,10 +344,10 @@ void PlayerManager::addDefaultPlayer()
     // Set the name as the default name, but don't mark it as 'default'
     // yet, since not having a default player forces the player selection
     // screen to be shown.
-    m_all_players.push_back(new Online::CurrentUser(username.c_str()) );
+    m_all_players.push_back(new Online::OnlinePlayerProfile(username.c_str()) );
 
     // add default guest player
-    m_all_players.push_back(new Online::CurrentUser(_LTR("Guest"), /*guest*/true));
+    m_all_players.push_back(new Online::OnlinePlayerProfile(_LTR("Guest"), /*guest*/true));
 }   // addDefaultPlayer
 
 // ----------------------------------------------------------------------------

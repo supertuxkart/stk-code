@@ -46,7 +46,7 @@ namespace Online
       * \brief Class that represents an online registered user
       * \ingroup online
       */
-    class CurrentUser : public PlayerProfile
+    class OnlinePlayerProfile : public PlayerProfile
     {
         public:
             // ----------------------------------------------------------------
@@ -136,12 +136,12 @@ namespace Online
                                                  bool request_now = true);
 
         public:
-            CurrentUser(const XMLNode *player);
-            CurrentUser(const core::stringw &name, bool is_guest = false);
-            virtual ~CurrentUser() {};
+            OnlinePlayerProfile(const XMLNode *player);
+            OnlinePlayerProfile(const core::stringw &name, bool is_guest = false);
+            virtual ~OnlinePlayerProfile() {};
             // ----------------------------------------------------------------
 
-    };   // class CurrentUser
+    };   // class OnlinePlayerProfile
 
 } // namespace Online
 
