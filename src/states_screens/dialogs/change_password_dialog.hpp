@@ -27,6 +27,7 @@ namespace GUIEngine
 {
     class IconButtonWidget;
     class LabelWidget;
+    class RibbonWidget;
 }
 
 /**
