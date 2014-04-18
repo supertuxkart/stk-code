@@ -260,11 +260,7 @@ GLuint LoadShader(const char * file, unsigned type)
 		delete[] ErrorMessage;
 	}
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 
 	return Id;
 }
@@ -288,11 +284,7 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
 		delete[] ErrorMessage;
 	}
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 
 	return Program;
 }
@@ -358,11 +350,7 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     if (aniso == 0) aniso = 1;
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, allowAF ? (float)aniso : 1.0f);
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 }
 
 void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
@@ -398,11 +386,7 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 }
 
 void drawTexQuad(const video::ITexture *texture, float width, float height,
@@ -419,11 +403,7 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 }
 
 static void
@@ -527,11 +507,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
         glDisable(GL_SCISSOR_TEST);
     glUseProgram(0);
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
@@ -581,11 +557,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
         glDisable(GL_SCISSOR_TEST);
 	glUseProgram(0);
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 }
 
 void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
@@ -645,9 +617,5 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
         glDisable(GL_SCISSOR_TEST);
 	glUseProgram(0);
 
-    GLenum glErr = glGetError();
-    if (glErr != GL_NO_ERROR)
-    {
-        Log::warn("IrrDriver", "GLWrap : OpenGL error %i\n", glErr);
-    }
+    glGetError();
 }
