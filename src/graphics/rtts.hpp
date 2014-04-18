@@ -64,6 +64,14 @@ enum TypeRTT
     RTT_DISPLACE,
     RTT_MLAA_COLORS,
 
+    RTT_BLOOM_1024,
+    RTT_BLOOM_512,
+    RTT_TMP_512,
+    RTT_BLOOM_256,
+    RTT_TMP_256,
+    RTT_BLOOM_128,
+    RTT_TMP_128,
+
     RTT_COUNT
 };
 
@@ -86,6 +94,13 @@ enum TypeFBO
     FBO_EIGHTH1,
     FBO_EIGHTH2,
     FBO_DISPLACE,
+    FBO_BLOOM_1024,
+    FBO_BLOOM_512,
+    FBO_TMP_512,
+    FBO_BLOOM_256,
+    FBO_TMP_256,
+    FBO_BLOOM_128,
+    FBO_TMP_128,
     FBO_COUNT
 };
 

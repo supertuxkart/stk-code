@@ -22,7 +22,6 @@
 #include "config/user_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "online/servers_manager.hpp"
-#include "online/current_user.hpp"
 
 using namespace Online;
 

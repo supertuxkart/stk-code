@@ -44,7 +44,7 @@ Profiler profiler;
 #ifdef WIN32
     #include <windows.h>
 
-    static double _getTimeMilliseconds()
+    double getTimeMilliseconds()
     {
         LARGE_INTEGER freq;
         QueryPerformanceFrequency(&freq);
@@ -57,7 +57,7 @@ Profiler profiler;
 
 #else
     #include <sys/time.h>
-    static double _getTimeMilliseconds()
+    double getTimeMilliseconds()
     {
         struct timeval tv;
         gettimeofday(&tv, NULL);
@@ -71,7 +71,7 @@ Profiler::Profiler()
 {
     m_thread_infos.resize(1);    // TODO: monothread now, should support multithreading
     m_write_id = 0;
-    m_time_last_sync = _getTimeMilliseconds();
+    m_time_last_sync = getTimeMilliseconds();
     m_time_between_sync = 0.0;
     m_freeze_state = UNFROZEN;
     m_capture_report = false;
@@ -120,7 +120,7 @@ void Profiler::pushCpuMarker(const char* name, const video::SColor& color)
 
     ThreadInfo& ti = getThreadInfo();
     MarkerStack& markers_stack = ti.markers_stack[m_write_id];
-    double  start = _getTimeMilliseconds() - m_time_last_sync;
+    double  start = getTimeMilliseconds() - m_time_last_sync;
     size_t  layer = markers_stack.size();
 
     // Add to the stack of current markers
@@ -143,7 +143,7 @@ void Profiler::popCpuMarker()
 
     // Update the date of end of the marker
     Marker&     marker = markers_stack.top();
-    marker.end = _getTimeMilliseconds() - m_time_last_sync;
+    marker.end = getTimeMilliseconds() - m_time_last_sync;
 
     // Remove the marker from the stack and add it to the list of markers done
     markers_done.push_front(marker);
@@ -158,8 +158,8 @@ void Profiler::synchronizeFrame()
     if(m_freeze_state == FROZEN)
         return;
 
-    // Avoid using several times _getTimeMilliseconds(), which would yield different results
-    double now = _getTimeMilliseconds();
+    // Avoid using several times getTimeMilliseconds(), which would yield different results
+    double now = getTimeMilliseconds();
 
     // Swap buffers
     int old_write_id = m_write_id;

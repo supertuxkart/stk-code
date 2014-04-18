@@ -2,7 +2,6 @@
 #define HEADER_REQUEST_CONNECTION_HPP
 
 #include "network/protocol.hpp"
-#include "online/current_user.hpp"
 #include "online/xml_request.hpp"
 
 class RequestConnection : public Protocol

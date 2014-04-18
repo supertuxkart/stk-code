@@ -21,7 +21,7 @@
 #include "achievements/achievements_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
-#include "online/current_user.hpp"
+#include "online/online_player_profile.hpp"
 #include "io/xml_node.hpp"
 #include "io/utf_writer.hpp"
 #include "utils/string_utils.hpp"
@@ -39,16 +39,17 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
 #ifdef DEBUG
     m_magic_number = 0xABCD1234;
 #endif
-    m_name                = name;
+    m_local_name          = name;
     m_is_guest_account    = is_guest;
-    m_is_default          = false;
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
-    m_story_mode_status   = unlock_manager->createStoryModeStatus();
     m_is_default          = false;
-    m_current_user        = new Online::CurrentUser();
-    m_achievements_status =
-                        AchievementsManager::get()->createAchievementsStatus();
+    m_is_default          = false;
+    m_saved_session       = false;
+    m_saved_token         = "";
+    m_saved_user_id       = 0;
+    m_achievements_status = NULL;
+    m_story_mode_status   = NULL;
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -72,9 +73,8 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_saved_user_id       = 0;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
-    m_current_user        = new Online::CurrentUser();
 
-    node->get("name",          &m_name            );
+    node->get("name",          &m_local_name      );
     node->get("guest",         &m_is_guest_account);
     node->get("use-frequency", &m_use_frequency   );
     node->get("unique-id",     &m_unique_id       );
@@ -94,29 +94,42 @@ PlayerProfile::~PlayerProfile()
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
-    delete m_current_user;
 }   // ~PlayerProfile
 
 
 //------------------------------------------------------------------------------
-/** This function loads the achievement and story mode data. This
-*/
+/** This function loads the achievement and story mode data. These can only
+ *  be loaded after the UnlockManager is created, which needs the karts
+ *  and tracks to be loaded first.
+ */
 void PlayerProfile::loadRemainingData(const XMLNode *node)
 {
     const XMLNode *xml_story_mode = node->getNode("story-mode");
-    m_story_mode_status = unlock_manager->createStoryModeStatus(xml_story_mode);
+    m_story_mode_status =
+                  unlock_manager->createStoryModeStatus(xml_story_mode);
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
-        ->createAchievementsStatus(xml_achievements);
-}   // loadRemainingData
+                          ->createAchievementsStatus(xml_achievements);
+}   // initRemainingData
 
+//------------------------------------------------------------------------------
+/** Initialises the story- and achievement data structure in case of the first
+ *  start of STK.
+ */
+void PlayerProfile::initRemainingData()
+{
+    m_story_mode_status = unlock_manager->createStoryModeStatus();
+    m_achievements_status =
+        AchievementsManager::get()->createAchievementsStatus();
+
+}   // initRemainingData
 //------------------------------------------------------------------------------
 /** Writes the data for this player to the specified UTFWriter.
  *  \param out The utf writer to write the data to.
  */
 void PlayerProfile::save(UTFWriter &out)
 {
-    out << L"    <player name=\"" << m_name
+    out << L"    <player name=\"" << m_local_name
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
@@ -128,11 +141,11 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" saved-token=\""         << m_saved_token << L"\">\n";
 
     {
-        assert(m_story_mode_status);
-        m_story_mode_status->save(out);
+        if(m_story_mode_status)
+            m_story_mode_status->save(out);
 
-        assert(m_achievements_status);
-        m_achievements_status->save(out);
+        if(m_achievements_status)
+            m_achievements_status->save(out);
     }
     out << L"    </player>\n";
 }   // save

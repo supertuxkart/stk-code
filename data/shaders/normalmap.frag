@@ -19,7 +19,7 @@ vec2 EncodeNormal(vec3 n);
 void main()
 {
 	// normal in Tangent Space
-	vec3 TS_normal = 2.0 * pow(texture(normalMap, uv).rgb, vec3(1./2.2)) - 1.0;
+	vec3 TS_normal = 2.0 * texture(normalMap, uv).rgb - 1.0;
 	// Because of interpolation, we need to renormalize
 	vec3 Frag_tangent = normalize(tangent);
 	vec3 Frag_normal = normalize(cross(Frag_tangent, bitangent));

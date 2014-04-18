@@ -22,7 +22,6 @@
 #include "config/user_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/current_user.hpp"
 #include "utils/log.hpp"
 
 HidePublicAddress::HidePublicAddress() : Protocol(NULL, PROTOCOL_SILENT)

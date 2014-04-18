@@ -84,6 +84,7 @@ extern PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
 extern PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
 extern PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
 extern PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
+extern PFNGLBLENDCOLORPROC glBlendColor;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
@@ -158,7 +159,7 @@ GLint LoadProgram(Types ... args)
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
-void transformTexturesTosRGB(irr::video::ITexture *tex);
+void compressTexture(irr::video::ITexture *tex, bool srgb);
 void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,

@@ -31,10 +31,12 @@
 
 class AchievementsStatus;
 
-namespace online 
+namespace Online 
 {
     class CurrentUser;
     class HTTPRequest;
+    class OnlineProfile;
+    class XMLRequest;
 }
 class PlayerProfile;
 
@@ -60,7 +62,7 @@ private:
     PlayerProfile* m_current_player;
 
     /** Saves the XML tree from players.xml for use in the 2nd
-     * loading stage (loadRemainingData). */
+     * loading stage (initRemainingData). */
     const XMLNode *m_player_data;
 
     void load();
@@ -86,7 +88,7 @@ public:
     }   // destroy
 
     void save();
-    void loadRemainingData();
+    void initRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
@@ -99,18 +101,18 @@ public:
                                const std::string &php_name = "");
     static unsigned int getCurrentOnlineId();
     static bool isCurrentLoggedIn();
+    static Online::OnlineProfile* getCurrentOnlineProfile();
 
-    /** The online state a player can be in. */
-    enum OnlineState
-    {
-        OS_SIGNED_OUT = 0,
-        OS_SIGNED_IN,
-        OS_GUEST,
-        OS_SIGNING_IN,
-        OS_SIGNING_OUT
-    };
-
-    static OnlineState getCurrentOnlineState();
+    static PlayerProfile::OnlineState getCurrentOnlineState();
+    static const irr::core::stringw& getCurrentOnlineUserName();
+    static void requestOnlinePoll();
+    static void resumeSavedSession();
+    static void onSTKQuit();
+    static void requestSignOut();
+    static Online::XMLRequest *requestSignIn(const irr::core::stringw &username,
+                                             const irr::core::stringw &password,
+                                             bool save_session,
+                                              bool request_now = true);
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */
@@ -118,11 +120,7 @@ public:
     {
         return get()->m_current_player; 
     }   // getCurrentPlayer
-    // ------------------------------------------------------------------------
-    static Online::CurrentUser* getCurrentUser()
-    {
-        return get()->m_current_player->getCurrentUser();
-    }   // getCurrentUser
+
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------

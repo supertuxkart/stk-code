@@ -12,7 +12,7 @@ varying vec2 uv;
 
 void main()
 {
-    vec4 Color = texture(tex, uv) * color;
+    vec4 Color = texture(tex, uv) * pow(color, vec4(2.2));
     // Premultiply alpha
     FragColor = vec4(Color.rgb * Color.a, Color.a);
 }

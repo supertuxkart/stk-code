@@ -51,15 +51,6 @@ private:
      *  (ie. 'volcano'). */
     std::vector<std::string> m_tracks;
 
-    /** This is the list of actually available tracks. In the last GP Fort
-     *  Magma can not be used untill the final challenge. In order to provide
-     *  still 5 tracks/GP, the last GP is only using 4 tracks in story mode,
-     *  but (once nolok is unlocked) Fort Magma is added after that. So this
-     *  list is always re-evaluated depending on the state of Nolok (i.e. if
-     *  nolok is unlocked, Fort Magma is available, otherwise not).
-     *  Mark this member mutable so that getTrackNames can be const. */
-    mutable std::vector<std::string> m_really_available_tracks;
-
     /** The number of laps that each track should be raced, in the right order */
     std::vector<int> m_laps;
 
@@ -69,7 +60,13 @@ private:
     /** Wether the user can edit this grand prix or not */
     bool m_editable;
 
-    bool isTrackAvailable(const std::string &id) const;
+    /** In the last GP Fort Magma can not be used untill the final challenge.
+     *  In order to provide still 5 tracks/GP, the last GP is only using 4
+     *  tracks in story mode, but once nolok is unlocked Fort Magma becomes
+     *  available (i.e. if nolok is unlocked, Fort Magma is available, otherwise
+     *  not).
+     */
+    bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
 
@@ -87,23 +84,23 @@ public:
     void reload();
     bool writeToFile();
 
-    bool                            checkConsistency(bool chatty=true) const;
-    const std::vector<std::string>& getTrackNames() const;
-    void                            getLaps(std::vector<int> *laps) const;
-    void                            getReverse(std::vector<bool> *reverse) const;
-    bool                            isEditable() const;
-    unsigned int                    getNumberOfTracks() const;
-    const std::string&              getTrackId(const unsigned int track) const;
-    irr::core::stringw              getTrackName(const unsigned int track) const;
-    unsigned int                    getLaps(const unsigned int track) const;
-    bool                            getReverse(const unsigned int track) const;
-    void                            moveUp(const unsigned int track);
-    void                            moveDown(const unsigned int track);
-    void                            addTrack(Track* track, unsigned int laps,
-                                             bool reverse, int position=-1);
-    void                            editTrack(unsigned int t, Track* track,
-                                              unsigned int laps, bool reverse);
-    void                            remove(const unsigned int track);
+    bool                     checkConsistency(bool chatty=true) const;
+    std::vector<std::string> getTrackNames(const bool includeLocked=false) const;
+    std::vector<int>         getLaps(const bool includeLocked=false) const;
+    std::vector<bool>        getReverse(const bool includeLocked=false) const;
+    bool                     isEditable() const;
+    unsigned int             getNumberOfTracks(const bool includeLocked=false) const;
+    const std::string&       getTrackId(const unsigned int track) const;
+    irr::core::stringw       getTrackName(const unsigned int track) const;
+    unsigned int             getLaps(const unsigned int track) const;
+    bool                     getReverse(const unsigned int track) const;
+    void                     moveUp(const unsigned int track);
+    void                     moveDown(const unsigned int track);
+    void                     addTrack(Track* track, unsigned int laps,
+                                      bool reverse, int position=-1);
+    void                     editTrack(unsigned int t, Track* track,
+                                       unsigned int laps, bool reverse);
+    void                     remove(const unsigned int track);
 
     // ------------------------------------------------------------------------
     /** @return the (potentially translated) user-visible name of the Grand

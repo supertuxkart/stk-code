@@ -178,7 +178,6 @@
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
-#include "online/current_user.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request_manager.hpp"
 #include "online/servers_manager.hpp"
@@ -966,7 +965,7 @@ int handleCmdLine()
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
-                PlayerManager::getCurrentUser()->requestSignIn(login, password, false, false);
+                PlayerManager::requestSignIn(login, password, false, false);
         request->executeNow();
 
         if (request->isSuccess())
@@ -1178,7 +1177,7 @@ int main(int argc, char *argv[] )
         // Reading the rest of the player data needs the unlock manager to
         // initialise the game slots of all players and the AchievementsManager
         // to initialise the AchievementsStatus, so it is done only now.
-        PlayerManager::get()->loadRemainingData();
+        PlayerManager::get()->initRemainingData();
 
         GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gui_lock.png"  ) );

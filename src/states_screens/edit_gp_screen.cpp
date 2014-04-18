@@ -199,8 +199,8 @@ void EditGPScreen::onConfirm()
     if (m_action == "remove")
     {
         m_gp->remove(m_selected);
-        setSelected(m_selected >= (int)m_gp->getNumberOfTracks() ?
-            m_gp->getNumberOfTracks() - 1 : m_selected);
+        setSelected(m_selected >= (int)m_gp->getNumberOfTracks(true) ?
+            m_gp->getNumberOfTracks(true) - 1 : m_selected);
         loadList(m_selected);
         setModified(true);
     }
@@ -228,7 +228,7 @@ void EditGPScreen::loadList(const int selected)
     m_icon_bank->scaleToHeight (64);
     m_list->setIcons(m_icon_bank, 64);
 
-    for (unsigned int i = 0; i < m_gp->getNumberOfTracks(); i++)
+    for (unsigned int i = 0; i < m_gp->getNumberOfTracks(true); i++)
     {
         std::vector<GUIEngine::ListWidget::ListCell> row;
 
@@ -290,8 +290,8 @@ void EditGPScreen::edit()
     {
         edit_screen->setSelection(track_manager->getTrack(
             m_gp->getTrackId(m_selected)),
-            m_gp->getLaps(m_selected),
-            m_gp->getReverse(m_selected));
+            m_gp->getLaps((unsigned int)m_selected),
+            m_gp->getReverse((unsigned int)m_selected));
         StateManager::get()->pushScreen(edit_screen);
     }
 }

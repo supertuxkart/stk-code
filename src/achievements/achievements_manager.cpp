@@ -25,7 +25,6 @@
 #include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 

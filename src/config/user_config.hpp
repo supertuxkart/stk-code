@@ -440,6 +440,21 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
+    PARAM_PREFIX BoolUserConfigParam        m_texture_compression
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
+        &m_video_group, "Enable Texture Compression"));
+    PARAM_PREFIX BoolUserConfigParam        m_glow
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
+        &m_video_group, "Enable Glow"));
+    PARAM_PREFIX BoolUserConfigParam        m_bloom
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_bloom",
+        &m_video_group, "Enable Bloom"));
+    PARAM_PREFIX BoolUserConfigParam        m_light_shaft
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
+        &m_video_group, "Enable Light Shafts"));
+    PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+        &m_video_group, "Enable Dynamic Lights"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -589,10 +604,6 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
                            "Whether vertical sync is enabled") );
-    PARAM_PREFIX BoolUserConfigParam         m_pixel_shaders
-    PARAM_DEFAULT( BoolUserConfigParam(false, "pixel_shaders",
-                                       &m_graphics_quality,
-                                       "Whether to enable pixel shaders (splatting, normal maps, ...)") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,
@@ -601,10 +612,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "mlaa", &m_graphics_quality,
                            "Whether MLAA anti-aliasing should be enabled") );
-    PARAM_PREFIX IntUserConfigParam          m_ssao
-            PARAM_DEFAULT( IntUserConfigParam(0,
+    PARAM_PREFIX BoolUserConfigParam          m_ssao
+            PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
-                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+                           "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows", &m_graphics_quality,

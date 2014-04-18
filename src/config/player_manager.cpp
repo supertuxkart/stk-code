@@ -23,7 +23,7 @@
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
-#include "online/current_user.hpp"
+#include "online/online_player_profile.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -56,14 +56,14 @@ void PlayerManager::setUserDetails(Online::HTTPRequest *request,
     const std::string &action,
     const std::string &php_name)
 {
-    get()->getCurrentUser()->setUserDetails(request, action, php_name);
+    get()->getCurrentPlayer()->setUserDetails(request, action, php_name);
 }   // setUserDetails
 
 // ----------------------------------------------------------------------------
 /** Returns whether a user is signed in or not. */
 bool PlayerManager::isCurrentLoggedIn()
 {
-    return getCurrentUser()->isRegisteredUser();
+    return getCurrentPlayer()->isLoggedIn();
 }   // isCurrentLoggedIn
 
 // ----------------------------------------------------------------------------
@@ -72,17 +72,92 @@ bool PlayerManager::isCurrentLoggedIn()
 */
 unsigned int PlayerManager::getCurrentOnlineId()
 {
-    return getCurrentUser()->getID();
+    return getCurrentPlayer()->getOnlineId();
 }   // getCurrentOnlineId
 
 // ----------------------------------------------------------------------------
 /** Returns the online state of the current player. It can be logged out,
  *  logging in, logged in, logging out, logged out, or guest.
  */
-PlayerManager::OnlineState PlayerManager::getCurrentOnlineState()
+PlayerProfile::OnlineState PlayerManager::getCurrentOnlineState()
 {
-    return (OnlineState)getCurrentUser()->getUserState();
+    return getCurrentPlayer()->getOnlineState();
 }   // getCurrentOnlineState
+
+// ----------------------------------------------------------------------------
+/** Returns the online name of this player.
+ */
+const irr::core::stringw& PlayerManager::getCurrentOnlineUserName()
+{
+    if (getCurrentOnlineState() == PlayerProfile::OS_SIGNED_IN ||
+        getCurrentOnlineState() == PlayerProfile::OS_GUEST         )
+        return getCurrentOnlineProfile()->getUserName();
+
+    static core::stringw not_signed_in = _("Currently not signed in");
+    return not_signed_in;
+}   // getCurrentOnlineUserName
+
+// ----------------------------------------------------------------------------
+/** Sends a request to the server to see if any new information is
+ *  available. (online friends, notifications, etc.).
+ */
+void PlayerManager::requestOnlinePoll()
+{
+    getCurrentPlayer()->requestPoll();
+}   // requestOnlinePoll
+
+// ----------------------------------------------------------------------------
+/** Reconnect to the server using the saved session data.
+ */
+void PlayerManager::resumeSavedSession()
+{
+    getCurrentPlayer()->requestSavedSession();
+}   // resumeSavedSession
+
+// ----------------------------------------------------------------------------
+/** Sends a message to the server that the client has been closed, if a
+ *  user is signed in.
+ */
+void PlayerManager::onSTKQuit()
+{
+    getCurrentPlayer()->onSTKQuit();
+}   // onSTKQuit
+
+// ----------------------------------------------------------------------------
+/** Create a signin request.
+ *  \param username Name of user.
+ *  \param password Password.
+ *  \param save_session If true, the login credential will be saved to
+ *         allow a password-less login.
+ *  \param request_now Immediately submit this request to the
+ *         RequestManager.
+ */
+
+Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &username,
+                                                 const irr::core::stringw &password,
+                                                 bool save_session,
+                                                 bool request_now)
+{
+    return getCurrentPlayer()->requestSignIn(username, password, save_session,
+                                             request_now);
+}   // requestSignIn
+
+// ----------------------------------------------------------------------------
+/** Signs the current user out.
+ */
+void PlayerManager::requestSignOut()
+{
+    getCurrentPlayer()->requestSignOut();
+}   // requestSignOut
+
+// ----------------------------------------------------------------------------
+/** Returns the current online profile (which is the list of all achievements
+ *  and friends).
+ */
+Online::OnlineProfile* PlayerManager::getCurrentOnlineProfile()
+{
+    return getCurrentPlayer()->getProfile();
+}   // getCurrentOnlineProfile
 
 // ============================================================================
 /** Constructor.
@@ -126,7 +201,7 @@ void PlayerManager::load()
     for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
     {
         const XMLNode *player_xml = m_player_data->getNode(i);
-        PlayerProfile *player = new PlayerProfile(player_xml);
+        PlayerProfile *player = new Online::OnlinePlayerProfile(player_xml);
         m_all_players.push_back(player);
         if(player->isDefault())
             m_current_player = player;
@@ -136,21 +211,30 @@ void PlayerManager::load()
 
 // ----------------------------------------------------------------------------
 /** The 2nd loading stage. During this stage achievements and story mode
- *  data is read for each player.
+ *  data is initialised for each player. In case of existing player (i.e. not
+ *  first time start of stk) the data is read from the players.xml file,
+ *  in case of a first time start new/empty data structures for the players
+ *  (which were created by default) are created.
  */
-void PlayerManager::loadRemainingData()
+void PlayerManager::initRemainingData()
 {
-    for (unsigned int i = 0; i<m_player_data->getNumNodes(); i++)
+    for (unsigned int i = 0; i<m_all_players.size(); i++)
     {
-        const XMLNode *player_xml = m_player_data->getNode(i);
-        m_all_players[i].loadRemainingData(player_xml);
+        // On the first time STK is run, there is no player data,
+        // so just initialise the story and achievement data
+        // structures
+        if (!m_player_data)
+            m_all_players[i].initRemainingData();
+        else   // not a first time start, load remaining data
+            m_all_players[i].loadRemainingData(m_player_data->getNode(i));
     }
+
     delete m_player_data;
     m_player_data = NULL;
 
     // Sort player by frequency
     m_all_players.insertionSort(/*start*/0, /*desc*/true);
-}   // loadRemainingData
+}   // initRemainingData
 
 // ----------------------------------------------------------------------------
 /** Saves all player profiles to players.xml.
@@ -188,7 +272,7 @@ void PlayerManager::save()
  */
 void PlayerManager::addNewPlayer(const core::stringw& name)
 {
-    m_all_players.push_back( new PlayerProfile(name) );
+    m_all_players.push_back( new Online::OnlinePlayerProfile(name) );
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
@@ -257,13 +341,13 @@ void PlayerManager::addDefaultPlayer()
     else if(getenv("LOGNAME")!=NULL)    // Linux, Macs
         username = getenv("LOGNAME");
 
-    // Set the name as the default name for all players.
-    m_all_players.push_back(new PlayerProfile(username.c_str()) );
+    // Set the name as the default name, but don't mark it as 'default'
+    // yet, since not having a default player forces the player selection
+    // screen to be shown.
+    m_all_players.push_back(new Online::OnlinePlayerProfile(username.c_str()) );
 
     // add default guest player
-    m_all_players.push_back( new PlayerProfile(_LTR("Guest"), /*guest*/true) );
-
-
+    m_all_players.push_back(new Online::OnlinePlayerProfile(_LTR("Guest"), /*guest*/true));
 }   // addDefaultPlayer
 
 // ----------------------------------------------------------------------------

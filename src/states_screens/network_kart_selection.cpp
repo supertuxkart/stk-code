@@ -10,7 +10,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/client_lobby_room_protocol.hpp"
 #include "network/network_manager.hpp"
-#include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 
 static const char RANDOM_KART_ID[] = "randomkart";
@@ -68,7 +67,7 @@ void NetworkKartSelectionScreen::init()
 
     for (unsigned int i = 0; i < players.size(); i++)
     {
-        if (players[i]->user_profile == PlayerManager::getCurrentUser()->getProfile())
+        if (players[i]->user_profile == PlayerManager::getCurrentOnlineProfile())
         {
             m_id_mapping.insert(m_id_mapping.begin(),players[i]->race_id); //!< first kart widget always me
             Log::info("NKSS", "Insert %d at pos 0", players[i]->race_id);

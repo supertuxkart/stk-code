@@ -21,7 +21,6 @@
 #include "online/request_manager.hpp"
 
 #include "config/player_manager.hpp"
-#include "online/current_user.hpp"
 #include "states_screens/state_manager.hpp"
 
 #include <iostream>
@@ -129,7 +128,10 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        PlayerManager::getCurrentUser()->requestSavedSession();
+        // In case that login id was not saved (or first start of stk), 
+        // current player would not be defined at this stage.
+        if(PlayerManager::getCurrentPlayer())
+            PlayerManager::resumeSavedSession();
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -147,7 +149,7 @@ namespace Online
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
         //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
-        PlayerManager::getCurrentUser()->onSTKQuit();
+        PlayerManager::onSTKQuit();
         addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
@@ -277,8 +279,12 @@ namespace Online
     {
         handleResultQueue();
 
-        //Database polling starts here, only needed for registered users
-        if (!PlayerManager::isCurrentLoggedIn())
+        // Database polling starts here, only needed for registered users. If
+        // there is no player data yet (i.e. either because first time start
+        // of stk, and loging screen hasn't finished yet, or no default player
+        // was saved), don't do anything
+        if (!PlayerManager::getCurrentPlayer() ||
+            !PlayerManager::isCurrentLoggedIn())
             return;
 
         m_time_since_poll += dt;
@@ -288,7 +294,7 @@ namespace Online
         if(m_time_since_poll > interval)
         {
             m_time_since_poll = 0;
-            PlayerManager::getCurrentUser()->requestPoll();
+            PlayerManager::requestOnlinePoll();
         }
 
     }   // update

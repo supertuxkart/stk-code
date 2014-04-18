@@ -19,7 +19,6 @@
 
 #include "online/profile_manager.hpp"
 
-#include "online/current_user.hpp"
 #include "online/online_profile.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"

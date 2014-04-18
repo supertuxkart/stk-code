@@ -54,7 +54,7 @@ private:
     GUIEngine::IconButtonWidget * m_profile_widget;
     GUIEngine::IconButtonWidget * m_sign_out_widget;
 
-    PlayerManager::OnlineState m_recorded_state;
+    PlayerProfile::OnlineState m_recorded_state;
 
     bool hasStateChanged();
     void setInitialFocus();

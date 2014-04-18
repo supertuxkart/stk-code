@@ -45,12 +45,17 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
         return SM_DEFAULT;
 }
 
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type)
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
 {
     if (type == irr_driver->getShader(ES_BUBBLES))
         return TM_BUBBLE;
-    else
-        return TM_DEFAULT;
+    video::E_BLEND_FACTOR srcFact, DstFact;
+    video::E_MODULATE_FUNC mod;
+    u32 alpha;
+    unpack_textureBlendFunc(srcFact, DstFact, mod, alpha, MaterialTypeParam);
+    if (DstFact == video::EBF_ONE)
+        return TM_ADDITIVE;
+    return TM_DEFAULT;
 }
 
 GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
@@ -178,12 +183,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	}
 	ITexture *tex;
 	for (unsigned i = 0; i < 6; i++)
-	{
-		tex = mb->getMaterial().getTexture(i);
-        if (tex)
-            transformTexturesTosRGB(tex);
-        result.textures[i] = tex;
-	}
+        result.textures[i] = mb->getMaterial().getTexture(i);
     result.TextureMatrix = 0;
 	return result;
 }
@@ -225,7 +225,10 @@ void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjecti
   size_t count = mesh.IndexCount;
 
   if (mesh.textures[0])
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  {
+      compressTexture(mesh.textures[0], true);
+      setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  }
   else
   {
       setTexture(0, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
@@ -252,7 +255,7 @@ void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProje
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-
+  compressTexture(mesh.textures[0], true);
   setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0);
@@ -269,6 +272,7 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
 	MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, windDir, 0);
@@ -286,6 +290,7 @@ void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const
 	size_t count = mesh.IndexCount;
 
 	assert(mesh.textures[1]);
+    compressTexture(mesh.textures[1], false);
     setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::NormalMapShader::setUniforms(ModelMatrix, InverseModelMatrix, 0);
@@ -336,6 +341,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
   size_t count = mesh.IndexCount;
 
   // Texlayout
+  compressTexture(mesh.textures[1], true);
   setTexture(MeshShader::SplattingShader::TU_tex_layout, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
@@ -348,6 +354,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
   //Tex detail0
+  compressTexture(mesh.textures[2], true);
   setTexture(MeshShader::SplattingShader::TU_tex_detail0, getTextureGLuint(mesh.textures[2]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
@@ -360,6 +367,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
   //Tex detail1
+  compressTexture(mesh.textures[3], true);
   setTexture(MeshShader::SplattingShader::TU_tex_detail1, getTextureGLuint(mesh.textures[3]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
@@ -371,6 +379,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
     GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
+  compressTexture(mesh.textures[4], true);
   //Tex detail2
   setTexture(MeshShader::SplattingShader::TU_tex_detail2, getTextureGLuint(mesh.textures[4]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
@@ -384,6 +393,7 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
   //Tex detail3
+  compressTexture(mesh.textures[5], true);
   setTexture(MeshShader::SplattingShader::TU_tex_detail3, getTextureGLuint(mesh.textures[5]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
@@ -410,6 +420,7 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
+  compressTexture(mesh.textures[0], true);
   setTexture(MeshShader::ObjectRefPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
@@ -438,6 +449,7 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::CausticsShader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     if (irr_driver->getLightViz())
     {
@@ -451,6 +463,7 @@ void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionM
     }
     if (!CausticTex)
         CausticTex = irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str());
+    compressTexture(CausticTex, false);
     setTexture(MeshShader::CausticsShader::TU_caustictex, getTextureGLuint(CausticTex), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2,
@@ -469,6 +482,7 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::GrassPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 	if (irr_driver->getLightViz())
 	{
@@ -509,6 +523,7 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::ObjectRimLimitShader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 	if (irr_driver->getLightViz())
 	{
@@ -535,6 +550,7 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::ObjectUnlitShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 	if (irr_driver->getLightViz())
 	{
@@ -561,6 +577,7 @@ void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelView
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
+  compressTexture(mesh.textures[0], true);
   setTexture(MeshShader::DetailledObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
@@ -572,7 +589,7 @@ void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelView
     GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
     glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
-
+  compressTexture(mesh.textures[1], true);
   setTexture(MeshShader::DetailledObjectPass2Shader::TU_detail, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   MeshShader::DetailledObjectPass2Shader::setUniforms(ModelViewProjectionMatrix);
@@ -589,6 +606,7 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 	if (irr_driver->getLightViz())
 	{
@@ -615,6 +633,7 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
@@ -645,6 +664,7 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
         tmpcol.getGreen() / 255.0f,
         tmpcol.getBlue() / 255.0f);
 
+    compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     glUseProgram(MeshShader::TransparentFogShader::Program);
@@ -665,6 +685,7 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 	GLenum itype = mesh.IndexType;
 	size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
 	MeshShader::BubbleShader::setUniforms(ModelViewProjectionMatrix, 0, time, transparency);
@@ -681,6 +702,7 @@ void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
+    compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
 
@@ -833,10 +855,10 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
             MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
         break;
     case TM_DEFAULT:
+    case TM_ADDITIVE:
         if (World::getWorld()->getTrack()->isFogEnabled())
             mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
                 MeshShader::TransparentFogShader::attrib_position, MeshShader::TransparentFogShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentFogShader::attrib_color, mesh.Stride);
-
         else
             mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
                 MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentShader::attrib_color, mesh.Stride);

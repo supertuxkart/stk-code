@@ -6,6 +6,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/profiler.hpp"
 
 using namespace irr;
 
@@ -89,6 +90,7 @@ void STKAnimatedMesh::render()
             if (!mb)
                 continue;
             video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
+            f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
             video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
             if (!isObject(type))
             {
@@ -100,7 +102,7 @@ void STKAnimatedMesh::render()
             GLMesh &mesh = GLmeshes[i];
             if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type);
+                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
                 initvaostate(mesh, TranspMat);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
@@ -148,6 +150,8 @@ void STKAnimatedMesh::render()
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
+        PROFILER_PUSH_CPU_MARKER("GATHER SOLID MESHES", 0xFC, 0xFA, 0x68);
+
         GLMesh* mesh;
         for_in(mesh, GeometricMesh[FPSM_DEFAULT])
         {
@@ -163,11 +167,14 @@ void STKAnimatedMesh::render()
             GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
+        PROFILER_POP_CPU_MARKER();
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
+        PROFILER_PUSH_CPU_MARKER("GATHER TRANSPARENT MESHES", 0xFC, 0xFA, 0x68);
+
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
@@ -214,6 +221,7 @@ void STKAnimatedMesh::render()
             GroupedSM<SM_UNTEXTURED>::TIMVSet.push_back(invmodel);
         }
 
+        PROFILER_POP_CPU_MARKER();
         return;
     }
 
@@ -247,18 +255,24 @@ void STKAnimatedMesh::render()
 
         if (World::getWorld()->getTrack()->isFogEnabled())
         {
-            if (!TransparentMesh[TM_DEFAULT].empty())
+            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
                 glUseProgram(MeshShader::TransparentFogShader::Program);
-
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            glBlendFunc(GL_ONE, GL_ONE);
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
         }
         else
         {
-            if (!TransparentMesh[TM_DEFAULT].empty())
+            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
                 glUseProgram(MeshShader::TransparentShader::Program);
-
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
             for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            glBlendFunc(GL_ONE, GL_ONE);
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
         }
         return;

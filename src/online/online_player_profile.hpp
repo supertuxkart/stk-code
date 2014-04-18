@@ -19,12 +19,12 @@
 #ifndef HEADER_CURRENT_ONLINE_USER_HPP
 #define HEADER_CURRENT_ONLINE_USER_HPP
 
+#include "config/player_profile.hpp"
 #include "online/http_request.hpp"
 #include "online/online_profile.hpp"
 #include "online/request_manager.hpp"
 #include "online/server.hpp"
 #include "online/xml_request.hpp"
-#include "utils/leak_check.hpp"
 #include "utils/synchronised.hpp"
 #include "utils/types.hpp"
 
@@ -46,10 +46,8 @@ namespace Online
       * \brief Class that represents an online registered user
       * \ingroup online
       */
-    class CurrentUser
+    class OnlinePlayerProfile : public PlayerProfile
     {
-        private:
-            LEAK_CHECK()
         public:
             // ----------------------------------------------------------------
             class SignInRequest : public XMLRequest
@@ -80,63 +78,70 @@ namespace Online
             bool                        m_save_session;
             OnlineProfile              *m_profile;
 
-            bool saveSession()  const   { return m_save_session;      }
+            /** The state of the player (logged in, logging in, ...) */
+            PlayerProfile::OnlineState  m_online_state;
+
+            bool doSaveSession()  const { return m_save_session; }
 
 
-            void signIn                 (bool success, const XMLNode * input);
-            void signOut                (bool success, const XMLNode * input);
+            virtual void signIn(bool success, const XMLNode * input);
+            virtual void signOut(bool success, const XMLNode * input);
 
             // For now declare functions that will become part of PlayerManager
             // or Playerprofile to be private, and give only PlayerManager
             // access to them. FIXME
 
             // FIXME: This apparently does not compile on linux :(
-            // So I'll make this all public for now again
-            // friend class PlayerManager;
+            // So for now (while this is needed) I'll only add this on
+            // windows only (where it works).
+#ifdef WIN32
+             friend class PlayerManager;
     public:
-            uint32_t getID() const;
-            void setUserDetails(HTTPRequest *request,
-                                const std::string &action,
-                                const std::string &php_script = "");
-            bool isRegisteredUser() const { return m_state == US_SIGNED_IN; }
-            /** Returns the user state. */
-            enum UserState
-            {
-                US_SIGNED_OUT = 0,
-                US_SIGNED_IN,
-                US_GUEST,
-                US_SIGNING_IN,
-                US_SIGNING_OUT
-            };
-            UserState                   m_state;
-            const UserState getUserState() const { return m_state; }
+#else
+    public:
+#endif
+            virtual uint32_t getOnlineId() const;
+            virtual void setUserDetails(Online::HTTPRequest *request,
+                                        const std::string &action,
+                                        const std::string &php_script = "");
 
-
-        public:
-            CurrentUser();
-            void                            requestSavedSession();
-            SignInRequest *                 requestSignIn(  const irr::core::stringw &username,
-                                                            const irr::core::stringw &password,
-                                                            bool save_session,
-                                                            bool request_now = true);
-            void                            requestSignOut();
-
-            void                            requestFriendRequest(const uint32_t friend_id) const;
-            void                            onSTKQuit() const;
-            void                            requestPoll() const;
-
-            irr::core::stringw              getUserName()           const;
+            virtual void requestPoll() const;
+            virtual void onSTKQuit() const;
             // ----------------------------------------------------------------
+            /** Returns if this user is logged in. */
+            virtual bool isLoggedIn() const 
+            {
+                return m_online_state == PlayerProfile::OS_SIGNED_IN;
+            }   // isLoggedIn
+
+            // ----------------------------------------------------------------
+            /** The online state of the player (i.e. logged out, logging in,
+             *  logged in, ...). */
+            PlayerProfile::OnlineState getOnlineState() const
+            {
+                return m_online_state;
+            }   // getOnlineState
+            // ----------------------------------------------------------------
+            /** Returns a pointer to the profile associated with the current
+            *  user. */
+            OnlineProfile* getProfile() const { return m_profile; }
             // ----------------------------------------------------------------
             /** Returns the session token of the signed in user. */
             const std::string& getToken() const { return m_token; }
-            // ----------------------------------------------------------------
-            /** Returns a pointer to the profile associated with the current
-             *  user. */
-            OnlineProfile* getProfile() const { return m_profile; }
+            virtual void requestSavedSession();
+            virtual void requestSignOut();
+            virtual SignInRequest *requestSignIn(const irr::core::stringw &username,
+                                                 const irr::core::stringw &password,
+                                                 bool save_session,
+                                                 bool request_now = true);
+
+        public:
+            OnlinePlayerProfile(const XMLNode *player);
+            OnlinePlayerProfile(const core::stringw &name, bool is_guest = false);
+            virtual ~OnlinePlayerProfile() {};
             // ----------------------------------------------------------------
 
-    };   // class CurrentUser
+    };   // class OnlinePlayerProfile
 
 } // namespace Online
 

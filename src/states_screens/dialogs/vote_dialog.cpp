@@ -18,17 +18,15 @@
 #include "states_screens/dialogs/vote_dialog.hpp"
 
 #include "addons/addons_manager.hpp"
-#include "config/player_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_user.hpp"
-#include "online/messages.hpp"
 
 #include <IGUIEnvironment.h>
-
 
 using namespace GUIEngine;
 using namespace irr;
