@@ -198,10 +198,19 @@ void IrrDriver::renderGLSL(float dt)
 		PROFILER_POP_CPU_MARKER();
 
 		PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
+        if (!UserConfigParams::m_dynamic_lights)
+        {
+            glEnable(GL_FRAMEBUFFER_SRGB);
+            glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        }
+        else
+        {
+            glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
+        }
         renderSolidSecondPass();
         PROFILER_POP_CPU_MARKER();
 
-        if (World::getWorld()->getTrack()->isFogEnabled())
+        if (UserConfigParams::m_dynamic_lights && World::getWorld()->getTrack()->isFogEnabled())
         {
             PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
             m_post_processing->renderFog(irr_driver->getInvProjMatrix());
@@ -284,7 +293,10 @@ void IrrDriver::renderGLSL(float dt)
 
     PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0xFF, 0x00);
     // Render the post-processed scene
-    m_post_processing->render();
+    if (UserConfigParams::m_dynamic_lights)
+        m_post_processing->render();
+    else
+        glDisable(GL_FRAMEBUFFER_SRGB);
     PROFILER_POP_CPU_MARKER();
 
     glBindVertexArray(0);
@@ -450,7 +462,6 @@ void IrrDriver::renderSolidFirstPass()
 
 void IrrDriver::renderSolidSecondPass()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
     SColor clearColor = World::getWorld()->getClearColor();
     glClearColor(clearColor.getRed()  / 255.f, clearColor.getGreen() / 255.f,
                  clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
@@ -516,7 +527,6 @@ void IrrDriver::renderSolidSecondPass()
 
 void IrrDriver::renderTransparent()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
     irr_driver->setPhase(TRANSPARENT_PASS);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
