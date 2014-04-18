@@ -630,13 +630,15 @@ void PostProcessing::render()
                 renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
 
                 // Downsample
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
-                glViewport(0, 0, 256, 256);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+                glBlitFramebuffer(0, 0, 512, 512, 0, 0, 256, 256, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
-                glViewport(0, 0, 128, 128);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
+                glBlitFramebuffer(0, 0, 256, 256, 0, 0, 128, 128, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
                 // Blur
                 glViewport(0, 0, 512, 512);
