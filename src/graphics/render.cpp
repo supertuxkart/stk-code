@@ -869,7 +869,10 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
+    {
+        gl_driver->extGlDrawBuffers(1, bufs);
         return;
+    }
 
     if (SkyboxCubeMap)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
@@ -943,6 +946,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+    gl_driver->extGlDrawBuffers(1, bufs);
     // Handle SSAO
     if (UserConfigParams::m_ssao)
     {
