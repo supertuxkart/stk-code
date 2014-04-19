@@ -53,7 +53,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 	float sum = 0.;
 	for (int i = 0; i < 4; i++)
 	{
-		sum += texture(shadowtex, vec4(shadowtexcoord + 0.0005 * shadowoffset[i], float(index), 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+		sum += texture(shadowtex, vec4(shadowtexcoord + shadowoffset[i] / 2048., float(index), 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
 	}
 	return sum / 4.;
 }
@@ -91,26 +91,26 @@ void main() {
 	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
 	bias = clamp(bias, 0.001, 0.014);
 	float factor;
-	if (xpos.z < 20.)
+	if (xpos.z < 5.)
 		factor = getShadowFactor(xpos.xyz, bias, 0);
-	else if (xpos.z < 25.)
+	else if (xpos.z < 6.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 0), b = getShadowFactor(xpos.xyz, bias, 1);
-		factor = mix(a, b, (xpos.z - 20.) / 5.);
+		factor = mix(a, b, (xpos.z - 5.));
 	}
-	else if (xpos.z < 50.)
+	else if (xpos.z < 20.)
 		factor = getShadowFactor(xpos.xyz, bias, 1);
-	else if (xpos.z < 60.)
+	else if (xpos.z < 30.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 1), b = getShadowFactor(xpos.xyz, bias, 2);
-		factor = mix(a, b, (xpos.z - 50.) / 10.);
+		factor = mix(a, b, (xpos.z - 20.) / 10.);
 	}
-	else if (xpos.z < 100.)
+	else if (xpos.z < 50.)
 		factor = getShadowFactor(xpos.xyz, bias, 2);
-	else if (xpos.z < 120.)
+	else if (xpos.z < 70.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 2), b = getShadowFactor(xpos.xyz, bias, 3);
-		factor = mix(a, b, (xpos.z - 100.) / 20.);
+		factor = mix(a, b, (xpos.z - 50.) / 20.);
 	}
 	else
 		factor = getShadowFactor(xpos.xyz, bias, 3);
