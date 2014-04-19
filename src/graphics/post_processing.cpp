@@ -604,7 +604,7 @@ void PostProcessing::render()
         scene::ICameraSceneNode * const camnode =
             Camera::getCamera(cam)->getCameraSceneNode();
         mocb->setCurrentCamera(cam);
-        GLuint in_rtt = irr_driver->getRenderTargetTexture(RTT_TMP2), in_fbo = irr_driver->getFBO(FBO_TMP2_WITH_DS);
+        GLuint in_rtt = irr_driver->getRenderTargetTexture(RTT_COLOR), in_fbo = irr_driver->getFBO(FBO_COLORS);
         GLuint out_rtt = irr_driver->getRenderTargetTexture(RTT_TMP1), out_fbo = irr_driver->getFBO(FBO_TMP1_WITH_DS);
         // Each effect uses these as named, and sets them up for the next effect.
         // This allows chaining effects where some may be disabled.
@@ -614,16 +614,15 @@ void PostProcessing::render()
         glDisable(GL_BLEND);
 
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
-        // Blit the base to tmp1
-        blitFBO(irr_driver->getFBO(FBO_COLORS), out_fbo, UserConfigParams::m_width, UserConfigParams::m_height);
-
             if (UserConfigParams::m_bloom)
             {
                 glClear(GL_STENCIL_BUFFER_BIT);
 
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
-                glViewport(0, 0, 1024, 1024);
-                renderPassThrough(out_rtt);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_COLORS));
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
+                glBlitFramebuffer(0, 0, UserConfigParams::m_width, UserConfigParams::m_height, 0, 0, 1024, 1024, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
                 glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
                 glViewport(0, 0, 512, 512);
@@ -656,7 +655,7 @@ void PostProcessing::render()
                 glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
                 // Additively blend on top of tmp1
-                glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
+                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_COLORS));
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
                 glBlendEquation(GL_FUNC_ADD);
@@ -669,8 +668,6 @@ void PostProcessing::render()
                 glDisable(GL_BLEND);
             } // end if bloom
 
-            std::swap(in_fbo, out_fbo);
-            std::swap(in_rtt, out_rtt);
         PROFILER_POP_CPU_MARKER();
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
