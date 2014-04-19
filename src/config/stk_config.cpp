@@ -39,6 +39,7 @@ float STKConfig::UNDEFINED = -99.9f;
 STKConfig::STKConfig()
 {
     m_has_been_loaded         = false;
+    m_title_music             = NULL;
     m_default_kart_properties = new KartProperties();
 }   // STKConfig
 //-----------------------------------------------------------------------------
@@ -46,7 +47,9 @@ STKConfig::~STKConfig()
 {
     if(m_title_music)
         delete m_title_music;
-    delete m_default_kart_properties;
+
+    if(m_default_kart_properties)
+        delete m_default_kart_properties;
 }   // ~STKConfig
 
 //-----------------------------------------------------------------------------

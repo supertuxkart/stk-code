@@ -490,9 +490,12 @@ void FileManager::pushTextureSearchPath(const std::string& path)
  */
 void FileManager::popTextureSearchPath()
 {
-    std::string dir = m_texture_search_path.back();
-    m_texture_search_path.pop_back();
-    m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+    if(!m_texture_search_path.empty())
+    {
+        std::string dir = m_texture_search_path.back();
+        m_texture_search_path.pop_back();
+        m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+    }
 }   // popTextureSearchPath
 
 //-----------------------------------------------------------------------------
@@ -500,10 +503,24 @@ void FileManager::popTextureSearchPath()
  */
 void FileManager::popModelSearchPath()
 {
-    std::string dir = m_model_search_path.back();
-    m_model_search_path.pop_back();
-    m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+    if(!m_model_search_path.empty())
+    {
+        std::string dir = m_model_search_path.back();
+        m_model_search_path.pop_back();
+        m_file_system->removeFileArchive(createAbsoluteFilename(dir));
+    }
 }   // popModelSearchPath
+
+// ------------------------------------------------------------------------
+/** Removes the last added directory from the music search path.
+ */
+void FileManager::popMusicSearchPath()
+{
+    if(!m_music_search_path.empty())
+    {
+        m_music_search_path.pop_back();
+    }
+}
 
 //-----------------------------------------------------------------------------
 /** Tries to find the specified file in any of the given search paths.

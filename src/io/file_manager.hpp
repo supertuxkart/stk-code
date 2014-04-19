@@ -132,9 +132,10 @@ public:
 
 
     void       pushTextureSearchPath(const std::string& path);
-    void       pushModelSearchPath  (const std::string& path);
-    void       popTextureSearchPath ();
-    void       popModelSearchPath   ();
+    void       pushModelSearchPath(const std::string& path);
+    void       popTextureSearchPath();
+    void       popModelSearchPath();
+    void       popMusicSearchPath();
     void       redirectOutput();
     // ------------------------------------------------------------------------
     /** Adds a directory to the music search path (or stack).
@@ -143,10 +144,7 @@ public:
     {
         m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
-    // ------------------------------------------------------------------------
-    /** Removes the last added directory from the music search path.
-     */
-    void popMusicSearchPath() {m_music_search_path.pop_back(); }
+
     // ------------------------------------------------------------------------
     /** Returns true if the specified file exists.
      */
