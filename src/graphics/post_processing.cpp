@@ -304,14 +304,14 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     {
         glUseProgram(FullScreenShader::ShadowedSunLightDebugShader::Program);
         glBindVertexArray(FullScreenShader::ShadowedSunLightDebugShader::vao);
-        FullScreenShader::ShadowedSunLightDebugShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+        FullScreenShader::ShadowedSunLightDebugShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
 
     }
     else
     {
         glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
         glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
-        FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+        FullScreenShader::ShadowedSunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
     }
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);

@@ -6,22 +6,22 @@ uniform sampler2DArrayShadow shadowtex;
 
 uniform vec3 direction;
 uniform vec3 col;
-uniform mat4 invproj;
-uniform mat4 shadowmat[4];
 //uniform int hasclouds;
 //uniform vec2 wind;
 //uniform float shadowoffset;
 
-#if __VERSION__ >= 130
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
+
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
-#else
-varying vec2 uv;
-#define Diff gl_FragData[0]
-#define Spec gl_FragData[1]
-#endif
-
 
 vec3 DecodeNormal(vec2 n);
 vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
@@ -37,7 +37,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 		vec2(1., 1.)
 	);
 
-	vec4 shadowcoord = (shadowmat[index] * vec4(pos, 1.0));
+	vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
 	shadowcoord /= shadowcoord.w;
 	vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
 //	shadowcoord = (shadowcoord * 0.5) + vec3(0.5);
@@ -61,7 +61,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 void main() {
 	float z = texture(dtex, uv).x;
 	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
-	xpos = invproj * xpos;
+	xpos = InverseProjectionMatrix * xpos;
 	xpos.xyz /= xpos.w;
 
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));

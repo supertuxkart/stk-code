@@ -556,22 +556,22 @@ class ShadowedSunLightShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_shadowmat, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_direction, uniform_col;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const std::vector<core::matrix4> &shadowmat, const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
+    static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
 };
 
 class ShadowedSunLightDebugShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_direction, uniform_col;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
+    static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
 };
 
 class Gaussian6HBlurShader
