@@ -608,7 +608,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode,
         float up = box.MaxEdge.Y;
         float down = box.MinEdge.Y;
 
-        left -= fmodf(left, units_per_w);
+/*        left -= fmodf(left, units_per_w);
         right -= fmodf(right, units_per_w);
         up -= fmodf(up, units_per_h);
         down -= fmodf(down, units_per_h);
@@ -617,7 +617,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode,
         // FIXME: quick and dirt (and wrong) workaround to avoid division by zero
         if (left == right) right += 0.1f;
         if (up == down) down += 0.1f;
-        if (z == 30) z += 0.1f;
+        if (z == 30) z += 0.1f;*/
 
         core::matrix4 tmp_matrix;
 
