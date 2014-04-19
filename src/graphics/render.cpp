@@ -812,14 +812,16 @@ void IrrDriver::renderGlow(video::SOverrideMaterial &overridemat,
     glDisable(GL_BLEND);
 
     // To half
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_HALF1));
-    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_TMP1));
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP1_WITH_DS));
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
+    glBlitFramebuffer(0, 0, UserConfigParams::m_width, UserConfigParams::m_height, 0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     // To quarter
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_QUARTER1));
-    glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_HALF1));
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
+    glBlitFramebuffer(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, 0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
