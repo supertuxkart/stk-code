@@ -389,6 +389,18 @@ void Shaders::check(const int num) const
     }
 }
 
+static void bypassUBO(GLint Program)
+{
+    GLint VM = glGetUniformLocation(Program, "ViewMatrix");
+    glUniformMatrix4fv(VM, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
+    GLint PM = glGetUniformLocation(Program, "ProjectionMatrix");
+    glUniformMatrix4fv(PM, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
+    GLint IVM = glGetUniformLocation(Program, "InverseViewMatrix");
+    glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
+    GLint IPM = glGetUniformLocation(Program, "InverseProjectionMatrix");
+    glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
+}
+
 namespace MeshShader
 {
 
@@ -419,6 +431,8 @@ namespace MeshShader
 
     void ObjectPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_tex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
@@ -452,6 +466,8 @@ namespace MeshShader
 
     void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
@@ -520,6 +536,8 @@ namespace MeshShader
 
     void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniform1i(uniform_normalMap, TU_normalMap);
@@ -552,6 +570,8 @@ namespace MeshShader
 
     void InstancedObjectPass1Shader::setUniforms(unsigned TU_tex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform1i(uniform_tex, TU_tex);
     }
 
@@ -584,6 +604,8 @@ namespace MeshShader
 
     void InstancedObjectRefPass1Shader::setUniforms(unsigned TU_tex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform1i(uniform_tex, TU_tex);
     }
 
@@ -620,6 +642,8 @@ namespace MeshShader
 
     void InstancedGrassPass1Shader::setUniforms(const core::vector3df &windDir, unsigned TU_tex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform3f(uniform_windDir, windDir.X, windDir.Y, windDir.Z);
         glUniform1i(uniform_tex, TU_tex);
     }
@@ -665,6 +689,8 @@ namespace MeshShader
 
     void ObjectPass2Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
@@ -719,6 +745,8 @@ namespace MeshShader
 
     void InstancedObjectPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
@@ -773,6 +801,8 @@ namespace MeshShader
 
     void InstancedObjectRefPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform2f(uniform_screen, float(UserConfigParams::m_width), float(UserConfigParams::m_height));
@@ -823,6 +853,8 @@ namespace MeshShader
 
     void DetailledObjectPass2Shader::setUniforms(const core::matrix4 &ModelMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform2f(uniform_screen, float(UserConfigParams::m_width),
                                     float(UserConfigParams::m_height));
@@ -856,6 +888,8 @@ namespace MeshShader
 
     void ObjectUnlitShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
     }
 
@@ -904,6 +938,8 @@ namespace MeshShader
                                            const core::matrix4 &InverseModelMatrix,
                                            const core::matrix4 &TextureMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
@@ -946,6 +982,8 @@ namespace MeshShader
 
     void UntexturedObjectShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform2f(uniform_screen, float(UserConfigParams::m_width),
                                     float(UserConfigParams::m_height));
@@ -995,6 +1033,8 @@ namespace MeshShader
     void ObjectRefPass2Shader::setUniforms(const core::matrix4 &ModelMatrix, 
                                            const core::matrix4 &TextureMatrix)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform2f(uniform_screen, float(UserConfigParams::m_width), 
@@ -1112,6 +1152,8 @@ namespace MeshShader
 
     void InstancedGrassPass2Shader::setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_VP, 1, GL_FALSE, ViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
         glUniformMatrix4fv(uniform_IVM, 1, GL_FALSE, InverseViewMatrix.pointer());
@@ -1152,6 +1194,8 @@ namespace MeshShader
 
     void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::vector2df& screen)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniform2f(uniform_screen, screen.X, screen.Y);
@@ -1430,6 +1474,8 @@ namespace MeshShader
 
     void ColorizeShader::setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform3f(uniform_col, r, g, b);
     }
@@ -1682,6 +1728,8 @@ namespace MeshShader
 
     void SkyboxShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &screen, unsigned TU_tex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
         glUniform2f(uniform_screen, screen.X, screen.Y);

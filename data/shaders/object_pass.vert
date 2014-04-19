@@ -1,3 +1,9 @@
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+#else
 layout (std140) uniform MatrixesData
 {
     mat4 ViewMatrix;
@@ -6,6 +12,7 @@ layout (std140) uniform MatrixesData
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
 };
+#endif
 
 uniform mat4 ModelMatrix;
 uniform mat4 InverseModelMatrix;

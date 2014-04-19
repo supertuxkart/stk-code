@@ -234,6 +234,8 @@ GLuint LoadShader(const char * file, unsigned type)
     std::string Code = versionString;
 	std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
+    if (UserConfigParams::m_ubo_disabled)
+        Code += "#define UBO_DISABLED\n";
 	if (Stream.is_open())
 	{
 		std::string Line = "";
