@@ -82,7 +82,7 @@ class InstancedObjectPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_position, attrib_normal, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();

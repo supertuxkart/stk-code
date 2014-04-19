@@ -547,6 +547,7 @@ namespace MeshShader
     GLuint InstancedObjectPass1Shader::Program;
     GLuint InstancedObjectPass1Shader::attrib_position;
     GLuint InstancedObjectPass1Shader::attrib_normal;
+    GLuint InstancedObjectPass1Shader::attrib_texcoord;
     GLuint InstancedObjectPass1Shader::attrib_orientation;
     GLuint InstancedObjectPass1Shader::attrib_origin;
     GLuint InstancedObjectPass1Shader::attrib_scale;
@@ -564,6 +565,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_scale = glGetAttribLocation(Program, "Scale");
         attrib_normal = glGetAttribLocation(Program, "Normal");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_tex = glGetUniformLocation(Program, "tex");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
