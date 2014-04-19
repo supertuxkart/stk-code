@@ -572,6 +572,7 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 
 void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
+    return;
     irr_driver->IncreaseObjectCount();
   GLenum ptype = mesh.PrimitiveType;
   GLenum itype = mesh.IndexType;

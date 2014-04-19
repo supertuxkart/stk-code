@@ -32,8 +32,8 @@ void main()
     vec3 light_pos = pseudocenter.xyz;
     vec3 light_col = col.xyz;
     float d = distance(light_pos, xpos.xyz);
-    float att = energy * 200. / (4. * 3.14 * d * d);
-    float spec_att = (energy + 10.) * 200. / (4. * 3.14 * d * d);
+    float att = energy * 200. / (1 + d + 4. * 3.14 * d * d);
+    float spec_att = energy * 200. / (1 + d + 4. * 3.14 * d * d);
 
     // Light Direction
     vec3 L = -normalize(xpos.xyz - light_pos);
