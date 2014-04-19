@@ -1243,12 +1243,12 @@ static void testSH(char *color[6], size_t width, size_t height,
         blueSHCoeff, greenSHCoeff, redSHCoeff
         );
 
-    printf("Blue:\n");
-    displayCoeff(blueSHCoeff);
-    printf("Green:\n");
-    displayCoeff(greenSHCoeff);
-    printf("Red:\n");
-    displayCoeff(redSHCoeff);
+    //printf("Blue:\n");
+    //displayCoeff(blueSHCoeff);
+    //printf("Green:\n");
+    //displayCoeff(greenSHCoeff);
+    //printf("Red:\n");
+    //displayCoeff(redSHCoeff);
 
 
 
