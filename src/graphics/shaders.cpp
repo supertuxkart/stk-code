@@ -312,6 +312,7 @@ void Shaders::loadShaders()
     FullScreenShader::SunLightShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
+    FullScreenShader::ShadowedSunLightDebugShader::init();
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
     FullScreenShader::GodRayShader::init();
@@ -2188,6 +2189,41 @@ namespace FullScreenShader
         glUniform1i(uniform_dtex, TU_dtex);
         glUniform1i(uniform_shadowtex, TU_shadowtex);
         delete[] tmp;
+    }
+
+    GLuint ShadowedSunLightDebugShader::Program;
+    GLuint ShadowedSunLightDebugShader::uniform_ntex;
+    GLuint ShadowedSunLightDebugShader::uniform_dtex;
+    GLuint ShadowedSunLightDebugShader::uniform_shadowtex;
+    GLuint ShadowedSunLightDebugShader::uniform_direction;
+    GLuint ShadowedSunLightDebugShader::uniform_col;
+    GLuint ShadowedSunLightDebugShader::uniform_invproj;
+    GLuint ShadowedSunLightDebugShader::vao;
+
+    void ShadowedSunLightDebugShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadowdebug.frag").c_str());
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
+        uniform_direction = glGetUniformLocation(Program, "direction");
+        uniform_col = glGetUniformLocation(Program, "col");
+        uniform_invproj = glGetUniformLocation(Program, "invproj");
+        vao = createVAO(Program);
+    }
+
+    void ShadowedSunLightDebugShader::setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
+    {
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+        glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
+        glUniform3f(uniform_col, r, g, b);
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1i(uniform_dtex, TU_dtex);
+        glUniform1i(uniform_shadowtex, TU_shadowtex);
     }
 
     GLuint Gaussian6HBlurShader::Program;

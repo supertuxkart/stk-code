@@ -289,8 +289,6 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
 
-    glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
-    glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
     setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     glActiveTexture(GL_TEXTURE2);
@@ -301,7 +299,20 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+
+    if (irr_driver->getShadowViz())
+    {
+        glUseProgram(FullScreenShader::ShadowedSunLightDebugShader::Program);
+        glBindVertexArray(FullScreenShader::ShadowedSunLightDebugShader::vao);
+        FullScreenShader::ShadowedSunLightDebugShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+
+    }
+    else
+    {
+        glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
+        glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
+        FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+    }
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
