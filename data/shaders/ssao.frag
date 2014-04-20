@@ -13,7 +13,7 @@ varying vec2 uv;
 #define AO gl_FragColor.x
 #endif
 
-const float strengh = 3.;
+const float strengh = 5.;
 const float radius = 1.f;
 
 #define SAMPLES 16
@@ -22,7 +22,9 @@ const float invSamples = strengh / SAMPLES;
 
 vec3 rand(vec2 co)
 {
-   return texture(noise_texture, co * pow(3.14159265359, 2.)).xyz;
+	float noiseX = clamp(fract(sin(dot(co ,vec2(12.9898,78.233))) * 43758.5453),0.0,1.0)*2.0-1.0;
+	float noiseY = clamp(fract(sin(dot(co ,vec2(12.9898,78.233)*2.0)) * 43758.5453),0.0,1.0)*2.0-1.0;
+   return vec3(noiseX, noiseY, length(texture(noise_texture, co * pow(3.14159265359, 2.)).xyz));
 }
 
 vec3 DecodeNormal(vec2 n);
