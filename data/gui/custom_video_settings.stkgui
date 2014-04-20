@@ -114,6 +114,24 @@
         </div>
     </div>
     
+    <spacer height="4" width="10" />
+    
+    <div layout="horizontal-row" width="100%" height="fit">
+        <div layout="horizontal-row" proportion="1" height="fit">
+            <checkbox id="ubo"/>
+            <spacer width="10" height="10"/>
+            <label text="Uniform buffer objects" I18N="Video settings"/>
+        </div>
+        
+        <spacer height="4" width="10" />
+        <!--
+        <div layout="horizontal-row" proportion="1" height="fit">
+            <checkbox id="anim_gfx"/>
+            <spacer width="10" height="10"/>
+            <label text="Animated Scenery" I18N="Video settings"/>
+        </div>
+        -->
+    </div>
     
     <spacer height="20" width="10" />
     
