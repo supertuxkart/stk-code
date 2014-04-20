@@ -559,9 +559,9 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode,
     float FarValues[] =
     {
         6.,
-        30.,
-        70.,
-        oldfar,
+        21.,
+        55.,
+        150.,
     };
     float NearValues[] =
     {

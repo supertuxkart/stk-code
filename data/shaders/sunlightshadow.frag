@@ -100,20 +100,26 @@ void main() {
 	}
 	else if (xpos.z < 20.)
 		factor = getShadowFactor(xpos.xyz, bias, 1);
-	else if (xpos.z < 30.)
+	else if (xpos.z < 21.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 1), b = getShadowFactor(xpos.xyz, bias, 2);
-		factor = mix(a, b, (xpos.z - 20.) / 10.);
+		factor = mix(a, b, (xpos.z - 20.));
 	}
 	else if (xpos.z < 50.)
 		factor = getShadowFactor(xpos.xyz, bias, 2);
-	else if (xpos.z < 70.)
+	else if (xpos.z < 55.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 2), b = getShadowFactor(xpos.xyz, bias, 3);
-		factor = mix(a, b, (xpos.z - 50.) / 20.);
+		factor = mix(a, b, (xpos.z - 50.) / 5.);
+	}
+	else if (xpos.z < 145.)
+		factor = getShadowFactor(xpos.xyz, bias, 3);
+	else if (xpos.z < 150.)
+	{
+		factor = mix(getShadowFactor(xpos.xyz, bias, 3), 1., (xpos.z - 145.) / 5.);
 	}
 	else
-		factor = getShadowFactor(xpos.xyz, bias, 3);
+		factor = 1.;
 	Diff = vec4(factor * NdotL * col, 1.);
 	Spec = vec4(factor * Specular, 1.);
 	return;
