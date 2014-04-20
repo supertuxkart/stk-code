@@ -705,7 +705,7 @@ void PostProcessing::render()
             // Fade to quarter
             glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
             glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-            renderGodFade(irr_driver->getRenderTargetTexture(RTT_TMP2), col);
+            renderGodFade(out_rtt, col);
 
             // Blur
             renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
