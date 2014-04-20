@@ -520,11 +520,22 @@ public:
     static void setUniforms(unsigned TU_tex);
 };
 
+class ToneMapShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_logluminancetex;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(unsigned TU_tex, unsigned TU_logluminance);
+};
+
 class ColorLevelShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_invprojm,  uniform_dtex, uniform_inlevel, uniform_outlevel, uniform_logluminancetex;
+    static GLuint uniform_tex, uniform_invprojm, uniform_dtex, uniform_inlevel, uniform_outlevel;
     static GLuint vao;
 
     static void init();

@@ -234,7 +234,6 @@ void renderColorLevel(GLuint in)
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
     glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
-    glUniform1i(FullScreenShader::ColorLevelShader::uniform_logluminancetex, 2);
     glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -524,6 +523,18 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
+static void toneMap(GLuint fbo, GLuint rtt)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glUseProgram(FullScreenShader::ToneMapShader::Program);
+    glBindVertexArray(FullScreenShader::ToneMapShader::vao);
+    setTexture(0, rtt, GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
+    FullScreenShader::ToneMapShader::setUniforms(0, 1);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
 static void averageTexture(GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0);
@@ -533,6 +544,7 @@ static void averageTexture(GLuint tex)
 
 static void computeLogLuminance(GLuint tex)
 {
+    glViewport(0, 0, 1024, 1024);
     glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_LOG_LUMINANCE));
     glUseProgram(FullScreenShader::LogLuminanceShader::Program);
     glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
@@ -541,6 +553,7 @@ static void computeLogLuminance(GLuint tex)
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     averageTexture(irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE));
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 void PostProcessing::applyMLAA()
@@ -624,60 +637,65 @@ void PostProcessing::render()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
 
+/*        computeLogLuminance(in_rtt);
+        toneMap(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);*/
+
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
-            if (UserConfigParams::m_bloom)
-            {
-                glClear(GL_STENCIL_BUFFER_BIT);
+        if (UserConfigParams::m_bloom)
+        {
+            glClear(GL_STENCIL_BUFFER_BIT);
 
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_COLORS));
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
-                glBlitFramebuffer(0, 0, UserConfigParams::m_width, UserConfigParams::m_height, 0, 0, 1024, 1024, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, in_fbo);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
+            glBlitFramebuffer(0, 0, UserConfigParams::m_width, UserConfigParams::m_height, 0, 0, 1024, 1024, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
-                glViewport(0, 0, 512, 512);
-                renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+            glViewport(0, 0, 512, 512);
+            renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
 
-                // Downsample
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
-                glBlitFramebuffer(0, 0, 512, 512, 0, 0, 256, 256, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            // Downsample
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+            glBlitFramebuffer(0, 0, 512, 512, 0, 0, 256, 256, GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
-                glBlitFramebuffer(0, 0, 256, 256, 0, 0, 128, 128, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-                glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-                glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
+            glBlitFramebuffer(0, 0, 256, 256, 0, 0, 128, 128, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-                // Blur
-                glViewport(0, 0, 512, 512);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
-                    irr_driver->getFBO(FBO_TMP_512), irr_driver->getRenderTargetTexture(RTT_TMP_512), 512, 512);
+            // Blur
+            glViewport(0, 0, 512, 512);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
+                irr_driver->getFBO(FBO_TMP_512), irr_driver->getRenderTargetTexture(RTT_TMP_512), 512, 512);
 
-                glViewport(0, 0, 256, 256);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
-                    irr_driver->getFBO(FBO_TMP_256), irr_driver->getRenderTargetTexture(RTT_TMP_256), 256, 256);
+            glViewport(0, 0, 256, 256);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
+                irr_driver->getFBO(FBO_TMP_256), irr_driver->getRenderTargetTexture(RTT_TMP_256), 256, 256);
 
-                glViewport(0, 0, 128, 128);
-                renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
-                    irr_driver->getFBO(FBO_TMP_128), irr_driver->getRenderTargetTexture(RTT_TMP_128), 128, 128);
+            glViewport(0, 0, 128, 128);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
+                irr_driver->getFBO(FBO_TMP_128), irr_driver->getRenderTargetTexture(RTT_TMP_128), 128, 128);
 
-                glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+            glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
-                // Additively blend on top of tmp1
-                glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_COLORS));
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
-                glBlendEquation(GL_FUNC_ADD);
-                glBlendColor(.125, .125, .125, .125);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
-                glBlendColor(.25, .25, .25, .25);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
-                glBlendColor(.5, .5, .5, .5);
-                renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
-                glDisable(GL_BLEND);
-            } // end if bloom
+            // Additively blend on top of tmp1
+            glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+            glBlendColor(.125, .125, .125, .125);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
+            glBlendColor(.25, .25, .25, .25);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+            glBlendColor(.5, .5, .5, .5);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+            glDisable(GL_BLEND);
+        } // end if bloom
 
         PROFILER_POP_CPU_MARKER();
 
@@ -759,8 +777,6 @@ void PostProcessing::render()
             std::swap(in_rtt, out_rtt);
             PROFILER_POP_CPU_MARKER();
         }
-
-        computeLogLuminance(in_rtt);
 
         glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
         renderColorLevel(in_rtt);

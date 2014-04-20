@@ -317,6 +317,7 @@ void Shaders::loadShaders()
     FullScreenShader::GodFadeShader::init();
     FullScreenShader::GodRayShader::init();
     FullScreenShader::LogLuminanceShader::init();
+    FullScreenShader::ToneMapShader::init();
     FullScreenShader::MLAAColorEdgeDetectionSHader::init();
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
@@ -2061,9 +2062,31 @@ namespace FullScreenShader
         glUniform1i(FullScreenShader::BloomShader::uniform_texture, TU_tex);
     }
 
+    GLuint ToneMapShader::Program;
+    GLuint ToneMapShader::uniform_tex;
+    GLuint ToneMapShader::uniform_logluminancetex;
+    GLuint ToneMapShader::vao;
+
+    void ToneMapShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/tonemap.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
+        vao = createVAO(Program);
+    }
+
+    void ToneMapShader::setUniforms(unsigned TU_tex, unsigned TU_loglum)
+    {
+        glUniform1i(uniform_tex, TU_tex);
+        glUniform1i(uniform_logluminancetex, TU_loglum);
+    }
+
     GLuint ColorLevelShader::Program;
     GLuint ColorLevelShader::uniform_tex;
-    GLuint ColorLevelShader::uniform_logluminancetex;
     GLuint ColorLevelShader::uniform_inlevel;
     GLuint ColorLevelShader::uniform_outlevel;
     GLuint ColorLevelShader::vao;
@@ -2077,7 +2100,6 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/color_levels.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_inlevel = glGetUniformLocation(Program, "inlevel");
         uniform_outlevel = glGetUniformLocation(Program, "outlevel");

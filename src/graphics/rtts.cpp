@@ -86,7 +86,6 @@ RTT::RTT()
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB, GL_BGR, GL_UNSIGNED_BYTE);
-    RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_SSAO] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
 
@@ -105,6 +104,7 @@ RTT::RTT()
     RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
 
     FrameBuffers[FBO_SSAO] = generateFBO(RenderTargetTextures[RTT_SSAO]);
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
