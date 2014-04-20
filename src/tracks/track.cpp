@@ -1318,7 +1318,7 @@ void Track::handleExplosion(const Vec3 &pos, const PhysicalObject *obj,
 }   // handleExplosion
 
 // ----------------------------------------------------------------------------
-/** Creates a water node.
+/** Creates a water node. OBSOLETE, kept for backwards compat only
  *  \param node The XML node containing the specifications for the water node.
  */
 void Track::createWater(const XMLNode &node)
@@ -1328,8 +1328,13 @@ void Track::createWater(const XMLNode &node)
     std::string full_path = m_root+model_name;
 
     scene::IMesh *mesh = irr_driver->getMesh(full_path);
-    if (mesh == NULL) return;
+    if (mesh == NULL)
+    {
+        Log::warn("Track", "Water not found : '%s'", full_path.c_str());
+        return;
+    }
 
+    /*
     float wave_height  = 2.0f;
     float wave_speed   = 300.0f;
     float wave_length  = 10.0f;
@@ -1351,11 +1356,12 @@ void Track::createWater(const XMLNode &node)
         wave_speed =300.0f;
     }
     node.get("length", &wave_length);
+    */
     scene::ISceneNode* scene_node = NULL;
-
+    /*
     if (UserConfigParams::m_graphical_effects)
     {
-        /*scene::IMesh *welded;
+        scene::IMesh *welded;
         scene_node = irr_driver->addWaterNode(mesh, &welded,
                                               wave_height,
                                               wave_speed,
@@ -1365,12 +1371,12 @@ void Track::createWater(const XMLNode &node)
         irr_driver->grabAllTextures(mesh);
         m_all_cached_meshes.push_back(mesh);
 
-        mesh = welded;*/
+        mesh = welded;
     }
     else
-    {
+    {*/
         scene_node = irr_driver->addMesh(mesh);
-    }
+    //}
 
     if(!mesh || !scene_node)
     {
