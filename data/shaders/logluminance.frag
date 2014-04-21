@@ -3,7 +3,7 @@ uniform sampler2D tex;
 in vec2 uv;
 out vec4 FragColor;
 
-float delta = .1;
+float delta = .0001;
 
 void main()
 {
