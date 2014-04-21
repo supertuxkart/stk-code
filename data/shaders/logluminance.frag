@@ -9,6 +9,7 @@ void main()
 {
     vec3 weight = vec3(0.2125f, 0.7154f, 0.0721f);
     vec3 col = texture(tex, uv).xyz;
-    float luma = dot(col, weight);
+    // TODO: Investigate why color buffer has negative value sometimes
+    float luma = max(dot(col, weight), 0.);
     FragColor = vec4(log(luma + delta));
 }
