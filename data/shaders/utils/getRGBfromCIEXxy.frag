@@ -12,6 +12,6 @@ vec3 getRGBFromCIEXxy(vec3 YxyColor)
         vec3(-.4985, .0416, 1.0572)));
 
     vec3 sRGBColor = XYZ2sRGB * XYZ;
-    return sRGBColor;//vec3(pow(sRGBColor.x, 2.2), pow(sRGBColor.y, 2.2), pow(sRGBColor.z, 2.2));
+    return max(sRGBColor, vec3(0.));//vec3(pow(sRGBColor.x, 2.2), pow(sRGBColor.y, 2.2), pow(sRGBColor.z, 2.2));
 }
 
