@@ -120,8 +120,8 @@ void main() {
 	}
 	else
 		factor = 1.;
-	Diff = vec4(factor * NdotL * col, 1.);
-	Spec = vec4(factor * Specular, 1.);
+	Diff = vec4(1200. * factor * NdotL * col, 1.);
+	Spec = vec4(1200. * factor * Specular, 1.);
 	return;
 
 //	float moved = (abs(dx) + abs(dy)) * 0.5;
