@@ -106,6 +106,7 @@ IrrDriver::IrrDriver()
     m_request_screenshot  = false;
     m_shaders             = NULL;
     m_rtts                = NULL;
+    m_post_processing     = NULL;
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = 0;
@@ -124,7 +125,11 @@ IrrDriver::~IrrDriver()
     // instead we just decrease the ref count here. When the material
     // is deleted, it will trigger the actual deletion of
     // PostProcessing when decreasing the refcount of its callback object.
-    m_post_processing->drop();
+    if(m_post_processing)
+    {
+        // check if we createad the OpenGL device by calling initDevice()
+        m_post_processing->drop();
+    }
     assert(m_device != NULL);
 
     m_device->drop();

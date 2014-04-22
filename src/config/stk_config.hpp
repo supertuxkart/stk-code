@@ -137,8 +137,7 @@ public:
     std::vector<int> m_score_increase;
 
     /** Filename of the title music to play.*/
-    MusicInformation
-         *m_title_music;
+    MusicInformation *m_title_music;
 
     /** Minimum time between consecutive saved tranform events.  */
     float m_replay_dt;
