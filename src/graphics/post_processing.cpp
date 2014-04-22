@@ -778,11 +778,6 @@ void PostProcessing::render()
             PROFILER_POP_CPU_MARKER();
         }
 
-        glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
-        renderColorLevel(in_rtt);
-        std::swap(in_fbo, out_fbo);
-        std::swap(in_rtt, out_rtt);
-
         if (irr_driver->getNormals())
         {
             glEnable(GL_FRAMEBUFFER_SRGB);
