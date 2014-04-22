@@ -637,11 +637,6 @@ void PostProcessing::render()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
 
-        computeLogLuminance(in_rtt);
-        toneMap(out_fbo, in_rtt);
-        std::swap(in_rtt, out_rtt);
-        std::swap(in_fbo, out_fbo);
-
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         if (UserConfigParams::m_bloom)
         {
@@ -698,6 +693,11 @@ void PostProcessing::render()
         } // end if bloom
 
         PROFILER_POP_CPU_MARKER();
+
+        computeLogLuminance(in_rtt);
+        toneMap(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         if (UserConfigParams::m_light_shaft && m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
