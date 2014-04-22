@@ -270,7 +270,8 @@ void FeatureUnlockedCutScene::init()
         video::ITexture *t = irr_driver->getTexture(texture_names[i]);
         textures.push_back(t);
     }
-    m_sky = irr_driver->addSkyBox(textures);
+    std::vector<video::ITexture*> sh_textures;
+    m_sky = irr_driver->addSkyBox(textures, sh_textures);
 #ifdef DEBUG
     m_sky->setName("skybox");
 #endif

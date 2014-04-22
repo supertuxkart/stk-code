@@ -1351,7 +1351,60 @@ void IrrDriver::generateSkyboxCubemap()
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
 
-    testSH(rgba, w, h, blueSHCoeff, greenSHCoeff, redSHCoeff);
+    if (SphericalHarmonicsTextures.size() == 6)
+    {
+        unsigned sh_w = 0, sh_h = 0;
+        for (unsigned i = 0; i < 6; i++)
+        {
+            sh_w = MAX2(sh_w, SphericalHarmonicsTextures[i]->getOriginalSize().Width);
+            sh_h = MAX2(sh_h, SphericalHarmonicsTextures[i]->getOriginalSize().Height);
+        }
+
+        char *sh_rgba[6];
+        for (unsigned i = 0; i < 6; i++)
+            sh_rgba[i] = new char[sh_w * sh_h * 4];
+        for (unsigned i = 0; i < 6; i++)
+        {
+            unsigned idx = texture_permutation[i];
+
+            video::IImage* image = getVideoDriver()->createImageFromData(
+                SphericalHarmonicsTextures[idx]->getColorFormat(),
+                SphericalHarmonicsTextures[idx]->getSize(),
+                SphericalHarmonicsTextures[idx]->lock(),
+                false
+                );
+            SphericalHarmonicsTextures[idx]->unlock();
+
+            image->copyToScaling(sh_rgba[i], sh_w, sh_h);
+            image->drop();
+        }
+
+        testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
+
+        for (unsigned i = 0; i < 6; i++)
+            delete[] sh_rgba[i];
+    }
+    else
+    {
+        int sh_w = 16;
+        int sh_h = 16;
+
+        char *sh_rgba[6];
+        for (unsigned i = 0; i < 6; i++)
+        {
+            sh_rgba[i] = new char[sh_w * sh_h * 4];
+
+            for (int j = 0; j < sh_w * sh_h * 4; j++)
+            {
+                sh_rgba[i][j] = 150;
+            }
+        }
+
+        testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
+
+        for (unsigned i = 0; i < 6; i++)
+            delete[] sh_rgba[i];
+    }
 
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];

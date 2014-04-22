@@ -116,6 +116,7 @@ private:
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
     std::vector<video::ITexture *> SkyboxTextures;
+    std::vector<video::ITexture *> SphericalHarmonicsTextures;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];
@@ -302,7 +303,8 @@ public:
     scene::ISceneNode    *addSkyDome(video::ITexture *texture, int hori_res,
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
-    scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
+    scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names,
+                                    const std::vector<video::ITexture*> &sphericalHarmonics);
     void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);

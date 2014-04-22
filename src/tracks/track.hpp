@@ -281,6 +281,8 @@ private:
      *  in case of a dome, and 6 textures for a box. */
     std::vector<video::ITexture*> m_sky_textures;
 
+    std::vector<video::ITexture*> m_spherical_harmonics_textures;
+
     /** Used if m_sky_type is SKY_COLOR only */
     irr::video::SColor m_sky_color;
 

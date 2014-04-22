@@ -1165,11 +1165,12 @@ scene::ISceneNode *IrrDriver::addSkyDome(video::ITexture *texture,
  *  \param front: Texture for the front plane of the box.
  *  \param back: Texture for the back plane of the box.
  */
-scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
-                                        &texture)
+scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &texture,
+    const std::vector<video::ITexture*> &sphericalHarmonics)
 {
     assert(texture.size() == 6);
     SkyboxTextures = texture;
+    SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
@@ -1179,6 +1180,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*>
 void IrrDriver::suppressSkyBox()
 {
     SkyboxTextures.clear();
+    SphericalHarmonicsTextures.clear();
     if (SkyboxCubeMap)
         glDeleteTextures(1, &SkyboxCubeMap);
     SkyboxCubeMap = 0;

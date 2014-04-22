@@ -285,6 +285,14 @@ void Track::cleanup()
     }
     m_sky_textures.clear();
 
+    for (unsigned int i = 0; i<m_spherical_harmonics_textures.size(); i++)
+    {
+        m_spherical_harmonics_textures[i]->drop();
+        if (m_spherical_harmonics_textures[i]->getReferenceCount() == 1)
+            irr_driver->removeTexture(m_spherical_harmonics_textures[i]);
+    }
+    m_spherical_harmonics_textures.clear();
+
     if(m_cache_track)
         material_manager->makeMaterialsPermanent();
     else
@@ -1643,7 +1651,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
     else if(m_sky_type==SKY_BOX && m_sky_textures.size() == 6)
     {
-        m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures));
+        //if (m_spherical_harmonics_textures.size() > 0)
+            m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_spherical_harmonics_textures));
+        //else
+        //    m_all_nodes.push_back(irr_driver->addSkyBox(m_sky_textures, m_sky_textures));
     }
     else if(m_sky_type==SKY_COLOR)
     {
@@ -2097,6 +2108,24 @@ void Track::handleSky(const XMLNode &xml_node, const std::string &filename)
         {
             m_sky_type = SKY_BOX;
         }
+
+        std::string sh_textures;
+        xml_node.get("sh-texture", &sh_textures);
+        v = StringUtils::split(sh_textures, ' ');
+        for (unsigned int i = 0; i<v.size(); i++)
+        {
+            video::ITexture *t = irr_driver->getTexture(v[i]);
+            if (t)
+            {
+                t->grab();
+                m_spherical_harmonics_textures.push_back(t);
+            }
+            else
+            {
+                Log::error("track", "Sky-box spherical harmonics texture '%s' not found - ignored.",
+                    v[i].c_str());
+            }
+        }   // for i<v.size()
     }
     else if (xml_node.getName() == "sky-color")
     {
