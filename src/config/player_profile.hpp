@@ -44,6 +44,9 @@ class UTFWriter;
  *  A PlayerProfile keeps track of the story mode progress using an instance
  *  of StoryModeStatus, and achievements with AchievementsStatus. All data
  *  is saved in the players.xml file.
+ *  This class also defines the interface for handling online data. All of
+ *  the online handling is done in the derived class OnlinePlayerProfile,
+ *  where the interface is fully implemented.
  * \ingroup config
  */
 class PlayerProfile : public NoCopy
