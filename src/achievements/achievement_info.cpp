@@ -147,7 +147,7 @@ bool AchievementInfo::checkCompletion(Achievement * achievement) const
         return false;
     }
     default:
-        Log::fatal("AchievementInfo", "Missing check for tpye %d.",
+        Log::fatal("AchievementInfo", "Missing check for type %d.",
                    m_check_type);
     }   // switch
 

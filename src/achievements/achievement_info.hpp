@@ -42,16 +42,18 @@ class AchievementInfo
 {
 public:
     /** Some handy names for the various achievements. */
-    enum { ACHIEVE_COLUMBUS    = 1,
-           ACHIEVE_FIRST       = ACHIEVE_COLUMBUS,
-           ACHIEVE_STRIKE      = 2,
-           ACHIEVE_ARCH_ENEMY  = 3,
-           ACHIEVE_MARATHONER  = 4,
-           ACHIEVE_SKIDDING    = 5,
-           ACHIEVE_GOLD_DRIVER = 6,
+    enum { ACHIEVE_COLUMBUS      = 1,
+           ACHIEVE_FIRST         = ACHIEVE_COLUMBUS,
+           ACHIEVE_STRIKE        = 2,
+           ACHIEVE_ARCH_ENEMY    = 3,
+           ACHIEVE_MARATHONER    = 4,
+           ACHIEVE_SKIDDING      = 5,
+           ACHIEVE_GOLD_DRIVER   = 6,
            ACHIEVE_POWERUP_LOVER = 7,
-           ACHIEVE_UNSTOPPABLE = 8
+           ACHIEVE_UNSTOPPABLE   = 8,
+           ACHIEVE_BANANA        = 9
     };
+
     /** Achievement check type:
      *  ALL_AT_LEAST: All goal values must be reached (or exceeded).
      *  ONE_AT_LEAST: At least one current value reaches or exceedes the goal.
