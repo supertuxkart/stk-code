@@ -1153,7 +1153,8 @@ void SkiddingAI::handleItems(const float dt)
 
     if (m_superpower == RaceManager::SUPERPOWER_NOLOK_BOSS)
     {
-        m_controls->m_look_back = (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_BOWLING);
+        m_controls->m_look_back = (m_kart->getPowerup()->getType() ==
+                                   PowerupManager::POWERUP_BOWLING    );
 
         if( m_time_since_last_shot > 3.0f )
         {
@@ -1161,7 +1162,10 @@ void SkiddingAI::handleItems(const float dt)
             if (m_kart->getPowerup()->getType() == PowerupManager::POWERUP_SWATTER)
                 m_time_since_last_shot = 3.0f;
             else
-                m_time_since_last_shot = (rand() % 1000) / 1000.0f * 3.0f - 2.0f; // to make things less predictable :)
+            {
+                // to make things less predictable :)
+                m_time_since_last_shot = (rand() % 1000) / 1000.0f * 3.0f - 2.0f;
+            }
         }
         else
         {
@@ -1241,28 +1245,46 @@ void SkiddingAI::handleItems(const float dt)
     // towards m_kart_ahead.
     case PowerupManager::POWERUP_CAKE:
         {
-            // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a cake.
+            // if the kart has a shield, do not break it by using a cake.
+            if(m_kart->getShieldTime() > min_bubble_time)
                 break;
             // Leave some time between shots
             if(m_time_since_last_shot<3.0f) break;
 
             // Do not fire if the kart is driving too slow
-            bool kart_behind_is_slow = (m_kart_behind && m_kart_behind->getSpeed() < m_kart->getSpeed());
-            bool kart_ahead_is_slow = (m_kart_ahead && m_kart_ahead->getSpeed() < m_kart->getSpeed());
-            // Since cakes can be fired all around, just use a sane distance
-            // with a bit of extra for backwards, as enemy will go towards cake
+            bool kart_behind_is_slow =
+                (m_kart_behind && m_kart_behind->getSpeed() < m_kart->getSpeed());
+            bool kart_ahead_is_slow =
+                (m_kart_ahead && m_kart_ahead->getSpeed() < m_kart->getSpeed());
+            // Consider firing backwards if there is no kart ahead or it is
+            // slower. Also, if the kart behind is closer and not slower than
+            // this kart.
             bool fire_backwards = !m_kart_ahead ||
-                                  (m_kart_behind && m_kart_ahead && 
-                                    (m_distance_behind < m_distance_ahead || kart_ahead_is_slow) &&
+                                  (m_kart_behind                             && 
+                                    (m_distance_behind < m_distance_ahead || 
+                                     kart_ahead_is_slow                    ) &&
                                     !kart_behind_is_slow
                                   );
-            if ((fire_backwards && kart_behind_is_slow) || (!fire_backwards && kart_ahead_is_slow))
+
+            // Don't fire at a kart that is slower than us. Reason is that
+            // we can either save the cake for later since we will overtake
+            // the kart anyway, or that this might force the kart ahead to
+            // use its nitro/zipper (and then we will shoot since then the
+            // kart is faster).
+            if ((fire_backwards && kart_behind_is_slow) || 
+                (!fire_backwards && kart_ahead_is_slow)    )
                 break;
+
+            // Don't fire if the kart we are aiming at is invulnerable.
+            if (fire_backwards  && m_kart_behind->isInvulnerable() ||
+                !fire_backwards && m_kart_ahead->isInvulnerable()     )
+                return;
 
             float distance = fire_backwards ? m_distance_behind
                                             : m_distance_ahead;
-            m_controls->m_fire = (fire_backwards && distance < 25.0f)  ||
+            // Since cakes can be fired all around, just use a sane distance
+            // with a bit of extra for backwards, as enemy will go towards cake
+            m_controls->m_fire = (fire_backwards && distance < 25.0f) ||
                                  (!fire_backwards && distance < 20.0f);
             if(m_controls->m_fire)
                 m_controls->m_look_back = fire_backwards;
@@ -1271,8 +1293,8 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_BOWLING:
         {
-            // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a bowling ball.
+            // if the kart has a shield, do not break it by using a bowling ball.
+            if(m_kart->getShieldTime() > min_bubble_time)
                 break;
             // Leave more time between bowling balls, since they are
             // slower, so it should take longer to hit something which
@@ -1301,8 +1323,8 @@ void SkiddingAI::handleItems(const float dt)
 
     case PowerupManager::POWERUP_PLUNGER:
         {
-            // Do not destroy your own shield
-            if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a plunger.
+            // if the kart has a shield, do not break it by using a plunger.
+            if(m_kart->getShieldTime() > min_bubble_time)
                 break;
 
             // Leave more time after a plunger, since it will take some
@@ -1375,8 +1397,8 @@ void SkiddingAI::handleItems(const float dt)
             break;
         }
     case PowerupManager::POWERUP_RUBBERBALL:
-        // Do not destroy your own shield
-        if(m_kart->getShieldTime() > min_bubble_time) // if the kart has a shield, do not break it by using a swatter.
+        // if the kart has a shield, do not break it by using a swatter.
+        if(m_kart->getShieldTime() > min_bubble_time)
             break;
         // Perhaps some more sophisticated algorithm might be useful.
         // For now: fire if there is a kart ahead (which means that
@@ -1728,7 +1750,8 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;
-                Vec3 other_kart_xyz = other_kart->getXYZ() + other_kart->getVelocity()*(i*dt);
+                Vec3 other_kart_xyz = other_kart->getXYZ() 
+                                    + other_kart->getVelocity()*(i*dt);
                 float kart_distance = (step_coord - other_kart_xyz).length_2d();
 
                 if( kart_distance < m_kart_length)
