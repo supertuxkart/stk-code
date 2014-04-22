@@ -9,8 +9,8 @@ out vec4 FragColor;
 vec3 getCIEYxy(vec3 rgbColor);
 vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
-float exposure = .18;
-float Lwhite = 1.;
+float exposure = .045;
+float Lwhite = 100.;
 float delta = .0001;
 float saturation = 1.;
 
