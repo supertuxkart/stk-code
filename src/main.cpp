@@ -201,6 +201,7 @@
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
+static void cleanUserConfig();
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -462,10 +463,10 @@ void cmdLineHelp()
  */
 int handleCmdLinePreliminary()
 {
-    if(CommandLine::has("--help") || CommandLine::has("--help") ||
-       CommandLine::has("-h"))
+    if(CommandLine::has("--help") || CommandLine::has("-h"))
     {
         cmdLineHelp();
+        cleanUserConfig();
         exit(0);
     }
 
@@ -478,6 +479,7 @@ int handleCmdLinePreliminary()
                           IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
                           IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
         Log::info("main", "==============================");
+        cleanUserConfig();
         exit(0);
     }
 
@@ -1213,8 +1215,10 @@ int main(int argc, char *argv[] )
         // If the server has been created (--server option), this will do nothing (just a warning):
         NetworkManager::getInstance<ClientNetworkManager>();
         if (NetworkManager::getInstance()->isServer())
+        {
             ServerNetworkManager::getInstance()->setMaxPlayers(
                     UserConfigParams::m_server_max_players);
+        }
         NetworkManager::getInstance()->run();
         if (NetworkManager::getInstance()->isServer())
         {
@@ -1443,15 +1447,24 @@ static void cleanSuperTuxKart()
     if(sfx_manager)             delete sfx_manager;
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
-    if(stk_config)              delete stk_config;
-    if(user_config)             delete user_config;
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
-    if(translations)            delete translations;
-    if(file_manager)            delete file_manager;
-    if(irr_driver)              delete irr_driver;
+
+    cleanUserConfig();
 
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
 }   // cleanSuperTuxKart
 
+//=============================================================================
+/**
+ * Frees all the memory of initUserConfig()
+ */
+static void cleanUserConfig()
+{
+    if(stk_config)              delete stk_config;
+    if(translations)            delete translations;
+    if(user_config)             delete user_config;
+    if(file_manager)            delete file_manager;
+    if(irr_driver)              delete irr_driver;
+}
