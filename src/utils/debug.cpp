@@ -29,6 +29,7 @@
 #include "race/history.hpp"
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
+#include "states_screens/dialogs/debug_slider.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include <IGUIEnvironment.h>
@@ -77,7 +78,9 @@ enum DebugMenuCommand
     DEBUG_ATTACHMENT_BOMB,
     DEBUG_ATTACHMENT_ANVIL,
     DEBUG_TOGGLE_GUI,
-    DEBUG_THROTTLE_FPS
+    DEBUG_THROTTLE_FPS,
+    DEBUG_TWEAK_SHADER_EXPOSURE,
+    DEBUG_TWEAK_SHADER_LWHITE
 };
 
 // -----------------------------------------------------------------------------
@@ -177,6 +180,11 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
+
+            mnu->addItem(L"Adjust shaders >", -1, true, true);
+            sub = mnu->getSubMenu(3);
+            sub->addItem(L"Exposure", DEBUG_TWEAK_SHADER_EXPOSURE);
+            sub->addItem(L"LWhite", DEBUG_TWEAK_SHADER_LWHITE);
 
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
@@ -369,15 +377,15 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_ATTACHMENT_ANVIL)
                 {
-            addAttachment(Attachment::ATTACH_ANVIL);
+                    addAttachment(Attachment::ATTACH_ANVIL);
                 }
                 else if (cmdID == DEBUG_ATTACHMENT_BOMB)
                 {
-            addAttachment(Attachment::ATTACH_BOMB);
+                    addAttachment(Attachment::ATTACH_BOMB);
                 }
                 else if (cmdID == DEBUG_ATTACHMENT_PARACHUTE)
                 {
-            addAttachment(Attachment::ATTACH_PARACHUTE);
+                    addAttachment(Attachment::ATTACH_PARACHUTE);
                 }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {
@@ -393,6 +401,14 @@ bool onEvent(const SEvent &event)
                         if (kart->getController()->isPlayerController())
                             kart->getNode()->setVisible(gui->m_enabled);
                     }
+                }
+                else if (cmdID == DEBUG_TWEAK_SHADER_EXPOSURE)
+                {
+                    new DebugSliderDialog("exposure", "Exposure");
+                }
+                else if (cmdID == DEBUG_TWEAK_SHADER_LWHITE)
+                {
+                    new DebugSliderDialog("lwhite", "LWhite");
                 }
             }
 

@@ -2177,7 +2177,8 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 {
     if (ModalDialog::getCurrent() == NULL) return rect;
 
-    drawBGFadeColor();
+    if (ModalDialog::getCurrent()->fadeBackground())
+        drawBGFadeColor();
 
     // draw frame
     if (m_dialog_size < 1.0f)
