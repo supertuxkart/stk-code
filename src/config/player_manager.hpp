@@ -58,6 +58,9 @@ private:
 
     PtrVector<PlayerProfile> m_all_players;
 
+    /** A list of all online ids created locally. */
+    std::vector<core::stringw> m_all_online_ids;
+
     /** A pointer to the current player. */
     PlayerProfile* m_current_player;
 
@@ -113,6 +116,7 @@ public:
                                              const irr::core::stringw &password,
                                              bool save_session,
                                               bool request_now = true);
+    void addOnlineId(const core::stringw &online_id);
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */
@@ -154,6 +158,13 @@ public:
         }
         a->increase(key, increase);
     }   // increaseAchievement
+    // ------------------------------------------------------------------------
+    /** Returns the list of all online ids. */
+    const std::vector<core::stringw>& getAllOnlineIds() const
+    {
+        return m_all_online_ids;
+    }   // getAllOnlineIds
+    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
 };   // PlayerManager
 

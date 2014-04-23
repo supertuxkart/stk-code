@@ -99,6 +99,7 @@ void LoginScreen::login()
         info_widget->setDefaultColor();
         bool remember = getWidget<CheckBoxWidget>("remember")->getState();
         PlayerManager::requestSignIn(username, password, remember);
+        PlayerManager::get()->addOnlineId(username);
     }
 }   // login
 

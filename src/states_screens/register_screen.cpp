@@ -17,6 +17,7 @@
 
 #include "states_screens/register_screen.hpp"
 
+#include "config/player_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -103,6 +104,7 @@ void RegisterScreen::doRegister()
     }
     else
     {
+        PlayerManager::get()->addOnlineId(username);
         m_info_widget->setDefaultColor();
         new RegistrationDialog();
         return;
