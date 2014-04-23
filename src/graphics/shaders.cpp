@@ -518,6 +518,7 @@ namespace MeshShader
     GLuint NormalMapShader::uniform_MM;
     GLuint NormalMapShader::uniform_IMM;
     GLuint NormalMapShader::uniform_normalMap;
+    GLuint NormalMapShader::uniform_DiffuseForAlpha;
 
     void NormalMapShader::init()
     {
@@ -532,17 +533,19 @@ namespace MeshShader
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_normalMap = glGetUniformLocation(Program, "normalMap");
+        uniform_DiffuseForAlpha = glGetUniformLocation(Program, "DiffuseForAlpha");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap)
+    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap, unsigned TU_uniform_DiffuseForAlpha)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniform1i(uniform_normalMap, TU_normalMap);
+        glUniform1i(uniform_DiffuseForAlpha, TU_uniform_DiffuseForAlpha);
     }
 
     GLuint InstancedObjectPass1Shader::Program;

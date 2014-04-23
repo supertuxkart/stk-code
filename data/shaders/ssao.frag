@@ -66,5 +66,5 @@ void main(void)
 		bl += isOccluded ? samplePoints[i].z * smoothstep(5 * radius, 0, distance(samplePos, FragPos)) : 0.;
 	}
 
-	AO = 1.0 - bl * invSamples;
+	AO = max(1.0 - bl * invSamples, 0.);
 }
