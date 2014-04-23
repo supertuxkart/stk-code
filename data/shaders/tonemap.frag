@@ -9,8 +9,8 @@ out vec4 FragColor;
 vec3 getCIEYxy(vec3 rgbColor);
 vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
-float exposure = .4;
-float whitePoint = 1.5;
+float exposure = .3;
+float whitePoint = 1.;
 float delta = .1;
 
 void main()
@@ -22,5 +22,6 @@ void main()
     vec3 Yxy = getCIEYxy(col.xyz);
     float Lp = Yxy.r * exposure / avgLuminance;
     Yxy.r = (Lp * (1. * Lp / (whitePoint * whitePoint))) / (1. + Lp);
-    FragColor.xyz = getRGBFromCIEXxy(Yxy);
+    FragColor = vec4(getRGBFromCIEXxy(Yxy), 1.);
+
 }

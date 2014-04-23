@@ -637,10 +637,10 @@ void PostProcessing::render()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
 
-/*        computeLogLuminance(in_rtt);
+        computeLogLuminance(in_rtt);
         toneMap(out_fbo, in_rtt);
         std::swap(in_rtt, out_rtt);
-        std::swap(in_fbo, out_fbo);*/
+        std::swap(in_fbo, out_fbo);
 
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         if (UserConfigParams::m_bloom)
