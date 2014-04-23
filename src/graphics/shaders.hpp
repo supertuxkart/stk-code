@@ -531,6 +531,17 @@ public:
     static void setUniforms(unsigned TU_tex, unsigned TU_logluminance);
 };
 
+class DepthOfFieldShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_depth, uniform_screen, uniform_invproj;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &invproj, const core::vector2df &screen, unsigned TU_tex, unsigned TU_depth);
+};
+
 class ColorLevelShader
 {
 public:

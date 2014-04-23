@@ -535,6 +535,19 @@ static void toneMap(GLuint fbo, GLuint rtt)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
+static void renderDoF(GLuint fbo, GLuint rtt)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glUseProgram(FullScreenShader::DepthOfFieldShader::Program);
+    glBindVertexArray(FullScreenShader::DepthOfFieldShader::vao);
+    setTexture(0, rtt, GL_LINEAR, GL_LINEAR);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::DepthOfFieldShader::setUniforms(irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
 static void averageTexture(GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0);
@@ -636,6 +649,10 @@ void PostProcessing::render()
         // As the original color shouldn't be touched, the first effect can't be disabled.
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
+
+        renderDoF(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         if (UserConfigParams::m_light_shaft && m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays

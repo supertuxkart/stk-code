@@ -298,6 +298,7 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
+    FullScreenShader::DepthOfFieldShader::init();
     FullScreenShader::ColorLevelShader::init();
     FullScreenShader::FogShader::init();
     FullScreenShader::Gaussian3HBlurShader::init();
@@ -2086,6 +2087,33 @@ namespace FullScreenShader
     {
         glUniform1i(uniform_tex, TU_tex);
         glUniform1i(uniform_logluminancetex, TU_loglum);
+    }
+
+    GLuint DepthOfFieldShader::Program;
+    GLuint DepthOfFieldShader::uniform_tex;
+    GLuint DepthOfFieldShader::uniform_depth;
+    GLuint DepthOfFieldShader::uniform_invproj;
+    GLuint DepthOfFieldShader::uniform_screen;
+    GLuint DepthOfFieldShader::vao;
+
+    void DepthOfFieldShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/dof.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_depth = glGetUniformLocation(Program, "dtex");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_invproj = glGetUniformLocation(Program, "invprojm");
+        vao = createVAO(Program);
+    }
+
+    void DepthOfFieldShader::setUniforms(const core::matrix4 &invproj, const core::vector2df &screen, unsigned TU_tex, unsigned TU_dtex)
+    {
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+        glUniform1i(uniform_tex, TU_tex);
+        glUniform1i(uniform_depth, TU_dtex);
     }
 
     GLuint ColorLevelShader::Program;
