@@ -292,8 +292,10 @@ void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const
 	assert(mesh.textures[1]);
     compressTexture(mesh.textures[1], false);
     setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    compressTexture(mesh.textures[0], true);
+    setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-    MeshShader::NormalMapShader::setUniforms(ModelMatrix, InverseModelMatrix, 0);
+    MeshShader::NormalMapShader::setUniforms(ModelMatrix, InverseModelMatrix, 0, 1);
 
     assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);
