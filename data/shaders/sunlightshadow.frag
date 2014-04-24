@@ -53,7 +53,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 	float sum = 0.;
 	for (int i = 0; i < 4; i++)
 	{
-		sum += texture(shadowtex, vec4(shadowtexcoord + shadowoffset[i] / 2048., float(index), 0.5 * (shadowcoord.z - bias * 0.01) + 0.5));
+		sum += texture(shadowtex, vec4(shadowtexcoord + shadowoffset[i] / 2048., float(index), 0.5 * shadowcoord.z + 0.5 + bias));
 	}
 	return sum / 4.;
 }
@@ -88,8 +88,8 @@ void main() {
 //	}
 
 	// Shadows
-	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
-	bias = clamp(bias, 0.001, 0.014);
+	float bias = 0.005 * tan(acos(NdotL)); // According to the slope
+	bias = clamp(bias, 0., 0.01);
 	float factor;
 	if (xpos.z < 5.)
 		factor = getShadowFactor(xpos.xyz, bias, 0);
