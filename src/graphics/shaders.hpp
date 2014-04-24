@@ -524,11 +524,11 @@ class ToneMapShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_logluminancetex;
+    static GLuint uniform_tex, uniform_logluminancetex, uniform_exposure, uniform_lwhite;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(unsigned TU_tex, unsigned TU_logluminance);
+    static void setUniforms(float exposure, float Lwhite, unsigned TU_tex, unsigned TU_logluminance);
 };
 
 class DepthOfFieldShader

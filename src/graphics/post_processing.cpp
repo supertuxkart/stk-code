@@ -530,7 +530,7 @@ static void toneMap(GLuint fbo, GLuint rtt)
     glBindVertexArray(FullScreenShader::ToneMapShader::vao);
     setTexture(0, rtt, GL_NEAREST, GL_NEAREST);
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
-    FullScreenShader::ToneMapShader::setUniforms(0, 1);
+    FullScreenShader::ToneMapShader::setUniforms(irr_driver->getExposure(), irr_driver->getLwhite(), 0, 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

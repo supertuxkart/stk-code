@@ -99,6 +99,8 @@ private:
     Shaders              *m_shaders;
     /** Wind. */
     Wind                 *m_wind;
+    float                m_exposure;
+    float                m_lwhite;
     /** RTTs. */
     RTT                *m_rtts;
     /** Shadow importance. */
@@ -158,6 +160,26 @@ public:
             return 100 + (GLMinorVersion + 3) * 10;
         else
             return 120;
+    }
+
+    float getExposure() const
+    {
+        return m_exposure;
+    }
+
+    void setExposure(float v)
+    {
+        m_exposure = v;
+    }
+
+    float getLwhite() const
+    {
+      return m_lwhite;
+    }
+
+    void setLwhite(float v)
+    {
+        m_lwhite = v;
     }
 
 private:

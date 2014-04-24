@@ -2,6 +2,8 @@
 
 uniform sampler2D tex;
 uniform sampler2D logluminancetex;
+uniform float exposure = .09;
+uniform float Lwhite = 1.;
 
 in vec2 uv;
 out vec4 FragColor;
@@ -9,8 +11,7 @@ out vec4 FragColor;
 vec3 getCIEYxy(vec3 rgbColor);
 vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
-float exposure = .09;
-float Lwhite = 1.;
+
 float delta = .0001;
 float saturation = 1.;
 

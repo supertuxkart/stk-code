@@ -26,6 +26,7 @@
 #include "modes/world.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
+#include "graphics/irr_driver.hpp"
 
 using namespace GUIEngine;
 
@@ -73,6 +74,10 @@ GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& e
     {
         int value = getWidget<SpinnerWidget>("value_slider")->getValue();
         Log::info("DebugSlider", "Value for <%s> : %i", m_id.c_str(), value);
+        if (m_id == "lwhite")
+            irr_driver->setLwhite(value / 10.);
+        if (m_id == "exposure")
+            irr_driver->setExposure(value / 100.);
         return GUIEngine::EVENT_BLOCK;
     }
 
