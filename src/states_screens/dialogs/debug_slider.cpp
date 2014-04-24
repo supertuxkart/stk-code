@@ -48,6 +48,14 @@ DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg) :
 
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
+
+    float val;
+    if (m_id == "lwhite")
+      val = irr_driver->getLwhite() * 10.;
+    if (m_id == "exposure")
+      val = irr_driver->getExposure() * 100.;
+
+    getWidget<SpinnerWidget>("value_slider")->setValue(val);
 }
 
 // ------------------------------------------------------------------------------------------------------

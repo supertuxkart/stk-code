@@ -2091,8 +2091,8 @@ namespace FullScreenShader
     {
         glUniform1i(uniform_tex, TU_tex);
         glUniform1i(uniform_logluminancetex, TU_loglum);
-//        glUniform1f(uniform_exposure, exposure);
-//        glUniform1f(uniform_lwhite, Lwhite);
+        glUniform1f(uniform_exposure, exposure);
+        glUniform1f(uniform_lwhite, Lwhite);
     }
 
     GLuint DepthOfFieldShader::Program;
