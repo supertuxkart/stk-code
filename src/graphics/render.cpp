@@ -665,8 +665,8 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     irr_driver->setPhase(SHADOW_PASS);
     glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.5, 0.);
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
     glViewport(0, 0, 1024, 1024);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -674,7 +674,7 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    glCullFace(GL_BACK);
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
 
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);

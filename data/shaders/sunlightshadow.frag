@@ -53,7 +53,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 	float sum = 0.;
 	for (int i = 0; i < 4; i++)
 	{
-		sum += texture(shadowtex, vec4(shadowtexcoord + shadowoffset[i] / 2048., float(index), 0.5 * shadowcoord.z + 0.5 + bias));
+		sum += texture(shadowtex, vec4(shadowtexcoord + shadowoffset[i] / 2048., float(index), 0.5 * shadowcoord.z + 0.5));
 	}
 	return sum / 4.;
 }
