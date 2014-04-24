@@ -655,7 +655,8 @@ void PostProcessing::render()
         std::swap(in_fbo, out_fbo);
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
-        if (UserConfigParams::m_light_shaft && m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
+        const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+        if (UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
             glEnable(GL_DEPTH_TEST);
             // Grab the sky

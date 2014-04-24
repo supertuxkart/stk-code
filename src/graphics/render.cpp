@@ -236,7 +236,7 @@ void IrrDriver::renderGLSL(float dt)
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-        if (UserConfigParams::m_light_shaft)//hasflare || hasgodrays)
+        if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
