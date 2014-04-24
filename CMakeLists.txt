@@ -13,6 +13,8 @@ endif()
 
 option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
+option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
+
 if(UNIX)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
 endif()
@@ -319,10 +321,13 @@ if(NOT IS_DIRECTORY ../data)
 endif()
 
 # ==== Checking if stk-assets folder exists ====
-if(NOT IS_DIRECTORY ../../stk-assets)
-  set (CUR_DIR ${CMAKE_CURRENT_SOURCE_DIR})
-  get_filename_component(PARENT_DIR ${CUR_DIR} PATH)
-  message( FATAL_ERROR "${PARENT_DIR}/stk-assets folder doesn't exist" )
+if(CHECK_ASSETS)
+  if(NOT IS_DIRECTORY ../../stk-assets)
+    set (CUR_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    get_filename_component(PARENT_DIR ${CUR_DIR} PATH)
+    message( FATAL_ERROR "${PARENT_DIR}/stk-assets folder doesn't exist. "
+      "Please download the stk-assets, or disable this test with -DCHECK_ASSETS=off." )
+  endif()
 endif()
 
 set(PREFIX ${CMAKE_INSTALL_PREFIX})

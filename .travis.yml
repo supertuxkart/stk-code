@@ -24,7 +24,7 @@ script:
   #  Build commands
   - mkdir build
   - cd build
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off
   - make VERBOSE=1 -j 4 
 notifications:
   irc:
