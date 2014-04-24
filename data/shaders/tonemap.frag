@@ -1,4 +1,4 @@
-#define AUTO_EXPOSURE
+// From http://www.ceng.metu.edu.tr/~akyuz/files/hdrgpu.pdf
 
 uniform sampler2D tex;
 uniform sampler2D logluminancetex;
@@ -9,18 +9,23 @@ out vec4 FragColor;
 vec3 getCIEYxy(vec3 rgbColor);
 vec3 getRGBFromCIEXxy(vec3 YxyColor);
 
-float exposure = .4;
-float whitePoint = 1.5;
-float delta = .1;
+float exposure = .09;
+float Lwhite = 1.;
+float delta = .0001;
+float saturation = 1.;
 
 void main()
 {
     vec4 col = texture(tex, uv);
-    float avgLuminance = textureLod(logluminancetex, uv, 10.).x;
-    avgLuminance = exp(avgLuminance) - delta;
+    float avgLw = textureLod(logluminancetex, uv, 10.).x;
+    avgLw = max(exp(avgLw) - delta, delta);
 
-    vec3 Yxy = getCIEYxy(col.xyz);
-    float Lp = Yxy.r * exposure / avgLuminance;
-    Yxy.r = (Lp * (1. * Lp / (whitePoint * whitePoint))) / (1. + Lp);
-    FragColor.xyz = getRGBFromCIEXxy(Yxy);
+    vec3 Cw = getCIEYxy(col.xyz);
+    float Lw = Cw.y;
+    float L = Lw * exposure / avgLw;
+    float Ld = L * (1. + L / (Lwhite * Lwhite));
+    Ld /= (1. + L);
+
+    FragColor = vec4(Ld * pow(col.xyz / Lw, vec3(saturation)), 1.);
+
 }

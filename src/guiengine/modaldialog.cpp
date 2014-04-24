@@ -52,6 +52,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
 {
     m_dialog_location = location;
     m_init            = false;
+    m_fade_background = true;
     m_percent_width   = percentWidth;
     m_percent_height  = percentHeight;
     m_irrlicht_window = NULL;

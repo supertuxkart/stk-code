@@ -56,6 +56,8 @@ void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
 
+    Track *track = world->getTrack();
+
     // Overrides
     video::SOverrideMaterial &overridemat = m_video_driver->getOverrideMaterial();
     overridemat.EnablePasses = scene::ESNRP_SOLID | scene::ESNRP_TRANSPARENT;
@@ -184,8 +186,8 @@ void IrrDriver::renderGLSL(float dt)
 
         PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
         // Shadows
-        if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights && UserConfigParams::m_shadows)
-           //&& World::getWorld()->getTrack()->hasShadows())
+        if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
+            UserConfigParams::m_shadows && track->hasShadows())
         {
             renderShadows(camnode, camera);
         }

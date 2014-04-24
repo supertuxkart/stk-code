@@ -298,6 +298,7 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
+    FullScreenShader::DepthOfFieldShader::init();
     FullScreenShader::ColorLevelShader::init();
     FullScreenShader::FogShader::init();
     FullScreenShader::Gaussian3HBlurShader::init();
@@ -518,6 +519,7 @@ namespace MeshShader
     GLuint NormalMapShader::uniform_MM;
     GLuint NormalMapShader::uniform_IMM;
     GLuint NormalMapShader::uniform_normalMap;
+    GLuint NormalMapShader::uniform_DiffuseForAlpha;
 
     void NormalMapShader::init()
     {
@@ -532,17 +534,19 @@ namespace MeshShader
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_normalMap = glGetUniformLocation(Program, "normalMap");
+        uniform_DiffuseForAlpha = glGetUniformLocation(Program, "DiffuseForAlpha");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap)
+    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap, unsigned TU_uniform_DiffuseForAlpha)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
         glUniform1i(uniform_normalMap, TU_normalMap);
+        glUniform1i(uniform_DiffuseForAlpha, TU_uniform_DiffuseForAlpha);
     }
 
     GLuint InstancedObjectPass1Shader::Program;
@@ -2083,6 +2087,33 @@ namespace FullScreenShader
     {
         glUniform1i(uniform_tex, TU_tex);
         glUniform1i(uniform_logluminancetex, TU_loglum);
+    }
+
+    GLuint DepthOfFieldShader::Program;
+    GLuint DepthOfFieldShader::uniform_tex;
+    GLuint DepthOfFieldShader::uniform_depth;
+    GLuint DepthOfFieldShader::uniform_invproj;
+    GLuint DepthOfFieldShader::uniform_screen;
+    GLuint DepthOfFieldShader::vao;
+
+    void DepthOfFieldShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/dof.frag").c_str());
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_depth = glGetUniformLocation(Program, "dtex");
+        uniform_screen = glGetUniformLocation(Program, "screen");
+        uniform_invproj = glGetUniformLocation(Program, "invprojm");
+        vao = createVAO(Program);
+    }
+
+    void DepthOfFieldShader::setUniforms(const core::matrix4 &invproj, const core::vector2df &screen, unsigned TU_tex, unsigned TU_dtex)
+    {
+        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
+        glUniform2f(uniform_screen, screen.X, screen.Y);
+        glUniform1i(uniform_tex, TU_tex);
+        glUniform1i(uniform_depth, TU_dtex);
     }
 
     GLuint ColorLevelShader::Program;

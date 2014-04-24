@@ -535,6 +535,19 @@ static void toneMap(GLuint fbo, GLuint rtt)
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
+static void renderDoF(GLuint fbo, GLuint rtt)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glUseProgram(FullScreenShader::DepthOfFieldShader::Program);
+    glBindVertexArray(FullScreenShader::DepthOfFieldShader::vao);
+    setTexture(0, rtt, GL_LINEAR, GL_LINEAR);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::DepthOfFieldShader::setUniforms(irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
 static void averageTexture(GLuint tex)
 {
     glActiveTexture(GL_TEXTURE0);
@@ -637,10 +650,81 @@ void PostProcessing::render()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
 
-/*        computeLogLuminance(in_rtt);
-        toneMap(out_fbo, in_rtt);
+        renderDoF(out_fbo, in_rtt);
         std::swap(in_rtt, out_rtt);
-        std::swap(in_fbo, out_fbo);*/
+        std::swap(in_fbo, out_fbo);
+
+        PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
+        if (UserConfigParams::m_light_shaft && m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
+        {
+            glEnable(GL_DEPTH_TEST);
+            // Grab the sky
+            glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
+            glClear(GL_COLOR_BUFFER_BIT);
+            irr_driver->renderSkybox();
+
+            // Set the sun's color
+            const SColor col = World::getWorld()->getTrack()->getSunColor();
+            ColorizeProvider * const colcb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
+            colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
+
+            // The sun interposer
+            STKMeshSceneNode *sun = irr_driver->getSunInterposer();
+            irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
+            irr_driver->setPhase(GLOW_PASS);
+            sun->render();
+            glDisable(GL_DEPTH_TEST);
+
+            // Fade to quarter
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
+            glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
+            renderGodFade(out_rtt, col);
+
+            // Blur
+            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2),
+                UserConfigParams::m_width / 4,
+                UserConfigParams::m_height / 4);
+
+
+
+            // Calculate the sun's position in texcoords
+            const core::vector3df pos = sun->getPosition();
+            float ndc[4];
+            core::matrix4 trans = camnode->getProjectionMatrix();
+            trans *= camnode->getViewMatrix();
+
+            trans.transformVect(ndc, pos);
+
+            const float texh = m_vertices[cam].v1.TCoords.Y - m_vertices[cam].v0.TCoords.Y;
+            const float texw = m_vertices[cam].v3.TCoords.X - m_vertices[cam].v0.TCoords.X;
+
+            const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
+            const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
+
+            // Rays please
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER2));
+            renderGodRay(irr_driver->getRenderTargetTexture(RTT_QUARTER1), core::vector2df(sunx, suny));
+
+            // Blur
+            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2),
+                irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                UserConfigParams::m_width / 4,
+                UserConfigParams::m_height / 4);
+
+            glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+            // Blend
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2));
+            glDisable(GL_BLEND);
+        }
+        PROFILER_POP_CPU_MARKER();
+
+        // Simulate camera defects from there
 
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         if (UserConfigParams::m_bloom)
@@ -696,78 +780,12 @@ void PostProcessing::render()
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
             glDisable(GL_BLEND);
         } // end if bloom
-
         PROFILER_POP_CPU_MARKER();
 
-        PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
-        if (UserConfigParams::m_light_shaft && m_sunpixels > 30)//World::getWorld()->getTrack()->hasGodRays() && ) // god rays
-        {
-            glEnable(GL_DEPTH_TEST);
-            // Grab the sky
-            glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
-            glClear(GL_COLOR_BUFFER_BIT);
-            irr_driver->renderSkybox();
-
-            // Set the sun's color
-            const SColor col = World::getWorld()->getTrack()->getSunColor();
-            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
-                colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
-
-            // The sun interposer
-            STKMeshSceneNode *sun = irr_driver->getSunInterposer();
-            irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
-            irr_driver->setPhase(GLOW_PASS);
-            sun->render();
-            glDisable(GL_DEPTH_TEST);
-
-            // Fade to quarter
-            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
-            glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
-            renderGodFade(out_rtt, col);
-
-            // Blur
-            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                                irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2),
-                                UserConfigParams::m_width / 4,
-                                UserConfigParams::m_height / 4);
-
-
-
-            // Calculate the sun's position in texcoords
-            const core::vector3df pos = sun->getPosition();
-            float ndc[4];
-            core::matrix4 trans = camnode->getProjectionMatrix();
-            trans *= camnode->getViewMatrix();
-
-            trans.transformVect(ndc, pos);
-
-            const float texh = m_vertices[cam].v1.TCoords.Y - m_vertices[cam].v0.TCoords.Y;
-            const float texw = m_vertices[cam].v3.TCoords.X - m_vertices[cam].v0.TCoords.X;
-
-            const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
-            const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
-
-            // Rays please
-            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER2));
-            renderGodRay(irr_driver->getRenderTargetTexture(RTT_QUARTER1), core::vector2df(sunx, suny));
-
-            // Blur
-            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2),
-                irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
-                UserConfigParams::m_width / 4,
-                UserConfigParams::m_height / 4);
-
-            glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
-            // Blend
-            glEnable(GL_BLEND);
-            glBlendFunc(GL_ONE, GL_ONE);
-            glBlendEquation(GL_FUNC_ADD);
-
-            glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2));
-            glDisable(GL_BLEND);
-        }
-        PROFILER_POP_CPU_MARKER();
+        computeLogLuminance(in_rtt);
+        toneMap(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);
 
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
@@ -777,11 +795,6 @@ void PostProcessing::render()
             std::swap(in_rtt, out_rtt);
             PROFILER_POP_CPU_MARKER();
         }
-
-        glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
-        renderColorLevel(in_rtt);
-        std::swap(in_fbo, out_fbo);
-        std::swap(in_rtt, out_rtt);
 
         if (irr_driver->getNormals())
         {
