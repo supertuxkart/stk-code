@@ -79,88 +79,98 @@ void GrandPrixData::reload()
     if (root.get() == NULL)
     {
         Log::error("GrandPrixData",
-                   "Error while trying to read grandprix file '%s'",
+                   "Error while trying to read xml Grand Prix from file '%s'. "
+                   "Is the file readable for supertuxkart?",
                    m_filename.c_str());
-        throw std::logic_error("File not found");
+        throw std::runtime_error("File couldn't be read");
     }
 
-    bool foundName = false;
-
-    if (root->getName() == "supertuxkart_grand_prix")
-    {
-        if (root->get("name", &m_name) == 0)
-        {
-             Log::error("GrandPrixData",
-                        "Error while trying to read grandprix file '%s': "
-                        "missing 'name' attribute", m_filename.c_str());
-            throw std::logic_error("File contents are incomplete or corrupt");
-        }
-        foundName = true;
-    }
-    else
+    if (root->getName() != "supertuxkart_grand_prix")
     {
         Log::error("GrandPrixData",
-                   "Error while trying to read grandprix file '%s': "
-                   "Root node has an unexpected name", m_filename.c_str());
-        throw std::logic_error("File contents are incomplete or corrupt");
+                   "Error while trying to read Grand Prix file '%s': "
+                   "Root node has the wrong name %s", m_filename.c_str()),
+                   root->getName().c_str();
+        throw std::runtime_error("Wrong root node name");
     }
 
+    if (!root->get("name", &m_name))
+    {
+         Log::error("GrandPrixData",
+                    "Error while trying to read grandprix file '%s': "
+                    "missing 'name' attribute", m_filename.c_str());
+        throw std::runtime_error("Missing name attribute");
+    }
+
+    // Every iteration means parsing one track entry
     const int amount = root->getNumNodes();
-    for (int i=0; i<amount; i++)
+    for (int i = 0; i < amount; i++)
     {
         const XMLNode* node = root->getNode(i);
 
-        // read a track entry
-        if (node->getName() == "track")
-        {
-            std::string trackID;
-            int numLaps;
-            bool reversed = false;
-
-            const int idFound  = node->get("id",   &trackID  );
-            const int lapFound = node->get("laps", &numLaps  );
-            // Will stay false if not found
-            node->get("reverse", &reversed );
-
-            if (!idFound || !lapFound)
-            {
-                Log::error("GrandPrixData",
-                           "Error while trying to read grandprix file '%s' : "
-                            "<track> tag does not have id and laps reverse "
-                            "attributes.", m_filename.c_str());
-                throw std::logic_error("File contents are incomplete or corrupt");
-            }
-
-            // Make sure the track really is reversible
-            Track* t = track_manager->getTrack(trackID);
-            if (t != NULL && reversed)
-                reversed = t->reverseAvailable();
-
-            m_tracks.push_back(trackID);
-            m_laps.push_back(numLaps);
-            m_reversed.push_back(reversed);
-
-            assert(m_tracks.size() == m_laps.size()    );
-            assert(m_laps.size()   == m_reversed.size());
-        }
-        else
+        if (node->getName() != "track")
         {
             Log::error("GrandPrixData"
-                       "Unknown node in Grand Prix XML file: %s",
-                       node->getName().c_str());
+                       "Unknown node in Grand Prix XML file ': %s",
+                       m_filename.c_str(), node->getName().c_str());
             throw std::runtime_error("Unknown node in the XML file");
         }
-    }   // end for
 
-    // sanity checks
-    if  (!foundName)
-    {
-        Log::error("GrandPrixData",
-                   "Error while trying to read grandprix file '%s': "
-                   "missing 'name' attribute\n", m_filename.c_str());
-        throw std::logic_error("File contents are incomplete or corrupt");
-    }
-}
+        // 1. Parsing the id atttribute
+        std::string track_id;
+        if (!node->get("id", &track_id))
+        {
+            Log::error("GrandPrixData",
+                       "The id attribute is missing in the %d. track entry of "
+                       "the Grand Prix xml file '%s'.", i, m_filename.c_str());
+            throw std::runtime_error("Missing track id");
+        }
+
+        // 1.1 Checking if the track exists
+        Track* t = track_manager->getTrack(track_id);
+        if (t != NULL)
+        {
+            Log::error("GrandPrixData",
+                       "Grand Prix '%s' contains a track '%s' that does not "
+                       "exist", m_filename.c_str(), track_id.c_str());
+            throw std::runtime_error("Unknown track");
+        }
+
+        // 2. Parsing the number of laps
+        int number_of_laps;
+        if (!node->get("laps", &number_of_laps))
+        {
+            Log::error("GrandPrixData",
+                       "The laps attribute is missing in the %d. track entry "
+                       "of the Grand Prix xml file '%s'.", i,
+                       m_filename.c_str());
+            throw std::runtime_error("Missing track id");
+        }
+
+        if (number_of_laps < 1)
+        {
+            Log::error("GrandPrixData",
+                       "Track '%s' in Grand Prix '%s' should be raced with %d "
+                       "laps, which isn't possible.", track_id.c_str(),
+                       m_filename.c_str());
+            throw std::runtime_error("Lap count lower than 1");
+        }
+
+        // 3. Parsing the reversed attribute
+        bool reversed = false; // Stays false if not found
+        node->get("reverse", &reversed );
+        if (!t->reverseAvailable())
+            reversed = false;
+
+        // Adding parsed data
+        m_tracks.push_back(track_id);
+        m_laps.push_back(number_of_laps);
+        m_reversed.push_back(reversed);
+
+        assert(m_tracks.size() == m_laps.size()    );
+        assert(m_laps.size()   == m_reversed.size());
+    }   // end for all root nodes
+}   // reload()
 
 // ----------------------------------------------------------------------------
 bool GrandPrixData::writeToFile()

@@ -77,7 +77,7 @@ void GrandPrixManager::load(const std::string& filename)
                    "Grand Prix '%s' loaded from %s",
                    gp->getId().c_str(), filename.c_str());
     }
-    catch (std::logic_error& e)
+    catch (std::runtime_error& e)
     {
         Log::error("GrandPrixManager",
                    "Ignoring grand prix %s (%s)\n", filename.c_str(), e.what());

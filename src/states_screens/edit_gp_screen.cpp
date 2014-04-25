@@ -328,5 +328,5 @@ bool EditGPScreen::canMoveUp() const
 // -----------------------------------------------------------------------------
 bool EditGPScreen::canMoveDown() const
 {
-    return (0 =< m_selected && m_selected < m_list->getItemCount() - 1);
+    return (0 <= m_selected && m_selected < m_list->getItemCount() - 1);
 }
