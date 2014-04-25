@@ -259,7 +259,7 @@ void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
     }
     else if (m_action == "rename")
     {
-        m_selection->setName(newName);
+        m_selection->m_name = newName;
         m_selection->writeToFile();
     }
     else if (m_action == "new")

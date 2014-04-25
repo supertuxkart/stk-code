@@ -56,14 +56,14 @@ class EditGPScreen :
     bool canMoveUp() const;
     bool canMoveDown() const;
 
-    GrandPrixData*                     m_gp;
-    GUIEngine::ListWidget*             m_list;
-    irr::gui::STKModifiedSpriteBank*   m_icon_bank;
-    std::vector<int>                   m_icons;
-    int                                m_selected;
-    bool                               m_modified;
+    GrandPrixData*                   m_gp;
+    GUIEngine::ListWidget*           m_list;
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+    std::vector<int>                 m_icons;
+    int                              m_selected;
+    bool                             m_modified;
 
-    std::string                        m_action;
+    std::string                      m_action;
 
 public:
 
@@ -75,7 +75,8 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name,
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

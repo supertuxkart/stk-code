@@ -182,10 +182,10 @@ GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
     std::string newID = generateId();
 
     GrandPrixData* gp = new GrandPrixData;
-    gp->setId(newID);
-    gp->setName(newName);
-    gp->setFilename(file_manager->getGPDir() + newID + SUFFIX);
-    gp->setEditable(true);
+    gp->m_id = newID;
+    gp->m_name = newName;
+    gp->m_filename = file_manager->getGPDir() + newID + SUFFIX;
+    gp->m_editable = true;
     gp->writeToFile();
     m_gp_data.push_back(gp);
 
@@ -202,10 +202,10 @@ GrandPrixData* GrandPrixManager::copy(const std::string& id,
     std::string newID = generateId();
 
     GrandPrixData* gp = new GrandPrixData(*getGrandPrix(id));
-    gp->setId(newID);
-    gp->setName(newName);
-    gp->setFilename(file_manager->getGPDir() + newID + SUFFIX);
-    gp->setEditable(true);
+    gp->m_id = newID;
+    gp->m_name = newName;
+    gp->m_filename = file_manager->getGPDir() + newID + SUFFIX;
+    gp->m_editable = true;
     gp->writeToFile();
     m_gp_data.push_back(gp);
 

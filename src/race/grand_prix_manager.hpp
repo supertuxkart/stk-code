@@ -24,6 +24,9 @@
 
 #include "race/grand_prix_data.hpp"
 
+// FIXME remove this ugly hack to make the file compile
+class GrandPrixData;
+
 /**
   * \ingroup race
   */

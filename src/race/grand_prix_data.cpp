@@ -45,30 +45,6 @@ GrandPrixData::GrandPrixData(const std::string& filename)
 }
 
 // ----------------------------------------------------------------------------
-void GrandPrixData::setId(const std::string& id)
-{
-    m_id = id;
-}
-
-// ----------------------------------------------------------------------------
-void GrandPrixData::setName(const irr::core::stringw& name)
-{
-    m_name = name;
-}
-
-// ----------------------------------------------------------------------------
-void GrandPrixData::setFilename(const std::string& filename)
-{
-    m_filename = filename;
-}
-
-// ----------------------------------------------------------------------------
-void GrandPrixData::setEditable(const bool editable)
-{
-    m_editable = editable;
-}
-
-// ----------------------------------------------------------------------------
 void GrandPrixData::reload()
 {
     m_tracks.clear();

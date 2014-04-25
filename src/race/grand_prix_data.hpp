@@ -27,8 +27,12 @@
 #include <stdexcept>
 
 #include "utils/translation.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "tracks/track.hpp"
+#include "states_screens/grand_prix_editor_screen.hpp"
 
-class Track;
+// FIXME remove this ugly hack to make the file compile
+class GrandPrixManager;
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
@@ -36,6 +40,8 @@ class Track;
   */
 class GrandPrixData
 {
+    friend GrandPrixManager;
+    friend GrandPrixEditorScreen;
 private:
     /** The name of the grand prix. */
     irr::core::stringw m_name;
@@ -78,10 +84,6 @@ public:
     GrandPrixData() {};
 
     // Methods for the GP editor
-    void setId(const std::string& id);
-    void setName(const irr::core::stringw& name);
-    void setFilename(const std::string& filename);
-    void setEditable(const bool editable);
     /** Load the grand prix from the file set by the constructor or the grand
      * prix editor */
     void reload();
