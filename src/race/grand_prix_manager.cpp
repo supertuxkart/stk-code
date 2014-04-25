@@ -19,7 +19,7 @@
 #include "race/grand_prix_manager.hpp"
 
 #include "config/user_config.hpp"
-#include "grand_prix_data.hpp"
+#include "race/grand_prix_data.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -36,12 +36,13 @@ void GrandPrixManager::loadFiles()
 {
     std::set<std::string> dirs;
 
-    //Add all the directories to a set to avoid duplicates
+    // Add all the directories to a set to avoid duplicates
     dirs.insert(file_manager->getAsset(FileManager::GRANDPRIX, ""));
     dirs.insert(file_manager->getGPDir());
     dirs.insert(UserConfigParams::m_additional_gp_directory);
 
-    for (std::set<std::string>::const_iterator it = dirs.begin(); it != dirs.end(); ++it)
+    for (std::set<std::string>::const_iterator it  = dirs.begin();
+                                               it != dirs.end  (); ++it)
     {
         std::string dir = *it;
         if (!dir.empty() && dir[dir.size() - 1] == '/')
@@ -52,35 +53,34 @@ void GrandPrixManager::loadFiles()
 // ----------------------------------------------------------------------------
 void GrandPrixManager::loadDir(const std::string& dir)
 {
-    Log::info("GrandPrixManager", "Loading Grand Prix files from %s", dir.c_str());
+    Log::info("GrandPrixManager",
+              "Loading Grand Prix files from %s", dir.c_str());
     assert(!dir.empty() && dir[dir.size() - 1] == '/');
 
-    // Findout which grand prixs are available and load them
+    // Findout which grand prix are available and load them
     std::set<std::string> result;
     file_manager->listFiles(result, dir);
-    for(std::set<std::string>::iterator i = result.begin(); i != result.end(); i++)
-    {
+    for(std::set<std::string>::iterator i  = result.begin();
+                                        i != result.end(); i++)
         if (StringUtils::hasSuffix(*i, SUFFIX))
             load(dir + *i);
-    }   // for i
-}   // loadDir
+}
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::load(const std::string& filename)
 {
-    GrandPrixData* gp;
-
     try
     {
-        gp = new GrandPrixData(filename);
+        GrandPrixData* gp = new GrandPrixData(filename);
         m_gp_data.push_back(gp);
-        Log::debug("GrandPrixManager", "Grand Prix '%s' loaded from %s",
-            gp->getId().c_str(), filename.c_str());
+        Log::debug("GrandPrixManager",
+                   "Grand Prix '%s' loaded from %s",
+                   gp->getId().c_str(), filename.c_str());
     }
-    catch (std::logic_error& er)
+    catch (std::logic_error& e)
     {
-        Log::error("GrandPrixManager", "Ignoring GP %s (%s)\n",
-            filename.c_str(), er.what());
+        Log::error("GrandPrixManager",
+                   "Ignoring grand prix %s (%s)\n", filename.c_str(), e.what());
     }
 }   // load
 
@@ -99,66 +99,63 @@ std::string GrandPrixManager::generateId()
 {
     std::stringstream s;
 
-    do
+    bool unique = false;
+    while(!unique)
     {
         s.clear();
         s << "usr_gp_" << ((rand() % 90000000) + 10000000);
-    } while (existsId(s.str()));
+
+        // Check if the id already exists
+        unique = true;
+        for (unsigned int i = 0; i < m_gp_data.size(); i++)
+        {
+            if (m_gp_data[i]->getId() == s.str())
+            {
+                unique = false;
+                break;
+            }
+        }
+    }
 
     return s.str();
 }
 
 // ----------------------------------------------------------------------------
-bool GrandPrixManager::existsId(const std::string& id) const
-{
-    bool exists;
-
-    exists = false;
-    for (unsigned int i = 0; !exists && i < m_gp_data.size(); i++)
-        exists = (m_gp_data[i]->getId() == id);
-
-    return exists;
-}
-
-// ----------------------------------------------------------------------------
 bool GrandPrixManager::existsName(const irr::core::stringw& name) const
 {
-    bool exists;
+    for (unsigned int i = 0; i < m_gp_data.size(); i++)
+        if (m_gp_data[i]->getName() == name)
+            return true;
 
-    exists = false;
-    for (unsigned int i = 0; !exists && i < m_gp_data.size(); i++)
-        exists = (m_gp_data[i]->getName() == name);
-
-    return exists;
+    return false;
 }
 
 // ----------------------------------------------------------------------------
 GrandPrixManager::GrandPrixManager()
 {
     loadFiles();
-}   // GrandPrixManager
+}
 
 // ----------------------------------------------------------------------------
 GrandPrixManager::~GrandPrixManager()
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
-    {
         delete m_gp_data[i];
-    }   // for i
-
-}   // ~GrandPrixManager
+}
 
 // ----------------------------------------------------------------------------
-const GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
+GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 {
     return editGrandPrix(s);
-}   // getGrandPrix
+}
 
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
-        if(m_gp_data[i]->getId()==s) return m_gp_data[i];
+        if(m_gp_data[i]->getId() == s)
+            return m_gp_data[i];
+
     return NULL;
 }
 
@@ -177,7 +174,7 @@ void GrandPrixManager::checkConsistency()
 }   // checkConsistency
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::createNew(const irr::core::stringw& newName)
+GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
 {
     if (existsName(newName))
         return NULL;
@@ -197,7 +194,7 @@ GrandPrixData* GrandPrixManager::createNew(const irr::core::stringw& newName)
 
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::copy(const std::string& id,
-    const irr::core::stringw& newName)
+                                      const irr::core::stringw& newName)
 {
     if (existsName(newName))
         return NULL;
@@ -228,6 +225,7 @@ void GrandPrixManager::remove(const std::string& id)
     }
     else
     {
-        Log::warn("GrandPrixManager", "Grand Prix '%s' cannot be removed\n", gp->getId().c_str());
+        Log::warn("GrandPrixManager",
+                  "Grand Prix '%s' can not be removed", gp->getId().c_str());
     }
 }

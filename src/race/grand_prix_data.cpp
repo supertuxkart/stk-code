@@ -35,10 +35,11 @@
 
 
 // ----------------------------------------------------------------------------
-GrandPrixData::GrandPrixData(const std::string& filename) throw(std::logic_error)
+GrandPrixData::GrandPrixData(const std::string& filename)
 {
     m_filename = filename;
-    m_id       = StringUtils::getBasename(StringUtils::removeExtension(filename));
+    m_id       = StringUtils::getBasename(
+                                        StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
     reload();
 }
@@ -77,8 +78,9 @@ void GrandPrixData::reload()
     std::auto_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
     if (root.get() == NULL)
     {
-        Log::error("GrandPrixData","Error while trying to read grandprix file '%s'",
-                    m_filename.c_str());
+        Log::error("GrandPrixData",
+                   "Error while trying to read grandprix file '%s'",
+                   m_filename.c_str());
         throw std::logic_error("File not found");
     }
 
@@ -88,19 +90,20 @@ void GrandPrixData::reload()
     {
         if (root->get("name", &m_name) == 0)
         {
-             Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
-                    "missing 'name' attribute\n", m_filename.c_str());
+             Log::error("GrandPrixData",
+                        "Error while trying to read grandprix file '%s': "
+                        "missing 'name' attribute", m_filename.c_str());
             throw std::logic_error("File contents are incomplete or corrupt");
         }
         foundName = true;
     }
     else
     {
-        Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
-                "Root node has an unexpected name\n", m_filename.c_str());
+        Log::error("GrandPrixData",
+                   "Error while trying to read grandprix file '%s': "
+                   "Root node has an unexpected name", m_filename.c_str());
         throw std::logic_error("File contents are incomplete or corrupt");
     }
-
 
     const int amount = root->getNumNodes();
     for (int i=0; i<amount; i++)
@@ -114,25 +117,24 @@ void GrandPrixData::reload()
             int numLaps;
             bool reversed = false;
 
-            const int idFound      = node->get("id",      &trackID  );
-            const int lapFound     = node->get("laps",    &numLaps  );
+            const int idFound  = node->get("id",   &trackID  );
+            const int lapFound = node->get("laps", &numLaps  );
             // Will stay false if not found
             node->get("reverse", &reversed );
 
             if (!idFound || !lapFound)
             {
-                Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
-                                "<track> tag does not have idi and laps reverse attributes. \n",
-                                m_filename.c_str());
+                Log::error("GrandPrixData",
+                           "Error while trying to read grandprix file '%s' : "
+                            "<track> tag does not have id and laps reverse "
+                            "attributes.", m_filename.c_str());
                 throw std::logic_error("File contents are incomplete or corrupt");
             }
 
             // Make sure the track really is reversible
             Track* t = track_manager->getTrack(trackID);
             if (t != NULL && reversed)
-            {
                 reversed = t->reverseAvailable();
-            }
 
             m_tracks.push_back(trackID);
             m_laps.push_back(numLaps);
@@ -143,16 +145,19 @@ void GrandPrixData::reload()
         }
         else
         {
-            std::cerr << "Unknown node in Grand Prix XML file : " << node->getName().c_str() << std::endl;
-            throw std::runtime_error("Unknown node in sfx XML file");
+            Log::error("GrandPrixData"
+                       "Unknown node in Grand Prix XML file: %s",
+                       node->getName().c_str());
+            throw std::runtime_error("Unknown node in the XML file");
         }
-    }// nend for
+    }   // end for
 
     // sanity checks
     if  (!foundName)
     {
-        Log::error("GrandPrixData", "Error while trying to read grandprix file '%s' : "
-                "missing 'name' attribute\n", m_filename.c_str());
+        Log::error("GrandPrixData",
+                   "Error while trying to read grandprix file '%s': "
+                   "missing 'name' attribute\n", m_filename.c_str());
         throw std::logic_error("File contents are incomplete or corrupt");
     }
 }
@@ -165,14 +170,15 @@ bool GrandPrixData::writeToFile()
         UTFWriter file(m_filename.c_str());
         if (file.is_open())
         {
-            file << L"\n<supertuxkart_grand_prix name=\"" << m_name << L"\">\n\n";
+            file << L"\n<supertuxkart_grand_prix name=\"" << m_name
+                 << L"\">\n\n";
             for (unsigned int i = 0; i < m_tracks.size(); i++)
             {
                 file <<
-                    L"\t<track id=\""  << m_tracks[i] <<
-                    L"\" laps=\""      << m_laps[i] <<
-                    L"\" reverse=\""   << (m_reversed[i] ? L"true" : L"false") <<
-                L"\" />\n";
+                    L"\t<track id=\"" << m_tracks[i] <<
+                    L"\" laps=\""     << m_laps[i] <<
+                    L"\" reverse=\""  << (m_reversed[i] ? L"true" : L"false")
+                                      <<  L"\" />\n";
             }
             file << L"\n</supertuxkart_grand_prix>\n";
 
@@ -185,33 +191,32 @@ bool GrandPrixData::writeToFile()
     }
     catch (std::runtime_error& e)
     {
-        Log::error("GrandPrixData", "Failed to write '%s'; cause: %s\n",
-            m_filename.c_str(), e.what());
+        Log::error("GrandPrixData",
+                   "Failed to write grand prix to '%s'; cause: %s",
+                   m_filename.c_str(), e.what());
         return false;
     }
 }
 
 // ----------------------------------------------------------------------------
-bool GrandPrixData::checkConsistency(bool chatty) const
+bool GrandPrixData::checkConsistency(bool log_error) const
 {
-    for (unsigned int i = 0; i<m_tracks.size(); i++)
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
-        Track* t = track_manager->getTrack(m_tracks[i]);
-
-        if (t == NULL)
+        if (track_manager->getTrack(m_tracks[i]) == NULL)
         {
-            if (chatty)
+            if (log_error)
             {
-                Log::error("GrandPrixData", "Grand Prix '%ls': Track '%s' does not exist!\n",
-                                m_name.c_str(), m_tracks[i].c_str());
-                Log::error("GrandPrixData", "This Grand Prix will not be available.\n");
+                Log::error("GrandPrixData",
+                           "The grand prix '%ls' won't be available because "
+                           "the track '%s' does not exist!", m_name.c_str(),
+                           m_tracks[i].c_str());
             }
             return false;
         }
-
-    }   // for i
+    }
     return true;
-}   // checkConsistency
+}
 
 
 // ----------------------------------------------------------------------------
@@ -221,27 +226,28 @@ bool GrandPrixData::checkConsistency(bool chatty) const
  *  is unlocked). It also prevents people from using the grand prix editor as
  *  a way to play tracks that still haven't been unlocked
  */
-bool GrandPrixData::isTrackAvailable(const std::string &id, bool includeLocked) const
+bool GrandPrixData::isTrackAvailable(const std::string &id, bool includeLocked)
+                                                                           const
 {
     if (includeLocked)
         return true;
     else if (id == "fortmagma")
         return !PlayerManager::getCurrentPlayer()->isLocked("fortmagma");
     else
-        return (!m_editable || !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
-}   // isTrackAvailable
+        return (!m_editable
+                || !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
+}
 
 // ----------------------------------------------------------------------------
 std::vector<std::string> GrandPrixData::getTrackNames(bool includeLocked) const
 {
     std::vector<std::string> names;
     for (unsigned int i = 0; i < m_tracks.size(); i++)
-    {
         if(isTrackAvailable(m_tracks[i], includeLocked))
             names.push_back(m_tracks[i]);
-    }   // for i
+
     return names;
-}   // getTrackNames
+}
 
 // ----------------------------------------------------------------------------
 std::vector<int> GrandPrixData::getLaps(bool includeLocked) const
@@ -250,8 +256,9 @@ std::vector<int> GrandPrixData::getLaps(bool includeLocked) const
     for (unsigned int i = 0; i< m_tracks.size(); i++)
         if(isTrackAvailable(m_tracks[i], includeLocked))
             laps.push_back(m_laps[i]);
+
     return laps;
-}   // getLaps
+}
 
 // ----------------------------------------------------------------------------
 std::vector<bool> GrandPrixData::getReverse(bool includeLocked) const
@@ -260,14 +267,15 @@ std::vector<bool> GrandPrixData::getReverse(bool includeLocked) const
     for (unsigned int i = 0; i< m_tracks.size(); i++)
         if(isTrackAvailable(m_tracks[i], includeLocked))
             reverse.push_back(m_reversed[i]);
+
     return reverse;
-}   // getReverse
+}
 
 // ----------------------------------------------------------------------------
 bool GrandPrixData::isEditable() const
 {
     return m_editable;
-}   // isEditable
+}
 
 // ----------------------------------------------------------------------------
 unsigned int GrandPrixData::getNumberOfTracks(bool includeLocked) const
@@ -281,7 +289,7 @@ unsigned int GrandPrixData::getNumberOfTracks(bool includeLocked) const
 // ----------------------------------------------------------------------------
 irr::core::stringw GrandPrixData::getTrackName(const unsigned int track) const
 {
-    assert(track < getNumberOfTracks(true));
+    assert(0 <= track && track < getNumberOfTracks(true));
     Track* t = track_manager->getTrack(m_tracks[track]);
     assert(t != NULL);
     return t->getName();
@@ -334,49 +342,47 @@ void GrandPrixData::moveDown(const unsigned int track)
 
 // ----------------------------------------------------------------------------
 void GrandPrixData::addTrack(Track* track, unsigned int laps, bool reverse,
-    int position)
+                             int position)
 {
-    int n;
-
-    n = getNumberOfTracks(true);
+    int n = getNumberOfTracks(true);
     assert (track != NULL);
     assert (laps > 0);
-    assert (position >= -1 && position < n);
+    assert (-1 < position && position < n);
 
     if (position < 0 || position == (n - 1) || m_tracks.empty())
     {
-        //Append new track to the end of the list
+        // Append new track to the end of the list
         m_tracks.push_back(track->getIdent());
         m_laps.push_back(laps);
         m_reversed.push_back(reverse);
     }
     else
     {
-        //Insert new track right after the specified position. Caution:
-        //std::vector inserts elements _before_ the specified position
-        m_tracks.insert(m_tracks.begin() + position + 1, track->getIdent());
-        m_laps.insert(m_laps.begin() + position + 1, laps);
-        m_reversed.insert(m_reversed.begin() + position + 1, reverse);
+        // Insert new track right after the specified position. Caution:
+        // std::vector inserts elements _before_ the specified position
+        m_tracks.  insert(m_tracks.begin()   + position + 1, track->getIdent());
+        m_laps.    insert(m_laps.begin()     + position + 1, laps             );
+        m_reversed.insert(m_reversed.begin() + position + 1, reverse          );
     }
 }
 
 // ----------------------------------------------------------------------------
-void GrandPrixData::editTrack(unsigned int t, Track* track,
-    unsigned int laps, bool reverse)
+void GrandPrixData::editTrack(unsigned int index, Track* track,
+                              unsigned int laps, bool reverse)
 {
-    assert (t < getNumberOfTracks(true));
+    assert (index < getNumberOfTracks(true));
     assert (track != NULL);
     assert (laps > 0);
 
-    m_tracks[t] = track->getIdent();
-    m_laps[t] = laps;
-    m_reversed[t] = reverse;
+    m_tracks[index]   = track->getIdent();
+    m_laps[index]     = laps;
+    m_reversed[index] = reverse;
 }
 
 // ----------------------------------------------------------------------------
 void GrandPrixData::remove(const unsigned int track)
 {
-    assert (track < getNumberOfTracks(true));
+    assert (0 < track && track < getNumberOfTracks(true));
 
     m_tracks.erase(m_tracks.begin() + track);
     m_laps.erase(m_laps.begin() + track);
