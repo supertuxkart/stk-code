@@ -276,10 +276,8 @@ void EditGPScreen::setModified(const bool modified)
 // -----------------------------------------------------------------------------
 void EditGPScreen::setSelected(const int selected)
 {
-    IconButtonWidget* button_up = getWidget<IconButtonWidget>("up");
-    assert(button_up != NULL);
-    IconButtonWidget* button_down = getWidget<IconButtonWidget>("down");
-    assert(button_down != NULL);
+    assert(getWidget<IconButtonWidget>("up") != NULL);
+    assert(getWidget<IconButtonWidget>("down") != NULL);
 
     m_selected = selected;
 }
@@ -311,14 +309,14 @@ bool EditGPScreen::save()
     else
     {
         new MessageDialog(
-            _("An error occurred while trying to save your grand prix"),
+            _("An error occurred while trying to save your grand prix."),
             MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
         return false;
     }
 }
 
 // -----------------------------------------------------------------------------
-void EditGPScreen::back ()
+void EditGPScreen::back()
 {
     m_action.clear();
     m_modified = false;
@@ -328,11 +326,11 @@ void EditGPScreen::back ()
 // -----------------------------------------------------------------------------
 bool EditGPScreen::canMoveUp() const
 {
-    return (m_selected > 0 && m_selected < m_list->getItemCount());
+    return (0 < m_selected && m_selected < m_list->getItemCount());
 }
 
 // -----------------------------------------------------------------------------
 bool EditGPScreen::canMoveDown() const
 {
-    return (m_selected >= 0 && m_selected < (m_list->getItemCount() - 1));
+    return (0 =< m_selected && m_selected < m_list->getItemCount() - 1);
 }
