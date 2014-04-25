@@ -23,9 +23,13 @@ void main()
 
     vec3 Cw = getCIEYxy(col.xyz);
     float Lw = Cw.y;
-    float L = Lw * exposure / avgLw;
+
+/*    float L = Lw * exposure / avgLw;
     float Ld = L * (1. + L / (Lwhite * Lwhite));
-    Ld /= (1. + L);
+    Ld /= (1. + L);*/
+
+    float Ld = (Lw * (6.2 * Lw + .5)) / (Lw * (6.2 * Lw + 1.7) + 0.06);
+    Ld = pow(Ld, 2.2);
 
     FragColor = vec4(Ld * pow(col.xyz / Lw, vec3(saturation)), 1.);
 
