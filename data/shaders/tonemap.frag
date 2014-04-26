@@ -31,7 +31,7 @@ void main()
 //    FragColor = vec4(Ld * pow(col.xyz / Lw, vec3(saturation)), 1.);
 
     // Uncharted2 tonemap with Auria's custom coefficients
-    vec4 perChannel = (col * (6.9 * col + .5)) / (col * (5.5 * col + 1.7) + 0.06);
+    vec4 perChannel = (col * (6.9 * col + .5)) / (col * (5.2 * col + 1.7) + 0.06);
     perChannel = pow(perChannel, vec4(2.2));
     FragColor = vec4(perChannel.xyz, 1.);
 
