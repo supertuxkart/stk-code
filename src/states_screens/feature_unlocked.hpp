@@ -156,7 +156,7 @@ public:
                              float w, float h, irr::core::stringw msg);
 
     void addUnlockedTrack(const Track* track);
-    void addUnlockedGP(const GrandPrixData* gp);
+    void addUnlockedGP(const GrandPrix* gp);
 
     /** Call before showing up the screen to make whatever the passed challenges unlocked
       * come out of the chest */

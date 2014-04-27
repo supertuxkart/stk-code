@@ -23,7 +23,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/edit_gp_screen.hpp"
@@ -148,7 +148,7 @@ void GrandPrixEditorScreen::init()
 }
 
 // -----------------------------------------------------------------------------
-void GrandPrixEditorScreen::setSelection (const GrandPrixData* gpdata)
+void GrandPrixEditorScreen::setSelection (const GrandPrix* gpdata)
 {
     LabelWidget* gpname_widget = getWidget<LabelWidget>("gpname");
     assert(gpname_widget != NULL);
@@ -170,7 +170,7 @@ void GrandPrixEditorScreen::loadTrackList (const std::string& gpname)
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
-    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gpname);
+    const GrandPrix* gp = grand_prix_manager->getGrandPrix(gpname);
     const std::vector<std::string> tracks = gp->getTrackNames(true);
 
     tracks_widget->clearItems();
@@ -208,7 +208,7 @@ void GrandPrixEditorScreen::loadGPList()
     // Build GP list
     for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)
     {
-        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(i);
+        const GrandPrix* gp = grand_prix_manager->getGrandPrix(i);
         const std::vector<std::string> tracks = gp->getTrackNames(true);
 
         std::vector<std::string> sshot_files;
@@ -242,7 +242,7 @@ void GrandPrixEditorScreen::loadGPList()
 }
 
 // -----------------------------------------------------------------------------
-void GrandPrixEditorScreen::showEditScreen(GrandPrixData* gp)
+void GrandPrixEditorScreen::showEditScreen(GrandPrix* gp)
 {
     assert(gp != NULL);
     EditGPScreen* edit = EditGPScreen::getInstance();

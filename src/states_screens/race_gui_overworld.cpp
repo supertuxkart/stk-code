@@ -472,7 +472,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
             if (challenge->isGrandPrix())
             {
-                const GrandPrixData* gp =
+                const GrandPrix* gp =
                     grand_prix_manager->getGrandPrix(challenge->getGPId());
 
                 if (gp == NULL)

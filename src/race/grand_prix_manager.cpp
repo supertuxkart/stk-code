@@ -19,7 +19,7 @@
 #include "race/grand_prix_manager.hpp"
 
 #include "config/user_config.hpp"
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
 
@@ -71,7 +71,7 @@ void GrandPrixManager::load(const std::string& filename)
 {
     try
     {
-        GrandPrixData* gp = new GrandPrixData(filename);
+        GrandPrix* gp = new GrandPrix(filename);
         m_gp_data.push_back(gp);
         Log::debug("GrandPrixManager",
                    "Grand Prix '%s' loaded from %s",
@@ -144,13 +144,13 @@ GrandPrixManager::~GrandPrixManager()
 }
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
+GrandPrix* GrandPrixManager::getGrandPrix(const std::string& s) const
 {
     return editGrandPrix(s);
 }
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
+GrandPrix* GrandPrixManager::editGrandPrix(const std::string& s) const
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
         if(m_gp_data[i]->getId() == s)
@@ -174,14 +174,14 @@ void GrandPrixManager::checkConsistency()
 }   // checkConsistency
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
+GrandPrix* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
 {
     if (existsName(newName))
         return NULL;
 
     std::string newID = generateId();
 
-    GrandPrixData* gp = new GrandPrixData;
+    GrandPrix* gp = new GrandPrix;
     gp->m_id = newID;
     gp->m_name = newName;
     gp->m_filename = file_manager->getGPDir() + newID + SUFFIX;
@@ -193,7 +193,7 @@ GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
 }
 
 // ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::copy(const std::string& id,
+GrandPrix* GrandPrixManager::copy(const std::string& id,
                                       const irr::core::stringw& newName)
 {
     if (existsName(newName))
@@ -201,7 +201,7 @@ GrandPrixData* GrandPrixManager::copy(const std::string& id,
 
     std::string newID = generateId();
 
-    GrandPrixData* gp = new GrandPrixData(*getGrandPrix(id));
+    GrandPrix* gp = new GrandPrix(*getGrandPrix(id));
     gp->m_id = newID;
     gp->m_name = newName;
     gp->m_filename = file_manager->getGPDir() + newID + SUFFIX;
@@ -215,7 +215,7 @@ GrandPrixData* GrandPrixManager::copy(const std::string& id,
 // ----------------------------------------------------------------------------
 void GrandPrixManager::remove(const std::string& id)
 {
-    const GrandPrixData* gp = getGrandPrix(id);
+    const GrandPrix* gp = getGrandPrix(id);
     assert(gp != NULL);
 
     if (gp->isEditable())

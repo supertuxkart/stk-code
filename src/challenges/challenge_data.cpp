@@ -25,7 +25,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/linear_world.hpp"
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
 #include "tracks/track.hpp"
@@ -285,7 +285,7 @@ void ChallengeData::check() const
     }
     else if(m_mode==CM_GRAND_PRIX)
     {
-        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_id);
+        const GrandPrix* gp = grand_prix_manager->getGrandPrix(m_gp_id);
 
         if (gp == NULL)
         {
@@ -376,7 +376,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
     else if(m_mode==CM_GRAND_PRIX)
     {
         race_manager->setMinorMode(m_minor);
-        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(m_gp_id);
+        const GrandPrix *gp = grand_prix_manager->getGrandPrix(m_gp_id);
         race_manager->setGrandPrix(*gp);
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
@@ -494,7 +494,7 @@ const irr::core::stringw
         }
         case UNLOCK_GP:
         {
-            const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_name);
+            const GrandPrix* gp = grand_prix_manager->getGrandPrix(m_name);
 
             // shouldn't happen but let's avoid crashes as much as possible...
             if (gp == NULL) return irr::core::stringw( L"????" );

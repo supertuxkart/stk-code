@@ -38,7 +38,7 @@ class GrandPrixManager;
   * of races that has to be completed one after the other
   * \ingroup race
   */
-class GrandPrixData
+class GrandPrix
 {
     friend GrandPrixManager;
     friend GrandPrixEditorScreen;
@@ -78,10 +78,10 @@ public:
     #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
     #pragma warning(disable:4290)
     #endif
-    /** Load the GrandPrixData from the given filename */
-    GrandPrixData(const std::string& filename);
-    /** Needed for simple creation of an instance of GrandPrixData */
-    GrandPrixData() {};
+    /** Load the GrandPrix from the given filename */
+    GrandPrix(const std::string& filename);
+    /** Needed for simple creation of an instance of GrandPrix */
+    GrandPrix() {};
 
     // Methods for the GP editor
     /** Load the grand prix from the file set by the constructor or the grand
@@ -120,7 +120,7 @@ public:
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
 
-};   // GrandPrixData
+};   // GrandPrix
 
 #endif
 

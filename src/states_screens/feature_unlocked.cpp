@@ -615,7 +615,7 @@ void FeatureUnlockedCutScene::addUnlockedTrack(const Track* track)
 
 // ----------------------------------------------------------------------------
 
-void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
+void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrix* gp)
 {
     std::vector<ITexture*> images;
     if (gp == NULL)

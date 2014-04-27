@@ -23,7 +23,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "states_screens/edit_track_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -49,7 +49,7 @@ EditGPScreen::~EditGPScreen()
 }
 
 // -----------------------------------------------------------------------------
-void EditGPScreen::setSelectedGP(GrandPrixData* gp)
+void EditGPScreen::setSelectedGP(GrandPrix* gp)
 {
     assert(gp != NULL);
     m_gp = gp;

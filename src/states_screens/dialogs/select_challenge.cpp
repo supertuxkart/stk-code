@@ -130,7 +130,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
 
     if (c->getData()->isGrandPrix())
     {
-        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
+        const GrandPrix* gp = grand_prix_manager->getGrandPrix(c->getData()->getGPId());
         getWidget<LabelWidget>("title")->setText( gp->getName(), true );
     }
     else

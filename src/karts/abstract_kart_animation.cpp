@@ -18,7 +18,7 @@
 
 #include "karts/abstract_kart_animation.hpp"
 
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "graphics/slip_stream.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/skidding.hpp"
