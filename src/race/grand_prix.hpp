@@ -27,12 +27,11 @@
 #include <stdexcept>
 
 #include "utils/translation.hpp"
-#include "race/grand_prix_manager.hpp"
 #include "tracks/track.hpp"
-#include "states_screens/grand_prix_editor_screen.hpp"
 
 // FIXME remove this ugly hack to make the file compile
 class GrandPrixManager;
+class GrandPrixEditorScreen;
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
@@ -40,8 +39,8 @@ class GrandPrixManager;
   */
 class GrandPrix
 {
-    friend GrandPrixManager;
-    friend GrandPrixEditorScreen;
+    friend class GrandPrixManager;
+    friend class GrandPrixEditorScreen;
 private:
     /** The name of the grand prix. */
     irr::core::stringw m_name;
