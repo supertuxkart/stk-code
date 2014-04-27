@@ -19,8 +19,8 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
-#include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
+#include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
@@ -48,33 +48,67 @@ void StoryModeLobbyScreen::loadedFromFile()
 void StoryModeLobbyScreen::init()
 {
     Screen::init();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
+    if (player)
+    {
+        //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        //return;
+    }
 
-    CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-    cb->setState(false);
+    //CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
+    //cb->setState(false);
 
     ListWidget* list = getWidget<ListWidget>("gameslots");
-    list->clear();
 
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if(player)
+    //PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
+#if 0
+
+    if (UserConfigParams::m_default_player.toString().size() > 0)
     {
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        return;
-    }
+        for (unsigned int n=0; n<players.size(); n++)
+        {
+            if (players[n].getName() == UserConfigParams::m_default_player.toString())
+            {
+                unlock_manager->setCurrentSlot(players[n].getUniqueID());
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                return;
+            }
+        }
+    }.
+#endif
+
+    DynamicRibbonWidget* local = getWidget<DynamicRibbonWidget>("local");
+    assert( local != NULL );
 
     for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
         const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
         if (player->isGuestAccount()) continue;
-
-        // FIXME: we're using a trunacted ascii version of the player name as
-        //        identifier, let's hope this causes no issues...
-        list->addItem(core::stringc(player->getName().c_str()).c_str(),
-                                    player->getName() );
+        std::string s = StringUtils::toString(n);
+        local->addItem(player->getName(), s, "", 0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     }
 
-    list->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
-    list->setSelectionID(0);
+    local->addItem("Create new user", "local_new", 
+                   "karts/sara/icon-sara.png", 0,
+                   IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+    local->updateItemDisplay();
+
+    DynamicRibbonWidget* online = this->getWidget<DynamicRibbonWidget>("online");
+    assert( online != NULL );
+    const std::vector<core::stringw> &online_ids = 
+        PlayerManager::get()->getAllOnlineIds();
+    for (unsigned int i = 0; i < online_ids.size(); i++)
+    {
+        std::string s = StringUtils::toString(i);
+        online->addItem(online_ids[i], s, "karts/nolok/nolokicon.png", 0,
+                        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+
+    }
+    online->addItem("Create new online user", "online_new",
+                     "karts/sara/icon-sara.png", 0,
+                     IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+    online->updateItemDisplay();
+
 
 }   // init
 
@@ -91,6 +125,35 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
                                          const std::string& name,
                                          const int player_id)
 {
+    if (name == "local")
+    {
+        // FIXME nothing to do
+    }
+    else if (name == "options")
+    {
+        const std::string &button =
+            getWidget<RibbonWidget>("options")->getSelectionIDString(player_id);
+        if (button == "ok" || button == "ok_and_save")
+        {
+            DynamicRibbonWidget *local = getWidget<DynamicRibbonWidget>("local");
+            const std::string &name = local->getSelectionIDString(player_id);
+            if (name == "local_new")
+            {
+                // create new local player
+                return;
+            }
+            unsigned int id;
+            StringUtils::fromString(name, id);
+            PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
+            PlayerManager::get()->setCurrentPlayer(profile, button=="ok_and_save");
+            StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            return;
+        }   // button==ok || ok_and_save
+    }   // options
+
+    return;
+
+
     if (name == "back")
     {
         StateManager::get()->escapePressed();
@@ -103,27 +166,35 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     {
         ListWidget* list = getWidget<ListWidget>("gameslots");
 
-        PlayerProfile *player = PlayerManager::get()
-                              ->getPlayer(list->getSelectionLabel());
-        if(player)
+        bool slot_found = false;
+
+        for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
         {
-            player->computeActive();
-            CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-            PlayerManager::get()->setCurrentPlayer(player,cb->getState());
+            PlayerProfile *player = PlayerManager::get()->getPlayer(n);
+            if (list->getSelectionLabel() == player->getName())
+            {
+                PlayerManager::get()->setCurrentPlayer(player, false);
+                slot_found = true;
+                break;
+            }
         }
-        else
+
+        if (!slot_found)
         {
             Log::error("StoryModeLobby",
                        "Cannot find player corresponding to slot '%s'.",
                      core::stringc(list->getSelectionLabel().c_str()).c_str());
         }
+        else
+        {
+//            CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
+//            if (cb->getState())
+            {
+//                UserConfigParams::m_default_player = list->getSelectionLabel();
+            }
+        }
 
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        // Since only now the current player is defined, we have to request 
-        // a login (if an online login was saved). If the current player was
-        // saved, this request will be started much earlier in the startup
-        // sequence from the RequestManager.
-        PlayerManager::resumeSavedSession();
     }
 }   // eventCallback
 
@@ -135,19 +206,26 @@ void StoryModeLobbyScreen::unloaded()
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& new_name)
+void StoryModeLobbyScreen::onNewPlayerWithName(const core::stringw& newName)
 {
-    PlayerProfile *player = PlayerManager::get()->getPlayer(new_name);
-    if(player)
+    bool slot_found = false;
+
+    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
-        PlayerManager::get()->setCurrentPlayer(player,false);
-        player->computeActive();
+        PlayerProfile *player = PlayerManager::get()->getPlayer(n);
+        if (player->getName() == newName)
+        {
+            PlayerManager::get()->setCurrentPlayer(player, false);
+            slot_found = true;
+            break;
+        }
     }
-    else
+
+    if (!slot_found)
     {
         Log::error("StoryModeLobbyScreen",
                    "Cannot find player corresponding to slot '%s'.",
-                   core::stringc(new_name.c_str()).c_str());
+                   core::stringc(newName.c_str()).c_str());
     }
 
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());

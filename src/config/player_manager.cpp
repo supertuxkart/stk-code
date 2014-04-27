@@ -38,12 +38,6 @@ void PlayerManager::create()
 {
     assert(!m_player_manager);
     m_player_manager = new PlayerManager();
-    if(m_player_manager->getNumPlayers() == 0)
-    {
-        m_player_manager->addDefaultPlayer();
-        m_player_manager->save();
-    }
-
 }   // create
 
 // ----------------------------------------------------------------------------
@@ -211,9 +205,11 @@ void PlayerManager::load()
         m_all_online_ids.clear();
 
     m_current_player = NULL;
-    for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
+    std::vector<XMLNode*> player_list;
+    m_player_data->getNodes("player", player_list);
+    for(unsigned int i=0; i<player_list.size(); i++)
     {
-        const XMLNode *player_xml = m_player_data->getNode(i);
+        const XMLNode *player_xml = player_list[i];
         PlayerProfile *player = new Online::OnlinePlayerProfile(player_xml);
         m_all_players.push_back(player);
         if(player->isDefault())
@@ -231,6 +227,11 @@ void PlayerManager::load()
  */
 void PlayerManager::initRemainingData()
 {
+    // Filter the player nodes out (there is one additional node 'online-ids'
+    // which makes this necessary), otherwise the index of m_all_players
+    // is not identical with the index in the xml file.
+    std::vector<XMLNode*> player_nodes;
+    m_player_data->getNodes("player", player_nodes);
     for (unsigned int i = 0; i<m_all_players.size(); i++)
     {
         // On the first time STK is run, there is no player data,
@@ -239,7 +240,7 @@ void PlayerManager::initRemainingData()
         if (!m_player_data)
             m_all_players[i].initRemainingData();
         else   // not a first time start, load remaining data
-            m_all_players[i].loadRemainingData(m_player_data->getNode(i));
+            m_all_players[i].loadRemainingData(player_nodes[i]);
     }
 
     delete m_player_data;
