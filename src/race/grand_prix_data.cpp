@@ -89,8 +89,8 @@ void GrandPrixData::reload()
     {
         Log::error("GrandPrixData",
                    "Error while trying to read Grand Prix file '%s': "
-                   "Root node has the wrong name %s", m_filename.c_str()),
-                   root->getName().c_str();
+                   "Root node has the wrong name %s", m_filename.c_str(),
+                   root->getName().c_str());
         throw std::runtime_error("Wrong root node name");
     }
 
@@ -111,7 +111,7 @@ void GrandPrixData::reload()
         if (node->getName() != "track")
         {
             Log::error("GrandPrixData"
-                       "Unknown node in Grand Prix XML file ': %s",
+                       "Unknown node in Grand Prix XML file '%s': %s",
                        m_filename.c_str(), node->getName().c_str());
             throw std::runtime_error("Unknown node in the XML file");
         }
@@ -122,17 +122,17 @@ void GrandPrixData::reload()
         {
             Log::error("GrandPrixData",
                        "The id attribute is missing in the %d. track entry of "
-                       "the Grand Prix xml file '%s'.", i, m_filename.c_str());
+                       "the Grand Prix file '%s'.", i, m_filename.c_str());
             throw std::runtime_error("Missing track id");
         }
 
         // 1.1 Checking if the track exists
         Track* t = track_manager->getTrack(track_id);
-        if (t != NULL)
+        if (t == NULL)
         {
             Log::error("GrandPrixData",
-                       "Grand Prix '%s' contains a track '%s' that does not "
-                       "exist", m_filename.c_str(), track_id.c_str());
+                       "The Grand Prix file '%s' contains a track '%s' that "
+                       "does not exist", m_filename.c_str(), track_id.c_str());
             throw std::runtime_error("Unknown track");
         }
 
@@ -142,16 +142,15 @@ void GrandPrixData::reload()
         {
             Log::error("GrandPrixData",
                        "The laps attribute is missing in the %d. track entry "
-                       "of the Grand Prix xml file '%s'.", i,
-                       m_filename.c_str());
+                       "of the Grand Prix file '%s'.", i, m_filename.c_str());
             throw std::runtime_error("Missing track id");
         }
 
         if (number_of_laps < 1)
         {
             Log::error("GrandPrixData",
-                       "Track '%s' in Grand Prix '%s' should be raced with %d "
-                       "laps, which isn't possible.", track_id.c_str(),
+                       "Track '%s' in the Grand Prix file '%s' should be raced "
+                       "with %d laps, which isn't possible.", track_id.c_str(),
                        m_filename.c_str());
             throw std::runtime_error("Lap count lower than 1");
         }
