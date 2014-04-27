@@ -383,6 +383,43 @@ void handleXmasMode()
     if(xmas)
         kart_properties_manager->setHatMeshName("christmas_hat.b3d");
 }   // handleXmasMode
+// ============================================================================
+/** This function sets up all data structure for an immediate race start.
+ *  It is used when the -N or -R command line options are used.
+ */
+void setupRaceStart()
+{
+    // Skip the start screen. This esp. means that no login screen is
+    // displayed (if necessary), so we have to make sure there is
+    // a current player
+    PlayerManager::get()->enforceCurrentPlayer();
+
+    InputDevice *device;
+
+    // Use keyboard 0 by default in --no-start-screen
+    device = input_manager->getDeviceList()->getKeyboard(0);
+
+    // Create player and associate player with keyboard
+    StateManager::get()->createActivePlayer(
+        PlayerManager::get()->getPlayer(0), device, NULL);
+
+    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+    {
+        Log::warn("main", "Kart '%s' is unknown so will use the "
+            "default kart.",
+            UserConfigParams::m_default_kart.c_str());
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
+    }
+    else
+    {
+        // Set up race manager appropriately
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    }
+
+    // ASSIGN should make sure that only input from assigned devices
+    // is read.
+    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+}   // setupRaceMode
 
 // ----------------------------------------------------------------------------
 /** Prints help for command line options to stdout.
@@ -1262,37 +1299,7 @@ int main(int argc, char *argv[] )
         }
         else
         {
-            // Skip the start screen. This esp. means that no login screen is
-            // displayed (if necessary), so we have to make sure there is
-            // a current player
-            PlayerManager::get()->enforceCurrentPlayer();
-            
-            InputDevice *device;
-
-            // Use keyboard 0 by default in --no-start-screen
-            device = input_manager->getDeviceList()->getKeyboard(0);
-
-            // Create player and associate player with keyboard
-            StateManager::get()->createActivePlayer(
-                         PlayerManager::get()->getPlayer(0), device, NULL);
-
-            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-            {
-                Log::warn("main", "Kart '%s' is unknown so will use the "
-                          "default kart.",
-                          UserConfigParams::m_default_kart.c_str());
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
-            }
-            else
-            {
-                // Set up race manager appropriately
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-            }
-
-            // ASSIGN should make sure that only input from assigned devices
-            // is read.
-            input_manager->getDeviceList()->setAssignMode(ASSIGN);
-
+            setupRaceStart();
             // Go straight to the race
             StateManager::get()->enterGameState();
         }
