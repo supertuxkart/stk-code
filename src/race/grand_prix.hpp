@@ -31,7 +31,6 @@
 
 // FIXME remove this ugly hack to make the file compile
 class GrandPrixManager;
-class GrandPrixEditorScreen;
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
