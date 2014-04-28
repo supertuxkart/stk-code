@@ -2274,36 +2274,36 @@ void Kart::updateFlying()
 {
     if (m_controls.m_accel)
     {
-        float orientation = getHeading();
-        m_body->applyCentralImpulse(btVector3(60.0f*sin(orientation), 0.0,
-                                              60.0f*cos(orientation)));
+        btVector3 velocity = m_body->getLinearVelocity();
+        if (velocity.length() < 50)
+        {
+            float orientation = getHeading();
+            m_body->applyCentralImpulse(btVector3(60.0f*sin(orientation), 0.0,
+                60.0f*cos(orientation)));
+        }
     }
+    else if (m_controls.m_brake)
+    {
+        btVector3 velocity = m_body->getLinearVelocity();
+        if (velocity.length() > -15)
+        {
+            float orientation = getHeading();
+            m_body->applyCentralImpulse(btVector3(-60.0f*sin(orientation), 0.0,
+                -60.0f*cos(orientation)));
+        }
+    }
+
     if (m_controls.m_steer != 0.0f)
     {
         m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
     }
-    if (m_controls.m_brake)
+
+    if (!m_controls.m_brake && !m_controls.m_accel && (m_controls.m_steer > -0.9f && m_controls.m_steer < 0.1f))
     {
         btVector3 velocity = m_body->getLinearVelocity();
-
-        const float x = velocity.x();
-        if (x > 0.2f)        velocity.setX(x - 0.2f);
-        else if (x < -0.2f)  velocity.setX(x + 0.2f);
-        else                 velocity.setX(0);
-
-        const float y = velocity.y();
-        if (y > 0.2f)        velocity.setY(y - 0.2f);
-        else if (y < -0.2f)  velocity.setY(y + 0.2f);
-        else                 velocity.setY(0);
-
-        const float z = velocity.z();
-        if (z > 0.2f)        velocity.setZ(z - 0.2f);
-        else if (z < -0.2f)  velocity.setZ(z + 0.2f);
-        else                 velocity.setZ(0);
-
+        velocity = velocity * 0.96f;
         m_body->setLinearVelocity(velocity);
-
-    }   // if brake
+    }
 
     // dampen any roll while flying, makes the kart hard to control
     btVector3 velocity = m_body->getAngularVelocity();

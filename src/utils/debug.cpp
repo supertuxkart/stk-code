@@ -78,6 +78,7 @@ enum DebugMenuCommand
     DEBUG_ATTACHMENT_BOMB,
     DEBUG_ATTACHMENT_ANVIL,
     DEBUG_TOGGLE_GUI,
+    DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
     DEBUG_TWEAK_SHADER_EXPOSURE,
     DEBUG_TWEAK_SHADER_LWHITE
@@ -181,10 +182,10 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
 
-            mnu->addItem(L"Adjust shaders >", -1, true, true);
-            sub = mnu->getSubMenu(3);
-            sub->addItem(L"Exposure", DEBUG_TWEAK_SHADER_EXPOSURE);
-            sub->addItem(L"LWhite", DEBUG_TWEAK_SHADER_LWHITE);
+            //mnu->addItem(L"Adjust shaders >", -1, true, true);
+            //sub = mnu->getSubMenu(3);
+            //sub->addItem(L"Exposure", DEBUG_TWEAK_SHADER_EXPOSURE);
+            //sub->addItem(L"LWhite", DEBUG_TWEAK_SHADER_LWHITE);
 
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
@@ -194,6 +195,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Toggle GUI", DEBUG_TOGGLE_GUI);
+            mnu->addItem(L"Hide karts", DEBUG_HIDE_KARTS);
 
 
             g_debug_menu_visible = true;
@@ -393,13 +395,17 @@ bool onEvent(const SEvent &event)
                     if (world == NULL) return false;
                     RaceGUIBase* gui = world->getRaceGUI();
                     if (gui != NULL) gui->m_enabled = !gui->m_enabled;
-
+                }
+                else if (cmdID == DEBUG_HIDE_KARTS)
+                {
+                    World* world = World::getWorld();
+                    if (world == NULL) return false;
                     const int count = World::getWorld()->getNumKarts();
-                    for (int n=0; n<count; n++)
+                    for (int n = 0; n<count; n++)
                     {
                         AbstractKart* kart = world->getKart(n);
                         if (kart->getController()->isPlayerController())
-                            kart->getNode()->setVisible(gui->m_enabled);
+                            kart->getNode()->setVisible(false);
                     }
                 }
                 else if (cmdID == DEBUG_TWEAK_SHADER_EXPOSURE)
