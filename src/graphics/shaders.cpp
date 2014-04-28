@@ -2069,6 +2069,8 @@ namespace FullScreenShader
     GLuint ToneMapShader::Program;
     GLuint ToneMapShader::uniform_tex;
     GLuint ToneMapShader::uniform_logluminancetex;
+    GLuint ToneMapShader::uniform_exposure;
+    GLuint ToneMapShader::uniform_lwhite;
     GLuint ToneMapShader::vao;
 
     void ToneMapShader::init()
@@ -2080,13 +2082,17 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/tonemap.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
+        uniform_exposure = glGetUniformLocation(Program, "exposure");
+        uniform_lwhite = glGetUniformLocation(Program, "Lwhite");
         vao = createVAO(Program);
     }
 
-    void ToneMapShader::setUniforms(unsigned TU_tex, unsigned TU_loglum)
+    void ToneMapShader::setUniforms(float exposure, float Lwhite, unsigned TU_tex, unsigned TU_loglum)
     {
         glUniform1i(uniform_tex, TU_tex);
         glUniform1i(uniform_logluminancetex, TU_loglum);
+        glUniform1f(uniform_exposure, exposure);
+        glUniform1f(uniform_lwhite, Lwhite);
     }
 
     GLuint DepthOfFieldShader::Program;

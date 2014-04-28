@@ -22,7 +22,7 @@ out vec4 Spec;
 vec3 DecodeNormal(vec2 n);
 vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 
-vec3 getShadowFactor(vec3 pos, float bias)
+vec3 getShadowFactor(vec3 pos)
 {
     vec3 cascadeColor[] = vec3[](
         vec3(1., 0., 0.),
@@ -37,7 +37,7 @@ vec3 getShadowFactor(vec3 pos, float bias)
         vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
         if (shadowtexcoord.x < 0. || shadowtexcoord.x > 1. || shadowtexcoord.y < 0. || shadowtexcoord.y > 1.)
             continue;
-        return cascadeColor[i] * texture(shadowtex, vec4(shadowtexcoord, float(i), 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+        return cascadeColor[i] * texture(shadowtex, vec4(shadowtexcoord, float(i), 0.5 * shadowcoord.z + 0.5));
     }
     return vec3(1.);
 }
@@ -61,9 +61,7 @@ void main() {
     vec3 outcol = NdotL * col;
 
     // Shadows
-    float bias = 0.002 * tan(acos(NdotL)); // According to the slope
-    bias = clamp(bias, 0.001, 0.014);
-    vec3 factor = getShadowFactor(xpos.xyz, bias);
+    vec3 factor = getShadowFactor(xpos.xyz);
     Diff = vec4(factor * NdotL * col, 1.);
     Spec = vec4(factor * Specular, 1.);
     return;

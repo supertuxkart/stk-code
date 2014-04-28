@@ -462,9 +462,11 @@ void STKMeshSceneNode::render()
             glDisable(GL_CULL_FACE);
 
         GLMesh* mesh;
-        if (!GeometricMesh[FPSM_DEFAULT].empty())
+        if (!GeometricMesh[FPSM_DEFAULT].empty() || !GeometricMesh[FPSM_NORMAL_MAP].empty())
             glUseProgram(MeshShader::ShadowShader::Program);
         for_in(mesh, GeometricMesh[FPSM_DEFAULT])
+            drawShadow(*mesh, AbsoluteTransformation);
+        for_in(mesh, GeometricMesh[FPSM_NORMAL_MAP])
             drawShadow(*mesh, AbsoluteTransformation);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())

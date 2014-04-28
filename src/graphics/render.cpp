@@ -236,7 +236,7 @@ void IrrDriver::renderGLSL(float dt)
         // Is the lens flare enabled & visible? Check last frame's query.
         const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-        if (UserConfigParams::m_light_shaft)//hasflare || hasgodrays)
+        if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
         {
             irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
@@ -665,8 +665,8 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     irr_driver->setPhase(SHADOW_PASS);
     glDisable(GL_BLEND);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(1.5, 0.);
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
     glViewport(0, 0, 1024, 1024);
     glClear(GL_DEPTH_BUFFER_BIT);
@@ -674,7 +674,7 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    glCullFace(GL_BACK);
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
 
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
@@ -901,7 +901,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         if (!m_lights[i]->isPointLight())
         {
           m_lights[i]->render();
-          if (UserConfigParams::m_shadows)
+          if (UserConfigParams::m_shadows && World::getWorld()->getTrack()->hasShadows())
               m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
           else
               m_post_processing->renderSunlight();
@@ -1391,14 +1391,20 @@ void IrrDriver::generateSkyboxCubemap()
         int sh_w = 16;
         int sh_h = 16;
 
+        const video::SColorf& ambientf = irr_driver->getSceneManager()->getAmbientLight();
+        video::SColor ambient = ambientf.toSColor();
+
         char *sh_rgba[6];
         for (unsigned i = 0; i < 6; i++)
         {
             sh_rgba[i] = new char[sh_w * sh_h * 4];
 
-            for (int j = 0; j < sh_w * sh_h * 4; j++)
+            for (int j = 0; j < sh_w * sh_h * 4; j+=4)
             {
-                sh_rgba[i][j] = 150;
+                sh_rgba[i][j] = ambient.getBlue();
+                sh_rgba[i][j + 1] = ambient.getGreen();
+                sh_rgba[i][j + 2] = ambient.getRed();
+                sh_rgba[i][j + 3] = 255;
             }
         }
 
