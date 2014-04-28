@@ -114,7 +114,8 @@ void PlayerManager::resumeSavedSession()
  */
 void PlayerManager::onSTKQuit()
 {
-    getCurrentPlayer()->onSTKQuit();
+    if (getCurrentPlayer())
+        getCurrentPlayer()->onSTKQuit();
 }   // onSTKQuit
 
 // ----------------------------------------------------------------------------

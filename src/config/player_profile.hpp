@@ -95,6 +95,9 @@ private:
     /** The token of the saved session. */
     std::string m_saved_token;
 
+    /** The online user name used last (empty if not used online). */
+    core::stringw m_last_online_name;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -161,6 +164,18 @@ public:
         return m_is_guest_account;
     }   // isGuestAccount
 
+    // ------------------------------------------------------------------------
+    /** Returns the last used online name. */
+    const core::stringw& getLastOnlineName() const 
+    {
+        return m_last_online_name; 
+    }   // getLastOnlineName
+    // ------------------------------------------------------------------------
+    /** Sets the last used online name. */
+    void setLastOnlineName(const core::stringw &name)
+    {
+        m_last_online_name = name;
+    }   // setLastOnlineName
     // ------------------------------------------------------------------------
     /** Returns the unique id of this player. */
     unsigned int getUniqueID() const { return m_unique_id; }

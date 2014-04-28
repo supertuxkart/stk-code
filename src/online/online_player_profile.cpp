@@ -170,6 +170,7 @@ namespace Online
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
+            PlayerManager::getCurrentPlayer()->setLastOnlineName(username);
             m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;

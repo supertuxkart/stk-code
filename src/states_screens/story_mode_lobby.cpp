@@ -21,8 +21,10 @@
 #include "config/player_manager.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
+#include "states_screens/login_screen.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -41,12 +43,21 @@ StoryModeLobbyScreen::StoryModeLobbyScreen() : Screen("story_mode_lobby.stkgui")
 
 void StoryModeLobbyScreen::loadedFromFile()
 {
+
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
 
 void StoryModeLobbyScreen::init()
 {
+    m_online_cb = getWidget<CheckBoxWidget>("online");
+    assert(m_online_cb);
+    m_username_tb = getWidget<TextBoxWidget >("username");
+    assert(m_username_tb);
+    m_password_tb = getWidget<TextBoxWidget >("password");
+    assert(m_password_tb);
+    //m_password_tb->setPasswordBox(true, L'*');
+
     Screen::init();
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if (player)
@@ -54,28 +65,6 @@ void StoryModeLobbyScreen::init()
         //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
         //return;
     }
-
-    //CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-    //cb->setState(false);
-
-    ListWidget* list = getWidget<ListWidget>("gameslots");
-
-    //PtrVector<PlayerProfile>& players = UserConfigParams::m_all_players;
-#if 0
-
-    if (UserConfigParams::m_default_player.toString().size() > 0)
-    {
-        for (unsigned int n=0; n<players.size(); n++)
-        {
-            if (players[n].getName() == UserConfigParams::m_default_player.toString())
-            {
-                unlock_manager->setCurrentSlot(players[n].getUniqueID());
-                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-                return;
-            }
-        }
-    }.
-#endif
 
     DynamicRibbonWidget* local = getWidget<DynamicRibbonWidget>("local");
     assert( local != NULL );
@@ -85,30 +74,12 @@ void StoryModeLobbyScreen::init()
         const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
         if (player->isGuestAccount()) continue;
         std::string s = StringUtils::toString(n);
-        local->addItem(player->getName(), s, "", 0, IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+        local->addItem(player->getName(), s, "", 0, 
+                       IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     }
 
-    local->addItem("Create new user", "local_new", 
-                   "karts/sara/icon-sara.png", 0,
-                   IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-    local->updateItemDisplay();
 
-    DynamicRibbonWidget* online = this->getWidget<DynamicRibbonWidget>("online");
-    assert( online != NULL );
-    const std::vector<core::stringw> &online_ids = 
-        PlayerManager::get()->getAllOnlineIds();
-    for (unsigned int i = 0; i < online_ids.size(); i++)
-    {
-        std::string s = StringUtils::toString(i);
-        online->addItem(online_ids[i], s, "karts/nolok/nolokicon.png", 0,
-                        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-
-    }
-    online->addItem("Create new online user", "online_new",
-                     "karts/sara/icon-sara.png", 0,
-                     IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
-    online->updateItemDisplay();
-
+    update();
 
 }   // init
 
@@ -120,14 +91,43 @@ void StoryModeLobbyScreen::tearDown()
 }   // tearDown
 
 // ----------------------------------------------------------------------------
+void StoryModeLobbyScreen::update()
+{
+    bool online = m_online_cb->getState();
+    getWidget<LabelWidget>("label_username")->setVisible(online);
+    m_username_tb->setVisible(online);
+    getWidget<LabelWidget>("label_password")->setVisible(online);
+    m_password_tb->setVisible(online);
+}   // update
 
+// ----------------------------------------------------------------------------
 void StoryModeLobbyScreen::eventCallback(Widget* widget,
                                          const std::string& name,
                                          const int player_id)
 {
     if (name == "local")
     {
-        // FIXME nothing to do
+        // Clicked on a name --> Find the corresponding online data
+        // and display them
+        const std::string &s_index = getWidget<DynamicRibbonWidget>("local")
+                                     ->getSelectionIDString(player_id);
+        if (s_index == "") return;  // can happen if the list is empty
+
+        unsigned int id;
+        StringUtils::fromString(s_index, id);
+        PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
+        assert(profile);
+        getWidget<TextBoxWidget >("username")->setText(profile
+                                                       ->getLastOnlineName());
+        // In case of a saved session, remove the password field,
+        // since it is not necessary to display it.
+        getWidget<TextBoxWidget >("password")->setVisible(profile
+                                                          ->hasSavedSession());
+
+    }
+    else if (name == "online")
+    {
+        update();  // This will make the fields (in)visible
     }
     else if (name == "options")
     {
@@ -151,6 +151,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         }   // button==ok || ok_and_save
     }   // options
 
+    update();
     return;
 
 

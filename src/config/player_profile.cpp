@@ -48,6 +48,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
+    m_last_online_name    = "";
     m_achievements_status = NULL;
     m_story_mode_status   = NULL;
 }   // PlayerProfile
@@ -71,17 +72,19 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
+    m_last_online_name    = "";
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
 
-    node->get("name",          &m_local_name      );
-    node->get("guest",         &m_is_guest_account);
-    node->get("use-frequency", &m_use_frequency   );
-    node->get("unique-id",     &m_unique_id       );
-    node->get("is-default",    &m_is_default      );
-    node->get("saved-session", &m_saved_session   );
-    node->get("saved-user",    &m_saved_user_id   );
-    node->get("saved-token",   &m_saved_token     );
+    node->get("name",             &m_local_name      );
+    node->get("guest",            &m_is_guest_account);
+    node->get("use-frequency",    &m_use_frequency   );
+    node->get("unique-id",        &m_unique_id       );
+    node->get("is-default",       &m_is_default      );
+    node->get("saved-session",    &m_saved_session   );
+    node->get("saved-user",       &m_saved_user_id   );
+    node->get("saved-token",      &m_saved_token     );
+    node->get("last-online-name", &m_last_online_name);
 
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
@@ -138,8 +141,8 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";
 
     out << L"            saved-user=\"" << m_saved_user_id 
-        << L"\" saved-token=\""         << m_saved_token << L"\">\n";
-
+        << L"\" saved-token=\""         << m_saved_token << L"\"\n";
+    out << L"            last-online-name=\"" << m_last_online_name<< L"\">\n";
     {
         if(m_story_mode_status)
             m_story_mode_status->save(out);

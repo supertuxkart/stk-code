@@ -24,18 +24,35 @@
 #include "guiengine/screen.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine 
+{
+    class CheckBoxWidget;
+    class TextBoxWidget;
+    class Widget; 
+}
 
 
 /**
   * \brief Audio options screen
   * \ingroup states_screens
   */
-class StoryModeLobbyScreen : public GUIEngine::Screen, public EnterPlayerNameDialog::INewPlayerListener,
-    public GUIEngine::ScreenSingleton<StoryModeLobbyScreen>
+class StoryModeLobbyScreen : public GUIEngine::Screen, 
+                             public EnterPlayerNameDialog::INewPlayerListener,
+                             public GUIEngine::ScreenSingleton<StoryModeLobbyScreen>
 {
     StoryModeLobbyScreen();
 
+private:
+    /** Online check box. */
+    GUIEngine::CheckBoxWidget *m_online_cb;
+
+    /** User name entry field. */
+    GUIEngine::TextBoxWidget *m_username_tb;
+
+    /** Password widget. */
+    GUIEngine::TextBoxWidget *m_password_tb;
+
+    void update();
 public:
     friend class GUIEngine::ScreenSingleton<StoryModeLobbyScreen>;
 
