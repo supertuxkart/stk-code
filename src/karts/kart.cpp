@@ -2272,14 +2272,16 @@ void Kart::updateSliding()
  */
 void Kart::updateFlying()
 {
+    m_body->setLinearVelocity(m_body->getLinearVelocity() * 0.99f);
+
     if (m_controls.m_accel)
     {
         btVector3 velocity = m_body->getLinearVelocity();
-        if (velocity.length() < 50)
+        if (velocity.length() < 25)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(60.0f*sin(orientation), 0.0,
-                60.0f*cos(orientation)));
+            m_body->applyCentralImpulse(btVector3(100.0f*sin(orientation), 0.0,
+                100.0f*cos(orientation)));
         }
     }
     else if (m_controls.m_brake)
@@ -2288,21 +2290,14 @@ void Kart::updateFlying()
         if (velocity.length() > -15)
         {
             float orientation = getHeading();
-            m_body->applyCentralImpulse(btVector3(-60.0f*sin(orientation), 0.0,
-                -60.0f*cos(orientation)));
+            m_body->applyCentralImpulse(btVector3(-100.0f*sin(orientation), 0.0,
+                -100.0*cos(orientation)));
         }
     }
 
     if (m_controls.m_steer != 0.0f)
     {
         m_body->applyTorque(btVector3(0.0, m_controls.m_steer * 3500.0f, 0.0));
-    }
-
-    if (!m_controls.m_brake && !m_controls.m_accel && (m_controls.m_steer > -0.9f && m_controls.m_steer < 0.1f))
-    {
-        btVector3 velocity = m_body->getLinearVelocity();
-        velocity = velocity * 0.96f;
-        m_body->setLinearVelocity(velocity);
     }
 
     // dampen any roll while flying, makes the kart hard to control
