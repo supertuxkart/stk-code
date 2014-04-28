@@ -74,10 +74,10 @@ void StoryModeLobbyScreen::init()
         const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
         if (player->isGuestAccount()) continue;
         std::string s = StringUtils::toString(n);
-        local->addItem(player->getName(), s, "", 0, 
+        local->addItem(player->getName(), s, "/karts/nolok/nolokicon.png", 0, 
                        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     }
-
+    local->updateItemDisplay();
 
     update();
 
