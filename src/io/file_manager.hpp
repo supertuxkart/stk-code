@@ -72,6 +72,9 @@ private:
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
 
+    /** Directory where resized textures are cached. */
+    std::string       m_cached_textures_dir;
+
     /** Directory where user-defined grand prix are stored. */
     std::string       m_gp_dir;
 
@@ -91,6 +94,7 @@ private:
     bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
     void              checkAndCreateScreenshotDir();
+    void              checkAndCreateCachedTexturesDir();
     void              checkAndCreateGPDir();
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
     std::string       checkAndCreateLinuxDir(const char *env_name,
@@ -110,6 +114,7 @@ public:
     XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getScreenshotDir() const;
+    std::string       getCachedTexturesDir() const;
     std::string       getGPDir() const;
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;

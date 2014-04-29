@@ -192,6 +192,7 @@ FileManager::FileManager()
     checkAndCreateConfigDir();
     checkAndCreateAddonsDir();
     checkAndCreateScreenshotDir();
+    checkAndCreateCachedTexturesDir();
     checkAndCreateGPDir();
 
 #ifdef WIN32
@@ -597,6 +598,14 @@ std::string FileManager::getScreenshotDir() const
 }   // getScreenshotDir
 
 //-----------------------------------------------------------------------------
+/** Returns the directory in which resized textures should be cached.
+*/
+std::string FileManager::getCachedTexturesDir() const
+{
+    return m_cached_textures_dir;
+}   // getCachedTexturesDir
+
+//-----------------------------------------------------------------------------
 /** Returns the directory in which user-defined grand prix should be stored.
  */
 std::string FileManager::getGPDir() const
@@ -851,6 +860,31 @@ void FileManager::checkAndCreateScreenshotDir()
     }
 
 }   // checkAndCreateScreenshotDir
+
+// ----------------------------------------------------------------------------
+/** Creates the directories for cached textures. This will set 
+*  m_cached_textures_dir with the appropriate path.
+*/
+void FileManager::checkAndCreateCachedTexturesDir()
+{
+#if defined(WIN32) || defined(__CYGWIN__)
+    m_cached_textures_dir = m_user_config_dir + "resized-textures/";
+#elif defined(__APPLE__)
+    m_cached_textures_dir = getenv("HOME");
+    m_cached_textures_dir += "/Library/Application Support/SuperTuxKart/ResizedTextures/";
+#else
+    m_cached_textures_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
+    m_cached_textures_dir += "resized-textures/";
+#endif
+
+    if (!checkAndCreateDirectory(m_cached_textures_dir))
+    {
+        Log::error("FileManager", "Can not create cached textures directory '%s', "
+            "falling back to '.'.", m_cached_textures_dir.c_str());
+        m_cached_textures_dir = ".";
+    }
+
+}   // checkAndCreateCachedTexturesDir
 
 // ----------------------------------------------------------------------------
 /** Creates the directories for user-defined grand prix. This will set m_gp_dir
