@@ -1391,14 +1391,20 @@ void IrrDriver::generateSkyboxCubemap()
         int sh_w = 16;
         int sh_h = 16;
 
+        const video::SColorf& ambientf = irr_driver->getSceneManager()->getAmbientLight();
+        video::SColor ambient = ambientf.toSColor();
+
         char *sh_rgba[6];
         for (unsigned i = 0; i < 6; i++)
         {
             sh_rgba[i] = new char[sh_w * sh_h * 4];
 
-            for (int j = 0; j < sh_w * sh_h * 4; j++)
+            for (int j = 0; j < sh_w * sh_h * 4; j+=4)
             {
-                sh_rgba[i][j] = 150;
+                sh_rgba[i][j] = ambient.getBlue();
+                sh_rgba[i][j + 1] = ambient.getGreen();
+                sh_rgba[i][j + 2] = ambient.getRed();
+                sh_rgba[i][j + 3] = 255;
             }
         }
 
