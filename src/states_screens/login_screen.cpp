@@ -179,6 +179,10 @@ void LoginScreen::eventCallback(Widget* widget, const std::string& name,
         else if(button=="cancel")
             StateManager::get()->escapePressed();
     }
+    else if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
 
 }   // eventCallback
 
