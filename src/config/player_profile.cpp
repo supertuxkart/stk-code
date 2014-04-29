@@ -49,13 +49,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_saved_token         = "";
     m_saved_user_id       = 0;
     m_last_online_name    = "";
-    if (unlock_manager && AchievementsManager::get())
-        initRemainingData();
-    else
-    {
-        m_achievements_status = NULL;
-        m_story_mode_status = NULL;
-    }
+    initRemainingData();
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -65,11 +59,12 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
  *  that the achievement and story mode data depends on other data to be
  *  read first (challenges and achievement files), which in turn can only be
  *  created later in the startup process (they depend on e.g. all tracks to
- *  be known). On the other hand, automatic login needs to happen asap
- *  (i.e. as soon as the network thread is started), which needs the main
- *  player data (i.e. the default player, and saved session data). So the
- *  constructor only reads this data, the rest of the player data is handled
- *  in loadRemainingData later in the initialisation process.
+ *  be known). On the other hand, automatic login needs to happen asap (i.e.
+ *  as soon as the network thread is started) to avoid the player having to
+ *  wait for the login to finish , which needs the main player data (i.e.
+ *  the default player, and saved session data). So the constructor only
+ *  reads this data, the rest of the player data is handled in 
+ *  loadRemainingData later in the initialisation process.
  *  \param node The XML node representing this player.
 */
 PlayerProfile::PlayerProfile(const XMLNode* node)

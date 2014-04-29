@@ -57,6 +57,7 @@ private:
 
     void selectUser(int index);
     void makeEntryFieldsVisible(bool online);
+    virtual void onDialogClose();
 public:
     friend class GUIEngine::ScreenSingleton<StoryModeLobbyScreen>;
 

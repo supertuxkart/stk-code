@@ -47,37 +47,35 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(INewPlayerListener* listener,
     m_self_destroy = false;
     loadFromFile("enter_player_name_dialog.stkgui");
 
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    assert(textCtrl != NULL);
-    textCtrl->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
+    assert(text_field != NULL);
+    text_field->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    //if (translations->isRTLLanguage()) textCtrl->addListener(this);
-}
+    std::string username = "";
+
+    // If there is no player (i.e. first start of STK), try to pick
+    // a good default name
+    if (PlayerManager::get()->getNumPlayers() == 0)
+    {
+        if (getenv("USERNAME") != NULL)        // for windows
+            username = getenv("USERNAME");
+        else if (getenv("USER") != NULL)       // Linux, Macs
+            username = getenv("USER");
+        else if (getenv("LOGNAME") != NULL)    // Linux, Macs
+            username = getenv("LOGNAME");
+    }
+    text_field->setText(username.c_str());
+}   // EnterPlayerNameDialog
 
 // -----------------------------------------------------------------------------
 
 EnterPlayerNameDialog::~EnterPlayerNameDialog()
 {
-    // FIXME: what is this code for?
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    textCtrl->getIrrlichtElement()->remove();
-    textCtrl->clearListeners();
-}
+}   // ~EnterPlayerNameDialog
 
 // -----------------------------------------------------------------------------
-
-/*
-void EnterPlayerNameDialog::onTextUpdated()
-{
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    LabelWidget* lbl = getWidget<LabelWidget>("preview");
-
-    lbl->setText( core::stringw(translations->fribidize(textCtrl->getText())), false );
-}
-*/
-// -----------------------------------------------------------------------------
-
-GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation 
+            EnterPlayerNameDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "cancel")
     {
@@ -85,10 +83,9 @@ GUIEngine::EventPropagation EnterPlayerNameDialog::processEvent(const std::strin
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
-
 void EnterPlayerNameDialog::onEnterPressedInternal()
 {
     // ---- Cancel button pressed
@@ -102,8 +99,8 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
     }
 
     // ---- Otherwise, see if we can accept the new name
-    TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-    stringw player_name = textCtrl->getText().trim();
+    TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
+    stringw player_name = text_field->getText().trim();
     if (StringUtils::notEmpty(player_name))
     {
         // check for duplicates
@@ -133,21 +130,20 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
         label->setText(_("Cannot add a player with this name."), false);
         sfx_manager->quickSound( "anvil" );
     }
-}
+}   // onEnterPressedInternal
 
 // -----------------------------------------------------------------------------
-
 void EnterPlayerNameDialog::onUpdate(float dt)
 {
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
-        TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
-        stringw player_name = textCtrl->getText().trim();
+        TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
+        stringw player_name = text_field->getText().trim();
 
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
-        GUIEngine::getGUIEnv()->removeFocus( textCtrl->getIrrlichtElement() );
+        GUIEngine::getGUIEnv()->removeFocus( text_field->getIrrlichtElement() );
         GUIEngine::getGUIEnv()->removeFocus( m_irrlicht_window );
 
         // we will destroy the dialog before notifying the listener to be safer.
@@ -159,4 +155,4 @@ void EnterPlayerNameDialog::onUpdate(float dt)
 
         if (listener != NULL) listener->onNewPlayerWithName( player_name );
     }
-}
+}   // onUpdate

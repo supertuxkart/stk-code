@@ -81,10 +81,9 @@ void StoryModeLobbyScreen::init()
     m_players->updateItemDisplay();
 
     // Select the first user (the list of users is sorted by usage, so it
-    // is the most frequently used user).
+    // is the most frequently used user).    
     if (PlayerManager::get()->getNumPlayers()>0)
         selectUser(0);
-
 
 }   // init
 
@@ -241,6 +240,33 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
 void StoryModeLobbyScreen::unloaded()
 {
 }   // unloaded
+
+// ----------------------------------------------------------------------------
+/** Gets called when a dialog closes. At a first time start of STK the
+ *  internet dialog is shown first. Only when this dialog closes is it possible
+ *  to open the next dialog, which is the one to create a new player (which
+ *  is conventient on a first start).
+ */
+void StoryModeLobbyScreen::onDialogClose()
+{
+    // To allow players to exit the game without creating a player, we count
+    // how often this function was called. The first time is after the 
+    // internet allowed dialog, the 2nd time
+    static int number_of_calls = 0;
+    number_of_calls++;
+    if(PlayerManager::get()->getNumPlayers() == 0)
+    {
+        // Still 0 players after the enter player dialog was shown
+        // --> User wanted to abort, so pop this menu, which will
+        // trigger the end of STK.
+        if (number_of_calls > 1)
+        {
+            StateManager::get()->popMenu();
+            return;
+        }
+        new EnterPlayerNameDialog(this, 0.5f, 0.4f);
+    }   // getNumPlayers == 0
+}   // onDialogClose
 
 // ----------------------------------------------------------------------------
 /** This is a callback from the new user dialog.
