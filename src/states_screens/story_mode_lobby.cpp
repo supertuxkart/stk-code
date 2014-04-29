@@ -56,7 +56,9 @@ void StoryModeLobbyScreen::init()
     assert(m_username_tb);
     m_password_tb = getWidget<TextBoxWidget >("password");
     assert(m_password_tb);
-    //m_password_tb->setPasswordBox(true, L'*');
+    m_password_tb->setPasswordBox(true, L'*');
+    m_players = getWidget<DynamicRibbonWidget>("players");
+    assert(m_players);
 
     Screen::init();
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
@@ -66,20 +68,23 @@ void StoryModeLobbyScreen::init()
         //return;
     }
 
-    DynamicRibbonWidget* local = getWidget<DynamicRibbonWidget>("local");
-    assert( local != NULL );
-
+    m_players->clearItems();
     for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
         const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
         if (player->isGuestAccount()) continue;
         std::string s = StringUtils::toString(n);
-        local->addItem(player->getName(), s, "/karts/nolok/nolokicon.png", 0, 
+        m_players->addItem(player->getName(), s, "/karts/nolok/nolokicon.png", 0, 
                        IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
     }
-    local->updateItemDisplay();
 
-    update();
+    m_players->updateItemDisplay();
+
+    // Select the first user (the list of users is sorted by usage, so it
+    // is the most frequently used user).
+    if (PlayerManager::get()->getNumPlayers()>0)
+        selectUser(0);
+
 
 }   // init
 
@@ -91,9 +96,47 @@ void StoryModeLobbyScreen::tearDown()
 }   // tearDown
 
 // ----------------------------------------------------------------------------
-void StoryModeLobbyScreen::update()
+/** Called when a user is selected. It updates the online checkbox and
+ *  entrye fields.
+ */
+void StoryModeLobbyScreen::selectUser(int index)
 {
-    bool online = m_online_cb->getState();
+    PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
+    assert(profile);
+    getWidget<TextBoxWidget >("username")->setText(profile
+                                                   ->getLastOnlineName());
+    m_players->setSelection(StringUtils::toString(index), 0, /*focusIt*/true);
+
+    // Last game was not online, so make the offline settings the default
+    // (i.e. unckeck online checkbox, and make entry fields invisible).
+    if (profile->getLastOnlineName() == "")
+    {
+        m_online_cb->setState(false);
+        makeEntryFieldsVisible(false);
+        return;
+    }
+
+    // Now last use was with online --> Display the saved data
+    makeEntryFieldsVisible(true);
+    m_username_tb->setText(profile->getLastOnlineName());
+
+    // And make the password invisible if the session is saved (i.e
+    // the user does not need to enter a password).
+    if (profile->hasSavedSession())
+    {
+        m_password_tb->setVisible(false);
+        getWidget<LabelWidget>("label_password")->setVisible(false);
+    }
+
+}   // selectUser
+
+// ----------------------------------------------------------------------------
+/** Make the entry fields either visible or invisible.
+ *  \param online Online state, which dicates if the entry fields are
+ *         visible (true) or not.
+ */
+void StoryModeLobbyScreen::makeEntryFieldsVisible(bool online)
+{
     getWidget<LabelWidget>("label_username")->setVisible(online);
     m_username_tb->setVisible(online);
     getWidget<LabelWidget>("label_password")->setVisible(online);
@@ -101,33 +144,27 @@ void StoryModeLobbyScreen::update()
 }   // update
 
 // ----------------------------------------------------------------------------
+/** Called when the user selects anything on the screen.
+ */
 void StoryModeLobbyScreen::eventCallback(Widget* widget,
                                          const std::string& name,
                                          const int player_id)
 {
-    if (name == "local")
+    if (name == "players")
     {
         // Clicked on a name --> Find the corresponding online data
         // and display them
-        const std::string &s_index = getWidget<DynamicRibbonWidget>("local")
-                                     ->getSelectionIDString(player_id);
+        const std::string &s_index = getWidget<DynamicRibbonWidget>("players")
+                                   ->getSelectionIDString(player_id);
         if (s_index == "") return;  // can happen if the list is empty
 
         unsigned int id;
-        StringUtils::fromString(s_index, id);
-        PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
-        assert(profile);
-        getWidget<TextBoxWidget >("username")->setText(profile
-                                                       ->getLastOnlineName());
-        // In case of a saved session, remove the password field,
-        // since it is not necessary to display it.
-        getWidget<TextBoxWidget >("password")->setVisible(profile
-                                                          ->hasSavedSession());
-
+        if (StringUtils::fromString(s_index, id))
+            selectUser(id);
     }
     else if (name == "online")
     {
-        update();  // This will make the fields (in)visible
+        makeEntryFieldsVisible(m_online_cb->getState());
     }
     else if (name == "options")
     {
@@ -135,13 +172,14 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
             getWidget<RibbonWidget>("options")->getSelectionIDString(player_id);
         if (button == "ok" || button == "ok_and_save")
         {
-            DynamicRibbonWidget *local = getWidget<DynamicRibbonWidget>("local");
-            const std::string &name = local->getSelectionIDString(player_id);
-            if (name == "local_new")
+            if (m_online_cb->getState() && m_password_tb->getText() == "")
             {
-                // create new local player
+                getWidget<LabelWidget>("message")->setText("Enter password",true);
                 return;
             }
+
+            const std::string &name = m_players->getSelectionIDString(player_id);
+
             unsigned int id;
             StringUtils::fromString(name, id);
             PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
@@ -149,19 +187,18 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
             StateManager::get()->pushScreen(MainMenuScreen::getInstance());
             return;
         }   // button==ok || ok_and_save
+        else if (button == "new_user")
+        {
+            new EnterPlayerNameDialog(this, 0.5f, 0.4f);
+        }
     }   // options
 
-    update();
     return;
 
 
     if (name == "back")
     {
         StateManager::get()->escapePressed();
-    }
-    else if (name == "creategame")
-    {
-        new EnterPlayerNameDialog(this, 0.5f, 0.4f);
     }
     else if (name == "gameslots")
     {
@@ -206,30 +243,15 @@ void StoryModeLobbyScreen::unloaded()
 }   // unloaded
 
 // ----------------------------------------------------------------------------
-
-void StoryModeLobbyScreen::onNewPlayerWithName(const core::stringw& newName)
+/** This is a callback from the new user dialog.
+ */
+void StoryModeLobbyScreen::onNewPlayerWithName(const core::stringw& new_name)
 {
-    bool slot_found = false;
-
-    for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
-    {
-        PlayerProfile *player = PlayerManager::get()->getPlayer(n);
-        if (player->getName() == newName)
-        {
-            PlayerManager::get()->setCurrentPlayer(player, false);
-            slot_found = true;
-            break;
-        }
-    }
-
-    if (!slot_found)
-    {
-        Log::error("StoryModeLobbyScreen",
-                   "Cannot find player corresponding to slot '%s'.",
-                   core::stringc(newName.c_str()).c_str());
-    }
-
-    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+    init();
+    // Select the newly added player
+    selectUser(PlayerManager::get()->getNumPlayers() - 1);
+        
+    return;
 }   // onNewPlayerWithName
 
 // -----------------------------------------------------------------------------

@@ -52,7 +52,11 @@ private:
     /** Password widget. */
     GUIEngine::TextBoxWidget *m_password_tb;
 
-    void update();
+    /** The dynamic ribbon containing all players. */
+    GUIEngine::DynamicRibbonWidget* m_players;
+
+    void selectUser(int index);
+    void makeEntryFieldsVisible(bool online);
 public:
     friend class GUIEngine::ScreenSingleton<StoryModeLobbyScreen>;
 

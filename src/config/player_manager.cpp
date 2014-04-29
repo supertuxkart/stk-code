@@ -232,7 +232,8 @@ void PlayerManager::initRemainingData()
     // which makes this necessary), otherwise the index of m_all_players
     // is not identical with the index in the xml file.
     std::vector<XMLNode*> player_nodes;
-    m_player_data->getNodes("player", player_nodes);
+    if(m_player_data)
+        m_player_data->getNodes("player", player_nodes);
     for (unsigned int i = 0; i<m_all_players.size(); i++)
     {
         // On the first time STK is run, there is no player data,
@@ -338,7 +339,7 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enfocring current player '%s'.",
-                player->getName().c_str());
+                       player->getName().c_str());
             m_current_player = player;
             return;
         }

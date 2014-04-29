@@ -49,8 +49,13 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_saved_token         = "";
     m_saved_user_id       = 0;
     m_last_online_name    = "";
-    m_achievements_status = NULL;
-    m_story_mode_status   = NULL;
+    if (unlock_manager && AchievementsManager::get())
+        initRemainingData();
+    else
+    {
+        m_achievements_status = NULL;
+        m_story_mode_status = NULL;
+    }
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------

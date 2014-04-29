@@ -6,14 +6,14 @@
         <header text_align="center" width="80%" align="center" text="Select a Local Player"/>
         <spacer height="15" width="10"/>
 
-        <scrollable_ribbon id="local" height="220" y="10" x="10" width="98%" align="center" label_location="each"
+        <scrollable_ribbon id="players" height="120" y="10" x="10" width="98%" align="center" label_location="each"
                            square_items="true" child_width="160" child_height="120" />
 
         <spacer height="15" width="10"/>
         <div width="80%" align="center" layout="vertical-row" height="fit">
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
-                <checkbox  id="online" I18N="In the login screen"/>
+                <checkbox  id="online" I18N="In the login screen" text_align="left"/>
             </div>
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" height="100%" id="label_username" text_align="left"
@@ -28,7 +28,9 @@
                 <textbox proportion="2" height="fit" id="password" I18N="In the registration dialog"/>
             </div>
         </div>
-
+        <div width="80%" align="center" layout="vertical-row" height="fit">
+            <label id="message" width="80%" align="center" text_align="left"/>
+        </div>
         <spacer width="20" height="25"/>
         <buttonbar id="options" width="90%" height="13%" align="bottom">
             <icon-button id="ok" width="64" height="64" icon="gui/green_check.png"
