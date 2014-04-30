@@ -73,7 +73,6 @@ private:
     bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
-<<<<<<< HEAD:src/race/grand_prix.hpp
     #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
     #pragma warning(disable:4290)
     #endif
@@ -83,21 +82,6 @@ public:
     GrandPrix() {};
 
     // Methods for the GP editor
-=======
-#if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
-#  pragma warning(disable:4290)
-#endif
-    /** Load the GrandPrixData from the given filename */
-    GrandPrixData(const std::string& filename);
-    /** Needed for simple creation of an instance of GrandPrixData */
-    GrandPrixData() {};
-
-    // Methods for the GP editor
-    void setId(const std::string& id);
-    void setName(const irr::core::stringw& name);
-    void setFilename(const std::string& filename);
-    void setEditable(const bool editable);
->>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.hpp
     /** Load the grand prix from the file set by the constructor or the grand
      * prix editor */
     void reload();

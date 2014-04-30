@@ -19,12 +19,8 @@
 #include "race/grand_prix_manager.hpp"
 
 #include "config/user_config.hpp"
-<<<<<<< HEAD
 #include "race/grand_prix.hpp"
-=======
->>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
 #include "io/file_manager.hpp"
-#include "race/grand_prix_data.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>
@@ -75,11 +71,7 @@ void GrandPrixManager::load(const std::string& filename)
 {
     try
     {
-<<<<<<< HEAD
         GrandPrix* gp = new GrandPrix(filename);
-=======
-        GrandPrixData* gp = new GrandPrixData(filename);
->>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
         m_gp_data.push_back(gp);
         Log::debug("GrandPrixManager",
                    "Grand Prix '%s' loaded from %s",
@@ -149,18 +141,10 @@ GrandPrixManager::~GrandPrixManager()
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
         delete m_gp_data[i];
-<<<<<<< HEAD
 }
 
 // ----------------------------------------------------------------------------
 GrandPrix* GrandPrixManager::getGrandPrix(const std::string& s) const
-=======
-    }
-}
-
-// ----------------------------------------------------------------------------
-GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
->>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
 {
     return editGrandPrix(s);
 }
@@ -169,10 +153,8 @@ GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 GrandPrix* GrandPrixManager::editGrandPrix(const std::string& s) const
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
-    {
         if(m_gp_data[i]->getId() == s)
             return m_gp_data[i];
-    }   // for i in m_gp_data
 
     return NULL;
 }
@@ -192,11 +174,7 @@ void GrandPrixManager::checkConsistency()
 }   // checkConsistency
 
 // ----------------------------------------------------------------------------
-<<<<<<< HEAD
 GrandPrix* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
-=======
-GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
->>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
 {
     if (existsName(newName))
         return NULL;
@@ -215,11 +193,7 @@ GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
 }
 
 // ----------------------------------------------------------------------------
-<<<<<<< HEAD
 GrandPrix* GrandPrixManager::copy(const std::string& id,
-=======
-GrandPrixData* GrandPrixManager::copy(const std::string& id,
->>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
                                       const irr::core::stringw& newName)
 {
     if (existsName(newName))
