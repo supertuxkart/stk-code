@@ -35,7 +35,11 @@ class GrandPrixManager
 private:
     static const char* SUFFIX;
 
+<<<<<<< HEAD
     std::vector<GrandPrix*> m_gp_data;
+=======
+    std::vector<GrandPrixData*> m_gp_data;
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
 
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
@@ -53,15 +57,26 @@ public:
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
+<<<<<<< HEAD
     GrandPrix* getGrandPrix(const int i) const { return m_gp_data[i];     }
     GrandPrix* getGrandPrix(const std::string& s) const;
+=======
+    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
+    GrandPrixData* getGrandPrix(const std::string& s) const;
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
     unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
     void           checkConsistency();
 
     // Methods for the gp editor
+<<<<<<< HEAD
     GrandPrix* editGrandPrix(const std::string& s) const;
     GrandPrix* createNewGP(const irr::core::stringw& newName);
     GrandPrix* copy(const std::string& id,
+=======
+    GrandPrixData* editGrandPrix(const std::string& s) const;
+    GrandPrixData* createNewGP(const irr::core::stringw& newName);
+    GrandPrixData* copy(const std::string& id,
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b
                         const irr::core::stringw& newName);
     void           remove(const std::string& id);
 };   // GrandPrixManager

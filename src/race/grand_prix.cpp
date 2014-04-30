@@ -35,7 +35,11 @@
 
 
 // ----------------------------------------------------------------------------
+<<<<<<< HEAD:src/race/grand_prix.cpp
 GrandPrix::GrandPrix(const std::string& filename)
+=======
+GrandPrixData::GrandPrixData(const std::string& filename)
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
 {
     m_filename = filename;
     m_id       = StringUtils::getBasename(
@@ -54,7 +58,11 @@ void GrandPrix::reload()
     std::auto_ptr<XMLNode> root(file_manager->createXMLTree(m_filename));
     if (root.get() == NULL)
     {
+<<<<<<< HEAD:src/race/grand_prix.cpp
         Log::error("GrandPrix",
+=======
+        Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                    "Error while trying to read xml Grand Prix from file '%s'. "
                    "Is the file readable for supertuxkart?",
                    m_filename.c_str());
@@ -63,7 +71,11 @@ void GrandPrix::reload()
 
     if (root->getName() != "supertuxkart_grand_prix")
     {
+<<<<<<< HEAD:src/race/grand_prix.cpp
         Log::error("GrandPrix",
+=======
+        Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                    "Error while trying to read Grand Prix file '%s': "
                    "Root node has the wrong name %s", m_filename.c_str(),
                    root->getName().c_str());
@@ -72,7 +84,11 @@ void GrandPrix::reload()
 
     if (!root->get("name", &m_name))
     {
+<<<<<<< HEAD:src/race/grand_prix.cpp
          Log::error("GrandPrix",
+=======
+         Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                     "Error while trying to read grandprix file '%s': "
                     "missing 'name' attribute", m_filename.c_str());
         throw std::runtime_error("Missing name attribute");
@@ -86,7 +102,11 @@ void GrandPrix::reload()
 
         if (node->getName() != "track")
         {
+<<<<<<< HEAD:src/race/grand_prix.cpp
             Log::error("GrandPrix"
+=======
+            Log::error("GrandPrixData"
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                        "Unknown node in Grand Prix XML file '%s': %s",
                        m_filename.c_str(), node->getName().c_str());
             throw std::runtime_error("Unknown node in the XML file");
@@ -96,7 +116,11 @@ void GrandPrix::reload()
         std::string track_id;
         if (!node->get("id", &track_id))
         {
+<<<<<<< HEAD:src/race/grand_prix.cpp
             Log::error("GrandPrix",
+=======
+            Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                        "The id attribute is missing in the %d. track entry of "
                        "the Grand Prix file '%s'.", i, m_filename.c_str());
             throw std::runtime_error("Missing track id");
@@ -106,7 +130,11 @@ void GrandPrix::reload()
         Track* t = track_manager->getTrack(track_id);
         if (t == NULL)
         {
+<<<<<<< HEAD:src/race/grand_prix.cpp
             Log::error("GrandPrix",
+=======
+            Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                        "The Grand Prix file '%s' contains a track '%s' that "
                        "does not exist", m_filename.c_str(), track_id.c_str());
             throw std::runtime_error("Unknown track");
@@ -116,7 +144,11 @@ void GrandPrix::reload()
         int number_of_laps;
         if (!node->get("laps", &number_of_laps))
         {
+<<<<<<< HEAD:src/race/grand_prix.cpp
             Log::error("GrandPrix",
+=======
+            Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                        "The laps attribute is missing in the %d. track entry "
                        "of the Grand Prix file '%s'.", i, m_filename.c_str());
             throw std::runtime_error("Missing track id");
@@ -124,7 +156,11 @@ void GrandPrix::reload()
 
         if (number_of_laps < 1)
         {
+<<<<<<< HEAD:src/race/grand_prix.cpp
             Log::error("GrandPrix",
+=======
+            Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                        "Track '%s' in the Grand Prix file '%s' should be raced "
                        "with %d laps, which isn't possible.", track_id.c_str(),
                        m_filename.c_str());
@@ -176,7 +212,11 @@ bool GrandPrix::writeToFile()
     }
     catch (std::runtime_error& e)
     {
+<<<<<<< HEAD:src/race/grand_prix.cpp
         Log::error("GrandPrix",
+=======
+        Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                    "Failed to write grand prix to '%s'; cause: %s",
                    m_filename.c_str(), e.what());
         return false;
@@ -184,7 +224,11 @@ bool GrandPrix::writeToFile()
 }
 
 // ----------------------------------------------------------------------------
+<<<<<<< HEAD:src/race/grand_prix.cpp
 bool GrandPrix::checkConsistency(bool log_error) const
+=======
+bool GrandPrixData::checkConsistency(bool log_error) const
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
 {
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
@@ -192,7 +236,11 @@ bool GrandPrix::checkConsistency(bool log_error) const
         {
             if (log_error)
             {
+<<<<<<< HEAD:src/race/grand_prix.cpp
                 Log::error("GrandPrix",
+=======
+                Log::error("GrandPrixData",
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                            "The grand prix '%ls' won't be available because "
                            "the track '%s' does not exist!", m_name.c_str(),
                            m_tracks[i].c_str());
@@ -211,16 +259,26 @@ bool GrandPrix::checkConsistency(bool log_error) const
  *  is unlocked). It also prevents people from using the grand prix editor as
  *  a way to play tracks that still haven't been unlocked
  */
+<<<<<<< HEAD:src/race/grand_prix.cpp
 bool GrandPrix::isTrackAvailable(const std::string &id, bool includeLocked)
                                                                            const
+=======
+bool GrandPrixData::isTrackAvailable(const std::string &id, 
+                                     bool includeLocked     ) const
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
 {
     if (includeLocked)
         return true;
     else if (id == "fortmagma")
         return !PlayerManager::getCurrentPlayer()->isLocked("fortmagma");
     else
+<<<<<<< HEAD:src/race/grand_prix.cpp
         return (!m_editable
                 || !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
+=======
+        return (!m_editable ||
+                !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
 }
 
 // ----------------------------------------------------------------------------
@@ -230,7 +288,11 @@ std::vector<std::string> GrandPrix::getTrackNames(bool includeLocked) const
     for (unsigned int i = 0; i < m_tracks.size(); i++)
         if(isTrackAvailable(m_tracks[i], includeLocked))
             names.push_back(m_tracks[i]);
+<<<<<<< HEAD:src/race/grand_prix.cpp
 
+=======
+    }
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
     return names;
 }
 
@@ -326,13 +388,21 @@ void GrandPrix::moveDown(const unsigned int track)
 }
 
 // ----------------------------------------------------------------------------
+<<<<<<< HEAD:src/race/grand_prix.cpp
 void GrandPrix::addTrack(Track* track, unsigned int laps, bool reverse,
+=======
+void GrandPrixData::addTrack(Track* track, unsigned int laps, bool reverse,
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                              int position)
 {
     int n = getNumberOfTracks(true);
     assert (track != NULL);
     assert (laps > 0);
+<<<<<<< HEAD:src/race/grand_prix.cpp
     assert (-1 <= position && position < n);
+=======
+    assert (-1 < position && position < n);
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
 
     if (position < 0 || position == (n - 1) || m_tracks.empty())
     {
@@ -352,7 +422,11 @@ void GrandPrix::addTrack(Track* track, unsigned int laps, bool reverse,
 }
 
 // ----------------------------------------------------------------------------
+<<<<<<< HEAD:src/race/grand_prix.cpp
 void GrandPrix::editTrack(unsigned int index, Track* track,
+=======
+void GrandPrixData::editTrack(unsigned int index, Track* track,
+>>>>>>> b0169d28961d0e1d5c19cc2325cf09d634ba255b:src/race/grand_prix_data.cpp
                               unsigned int laps, bool reverse)
 {
     assert (index < getNumberOfTracks(true));

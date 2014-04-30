@@ -22,7 +22,7 @@ void main()
     vec2 offset = 10. / screen;
 
     vec4 col = texture2D(tex, uv);
-    vec4 colOriginal = col;
+/*    vec4 colOriginal = col;*/
     // Weight from here http://artmartinsh.blogspot.fr/2010/02/glsl-lens-blur-filter-with-bokeh.html
 
     col += texture2D(tex, uv + (vec2(0.0, 0.4) * offset) * blur);
@@ -73,10 +73,11 @@ void main()
     depth = clamp((FragPos.z/280), 0., 1.);
     depth  = (1 - depth);
 	  vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
+    FragColor = vec4(col.xyz / 41.0, 1.);
 
 /*
     FragColor.xyz = vec3(depth);
     FragColor.a = 1.0;
-    */
-    FragColor = vec4(final, 1.);
+    *
+    FragColor = vec4(final, 1.);*/
 }
