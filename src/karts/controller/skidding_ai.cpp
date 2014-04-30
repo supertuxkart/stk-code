@@ -1277,7 +1277,7 @@ void SkiddingAI::handleItems(const float dt)
 
             // Don't fire if the kart we are aiming at is invulnerable.
             if ( (fire_backwards  && m_kart_behind->isInvulnerable()) ||
-                 (!fire_backwards && m_kart_ahead->isInvulnerable()     )
+                 (!fire_backwards && m_kart_ahead->isInvulnerable() )   )
                 return;
 
             float distance = fire_backwards ? m_distance_behind
