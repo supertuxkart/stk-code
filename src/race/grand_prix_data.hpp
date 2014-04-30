@@ -69,9 +69,9 @@ private:
     bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
-    #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
-    #pragma warning(disable:4290)
-    #endif
+#if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
+#  pragma warning(disable:4290)
+#endif
     /** Load the GrandPrixData from the given filename */
     GrandPrixData(const std::string& filename);
     /** Needed for simple creation of an instance of GrandPrixData */

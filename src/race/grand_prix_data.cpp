@@ -226,16 +226,16 @@ bool GrandPrixData::checkConsistency(bool log_error) const
  *  is unlocked). It also prevents people from using the grand prix editor as
  *  a way to play tracks that still haven't been unlocked
  */
-bool GrandPrixData::isTrackAvailable(const std::string &id, bool includeLocked)
-                                                                           const
+bool GrandPrixData::isTrackAvailable(const std::string &id, 
+                                     bool includeLocked     ) const
 {
     if (includeLocked)
         return true;
     else if (id == "fortmagma")
         return !PlayerManager::getCurrentPlayer()->isLocked("fortmagma");
     else
-        return (!m_editable
-                || !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
+        return (!m_editable ||
+                !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
 }
 
 // ----------------------------------------------------------------------------
@@ -243,9 +243,10 @@ std::vector<std::string> GrandPrixData::getTrackNames(bool includeLocked) const
 {
     std::vector<std::string> names;
     for (unsigned int i = 0; i < m_tracks.size(); i++)
+    {
         if(isTrackAvailable(m_tracks[i], includeLocked))
             names.push_back(m_tracks[i]);
-
+    }
     return names;
 }
 
@@ -289,7 +290,7 @@ unsigned int GrandPrixData::getNumberOfTracks(bool includeLocked) const
 // ----------------------------------------------------------------------------
 irr::core::stringw GrandPrixData::getTrackName(const unsigned int track) const
 {
-    assert(0 <= track && track < getNumberOfTracks(true));
+    assert(track < getNumberOfTracks(true));
     Track* t = track_manager->getTrack(m_tracks[track]);
     assert(t != NULL);
     return t->getName();

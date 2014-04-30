@@ -19,8 +19,8 @@
 #include "race/grand_prix_manager.hpp"
 
 #include "config/user_config.hpp"
-#include "race/grand_prix_data.hpp"
 #include "io/file_manager.hpp"
+#include "race/grand_prix_data.hpp"
 #include "utils/string_utils.hpp"
 
 #include <algorithm>
@@ -140,7 +140,9 @@ GrandPrixManager::GrandPrixManager()
 GrandPrixManager::~GrandPrixManager()
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
+    {
         delete m_gp_data[i];
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -153,8 +155,10 @@ GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
+    {
         if(m_gp_data[i]->getId() == s)
             return m_gp_data[i];
+    }   // for i in m_gp_data
 
     return NULL;
 }
