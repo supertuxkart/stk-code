@@ -19,12 +19,12 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
-#include "states_screens/login_screen.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
@@ -149,6 +149,10 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
                                          const std::string& name,
                                          const int player_id)
 {
+    LabelWidget *info = getWidget<LabelWidget>("message");
+    info->setText("", true);
+    info->setErrorColor();
+
     if (name == "players")
     {
         // Clicked on a name --> Find the corresponding online data
@@ -163,6 +167,16 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     }
     else if (name == "online")
     {
+        // If online access is not allowed, do not accept an online account
+        // but advice the user where to enable this option.
+        if (m_online_cb->getState() && UserConfigParams::m_internet_status ==
+                                       Online::RequestManager::IPERM_NOT_ALLOWED)
+        {
+            info->setText(
+                "Internet access is disabled, please enable it in the options",
+                true);
+            m_online_cb->setState(false);
+        }
         makeEntryFieldsVisible(m_online_cb->getState());
     }
     else if (name == "options")
@@ -173,7 +187,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         {
             if (m_online_cb->getState() && m_password_tb->getText() == "")
             {
-                getWidget<LabelWidget>("message")->setText("Enter password",true);
+                info->setText("You need to enter a password.",true);
                 return;
             }
 

@@ -28,7 +28,7 @@
                 <textbox proportion="2" height="fit" id="password" I18N="In the registration dialog"/>
             </div>
         </div>
-        <div width="80%" align="center" layout="vertical-row" height="fit">
+        <div width="80%" align="center" layout="vertical-row" height="20%">
             <label id="message" width="80%" align="center" text_align="left"/>
         </div>
         <spacer width="20" height="25"/>
