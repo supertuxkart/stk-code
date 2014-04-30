@@ -17,6 +17,7 @@
 
 #include "states_screens/story_mode_lobby.hpp"
 
+#include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
@@ -175,6 +176,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
             info->setText(
                 "Internet access is disabled, please enable it in the options",
                 true);
+            sfx_manager->quickSound( "anvil" );
             m_online_cb->setState(false);
         }
         makeEntryFieldsVisible(m_online_cb->getState());
@@ -187,7 +189,8 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         {
             if (m_online_cb->getState() && m_password_tb->getText() == "")
             {
-                info->setText("You need to enter a password.",true);
+                info->setText(_("You need to enter a password."),true);
+                sfx_manager->quickSound( "anvil" );
                 return;
             }
 
