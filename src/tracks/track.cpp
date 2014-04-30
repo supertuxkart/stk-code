@@ -357,7 +357,7 @@ void Track::cleanup()
 void Track::loadTrackInfo()
 {
     irr_driver->setLwhite(1.);
-    irr_driver->setExposure(0.09);
+    irr_driver->setExposure(0.09f);
     // Default values
     m_use_fog               = false;
     m_fog_max               = 1.0f;
