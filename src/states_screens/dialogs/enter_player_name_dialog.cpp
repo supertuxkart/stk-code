@@ -17,8 +17,6 @@
 
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
@@ -31,6 +29,7 @@
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -80,6 +79,11 @@ GUIEngine::EventPropagation
     if (eventSource == "cancel")
     {
         dismiss();
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "ok")
+    {
+        onEnterPressedInternal();
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
