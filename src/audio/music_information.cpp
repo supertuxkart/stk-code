@@ -81,6 +81,7 @@ MusicInformation::MusicInformation(const XMLNode *root,
     m_normal_music    = NULL;
     m_fast_music      = NULL;
     m_enable_fast     = false;
+    m_music_waiting   = false;
     m_faster_time     = 1.0f;
     m_max_pitch       = 0.1f;
     m_gain            = 1.0f;

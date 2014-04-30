@@ -39,6 +39,6 @@ or collect any achievements while being online."
     </box>
 </div>
 
-<icon-button id="back" x="0" y="0" height="15%" icon="gui/back.png"/>
+<icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
 </stkgui>

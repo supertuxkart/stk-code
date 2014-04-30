@@ -469,7 +469,8 @@ void PhysicalObject::init()
                          btVector3(0,extend.getY()*0.5f, 0));
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
-    m_shape->calculateLocalInertia(m_mass, inertia);
+    if (m_body_type != MP_EXACT)
+        m_shape->calculateLocalInertia(m_mass, inertia);
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
