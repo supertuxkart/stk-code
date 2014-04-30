@@ -412,7 +412,7 @@ public:
 
 }
 
-#define MAXLIGHT 16
+#define MAXLIGHT 32
 
 namespace LightShader
 {
