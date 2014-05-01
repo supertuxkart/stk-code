@@ -290,6 +290,8 @@ public:
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
+    std::string           generateSmallerTextures(const std::string& dir);
+    std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
                                      const std::string &filename,
                                      bool is_premul=false,

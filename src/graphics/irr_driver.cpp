@@ -1240,6 +1240,76 @@ void IrrDriver::unsetTextureErrorMessage()
 }   // unsetTextureErrorMessage
 
 // ----------------------------------------------------------------------------
+/** Retrieve all textures in the specified directory, generate a smaller
+*   version for each of them and save them in the cache. Smaller textures are 
+*   generated only if they do not already exist or if their original version 
+*   is newer than the cached one.
+*   \param dir Directory from where textures will be retrieve.
+*   \return Directory where smaller textures were cached.
+*/
+std::string IrrDriver::generateSmallerTextures(const std::string& dir)
+{
+    std::set<std::string> files;
+    file_manager->listFiles(files, dir, true);
+
+    std::set<std::string>::const_iterator it;
+    for (it = files.cbegin(); it != files.cend(); ++it)
+    {
+        std::string ext = StringUtils::toLowerCase(StringUtils::getExtension(*it));
+        if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "bmp")
+        {
+            getSmallerTexture(*it);
+        }
+    } // for it in files
+
+    return file_manager->getCachedTexturesDir();
+} // generateSmallerTextures
+
+// ----------------------------------------------------------------------------
+/** Return the filename for the cached smaller version of the texture. Also,
+*   generate the smaller version of the texture if it does not already
+*   exist or if the original version is newer than the cached one.
+*   \param filename File name of the original texture.
+*   \return File name of the cached texture.
+*
+*   \todo Regenerate the texture if the original version is newer than the
+*         cached one.
+*/
+std::string IrrDriver::getSmallerTexture(const std::string& filename)
+{
+    // Retrieve the filename of the cached texture
+    std::string file = StringUtils::getBasename(filename);
+    std::string cached_file =
+        file_manager->getCachedTexturesDir() + file;
+    // If the cached texture does not exist, we generate it.
+    if (!file_manager->fileExists(cached_file))
+    {
+        video::IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        video::IImage* img =
+            video_driver->createImageFromFile(filename.c_str());
+
+        if (img != NULL)
+        {
+            core::dimension2d<u32> dim = img->getDimension();
+            core::dimension2d<u32> new_dim; // Dimension of the cached texture
+            const int scale_factor = 2;
+            // Resize the texture only if it can be done properly
+            if (dim.Width < scale_factor || dim.Height < scale_factor)
+                new_dim = dim;
+            else
+                new_dim = dim / scale_factor;
+
+            video::IImage* scaled =
+                video_driver->createImage(img->getColorFormat(), new_dim);
+            img->copyToScaling(scaled);
+
+            video_driver->writeImageToFile(scaled, cached_file.c_str());
+        } // if img != NULL
+    } // if !file_manager->fileExists(cached_file)
+    return cached_file;
+} // getSmallerTexture
+
+// ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object. This is just
  *  a convenient wrapper which loads the texture from a STK asset directory.
  *  It calls the file manager to get the full path, then calls the normal
