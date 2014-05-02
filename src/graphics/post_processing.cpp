@@ -650,9 +650,12 @@ void PostProcessing::render()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
 
-        renderDoF(out_fbo, in_rtt);
-        std::swap(in_rtt, out_rtt);
-        std::swap(in_fbo, out_fbo);
+        if (UserConfigParams::m_dof)
+        {
+            renderDoF(out_fbo, in_rtt);
+            std::swap(in_rtt, out_rtt);
+            std::swap(in_fbo, out_fbo);
+        }
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
