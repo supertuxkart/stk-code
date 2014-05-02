@@ -461,6 +461,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
         &m_video_group, "Enable Dynamic Lights"));
+    PARAM_PREFIX BoolUserConfigParam        m_dof
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
+        &m_video_group, "Enable Depth of Field"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */

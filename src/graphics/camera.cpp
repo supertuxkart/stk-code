@@ -308,7 +308,16 @@ void Camera::setInitialTransform()
  */
 void Camera::smoothMoveCamera(float dt)
 {
-    
+    Kart *kart = dynamic_cast<Kart*>(m_kart);
+    if (kart->isFlying())
+    {
+        Vec3 vec3 = m_kart->getXYZ() + Vec3(sin(m_kart->getHeading()) * -4.0f, 0.5f, cos(m_kart->getHeading()) * -4.0f);
+        m_camera->setTarget(m_kart->getXYZ().toIrrVector());
+        m_camera->setPosition(vec3.toIrrVector());
+        return;
+    }
+
+
     core::vector3df current_position  =  m_camera->getPosition();
     // Smoothly interpolate towards the position and target
     const KartProperties *kp = m_kart->getKartProperties();
@@ -345,6 +354,7 @@ void Camera::smoothMoveCamera(float dt)
     {
         current_position += (wanted_position - current_position) * dt * 5;
     }
+
     if(m_mode!=CM_FALLING)
         m_camera->setPosition(current_position);
     m_camera->setTarget(current_target);//set new target

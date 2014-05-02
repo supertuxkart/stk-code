@@ -51,7 +51,7 @@ private:
      *  (ie. 'volcano'). */
     std::vector<std::string> m_tracks;
 
-    /** The number of laps that each track should be raced, in the right order */
+    /** The number of laps that each track will be raced, in the right order */
     std::vector<int> m_laps;
 
     /** Whether the track in question should be done in reverse mode */
@@ -69,22 +69,25 @@ private:
     bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
-
-    /** Load the GrandPrixData from the given filename */
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
-#pragma warning(disable:4290)
+#  pragma warning(disable:4290)
 #endif
-                       GrandPrixData  (const std::string& filename) throw(std::logic_error);
-                       GrandPrixData  ()       {}; // empty for initialising
+    /** Load the GrandPrixData from the given filename */
+    GrandPrixData(const std::string& filename);
+    /** Needed for simple creation of an instance of GrandPrixData */
+    GrandPrixData() {};
 
+    // Methods for the GP editor
     void setId(const std::string& id);
     void setName(const irr::core::stringw& name);
     void setFilename(const std::string& filename);
     void setEditable(const bool editable);
+    /** Load the grand prix from the file set by the constructor or the grand
+     * prix editor */
     void reload();
     bool writeToFile();
 
-    bool                     checkConsistency(bool chatty=true) const;
+    bool                     checkConsistency(bool log_error=true) const;
     std::vector<std::string> getTrackNames(const bool includeLocked=false) const;
     std::vector<int>         getLaps(const bool includeLocked=false) const;
     std::vector<bool>        getReverse(const bool includeLocked=false) const;
@@ -98,22 +101,22 @@ public:
     void                     moveDown(const unsigned int track);
     void                     addTrack(Track* track, unsigned int laps,
                                       bool reverse, int position=-1);
-    void                     editTrack(unsigned int t, Track* track,
+    void                     editTrack(unsigned int index, Track* track,
                                        unsigned int laps, bool reverse);
     void                     remove(const unsigned int track);
 
     // ------------------------------------------------------------------------
     /** @return the (potentially translated) user-visible name of the Grand
      *  Prix (apply fribidi as needed) */
-    irr::core::stringw getName() const { return _LTR(m_name.c_str());    }
+    irr::core::stringw getName()     const { return _LTR(m_name.c_str()); }
 
     // ------------------------------------------------------------------------
-    /** @return the internal name identifier of the Grand Prix (not translated) */
-    const std::string& getId() const { return m_id;            }
+    /** @return the internal indentifier of the Grand Prix (not translated) */
+    const std::string& getId()       const { return m_id;                 }
 
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
-    const std::string& getFilename() const { return m_filename;  }
+    const std::string& getFilename() const { return m_filename;           }
 
 };   // GrandPrixData
 

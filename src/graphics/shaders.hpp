@@ -412,7 +412,7 @@ public:
 
 }
 
-#define MAXLIGHT 16
+#define MAXLIGHT 32
 
 namespace LightShader
 {
@@ -435,12 +435,12 @@ namespace LightShader
         static GLuint Program;
         static GLuint attrib_Position, attrib_Energy, attrib_Color;
         static GLuint attrib_Corner;
-        static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen, uniform_invproj, uniform_VM, uniform_PM;
+        static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen;
         static GLuint vbo;
         static GLuint vao;
 
         static void init();
-        static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
+        static void setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
     };
 }
 
@@ -556,11 +556,11 @@ class SunLightShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_direction, uniform_col, uniform_invproj;
+    static GLuint uniform_ntex, uniform_dtex, uniform_direction, uniform_col;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
+    static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
 };
 
 class DiffuseEnvMapShader
@@ -693,23 +693,23 @@ class SSAOShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_invprojm, uniform_projm, uniform_samplePoints;
+    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints;
     static GLuint vao;
     static float SSAOSamples[64];
     
     static void init();
-    static void setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise);
+    static void setUniforms(unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise);
 };
 
 class FogShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_ipvmat;
+    static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
+    static void setUniforms(float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
 };
 
 class MotionBlurShader

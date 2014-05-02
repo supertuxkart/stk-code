@@ -1,9 +1,23 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform float spec;
-uniform mat4 invproj;
-uniform mat4 ViewMatrix;
 uniform vec2 screen;
+
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+#else
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
+#endif
 
 flat in vec3 center;
 flat in float energy;
@@ -14,6 +28,7 @@ out vec4 Specular;
 
 vec3 DecodeNormal(vec2 n);
 vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 void main()
 {
@@ -22,9 +37,7 @@ void main()
     vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
     float roughness = texture(ntex, texc).z;
 
-    vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
-    xpos = invproj * xpos;
-    xpos /= xpos.w;
+    vec4 xpos = getPosFromUVDepth(vec3(texc, z), InverseProjectionMatrix);
     vec3 eyedir = -normalize(xpos.xyz);
 
     vec4 pseudocenter = ViewMatrix * vec4(center.xyz, 1.0);

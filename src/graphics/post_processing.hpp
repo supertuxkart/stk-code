@@ -76,8 +76,8 @@ public:
     void         renderSunlight();
     void         renderShadowedSunlight(const std::vector<core::matrix4> &sun_ortho_matrix, unsigned depthtex);
 
-    void renderFog(const core::matrix4 &ipvmat);
-    void renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm);
+    void renderFog();
+    void renderSSAO();
     void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
 
     /** Blur the in texture */

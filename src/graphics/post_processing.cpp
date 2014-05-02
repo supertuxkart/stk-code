@@ -274,7 +274,7 @@ void PostProcessing::renderSunlight()
   glBindVertexArray(FullScreenShader::SunLightShader::vao);
   setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
   setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
+  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
 }
@@ -412,7 +412,7 @@ void PostProcessing::renderGlow(unsigned tex)
 
 ITexture *noise_tex = 0;
 
-void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm)
+void PostProcessing::renderSSAO()
 {
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
@@ -427,12 +427,12 @@ void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matri
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
     setTexture(2, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
+    FullScreenShader::SSAOShader::setUniforms(0, 1, 2);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void PostProcessing::renderFog(const core::matrix4 &ipvmat)
+void PostProcessing::renderFog()
 {
     const Track * const track = World::getWorld()->getTrack();
 
@@ -457,7 +457,7 @@ void PostProcessing::renderFog(const core::matrix4 &ipvmat)
     glBindVertexArray(FullScreenShader::FogShader::vao);
 
     setTexture(0, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
+    FullScreenShader::FogShader::setUniforms(fogmax, startH, endH, start, end, col, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
@@ -650,9 +650,12 @@ void PostProcessing::render()
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_BLEND);
 
-        renderDoF(out_fbo, in_rtt);
-        std::swap(in_rtt, out_rtt);
-        std::swap(in_fbo, out_fbo);
+        if (UserConfigParams::m_dof)
+        {
+            renderDoF(out_fbo, in_rtt);
+            std::swap(in_rtt, out_rtt);
+            std::swap(in_fbo, out_fbo);
+        }
 
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();

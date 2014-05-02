@@ -215,7 +215,7 @@ void IrrDriver::renderGLSL(float dt)
         if (UserConfigParams::m_dynamic_lights && World::getWorld()->getTrack()->isFogEnabled())
         {
             PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
-            m_post_processing->renderFog(irr_driver->getInvProjMatrix());
+            m_post_processing->renderFog();
             PROFILER_POP_CPU_MARKER();
         }
 
@@ -858,11 +858,9 @@ static void renderPointLights(unsigned count)
     setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     LightShader::PointLightShader
-               ::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(),
-                            irr_driver->getInvProjMatrix(), 
-                            core::vector2df(float(UserConfigParams::m_width),
-                                            float(UserConfigParams::m_height) ), 
-                            200, 0, 1);
+               ::setUniforms(core::vector2df(float(UserConfigParams::m_width),
+                             float(UserConfigParams::m_height) ), 
+                             200, 0, 1);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
@@ -968,7 +966,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         glClearColor(1., 1., 1., 1.);
         glClear(GL_COLOR_BUFFER_BIT);
         glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-        m_post_processing->renderSSAO(irr_driver->getInvProjMatrix(), irr_driver->getProjMatrix());
+        m_post_processing->renderSSAO();
         // Blur it to reduce noise.
         m_post_processing->renderGaussian6Blur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
             irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);

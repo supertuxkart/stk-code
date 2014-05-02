@@ -264,7 +264,7 @@ void GrandPrixEditorScreen::onNewGPWithName(const stringw& newName)
     }
     else if (m_action == "new")
     {
-        setSelection(grand_prix_manager->createNew(newName));
+        setSelection(grand_prix_manager->createNewGP(newName));
     }
 
     loadGPList();
