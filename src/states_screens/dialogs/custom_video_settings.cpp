@@ -52,6 +52,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("anim_gfx")->setState( UserConfigParams::m_graphical_effects );
     getWidget<CheckBoxWidget>("weather_gfx")->setState( UserConfigParams::m_weather_effects );
     getWidget<CheckBoxWidget>("ubo")->setState(!UserConfigParams::m_ubo_disabled);
+    getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
 
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
     kart_anim->addLabel( _("Disabled") ); // 0
@@ -102,12 +103,14 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         bool dynamic_light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
         UserConfigParams::m_dynamic_lights = dynamic_light;
 
-        UserConfigParams::m_graphical_effects        =
+        UserConfigParams::m_graphical_effects =
             getWidget<CheckBoxWidget>("anim_gfx")->getState();
-        UserConfigParams::m_weather_effects          =
+        UserConfigParams::m_weather_effects =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
         UserConfigParams::m_ubo_disabled =
             !getWidget<CheckBoxWidget>("ubo")->getState();
+        UserConfigParams::m_dof =
+            getWidget<CheckBoxWidget>("dof")->getState();
 
         UserConfigParams::m_motionblur      =
             getWidget<CheckBoxWidget>("motionblur")->getState();
