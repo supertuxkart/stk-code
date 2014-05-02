@@ -74,6 +74,15 @@ enum STKRenderingPass
     PASS_COUNT,
 };
 
+enum QueryPerf
+{
+    Q_SOLID_PASS1,
+    Q_SOLID_PASS2,
+    Q_LIGHT,
+    Q_SHADOWS,
+    Q_LAST
+};
+
 /**
   * \brief class that creates the irrLicht device and offers higher-level
   *  ways to manage the 3D scene
@@ -211,6 +220,7 @@ private:
     unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
+    u32                  m_perf_query[Q_LAST];
     bool                 m_query_issued;
     class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
