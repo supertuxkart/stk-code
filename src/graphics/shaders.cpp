@@ -1636,6 +1636,8 @@ namespace MeshShader
         uniform_tex = glGetUniformLocation(Program, "tex");
         attrib_color = glGetAttribLocation(Program, "Color");
         uniform_windDir = glGetUniformLocation(Program, "windDir");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     void GrassShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex)
@@ -1756,9 +1758,6 @@ namespace LightShader
     GLuint PointLightShader::uniform_dtex;
     GLuint PointLightShader::uniform_spec;
     GLuint PointLightShader::uniform_screen;
-    GLuint PointLightShader::uniform_invproj;
-    GLuint PointLightShader::uniform_VM;
-    GLuint PointLightShader::uniform_PM;
     GLuint PointLightShader::vbo;
     GLuint PointLightShader::vao;
 
@@ -1768,6 +1767,7 @@ namespace LightShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
         attrib_Position = glGetAttribLocation(Program, "Position");
         attrib_Color = glGetAttribLocation(Program, "Color");
@@ -1776,10 +1776,7 @@ namespace LightShader
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_spec = glGetUniformLocation(Program, "spec");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
         uniform_screen = glGetUniformLocation(Program, "screen");
-        uniform_VM = glGetUniformLocation(Program, "ViewMatrix");
-        uniform_PM = glGetUniformLocation(Program, "ProjectionMatrix");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1804,13 +1801,12 @@ namespace LightShader
         glVertexAttribDivisor(attrib_Color, 1);
     }
 
-    void PointLightShader::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 &InvProjMatrix, const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
+    void PointLightShader::setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform1f(uniform_spec, 200);
         glUniform2f(uniform_screen, screen.X, screen.Y);
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-        glUniformMatrix4fv(uniform_VM, 1, GL_FALSE, ViewMatrix.pointer());
-        glUniformMatrix4fv(uniform_PM, 1, GL_FALSE, ProjMatrix.pointer());
 
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
@@ -2149,7 +2145,6 @@ namespace FullScreenShader
     GLuint SunLightShader::uniform_dtex;
     GLuint SunLightShader::uniform_direction;
     GLuint SunLightShader::uniform_col;
-    GLuint SunLightShader::uniform_invproj;
     GLuint SunLightShader::vao;
 
     void SunLightShader::init()
@@ -2158,18 +2153,21 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_col = glGetUniformLocation(Program, "col");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
         vao = createVAO(Program);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void SunLightShader::setUniforms(const core::vector3df &direction, const core::matrix4 &InvProjMatrix, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex)
+    void SunLightShader::setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex)
     {
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
         glUniform3f(uniform_col, r, g, b);
         glUniform1i(uniform_ntex, TU_ntex);
@@ -2221,6 +2219,7 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
@@ -2234,6 +2233,8 @@ namespace FullScreenShader
 
     void ShadowedSunLightShader::setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
         glUniform3f(uniform_col, r, g, b);
         glUniform1i(uniform_ntex, TU_ntex);
@@ -2268,6 +2269,8 @@ namespace FullScreenShader
 
     void ShadowedSunLightDebugShader::setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
         glUniform3f(uniform_col, r, g, b);
         glUniform1i(uniform_ntex, TU_ntex);
@@ -2422,8 +2425,6 @@ namespace FullScreenShader
     GLuint SSAOShader::uniform_ntex;
     GLuint SSAOShader::uniform_dtex;
     GLuint SSAOShader::uniform_noise_texture;
-    GLuint SSAOShader::uniform_invprojm;
-    GLuint SSAOShader::uniform_projm;
     GLuint SSAOShader::uniform_samplePoints;
     GLuint SSAOShader::vao;
     float SSAOShader::SSAOSamples[64];
@@ -2433,14 +2434,15 @@ namespace FullScreenShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/ssao.frag").c_str());
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_noise_texture = glGetUniformLocation(Program, "noise_texture");
-        uniform_invprojm = glGetUniformLocation(Program, "invprojm");
-        uniform_projm = glGetUniformLocation(Program, "projm");
         uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");
         vao = createVAO(Program);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
         // SSAOSamples[4 * i] and SSAOSamples[4 * i + 1] can be negative
 
@@ -2556,10 +2558,10 @@ namespace FullScreenShader
                     }*/
     }
 
-    void SSAOShader::setUniforms(const core::matrix4& projm, const core::matrix4 &invprojm, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise)
+    void SSAOShader::setUniforms(unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise)
     {
-        glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_invprojm, 1, GL_FALSE, invprojm.pointer());
-        glUniformMatrix4fv(FullScreenShader::SSAOShader::uniform_projm, 1, GL_FALSE, projm.pointer());
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
 
         glUniform1i(FullScreenShader::SSAOShader::uniform_ntex, TU_ntex);
@@ -2575,13 +2577,13 @@ namespace FullScreenShader
     GLuint FogShader::uniform_start;
     GLuint FogShader::uniform_end;
     GLuint FogShader::uniform_col;
-    GLuint FogShader::uniform_ipvmat;
     GLuint FogShader::vao;
 
     void FogShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/fog.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_fogmax = glGetUniformLocation(Program, "fogmax");
@@ -2590,19 +2592,21 @@ namespace FullScreenShader
         uniform_start = glGetUniformLocation(Program, "start");
         uniform_end = glGetUniformLocation(Program, "end");
         uniform_col = glGetUniformLocation(Program, "col");
-        uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
         vao = createVAO(Program);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void FogShader::setUniforms(const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex)
+    void FogShader::setUniforms(float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform1f(uniform_fogmax, fogmax);
         glUniform1f(uniform_startH, startH);
         glUniform1f(uniform_endH, endH);
         glUniform1f(uniform_start, start);
         glUniform1f(uniform_end, end);
         glUniform3f(uniform_col, col.X, col.Y, col.Z);
-        glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
         glUniform1i(uniform_tex, TU_ntex);
     }
 
