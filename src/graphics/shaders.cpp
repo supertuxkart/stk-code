@@ -1627,6 +1627,7 @@ namespace MeshShader
 
     void GrassShadowShader::init()
     {
+        return;
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
