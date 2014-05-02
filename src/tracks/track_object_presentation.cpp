@@ -251,6 +251,22 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 }
 
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
+    scene::IAnimatedMesh* model, const core::vector3df& xyz,
+    const core::vector3df& hpr, const core::vector3df& scale) :
+    TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    m_is_looped = false;
+    m_mesh = NULL;
+    m_node = NULL;
+
+    bool animated = (UserConfigParams::m_graphical_effects ||
+        World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_mesh = model;
+    init(NULL, NULL, true);
+}
+
+TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale) :
         TrackObjectPresentationSceneNode(xyz, hpr, scale)

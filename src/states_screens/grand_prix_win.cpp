@@ -33,8 +33,13 @@
 #include "items/item_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/cutscene_world.hpp"
+#include "modes/world.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
+#include "tracks/track.hpp"
+#include "tracks/track_object.hpp"
+#include "tracks/track_object_manager.hpp"
 #include "utils/translation.hpp"
 
 #include <IGUIEnvironment.h>
@@ -57,40 +62,52 @@ DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui")
+GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false)
 {
     setNeeds3D(true);
 
     m_throttle_FPS = false;
 
-    try
-    {
-        std::string path = file_manager->getAsset(FileManager::MUSIC,"win_theme.music");
-        m_music = music_manager->getMusicInformation(path);
-    }
-    catch (std::exception& e)
-    {
-        fprintf(stderr, "[GrandPrixWin] WARNING: exception caught when trying to load music: %s\n", e.what());
-        m_music = NULL;
-    }
+    StateManager::get()->enterGameState();
+    race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+    race_manager->setNumKarts(0);
+    race_manager->setNumPlayers(0);
+    race_manager->setNumLocalPlayers(0);
+    race_manager->startSingleRace("gpwin", 999, false);
+    std::vector<std::string> parts;
+    parts.push_back("gpwin");
+    ((CutsceneWorld*)World::getWorld())->setParts(parts);
+    CutsceneWorld::setUseDuration(false);
+    TrackObjectManager* tom = World::getWorld()->getTrack()->getTrackObjectManager();
+    const KartProperties* kp = kart_properties_manager->getKart("tux");
+    KartModel *kart_model = kp->getKartModelCopy();
+    m_all_kart_models.push_back(kart_model);
+    scene::ISceneNode* kart_main_node = kart_model->attachModel(false);
+    TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(kart_main_node, core::vector3df(0, -0.6, 0), core::vector3df(0, 0, 0), core::vector3df(0.5, 0.5, 0.5));
+    TrackObject* to = new TrackObject(core::vector3df(0, 0, 0), core::vector3df(0, 0, 0), core::vector3df(1, 1, 1),
+        "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
+    tom->insertObject(to);
+
+    World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 }   // GrandPrixWin
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixWin::loadedFromFile()
 {
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-
-    m_podium_x[0] = 1.4f;
-    m_podium_z[0] = 0.0f;
-
-    m_podium_x[1] = 2.2f;
-    m_podium_z[1] = 0.5f;
-
-    m_podium_x[2] = 3.0f;
-    m_podium_z[2] = 0.0f;
+    // TODO
+    //m_kart_node[0] = NULL;
+    //m_kart_node[1] = NULL;
+    //m_kart_node[2] = NULL;
+    //
+    //m_podium_x[0] = 1.4f;
+    //m_podium_z[0] = 0.0f;
+    //
+    //m_podium_x[1] = 2.2f;
+    //m_podium_z[1] = 0.5f;
+    //
+    //m_podium_x[2] = 3.0f;
+    //m_podium_z[2] = 0.0f;
 }   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
@@ -151,44 +168,14 @@ void GrandPrixWin::init()
         m_unlocked_label = NULL;
     }
 
-    m_phase = 1;
-    m_sky_angle = 0.0f;
     m_global_time = 0.0f;
 
-    video::ITexture *t = irr_driver->getTexture(FileManager::TEXTURE,
-                                                "clouds.png          ");
-    m_sky = irr_driver->addSkyDome(t,
-                                   16 /* hori_res */, 16 /* vert_res */,
-                                   1.0f /* texture_percent */,
-                                   2.0f /* sphere_percent */);
-
-    m_camera = irr_driver->addCameraSceneNode();
-    m_camera_x = 3.0f;
-    m_camera_y = 0.0f;
-    m_camera_z = -5.0f;
-    m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
-    m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-    irr_driver->getSceneManager()->setActiveCamera(m_camera);
-
-    m_camera_target_x = 1.5f;
-    m_camera_target_z = 0.0f;
-    m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
-    m_camera->setFOV( DEGREE_TO_RAD*50.0f );
-    m_camera->updateAbsolutePosition();
-
-
-    scene::IMesh* model_village = irr_driver->getMesh( file_manager->getAsset(FileManager::MODEL,"village.b3d") );
-    assert(model_village != NULL);
-    m_village = irr_driver->addMesh(model_village);
-#ifdef DEBUG
-    m_village->setName("village");
-#endif
-    m_village->setPosition( core::vector3df(2, INITIAL_Y, 0) );
-
+    // TODO
+    /*
+    m_phase = 1;
 
     scene::IMesh* podium_model = irr_driver->getMesh( file_manager->getAsset(FileManager::MODEL,"wood_podium.b3d") );
     assert(podium_model != NULL);
-
 
     m_podium_step[0] = irr_driver->addMesh(podium_model);
 #ifdef DEBUG
@@ -207,21 +194,7 @@ void GrandPrixWin::init()
     m_podium_step[2]->setName("Podium 2");
 #endif
     m_podium_step[2]->setPosition( core::vector3df(m_podium_x[2], INITIAL_PODIUM_Y, m_podium_z[2]) );
-
-    scene::ISceneManager* sceneManager = irr_driver->getSceneManager();
-    sceneManager->setAmbientLight(video::SColor(255, 95, 95, 95));
-
-    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->addLight(sun_pos, 300.0f, 0.25f, 0.25f, 0.25f);
-
-    m_finish_sound = sfx_manager->quickSound("gp_end");
-    if (!irr_driver->isGLSL())
-    {
-        scene::ILightSceneNode *lnode = (scene::ILightSceneNode *) m_light;
-        lnode->getLightData().DiffuseColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
-        lnode->getLightData().AmbientColor = irr::video::SColorf(0.25f, 0.25f, 0.25f, 1.0f);
-        lnode->getLightData().SpecularColor = irr::video::SColorf(0.0f, 0.0f, 0.0f, 1.0f);
-    }
+    */
 
     sfx_manager->quickSound("gp_end");
 }   // init
@@ -231,26 +204,9 @@ void GrandPrixWin::init()
 void GrandPrixWin::tearDown()
 {
     Screen::tearDown();
-    irr_driver->removeNode(m_sky);
-    m_sky = NULL;
+    ((CutsceneWorld*)World::getWorld())->abortCutscene();
 
-    irr_driver->removeCameraSceneNode(m_camera);
-    m_camera = NULL;
-
-    irr_driver->removeNode(m_light);
-    m_light = NULL;
-
-    irr_driver->removeNode(m_village);
-    m_village = NULL;
-
-    for (int n=0; n<3; n++)
-    {
-        irr_driver->removeNode(m_podium_step[n]);
-        m_podium_step[n] = NULL;
-        if (m_kart_node[n] != NULL) irr_driver->removeNode(m_kart_node[n]);
-        m_kart_node[n] = NULL;
-    }
-    for(unsigned int i=0; i<m_all_kart_models.size(); i++)
+    for (unsigned int i = 0; i<m_all_kart_models.size(); i++)
         delete m_all_kart_models[i];
     m_all_kart_models.clear();
 
@@ -260,12 +216,6 @@ void GrandPrixWin::tearDown()
         delete m_unlocked_label;
         m_unlocked_label = NULL;
     }
-    
-    if (m_finish_sound != NULL &&
-        m_finish_sound->getStatus() == SFXManager::SFX_PLAYING)
-    {
-        m_finish_sound->stop();
-    }
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -274,12 +224,9 @@ void GrandPrixWin::onUpdate(float dt)
 {
     m_global_time += dt;
 
-    m_sky_angle += dt*2;
-    if (m_sky_angle > 360) m_sky_angle -= 360;
-    m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
-
-
     // ---- karts move
+    // TODO
+    /*
     if (m_phase == 1)
     {
         assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
@@ -359,28 +306,7 @@ void GrandPrixWin::onUpdate(float dt)
         } // end for
 
     }
-
-    if (m_phase > 1)
-    {
-        //m_camera_x = 3.0f;
-        if (m_camera_z < -2.0f)                          m_camera_z        += dt*0.2f;
-
-        if      (m_camera_x < m_podium_x[1] - dt*0.1f)   m_camera_x        += dt*0.1f;
-        else if (m_camera_x > m_podium_x[1] + dt*0.1f)   m_camera_x        -= dt*0.1f;
-        else                                             m_camera_x         = m_podium_x[1];
-
-        if (m_camera_target_x < m_podium_x[1])           m_camera_target_x += dt*0.1f;
-
-        if (m_camera_y > -1.8f)                          m_camera_y        -= dt*0.1f;
-
-
-        m_camera->setTarget( core::vector3df(m_camera_target_x, -2.0f, m_camera_target_z) );
-
-        m_camera->setPosition( core::vector3df(m_camera_x, m_camera_y, m_camera_z) );
-        m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-        m_camera->updateAbsolutePosition();
-    }
-
+    */
 
     // ---- title
     static const int w = irr_driver->getFrameSize().Width;
@@ -413,8 +339,7 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
                 PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
             PlayerManager::getCurrentPlayer()->clearUnlocked();
 
-            FeatureUnlockedCutScene* scene =
-                FeatureUnlockedCutScene::getInstance();
+            FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
 
             assert(unlocked.size() > 0);
             scene->addTrophy(race_manager->getDifficulty());
@@ -434,6 +359,9 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
 
 void GrandPrixWin::setKarts(const std::string idents_arg[3])
 {
+    // TODO
+
+    /*
     // reorder in "podium order" (i.e. second player to the left, first player in the middle, last at the right)
     std::string idents[3];
     idents[0] = idents_arg[1];
@@ -475,6 +403,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
     } // end for
 
     assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
+    */
 }   // setKarts
 
 // -------------------------------------------------------------------------------------

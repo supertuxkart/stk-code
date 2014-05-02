@@ -116,6 +116,16 @@ public:
         m_node = NULL;
     }
 
+    TrackObjectPresentationSceneNode(
+        scene::ISceneNode* node,
+        const core::vector3df& xyz,
+        const core::vector3df& hpr,
+        const core::vector3df& scale) :
+        TrackObjectPresentation(xyz, hpr, scale)
+    {
+        m_node = node;
+    }
+
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df  getAbsolutePosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
@@ -200,6 +210,9 @@ public:
 
     TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
+        const core::vector3df& hpr, const core::vector3df& scale);
+    TrackObjectPresentationMesh(
+        scene::IAnimatedMesh* mesh, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale);
 
     virtual ~TrackObjectPresentationMesh();
