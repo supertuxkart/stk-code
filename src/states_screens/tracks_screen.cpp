@@ -25,7 +25,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
@@ -213,7 +213,7 @@ void TracksScreen::init()
     const int gpAmount = grand_prix_manager->getNumberOfGrandPrix();
     for (int n=0; n<gpAmount; n++)
     {
-        const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
+        const GrandPrix* gp = grand_prix_manager->getGrandPrix(n);
 
         const std::vector<std::string> tracks = gp->getTrackNames(true);
 

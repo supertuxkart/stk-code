@@ -28,7 +28,7 @@
 namespace GUIEngine { class Widget; }
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
-class GrandPrixData;
+class GrandPrix;
 
 /**
   * \brief screen where the user can edit a grand prix
@@ -56,26 +56,27 @@ class EditGPScreen :
     bool canMoveUp() const;
     bool canMoveDown() const;
 
-    GrandPrixData*                     m_gp;
-    GUIEngine::ListWidget*             m_list;
-    irr::gui::STKModifiedSpriteBank*   m_icon_bank;
-    std::vector<int>                   m_icons;
-    int                                m_selected;
-    bool                               m_modified;
+    GrandPrix*                   m_gp;
+    GUIEngine::ListWidget*           m_list;
+    irr::gui::STKModifiedSpriteBank* m_icon_bank;
+    std::vector<int>                 m_icons;
+    int                              m_selected;
+    bool                             m_modified;
 
-    std::string                        m_action;
+    std::string                      m_action;
 
 public:
 
                 ~EditGPScreen();
 
-    void         setSelectedGP(GrandPrixData* gp);
+    void         setSelectedGP(GrandPrix* gp);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name,
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

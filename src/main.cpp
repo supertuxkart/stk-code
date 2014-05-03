@@ -808,7 +808,7 @@ int handleCmdLine()
     if(CommandLine::has("--gp", &s))
     {
         race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(s);
+        const GrandPrix *gp = grand_prix_manager->getGrandPrix(s);
 
         if (!gp)
         {

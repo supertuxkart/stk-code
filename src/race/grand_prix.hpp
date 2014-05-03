@@ -27,15 +27,19 @@
 #include <stdexcept>
 
 #include "utils/translation.hpp"
+#include "tracks/track.hpp"
 
-class Track;
+// FIXME remove this ugly hack to make the file compile
+class GrandPrixManager;
 
 /** Simple class that hold the data relevant to a 'grand_prix', aka. a number
   * of races that has to be completed one after the other
   * \ingroup race
   */
-class GrandPrixData
+class GrandPrix
 {
+    friend class GrandPrixManager;
+    friend class GrandPrixEditorScreen;
 private:
     /** The name of the grand prix. */
     irr::core::stringw m_name;
@@ -69,19 +73,15 @@ private:
     bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
-#if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
-#  pragma warning(disable:4290)
-#endif
-    /** Load the GrandPrixData from the given filename */
-    GrandPrixData(const std::string& filename);
-    /** Needed for simple creation of an instance of GrandPrixData */
-    GrandPrixData() {};
+    #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
+    #pragma warning(disable:4290)
+    #endif
+    /** Load the GrandPrix from the given filename */
+    GrandPrix(const std::string& filename);
+    /** Needed for simple creation of an instance of GrandPrix */
+    GrandPrix() {};
 
     // Methods for the GP editor
-    void setId(const std::string& id);
-    void setName(const irr::core::stringw& name);
-    void setFilename(const std::string& filename);
-    void setEditable(const bool editable);
     /** Load the grand prix from the file set by the constructor or the grand
      * prix editor */
     void reload();
@@ -118,7 +118,7 @@ public:
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
 
-};   // GrandPrixData
+};   // GrandPrix
 
 #endif
 

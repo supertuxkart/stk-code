@@ -752,7 +752,7 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
+void RaceManager::startGP(const GrandPrix* gp, bool from_overworld,
                           bool continue_saved_gp)
 {
     assert(gp != NULL);

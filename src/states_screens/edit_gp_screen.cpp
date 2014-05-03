@@ -23,7 +23,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
 #include "states_screens/edit_track_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -49,7 +49,7 @@ EditGPScreen::~EditGPScreen()
 }
 
 // -----------------------------------------------------------------------------
-void EditGPScreen::setSelectedGP(GrandPrixData* gp)
+void EditGPScreen::setSelectedGP(GrandPrix* gp)
 {
     assert(gp != NULL);
     m_gp = gp;
@@ -58,19 +58,21 @@ void EditGPScreen::setSelectedGP(GrandPrixData* gp)
 // -----------------------------------------------------------------------------
 void EditGPScreen::loadedFromFile()
 {
+    irr::gui::IGUIEnvironment* gui_engine = GUIEngine::getGUIEnv();
     if (m_icon_bank == NULL)
-        m_icon_bank = new irr::gui::STKModifiedSpriteBank(GUIEngine::getGUIEnv());
+        m_icon_bank = new irr::gui::STKModifiedSpriteBank(gui_engine);
 
     m_list = getWidget<ListWidget>("tracks");
     assert(m_list != NULL);
-    m_list->addColumn(_("Track"), 3);
-    m_list->addColumn(_("Laps"), 1);
+    m_list->addColumn(_("Track"),    3);
+    m_list->addColumn(_("Laps"),     1);
     m_list->addColumn(_("Reversed"), 1);
 }
 
 // -----------------------------------------------------------------------------
-void EditGPScreen::eventCallback(GUIEngine::Widget* widget, const std::string& name,
-    const int playerID)
+void EditGPScreen::eventCallback(GUIEngine::Widget* widget,
+                                 const std::string& name,
+                                 const int playerID)
 {
     setSelected(m_list->getSelectionID());
 
@@ -176,14 +178,14 @@ void EditGPScreen::init()
         {
             if (m_action == "add")
             {
-                m_gp->addTrack(edit->getTrack(), edit->getLaps(), edit->getReverse(),
-                    m_selected);
+                m_gp->addTrack(edit->getTrack(), edit->getLaps(),
+                               edit->getReverse(), m_selected);
                 setSelected(m_selected + 1);
             }
             else if (m_action == "edit")
             {
                 m_gp->editTrack(m_selected, edit->getTrack(), edit->getLaps(),
-                    edit->getReverse());
+                                edit->getReverse());
             }
             setModified(true);
         }
@@ -199,8 +201,10 @@ void EditGPScreen::onConfirm()
     if (m_action == "remove")
     {
         m_gp->remove(m_selected);
-        setSelected(m_selected >= (int)m_gp->getNumberOfTracks(true) ?
-            m_gp->getNumberOfTracks(true) - 1 : m_selected);
+        if (m_selected >= (int)m_gp->getNumberOfTracks(true))
+            setSelected(m_gp->getNumberOfTracks(true) - 1);
+        else
+            setSelected(m_selected);
         loadList(m_selected);
         setModified(true);
     }

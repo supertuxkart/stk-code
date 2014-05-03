@@ -56,7 +56,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
 
     m_gp_ident = gpIdent;
 
-    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gpIdent);
+    const GrandPrix* gp = grand_prix_manager->getGrandPrix(gpIdent);
     if (gp == NULL)
     {
         assert(false);
@@ -268,7 +268,7 @@ void GPInfoDialog::onUpdate(float dt)
 
     if (frameAfter == frameBefore) return; // if nothing changed, return right now
 
-    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
+    const GrandPrix* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
     assert(gp != NULL);
     const std::vector<std::string> tracks = gp->getTrackNames();
     if (frameAfter >= (int)tracks.size())

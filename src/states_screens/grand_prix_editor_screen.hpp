@@ -25,7 +25,7 @@
 
 namespace GUIEngine { class Widget; }
 
-class GrandPrixData;
+class GrandPrix;
 
 /**
   * \brief screen where the user can edit his own grand prix
@@ -41,15 +41,15 @@ class GrandPrixEditorScreen :
 
          GrandPrixEditorScreen();
 
-    void setSelection(const GrandPrixData* gpdata);
+    void setSelection(const GrandPrix* gpdata);
     void loadGPList();
     void loadTrackList(const std::string& gpname);
-    void showEditScreen(GrandPrixData* gp);
+    void showEditScreen(GrandPrix* gp);
 
     void onNewGPWithName(const irr::core::stringw& newName);
     void onConfirm();
 
-    GrandPrixData*   m_selection;
+    GrandPrix*   m_selection;
     std::string      m_action;
 
 public:

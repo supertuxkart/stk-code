@@ -22,7 +22,10 @@
 #include <vector>
 #include <string>
 
-#include "race/grand_prix_data.hpp"
+#include "race/grand_prix.hpp"
+
+// FIXME remove this ugly hack to make the file compile
+class GrandPrix;
 
 /**
   * \ingroup race
@@ -32,7 +35,7 @@ class GrandPrixManager
 private:
     static const char* SUFFIX;
 
-    std::vector<GrandPrixData*> m_gp_data;
+    std::vector<GrandPrix*> m_gp_data;
 
     /** Load all the grands prix from the 3 directories known */
     void loadFiles();
@@ -50,15 +53,15 @@ public:
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
-    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
-    GrandPrixData* getGrandPrix(const std::string& s) const;
+    GrandPrix* getGrandPrix(const int i) const { return m_gp_data[i];     }
+    GrandPrix* getGrandPrix(const std::string& s) const;
     unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
     void           checkConsistency();
 
     // Methods for the gp editor
-    GrandPrixData* editGrandPrix(const std::string& s) const;
-    GrandPrixData* createNewGP(const irr::core::stringw& newName);
-    GrandPrixData* copy(const std::string& id,
+    GrandPrix* editGrandPrix(const std::string& s) const;
+    GrandPrix* createNewGP(const irr::core::stringw& newName);
+    GrandPrix* copy(const std::string& id,
                         const irr::core::stringw& newName);
     void           remove(const std::string& id);
 };   // GrandPrixManager
