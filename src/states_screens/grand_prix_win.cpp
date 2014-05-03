@@ -56,8 +56,9 @@ using namespace irr::video;
 const float KARTS_X = -0.62f;
 const float KARTS_DELTA_X = 0.815f;
 const float KARTS_DELTA_Y = -0.55f;
+const float KARTS_DEST_Z = 1.2f;
 const float INITIAL_Y = 0.0f;
-const float INITIAL_PODIUM_Y = -3.6f;
+const float INITIAL_PODIUM_Y = -0.89f;
 const float PODIUM_HEIGHT[3] = { 0.325f, 0.5f, 0.15f };
 
 DEFINE_SCREEN_SINGLETON( GrandPrixWin );
@@ -82,17 +83,21 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false)
     CutsceneWorld::setUseDuration(false);
     
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
+
+    m_kart_node[0] = NULL;
+    m_kart_node[1] = NULL;
+    m_kart_node[2] = NULL;
+
+    m_podium_steps[0] = NULL;
+    m_podium_steps[1] = NULL;
+    m_podium_steps[2] = NULL;
+
 }   // GrandPrixWin
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixWin::loadedFromFile()
 {
-    // TODO
-    //m_kart_node[0] = NULL;
-    //m_kart_node[1] = NULL;
-    //m_kart_node[2] = NULL;
-    //
     //m_podium_x[0] = 1.4f;
     //m_podium_z[0] = 0.0f;
     //
@@ -150,8 +155,6 @@ void GrandPrixWin::init()
         m_unlocked_label->m_w = message_width;
         m_unlocked_label->m_h = label_height;
         m_unlocked_label->setText(message, false);
-        //const irr::video::SColor orange(255, 255, 126, 21);
-        //unlocked_label->setColor(orange);
 
         m_unlocked_label->add();
         manualAddWidget(m_unlocked_label);
@@ -162,32 +165,7 @@ void GrandPrixWin::init()
     }
 
     m_global_time = 0.0f;
-
-    // TODO
-    /*
     m_phase = 1;
-
-    scene::IMesh* podium_model = irr_driver->getMesh( file_manager->getAsset(FileManager::MODEL,"wood_podium.b3d") );
-    assert(podium_model != NULL);
-
-    m_podium_step[0] = irr_driver->addMesh(podium_model);
-#ifdef DEBUG
-    m_podium_step[0]->setName("Podium 0");
-#endif
-    m_podium_step[0]->setPosition( core::vector3df(m_podium_x[0], INITIAL_PODIUM_Y, m_podium_z[0]) );
-
-    m_podium_step[1] = irr_driver->addMesh(podium_model);
-#ifdef DEBUG
-    m_podium_step[1]->setName("Podium 1");
-#endif
-    m_podium_step[1]->setPosition( core::vector3df(m_podium_x[1], INITIAL_PODIUM_Y, m_podium_z[1]) );
-
-    m_podium_step[2] = irr_driver->addMesh(podium_model);
-#ifdef DEBUG
-    m_podium_step[2]->setName("Podium 2");
-#endif
-    m_podium_step[2]->setPosition( core::vector3df(m_podium_x[2], INITIAL_PODIUM_Y, m_podium_z[2]) );
-    */
 
     sfx_manager->quickSound("gp_end");
 }   // init
@@ -218,8 +196,6 @@ void GrandPrixWin::onUpdate(float dt)
     m_global_time += dt;
 
     // ---- karts move
-    // TODO
-    /*
     if (m_phase == 1)
     {
         assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
@@ -230,24 +206,27 @@ void GrandPrixWin::onUpdate(float dt)
             if (m_kart_node[k] != NULL)
             {
 
-                if (fabsf(m_kart_z[k] - m_podium_z[k]) > dt)
+                if (fabsf(m_kart_z[k] - KARTS_DEST_Z) > dt)
                 {
-                    if (m_kart_z[k] < m_podium_z[k] - dt)
+                    if (m_kart_z[k] < KARTS_DEST_Z - dt)
                     {
                         m_kart_z[k] += dt;
                     }
-                    else if (m_kart_z[k] > m_podium_z[k] + dt)
+                    else if (m_kart_z[k] > KARTS_DEST_Z + dt)
                     {
                         m_kart_z[k] -= dt;
                     }
                     else
                     {
-                        m_kart_z[k] = m_podium_z[k];
+                        m_kart_z[k] = KARTS_DEST_Z;
                     }
                     karts_not_yet_done++;
                 }
 
-                m_kart_node[k]->setPosition( core::vector3df(m_kart_x[k], m_kart_y[k], m_kart_z[k]) );
+                core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
+                core::vector3df kart_rot(0, m_kart_rotation[k], 0);
+                core::vector3df kart_scale(0.5f, 0.5f, 0.5f);
+                m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
             }
         } // end for
 
@@ -268,8 +247,16 @@ void GrandPrixWin::onUpdate(float dt)
                 if (m_kart_rotation[k] < 180.f)
                 {
                     m_kart_rotation[k] += 25.0f*dt;
-                    m_kart_node[k]->setRotation( core::vector3df(0, m_kart_rotation[k], 0) );
-                    m_podium_step[k]->setRotation( core::vector3df(0, m_kart_rotation[k], 0) );
+
+                    core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
+                    core::vector3df kart_rot(0, m_kart_rotation[k], 0);
+                    core::vector3df kart_scale(0.5f, 0.5f, 0.5f);
+                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
+
+                    core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
+                    core::vector3df podium_rot(0, m_kart_rotation[k], 0);
+                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false);
+
                     karts_not_yet_done++;
                 }
             }
@@ -289,17 +276,22 @@ void GrandPrixWin::onUpdate(float dt)
                 if (m_kart_y[k] < y_target + KARTS_DELTA_Y)
                 {
                     m_kart_y[k] += dt*(PODIUM_HEIGHT[k]);
-                    m_kart_node[k]->setPosition( core::vector3df(m_kart_x[k], m_kart_y[k], m_kart_z[k]) );
-                    m_podium_step[k]->setPosition( core::vector3df(m_podium_x[k],
-                                                                   INITIAL_PODIUM_Y - (INITIAL_Y - m_kart_y[k]) - KARTS_DELTA_Y,
-                                                                   m_podium_z[k]) );
+                    core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
+                    core::vector3df kart_rot(0, m_kart_rotation[k], 0);
+                    core::vector3df kart_scale(0.5f, 0.5f, 0.5f);
+                    m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
 
+
+                    core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
+                    core::vector3df podium_rot(0, m_kart_rotation[k], 0);
+                    podium_pos.Y = INITIAL_PODIUM_Y - (INITIAL_Y - m_kart_y[k]) - KARTS_DELTA_Y;
+                    m_podium_steps[k]->move(podium_pos, podium_rot, core::vector3df(1.0f, 1.0f, 1.0f), false);
                 }
             }
         } // end for
 
     }
-    */
+
 
     // ---- title
     static const int w = irr_driver->getFrameSize().Width;
@@ -352,7 +344,7 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
 
 void GrandPrixWin::setKarts(const std::string idents_arg[3])
 {
-    TrackObjectManager* tom = World::getWorld()->getTrack()->getTrackObjectManager();
+    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
 
     // reorder in "podium order" (i.e. second player to the left, first player in the middle, last at the right)
     std::string idents[3];
@@ -366,25 +358,28 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         KartModel* kart_model = kp->getKartModelCopy();
         m_all_kart_models.push_back(kart_model);
         scene::ISceneNode* kart_main_node = kart_model->attachModel(false);
-        core::vector3df kart_pos(KARTS_X + i*KARTS_DELTA_X, INITIAL_Y + KARTS_DELTA_Y, 1.2f);
+
+        m_kart_x[i] = KARTS_X + i*KARTS_DELTA_X;
+        m_kart_y[i] = INITIAL_Y + KARTS_DELTA_Y;
+        m_kart_z[i] = -4; // to 1.2
+        m_kart_rotation[i] = 0.0f;
+
+        core::vector3df kart_pos(m_kart_x[i], m_kart_y[i], m_kart_z[i]);
         core::vector3df kart_rot(0, 0, 0);
         core::vector3df kart_scale(0.5, 0.5, 0.5);
 
         //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
         TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
             kart_main_node, kart_pos, kart_rot, kart_scale);
-        TrackObject* to = new TrackObject(kart_pos, kart_rot, kart_scale,
+        TrackObject* tobj = new TrackObject(kart_pos, kart_rot, kart_scale,
             "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
-        tom->insertObject(to);
-        //to->move(kart_pos, core::vector3df(0, 0, 0), core::vector3df(1, 1, 1), false);
+        tobjman->insertObject(tobj);
+
+        m_kart_node[i] = tobj;
     }
 
-    m_podium_steps[0] = NULL;
-    m_podium_steps[1] = NULL;
-    m_podium_steps[2] = NULL;
-
     TrackObject* currObj;
-    PtrVector<TrackObject>& objects = tom->getObjects();
+    PtrVector<TrackObject>& objects = tobjman->getObjects();
     for_in(currObj, objects)
     {
         TrackObjectPresentationMesh* meshPresentation = currObj->getPresentation<TrackObjectPresentationMesh>();
@@ -408,52 +403,6 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
     assert(m_podium_steps[0] != NULL);
     assert(m_podium_steps[1] != NULL);
     assert(m_podium_steps[2] != NULL);
-
-    // TODO
-
-    /*
-    // reorder in "podium order" (i.e. second player to the left, first player in the middle, last at the right)
-    std::string idents[3];
-    idents[0] = idents_arg[1];
-    idents[1] = idents_arg[0];
-    idents[2] = idents_arg[2];
-
-    for (int n=0; n<3; n++)
-    {
-        if (idents[n].size() == 0) continue;
-
-        scene::ISceneNode* kart_main_node = NULL;
-
-        const KartProperties* kp = kart_properties_manager->getKart(idents[n]);
-        if (kp != NULL)
-        {
-            KartModel *kart_model = kp->getKartModelCopy();
-            m_all_kart_models.push_back(kart_model);
-            kart_main_node = kart_model->attachModel(false);
-
-            m_kart_x[n] = m_podium_x[n];
-            m_kart_y[n] = INITIAL_Y + KARTS_DELTA_Y;
-            m_kart_z[n] = -4;
-            m_kart_rotation[n] = 0.0f;
-
-            assert(kart_main_node != NULL);
-            kart_main_node->setPosition( core::vector3df(m_kart_x[n],
-                                                         m_kart_y[n],
-                                                         m_kart_z[n]) );
-            kart_main_node->setScale( core::vector3df(0.4f, 0.4f, 0.4f)  );
-            float susp[4]={0,0,0,0};
-            kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
-        }
-        else
-        {
-            std::cerr << "[GrandPrixWin] WARNING : kart '" << idents[n] << "' not found!\n";
-        }
-
-        m_kart_node[n] = kart_main_node;
-    } // end for
-
-    assert(m_kart_node[0] != NULL || m_kart_node[1] != NULL || m_kart_node[2] != NULL);
-    */
 }   // setKarts
 
 // -------------------------------------------------------------------------------------
