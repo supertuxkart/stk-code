@@ -46,6 +46,9 @@ void main()
     vec3 light_col = col.xyz;
     float d = distance(light_pos, xpos.xyz);
     float att = energy * 200. / (1. + 33. * d + 33. * d * d);
+    float max_d = 20. * energy;
+    att *= (max_d - d) / max_d;
+    if (att <= 0.) discard;
 
     // Light Direction
     vec3 L = -normalize(xpos.xyz - light_pos);

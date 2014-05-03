@@ -29,7 +29,7 @@ const float zNear = 1.;
 void main(void)
 {
     // Beyond that value, light is too attenuated
-    float r = 100 * Energy;
+    float r = 30 * Energy;
     center = Position;
     energy = Energy;
     vec4 Center = ViewMatrix * vec4(Position, 1.);
