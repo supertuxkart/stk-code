@@ -1279,8 +1279,13 @@ std::string IrrDriver::getSmallerTexture(const std::string& filename)
 {
     // Retrieve the filename of the cached texture
     std::string file = StringUtils::getBasename(filename);
-    std::string cached_file =
-        file_manager->getCachedTexturesDir() + file;
+    std::string parent_dir = StringUtils::getPath(filename);
+    if (StringUtils::hasSuffix(parent_dir, "/"))
+        parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
+    parent_dir = StringUtils::getBasename(parent_dir);
+    std::string cached_file = file_manager->getCachedTexturesDir() + parent_dir + "/";
+    file_manager->checkAndCreateDirectoryP(cached_file);
+    cached_file += file;
     // If the cached texture does not exist, we generate it.
     if (!file_manager->fileExists(cached_file))
     {
