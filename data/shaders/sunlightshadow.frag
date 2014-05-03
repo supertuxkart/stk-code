@@ -15,6 +15,7 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 InverseViewMatrix;
 uniform mat4 InverseProjectionMatrix;
+uniform mat4 ShadowViewProjMatrixes[4];
 #else
 layout (std140) uniform MatrixesData
 {
