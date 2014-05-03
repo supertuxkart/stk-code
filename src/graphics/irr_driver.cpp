@@ -1254,7 +1254,7 @@ std::string IrrDriver::generateSmallerTextures(const std::string& dir)
     file_manager->listFiles(files, dir, true);
 
     std::set<std::string>::const_iterator it;
-    for (it = files.cbegin(); it != files.cend(); ++it)
+    for (it = files.begin(); it != files.end(); ++it)
     {
         std::string ext = StringUtils::toLowerCase(StringUtils::getExtension(*it));
         if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "bmp")
