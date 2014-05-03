@@ -1286,8 +1286,10 @@ std::string IrrDriver::getSmallerTexture(const std::string& filename)
     std::string cached_file = file_manager->getCachedTexturesDir() + parent_dir + "/";
     file_manager->checkAndCreateDirectoryP(cached_file);
     cached_file += file;
+
     // If the cached texture does not exist, we generate it.
-    if (!file_manager->fileExists(cached_file))
+    if (!file_manager->fileExists(cached_file) ||
+        file_manager->fileIsNewer(filename, cached_file))
     {
         video::IVideoDriver* video_driver = irr_driver->getVideoDriver();
         video::IImage* img =

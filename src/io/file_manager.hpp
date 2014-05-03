@@ -142,6 +142,9 @@ public:
     void       popModelSearchPath();
     void       popMusicSearchPath();
     void       redirectOutput();
+
+    bool       fileIsNewer(const std::string& f1, const std::string& f2) const;
+
     // ------------------------------------------------------------------------
     /** Adds a directory to the music search path (or stack).
      */

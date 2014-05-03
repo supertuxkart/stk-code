@@ -1184,3 +1184,17 @@ bool FileManager::removeDirectory(const std::string &name) const
 #endif
 }   // remove directory
 
+
+// ----------------------------------------------------------------------------
+/** Returns true if the first file is newer than the second. The comparison is
+*   based on the modification time of the two files.
+*/
+bool FileManager::fileIsNewer(const std::string& f1, const std::string& f2) const
+{
+    struct stat stat1;
+    struct stat stat2;
+    stat(f1.c_str(), &stat1);
+    stat(f2.c_str(), &stat2);
+    return stat1.st_mtime > stat2.st_mtime;
+}   // fileIsNewer
+
