@@ -124,7 +124,7 @@ void IrrDriver::renderGLSL(float dt)
 
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
-
+    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
     for(unsigned int cam = 0; cam < Camera::getNumCameras(); cam++)
     {
@@ -238,8 +238,6 @@ void IrrDriver::renderGLSL(float dt)
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
         if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
         {
-            irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
-
             GLuint res = 0;
             if (m_query_issued)
                 gl_driver->extGlGetQueryObjectuiv(m_lensflare_query, GL_QUERY_RESULT, &res);
@@ -300,6 +298,13 @@ void IrrDriver::renderGLSL(float dt)
     else
         glDisable(GL_FRAMEBUFFER_SRGB);
     PROFILER_POP_CPU_MARKER();
+
+    GLuint perf_query_res[Q_LAST];
+    for (unsigned i = 0; i < Q_LAST; i++)
+    {
+        gl_driver->extGlGetQueryObjectuiv(m_perf_query[i], GL_QUERY_RESULT, &perf_query_res[i]);
+        Log::info("GPU Perf", "Phase %d : %d us\n", i, perf_query_res[i] / 1000);
+    }
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -440,6 +445,8 @@ void IrrDriver::renderSolidFirstPass()
     GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::reset();
     GroupedFPSM<FPSM_NORMAL_MAP>::reset();
 
+    irr::video::COpenGLDriver* gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, m_perf_query[Q_SOLID_PASS1]);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -460,6 +467,7 @@ void IrrDriver::renderSolidFirstPass()
     {
         drawNormalPass(*GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i]);
     }
+    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
 }
 
 void IrrDriver::renderSolidSecondPass()
@@ -492,6 +500,8 @@ void IrrDriver::renderSolidSecondPass()
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
+    irr::video::COpenGLDriver* gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, m_perf_query[Q_SOLID_PASS2]);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     glUseProgram(MeshShader::ObjectPass2Shader::Program);
@@ -525,6 +535,7 @@ void IrrDriver::renderSolidSecondPass()
     glUseProgram(MeshShader::UntexturedObjectShader::Program);
     for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
         drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
+    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
 }
 
 void IrrDriver::renderTransparent()
@@ -673,7 +684,10 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
     glDrawBuffer(GL_NONE);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+    irr::video::COpenGLDriver* gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, m_perf_query[Q_SHADOWS]);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
+    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
     glDisable(GL_POLYGON_OFFSET_FILL);
 
 
@@ -893,6 +907,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
     const core::vector3df &campos =
         irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
 
+    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, m_perf_query[Q_LIGHT]);
     std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
     {
@@ -972,6 +987,7 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
             irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
         glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
     }
+    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
 }
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)

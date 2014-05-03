@@ -59,6 +59,8 @@ struct GFXPreset
     bool animatedScenery;
     int animatedCharacters;
     int anisotropy;
+    /** Depth of field */
+    bool dof;
 };
 
 static GFXPreset GFX_PRESETS[] =
@@ -66,31 +68,31 @@ static GFXPreset GFX_PRESETS[] =
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */
+        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */, false /* depth of field */
     },
 
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */, false /* depth of field */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */, false /* depth of field */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */, false /* depth of field */
     },
 
     {
         true /* light */, 2 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
-        true /* animatedScenery */, 2 /* animatedCharacters */, 8 /* anisotropy */
+        true /* animatedScenery */, 2 /* animatedCharacters */, 8 /* anisotropy */, true /* depth of field */
     }
 };
 
@@ -359,7 +361,8 @@ void OptionsScreenVideo::updateGfxSlider()
             //GFX_PRESETS[l].shaders == UserConfigParams::m_pixel_shaders
             GFX_PRESETS[l].shadows == UserConfigParams::m_shadows &&
             GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
-            GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects)
+            GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
+            GFX_PRESETS[l].dof == UserConfigParams::m_dof)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -523,6 +526,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_shadows = GFX_PRESETS[level].shadows;
         UserConfigParams::m_ssao = GFX_PRESETS[level].ssao;
         UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
+        UserConfigParams::m_dof = GFX_PRESETS[level].dof;
 
         updateGfxSlider();
     }
