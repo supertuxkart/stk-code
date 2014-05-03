@@ -81,6 +81,8 @@ void ThreeDAnimation::update(float dt)
         //m_node->setPosition(xyz.toIrrVector());
         //m_node->setScale(scale.toIrrVector());
 
+        if (!m_playing) return;
+
         // Note that the rotation order of irrlicht is different from the one
         // in blender. So in order to reproduce the blender IPO rotations
         // correctly, we have to get the rotations around each axis and combine

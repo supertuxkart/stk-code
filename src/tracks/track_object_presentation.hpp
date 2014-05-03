@@ -203,6 +203,8 @@ private:
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
 
+    std::string             m_model_file;
+
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
@@ -218,6 +220,8 @@ public:
     virtual ~TrackObjectPresentationMesh();
 
     virtual void reset() OVERRIDE;
+
+    const std::string& getModelFile() const { return m_model_file; }
 };
 
 /**

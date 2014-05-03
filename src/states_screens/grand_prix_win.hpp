@@ -26,6 +26,7 @@
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 namespace GUIEngine { class LabelWidget; }
 class KartProperties;
+class TrackObject;
 
 /**
   * \brief Screen shown at the end of a Grand Prix
@@ -39,6 +40,8 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 
     /** Global evolution of time */
     double m_global_time;
+
+    TrackObject* m_podium_steps[3];
 
     //irr::scene::IMeshSceneNode* m_podium_step[3];
     //irr::scene::ISceneNode* m_kart_node[3];

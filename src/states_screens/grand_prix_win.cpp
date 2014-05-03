@@ -53,8 +53,10 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-const float KARTS_DELTA_Y = 0.03f;
-const float INITIAL_Y = -3.0f;
+const float KARTS_X = -0.62f;
+const float KARTS_DELTA_X = 0.815f;
+const float KARTS_DELTA_Y = -0.55f;
+const float INITIAL_Y = 0.0f;
 const float INITIAL_PODIUM_Y = -3.6f;
 const float PODIUM_HEIGHT[3] = { 0.325f, 0.5f, 0.15f };
 
@@ -78,16 +80,7 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false)
     parts.push_back("gpwin");
     ((CutsceneWorld*)World::getWorld())->setParts(parts);
     CutsceneWorld::setUseDuration(false);
-    TrackObjectManager* tom = World::getWorld()->getTrack()->getTrackObjectManager();
-    const KartProperties* kp = kart_properties_manager->getKart("tux");
-    KartModel *kart_model = kp->getKartModelCopy();
-    m_all_kart_models.push_back(kart_model);
-    scene::ISceneNode* kart_main_node = kart_model->attachModel(false);
-    TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(kart_main_node, core::vector3df(0, -0.6, 0), core::vector3df(0, 0, 0), core::vector3df(0.5, 0.5, 0.5));
-    TrackObject* to = new TrackObject(core::vector3df(0, 0, 0), core::vector3df(0, 0, 0), core::vector3df(1, 1, 1),
-        "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
-    tom->insertObject(to);
-
+    
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 }   // GrandPrixWin
 
@@ -359,6 +352,63 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
 
 void GrandPrixWin::setKarts(const std::string idents_arg[3])
 {
+    TrackObjectManager* tom = World::getWorld()->getTrack()->getTrackObjectManager();
+
+    // reorder in "podium order" (i.e. second player to the left, first player in the middle, last at the right)
+    std::string idents[3];
+    idents[0] = idents_arg[1];
+    idents[1] = idents_arg[0];
+    idents[2] = idents_arg[2];
+
+    for (int i = 0; i < 3; i++)
+    {
+        const KartProperties* kp = kart_properties_manager->getKart(idents[i]);
+        KartModel* kart_model = kp->getKartModelCopy();
+        m_all_kart_models.push_back(kart_model);
+        scene::ISceneNode* kart_main_node = kart_model->attachModel(false);
+        core::vector3df kart_pos(KARTS_X + i*KARTS_DELTA_X, INITIAL_Y + KARTS_DELTA_Y, 1.2f);
+        core::vector3df kart_rot(0, 0, 0);
+        core::vector3df kart_scale(0.5, 0.5, 0.5);
+
+        //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
+        TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
+            kart_main_node, kart_pos, kart_rot, kart_scale);
+        TrackObject* to = new TrackObject(kart_pos, kart_rot, kart_scale,
+            "ghost", presentation, false /* isDynamic */, NULL /* physics settings */);
+        tom->insertObject(to);
+        //to->move(kart_pos, core::vector3df(0, 0, 0), core::vector3df(1, 1, 1), false);
+    }
+
+    m_podium_steps[0] = NULL;
+    m_podium_steps[1] = NULL;
+    m_podium_steps[2] = NULL;
+
+    TrackObject* currObj;
+    PtrVector<TrackObject>& objects = tom->getObjects();
+    for_in(currObj, objects)
+    {
+        TrackObjectPresentationMesh* meshPresentation = currObj->getPresentation<TrackObjectPresentationMesh>();
+        if (meshPresentation != NULL)
+        {
+            if (meshPresentation->getModelFile() == "gpwin_podium1.b3d")
+            {
+                m_podium_steps[0] = currObj;
+            }
+            else if (meshPresentation->getModelFile() == "gpwin_podium2.b3d")
+            {
+                m_podium_steps[1] = currObj;
+            }
+            else if (meshPresentation->getModelFile() == "gpwin_podium3.b3d")
+            {
+                m_podium_steps[2] = currObj;
+            }
+        }
+    }
+
+    assert(m_podium_steps[0] != NULL);
+    assert(m_podium_steps[1] != NULL);
+    assert(m_podium_steps[2] != NULL);
+
     // TODO
 
     /*

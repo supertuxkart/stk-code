@@ -202,6 +202,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_model_file = model_name;
     m_is_in_skybox = false;
     std::string render_pass;
     xml_node.get("renderpass", &render_pass);
@@ -277,6 +278,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
 
     bool animated = (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_model_file = model_file;
 
     if (file_manager->fileExists(model_file))
     {
