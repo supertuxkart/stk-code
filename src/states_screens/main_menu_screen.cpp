@@ -233,17 +233,50 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     if (selection == "options")
     {
         // The DEBUG item
+
+        // GP WIN
+        /*
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("gpwin", 999, false);
+        GrandPrixWin* scene = GrandPrixWin::getInstance();
+        StateManager::get()->pushScreen(scene);
+        const std::string winners[] = { "elephpant", "nolok", "pidgin" };
+        scene->setKarts(winners);
+        */
+
+        // GP Lose
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("gplose", 999, false);
+        GrandPrixLose* scene = GrandPrixLose::getInstance();
+        StateManager::get()->pushScreen(scene);
+        std::vector<std::string> losers;
+        losers.push_back("nolok");
+        losers.push_back("elephpant");
+        //losers.push_back("wilber");
+        //losers.push_back("tux");
+        scene->setKarts(losers);
+
+
+        /*
+        // FEATURE UNLOCKED
         FeatureUnlockedCutScene* scene =
-            FeatureUnlockedCutScene::getInstance();
+        FeatureUnlockedCutScene::getInstance();
 
         scene->addTrophy(RaceManager::DIFFICULTY_EASY);
         StateManager::get()->pushScreen(scene);
 
-        /*
         static int i = 1;
         i++;
 
-        if (i % 4 == 0)
+        if (i % 2 == 0)
         {
             // the passed kart will not be modified, that's why I allow myself
             // to use const_cast
@@ -255,7 +288,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    );
             StateManager::get()->pushScreen(scene);
         }
-        else if (i % 4 == 1)
+        else if (i % 2 == 1)
         {
             std::vector<video::ITexture*> textures;
             textures.push_back(irr_driver->getTexture(
@@ -274,23 +307,6 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             scene->addUnlockedPictures(textures, 1.0, 0.75, L"You did it");
 
             StateManager::get()->pushScreen(scene);
-        }
-        else if (i % 4 == 2)
-        {
-            GrandPrixWin* scene = GrandPrixWin::getInstance();
-            const std::string winners[] = { "elephpant", "nolok", "pidgin" };
-            StateManager::get()->pushScreen(scene);
-            scene->setKarts( winners );
-        }
-        else
-        {
-            GrandPrixLose* scene = GrandPrixLose::getInstance();
-            StateManager::get()->pushScreen(scene);
-            std::vector<std::string> losers;
-            losers.push_back("nolok");
-            losers.push_back("elephpant");
-            losers.push_back("wilber");
-            scene->setKarts( losers );
         }
          */
     }

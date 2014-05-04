@@ -124,13 +124,12 @@
         </div>
         
         <spacer height="4" width="10" />
-        <!--
+        
         <div layout="horizontal-row" proportion="1" height="fit">
-            <checkbox id="anim_gfx"/>
+            <checkbox id="dof"/>
             <spacer width="10" height="10"/>
-            <label text="Animated Scenery" I18N="Video settings"/>
+            <label text="Depth of field" I18N="Video settings"/>
         </div>
-        -->
     </div>
     
     <spacer height="20" width="10" />

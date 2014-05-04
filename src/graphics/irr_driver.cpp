@@ -463,6 +463,7 @@ void IrrDriver::initDevice()
 
         irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
+        gl_driver->extGlGenQueries(Q_LAST, m_perf_query);
         m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
@@ -1810,14 +1811,21 @@ void IrrDriver::update(float dt)
     World *world = World::getWorld();
 
     if (GUIEngine::getCurrentScreen() != NULL &&
-             GUIEngine::getCurrentScreen()->needs3D())
+        GUIEngine::getCurrentScreen()->needs3D() &&
+        world != NULL)
     {
         //printf("Screen that needs 3D\n");
-        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
-                                   video::SColor(0,0,0,255));
-        m_scene_manager->drawAll();
+        //m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
+        //                           video::SColor(0,0,0,255));
+        //m_scene_manager->drawAll();
+
+        if (m_glsl)
+            renderGLSL(dt);
+        else
+            renderFixed(dt);
+
         GUIEngine::render(dt);
-        m_video_driver->endScene();
+        //m_video_driver->endScene();
         return;
     }
     else if (!world)

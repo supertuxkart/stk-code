@@ -26,6 +26,7 @@
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 namespace GUIEngine { class LabelWidget; }
 class KartProperties;
+class TrackObject;
 
 /**
   * \brief Screen shown at the end of a Grand Prix
@@ -37,38 +38,26 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 
     GrandPrixWin();
 
-    /** sky angle, 0-360 */
-    float m_sky_angle;
-
     /** Global evolution of time */
     double m_global_time;
 
-    irr::scene::IMeshSceneNode* m_village;
+    TrackObject* m_podium_steps[3];
 
-    irr::scene::IMeshSceneNode* m_podium_step[3];
-    irr::scene::ISceneNode* m_kart_node[3];
+    TrackObject* m_kart_node[3];
+
+    //irr::scene::IMeshSceneNode* m_podium_step[3];
+    //irr::scene::ISceneNode* m_kart_node[3];
 
     /** A copy of the kart model for each kart used. */
     std::vector<KartModel*> m_all_kart_models;
 
-    irr::scene::ISceneNode* m_sky;
-    irr::scene::ICameraSceneNode* m_camera;
-
-    irr::scene::ISceneNode* m_light;
-
     GUIEngine::LabelWidget* m_unlocked_label;
 
     int m_phase;
-
+    
     float m_kart_x[3], m_kart_y[3], m_kart_z[3];
-    float m_podium_x[3], m_podium_z[3];
+    //float m_podium_x[3], m_podium_z[3];
     float m_kart_rotation[3];
-
-    float m_camera_x, m_camera_y, m_camera_z;
-    float m_camera_target_x, m_camera_target_z;
-
-    MusicInformation* m_music;
-    SFXBase* m_finish_sound;
 
 public:
 
@@ -90,8 +79,6 @@ public:
 
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
     void setKarts(const std::string idents[3]);
-
-    virtual MusicInformation* getMusic() const OVERRIDE { return m_music; }
 };
 
 #endif

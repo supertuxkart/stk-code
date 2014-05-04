@@ -5,6 +5,13 @@ uniform sampler2DArrayShadow shadowtex;
 uniform vec3 direction;
 uniform vec3 col;
 
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+uniform mat4 ShadowViewProjMatrixes[4];
+#else
 layout (std140) uniform MatrixesData
 {
     mat4 ViewMatrix;
@@ -13,6 +20,7 @@ layout (std140) uniform MatrixesData
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
 };
+#endif
 
 
 in vec2 uv;

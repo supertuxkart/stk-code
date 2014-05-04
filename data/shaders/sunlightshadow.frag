@@ -10,6 +10,13 @@ uniform vec3 col;
 //uniform vec2 wind;
 //uniform float shadowoffset;
 
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+uniform mat4 ShadowViewProjMatrixes[4];
+#else
 layout (std140) uniform MatrixesData
 {
     mat4 ViewMatrix;
@@ -18,6 +25,7 @@ layout (std140) uniform MatrixesData
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
 };
+#endif
 
 in vec2 uv;
 out vec4 Diff;
@@ -25,6 +33,7 @@ out vec4 Spec;
 
 vec3 DecodeNormal(vec2 n);
 vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 float getShadowFactor(vec3 pos, float bias, int index)
 {
@@ -60,9 +69,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 
 void main() {
 	float z = texture(dtex, uv).x;
-	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
-	xpos = InverseProjectionMatrix * xpos;
-	xpos.xyz /= xpos.w;
+	vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
     float roughness =texture(ntex, uv).z;

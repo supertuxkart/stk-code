@@ -45,6 +45,8 @@
 
 #include <string>
 
+bool CutsceneWorld::s_use_duration = false;
+
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
  */
@@ -151,6 +153,9 @@ void CutsceneWorld::init()
                                   (double)curr->getAnimator()->getAnimationDuration());
         }
     }
+
+    if (!s_use_duration)
+        m_duration = 999999.0f;
 
     if (m_duration <= 0.0f)
     {
@@ -367,6 +372,7 @@ void CutsceneWorld::enterRaceOverState()
 
     if (m_aborted || partId == -1 || partId == (int)m_parts.size() - 1)
     {
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         if (m_parts.size() == 1 && m_parts[0] == "endcutscene")
         {
             CreditsScreen* credits = CreditsScreen::getInstance();
@@ -377,6 +383,23 @@ void CutsceneWorld::enterRaceOverState()
             StateManager::get()->resetAndSetStack(newStack);
             StateManager::get()->pushScreen(credits);
         }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            if (race_manager->raceWasStartedFromOverworld())
+                OverWorld::enterOverWorld();
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else  if (m_parts.size() == 1 && m_parts[0] == "gplose")
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            if (race_manager->raceWasStartedFromOverworld())
+                OverWorld::enterOverWorld();
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (race_manager->getTrackName() == "introcutscene" ||
                  race_manager->getTrackName() == "introcutscene2")
         {
@@ -417,6 +440,9 @@ void CutsceneWorld::enterRaceOverState()
  */
 bool CutsceneWorld::isRaceOver()
 {
+    if (!s_use_duration && !m_aborted)
+        return false;
+
     return m_time > m_duration;
 }   // isRaceOver
 

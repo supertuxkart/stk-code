@@ -111,9 +111,9 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
 
     mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
 
-    if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+    if (World::getWorld() != NULL)
     {
-        mb->getMaterial().FogEnable = World::getWorld()->getTrack()->isFogEnabled();
+        mb->getMaterial().FogEnable = World::getWorld()->isFogEnabled();
     }
 
 

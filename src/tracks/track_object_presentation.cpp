@@ -202,6 +202,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_model_file = model_name;
     m_is_in_skybox = false;
     std::string render_pass;
     xml_node.get("renderpass", &render_pass);
@@ -251,6 +252,22 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 }
 
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
+    scene::IAnimatedMesh* model, const core::vector3df& xyz,
+    const core::vector3df& hpr, const core::vector3df& scale) :
+    TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    m_is_looped = false;
+    m_mesh = NULL;
+    m_node = NULL;
+
+    bool animated = (UserConfigParams::m_graphical_effects ||
+        World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_mesh = model;
+    init(NULL, NULL, true);
+}
+
+TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale) :
         TrackObjectPresentationSceneNode(xyz, hpr, scale)
@@ -261,6 +278,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
 
     bool animated = (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_model_file = model_file;
 
     if (file_manager->fileExists(model_file))
     {
@@ -374,10 +393,9 @@ void TrackObjectPresentationMesh::reset()
         a_node->OnAnimate(0);
         a_node->OnAnimate(0);
 
-        if(m_is_looped)
-        {
-            a_node->setFrameLoop(m_frame_start, m_frame_end);
-        }
+        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
+        // last frame, even if looping is disabled
+        a_node->setFrameLoop(m_frame_start, m_frame_end);
     }
 }
 
