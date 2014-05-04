@@ -37,14 +37,14 @@ vec2 UpdateClipRegionRoot(float nc,          /* Tangent plane x/y normal coordin
     float pz = (lc * lc + lz * lz - lightRadius * lightRadius) /
                (lz - (nz / nc) * lc);
 
-    if (pz > 0.0f) {
+    if (pz > 0.) {
         float c = -nz * cameraScale / nc;
-        if (nc > 0.0f) // Left side boundary
+        if (nc > 0.) // Left side boundary
             return vec2(c, 1.);
         else // Right side boundary
             return vec2(-1., c);
     }
-    return vec2(1., -1);
+    return vec2(-1., 1.);
 }
 
 vec2 UpdateClipRegion(float lc,          /* Light x/y coordinate (view space) */
@@ -56,17 +56,18 @@ vec2 UpdateClipRegion(float lc,          /* Light x/y coordinate (view space) */
     float lcSqPluslzSq = lc * lc + lz * lz;
     float d = rSq * lc * lc - lcSqPluslzSq * (rSq - lz * lz);
 
-    if (d > 0) {
-        float a = lightRadius * lc;
-        float b = sqrt(d);
-        float nx0 = (a + b) / lcSqPluslzSq;
-        float nx1 = (a - b) / lcSqPluslzSq;
+    // The camera is inside lignt bounding sphere, quad fits whole screen
+    if (d <= 0.)
+        return vec2(-1., 1.);
 
-        vec2 clip0 = UpdateClipRegionRoot(nx0, lc, lz, lightRadius, cameraScale);
-        vec2 clip1 = UpdateClipRegionRoot(nx1, lc, lz, lightRadius, cameraScale);
-        return vec2(max(clip0.x, clip1.x), min(clip0.y, clip1.y));
-    }
-    return vec2(1., -1.);
+    float a = lightRadius * lc;
+    float b = sqrt(d);
+    float nx0 = (a + b) / lcSqPluslzSq;
+    float nx1 = (a - b) / lcSqPluslzSq;
+
+    vec2 clip0 = UpdateClipRegionRoot(nx0, lc, lz, lightRadius, cameraScale);
+    vec2 clip1 = UpdateClipRegionRoot(nx1, lc, lz, lightRadius, cameraScale);
+    return vec2(max(clip0.x, clip1.x), min(clip0.y, clip1.y));
 }
 
 // Returns bounding box [min.x, max.x, min.y, max.y] in clip [-1, 1] space.
