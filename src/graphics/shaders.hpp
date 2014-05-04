@@ -434,7 +434,6 @@ namespace LightShader
     public:
         static GLuint Program;
         static GLuint attrib_Position, attrib_Energy, attrib_Color;
-        static GLuint attrib_Corner;
         static GLuint uniform_ntex, uniform_dtex, uniform_spec, uniform_screen;
         static GLuint vbo;
         static GLuint vao;
