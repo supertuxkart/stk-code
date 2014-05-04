@@ -304,6 +304,11 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 
 std::set<irr::video::ITexture *> AlreadyTransformedTexture;
 
+void resetTextureTable()
+{
+    AlreadyTransformedTexture.clear();
+}
+
 void compressTexture(irr::video::ITexture *tex, bool srgb)
 {
     if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())

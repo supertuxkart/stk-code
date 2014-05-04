@@ -1754,7 +1754,6 @@ namespace LightShader
     GLuint PointLightShader::attrib_Position;
     GLuint PointLightShader::attrib_Color;
     GLuint PointLightShader::attrib_Energy;
-    GLuint PointLightShader::attrib_Corner;
     GLuint PointLightShader::uniform_ntex;
     GLuint PointLightShader::uniform_dtex;
     GLuint PointLightShader::uniform_spec;
@@ -1773,7 +1772,6 @@ namespace LightShader
         attrib_Position = glGetAttribLocation(Program, "Position");
         attrib_Color = glGetAttribLocation(Program, "Color");
         attrib_Energy = glGetAttribLocation(Program, "Energy");
-        attrib_Corner = glGetAttribLocation(Program, "Corner");
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_spec = glGetUniformLocation(Program, "spec");
@@ -1781,10 +1779,6 @@ namespace LightShader
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
-
-        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
-        glEnableVertexAttribArray(attrib_Corner);
-        glVertexAttribPointer(attrib_Corner, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
 
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);

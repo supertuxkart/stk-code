@@ -159,6 +159,7 @@ GLint LoadProgram(Types ... args)
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+void resetTextureTable();
 void compressTexture(irr::video::ITexture *tex, bool srgb);
 void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height);
 
