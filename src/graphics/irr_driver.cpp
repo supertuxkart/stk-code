@@ -1811,14 +1811,21 @@ void IrrDriver::update(float dt)
     World *world = World::getWorld();
 
     if (GUIEngine::getCurrentScreen() != NULL &&
-             GUIEngine::getCurrentScreen()->needs3D())
+        GUIEngine::getCurrentScreen()->needs3D() &&
+        world != NULL)
     {
         //printf("Screen that needs 3D\n");
-        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
-                                   video::SColor(0,0,0,255));
-        m_scene_manager->drawAll();
+        //m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
+        //                           video::SColor(0,0,0,255));
+        //m_scene_manager->drawAll();
+
+        if (m_glsl)
+            renderGLSL(dt);
+        else
+            renderFixed(dt);
+
         GUIEngine::render(dt);
-        m_video_driver->endScene();
+        //m_video_driver->endScene();
         return;
     }
     else if (!world)

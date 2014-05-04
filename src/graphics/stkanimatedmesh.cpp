@@ -253,7 +253,7 @@ void STKAnimatedMesh::render()
         for_in(mesh, TransparentMesh[TM_BUBBLE])
             drawBubble(*mesh, ModelViewProjectionMatrix);
 
-        if (World::getWorld()->getTrack()->isFogEnabled())
+        if (World::getWorld()->isFogEnabled())
         {
             if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
                 glUseProgram(MeshShader::TransparentFogShader::Program);

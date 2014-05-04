@@ -212,7 +212,7 @@ void IrrDriver::renderGLSL(float dt)
         renderSolidSecondPass();
         PROFILER_POP_CPU_MARKER();
 
-        if (UserConfigParams::m_dynamic_lights && World::getWorld()->getTrack()->isFogEnabled())
+        if (UserConfigParams::m_dynamic_lights && World::getWorld()->isFogEnabled())
         {
             PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
             m_post_processing->renderFog();
