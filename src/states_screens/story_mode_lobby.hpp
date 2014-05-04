@@ -27,6 +27,7 @@
 namespace GUIEngine 
 {
     class CheckBoxWidget;
+    class RibbonWidget;
     class TextBoxWidget;
     class Widget; 
 }
