@@ -1810,7 +1810,8 @@ void IrrDriver::update(float dt)
     World *world = World::getWorld();
 
     if (GUIEngine::getCurrentScreen() != NULL &&
-             GUIEngine::getCurrentScreen()->needs3D())
+        GUIEngine::getCurrentScreen()->needs3D() &&
+        world != NULL)
     {
         //printf("Screen that needs 3D\n");
         //m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,

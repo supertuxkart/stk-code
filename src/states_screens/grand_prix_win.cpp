@@ -71,19 +71,6 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false)
 
     m_throttle_FPS = false;
 
-    StateManager::get()->enterGameState();
-    race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-    race_manager->setNumKarts(0);
-    race_manager->setNumPlayers(0);
-    race_manager->setNumLocalPlayers(0);
-    race_manager->startSingleRace("gpwin", 999, false);
-    std::vector<std::string> parts;
-    parts.push_back("gpwin");
-    ((CutsceneWorld*)World::getWorld())->setParts(parts);
-    CutsceneWorld::setUseDuration(false);
-    
-    World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
-
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;
     m_kart_node[2] = NULL;
@@ -98,21 +85,22 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false)
 
 void GrandPrixWin::loadedFromFile()
 {
-    //m_podium_x[0] = 1.4f;
-    //m_podium_z[0] = 0.0f;
-    //
-    //m_podium_x[1] = 2.2f;
-    //m_podium_z[1] = 0.5f;
-    //
-    //m_podium_x[2] = 3.0f;
-    //m_podium_z[2] = 0.0f;
 }   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
 void GrandPrixWin::init()
 {
+    std::vector<std::string> parts;
+    parts.push_back("gpwin");
+    ((CutsceneWorld*)World::getWorld())->setParts(parts);
+    CutsceneWorld::setUseDuration(false);
+
     Screen::init();
+
+    World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
+
+
     if (PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -187,6 +175,14 @@ void GrandPrixWin::tearDown()
         delete m_unlocked_label;
         m_unlocked_label = NULL;
     }
+
+    m_kart_node[0] = NULL;
+    m_kart_node[1] = NULL;
+    m_kart_node[2] = NULL;
+
+    m_podium_steps[0] = NULL;
+    m_podium_steps[1] = NULL;
+    m_podium_steps[2] = NULL;
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -355,6 +351,8 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
     for (int i = 0; i < 3; i++)
     {
         const KartProperties* kp = kart_properties_manager->getKart(idents[i]);
+        if (kp == NULL) continue;
+
         KartModel* kart_model = kp->getKartModelCopy();
         m_all_kart_models.push_back(kart_model);
         scene::ISceneNode* kart_main_node = kart_model->attachModel(false);

@@ -384,6 +384,13 @@ void CutsceneWorld::enterRaceOverState()
             StateManager::get()->pushScreen(credits);
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
+        {
+            MainMenuScreen* mainMenu = MainMenuScreen::getInstance();
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(mainMenu);
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (race_manager->getTrackName() == "introcutscene" ||
                  race_manager->getTrackName() == "introcutscene2")
         {
