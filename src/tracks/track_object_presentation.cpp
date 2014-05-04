@@ -393,10 +393,9 @@ void TrackObjectPresentationMesh::reset()
         a_node->OnAnimate(0);
         a_node->OnAnimate(0);
 
-        if(m_is_looped)
-        {
-            a_node->setFrameLoop(m_frame_start, m_frame_end);
-        }
+        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
+        // last frame, even if looping is disabled
+        a_node->setFrameLoop(m_frame_start, m_frame_end);
     }
 }
 

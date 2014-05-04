@@ -235,6 +235,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         // The DEBUG item
 
         // GP WIN
+        /*
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
@@ -242,20 +243,27 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         race_manager->setNumLocalPlayers(0);
         race_manager->startSingleRace("gpwin", 999, false);
         GrandPrixWin* scene = GrandPrixWin::getInstance();
-        const std::string winners[] = { "elephpant", "nolok", "pidgin" };
         StateManager::get()->pushScreen(scene);
+        const std::string winners[] = { "elephpant", "nolok", "pidgin" };
         scene->setKarts(winners);
+        */
 
         // GP Lose
-        /*
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("gplose", 999, false);
         GrandPrixLose* scene = GrandPrixLose::getInstance();
         StateManager::get()->pushScreen(scene);
         std::vector<std::string> losers;
         losers.push_back("nolok");
         losers.push_back("elephpant");
-        losers.push_back("wilber");
-        scene->setKarts( losers );
-        */
+        //losers.push_back("wilber");
+        //losers.push_back("tux");
+        scene->setKarts(losers);
+
 
         /*
         // FEATURE UNLOCKED
