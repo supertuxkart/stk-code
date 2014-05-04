@@ -386,9 +386,18 @@ void CutsceneWorld::enterRaceOverState()
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
         {
-            MainMenuScreen* mainMenu = MainMenuScreen::getInstance();
             race_manager->exitRace();
-            StateManager::get()->resetAndGoToScreen(mainMenu);
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            if (race_manager->raceWasStartedFromOverworld())
+                OverWorld::enterOverWorld();
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else  if (m_parts.size() == 1 && m_parts[0] == "gplose")
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            if (race_manager->raceWasStartedFromOverworld())
+                OverWorld::enterOverWorld();
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (race_manager->getTrackName() == "introcutscene" ||

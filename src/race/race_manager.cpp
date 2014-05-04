@@ -700,18 +700,28 @@ void RaceManager::exitRace(bool delete_world)
         }
         else
         {
-            StateManager::get()->pushScreen( GrandPrixLose::getInstance()  );
+            if (delete_world) World::deleteWorld();
+            delete_world = false;
+
+            StateManager::get()->enterGameState();
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+            race_manager->setNumKarts(0);
+            race_manager->setNumPlayers(0);
+            race_manager->setNumLocalPlayers(0);
+            race_manager->startSingleRace("gplose", 999, false);
+            GrandPrixLose* scene = GrandPrixLose::getInstance();
+            StateManager::get()->pushScreen(scene);
 
             if (humanLosers.size() >= 1)
             {
-                GrandPrixLose::getInstance()->setKarts( humanLosers );
+                scene->setKarts(humanLosers);
             }
             else
             {
                 std::cerr << "RaceManager::exitRace() : what's going on?? no winners and no losers??\n";
                 std::vector<std::string> karts;
                 karts.push_back(UserConfigParams::m_default_kart);
-                GrandPrixLose::getInstance()->setKarts( karts );
+                scene->setKarts(karts);
             }
         }
     }

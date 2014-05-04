@@ -65,7 +65,7 @@ DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false)
+GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false /* pause race */)
 {
     setNeeds3D(true);
 
