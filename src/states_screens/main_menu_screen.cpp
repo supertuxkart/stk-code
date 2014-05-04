@@ -41,11 +41,11 @@
 #include "states_screens/credits.hpp"
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/story_mode_lobby.hpp"
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
@@ -408,7 +408,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         if (PlayerManager::getCurrentOnlineId())
             StateManager::get()->pushScreen(OnlineScreen::getInstance());
         else
-            StateManager::get()->pushScreen(LoginScreen::getInstance());
+        {
+            StoryModeLobbyScreen *login = StoryModeLobbyScreen::getInstance();
+            login->setIsPopup(true);
+            StateManager::get()->pushScreen(login);
+        }
     }
     else if (selection == "addons")
     {

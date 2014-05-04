@@ -25,6 +25,7 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
+#include "online/messages.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -38,6 +39,7 @@ DEFINE_SCREEN_SINGLETON( StoryModeLobbyScreen );
 
 StoryModeLobbyScreen::StoryModeLobbyScreen() : Screen("story_mode_lobby.stkgui")
 {
+    m_is_popup_window = false;
 }   // StoryModeLobbyScreen
 
 // ----------------------------------------------------------------------------
@@ -51,6 +53,7 @@ void StoryModeLobbyScreen::loadedFromFile()
 
 void StoryModeLobbyScreen::init()
 {
+    m_login_successful = false;
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
     m_username_tb = getWidget<TextBoxWidget >("username");
@@ -60,13 +63,17 @@ void StoryModeLobbyScreen::init()
     m_password_tb->setPasswordBox(true, L'*');
     m_players = getWidget<DynamicRibbonWidget>("players");
     assert(m_players);
+    m_options_widget = getWidget<RibbonWidget>("options");
+    assert(m_options_widget);
+    m_info_widget = getWidget<LabelWidget>("message");
+    assert(m_info_widget);
 
     Screen::init();
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if (player)
+    if (player && !m_is_popup_window)
     {
-        //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        //return;
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
     }
 
     m_players->clearItems();
@@ -103,6 +110,11 @@ void StoryModeLobbyScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
+    PlayerProfile *cp = PlayerManager::getCurrentPlayer();
+    // If the current user is logged in, a logout is required now.
+    if(profile!=cp && cp && cp->isLoggedIn())
+        cp->requestSignOut();
+
     getWidget<TextBoxWidget >("username")->setText(profile
                                                    ->getLastOnlineName());
     m_players->setSelection(StringUtils::toString(index), 0, /*focusIt*/true);
@@ -117,6 +129,7 @@ void StoryModeLobbyScreen::selectUser(int index)
     }
 
     // Now last use was with online --> Display the saved data
+    m_online_cb->setState(true);
     makeEntryFieldsVisible(true);
     m_username_tb->setText(profile->getLastOnlineName());
 
@@ -141,7 +154,7 @@ void StoryModeLobbyScreen::makeEntryFieldsVisible(bool online)
     m_username_tb->setVisible(online);
     getWidget<LabelWidget>("label_password")->setVisible(online);
     m_password_tb->setVisible(online);
-}   // update
+}   // makeEntryFieldsVisible
 
 // ----------------------------------------------------------------------------
 /** Called when the user selects anything on the screen.
@@ -150,9 +163,9 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
                                          const std::string& name,
                                          const int player_id)
 {
-    LabelWidget *info = getWidget<LabelWidget>("message");
-    info->setText("", true);
-    info->setErrorColor();
+    // Clean any error message still shown
+    m_info_widget->setText("", true);
+    m_info_widget->setErrorColor();
 
     if (name == "players")
     {
@@ -173,7 +186,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         if (m_online_cb->getState() && UserConfigParams::m_internet_status ==
                                        Online::RequestManager::IPERM_NOT_ALLOWED)
         {
-            info->setText(
+            m_info_widget->setText(
                 "Internet access is disabled, please enable it in the options",
                 true);
             sfx_manager->quickSound( "anvil" );
@@ -183,77 +196,126 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     }
     else if (name == "options")
     {
-        const std::string &button =
-            getWidget<RibbonWidget>("options")->getSelectionIDString(player_id);
+        const std::string &button = 
+                             m_options_widget->getSelectionIDString(player_id);
         if (button == "ok" || button == "ok_and_save")
         {
             if (m_online_cb->getState() && m_password_tb->getText() == "")
             {
-                info->setText(_("You need to enter a password."),true);
-                sfx_manager->quickSound( "anvil" );
+                m_info_widget->setText(_("You need to enter a password."), true);
+                sfx_manager->quickSound("anvil");
                 return;
             }
-
-            const std::string &name = m_players->getSelectionIDString(player_id);
-
-            unsigned int id;
-            StringUtils::fromString(name, id);
-            PlayerProfile *profile = PlayerManager::get()->getPlayer(id);
-            PlayerManager::get()->setCurrentPlayer(profile, button=="ok_and_save");
-            StateManager::get()->pushScreen(MainMenuScreen::getInstance());
-            return;
+            login(button=="ok_and_save");
         }   // button==ok || ok_and_save
         else if (button == "new_user")
         {
             new EnterPlayerNameDialog(this, 0.5f, 0.4f);
         }
+        else if (button == "cancel")
+        {
+            PlayerProfile *cp = PlayerManager::getCurrentPlayer();
+            if(cp && cp->isLoggedIn())
+                cp->requestSignOut();
+            StateManager::get()->popMenu();
+        }
     }   // options
 
     return;
 
-
-    if (name == "back")
-    {
-        StateManager::get()->escapePressed();
-    }
-    else if (name == "gameslots")
-    {
-        ListWidget* list = getWidget<ListWidget>("gameslots");
-
-        bool slot_found = false;
-
-        for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
-        {
-            PlayerProfile *player = PlayerManager::get()->getPlayer(n);
-            if (list->getSelectionLabel() == player->getName())
-            {
-                PlayerManager::get()->setCurrentPlayer(player, false);
-                slot_found = true;
-                break;
-            }
-        }
-
-        if (!slot_found)
-        {
-            Log::error("StoryModeLobby",
-                       "Cannot find player corresponding to slot '%s'.",
-                     core::stringc(list->getSelectionLabel().c_str()).c_str());
-        }
-        else
-        {
-//            CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-//            if (cb->getState())
-            {
-//                UserConfigParams::m_default_player = list->getSelectionLabel();
-            }
-        }
-
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-    }
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+/** Called when OK or OK-and-save is clicked.
+ *  This will trigger the actual login (if requested) etc.
+ *  \param remember_me True if the login details should be remembered,
+ *         so that next time this menu can be skipped.
+ */
+void StoryModeLobbyScreen::login(bool remember_me)
+{
+    m_options_widget->setDeactivated();
 
+    const std::string &s_id = m_players->getSelectionIDString(0);
+    unsigned int n_id;
+    StringUtils::fromString(s_id, n_id);
+    PlayerProfile *profile = PlayerManager::get()->getPlayer(n_id);
+    PlayerManager::get()->setCurrentPlayer(profile, remember_me);
+    assert(profile);
+
+    // If no online login requested, go straight to the main menu screen.
+    if(!m_online_cb->getState())
+    {
+        if(profile->isLoggedIn())
+        {
+            // The player is logged in, but online is now disabled,
+            // so log the player out. There is no error handling of
+            // a failed logout request
+            profile->requestSignOut();
+        }
+        m_login_successful = true;
+        // This will trigger replacing this screen with the main menu screen.
+        onUpdate(0.0f);
+        return;
+    }
+
+    // If the user is not already logged in, start a login request
+    if (!profile->isLoggedIn())
+    {
+        if (profile->hasSavedSession())
+            profile->requestSavedSession();
+        else
+            profile->requestSignIn(m_username_tb->getText(),
+                                   m_password_tb->getText(),
+                                   remember_me);
+    }
+    return;
+}   // login
+
+// ----------------------------------------------------------------------------
+/** Called once every frame. It will replace this screen with the main menu
+ *  screen if a successful login happened.
+ */
+void StoryModeLobbyScreen::onUpdate(float dt)
+{
+    if (!m_options_widget->isActivated())
+        m_info_widget->setText(Online::Messages::loadingDots( _("Signing in")),
+                               false);
+
+    if(m_online_cb->getState() && m_login_successful)
+    {
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
+    }
+
+
+    PlayerProfile *cp = PlayerManager::getCurrentPlayer();
+    if (cp && cp->isLoggedIn())
+        cp->requestSignOut();
+}   // onUpdate
+
+// ----------------------------------------------------------------------------
+/** Callback from player profile if login was successful.
+ */
+void StoryModeLobbyScreen::loginSuccessful()
+{
+    // The callback is done from the main thread, so no need to sync
+    // access to m_success
+    m_login_successful = true;
+}   // loginSuccessful
+
+// ----------------------------------------------------------------------------
+/** Callback from player profile if login was unsuccessful.
+ *  \param error_message Contains the error message.
+ */
+void StoryModeLobbyScreen::loginError(const irr::core::stringw & error_message)
+{
+    sfx_manager->quickSound("anvil");
+    m_info_widget->setErrorColor();
+    m_info_widget->setText(error_message, false);
+    m_options_widget->setActivated();
+}   // loginError
+
+// ----------------------------------------------------------------------------
 void StoryModeLobbyScreen::unloaded()
 {
 }   // unloaded

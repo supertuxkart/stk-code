@@ -104,30 +104,6 @@ void LoginScreen::login()
 }   // login
 
 // -----------------------------------------------------------------------------
-/** Called from the login request when it was successfully exected.
- */
-void LoginScreen::loginSuccessful()
-{
-    // The callback is done from the main thread, so no need to sync
-    // access to m_success
-    m_success = true;
-}   // loginSuccessful
-
-// -----------------------------------------------------------------------------
-/** Called from the login request when the login was not successful.
- *  \param error_message The error message from the server (or curl).
- */
-void LoginScreen::loginError(const irr::core::stringw & error_message)
-{
-    sfx_manager->quickSound("anvil");
-    LabelWidget *info_widget = getWidget<LabelWidget>("info");
-    info_widget->setErrorColor();
-    info_widget->setText(error_message, false);
-
-    m_options_widget->setActivated();
-}   // loginError
-
-// -----------------------------------------------------------------------------
 /** Called in each frame. If a successful login is detected, the online screen
  *  will be displayed.
  */

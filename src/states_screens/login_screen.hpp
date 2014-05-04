@@ -56,8 +56,6 @@ public:
                                const std::string& name,
                                const int playerID) OVERRIDE;
 
-    void loginSuccessful();
-    void loginError(const irr::core::stringw & error_message);
 };   // class LoginScreen
 
 #endif

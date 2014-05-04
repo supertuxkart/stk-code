@@ -86,6 +86,12 @@ namespace Online
         }
 
         // ------------------------------------------------------------------------
+        /** Convenience function to type less in calls. */
+        irr::core::stringw loadingDots(const wchar_t *s)
+        {
+            return irr::core::stringw(s)+loadingDots();
+        }
+        // ------------------------------------------------------------------------
         /**
           * Shows a increasing number of dots.
           * \param interval A float representing the time it takes to add a new dot

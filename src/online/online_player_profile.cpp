@@ -27,11 +27,11 @@
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
-#include "states_screens/login_screen.hpp"
+#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
-#include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -143,7 +143,7 @@ namespace Online
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
-        LoginScreen *login = dynamic_cast<LoginScreen*>(screen);
+        StoryModeLobbyScreen *login = dynamic_cast<StoryModeLobbyScreen*>(screen);
         if(login)
         {
             if(isSuccess())

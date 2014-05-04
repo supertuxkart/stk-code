@@ -43,6 +43,15 @@ class StoryModeLobbyScreen : public GUIEngine::Screen,
     StoryModeLobbyScreen();
 
 private:
+
+    /** True if this window is a popup window, which means it will not
+     *  immediately go to the main menu if a current player is defined. */
+    bool m_is_popup_window;
+
+    /** Set in the callback from the login request to indicate that this 
+     *  window can be closed. */
+    bool m_login_successful;
+
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;
 
@@ -52,12 +61,21 @@ private:
     /** Password widget. */
     GUIEngine::TextBoxWidget *m_password_tb;
 
+    /** Label field for warning and error messages. */
+    GUIEngine::LabelWidget * m_info_widget;
+
+    /** The ribbon with all buttons. */
+    GUIEngine::RibbonWidget *m_options_widget;
+
     /** The dynamic ribbon containing all players. */
     GUIEngine::DynamicRibbonWidget* m_players;
 
     void selectUser(int index);
     void makeEntryFieldsVisible(bool online);
+    void login(bool remember_me);
     virtual void onDialogClose();
+    virtual void onUpdate(float dt) OVERRIDE;
+
 public:
     friend class GUIEngine::ScreenSingleton<StoryModeLobbyScreen>;
 
@@ -78,6 +96,13 @@ public:
 
     /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
     virtual void onNewPlayerWithName(const irr::core::stringw& newName);
-};
+
+    void loginSuccessful();
+    void loginError(const irr::core::stringw & error_message);
+    // ------------------------------------------------------------------------
+    /** True if this window is a popup window (i.e. it should not exit even if
+     *  the current player exists. */
+    void setIsPopup(bool popup) { m_is_popup_window = popup; }
+};   // class StoryModeLobby
 
 #endif
