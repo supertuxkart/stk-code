@@ -28,6 +28,7 @@
 #include "online/messages.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
 
@@ -67,6 +68,10 @@ void StoryModeLobbyScreen::init()
     assert(m_options_widget);
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
+
+    // Make sure this tab is actually focused.
+    RibbonWidget* tabs = getWidget<RibbonWidget>("login_tabs");
+    if (tabs) tabs->select( "tab_login", PLAYER_ID_GAME_MASTER );
 
     Screen::init();
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
@@ -167,7 +172,14 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     m_info_widget->setText("", true);
     m_info_widget->setErrorColor();
 
-    if (name == "players")
+    if (name == "login_tabs")
+    {
+        const std::string selection =
+            ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if (selection == "tab_register")
+            StateManager::get()->replaceTopMostScreen(RegisterScreen::getInstance());
+    }
+    else if (name == "players")
     {
         // Clicked on a name --> Find the corresponding online data
         // and display them
@@ -198,16 +210,10 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     {
         const std::string &button = 
                              m_options_widget->getSelectionIDString(player_id);
-        if (button == "ok" || button == "ok_and_save")
+        if (button == "ok")
         {
-            if (m_online_cb->getState() && m_password_tb->getText() == "")
-            {
-                m_info_widget->setText(_("You need to enter a password."), true);
-                sfx_manager->quickSound("anvil");
-                return;
-            }
-            login(button=="ok_and_save");
-        }   // button==ok || ok_and_save
+            login(getWidget<CheckBoxWidget>("remember_me")->getState());
+        }   // button==ok
         else if (button == "new_user")
         {
             new EnterPlayerNameDialog(this, 0.5f, 0.4f);
@@ -258,17 +264,28 @@ void StoryModeLobbyScreen::login(bool remember_me)
         return;
     }
 
+    if(profile->isLoggedIn())
+        return;
+
     // If the user is not already logged in, start a login request
-    if (!profile->isLoggedIn())
+    if (profile->hasSavedSession())
     {
-        if (profile->hasSavedSession())
-            profile->requestSavedSession();
-        else
-            profile->requestSignIn(m_username_tb->getText(),
-                                   m_password_tb->getText(),
-                                   remember_me);
+        // Online login with saved token
+        profile->requestSavedSession();
     }
-    return;
+    else
+    {
+        // Online login with password
+        if (m_password_tb->getText() == "")
+        {
+            m_info_widget->setText(_("You need to enter a password."), true);
+            sfx_manager->quickSound("anvil");
+            return;
+        }
+        profile->requestSignIn(m_username_tb->getText(),
+                               m_password_tb->getText(),
+                               remember_me);
+    }   // !hasSavedSession
 }   // login
 
 // ----------------------------------------------------------------------------

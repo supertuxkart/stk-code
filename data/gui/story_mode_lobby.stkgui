@@ -1,9 +1,16 @@
 <stkgui>
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
-    <div x="2%" y="2%" width="96%" height="97%" layout="vertical-row" >
-
+        <header align="center" width="80%" text="Login" text_align="center"/>
         <spacer height="15" width="10"/>
-        <header text_align="center" width="80%" align="center" text="Select a Local Player"/>
+
+        <tabs id="login_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
+            <icon-button id="tab_login" width="128" height="128" icon="gui/track_random.png"
+                    I18N="Tab in login menu" text="Sign In"/>
+            <icon-button id="tab_register" width="128" height="128" icon="gui/mode_ftl.png"
+                    I18N="Tab in login menu" text="Register"/>
+        </tabs>
+
         <spacer height="15" width="10"/>
 
         <scrollable_ribbon id="players" height="120" y="10" x="10" width="98%" align="center" label_location="each"
@@ -14,6 +21,14 @@
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
                 <checkbox  id="online" I18N="In the login screen" text_align="left"/>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Remember me"/>
+                <checkbox  id="remember_me" I18N="In the login screen" text_align="left"/>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Guest login"/>
+                <checkbox  id="guest_login" I18N="In the login screen" text_align="left"/>
             </div>
             <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" height="100%" id="label_username" text_align="left"
@@ -28,15 +43,13 @@
                 <textbox proportion="2" height="fit" id="password" I18N="In the registration dialog"/>
             </div>
         </div>
-        <div width="80%" align="center" layout="vertical-row" height="20%">
+        <div width="80%" align="center" layout="vertical-row" height="fit">
             <label id="message" width="80%" align="center" text_align="left"/>
         </div>
         <spacer width="20" height="25"/>
         <buttonbar id="options" width="90%" height="13%" align="bottom">
             <icon-button id="ok" width="64" height="64" icon="gui/green_check.png"
                          I18N="Login dialog" text="OK" label_location="bottom"/>
-            <icon-button id="ok_and_save" width="64" height="64" icon="gui/main_help.png"
-                          I18N="Login dialog" text="OK and Save" label_location="bottom"/>
             <icon-button id="new_user" width="64" height="64" icon="gui/main_help.png"
                           I18N="Login dialog" text="Create new user" label_location="bottom"/>
             <icon-button id="cancel" width="64" height="64" icon="gui/main_help.png"
