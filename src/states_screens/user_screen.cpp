@@ -54,7 +54,6 @@ void UserScreen::loadedFromFile()
 
 void UserScreen::init()
 {
-    m_login_successful = false;
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
     m_username_tb = getWidget<TextBoxWidget >("username");
@@ -72,6 +71,12 @@ void UserScreen::init()
     // Make sure this tab is actually focused.
     RibbonWidget* tabs = getWidget<RibbonWidget>("login_tabs");
     if (tabs) tabs->select( "tab_login", PLAYER_ID_GAME_MASTER );
+
+    // It should always be activated ... but just in case
+    m_options_widget->setActivated();
+    // Clean any error message still shown
+    m_info_widget->setText("", true);
+    m_info_widget->setErrorColor();
 
     Screen::init();
     PlayerProfile *player = PlayerManager::getCurrentPlayer();
@@ -232,6 +237,15 @@ void UserScreen::eventCallback(Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
+/** Closes the UserScreen, and makes sure that the right screen is displayed
+ *  next.
+ */
+void UserScreen::closeScreen()
+{
+    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+}   // closeScreen
+
+// ----------------------------------------------------------------------------
 /** Called when OK or OK-and-save is clicked.
  *  This will trigger the actual login (if requested) etc.
  *  \param remember_me True if the login details should be remembered,
@@ -239,6 +253,8 @@ void UserScreen::eventCallback(Widget* widget,
  */
 void UserScreen::login(bool remember_me)
 {
+    // If an error occurs, the callback informing this screen about the
+    // problem will activate the widget again.
     m_options_widget->setDeactivated();
 
     const std::string &s_id = m_players->getSelectionIDString(0);
@@ -258,16 +274,21 @@ void UserScreen::login(bool remember_me)
             // a failed logout request
             profile->requestSignOut();
         }
-        m_login_successful = true;
-        // This will trigger replacing this screen with the main menu screen.
-        onUpdate(0.0f);
+        closeScreen();
         return;
     }
 
+    // Player wants to be online, and is already online - nothing to do
     if(profile->isLoggedIn())
+    {
+        closeScreen();
         return;
+    }
 
-    // If the user is not already logged in, start a login request
+    // Now we need to start a login request to the server
+    // This implies that this screen will wait till the server responds, so
+    // that error messages ('invalid password') can be shown, and the user
+    // can decide what to do about them.
     if (profile->hasSavedSession())
     {
         // Online login with saved token
@@ -275,7 +296,7 @@ void UserScreen::login(bool remember_me)
     }
     else
     {
-        // Online login with password
+        // Online login with password --> we need a valid password
         if (m_password_tb->getText() == "")
         {
             m_info_widget->setText(_("You need to enter a password."), true);
@@ -286,6 +307,7 @@ void UserScreen::login(bool remember_me)
                                m_password_tb->getText(),
                                remember_me);
     }   // !hasSavedSession
+
 }   // login
 
 // ----------------------------------------------------------------------------
@@ -297,17 +319,6 @@ void UserScreen::onUpdate(float dt)
     if (!m_options_widget->isActivated())
         m_info_widget->setText(Online::Messages::loadingDots( _("Signing in")),
                                false);
-
-    if(m_online_cb->getState() && m_login_successful)
-    {
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        return;
-    }
-
-
-    PlayerProfile *cp = PlayerManager::getCurrentPlayer();
-    if (cp && cp->isLoggedIn())
-        cp->requestSignOut();
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -315,9 +326,13 @@ void UserScreen::onUpdate(float dt)
  */
 void UserScreen::loginSuccessful()
 {
+    m_options_widget->setActivated();
+    // Clean any error message still shown
+    m_info_widget->setText("", true);
+    m_info_widget->setErrorColor();
     // The callback is done from the main thread, so no need to sync
-    // access to m_success
-    m_login_successful = true;
+    // access to m_success. OnUpdate will check this flag
+    closeScreen();
 }   // loginSuccessful
 
 // ----------------------------------------------------------------------------

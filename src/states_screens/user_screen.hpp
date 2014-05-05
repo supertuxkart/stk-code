@@ -49,10 +49,6 @@ private:
      *  immediately go to the main menu if a current player is defined. */
     bool m_is_popup_window;
 
-    /** Set in the callback from the login request to indicate that this 
-     *  window can be closed. */
-    bool m_login_successful;
-
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;
 
@@ -74,6 +70,7 @@ private:
     void selectUser(int index);
     void makeEntryFieldsVisible(bool online);
     void login(bool remember_me);
+    void closeScreen();
     virtual void onDialogClose();
     virtual void onUpdate(float dt) OVERRIDE;
 
