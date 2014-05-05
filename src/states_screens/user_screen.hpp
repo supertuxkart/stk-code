@@ -16,8 +16,8 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 
-#ifndef __HEADER_STORY_MODE_LOBBY_HPP__
-#define __HEADER_STORY_MODE_LOBBY_HPP__
+#ifndef __HEADER_USER_SCREEN_HPP__
+#define __HEADER_USER_SCREEN_HPP__
 
 #include <string>
 
@@ -37,11 +37,11 @@ namespace GUIEngine
   * \brief Audio options screen
   * \ingroup states_screens
   */
-class StoryModeLobbyScreen : public GUIEngine::Screen, 
-                             public EnterPlayerNameDialog::INewPlayerListener,
-                             public GUIEngine::ScreenSingleton<StoryModeLobbyScreen>
+class UserScreen : public GUIEngine::Screen, 
+                   public EnterPlayerNameDialog::INewPlayerListener,
+                   public GUIEngine::ScreenSingleton<UserScreen>
 {
-    StoryModeLobbyScreen();
+    UserScreen();
 
 private:
 
@@ -78,7 +78,7 @@ private:
     virtual void onUpdate(float dt) OVERRIDE;
 
 public:
-    friend class GUIEngine::ScreenSingleton<StoryModeLobbyScreen>;
+    friend class GUIEngine::ScreenSingleton<UserScreen>;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
@@ -104,6 +104,6 @@ public:
     /** True if this window is a popup window (i.e. it should not exit even if
      *  the current player exists. */
     void setIsPopup(bool popup) { m_is_popup_window = popup; }
-};   // class StoryModeLobby
+};   // class UserScreen
 
 #endif

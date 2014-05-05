@@ -28,7 +28,7 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/story_mode_lobby.hpp"
+#include "states_screens/user_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -187,7 +187,7 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         StateManager *sm = StateManager::get();
         if (selection == "tab_login")
-            sm->replaceTopMostScreen(StoryModeLobbyScreen::getInstance());
+            sm->replaceTopMostScreen(UserScreen::getInstance());
     }
     else if (name=="options")
     {

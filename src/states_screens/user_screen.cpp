@@ -15,7 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "states_screens/story_mode_lobby.hpp"
+#include "states_screens/user_screen.hpp"
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
@@ -34,25 +34,25 @@
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( StoryModeLobbyScreen );
+DEFINE_SCREEN_SINGLETON( UserScreen );
 
 // ----------------------------------------------------------------------------
 
-StoryModeLobbyScreen::StoryModeLobbyScreen() : Screen("story_mode_lobby.stkgui")
+UserScreen::UserScreen() : Screen("user_screen.stkgui")
 {
     m_is_popup_window = false;
-}   // StoryModeLobbyScreen
+}   // UserScreen
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::loadedFromFile()
+void UserScreen::loadedFromFile()
 {
 
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::init()
+void UserScreen::init()
 {
     m_login_successful = false;
     m_online_cb = getWidget<CheckBoxWidget>("online");
@@ -102,7 +102,7 @@ void StoryModeLobbyScreen::init()
 
 // ----------------------------------------------------------------------------
 
-void StoryModeLobbyScreen::tearDown()
+void UserScreen::tearDown()
 {
     Screen::tearDown();
 }   // tearDown
@@ -111,7 +111,7 @@ void StoryModeLobbyScreen::tearDown()
 /** Called when a user is selected. It updates the online checkbox and
  *  entrye fields.
  */
-void StoryModeLobbyScreen::selectUser(int index)
+void UserScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
@@ -153,7 +153,7 @@ void StoryModeLobbyScreen::selectUser(int index)
  *  \param online Online state, which dicates if the entry fields are
  *         visible (true) or not.
  */
-void StoryModeLobbyScreen::makeEntryFieldsVisible(bool online)
+void UserScreen::makeEntryFieldsVisible(bool online)
 {
     getWidget<LabelWidget>("label_username")->setVisible(online);
     m_username_tb->setVisible(online);
@@ -164,7 +164,7 @@ void StoryModeLobbyScreen::makeEntryFieldsVisible(bool online)
 // ----------------------------------------------------------------------------
 /** Called when the user selects anything on the screen.
  */
-void StoryModeLobbyScreen::eventCallback(Widget* widget,
+void UserScreen::eventCallback(Widget* widget,
                                          const std::string& name,
                                          const int player_id)
 {
@@ -237,7 +237,7 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
  *  \param remember_me True if the login details should be remembered,
  *         so that next time this menu can be skipped.
  */
-void StoryModeLobbyScreen::login(bool remember_me)
+void UserScreen::login(bool remember_me)
 {
     m_options_widget->setDeactivated();
 
@@ -292,7 +292,7 @@ void StoryModeLobbyScreen::login(bool remember_me)
 /** Called once every frame. It will replace this screen with the main menu
  *  screen if a successful login happened.
  */
-void StoryModeLobbyScreen::onUpdate(float dt)
+void UserScreen::onUpdate(float dt)
 {
     if (!m_options_widget->isActivated())
         m_info_widget->setText(Online::Messages::loadingDots( _("Signing in")),
@@ -313,7 +313,7 @@ void StoryModeLobbyScreen::onUpdate(float dt)
 // ----------------------------------------------------------------------------
 /** Callback from player profile if login was successful.
  */
-void StoryModeLobbyScreen::loginSuccessful()
+void UserScreen::loginSuccessful()
 {
     // The callback is done from the main thread, so no need to sync
     // access to m_success
@@ -324,7 +324,7 @@ void StoryModeLobbyScreen::loginSuccessful()
 /** Callback from player profile if login was unsuccessful.
  *  \param error_message Contains the error message.
  */
-void StoryModeLobbyScreen::loginError(const irr::core::stringw & error_message)
+void UserScreen::loginError(const irr::core::stringw & error_message)
 {
     sfx_manager->quickSound("anvil");
     m_info_widget->setErrorColor();
@@ -333,7 +333,7 @@ void StoryModeLobbyScreen::loginError(const irr::core::stringw & error_message)
 }   // loginError
 
 // ----------------------------------------------------------------------------
-void StoryModeLobbyScreen::unloaded()
+void UserScreen::unloaded()
 {
 }   // unloaded
 
@@ -343,7 +343,7 @@ void StoryModeLobbyScreen::unloaded()
  *  to open the next dialog, which is the one to create a new player (which
  *  is conventient on a first start).
  */
-void StoryModeLobbyScreen::onDialogClose()
+void UserScreen::onDialogClose()
 {
     // To allow players to exit the game without creating a player, we count
     // how often this function was called. The first time is after the 
@@ -367,7 +367,7 @@ void StoryModeLobbyScreen::onDialogClose()
 // ----------------------------------------------------------------------------
 /** This is a callback from the new user dialog.
  */
-void StoryModeLobbyScreen::onNewPlayerWithName(const core::stringw& new_name)
+void UserScreen::onNewPlayerWithName(const core::stringw& new_name)
 {
     init();
     // Select the newly added player

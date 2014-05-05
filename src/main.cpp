@@ -187,9 +187,9 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
-#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -1287,7 +1287,7 @@ int main(int argc, char *argv[] )
 
         if(!UserConfigParams::m_no_start_screen)
         {
-            StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
+            StateManager::get()->pushScreen(UserScreen::getInstance());
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())

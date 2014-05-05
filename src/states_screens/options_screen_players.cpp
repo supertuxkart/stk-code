@@ -35,7 +35,7 @@
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/story_mode_lobby.hpp"
+#include "states_screens/user_screen.hpp"
 
 #include <IGUIButton.h>
 
@@ -186,7 +186,7 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     {
         race_manager->clearKartLastPositionOnOverworld();
         PlayerManager::get()->setCurrentPlayer(NULL,false);
-        StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
+        StateManager::get()->pushScreen(UserScreen::getInstance());
     }
 
 }   // eventCallback
