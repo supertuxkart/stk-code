@@ -39,7 +39,8 @@ using namespace irr::gui;
 // -----------------------------------------------------------------------------
 
 EnterPlayerNameDialog::EnterPlayerNameDialog(INewPlayerListener* listener,
-                                             const float w, const float h) :
+                                             const float w, const float h,
+                                             const core::stringw &name):
         ModalDialog(w, h)
 {
     m_listener = listener;
@@ -48,9 +49,14 @@ EnterPlayerNameDialog::EnterPlayerNameDialog(INewPlayerListener* listener,
 
     TextBoxWidget* text_field = getWidget<TextBoxWidget>("textfield");
     assert(text_field != NULL);
+    text_field->setText(name);
     text_field->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
+    if(name!=L"")
+        m_original_player = PlayerManager::get()->getPlayer(name);
+    else
+        m_original_player = NULL;
 
-    std::string username = "";
+    core::stringw username = name;
 
     // If there is no player (i.e. first start of STK), try to pick
     // a good default name
@@ -120,10 +126,16 @@ void EnterPlayerNameDialog::onEnterPressedInternal()
             }
         }
 
-        // Finally, add the new player.
-        PlayerManager::get()->addNewPlayer(player_name);
-        PlayerManager::get()->save();
-
+        if(m_original_player)
+        {
+            m_original_player->setName(player_name);
+        }
+        else
+        {
+            // Finally, add the new player.
+            PlayerManager::get()->addNewPlayer(player_name);
+            PlayerManager::get()->save();
+        }
         // It's unsafe to delete from inside the event handler so we do it
         // in onUpdate (which checks for m_self_destroy)
         m_self_destroy = true;

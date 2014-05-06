@@ -31,11 +31,13 @@ namespace GUIEngine
     class LabelWidget;
 }
 
-/**
- * \brief Dialog that allows the player to enter the name for a new player
+class PlayerProfile;
+
+/** Dialog that allows the player to enter the name for a new player or
+ *  rename an existing player.
  * \ingroup states_screens
  */
-class EnterPlayerNameDialog : public GUIEngine::ModalDialog//, public GUIEngine::ITextBoxWidgetListener
+class EnterPlayerNameDialog : public GUIEngine::ModalDialog
 {
     
 public:
@@ -51,6 +53,10 @@ private:
     
     INewPlayerListener* m_listener;
     bool m_self_destroy;
+
+    /** Pointer to the original PlayerProfile if it's a rename, or NULL if it
+     *  is a new player. */
+    PlayerProfile *m_original_player;
     
 public:
     
@@ -58,7 +64,7 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      */
     EnterPlayerNameDialog(INewPlayerListener* listener, const float percentWidth,
-                          const float percentHeight);
+                          const float percentHeight, const core::stringw &name="");
     ~EnterPlayerNameDialog();
 
     void onEnterPressedInternal();

@@ -254,6 +254,10 @@ void UserScreen::eventCallback(Widget* widget,
         }
         else if (button == "rename")
         {
+            PlayerProfile *cp = getSelectedPlayer();
+            new EnterPlayerNameDialog(this, 0.5f, 0.4f, cp->getName());
+            // Init will automatically be called, which 
+            // refreshes the player list
         }
         else if (button == "delete")
         {
@@ -391,7 +395,6 @@ void UserScreen::deletePlayer()
             UserScreen::getInstance()->doDeletePlayer();
         }   // onConfirm
     };   // ConfirmServer
-
 
     new MessageDialog(message, MessageDialog::MESSAGE_DIALOG_CONFIRM,
                       new ConfirmServer(), true);
