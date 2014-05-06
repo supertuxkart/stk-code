@@ -87,6 +87,8 @@ using namespace irr;
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
+GPUTimer          m_perf_query[Q_LAST];
+
 const int MIN_SUPPORTED_HEIGHT = 600;
 const int MIN_SUPPORTED_WIDTH  = 800;
 
@@ -166,6 +168,11 @@ void IrrDriver::IncreaseObjectCount()
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 {
   return m_mrt;
+}
+
+GPUTimer &IrrDriver::getGPUTimer(unsigned i)
+{
+    return m_perf_query[i];
 }
 
 // ----------------------------------------------------------------------------
@@ -463,7 +470,6 @@ void IrrDriver::initDevice()
 
         irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
-        gl_driver->extGlGenQueries(Q_LAST, m_perf_query);
         m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);

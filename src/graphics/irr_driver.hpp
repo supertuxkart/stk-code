@@ -220,7 +220,6 @@ private:
     unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
-    u32                  m_perf_query[Q_LAST];
     bool                 m_query_issued;
     class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
@@ -368,6 +367,7 @@ public:
     void                  setTextureErrorMessage(const std::string &error,
                                                  const std::string &detail="");
     void                  unsetTextureErrorMessage();
+    class GPUTimer        &getGPUTimer(unsigned);
 
     void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
                         const core::vector2df &c,
