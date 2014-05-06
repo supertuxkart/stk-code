@@ -87,21 +87,32 @@ void UserScreen::init()
     }
 
     m_players->clearItems();
+    std::string current_player_index="";
+
     for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
         const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
         if (player->isGuestAccount()) continue;
         std::string s = StringUtils::toString(n);
         m_players->addItem(player->getName(), s, "/karts/nolok/nolokicon.png", 0, 
-                       IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+                           IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+        if(player==PlayerManager::getCurrentPlayer())
+            current_player_index = s;
     }
 
     m_players->updateItemDisplay();
 
-    // Select the first user (the list of users is sorted by usage, so it
-    // is the most frequently used user).    
-    if (PlayerManager::get()->getNumPlayers()>0)
-        selectUser(0);
+    // Select the current player. That can only be done after 
+    // updateItemDisplay is called.
+    if(current_player_index.size()>0)
+            m_players->setSelection(current_player_index, PLAYER_ID_GAME_MASTER,
+                                    /*focus*/ true);
+    else   // no current player found
+    {
+        // The first player is the most frequently used, so select it
+        if (PlayerManager::get()->getNumPlayers() > 0)
+            selectUser(0);
+    }
 
 }   // init
 
