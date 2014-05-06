@@ -27,6 +27,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "online/messages.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
+#include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -115,6 +116,16 @@ void UserScreen::init()
     }
 
 }   // init
+
+// ----------------------------------------------------------------------------
+PlayerProfile* UserScreen::getSelectedPlayer()
+{
+    const std::string &s_id = m_players
+                            ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    unsigned int n_id;
+    StringUtils::fromString(s_id, n_id);
+    return PlayerManager::get()->getPlayer(n_id);
+}   // getSelectedPlayer
 
 // ----------------------------------------------------------------------------
 
@@ -241,6 +252,13 @@ void UserScreen::eventCallback(Widget* widget,
                 cp->requestSignOut();
             StateManager::get()->popMenu();
         }
+        else if (button == "rename")
+        {
+        }
+        else if (button == "delete")
+        {
+            deletePlayer();
+        }
     }   // options
 
     return;
@@ -268,10 +286,7 @@ void UserScreen::login(bool remember_me)
     // problem will activate the widget again.
     m_options_widget->setDeactivated();
 
-    const std::string &s_id = m_players->getSelectionIDString(0);
-    unsigned int n_id;
-    StringUtils::fromString(s_id, n_id);
-    PlayerProfile *profile = PlayerManager::get()->getPlayer(n_id);
+    PlayerProfile *profile = getSelectedPlayer();
     PlayerManager::get()->setCurrentPlayer(profile, remember_me);
     assert(profile);
 
@@ -359,9 +374,47 @@ void UserScreen::loginError(const irr::core::stringw & error_message)
 }   // loginError
 
 // ----------------------------------------------------------------------------
+/** Called when a player will be deleted.
+ */
+void UserScreen::deletePlayer()
+{
+    PlayerProfile *player = getSelectedPlayer();
+    irr::core::stringw message =
+        //I18N: In the player info dialog (when deleting)
+        _("Do you really want to delete player '%s' ?", player->getName());
+
+    class ConfirmServer : public MessageDialog::IConfirmDialogListener
+    {
+    public:
+        virtual void onConfirm()
+        {
+            UserScreen::getInstance()->doDeletePlayer();
+        }   // onConfirm
+    };   // ConfirmServer
+
+
+    new MessageDialog(message, MessageDialog::MESSAGE_DIALOG_CONFIRM,
+                      new ConfirmServer(), true);
+}   // deletePlayer
+
+// ----------------------------------------------------------------------------
+/** Callback when the user confirms to delete a player. This function actually
+ *  deletes the player, discards the dialog, and re-initialised the UserScreen
+ *  to display only the available players.
+ */
+void UserScreen::doDeletePlayer()
+{
+    PlayerProfile *player = getSelectedPlayer();
+    PlayerManager::get()->deletePlayer(player);
+    GUIEngine::ModalDialog::dismiss();
+    init();
+}   // doDeletePlayer
+
+// ----------------------------------------------------------------------------
 void UserScreen::unloaded()
 {
 }   // unloaded
+
 
 // ----------------------------------------------------------------------------
 /** Gets called when a dialog closes. At a first time start of STK the

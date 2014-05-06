@@ -32,6 +32,8 @@ namespace GUIEngine
     class Widget; 
 }
 
+class PlayerProfile;
+
 
 /**
   * \brief Audio options screen
@@ -71,6 +73,9 @@ private:
     void makeEntryFieldsVisible(bool online);
     void login(bool remember_me);
     void closeScreen();
+    void deletePlayer();
+    void doDeletePlayer();
+    PlayerProfile* getSelectedPlayer();
     virtual void onDialogClose();
     virtual void onUpdate(float dt) OVERRIDE;
 
