@@ -153,6 +153,25 @@ GLint LoadProgram(Types ... args)
     return ProgramID;
 }
 
+class GPUTimer;
+
+class ScopedGPUTimer
+{
+public:
+    ScopedGPUTimer(GPUTimer &);
+    ~ScopedGPUTimer();
+};
+
+class GPUTimer
+{
+    friend class ScopedGPUTimer;
+    GLuint query;
+    bool initialised;
+public:
+    GPUTimer();
+    unsigned elapsedTimeus();
+};
+
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"

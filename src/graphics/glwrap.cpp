@@ -369,6 +369,36 @@ void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
+ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
+{
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    if (!timer.initialised)
+    {
+        gl_driver->extGlGenQueries(1, &timer.query);
+        timer.initialised = true;
+    }
+    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, timer.query);
+}
+ScopedGPUTimer::~ScopedGPUTimer()
+{
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
+}
+
+GPUTimer::GPUTimer() : initialised(false)
+{
+}
+
+unsigned GPUTimer::elapsedTimeus()
+{
+    if (!initialised)
+        return 0;
+    GLuint result;
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    return result / 1000;
+}
+
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
     float tex_width, float tex_height)

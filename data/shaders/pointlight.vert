@@ -86,7 +86,7 @@ vec4 ComputeClipRegion(vec3 lightPosView, float lightRadius)
 
 void main(void)
 {
-    float radius = 20. * Energy;
+    float radius = 5. * Energy;
     vec4 Center = ViewMatrix * vec4(Position, 1.);
     Center /= Center.w;
 

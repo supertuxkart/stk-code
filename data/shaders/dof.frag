@@ -69,10 +69,10 @@ void main()
     col += texture2D(tex, uv + (vec2(-0.29, -0.29) * offset) * blur * 0.4);
     col += texture2D(tex, uv + (vec2(0.0, 0.4) * offset) * blur * 0.4);
     
-    col.rgb = col.rgb / 41.0;
+    col = vec4(col.rgb / 41.0, col.a);
     depth = clamp((FragPos.z/280), 0., 1.);
     depth  = (1 - depth);
-	  vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
+    vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
 
 /*
     FragColor.xyz = vec3(depth);
