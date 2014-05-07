@@ -188,6 +188,8 @@ void UserScreen::selectUser(int index)
  */
 void UserScreen::makeEntryFieldsVisible(bool online)
 {
+    getWidget<LabelWidget>("label_guest")->setVisible(online);
+    getWidget<CheckBoxWidget>("guest")->setVisible(online);
     getWidget<LabelWidget>("label_username")->setVisible(online);
     m_username_tb->setVisible(online);
     getWidget<LabelWidget>("label_password")->setVisible(online);
