@@ -14,16 +14,26 @@ in vec3 Scale;
 in vec3 Position;
 in vec2 Texcoord;
 
+#ifdef VSLayer
+out vec2 uv;
+#else
 out vec2 tc;
 out int layerId;
+#endif
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 
 void main(void)
 {
-    layerId = gl_InstanceID & 3;
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
+#ifdef VSLayer
+    gl_Layer = gl_InstanceID & 3;
+    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position, 1.);
+    uv = Texcoord;
+#else
+    layerId = gl_InstanceID & 3;
     gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position, 1.);
     tc = Texcoord;
+#endif
 }

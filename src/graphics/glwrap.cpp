@@ -236,6 +236,8 @@ GLuint LoadShader(const char * file, unsigned type)
     Code += "//" + std::string(file) + "\n";
     if (UserConfigParams::m_ubo_disabled)
         Code += "#define UBO_DISABLED\n";
+    if (irr_driver->hasVSLayerExtension())
+        Code += "#define VSLayer\n";
 	if (Stream.is_open())
 	{
 		std::string Line = "";

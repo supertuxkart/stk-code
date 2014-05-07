@@ -92,6 +92,7 @@ class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
     int GLMajorVersion, GLMinorVersion;
+    bool hasVSLayer;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -169,6 +170,11 @@ public:
             return 100 + (GLMinorVersion + 3) * 10;
         else
             return 120;
+    }
+
+    bool hasVSLayerExtension() const
+    {
+        return hasVSLayer;
     }
 
     float getExposure() const
