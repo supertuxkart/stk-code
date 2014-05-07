@@ -337,6 +337,7 @@ void UserScreen::login(bool remember_me)
         {
             m_info_widget->setText(_("You need to enter a password."), true);
             sfx_manager->quickSound("anvil");
+            m_options_widget->setActivated();
             return;
         }
         profile->requestSignIn(m_username_tb->getText(),
