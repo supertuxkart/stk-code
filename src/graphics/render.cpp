@@ -298,10 +298,7 @@ void IrrDriver::renderGLSL(float dt)
     else
         glDisable(GL_FRAMEBUFFER_SRGB);
     PROFILER_POP_CPU_MARKER();
-
-    for (unsigned i = 0; i < Q_LAST; i++)
-        Log::info("GPU Perf", "Phase %d : %d us\n", i, getGPUTimer(i).elapsedTimeus());
-
+    
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -446,7 +443,9 @@ void IrrDriver::renderSolidFirstPass()
       return;
 
     {
+#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
+#endif
         glUseProgram(MeshShader::ObjectPass1Shader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
         {
@@ -497,7 +496,9 @@ void IrrDriver::renderSolidSecondPass()
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
 
     {
+#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
+#endif
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
         glUseProgram(MeshShader::ObjectPass2Shader::Program);
@@ -681,7 +682,9 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
     {
+#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
+#endif
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -904,7 +907,9 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
 
     {
+#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
+#endif
         std::vector<LightNode *> BucketedLN[15];
         for (unsigned int i = 0; i < lightcount; i++)
         {

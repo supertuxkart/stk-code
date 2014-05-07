@@ -37,6 +37,7 @@ Profiler profiler;
 #define LINE_HEIGHT 0.030f   // height of a line representing a thread
 
 #define MARKERS_NAMES_POS      core::rect<s32>(50,100,150,200)
+#define GPU_MARKERS_NAMES_POS      core::rect<s32>(50,165,150,250)
 
 #define TIME_DRAWN_MS 30.0f // the width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 
@@ -315,6 +316,48 @@ void Profiler::draw()
         }
     }
 
+    QueryPerf hovered_gpu_marker = Q_LAST;
+    long hovered_gpu_marker_elapsed = 0;
+    if (hovered_markers.size() == 0)
+    {
+        int gpu_y = y_offset + nb_thread_infos*line_height + line_height/2;
+        float total = 0;
+        for (unsigned i = 0; i < Q_LAST; i++)
+        {
+            total += irr_driver->getGPUTimer(i).elapsedTimeus();
+        }
+
+        static video::SColor colors[] = {
+            video::SColor(255, 255, 0, 0),
+            video::SColor(255, 0, 255, 0),
+            video::SColor(255, 0, 0, 255),
+            video::SColor(255, 255, 255, 0),
+            video::SColor(255, 255, 0, 255),
+            video::SColor(255, 0, 255, 255)
+        };
+
+        float curr_val = 0;
+        for (unsigned i = 0; i < Q_LAST; i++)
+        {
+            //Log::info("GPU Perf", "Phase %d : %d us\n", i, irr_driver->getGPUTimer(i).elapsedTimeus());
+
+            float elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+            core::rect<s32> pos((s32)(x_offset + (curr_val / total)*profiler_width),
+                (s32)(y_offset + gpu_y),
+                (s32)(x_offset + ((curr_val + elapsed) / total)*profiler_width),
+                (s32)(y_offset + gpu_y + line_height));
+
+            curr_val += elapsed;
+            GL32_draw2DRectangle(colors[i % 6], pos);
+
+            if (pos.isPointInside(mouse_pos))
+            {
+                hovered_gpu_marker = (QueryPerf)i;
+                hovered_gpu_marker_elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+            }
+        }
+    }
+
     // Draw the end of the frame
     {
         s32 x_sync = (s32)(x_offset + factor*m_time_between_sync);
@@ -343,6 +386,13 @@ void Profiler::draw()
             hovered_markers.pop();
         }
         font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+
+        if (hovered_gpu_marker != Q_LAST)
+        {
+            std::ostringstream oss;
+            oss << "GPU marker " << hovered_gpu_marker << " : " << hovered_gpu_marker_elapsed << " us";
+            font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+        }
     }
 
     if (m_capture_report)
@@ -397,6 +447,6 @@ void Profiler::drawBackground()
                                    (int)((1.0-MARGIN_X)                * screen_size.Width),
                                    (int)((MARGIN_Y + 1.75f*LINE_HEIGHT) * screen_size.Height));
 
-    video::SColor   color(0xFF, 0xFF, 0xFF, 0xFF);
+    video::SColor   color(0x88, 0xFF, 0xFF, 0xFF);
     GL32_draw2DRectangle(color, background_rect);
 }

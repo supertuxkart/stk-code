@@ -164,10 +164,14 @@ public:
 
     bool getCaptureReport() const { return m_capture_report; }
     void setCaptureReport(bool captureReport);
+
+    bool isFrozen() const { return m_freeze_state == FROZEN; }
+
 protected:
     // TODO: detect on which thread this is called to support multithreading
     ThreadInfo& getThreadInfo() { return m_thread_infos[0]; }
     void        drawBackground();
+
 
 };
 
