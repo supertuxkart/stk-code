@@ -239,7 +239,7 @@ void UserScreen::eventCallback(Widget* widget,
                              m_options_widget->getSelectionIDString(player_id);
         if (button == "ok")
         {
-            login(getWidget<CheckBoxWidget>("remember_me")->getState());
+            login(UserConfigParams::m_remember_user);
         }   // button==ok
         else if (button == "new_user")
         {

@@ -131,6 +131,10 @@ void OptionsScreenUI::init()
     news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
 
+    CheckBoxWidget* remember_me = getWidget<CheckBoxWidget>("remember-me");
+    assert( remember_me!= NULL );
+    remember_me->setState( UserConfigParams::m_remember_user);
+
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const int skinCount = m_skins.size();
@@ -240,6 +244,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // downloaded if necessary.
         if(internet->getState())
             NewsManager::get()->init(false);
+    }
+    else if (name=="remember-me")
+    {
+        CheckBoxWidget* remember_me = getWidget<CheckBoxWidget>("remember-me");
+        assert( remember_me != NULL );
+        UserConfigParams::m_remember_user = remember_me->getState();
     }
     else if (name == "language")
     {

@@ -23,10 +23,6 @@
                 <checkbox  id="online" I18N="In the login screen" text_align="left"/>
             </div>
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Remember me"/>
-                <checkbox  id="remember_me" I18N="In the login screen" text_align="left"/>
-            </div>
-            <div width="100%" height="fit" layout="horizontal-row" >
                 <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Guest login"/>
                 <checkbox  id="guest_login" I18N="In the login screen" text_align="left"/>
             </div>
