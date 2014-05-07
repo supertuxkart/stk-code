@@ -105,11 +105,17 @@ void UserScreen::init()
 
     // Select the current player. That can only be done after 
     // updateItemDisplay is called.
+    RibbonWidget *title = getWidget<RibbonWidget>("login_tabs");
+
     if(current_player_index.size()>0)
-            m_players->setSelection(current_player_index, PLAYER_ID_GAME_MASTER,
-                                    /*focus*/ true);
+    {
+        m_players->setSelection(current_player_index, PLAYER_ID_GAME_MASTER,
+                                /*focus*/ true);
+        title->setLabel(0, PlayerManager::getCurrentPlayer()->getName());
+    }
     else   // no current player found
     {
+        title->setLabel(0, _("Login"));
         // The first player is the most frequently used, so select it
         if (PlayerManager::get()->getNumPlayers() > 0)
             selectUser(0);
@@ -192,8 +198,8 @@ void UserScreen::makeEntryFieldsVisible(bool online)
 /** Called when the user selects anything on the screen.
  */
 void UserScreen::eventCallback(Widget* widget,
-                                         const std::string& name,
-                                         const int player_id)
+                               const std::string& name,
+                               const int player_id)
 {
     // Clean any error message still shown
     m_info_widget->setText("", true);
