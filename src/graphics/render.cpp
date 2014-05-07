@@ -1192,7 +1192,7 @@ static void displayCoeff(float *SHCoeff)
 }
 
 // Only for 9 coefficients
-static void testSH(char *color[6], size_t width, size_t height,
+static void testSH(unsigned char *color[6], size_t width, size_t height,
     float *blueSHCoeff, float *greenSHCoeff, float *redSHCoeff)
 {
     float *Y00[6];
@@ -1373,9 +1373,9 @@ void IrrDriver::generateSkyboxCubemap()
             sh_h = MAX2(sh_h, SphericalHarmonicsTextures[i]->getOriginalSize().Height);
         }
 
-        char *sh_rgba[6];
+        unsigned char *sh_rgba[6];
         for (unsigned i = 0; i < 6; i++)
-            sh_rgba[i] = new char[sh_w * sh_h * 4];
+            sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
         for (unsigned i = 0; i < 6; i++)
         {
             unsigned idx = texture_permutation[i];
@@ -1405,10 +1405,10 @@ void IrrDriver::generateSkyboxCubemap()
         const video::SColorf& ambientf = irr_driver->getSceneManager()->getAmbientLight();
         video::SColor ambient = ambientf.toSColor();
 
-        char *sh_rgba[6];
+        unsigned char *sh_rgba[6];
         for (unsigned i = 0; i < 6; i++)
         {
-            sh_rgba[i] = new char[sh_w * sh_h * 4];
+            sh_rgba[i] = new unsigned char[sh_w * sh_h * 4];
 
             for (int j = 0; j < sh_w * sh_h * 4; j+=4)
             {
