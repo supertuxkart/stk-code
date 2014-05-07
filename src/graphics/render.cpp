@@ -985,7 +985,6 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
             irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
         glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
     }
-    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
 }
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
