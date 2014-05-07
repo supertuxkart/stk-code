@@ -1,5 +1,5 @@
 layout(triangles) in;
-layout(triangle_strip, max_vertices=4) out;
+layout(triangle_strip, max_vertices=3) out;
 
 in vec2 tc[3];
 in int layerId[3];

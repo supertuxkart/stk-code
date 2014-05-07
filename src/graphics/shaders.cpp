@@ -1500,10 +1500,19 @@ namespace MeshShader
             attrib_position = -1;
             return;
         }
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        }
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1530,11 +1539,21 @@ namespace MeshShader
             attrib_position = -1;
             return;
         }
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
+        }
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
@@ -1562,10 +1581,19 @@ namespace MeshShader
             attrib_texcoord = -1;
             return;
         }
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
-            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_tex = glGetUniformLocation(Program, "tex");
@@ -1597,11 +1625,21 @@ namespace MeshShader
             attrib_texcoord = -1;
             return;
         }
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_origin = glGetAttribLocation(Program, "Origin");
