@@ -28,6 +28,7 @@
 #include "config/user_config.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/CBatchingMesh.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/material_manager.hpp"
@@ -206,6 +207,8 @@ void Track::cleanup()
     ItemManager::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
+    // Clear remainder of transformed textures
+    resetTextureTable();
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {

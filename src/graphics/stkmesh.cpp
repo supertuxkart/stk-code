@@ -710,7 +710,7 @@ void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4);
 }
 
 void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
@@ -724,7 +724,7 @@ void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4);
 }
 
 bool isObject(video::E_MATERIAL_TYPE type)
@@ -858,7 +858,7 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
         break;
     case TM_DEFAULT:
     case TM_ADDITIVE:
-        if (World::getWorld()->getTrack()->isFogEnabled())
+        if (World::getWorld()->isFogEnabled())
             mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
                 MeshShader::TransparentFogShader::attrib_position, MeshShader::TransparentFogShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentFogShader::attrib_color, mesh.Stride);
         else

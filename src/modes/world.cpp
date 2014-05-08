@@ -1180,4 +1180,11 @@ void World::escapePressed()
     new RacePausedDialog(0.8f, 0.6f);
 }
 
+//-----------------------------------------------------------------------------
+
+bool World::isFogEnabled() const
+{
+    return m_track != NULL && m_track->isFogEnabled();
+}
+
 /* EOF */

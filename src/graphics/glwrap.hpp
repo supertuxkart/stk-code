@@ -155,12 +155,32 @@ GLint LoadProgram(Types ... args)
     return ProgramID;
 }
 
+class GPUTimer;
+
+class ScopedGPUTimer
+{
+public:
+    ScopedGPUTimer(GPUTimer &);
+    ~ScopedGPUTimer();
+};
+
+class GPUTimer
+{
+    friend class ScopedGPUTimer;
+    GLuint query;
+    bool initialised;
+public:
+    GPUTimer();
+    unsigned elapsedTimeus();
+};
+
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
 
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
+void resetTextureTable();
 void compressTexture(irr::video::ITexture *tex, bool srgb);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);

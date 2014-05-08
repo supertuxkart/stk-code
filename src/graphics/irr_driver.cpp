@@ -87,6 +87,8 @@ using namespace irr;
 /** singleton */
 IrrDriver *irr_driver = NULL;
 
+GPUTimer          m_perf_query[Q_LAST];
+
 const int MIN_SUPPORTED_HEIGHT = 600;
 const int MIN_SUPPORTED_WIDTH  = 800;
 
@@ -166,6 +168,11 @@ void IrrDriver::IncreaseObjectCount()
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 {
   return m_mrt;
+}
+
+GPUTimer &IrrDriver::getGPUTimer(unsigned i)
+{
+    return m_perf_query[i];
 }
 
 // ----------------------------------------------------------------------------
@@ -434,6 +441,14 @@ void IrrDriver::initDevice()
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
+    // Parse extensions
+    hasVSLayer = false;
+    const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+    if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
+        hasVSLayer = true;
+
+
+
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);
 
@@ -463,7 +478,6 @@ void IrrDriver::initDevice()
 
         irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
         gl_driver->extGlGenQueries(1, &m_lensflare_query);
-        gl_driver->extGlGenQueries(Q_LAST, m_perf_query);
         m_query_issued = false;
 
         scene::IMesh * const sphere = m_scene_manager->getGeometryCreator()->createSphereMesh(1, 16, 16);
@@ -1896,14 +1910,21 @@ void IrrDriver::update(float dt)
     World *world = World::getWorld();
 
     if (GUIEngine::getCurrentScreen() != NULL &&
-             GUIEngine::getCurrentScreen()->needs3D())
+        GUIEngine::getCurrentScreen()->needs3D() &&
+        world != NULL)
     {
         //printf("Screen that needs 3D\n");
-        m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
-                                   video::SColor(0,0,0,255));
-        m_scene_manager->drawAll();
+        //m_video_driver->beginScene(/*backBuffer clear*/true, /*zBuffer*/true,
+        //                           video::SColor(0,0,0,255));
+        //m_scene_manager->drawAll();
+
+        if (m_glsl)
+            renderGLSL(dt);
+        else
+            renderFixed(dt);
+
         GUIEngine::render(dt);
-        m_video_driver->endScene();
+        //m_video_driver->endScene();
         return;
     }
     else if (!world)

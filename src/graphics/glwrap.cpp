@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include "config/user_config.hpp"
+#include "utils/profiler.hpp"
 
 #ifdef _IRR_WINDOWS_API_
 #define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
@@ -240,6 +241,8 @@ GLuint LoadShader(const char * file, unsigned type)
     Code += "//" + std::string(file) + "\n";
     if (UserConfigParams::m_ubo_disabled)
         Code += "#define UBO_DISABLED\n";
+    if (irr_driver->hasVSLayerExtension())
+        Code += "#define VSLayer\n";
 	if (Stream.is_open())
 	{
 		std::string Line = "";
@@ -307,6 +310,11 @@ GLuint getDepthTexture(irr::video::ITexture *tex)
 }
 
 std::set<irr::video::ITexture *> AlreadyTransformedTexture;
+void resetTextureTable()
+{
+    AlreadyTransformedTexture.clear();
+}
+
 void compressTexture(irr::video::ITexture *tex, bool srgb)
 {
     if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
@@ -459,6 +467,42 @@ void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
     glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
+{
+    if (!UserConfigParams::m_profiler_enabled) return;
+    if (profiler.isFrozen()) return;
+
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    if (!timer.initialised)
+    {
+        gl_driver->extGlGenQueries(1, &timer.query);
+        timer.initialised = true;
+    }
+    gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, timer.query);
+}
+ScopedGPUTimer::~ScopedGPUTimer()
+{
+    if (!UserConfigParams::m_profiler_enabled) return;
+    if (profiler.isFrozen()) return;
+    
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
+}
+
+GPUTimer::GPUTimer() : initialised(false)
+{
+}
+
+unsigned GPUTimer::elapsedTimeus()
+{
+    if (!initialised)
+        return 0;
+    GLuint result;
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
+    gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
+    return result / 1000;
 }
 
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,

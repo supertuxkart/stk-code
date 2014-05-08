@@ -45,17 +45,14 @@ class CutsceneWorld : public World
     double m_duration;
     bool m_aborted;
 
+    // TODO find a better way than static
+    static bool s_use_duration;
+
     /** monkey tricks to get the animations in sync with irrlicht. we reset the time
      *  after all is loaded and it's running withotu delays
      */
     bool m_second_reset;
     double m_time_at_second_reset;
-
-    void abortCutscene()
-    {
-        if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
-        m_aborted = true;
-    }
 
     std::vector<std::string> m_parts;
 
@@ -107,6 +104,14 @@ public:
     };
     // ------------------------------------------------------------------------
     virtual void escapePressed() OVERRIDE { abortCutscene(); }
+    // ------------------------------------------------------------------------
+    static void setUseDuration(bool use_duration) { s_use_duration = use_duration; }
+    // ------------------------------------------------------------------------
+    void abortCutscene()
+    {
+        if (m_time < m_duration - 2.0f) m_duration = m_time + 2.0f;
+        m_aborted = true;
+    }
 
 };   // CutsceneWorld
 
