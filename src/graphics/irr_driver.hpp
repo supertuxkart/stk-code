@@ -264,6 +264,7 @@ private:
     void renderSolidSecondPass();
     void renderTransparent();
     void renderParticles();
+    void computeSunVisibility();
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode,
         Camera * const camera);
     void renderShadows(//ShadowImportanceProvider * const sicb,
