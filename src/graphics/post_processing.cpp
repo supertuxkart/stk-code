@@ -665,7 +665,7 @@ void PostProcessing::render()
             // Grab the sky
             glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
             glClear(GL_COLOR_BUFFER_BIT);
-            irr_driver->renderSkybox();
+//            irr_driver->renderSkybox();
 
             // Set the sun's color
             const SColor col = World::getWorld()->getTrack()->getSunColor();
