@@ -443,9 +443,7 @@ void IrrDriver::renderSolidFirstPass()
       return;
 
     {
-#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
-#endif
         glUseProgram(MeshShader::ObjectPass1Shader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
         {
@@ -496,9 +494,9 @@ void IrrDriver::renderSolidSecondPass()
     setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
 
     {
-#ifdef DEBUG
+
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
-#endif
+
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
         glUseProgram(MeshShader::ObjectPass2Shader::Program);
@@ -682,9 +680,7 @@ void IrrDriver::renderShadows(//ShadowImportanceProvider * const sicb,
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
     {
-#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
-#endif
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -907,9 +903,8 @@ void IrrDriver::renderLights(const core::aabbox3df& cambox,
         irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
 
     {
-#ifdef DEBUG
         ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
-#endif
+
         std::vector<LightNode *> BucketedLN[15];
         for (unsigned int i = 0; i < lightcount; i++)
         {
