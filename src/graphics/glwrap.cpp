@@ -381,7 +381,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb)
 */
 bool loadCompressedTexture(const std::string& compressed_tex)
 {
-    std::ifstream ifs(compressed_tex, std::ios::in | std::ios::binary);
+    std::ifstream ifs(compressed_tex.c_str(), std::ios::in | std::ios::binary);
     if (!ifs.is_open())
         return false;
 
@@ -431,7 +431,7 @@ void saveCompressedTexture(const std::string& compressed_tex)
 
     char *data = new char[size];
     glGetCompressedTexImage(GL_TEXTURE_2D, 0, (GLvoid*)data);
-    std::ofstream ofs(compressed_tex, std::ios::out | std::ios::binary);
+    std::ofstream ofs(compressed_tex.c_str(), std::ios::out | std::ios::binary);
     if (ofs.is_open())
     {
         ofs.write((char*)&internal_format, sizeof(int));
