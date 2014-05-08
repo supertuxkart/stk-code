@@ -444,7 +444,7 @@ void IrrDriver::initDevice()
     // Parse extensions
     hasVSLayer = false;
     const GLubyte *extensions = glGetString(GL_EXTENSIONS);
-    if (strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
+    if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
         hasVSLayer = true;
 
 
