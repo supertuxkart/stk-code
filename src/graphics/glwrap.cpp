@@ -3,6 +3,7 @@
 #include <fstream>
 #include <string>
 #include "config/user_config.hpp"
+#include "utils/profiler.hpp"
 
 #ifdef _IRR_WINDOWS_API_
 #define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
@@ -236,6 +237,8 @@ GLuint LoadShader(const char * file, unsigned type)
     Code += "//" + std::string(file) + "\n";
     if (UserConfigParams::m_ubo_disabled)
         Code += "#define UBO_DISABLED\n";
+    if (irr_driver->hasVSLayerExtension())
+        Code += "#define VSLayer\n";
 	if (Stream.is_open())
 	{
 		std::string Line = "";
@@ -371,6 +374,9 @@ void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
 
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
 {
+    if (!UserConfigParams::m_profiler_enabled) return;
+    if (profiler.isFrozen()) return;
+
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     if (!timer.initialised)
     {
@@ -381,6 +387,9 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
 }
 ScopedGPUTimer::~ScopedGPUTimer()
 {
+    if (!UserConfigParams::m_profiler_enabled) return;
+    if (profiler.isFrozen()) return;
+    
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
 }

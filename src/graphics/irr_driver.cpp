@@ -441,6 +441,14 @@ void IrrDriver::initDevice()
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
+    // Parse extensions
+    hasVSLayer = false;
+    const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+    if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
+        hasVSLayer = true;
+
+
+
     // This remaps the window, so it has to be done before the clear to avoid flicker
     m_device->setResizable(false);
 
