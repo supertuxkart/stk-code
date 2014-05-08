@@ -64,85 +64,72 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     if (name == "tracks")
     {
         DynamicRibbonWidget* w2 = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if (w2 != NULL)
+        if (w2 == NULL)
+            return;
+
+        const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        if(UserConfigParams::logGUI())
+            Log::debug("Clicked on track %s\n", selection.c_str());
+
+        UserConfigParams::m_last_track = selection;
+
+        if (selection == "random_track")
         {
-            const std::string selection = w2->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-            if(UserConfigParams::logGUI())
-                std::cout << "Clicked on track " << selection.c_str()
-                          << std::endl;
+            RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
+            assert(tabs != NULL);
 
-            UserConfigParams::m_last_track = selection;
+            if (m_random_track_list.empty()) return;
 
-            if (selection == "random_track")
+            std::string track = m_random_track_list.front();
+            m_random_track_list.pop_front();
+            m_random_track_list.push_back(track);
+
+            Track* clickedTrack = track_manager->getTrack( track );
+            if (clickedTrack != NULL)
             {
-                RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-                assert( tabs != NULL );
+                ITexture* screenshot =
+                    irr_driver->getTexture(clickedTrack->getScreenshotFile(),
+                                           "While loading screenshot for track '%s':",
+                                           clickedTrack->getFilename()   );
 
-                if (m_random_track_list.empty()) return;
-
-                std::string track = m_random_track_list.front();
-                m_random_track_list.pop_front();
-                m_random_track_list.push_back(track);
-                Track* clickedTrack = track_manager->getTrack( track );
-
-
-                if (clickedTrack != NULL)
-                {
-                    ITexture* screenshot =
-                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                                "While loading screenshot for track '%s':",
-                                                clickedTrack->getFilename()   );
-
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
-                                        translations->fribidize(clickedTrack->getName()),
-                                        screenshot, 0.8f, 0.7f);
-                }
-
+                new TrackInfoDialog(selection, clickedTrack->getIdent(),
+                                    translations->fribidize(clickedTrack->getName()),
+                                    screenshot, 0.8f, 0.7f);
             }
-            else if (selection == "locked")
-            {
-                unlock_manager->playLockSound();
-            }
-            else if (selection == RibbonWidget::NO_ITEM_ID)
-            {
-            }
-            else
-            {
-                Track* clickedTrack = track_manager->getTrack(selection);
-                if (clickedTrack != NULL)
-                {
-                    ITexture* screenshot =
-                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                                "While loading screenshot for track '%s'",
-                                                clickedTrack->getFilename());
 
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
-                                        translations->fribidize(clickedTrack->getName()),
-                                        screenshot, 0.8f, 0.7f);
-                }
-            }
         }
-    }
-    else if (name == "gps")
-    {
-        DynamicRibbonWidget* gps_widget = dynamic_cast<DynamicRibbonWidget*>(widget);
-        if (gps_widget != NULL)
+        else if (selection == "locked")
         {
-            std::string selection = gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-
-            if (selection == "locked")
-            {
-                unlock_manager->playLockSound();
-            }
-            else
-            {
-                new GPInfoDialog( selection, 0.8f, 0.7f );
-            }
+            unlock_manager->playLockSound();
+        }
+        else if (selection == RibbonWidget::NO_ITEM_ID)
+        {
         }
         else
         {
-            assert(false);
+            Track* clickedTrack = track_manager->getTrack(selection);
+            if (clickedTrack != NULL)
+            {
+                ITexture* screenshot =
+                    irr_driver->getTexture( clickedTrack->getScreenshotFile(),
+                                            "While loading screenshot for track '%s'",
+                                            clickedTrack->getFilename());
+
+                new TrackInfoDialog(selection, clickedTrack->getIdent(),
+                                    translations->fribidize(clickedTrack->getName()),
+                                    screenshot, 0.8f, 0.7f);
+            }
         }
+    }   // if (name == "tracks")
+    else if (name == "gps")
+    {
+        DynamicRibbonWidget* gps_widget = dynamic_cast<DynamicRibbonWidget*>(widget);
+        std::string selection = gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        if (selection == "locked")
+            unlock_manager->playLockSound();
+        else
+            new GPInfoDialog(selection, 0.8f, 0.7f);
     }
     else if (name == "trackgroups")
     {
@@ -217,7 +204,7 @@ void TracksScreen::init()
 
         const std::vector<std::string> tracks = gp->getTrackNames(true);
 
-        std::vector<std::string> sshot_files;
+        std::vector<std::string> screenshots;
         for (unsigned int t=0; t<tracks.size(); t++)
         {
             Track* curr = track_manager->getTrack(tracks[t]);
@@ -228,29 +215,39 @@ void TracksScreen::init()
             }
             else
             {
-                sshot_files.push_back(curr->getScreenshotFile());
+                screenshots.push_back(curr->getScreenshotFile());
             }
         }
-        if (sshot_files.size() == 0)
+        if (screenshots.size() == 0)
         {
             std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId()
                       << "' does not contain any valid track.\n";
-            sshot_files.push_back("gui/main_help.png");
+            screenshots.push_back("gui/main_help.png");
         }
 
         if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()))
         {
-            gps_widget->addAnimatedItem(_("Locked!"),
-                                        "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
+            gps_widget->addAnimatedItem(_("Locked!"), "locked",
+                                        screenshots, 1.5f,
+                                        LOCKED_BADGE | TROPHY_BADGE,
                                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
         else
         {
-            gps_widget->addAnimatedItem(translations->fribidize(gp->getName()), gp->getId(),
-                                        sshot_files, 1.5f, TROPHY_BADGE,
-                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            gps_widget->addAnimatedItem(translations->fribidize(gp->getName()),
+                                        gp->getId(), screenshots, 1.5f,
+                                        TROPHY_BADGE,
+                                        IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
     }
+
+    // Random GP
+    std::vector<std::string> screenshots;
+    screenshots.push_back("gui/main_help.png");
+    gps_widget->addAnimatedItem(translations->fribidize("Random"), "Random",
+                                screenshots, 1.5f, 0,
+                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+
     gps_widget->updateItemDisplay();
 
 
