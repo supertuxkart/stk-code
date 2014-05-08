@@ -710,7 +710,7 @@ void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4);
 }
 
 void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
@@ -724,7 +724,7 @@ void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 
     assert(mesh.vao_shadow_pass);
     glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4);
 }
 
 bool isObject(video::E_MATERIAL_TYPE type)

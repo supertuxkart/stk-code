@@ -316,13 +316,13 @@ install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION sha
 install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
 
 # ==== Checking if data folder exists ====
-if(NOT IS_DIRECTORY ../data)
+if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
   message( FATAL_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/data folder doesn't exist" )
 endif()
 
 # ==== Checking if stk-assets folder exists ====
 if(CHECK_ASSETS)
-  if(NOT IS_DIRECTORY ../../stk-assets)
+  if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../stk-assets)
     set (CUR_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     get_filename_component(PARENT_DIR ${CUR_DIR} PATH)
     message( FATAL_ERROR "${PARENT_DIR}/stk-assets folder doesn't exist. "

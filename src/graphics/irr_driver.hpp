@@ -92,6 +92,7 @@ class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
     int GLMajorVersion, GLMinorVersion;
+    bool hasVSLayer;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -169,6 +170,11 @@ public:
             return 100 + (GLMinorVersion + 3) * 10;
         else
             return 120;
+    }
+
+    bool hasVSLayerExtension() const
+    {
+        return hasVSLayer;
     }
 
     float getExposure() const
@@ -258,22 +264,13 @@ private:
     void renderSolidSecondPass();
     void renderTransparent();
     void renderParticles();
-    void computeCameraMatrix(scene::ICameraSceneNode * const camnode,
-        Camera * const camera);
-    void renderShadows(//ShadowImportanceProvider * const sicb,
-                       scene::ICameraSceneNode * const camnode,
-                       //video::SOverrideMaterial &overridemat,
-                       Camera * const camera);
-    void renderGlow(video::SOverrideMaterial &overridemat,
-                    std::vector<GlowData>& glows,
-                    const core::aabbox3df& cambox,
-                    int cam);
-    void renderLights(const core::aabbox3df& cambox,
-                      scene::ICameraSceneNode * const camnode,
-                      video::SOverrideMaterial &overridemat,
-                      int cam, float dt);
-    void renderDisplacement(video::SOverrideMaterial &overridemat,
-                            int cam);
+    void computeSunVisibility();
+    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode);
+    void renderShadows();
+    void renderGlow(std::vector<GlowData>& glows);
+    void renderLights(float dt);
+    void renderDisplacement();
     void doScreenShot();
 public:
          IrrDriver();
@@ -281,7 +278,7 @@ public:
     void initDevice();
     void reset();
     void generateSkyboxCubemap();
-    void renderSkybox();
+    void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
     const std::vector<core::matrix4> &getShadowViewProj() const
