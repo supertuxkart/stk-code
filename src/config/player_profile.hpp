@@ -129,9 +129,7 @@ public:
     virtual void requestSavedSession() = 0;
     virtual void onSTKQuit() const = 0;
     virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
-                                              const irr::core::stringw &password,
-                                              bool save_session,
-                                              bool request_now = true) = 0;
+                                              const irr::core::stringw &password) = 0;
     virtual void signIn(bool success, const XMLNode * input) = 0;
     virtual void signOut(bool success, const XMLNode * input) = 0;
     virtual void requestSignOut() = 0;

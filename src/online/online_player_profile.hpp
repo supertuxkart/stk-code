@@ -131,9 +131,7 @@ namespace Online
             virtual void requestSavedSession();
             virtual void requestSignOut();
             virtual SignInRequest *requestSignIn(const irr::core::stringw &username,
-                                                 const irr::core::stringw &password,
-                                                 bool save_session,
-                                                 bool request_now = true);
+                                                 const irr::core::stringw &password);
 
         public:
             OnlinePlayerProfile(const XMLNode *player);

@@ -22,11 +22,11 @@
 #include <string>
 
 #include "guiengine/screen.hpp"
-#include "states_screens/dialogs/enter_player_name_dialog.hpp"
 
 namespace GUIEngine 
 {
     class CheckBoxWidget;
+    class LabelWidget;
     class RibbonWidget;
     class TextBoxWidget;
     class Widget; 
@@ -40,7 +40,6 @@ class PlayerProfile;
   * \ingroup states_screens
   */
 class UserScreen : public GUIEngine::Screen, 
-                   public EnterPlayerNameDialog::INewPlayerListener,
                    public GUIEngine::ScreenSingleton<UserScreen>
 {
     UserScreen();
@@ -71,7 +70,7 @@ private:
 
     void selectUser(int index);
     void makeEntryFieldsVisible(bool online);
-    void login(bool remember_me);
+    void login();
     void closeScreen();
     void deletePlayer();
     void doDeletePlayer();
@@ -97,11 +96,10 @@ public:
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
 
-    /** \brief implement callback from EnterPlayerNameDialog::INewPlayerListener */
-    virtual void onNewPlayerWithName(const irr::core::stringw& newName);
-
     void loginSuccessful();
-    void loginError(const irr::core::stringw & error_message);
+    void loginError(const irr::core::stringw &error_message);
+    void newUserAdded(const irr::core::stringw &local_name,
+                      const irr::core::stringw &online_name);
     // ------------------------------------------------------------------------
     /** True if this window is a popup window (i.e. it should not exit even if
      *  the current player exists. */

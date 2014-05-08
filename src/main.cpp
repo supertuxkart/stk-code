@@ -999,8 +999,7 @@ int handleCmdLine()
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
-                PlayerManager::requestSignIn(login, password, false, false);
-        request->executeNow();
+                PlayerManager::requestSignIn(login, password);
 
         if (request->isSuccess())
         {

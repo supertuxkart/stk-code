@@ -25,8 +25,8 @@
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
+#include "guiengine/widgets/text_box_widget.hpp"
 #include "online/messages.hpp"
-#include "states_screens/dialogs/enter_player_name_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/register_screen.hpp"
@@ -69,10 +69,6 @@ void UserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
-    // Make sure this tab is actually focused.
-    RibbonWidget* tabs = getWidget<RibbonWidget>("login_tabs");
-    if (tabs) tabs->select( "tab_login", PLAYER_ID_GAME_MASTER );
-
     // It should always be activated ... but just in case
     m_options_widget->setActivated();
     // Clean any error message still shown
@@ -105,17 +101,18 @@ void UserScreen::init()
 
     // Select the current player. That can only be done after 
     // updateItemDisplay is called.
-    RibbonWidget *title = getWidget<RibbonWidget>("login_tabs");
-
     if(current_player_index.size()>0)
     {
         m_players->setSelection(current_player_index, PLAYER_ID_GAME_MASTER,
                                 /*focus*/ true);
-        title->setLabel(0, PlayerManager::getCurrentPlayer()->getName());
+        const stringw &online_name = PlayerManager::getCurrentPlayer()
+                                   ->getLastOnlineName();
+        m_online_cb->setState(online_name.size()>0);
+        m_username_tb->setText(online_name);
+        makeEntryFieldsVisible(online_name.size()>0);
     }
     else   // no current player found
     {
-        title->setLabel(0, _("Login"));
         // The first player is the most frequently used, so select it
         if (PlayerManager::get()->getNumPlayers() > 0)
             selectUser(0);
@@ -207,14 +204,7 @@ void UserScreen::eventCallback(Widget* widget,
     m_info_widget->setText("", true);
     m_info_widget->setErrorColor();
 
-    if (name == "login_tabs")
-    {
-        const std::string selection =
-            ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        if (selection == "tab_register")
-            StateManager::get()->replaceTopMostScreen(RegisterScreen::getInstance());
-    }
-    else if (name == "players")
+    if (name == "players")
     {
         // Clicked on a name --> Find the corresponding online data
         // and display them
@@ -247,11 +237,11 @@ void UserScreen::eventCallback(Widget* widget,
                              m_options_widget->getSelectionIDString(player_id);
         if (button == "ok")
         {
-            login(UserConfigParams::m_remember_user);
+            login();
         }   // button==ok
         else if (button == "new_user")
         {
-            new EnterPlayerNameDialog(this, 0.5f, 0.4f);
+            StateManager::get()->pushScreen(RegisterScreen::getInstance());
         }
         else if (button == "cancel")
         {
@@ -263,7 +253,7 @@ void UserScreen::eventCallback(Widget* widget,
         else if (button == "rename")
         {
             PlayerProfile *cp = getSelectedPlayer();
-            new EnterPlayerNameDialog(this, 0.5f, 0.4f, cp->getName());
+            StateManager::get()->pushScreen(RegisterScreen::getInstance());
             // Init will automatically be called, which 
             // refreshes the player list
         }
@@ -292,14 +282,14 @@ void UserScreen::closeScreen()
  *  \param remember_me True if the login details should be remembered,
  *         so that next time this menu can be skipped.
  */
-void UserScreen::login(bool remember_me)
+void UserScreen::login()
 {
     // If an error occurs, the callback informing this screen about the
     // problem will activate the widget again.
     m_options_widget->setDeactivated();
 
     PlayerProfile *profile = getSelectedPlayer();
-    PlayerManager::get()->setCurrentPlayer(profile, remember_me);
+    PlayerManager::get()->setCurrentPlayer(profile);
     assert(profile);
 
     // If no online login requested, go straight to the main menu screen.
@@ -343,8 +333,7 @@ void UserScreen::login(bool remember_me)
             return;
         }
         profile->requestSignIn(m_username_tb->getText(),
-                               m_password_tb->getText(),
-                               remember_me);
+                               m_password_tb->getText());
     }   // !hasSavedSession
 
 }   // login
@@ -385,6 +374,15 @@ void UserScreen::loginError(const irr::core::stringw & error_message)
     m_info_widget->setText(error_message, false);
     m_options_widget->setActivated();
 }   // loginError
+
+// ----------------------------------------------------------------------------
+void UserScreen::newUserAdded(const irr::core::stringw &local_name,
+                              const irr::core::stringw &online_name)
+{
+    PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
+    PlayerManager::get()->setCurrentPlayer(player);
+    player->setLastOnlineName(online_name);
+}   // newUserAdded
 
 // ----------------------------------------------------------------------------
 /** Called when a player will be deleted.
@@ -451,21 +449,9 @@ void UserScreen::onDialogClose()
             StateManager::get()->popMenu();
             return;
         }
-        new EnterPlayerNameDialog(this, 0.5f, 0.4f);
+        StateManager::get()->pushScreen(RegisterScreen::getInstance());
     }   // getNumPlayers == 0
 }   // onDialogClose
-
-// ----------------------------------------------------------------------------
-/** This is a callback from the new user dialog.
- */
-void UserScreen::onNewPlayerWithName(const core::stringw& new_name)
-{
-    init();
-    // Select the newly added player
-    selectUser(PlayerManager::get()->getNumPlayers() - 1);
-        
-    return;
-}   // onNewPlayerWithName
 
 // -----------------------------------------------------------------------------
 

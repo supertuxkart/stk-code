@@ -117,22 +117,18 @@ namespace Online
      */
     OnlinePlayerProfile::SignInRequest*
         OnlinePlayerProfile::requestSignIn(const core::stringw &username,
-                                   const core::stringw &password,
-                                   bool save_session, bool request_now)
+                                   const core::stringw &password)
     {
         assert(m_online_state == OS_SIGNED_OUT);
-        m_save_session = save_session;
+        m_save_session = UserConfigParams::m_remember_user;
         SignInRequest * request = new SignInRequest(false);
         request->setServerURL("client-user.php");
         request->addParameter("action","connect");
         request->addParameter("username",username);
         request->addParameter("password",password);
-        request->addParameter("save-session", save_session);
-        if (request_now)
-        {
-            request->queue();
-            m_online_state = OS_SIGNING_IN;
-        }
+        request->addParameter("save-session", m_save_session);
+        request->queue();
+        m_online_state = OS_SIGNING_IN;
         return request;
     }   // requestSignIn
 

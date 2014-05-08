@@ -20,6 +20,7 @@
 
 #include "achievements/achievements_manager.hpp"
 #include "config/player_profile.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
@@ -129,12 +130,9 @@ void PlayerManager::onSTKQuit()
  */
 
 Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &username,
-                                                 const irr::core::stringw &password,
-                                                 bool save_session,
-                                                 bool request_now)
+                                                 const irr::core::stringw &password)
 {
-    return getCurrentPlayer()->requestSignIn(username, password, save_session,
-                                             request_now);
+    return getCurrentPlayer()->requestSignIn(username, password);
 }   // requestSignIn
 
 // ----------------------------------------------------------------------------
@@ -294,9 +292,11 @@ void PlayerManager::save()
 /** Adds a new player to the list of all players.
  *  \param name Name of the new player.
  */
-void PlayerManager::addNewPlayer(const core::stringw& name)
+PlayerProfile* PlayerManager::addNewPlayer(const core::stringw& name)
 {
-    m_all_players.push_back( new Online::OnlinePlayerProfile(name) );
+    PlayerProfile *profile = new Online::OnlinePlayerProfile(name);
+    m_all_players.push_back(profile);
+    return profile;
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
@@ -305,6 +305,8 @@ void PlayerManager::addNewPlayer(const core::stringw& name)
 void PlayerManager::deletePlayer(PlayerProfile *player)
 {
     m_all_players.erase(player);
+    if(player==m_current_player)
+        m_current_player = NULL;
 }   // deletePlayer
 
 // ----------------------------------------------------------------------------
@@ -430,8 +432,9 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
  *  \param remember_me If this player should be marked as default
  *         player in players.xml
  */
-void PlayerManager::setCurrentPlayer(PlayerProfile *player, bool remember_me)
+void PlayerManager::setCurrentPlayer(PlayerProfile *player)
 {
+    bool remember_me = UserConfigParams::m_remember_user;
     // Reset current default player
     if(m_current_player)
         m_current_player->setDefault(false);

@@ -33,6 +33,8 @@ class RegisterScreen : public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<RegisterScreen>;
 
+    void makeEntryFieldsVisible(bool online);
+    void registerLocal(const irr::core::stringw &local_name);
     void doRegister();
     void init();
     RegisterScreen();
