@@ -133,6 +133,8 @@ private:
     float greenSHCoeff[9];
     float redSHCoeff[9];
 
+    /** Keep a trace of the origin file name of a texture. */
+    std::map<video::ITexture*, std::string> m_texturesFileName;
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -311,6 +313,7 @@ public:
                                      bool is_premul=false,
                                      bool is_prediv=false,
                                      bool complain_if_not_found=true);
+    std::string           getTextureName(video::ITexture* tex);
     void                  grabAllTextures(const scene::IMesh *mesh);
     void                  dropAllTextures(const scene::IMesh *mesh);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL,

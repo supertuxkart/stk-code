@@ -116,6 +116,7 @@ public:
     std::string       getScreenshotDir() const;
     std::string       getCachedTexturesDir() const;
     std::string       getGPDir() const;
+    std::string       getTextureCacheLocation(const std::string& filename);
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);

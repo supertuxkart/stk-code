@@ -868,13 +868,13 @@ void FileManager::checkAndCreateScreenshotDir()
 void FileManager::checkAndCreateCachedTexturesDir()
 {
 #if defined(WIN32) || defined(__CYGWIN__)
-    m_cached_textures_dir = m_user_config_dir + "resized-textures/";
+    m_cached_textures_dir = m_user_config_dir + "cached-textures/";
 #elif defined(__APPLE__)
     m_cached_textures_dir = getenv("HOME");
-    m_cached_textures_dir += "/Library/Application Support/SuperTuxKart/ResizedTextures/";
+    m_cached_textures_dir += "/Library/Application Support/SuperTuxKart/CachedTextures/";
 #else
     m_cached_textures_dir = checkAndCreateLinuxDir("XDG_CACHE_HOME", "supertuxkart", ".cache/", ".");
-    m_cached_textures_dir += "resized-textures/";
+    m_cached_textures_dir += "cached-textures/";
 #endif
 
     if (!checkAndCreateDirectory(m_cached_textures_dir))
@@ -1009,6 +1009,35 @@ void FileManager::redirectOutput()
                          "be logged to %s.", logoutfile.c_str());
     Log::openOutputFiles(logoutfile);
 }   // redirectOutput
+
+//-----------------------------------------------------------------------------
+/** Returns the theoretical location of the cached version of a texture 
+*   depending of the current config. (This function also works for directories:
+*   in this case the returned directory will be the cache location for all
+*   textures that you will find in the specified directory. The specified
+*   directory must end with '/')
+*   \note The returned location is where the cached data should be read or 
+*   written but the file itseft does not necessarity exist. However, the
+*   directory structure is automatically created if it does not exist.
+*/
+std::string FileManager::getTextureCacheLocation(const std::string& filename)
+{
+    std::string file = StringUtils::getBasename(filename);
+
+    std::string parent_dir = StringUtils::getPath(filename);
+    if (StringUtils::hasSuffix(parent_dir, "/"))
+        parent_dir = parent_dir.substr(0, parent_dir.size() - 1);
+    parent_dir = StringUtils::getBasename(parent_dir);
+
+    std::string cache_subdir = UserConfigParams::m_high_definition_textures
+                               ? "hd/"
+                               : "resized/";
+    std::string cached_file =
+        getCachedTexturesDir() + cache_subdir + parent_dir + "/";
+    checkAndCreateDirectoryP(cached_file);
+    cached_file += file;
+    return cached_file;
+}   // getTextureCacheLocation
 
 //-----------------------------------------------------------------------------
 /** Returns the directory for addon files. */
