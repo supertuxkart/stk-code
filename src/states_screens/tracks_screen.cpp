@@ -188,10 +188,10 @@ void TracksScreen::beforeAddingWidget()
 void TracksScreen::init()
 {
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
-    assert( gps_widget != NULL );
+    assert(gps_widget != NULL);
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( tracks_widget != NULL );
+    assert(tracks_widget != NULL);
 
     // Reset GP list everytime (accounts for locking changes, etc.)
     gps_widget->clearItems();
@@ -240,13 +240,6 @@ void TracksScreen::init()
                                         IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
     }
-
-    // Random GP
-    std::vector<std::string> screenshots;
-    screenshots.push_back("gui/main_help.png");
-    gps_widget->addAnimatedItem(translations->fribidize("Random"), "Random",
-                                screenshots, 1.5f, 0,
-                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
 
     gps_widget->updateItemDisplay();
 
