@@ -1439,6 +1439,14 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
 }   // getTexture
 
 // ----------------------------------------------------------------------------
+/** Clear the texture-filename reminder.
+*/
+void IrrDriver::clearTexturesFileName()
+{
+    m_texturesFileName.clear();
+} // clearTexturesFileName
+
+// ----------------------------------------------------------------------------
 /** Get the texture file name using a texture pointer.
 *   \param tex Pointer on the texture for which we want to find the file name.
 *   \return Filename of the texture if found, or an empty string otherwise.

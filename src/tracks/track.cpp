@@ -207,8 +207,10 @@ void Track::cleanup()
     ItemManager::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
-    // Clear remainder of transformed textures
+    // Clear reminder of transformed textures
     resetTextureTable();
+    // Clear reminder of the link between textures and file names.
+    irr_driver->clearTexturesFileName();
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {

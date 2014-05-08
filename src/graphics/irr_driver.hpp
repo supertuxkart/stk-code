@@ -309,6 +309,7 @@ public:
                                      bool is_premul=false,
                                      bool is_prediv=false,
                                      bool complain_if_not_found=true);
+    void                  clearTexturesFileName();
     std::string           getTextureName(video::ITexture* tex);
     void                  grabAllTextures(const scene::IMesh *mesh);
     void                  dropAllTextures(const scene::IMesh *mesh);
