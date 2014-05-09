@@ -228,7 +228,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
         ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
-        renderLights(dt);
+        renderLights(camnode, dt);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -759,7 +759,7 @@ static void renderPointLights(unsigned count)
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
 
-void IrrDriver::renderLights(float dt)
+void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 {
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
@@ -781,8 +781,7 @@ void IrrDriver::renderLights(float dt)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     const u32 lightcount = m_lights.size();
-    const core::vector3df &campos =
-        irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
+    const core::vector3df &campos = camnode->getAbsolutePosition();
 
     std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)

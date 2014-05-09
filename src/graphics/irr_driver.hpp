@@ -278,7 +278,7 @@ private:
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
-    void renderLights(float dt);
+    void renderLights(scene::ICameraSceneNode * const camnode, float dt);
     void renderDisplacement();
     void doScreenShot();
 public:
