@@ -610,14 +610,15 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
         float up = box.MaxEdge.Y;
         float down = box.MinEdge.Y;
 
+        core::matrix4 tmp_matrix;
+
         // Prevent Matrix without extend
         if (left == right || up == down)
         {
             Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
+            sun_ortho_matrix.push_back(tmp_matrix);
             continue;
         }
-
-        core::matrix4 tmp_matrix;
 
         tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
             up, down,
