@@ -269,6 +269,7 @@ private:
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
+    void renderSSAO();
     void renderLights(float dt);
     void renderDisplacement();
     void doScreenShot();
