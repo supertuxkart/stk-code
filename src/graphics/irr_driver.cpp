@@ -841,7 +841,8 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
                    filename.c_str());
         return NULL;
     }
-    return am->getMesh(0);
+    scene::IMeshManipulator *mani = irr_driver->getVideoDriver()->getMeshManipulator();
+    return mani->createMeshWelded(am->getMesh(0));
 }   // getMesh
 
 // ----------------------------------------------------------------------------

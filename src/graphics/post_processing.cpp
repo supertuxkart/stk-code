@@ -786,12 +786,12 @@ void PostProcessing::render(scene::ICameraSceneNode * const camnode)
 
     //computeLogLuminance(in_rtt);
     {
-        PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
+//        PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
         toneMap(out_fbo, in_rtt);
         std::swap(in_rtt, out_rtt);
         std::swap(in_fbo, out_fbo);
-        PROFILER_POP_CPU_MARKER();
+//        PROFILER_POP_CPU_MARKER();
     }
 
     {
