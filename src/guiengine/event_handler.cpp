@@ -159,8 +159,12 @@ bool EventHandler::OnEvent (const SEvent &event)
              event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Remember the mouse position
-        m_mouse_pos.X = event.MouseInput.X;
-        m_mouse_pos.Y = event.MouseInput.Y;
+        if (event.EventType == EET_MOUSE_INPUT_EVENT &&
+            event.MouseInput.Event == EMIE_MOUSE_MOVED)
+        {
+            m_mouse_pos.X = event.MouseInput.X;
+            m_mouse_pos.Y = event.MouseInput.Y;
+        }
 
         // Notify the profiler of mouse events
         if(UserConfigParams::m_profiler_enabled &&
