@@ -207,8 +207,10 @@ void Track::cleanup()
     ItemManager::destroy();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
-    // Clear remainder of transformed textures
+    // Clear reminder of transformed textures
     resetTextureTable();
+    // Clear reminder of the link between textures and file names.
+    irr_driver->clearTexturesFileName();
 
     for(unsigned int i=0; i<m_animated_textures.size(); i++)
     {
@@ -832,7 +834,31 @@ bool Track::loadMainTrack(const XMLNode &root)
     std::string model_name;
     track_node->get("model", &model_name);
     std::string full_path = m_root+model_name;
-    scene::IMesh *mesh = irr_driver->getMesh(full_path);
+
+    scene::IMesh *mesh;
+    // If the hd texture option is disabled, we generate smaller textures
+    // and configure the path to them before loading the mesh.
+    if (!UserConfigParams::m_high_definition_textures)
+    {
+        std::string cached_textures_dir =
+            irr_driver->generateSmallerTextures(m_root);
+
+        irr::io::IAttributes* scene_params =
+            irr_driver->getSceneManager()->getParameters();
+        // Before changing the texture path, we retrieve the older one to restore it later
+        std::string texture_default_path =
+            scene_params->getAttributeAsString(scene::B3D_TEXTURE_PATH).c_str();
+        scene_params->setAttribute(scene::B3D_TEXTURE_PATH, cached_textures_dir.c_str());
+
+        mesh = irr_driver->getMesh(full_path);
+
+        scene_params->setAttribute(scene::B3D_TEXTURE_PATH, texture_default_path.c_str());
+    }
+    else // Load mesh with default (hd) textures
+    {
+        mesh = irr_driver->getMesh(full_path);
+    }
+    
     if(!mesh)
     {
         Log::fatal("track",
@@ -1474,6 +1500,15 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     file_manager->pushTextureSearchPath(m_root);
     file_manager->pushModelSearchPath  (m_root);
 
+    // If the hd texture option is disabled, we generate smaller textures
+    // and we also add the cache directory to the texture search path
+    if (!UserConfigParams::m_high_definition_textures)
+    {
+        std::string cached_textures_dir =
+            irr_driver->generateSmallerTextures(m_root);
+        file_manager->pushTextureSearchPath(cached_textures_dir);
+    }
+
     // First read the temporary materials.xml file if it exists
     try
     {
@@ -1666,7 +1701,10 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         World::getWorld()->setClearbackBufferColor(m_sky_color);
     }
 
-
+    if (!UserConfigParams::m_high_definition_textures)
+    {
+        file_manager->popTextureSearchPath();
+    }
     file_manager->popTextureSearchPath();
     file_manager->popModelSearchPath  ();
 

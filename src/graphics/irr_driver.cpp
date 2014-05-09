@@ -1256,6 +1256,74 @@ void IrrDriver::unsetTextureErrorMessage()
 }   // unsetTextureErrorMessage
 
 // ----------------------------------------------------------------------------
+/** Retrieve all textures in the specified directory, generate a smaller
+*   version for each of them and save them in the cache. Smaller textures are 
+*   generated only if they do not already exist or if their original version 
+*   is newer than the cached one.
+*   \param dir Directory from where textures will be retrieved.
+*              Must end with '/'.
+*   \return Directory where smaller textures were cached.
+*/
+std::string IrrDriver::generateSmallerTextures(const std::string& dir)
+{
+    std::set<std::string> files;
+    file_manager->listFiles(files, dir, true);
+
+    std::set<std::string>::const_iterator it;
+    for (it = files.begin(); it != files.end(); ++it)
+    {
+        std::string ext = StringUtils::toLowerCase(StringUtils::getExtension(*it));
+        if (ext == "png" || ext == "jpg" || ext == "jpeg" || ext == "bmp")
+        {
+            getSmallerTexture(*it);
+        }
+    } // for it in files
+
+    return file_manager->getTextureCacheLocation(dir);
+} // generateSmallerTextures
+
+// ----------------------------------------------------------------------------
+/** Return the filename for the cached smaller version of the texture. Also,
+*   generate the smaller version of the texture if it does not already
+*   exist or if the original version is newer than the cached one.
+*   \param filename File name of the original texture.
+*   \return File name of the cached texture.
+*/
+std::string IrrDriver::getSmallerTexture(const std::string& filename)
+{
+    // Retrieve the filename of the cached texture
+    std::string cached_file = file_manager->getTextureCacheLocation(filename);
+
+    // If the cached texture does not exist, we generate it.
+    if (!file_manager->fileExists(cached_file) ||
+        file_manager->fileIsNewer(filename, cached_file))
+    {
+        video::IVideoDriver* video_driver = irr_driver->getVideoDriver();
+        video::IImage* img =
+            video_driver->createImageFromFile(filename.c_str());
+
+        if (img != NULL)
+        {
+            core::dimension2d<u32> dim = img->getDimension();
+            core::dimension2d<u32> new_dim; // Dimension of the cached texture
+            const int scale_factor = 2;
+            // Resize the texture only if it can be done properly
+            if (dim.Width < scale_factor || dim.Height < scale_factor)
+                new_dim = dim;
+            else
+                new_dim = dim / scale_factor;
+
+            video::IImage* scaled =
+                video_driver->createImage(img->getColorFormat(), new_dim);
+            img->copyToScaling(scaled);
+
+            video_driver->writeImageToFile(scaled, cached_file.c_str());
+        } // if img != NULL
+    } // if !file_manager->fileExists(cached_file)
+    return cached_file;
+} // getSmallerTexture
+
+// ----------------------------------------------------------------------------
 /** Loads a texture from a file and returns the texture object. This is just
  *  a convenient wrapper which loads the texture from a STK asset directory.
  *  It calls the file manager to get the full path, then calls the normal
@@ -1366,8 +1434,33 @@ video::ITexture *IrrDriver::getTexture(const std::string &filename,
         Log::error("irr_driver", "Texture '%s' not found.", filename.c_str());
     }
 
+    m_texturesFileName[out] = filename;
+
     return out;
 }   // getTexture
+
+// ----------------------------------------------------------------------------
+/** Clear the texture-filename reminder.
+*/
+void IrrDriver::clearTexturesFileName()
+{
+    m_texturesFileName.clear();
+} // clearTexturesFileName
+
+// ----------------------------------------------------------------------------
+/** Get the texture file name using a texture pointer.
+*   \param tex Pointer on the texture for which we want to find the file name.
+*   \return Filename of the texture if found, or an empty string otherwise.
+*/
+std::string IrrDriver::getTextureName(video::ITexture* tex)
+{
+    std::map<video::ITexture*, std::string>::iterator it;
+    it = m_texturesFileName.find(tex);
+    if (it != m_texturesFileName.end())
+        return it->second;
+    else
+        return "";
+} // getTextureName
 
 // ----------------------------------------------------------------------------
 /** Appends a pointer to each texture used in this mesh to the vector.
