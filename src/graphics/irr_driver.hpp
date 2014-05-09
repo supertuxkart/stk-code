@@ -77,9 +77,13 @@ enum STKRenderingPass
 enum QueryPerf
 {
     Q_SOLID_PASS1,
-    Q_SOLID_PASS2,
-    Q_LIGHT,
     Q_SHADOWS,
+    Q_LIGHT,
+    Q_SSAO,
+    Q_SOLID_PASS2,
+    Q_TRANSPARENT,
+    Q_PARTICLES,
+    Q_DISPLACEMENT,
     Q_LAST
 };
 
