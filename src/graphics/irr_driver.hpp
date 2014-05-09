@@ -84,6 +84,10 @@ enum QueryPerf
     Q_TRANSPARENT,
     Q_PARTICLES,
     Q_DISPLACEMENT,
+    Q_GODRAYS,
+    Q_BLOOM,
+    Q_TONEMAP,
+    Q_MOTIONBLUR,
     Q_LAST
 };
 

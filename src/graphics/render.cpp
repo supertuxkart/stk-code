@@ -142,6 +142,12 @@ void IrrDriver::renderGLSL(float dt)
 
         renderScene(camnode, glows, dt, track->hasShadows());
 
+        // Render the post-processed scene
+        if (UserConfigParams::m_dynamic_lights)
+            m_post_processing->render(camnode);
+        else
+            glDisable(GL_FRAMEBUFFER_SRGB);
+
         PROFILER_POP_CPU_MARKER();
 
         // Note that drawAll must be called before rendering
@@ -152,14 +158,6 @@ void IrrDriver::renderGLSL(float dt)
             World::getWorld()->getPhysics()->draw();
     }   // for i<world->getNumKarts()
 
-    PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0xFF, 0x00);
-    // Render the post-processed scene
-    if (UserConfigParams::m_dynamic_lights)
-        m_post_processing->render();
-    else
-        glDisable(GL_FRAMEBUFFER_SRGB);
-    PROFILER_POP_CPU_MARKER();
-    
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
