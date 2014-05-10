@@ -52,6 +52,9 @@
 
 STKInstancedSceneNode *InstancedBox = 0;
 
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+
 void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
@@ -207,11 +210,20 @@ void IrrDriver::renderGLSL(float dt)
             std::map<video::SColor, std::vector<float>>::const_iterator it;
             for (it = lines.begin(); it != lines.end(); it++)
             {
-                for (int i = 0; i < it->second.size(); i += 6)
+                for (int i = 0; i < it->second.size(); i += 6 * 1024)
                 {
-                    draw3DLine(core::vector3df(it->second[i], it->second[i + 1], it->second[i + 2]), 
+                    unsigned count = MIN2(it->second.size() - i, 6 * 1024);
+                    glBindVertexArray(UtilShader::ColoredLine::vao);
+                    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+                    glBufferSubData(GL_ARRAY_BUFFER, 0, count, &(it->second.data()[i]));
+
+                    glUseProgram(UtilShader::ColoredLine::Program);
+                    UtilShader::ColoredLine::setUniforms(it->first);
+                    glDrawArrays(GL_LINES, 0, count / 6);
+
+/*                    draw3DLine(core::vector3df(it->second[i], it->second[i + 1], it->second[i + 2]),
                         core::vector3df(it->second[i + 3], it->second[i + 4], it->second[i + 5]),
-                        it->first);
+                        it->first);*/
                 }
             }
         }
@@ -755,8 +767,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 }
 
 // ----------------------------------------------------------------------------
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+
 static LightShader::PointLightInfo PointLightsInfo[MAXLIGHT];
 
 static void renderPointLights(unsigned count)

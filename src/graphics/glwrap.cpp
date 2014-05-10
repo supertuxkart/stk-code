@@ -541,8 +541,6 @@ void draw3DLine(const core::vector3df& start,
     glUseProgram(UtilShader::ColoredLine::Program);
     UtilShader::ColoredLine::setUniforms(color);
     glDrawArrays(GL_LINES, 0, 2);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGetError();
 }
