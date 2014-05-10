@@ -315,7 +315,7 @@ void resetTextureTable()
     AlreadyTransformedTexture.clear();
 }
 
-void compressTexture(irr::video::ITexture *tex, bool srgb)
+void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
 {
     if (AlreadyTransformedTexture.find(tex) != AlreadyTransformedTexture.end())
         return;
@@ -338,7 +338,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb)
     }
 
     size_t w = tex->getSize().Width, h = tex->getSize().Height;
-    char *data = new char[w * h * 4];
+    unsigned char *data = new unsigned char[w * h * 4];
     memcpy(data, tex->lock(), w * h * 4);
     tex->unlock();
     unsigned internalFormat, Format;
@@ -346,6 +346,17 @@ void compressTexture(irr::video::ITexture *tex, bool srgb)
         Format = GL_BGRA;
     else
         Format = GL_BGR;
+
+    if (premul_alpha)
+    {
+        for (unsigned i = 0; i < w * h; i++)
+        {
+            float alpha = pow(data[4 * i + 3] / 255., 1. / 2.2);
+            data[4 * i] *= alpha;
+            data[4 * i + 1] *= alpha;
+            data[4 * i + 2] *= alpha;
+        }
+    }
 
     if (!UserConfigParams::m_texture_compression)
     {

@@ -35,7 +35,7 @@ void STKBillboard::render()
     core::vector3df pos = getAbsolutePosition();
     glBindVertexArray(billboardvao);
     video::ITexture *tex = Material.getTexture(0);
-    compressTexture(tex, true);
+    compressTexture(tex, true, true);
     GLuint texid = getTextureGLuint(tex);
     setTexture(0, texid, GL_LINEAR, GL_LINEAR);
     glUseProgram(MeshShader::BillboardShader::Program);
