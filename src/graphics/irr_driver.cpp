@@ -1952,6 +1952,16 @@ void IrrDriver::update(float dt)
     else
         renderFixed(dt);
 
+
+    if (world != NULL && world->getPhysics() != NULL)
+    {
+        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+        if (debug_drawer != NULL && debug_drawer->debugEnabled())
+        {
+            debug_drawer->beginNextFrame();
+        }
+    }
+
     if (m_request_screenshot) doScreenShot();
 
     // Enable this next print statement to get render information printed

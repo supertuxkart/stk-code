@@ -165,6 +165,7 @@ public:
     void  setDebugMode(IrrDebugDrawer::DebugModeType mode) { m_debug_drawer->setDebugMode(mode); }
     /** Returns true if the debug drawer is enabled. */
     bool  isDebug() const     {return m_debug_drawer->debugEnabled(); }
+    IrrDebugDrawer* getDebugDrawer() { return m_debug_drawer; }
     virtual btScalar solveGroup(btCollisionObject** bodies, int numBodies,
                                 btPersistentManifold** manifold,int numManifolds,
                                 btTypedConstraint** constraints,int numConstraints,

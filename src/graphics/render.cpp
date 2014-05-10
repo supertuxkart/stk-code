@@ -197,6 +197,24 @@ void IrrDriver::renderGLSL(float dt)
     drawDebugMeshes();
 #endif
 
+
+    if (world != NULL && world->getPhysics() != NULL)
+    {
+        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+        if (debug_drawer != NULL && debug_drawer->debugEnabled())
+        {
+            const std::map<video::SColor, std::vector<btVector3>>& lines = debug_drawer->getLines();
+            std::map<video::SColor, std::vector<btVector3>>::const_iterator it;
+            for (it = lines.begin(); it != lines.end(); it++)
+            {
+                for (int i = 0; i < it->second.size(); i += 2)
+                {
+                    draw3DLine((const core::vector3df&)it->second[0], (const core::vector3df&)it->second[1], it->first);
+                }
+            }
+        }
+    }
+
     PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
     m_video_driver->endScene();
     PROFILER_POP_CPU_MARKER();

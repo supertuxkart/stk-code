@@ -58,7 +58,21 @@ void IrrDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
 {
     video::SColor c(255, (int)(color.getX()*255), (int)(color.getY()*255),
                          (int)(color.getZ()*255)                          );
-    draw3DLine((const core::vector3df&)from, (const core::vector3df&)to, c);
+
+    m_lines[c].push_back(from);
+    m_lines[c].push_back(to);
+
+    //draw3DLine((const core::vector3df&)from, (const core::vector3df&)to, c);
+}
+
+// -----------------------------------------------------------------------------
+
+void IrrDebugDrawer::beginNextFrame()
+{
+    for (std::map<video::SColor, std::vector<btVector3>>::iterator it = m_lines.begin(); it != m_lines.end(); it++)
+    {
+        it->second.clear();
+    }
 }
 
 /* EOF */

@@ -23,6 +23,8 @@
 #include "graphics/glwrap.hpp"
 
 #include "utils/vec3.hpp"
+#include <map>
+#include <vector>
 
 /**
   * \ingroup physics
@@ -39,6 +41,9 @@ public:
                                     DM_NO_KARTS_GRAPHICS = 0x02
                                   };
     DebugModeType   m_debug_mode;
+
+    std::map<video::SColor, std::vector<btVector3>> m_lines;
+
 protected:
     virtual void    setDebugMode(int debug_mode) {}
     /** Callback for bullet: if debug drawing should be done or not.
@@ -66,6 +71,9 @@ public:
     bool            debugEnabled() const         {return m_debug_mode!=0;}
     void            nextDebugMode();
     void            setDebugMode(DebugModeType mode);
+
+    void            beginNextFrame();
+    const std::map<video::SColor, std::vector<btVector3>>& getLines() const { return m_lines; }
 };   // IrrDebugDrawer
 
 #endif
