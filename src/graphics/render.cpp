@@ -219,9 +219,12 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     {
         PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
         ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
+        // To avoid wrong culling, use the largest view possible
+        m_scene_manager->setActiveCamera(m_suncam);
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
             UserConfigParams::m_shadows && hasShadow)
             renderShadows();
+        m_scene_manager->setActiveCamera(camnode);
         PROFILER_POP_CPU_MARKER();
     }
 
