@@ -139,6 +139,7 @@ void IrrDriver::renderGLSL(float dt)
 #endif
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
+        m_scene_manager->setActiveCamera(camnode);
 
         renderScene(camnode, glows, dt, track->hasShadows());
 
@@ -624,7 +625,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
             up, down,
             30, z);
         m_suncam->setProjectionMatrix(tmp_matrix, true);
-        m_scene_manager->setActiveCamera(m_suncam);
         m_suncam->render();
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -632,7 +632,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
     assert(sun_ortho_matrix.size() == 4);
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
-//    camnode->render();
 
     float *tmp = new float[16 * 8];
 
