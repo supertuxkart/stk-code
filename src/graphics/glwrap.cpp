@@ -423,10 +423,13 @@ bool loadCompressedTexture(const std::string& compressed_tex)
 */
 void saveCompressedTexture(const std::string& compressed_tex)
 {
-    int internal_format, width, height, size;
+    int internal_format, width, height, size, compressionSuccessful;
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint *)&internal_format);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_WIDTH, (GLint *)&width);
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, (GLint *)&height);
+    glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED, (GLint *)&compressionSuccessful);
+    if (!compressionSuccessful)
+        return;
     glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_COMPRESSED_IMAGE_SIZE, (GLint *)&size);
 
     char *data = new char[size];
