@@ -360,7 +360,7 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     video::ITexture *tex = getMaterial(0).getTexture(0);
-    compressTexture(tex, true);
+    compressTexture(tex, true, true);
     texture = getTextureGLuint(getMaterial(0).getTexture(0));
 }
 
