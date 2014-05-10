@@ -357,9 +357,9 @@ void compressTexture(irr::video::ITexture *tex, bool srgb)
     else
     {
         if (srgb)
-            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_SRGB_ALPHA : GL_COMPRESSED_SRGB;
+            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_SRGB_ALPHA_S3TC_DXT5_EXT : GL_COMPRESSED_SRGB_S3TC_DXT1_EXT;
         else
-            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA : GL_COMPRESSED_RGB;
+            internalFormat = (tex->hasAlpha()) ? GL_COMPRESSED_RGBA_S3TC_DXT5_EXT : GL_COMPRESSED_RGB_S3TC_DXT1_EXT;
     }
     glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, w, h, 0, Format, GL_UNSIGNED_BYTE, (GLvoid *)data);
     glGenerateMipmap(GL_TEXTURE_2D);
