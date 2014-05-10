@@ -209,7 +209,7 @@ void IrrDriver::renderGLSL(float dt)
             {
                 for (int i = 0; i < it->second.size(); i += 2)
                 {
-                    draw3DLine((const core::vector3df&)it->second[0], (const core::vector3df&)it->second[1], it->first);
+                    draw3DLine((const core::vector3df&)it->second[i], (const core::vector3df&)it->second[i + 1], it->first);
                 }
             }
         }
