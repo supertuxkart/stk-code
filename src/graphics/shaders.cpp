@@ -364,6 +364,7 @@ void Shaders::loadShaders()
     UIShader::ColoredTextureRectShader::init();
     UIShader::TextureRectShader::init();
     UIShader::UniformColoredTextureRectShader::init();
+    UtilShader::ColoredLine::init();
 }
 
 Shaders::~Shaders()
@@ -402,6 +403,39 @@ static void bypassUBO(GLint Program)
     glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
     GLint IPM = glGetUniformLocation(Program, "InverseProjectionMatrix");
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
+}
+
+namespace UtilShader
+{
+    GLuint ColoredLine::Program;
+    GLuint ColoredLine::uniform_color;
+    GLuint ColoredLine::vao;
+    GLuint ColoredLine::vbo;
+
+    void ColoredLine::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+        glGenVertexArrays(1, &vao);
+        glBindVertexArray(vao);
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        float vertex[6] = {};
+        glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), vertex, GL_DYNAMIC_DRAW);
+        GLuint attrib_position = glGetAttribLocation(Program, "Position");
+        glEnableVertexAttribArray(attrib_position);
+        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        uniform_color = glGetUniformLocation(Program, "color");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    void ColoredLine::setUniforms(const irr::video::SColor &col)
+    {
+        glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+        glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
+    }
 }
 
 namespace MeshShader

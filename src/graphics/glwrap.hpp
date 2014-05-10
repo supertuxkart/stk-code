@@ -186,6 +186,9 @@ bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
 void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height);
 
+void draw3DLine(const core::vector3df& start,
+    const core::vector3df& end, irr::video::SColor color);
+
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
     const irr::video::SColor &color, bool useAlphaChannelOfTexture);

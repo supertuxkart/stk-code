@@ -521,6 +521,32 @@ unsigned GPUTimer::elapsedTimeus()
     return result / 1000;
 }
 
+void draw3DLine(const core::vector3df& start,
+    const core::vector3df& end, irr::video::SColor color)
+{
+    if (!irr_driver->isGLSL()) {
+        irr_driver->getVideoDriver()->draw3DLine(start, end, color);
+        return;
+    }
+
+    float vertex[6] = {
+        start.X, start.Y, start.Z,
+        end.X, end.Y, end.Z
+    };
+
+    glBindVertexArray(UtilShader::ColoredLine::vao);
+    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 6 * sizeof(float), vertex);
+
+    glUseProgram(UtilShader::ColoredLine::Program);
+    UtilShader::ColoredLine::setUniforms(color);
+    glDrawArrays(GL_LINES, 0, 2);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGetError();
+}
+
 static void drawTexColoredQuad(const video::ITexture *texture, const video::SColor *col, float width, float height,
     float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
     float tex_width, float tex_height)

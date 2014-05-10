@@ -32,6 +32,21 @@ public:
     static GLuint cubevbo, cubeindexes;
     static GLuint ViewProjectionMatrixesUBO;
 };
+
+namespace UtilShader
+{
+class ColoredLine
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_color;
+    static GLuint vao, vbo;
+
+    static void init();
+    static void setUniforms(const irr::video::SColor &);
+};
+}
+
 namespace MeshShader
 {
 class ObjectPass1Shader
