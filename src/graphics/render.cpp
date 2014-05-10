@@ -203,13 +203,15 @@ void IrrDriver::renderGLSL(float dt)
         IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
         if (debug_drawer != NULL && debug_drawer->debugEnabled())
         {
-            const std::map<video::SColor, std::vector<btVector3>>& lines = debug_drawer->getLines();
-            std::map<video::SColor, std::vector<btVector3>>::const_iterator it;
+            const std::map<video::SColor, std::vector<float>>& lines = debug_drawer->getLines();
+            std::map<video::SColor, std::vector<float>>::const_iterator it;
             for (it = lines.begin(); it != lines.end(); it++)
             {
-                for (int i = 0; i < it->second.size(); i += 2)
+                for (int i = 0; i < it->second.size(); i += 6)
                 {
-                    draw3DLine((const core::vector3df&)it->second[i], (const core::vector3df&)it->second[i + 1], it->first);
+                    draw3DLine(core::vector3df(it->second[i], it->second[i + 1], it->second[i + 2]), 
+                        core::vector3df(it->second[i + 3], it->second[i + 4], it->second[i + 5]),
+                        it->first);
                 }
             }
         }

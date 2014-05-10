@@ -59,9 +59,13 @@ void IrrDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
     video::SColor c(255, (int)(color.getX()*255), (int)(color.getY()*255),
                          (int)(color.getZ()*255)                          );
 
-    m_lines[c].push_back(from);
-    m_lines[c].push_back(to);
-
+    std::vector<float>& v = m_lines[c];
+    v.push_back(from.getX());
+    v.push_back(from.getY());
+    v.push_back(from.getZ());
+    v.push_back(to.getX());
+    v.push_back(to.getY());
+    v.push_back(to.getZ());
     //draw3DLine((const core::vector3df&)from, (const core::vector3df&)to, c);
 }
 
@@ -69,7 +73,7 @@ void IrrDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
 
 void IrrDebugDrawer::beginNextFrame()
 {
-    for (std::map<video::SColor, std::vector<btVector3>>::iterator it = m_lines.begin(); it != m_lines.end(); it++)
+    for (std::map<video::SColor, std::vector<float>>::iterator it = m_lines.begin(); it != m_lines.end(); it++)
     {
         it->second.clear();
     }

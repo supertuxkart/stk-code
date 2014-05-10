@@ -42,7 +42,7 @@ public:
                                   };
     DebugModeType   m_debug_mode;
 
-    std::map<video::SColor, std::vector<btVector3>> m_lines;
+    std::map<video::SColor, std::vector<float>> m_lines;
 
 protected:
     virtual void    setDebugMode(int debug_mode) {}
@@ -73,7 +73,7 @@ public:
     void            setDebugMode(DebugModeType mode);
 
     void            beginNextFrame();
-    const std::map<video::SColor, std::vector<btVector3>>& getLines() const { return m_lines; }
+    const std::map<video::SColor, std::vector<float>>& getLines() const { return m_lines; }
 };   // IrrDebugDrawer
 
 #endif
