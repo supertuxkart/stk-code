@@ -206,7 +206,7 @@ void IrrDriver::renderGLSL(float dt)
         IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
         if (debug_drawer != NULL && debug_drawer->debugEnabled())
         {
-            const std::map<video::SColor, std::vector<float>>& lines = debug_drawer->getLines();
+            const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
             std::map<video::SColor, std::vector<float>>::const_iterator it;
 
 
