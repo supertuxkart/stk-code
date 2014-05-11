@@ -51,7 +51,7 @@ void main(void)
     vec3 norm = normalize(cross(ddy, ddx));
     // Workaround for nvidia and skyboxes
     float len = dot(vec3(1.0), abs(cur.xyz));
-    if (len < 0.2 || curdepth > 0.9955) discard;
+    if (len < 0.2) discard;
 
     int x = int(1024. * uv.x), y = int(1024. * uv.y);
     float r = radius / FragPos.z;
