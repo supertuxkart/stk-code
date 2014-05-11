@@ -216,16 +216,14 @@ void IrrDriver::renderGLSL(float dt)
             for (it = lines.begin(); it != lines.end(); it++)
             {
                 UtilShader::ColoredLine::setUniforms(it->first);
-                for (int i = 0; i < it->second.size(); i += 6 * 1024)
+                const std::vector<float> &vertex = it->second;
+                const float *tmp = vertex.data();
+                for (int i = 0; i < vertex.size(); i += 1024 * 6)
                 {
-                    unsigned count = MIN2(it->second.size() - i, 6 * 1024);
-                    glBufferSubData(GL_ARRAY_BUFFER, 0, count, &(it->second.data()[i]));
+                    unsigned count = MIN2(vertex.size() - i, 1024 * 6);
+                    glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
 
                     glDrawArrays(GL_LINES, 0, count / 3);
-
-/*                    draw3DLine(core::vector3df(it->second[i], it->second[i + 1], it->second[i + 2]),
-                        core::vector3df(it->second[i + 3], it->second[i + 4], it->second[i + 5]),
-                        it->first);*/
                 }
             }
             glUseProgram(0);
