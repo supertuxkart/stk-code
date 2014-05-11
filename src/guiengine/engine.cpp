@@ -1048,7 +1048,12 @@ namespace GUIEngine
         const int screen_width = irr_driver->getFrameSize().Width;
         const int screen_height = irr_driver->getFrameSize().Height;
         float scale = std::max(0, screen_width - 640)/564.0f;
-        if (screen_height < 700) scale = std::min(scale, 0.25f); // attempt to compensate for small screens
+
+        // attempt to compensate for small screens
+        if (screen_width < 1200) scale = std::max(0, screen_width - 640) / 750.0f;
+        if (screen_width < 900 || screen_height < 700) scale = std::min(scale, 0.05f);
+
+        Log::info("GUIEngine", "scale: %f", scale);
 
         float normal_text_scale = 0.7f + 0.2f*scale;
         float title_text_scale = 0.2f + 0.2f*scale;

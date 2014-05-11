@@ -389,8 +389,23 @@ void Profiler::draw()
 
         if (hovered_gpu_marker != Q_LAST)
         {
+            static const char *Phase[Q_LAST] =
+            {
+                "Solid Pass 1",
+                "Shadows",
+                "Lights",
+                "SSAO",
+                "Solid Pass 2",
+                "Transparent",
+                "Particles",
+                "Displacement",
+                "Godrays",
+                "Bloom",
+                "Tonemap",
+                "Motion Blur"
+            };
             std::ostringstream oss;
-            oss << "GPU marker " << hovered_gpu_marker << " : " << hovered_gpu_marker_elapsed << " us";
+            oss << Phase[hovered_gpu_marker] << " : " << hovered_gpu_marker_elapsed << " us";
             font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
         }
     }

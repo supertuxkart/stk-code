@@ -85,6 +85,8 @@ extern PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
 extern PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
 extern PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
 extern PFNGLBLENDCOLORPROC glBlendColor;
+extern PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D;
+extern PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
@@ -179,8 +181,13 @@ public:
 GLuint getTextureGLuint(irr::video::ITexture *tex);
 GLuint getDepthTexture(irr::video::ITexture *tex);
 void resetTextureTable();
-void compressTexture(irr::video::ITexture *tex, bool srgb);
+void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
+bool loadCompressedTexture(const std::string& compressed_tex);
+void saveCompressedTexture(const std::string& compressed_tex);
 void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height);
+
+void draw3DLine(const core::vector3df& start,
+    const core::vector3df& end, irr::video::SColor color);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

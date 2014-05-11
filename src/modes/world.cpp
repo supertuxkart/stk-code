@@ -621,8 +621,14 @@ void World::resetAllKarts()
     // Stil wait will all karts are in rest (and handle the case that a kart
     // fell through the ground, which can happen if a kart falls for a long
     // time, therefore having a high speed when hitting the ground.
+    int count = 0;
     while(!all_finished)
     {
+        if (count++ > 100)
+        {
+            Log::error("World", "Infitine loop waiting for all_finished?");
+            break;
+        }
         m_physics->update(1.f/60.f);
         all_finished=true;
         for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)

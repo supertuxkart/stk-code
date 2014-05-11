@@ -544,12 +544,12 @@ B3D, MS3D or X meshes */
 #endif
 
 //! Define _IRR_COMPILE_WITH_BMP_WRITER_ if you want to write .bmp files
-//#define _IRR_COMPILE_WITH_BMP_WRITER_
+#define _IRR_COMPILE_WITH_BMP_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_BMP_WRITER_
 #undef _IRR_COMPILE_WITH_BMP_WRITER_
 #endif
 //! Define _IRR_COMPILE_WITH_JPG_WRITER_ if you want to write .jpg files
-//#define _IRR_COMPILE_WITH_JPG_WRITER_
+#define _IRR_COMPILE_WITH_JPG_WRITER_
 #ifdef NO_IRR_COMPILE_WITH_JPG_WRITER_
 #undef _IRR_COMPILE_WITH_JPG_WRITER_
 #endif

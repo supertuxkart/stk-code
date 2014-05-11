@@ -20,8 +20,11 @@
 #define HEADER_IRR_DEBUG_DRAWER_HPP
 
 #include "btBulletDynamicsCommon.h"
+#include "graphics/glwrap.hpp"
 
 #include "utils/vec3.hpp"
+#include <map>
+#include <vector>
 
 /**
   * \ingroup physics
@@ -38,6 +41,11 @@ public:
                                     DM_NO_KARTS_GRAPHICS = 0x02
                                   };
     DebugModeType   m_debug_mode;
+
+    std::map<video::SColor, std::vector<float> > m_lines;
+
+    Vec3 m_camera_pos;
+
 protected:
     virtual void    setDebugMode(int debug_mode) {}
     /** Callback for bullet: if debug drawing should be done or not.
@@ -65,6 +73,9 @@ public:
     bool            debugEnabled() const         {return m_debug_mode!=0;}
     void            nextDebugMode();
     void            setDebugMode(DebugModeType mode);
+
+    void            beginNextFrame();
+    const std::map<video::SColor, std::vector<float> >& getLines() const { return m_lines; }
 };   // IrrDebugDrawer
 
 #endif

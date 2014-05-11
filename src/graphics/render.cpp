@@ -52,6 +52,9 @@
 
 STKInstancedSceneNode *InstancedBox = 0;
 
+#define MAX2(a, b) ((a) > (b) ? (a) : (b))
+#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+
 void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
@@ -139,8 +142,15 @@ void IrrDriver::renderGLSL(float dt)
 #endif
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
+        m_scene_manager->setActiveCamera(camnode);
 
         renderScene(camnode, glows, dt, track->hasShadows());
+
+        // Render the post-processed scene
+        if (UserConfigParams::m_dynamic_lights)
+            m_post_processing->render(camnode);
+        else
+            glDisable(GL_FRAMEBUFFER_SRGB);
 
         PROFILER_POP_CPU_MARKER();
 
@@ -152,14 +162,6 @@ void IrrDriver::renderGLSL(float dt)
             World::getWorld()->getPhysics()->draw();
     }   // for i<world->getNumKarts()
 
-    PROFILER_PUSH_CPU_MARKER("Postprocessing", 0xFF, 0xFF, 0x00);
-    // Render the post-processed scene
-    if (UserConfigParams::m_dynamic_lights)
-        m_post_processing->render();
-    else
-        glDisable(GL_FRAMEBUFFER_SRGB);
-    PROFILER_POP_CPU_MARKER();
-    
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -198,6 +200,37 @@ void IrrDriver::renderGLSL(float dt)
     drawDebugMeshes();
 #endif
 
+
+    if (world != NULL && world->getPhysics() != NULL)
+    {
+        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+        if (debug_drawer != NULL && debug_drawer->debugEnabled())
+        {
+            const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
+            std::map<video::SColor, std::vector<float> >::const_iterator it;
+
+
+            glUseProgram(UtilShader::ColoredLine::Program);
+            glBindVertexArray(UtilShader::ColoredLine::vao);
+            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+            for (it = lines.begin(); it != lines.end(); it++)
+            {
+                UtilShader::ColoredLine::setUniforms(it->first);
+                const std::vector<float> &vertex = it->second;
+                const float *tmp = vertex.data();
+                for (int i = 0; i < vertex.size(); i += 1024 * 6)
+                {
+                    unsigned count = MIN2(vertex.size() - i, 1024 * 6);
+                    glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
+
+                    glDrawArrays(GL_LINES, 0, count / 3);
+                }
+            }
+            glUseProgram(0);
+            glBindVertexArray(0);
+        }
+    }
+
     PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
     m_video_driver->endScene();
     PROFILER_POP_CPU_MARKER();
@@ -216,20 +249,35 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
 
     const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
 
-    PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
     // Shadows
-    if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
-        UserConfigParams::m_shadows && hasShadow)
     {
-        renderShadows();
+        PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
+        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
+        // To avoid wrong culling, use the largest view possible
+        m_scene_manager->setActiveCamera(m_suncam);
+        if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
+            UserConfigParams::m_shadows && hasShadow)
+            renderShadows();
+        m_scene_manager->setActiveCamera(camnode);
+        PROFILER_POP_CPU_MARKER();
     }
-    PROFILER_POP_CPU_MARKER();
-
-    PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
 
     // Lights
-    renderLights(dt);
-    PROFILER_POP_CPU_MARKER();
+    {
+        PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
+        renderLights(camnode, dt);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    // Handle SSAO
+    {
+        PROFILER_PUSH_CPU_MARKER("- SSAO", 0xFF, 0xFF, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_SSAO));
+        if (UserConfigParams::m_ssao)
+            renderSSAO();
+        PROFILER_POP_CPU_MARKER();
+    }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
     if (!UserConfigParams::m_dynamic_lights)
@@ -268,18 +316,29 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     computeSunVisibility();
     PROFILER_POP_CPU_MARKER();
 
-    // We need to re-render camera due to the per-cam-node hack.
-    PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
-    renderTransparent();
-    PROFILER_POP_CPU_MARKER();
+    // Render transparent
+    {
+        PROFILER_PUSH_CPU_MARKER("- Transparent Pass", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_TRANSPARENT));
+        renderTransparent();
+        PROFILER_POP_CPU_MARKER();
+    }
 
-    PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
-    renderParticles();
-    PROFILER_POP_CPU_MARKER();
+    // Render particles
+    {
+        PROFILER_PUSH_CPU_MARKER("- Particles", 0xFF, 0xFF, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_PARTICLES));
+        renderParticles();
+        PROFILER_POP_CPU_MARKER();
+    }
 
-    PROFILER_PUSH_CPU_MARKER("- Displacement", 0x00, 0x00, 0xFF);
-    renderDisplacement();
-    PROFILER_POP_CPU_MARKER();
+    // Render displacement
+    {
+        PROFILER_PUSH_CPU_MARKER("- Displacement", 0x00, 0x00, 0xFF);
+        ScopedGPUTimer Timer(getGPUTimer(Q_DISPLACEMENT));
+        renderDisplacement();
+        PROFILER_POP_CPU_MARKER();
+    }
 }
 
 // --------------------------------------------
@@ -591,11 +650,18 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
 
         core::matrix4 tmp_matrix;
 
+        // Prevent Matrix without extend
+        if (left == right || up == down)
+        {
+            Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
+            sun_ortho_matrix.push_back(tmp_matrix);
+            continue;
+        }
+
         tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
             up, down,
             30, z);
         m_suncam->setProjectionMatrix(tmp_matrix, true);
-        m_scene_manager->setActiveCamera(m_suncam);
         m_suncam->render();
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -603,7 +669,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
     assert(sun_ortho_matrix.size() == 4);
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
-//    camnode->render();
 
     float *tmp = new float[16 * 8];
 
@@ -632,12 +697,8 @@ void IrrDriver::renderShadows()
     glDrawBuffer(GL_NONE);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
-    {
-        ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
-        m_scene_manager->drawAll(scene::ESNRP_SOLID);
-    }
+    m_scene_manager->drawAll(scene::ESNRP_SOLID);
     glDisable(GL_POLYGON_OFFSET_FILL);
-
 
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
@@ -708,8 +769,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 }
 
 // ----------------------------------------------------------------------------
-#define MAX2(a, b) ((a) > (b) ? (a) : (b))
-#define MIN2(a, b) ((a) > (b) ? (b) : (a))
+
 static LightShader::PointLightInfo PointLightsInfo[MAXLIGHT];
 
 static void renderPointLights(unsigned count)
@@ -735,7 +795,7 @@ static void renderPointLights(unsigned count)
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
 
-void IrrDriver::renderLights(float dt)
+void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 {
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
@@ -757,92 +817,87 @@ void IrrDriver::renderLights(float dt)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     const u32 lightcount = m_lights.size();
-    const core::vector3df &campos =
-        irr_driver->getSceneManager()->getActiveCamera()->getAbsolutePosition();
+    const core::vector3df &campos = camnode->getAbsolutePosition();
 
+    std::vector<LightNode *> BucketedLN[15];
+    for (unsigned int i = 0; i < lightcount; i++)
     {
-        ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
-
-        std::vector<LightNode *> BucketedLN[15];
-        for (unsigned int i = 0; i < lightcount; i++)
+        if (!m_lights[i]->isPointLight())
         {
-            if (!m_lights[i]->isPointLight())
-            {
-                m_lights[i]->render();
-                if (UserConfigParams::m_shadows && World::getWorld()->getTrack()->hasShadows())
-                    m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
-                else
-                    m_post_processing->renderSunlight();
-                continue;
-            }
-            const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
-            unsigned idx = (unsigned)(lightpos.getLength() / 10);
-            if (idx > 14)
-                idx = 14;
-            BucketedLN[idx].push_back(m_lights[i]);
+            m_lights[i]->render();
+            if (UserConfigParams::m_shadows && World::getWorld()->getTrack()->hasShadows())
+                m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
+            else
+                m_post_processing->renderSunlight();
+            continue;
         }
-
-        unsigned lightnum = 0;
-
-        for (unsigned i = 0; i < 15; i++)
-        {
-            for (unsigned j = 0; j < BucketedLN[i].size(); j++)
-            {
-                if (++lightnum >= MAXLIGHT)
-                {
-                    LightNode* light_node = BucketedLN[i].at(j);
-                    light_node->setEnergyMultiplier(0.0f);
-                }
-                else
-                {
-                    LightNode* light_node = BucketedLN[i].at(j);
-
-                    float em = light_node->getEnergyMultiplier();
-                    if (em < 1.0f)
-                    {
-                        light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
-                    }
-
-                    const core::vector3df &pos = light_node->getAbsolutePosition();
-                    PointLightsInfo[lightnum].posX = pos.X;
-                    PointLightsInfo[lightnum].posY = pos.Y;
-                    PointLightsInfo[lightnum].posZ = pos.Z;
-
-                    PointLightsInfo[lightnum].energy = light_node->getEffectiveEnergy();
-
-                    const core::vector3df &col = light_node->getColor();
-                    PointLightsInfo[lightnum].red = col.X;
-                    PointLightsInfo[lightnum].green = col.Y;
-                    PointLightsInfo[lightnum].blue = col.Z;
-                }
-            }
-            if (lightnum > MAXLIGHT)
-            {
-                irr_driver->setLastLightBucketDistance(i * 10);
-                break;
-            }
-        }
-
-        lightnum++;
-
-        renderPointLights(MIN2(lightnum, MAXLIGHT));
-        if (SkyboxCubeMap)
-            m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+        const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
+        unsigned idx = (unsigned)(lightpos.getLength() / 10);
+        if (idx > 14)
+            idx = 14;
+        BucketedLN[idx].push_back(m_lights[i]);
     }
+
+    unsigned lightnum = 0;
+
+    for (unsigned i = 0; i < 15; i++)
+    {
+        for (unsigned j = 0; j < BucketedLN[i].size(); j++)
+        {
+            if (++lightnum >= MAXLIGHT)
+            {
+                LightNode* light_node = BucketedLN[i].at(j);
+                light_node->setEnergyMultiplier(0.0f);
+            }
+            else
+            {
+                LightNode* light_node = BucketedLN[i].at(j);
+
+                float em = light_node->getEnergyMultiplier();
+                if (em < 1.0f)
+                {
+                    light_node->setEnergyMultiplier(std::min(1.0f, em + dt));
+                }
+
+                const core::vector3df &pos = light_node->getAbsolutePosition();
+                PointLightsInfo[lightnum].posX = pos.X;
+                PointLightsInfo[lightnum].posY = pos.Y;
+                PointLightsInfo[lightnum].posZ = pos.Z;
+
+                PointLightsInfo[lightnum].energy = light_node->getEffectiveEnergy();
+
+                const core::vector3df &col = light_node->getColor();
+                PointLightsInfo[lightnum].red = col.X;
+                PointLightsInfo[lightnum].green = col.Y;
+                PointLightsInfo[lightnum].blue = col.Z;
+            }
+        }
+        if (lightnum > MAXLIGHT)
+        {
+            irr_driver->setLastLightBucketDistance(i * 10);
+            break;
+        }
+    }
+
+    lightnum++;
+
+    renderPointLights(MIN2(lightnum, MAXLIGHT));
+    if (SkyboxCubeMap)
+        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     gl_driver->extGlDrawBuffers(1, bufs);
-    // Handle SSAO
-    if (UserConfigParams::m_ssao)
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_SSAO));
-        glClearColor(1., 1., 1., 1.);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-        m_post_processing->renderSSAO();
-        // Blur it to reduce noise.
-        m_post_processing->renderGaussian6Blur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
-            irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
-        glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
-    }
+}
+
+void IrrDriver::renderSSAO()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_SSAO));
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderSSAO();
+    // Blur it to reduce noise.
+    m_post_processing->renderGaussian6Blur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
+        irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
