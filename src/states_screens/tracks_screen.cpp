@@ -75,9 +75,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
 
         if (selection == "random_track")
         {
-            RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-            assert(tabs != NULL);
-
             if (m_random_track_list.empty()) return;
 
             std::string track = m_random_track_list.front();
@@ -148,7 +145,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
 void TracksScreen::beforeAddingWidget()
 {
     Screen::init();
-    // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     tabs->clearAllChildren();
 
@@ -190,6 +186,9 @@ void TracksScreen::init()
     // Reset GP list everytime (accounts for locking changes, etc.)
     gps_widget->clearItems();
 
+    // Ensure that no GP and no track is NULL
+    grand_prix_manager->checkConsistency();
+
     // Build GP list
     const int gpAmount = grand_prix_manager->getNumberOfGrandPrix();
     for (int n=0; n<gpAmount; n++)
@@ -200,16 +199,8 @@ void TracksScreen::init()
         std::vector<std::string> screenshots;
         for (unsigned int t=0; t<tracks.size(); t++)
         {
-            Track* curr = track_manager->getTrack(tracks[t]);
-            if (curr == NULL)
-            {
-                std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId() << "' refers to track '"
-                          << tracks[t] << "', which does not exist.\n";
-            }
-            else
-            {
-                screenshots.push_back(curr->getScreenshotFile());
-            }
+            const Track* curr = track_manager->getTrack(tracks[t]);
+            screenshots.push_back(curr->getScreenshotFile());
         }
         if (screenshots.size() == 0)
         {
@@ -246,7 +237,6 @@ void TracksScreen::init()
 
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
     tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
-
 
     buildTrackList();
 
@@ -286,8 +276,8 @@ void TracksScreen::buildTrackList()
             if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
                 && !curr->hasEasterEggs())
                 continue;
-            if (curr->isArena() || curr->isSoccer()) continue;
-            if (curr->isInternal()) continue;
+            if (curr->isArena() || curr->isSoccer() || curr->isInternal())
+                continue;
 
             if(PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
@@ -316,9 +306,8 @@ void TracksScreen::buildTrackList()
             if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
                 && !curr->hasEasterEggs())
                 continue;
-            if (curr->isArena()) continue;
-            if (curr->isSoccer()) continue;
-            if (curr->isInternal()) continue;
+            if (curr->isArena() || curr->isSoccer() || curr->isInternal())
+                continue;
 
             if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
