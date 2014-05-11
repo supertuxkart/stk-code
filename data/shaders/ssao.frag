@@ -26,9 +26,10 @@ in vec2 uv;
 out float AO;
 
 const float sigma = 1.;
+const float tau = 7.;
 const float beta = 0.0001;
 const float epsilon = .00001;
-const float radius = .1;
+const float radius = 1.;
 const float k = 1.;
 
 #define SAMPLES 16
@@ -37,13 +38,6 @@ const float invSamples = 1. / SAMPLES;
 
 vec3 DecodeNormal(vec2 n);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
-
-vec3 rand(vec2 co)
-{
-    float noiseX = clamp(fract(sin(dot(co ,vec2(12.9898,78.233))) * 43758.5453),0.0,1.0)*2.0-1.0;
-    float noiseY = clamp(fract(sin(dot(co ,vec2(12.9898,78.233)*2.0)) * 43758.5453),0.0,1.0)*2.0-1.0;
-    return vec3(noiseX, noiseY, length(texture(noise_texture, co * pow(3.14159265359, 2.)).xyz));
-}
 
 void main(void)
 {
@@ -59,22 +53,23 @@ void main(void)
     float len = dot(vec3(1.0), abs(cur.xyz));
     if (len < 0.2 || curdepth > 0.9955) discard;
 
-    float randAngle = rand(uv).x;
-    vec2 Xaxis = vec2(cos(randAngle), sin(randAngle));
-    Xaxis = normalize(Xaxis);
-    vec2 Yaxis = vec2(sin(randAngle), -cos(randAngle));
-    Yaxis = normalize(Yaxis);
-
+    int x = int(1024. * uv.x), y = int(1024. * uv.y);
+    float r = radius / FragPos.z;
+    float phi = 30. * (x ^ y) + 10. * x * y;
     float bl = 0.0;
 
     for(int i = 0; i < SAMPLES; ++i) {
-        vec2 occluder_uv = samplePoints[i].x * Xaxis + samplePoints[i].y * Yaxis;
-        occluder_uv *= samplePoints[i].w * radius;
+        float alpha = (i + .5) * invSamples;
+        float theta = 2. * 3.14 * tau * alpha + phi;
+        float h = r * alpha;
+        vec2 occluder_uv = h * vec2(cos(theta), sin(theta));
         occluder_uv += uv;
 
         if (occluder_uv.x < 0. || occluder_uv.x > 1. || occluder_uv.y < 0. || occluder_uv.y > 1.) continue;
 
-        float occluderFragmentDepth = texture(dtex, occluder_uv).x;
+        float m = round(log2(h) + 3.);
+
+        float occluderFragmentDepth = textureLod(dtex, occluder_uv, m).x;
         vec4 OccluderPos = getPosFromUVDepth(vec3(occluder_uv, occluderFragmentDepth), InverseProjectionMatrix);
 
         vec3 vi = (OccluderPos - FragPos).xyz;

@@ -2624,13 +2624,12 @@ namespace FullScreenShader
                     }*/
     }
 
-    void SSAOShader::setUniforms(unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise)
+    void SSAOShader::setUniforms(unsigned TU_dtex, unsigned TU_noise)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
 
-        glUniform1i(FullScreenShader::SSAOShader::uniform_ntex, TU_ntex);
         glUniform1i(FullScreenShader::SSAOShader::uniform_dtex, TU_dtex);
         glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, TU_noise);
     }
