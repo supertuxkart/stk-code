@@ -207,7 +207,7 @@ void IrrDriver::renderGLSL(float dt)
         if (debug_drawer != NULL && debug_drawer->debugEnabled())
         {
             const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
-            std::map<video::SColor, std::vector<float>>::const_iterator it;
+            std::map<video::SColor, std::vector<float> >::const_iterator it;
 
 
             glUseProgram(UtilShader::ColoredLine::Program);
