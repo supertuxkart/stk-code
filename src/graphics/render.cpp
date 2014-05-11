@@ -892,11 +892,11 @@ void IrrDriver::renderSSAO()
     glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_SSAO));
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
-    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
     m_post_processing->renderSSAO();
     // Blur it to reduce noise.
     m_post_processing->renderGaussian6Blur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
-        irr_driver->getFBO(FBO_HALF1), irr_driver->getRenderTargetTexture(RTT_HALF1), UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+        irr_driver->getFBO(FBO_TMP4), irr_driver->getRenderTargetTexture(RTT_TMP4), UserConfigParams::m_width, UserConfigParams::m_height);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
