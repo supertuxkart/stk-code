@@ -206,12 +206,12 @@ void TracksScreen::init()
         }
     }
 
-    // Random GP
+    /*// Random GP - not finished yet
     std::vector<std::string> screenshots;
     screenshots.push_back("gui/main_help.png");
     gps_widget->addAnimatedItem(translations->fribidize("Random"), "Random",
                                 screenshots, 1.5f, 0,
-                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);*/
 
     gps_widget->updateItemDisplay();
 
