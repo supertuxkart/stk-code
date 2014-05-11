@@ -1,4 +1,5 @@
 // From paper http://graphics.cs.williams.edu/papers/AlchemyHPG11/
+// and improvements here http://graphics.cs.williams.edu/papers/SAOHPG12/
 
 uniform sampler2D ntex;
 uniform sampler2D dtex;
@@ -49,10 +50,11 @@ void main(void)
     vec4 cur = texture(ntex, uv);
     float curdepth = texture(dtex, uv).x;
     vec4 FragPos = getPosFromUVDepth(vec3(uv, curdepth), InverseProjectionMatrix);
-	if (FragPos.z < 0.) discard;
 
     // get the normal of current fragment
-    vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+    vec3 ddx = dFdx(FragPos.xyz);
+    vec3 ddy = dFdy(FragPos.xyz);
+    vec3 norm = normalize(cross(ddy, ddx));
     // Workaround for nvidia and skyboxes
     float len = dot(vec3(1.0), abs(cur.xyz));
     if (len < 0.2 || curdepth > 0.9955) discard;
