@@ -208,24 +208,28 @@ void IrrDriver::renderGLSL(float dt)
         {
             const std::map<video::SColor, std::vector<float>>& lines = debug_drawer->getLines();
             std::map<video::SColor, std::vector<float>>::const_iterator it;
+
+
+            glUseProgram(UtilShader::ColoredLine::Program);
+            glBindVertexArray(UtilShader::ColoredLine::vao);
+            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
             for (it = lines.begin(); it != lines.end(); it++)
             {
+                UtilShader::ColoredLine::setUniforms(it->first);
                 for (int i = 0; i < it->second.size(); i += 6 * 1024)
                 {
                     unsigned count = MIN2(it->second.size() - i, 6 * 1024);
-                    glBindVertexArray(UtilShader::ColoredLine::vao);
-                    glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
                     glBufferSubData(GL_ARRAY_BUFFER, 0, count, &(it->second.data()[i]));
 
-                    glUseProgram(UtilShader::ColoredLine::Program);
-                    UtilShader::ColoredLine::setUniforms(it->first);
-                    glDrawArrays(GL_LINES, 0, count / 6);
+                    glDrawArrays(GL_LINES, 0, count / 3);
 
 /*                    draw3DLine(core::vector3df(it->second[i], it->second[i + 1], it->second[i + 2]),
                         core::vector3df(it->second[i + 3], it->second[i + 4], it->second[i + 5]),
                         it->first);*/
                 }
             }
+            glUseProgram(0);
+            glBindVertexArray(0);
         }
     }
 
