@@ -188,12 +188,7 @@ void TracksScreen::init()
             const Track* curr = track_manager->getTrack(tracks[t]);
             screenshots.push_back(curr->getScreenshotFile());
         }
-        if (screenshots.size() == 0)
-        {
-            std::cerr << "/!\\ WARNING: Grand Prix '" << gp->getId()
-                      << "' does not contain any valid track.\n";
-            screenshots.push_back("gui/main_help.png");
-        }
+        assert(screenshots.size() > 0);
 
         if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()))
         {
