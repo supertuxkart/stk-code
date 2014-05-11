@@ -146,6 +146,43 @@ void IrrDriver::renderGLSL(float dt)
 
         renderScene(camnode, glows, dt, track->hasShadows());
 
+        // Debug physic
+        // Note that drawAll must be called before rendering
+        // the bullet debug view, since otherwise the camera
+        // is not set up properly. This is only used for
+        // the bullet debug view.
+        if (UserConfigParams::m_artist_debug_mode)
+            World::getWorld()->getPhysics()->draw();
+        if (world != NULL && world->getPhysics() != NULL)
+        {
+            IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
+            if (debug_drawer != NULL && debug_drawer->debugEnabled())
+            {
+                const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
+                std::map<video::SColor, std::vector<float> >::const_iterator it;
+
+
+                glUseProgram(UtilShader::ColoredLine::Program);
+                glBindVertexArray(UtilShader::ColoredLine::vao);
+                glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
+                for (it = lines.begin(); it != lines.end(); it++)
+                {
+                    UtilShader::ColoredLine::setUniforms(it->first);
+                    const std::vector<float> &vertex = it->second;
+                    const float *tmp = vertex.data();
+                    for (int i = 0; i < vertex.size(); i += 1024 * 6)
+                    {
+                        unsigned count = MIN2(vertex.size() - i, 1024 * 6);
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
+
+                        glDrawArrays(GL_LINES, 0, count / 3);
+                    }
+                }
+                glUseProgram(0);
+                glBindVertexArray(0);
+            }
+        }
+
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
             m_post_processing->render(camnode);
@@ -153,13 +190,6 @@ void IrrDriver::renderGLSL(float dt)
             glDisable(GL_FRAMEBUFFER_SRGB);
 
         PROFILER_POP_CPU_MARKER();
-
-        // Note that drawAll must be called before rendering
-        // the bullet debug view, since otherwise the camera
-        // is not set up properly. This is only used for
-        // the bullet debug view.
-        if (UserConfigParams::m_artist_debug_mode)
-            World::getWorld()->getPhysics()->draw();
     }   // for i<world->getNumKarts()
 
     glBindVertexArray(0);
@@ -200,36 +230,6 @@ void IrrDriver::renderGLSL(float dt)
     drawDebugMeshes();
 #endif
 
-
-    if (world != NULL && world->getPhysics() != NULL)
-    {
-        IrrDebugDrawer* debug_drawer = world->getPhysics()->getDebugDrawer();
-        if (debug_drawer != NULL && debug_drawer->debugEnabled())
-        {
-            const std::map<video::SColor, std::vector<float> >& lines = debug_drawer->getLines();
-            std::map<video::SColor, std::vector<float> >::const_iterator it;
-
-
-            glUseProgram(UtilShader::ColoredLine::Program);
-            glBindVertexArray(UtilShader::ColoredLine::vao);
-            glBindBuffer(GL_ARRAY_BUFFER, UtilShader::ColoredLine::vbo);
-            for (it = lines.begin(); it != lines.end(); it++)
-            {
-                UtilShader::ColoredLine::setUniforms(it->first);
-                const std::vector<float> &vertex = it->second;
-                const float *tmp = vertex.data();
-                for (int i = 0; i < vertex.size(); i += 1024 * 6)
-                {
-                    unsigned count = MIN2(vertex.size() - i, 1024 * 6);
-                    glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
-
-                    glDrawArrays(GL_LINES, 0, count / 3);
-                }
-            }
-            glUseProgram(0);
-            glBindVertexArray(0);
-        }
-    }
 
     PROFILER_PUSH_CPU_MARKER("EndSccene", 0x45, 0x75, 0x45);
     m_video_driver->endScene();
