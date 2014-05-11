@@ -712,7 +712,7 @@ public:
     static float SSAOSamples[64];
     
     static void init();
-    static void setUniforms(unsigned TU_ntex, unsigned TU_dtex, unsigned TU_noise);
+    static void setUniforms(unsigned TU_dtex, unsigned TU_noise);
 };
 
 class FogShader
