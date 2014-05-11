@@ -29,8 +29,8 @@ const float sigma = 1.;
 const float tau = 7.;
 const float beta = 0.0001;
 const float epsilon = .00001;
-const float radius = 1.;
-const float k = 1.;
+const float radius = 2.;
+const float k = 1.5;
 
 #define SAMPLES 16
 
@@ -67,7 +67,7 @@ void main(void)
 
         if (occluder_uv.x < 0. || occluder_uv.x > 1. || occluder_uv.y < 0. || occluder_uv.y > 1.) continue;
 
-        float m = round(log2(h)) + 7.;
+        float m = round(log2(h)) + 6.;
 
         float occluderFragmentDepth = textureLod(dtex, occluder_uv, m).x;
         vec4 OccluderPos = getPosFromUVDepth(vec3(occluder_uv, occluderFragmentDepth), InverseProjectionMatrix);
