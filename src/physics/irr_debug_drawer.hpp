@@ -42,7 +42,7 @@ public:
                                   };
     DebugModeType   m_debug_mode;
 
-    std::map<video::SColor, std::vector<float>> m_lines;
+    std::map<video::SColor, std::vector<float> > m_lines;
 
     Vec3 m_camera_pos;
 
