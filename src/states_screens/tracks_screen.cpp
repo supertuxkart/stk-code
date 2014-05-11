@@ -134,7 +134,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
     else if (name == "trackgroups")
     {
         RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-        assert( tabs != NULL );
         UserConfigParams::m_last_used_track_group = tabs->getSelectionIDString(0);
         buildTrackList();
     }
@@ -151,8 +150,6 @@ void TracksScreen::beforeAddingWidget()
     Screen::init();
     // Dynamically add tabs
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
-
     tabs->clearAllChildren();
 
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
@@ -179,7 +176,6 @@ void TracksScreen::beforeAddingWidget()
     }
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( tracks_widget != NULL );
     tracks_widget->setItemCountHint( track_manager->getNumberOfTracks()+1 );
 }
 
@@ -188,8 +184,6 @@ void TracksScreen::beforeAddingWidget()
 void TracksScreen::init()
 {
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
-    assert(gps_widget != NULL);
-
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
@@ -201,7 +195,6 @@ void TracksScreen::init()
     for (int n=0; n<gpAmount; n++)
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
-
         const std::vector<std::string> tracks = gp->getTrackNames(true);
 
         std::vector<std::string> screenshots;
@@ -242,7 +235,7 @@ void TracksScreen::init()
     }
 
     // Random GP
-    /std::vector<std::string> screenshots;
+    std::vector<std::string> screenshots;
     screenshots.push_back("gui/main_help.png");
     gps_widget->addAnimatedItem(translations->fribidize("Random"), "Random",
                                 screenshots, 1.5f, 0,
@@ -252,7 +245,6 @@ void TracksScreen::init()
 
 
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
     tabs->select(UserConfigParams::m_last_used_track_group, PLAYER_ID_GAME_MASTER);
 
 
@@ -275,10 +267,7 @@ void TracksScreen::init()
 void TracksScreen::buildTrackList()
 {
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( tracks_widget != NULL );
-
     RibbonWidget* tabs = this->getWidget<RibbonWidget>("trackgroups");
-    assert( tabs != NULL );
 
     // Reset track list everytime (accounts for locking changes, etc.)
     tracks_widget->clearItems();
@@ -359,7 +348,6 @@ void TracksScreen::buildTrackList()
 void TracksScreen::setFocusOnTrack(const std::string& trackName)
 {
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
-    assert( tracks_widget != NULL );
 
     // only the game master can select tracks, so it's safe to use 'PLAYER_ID_GAME_MASTER'
     tracks_widget->setSelection(trackName, PLAYER_ID_GAME_MASTER, true);
@@ -370,7 +358,6 @@ void TracksScreen::setFocusOnTrack(const std::string& trackName)
 void TracksScreen::setFocusOnGP(const std::string& gpName)
 {
     DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
-    assert( gps_widget != NULL );
 
     // only the game master can select tracks/GPs, so it's safe to use 'PLAYER_ID_GAME_MASTER'
     gps_widget->setSelection(gpName, PLAYER_ID_GAME_MASTER, true);
