@@ -46,19 +46,8 @@ DEFINE_SCREEN_SINGLETON( TracksScreen );
 
 // -----------------------------------------------------------------------------
 
-TracksScreen::TracksScreen() : Screen("tracks.stkgui")
-{
-}
-
-// -----------------------------------------------------------------------------
-
-void TracksScreen::loadedFromFile()
-{
-}
-
-// -----------------------------------------------------------------------------
-
-void TracksScreen::eventCallback(Widget* widget, const std::string& name, const int playerID)
+void TracksScreen::eventCallback(Widget* widget, const std::string& name,
+                                 const int playerID)
 {
     // -- track selection screen
     if (name == "tracks")
@@ -87,7 +76,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 ITexture* screenshot =
                     irr_driver->getTexture(clickedTrack->getScreenshotFile(),
                                            "While loading screenshot for track '%s':",
-                                           clickedTrack->getFilename()   );
+                                           clickedTrack->getFilename());
 
                 new TrackInfoDialog(selection, clickedTrack->getIdent(),
                                     translations->fribidize(clickedTrack->getName()),
@@ -108,9 +97,9 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
             if (clickedTrack != NULL)
             {
                 ITexture* screenshot =
-                    irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                            "While loading screenshot for track '%s'",
-                                            clickedTrack->getFilename());
+                    irr_driver->getTexture(clickedTrack->getScreenshotFile(),
+                                           "While loading screenshot for track '%s'",
+                                           clickedTrack->getFilename());
 
                 new TrackInfoDialog(selection, clickedTrack->getIdent(),
                                     translations->fribidize(clickedTrack->getName()),
@@ -164,12 +153,9 @@ void TracksScreen::beforeAddingWidget()
     //I18N: track group name
     FOR_GETTEXT_ONLY( _("Add-Ons") )
 
-    // add others after
+    // add behind the other categories
     for (int n=0; n<group_amount; n++)
-    {
-        // try to translate the group name
         tabs->addTextChild( _(groups[n].c_str()), groups[n] );
-    }
 
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     tracks_widget->setItemCountHint( track_manager->getNumberOfTracks()+1 );
@@ -179,7 +165,7 @@ void TracksScreen::beforeAddingWidget()
 
 void TracksScreen::init()
 {
-    DynamicRibbonWidget* gps_widget = this->getWidget<DynamicRibbonWidget>("gps");
+    DynamicRibbonWidget* gps_widget    = this->getWidget<DynamicRibbonWidget>("gps");
     DynamicRibbonWidget* tracks_widget = this->getWidget<DynamicRibbonWidget>("tracks");
     assert(tracks_widget != NULL);
 
