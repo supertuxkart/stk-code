@@ -44,6 +44,8 @@ public:
 
     std::map<video::SColor, std::vector<float>> m_lines;
 
+    Vec3 m_camera_pos;
+
 protected:
     virtual void    setDebugMode(int debug_mode) {}
     /** Callback for bullet: if debug drawing should be done or not.
