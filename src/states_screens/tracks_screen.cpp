@@ -245,64 +245,36 @@ void TracksScreen::buildTrackList()
     m_random_track_list.clear();
 
     const std::string curr_group_name = tabs->getSelectionIDString(0);
+    const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
+
+    int trackAmount = (curr_group_name == ALL_TRACK_GROUPS_ID) ?
+                      track_manager->getNumberOfTracks() :
+                      curr_group.size();
 
     // Build track list
-    if (curr_group_name == ALL_TRACK_GROUPS_ID)
+    for (int n=0; n<trackAmount; n++)
     {
-        const int trackAmount = track_manager->getNumberOfTracks();
+        int pos = (curr_group_name == ALL_TRACK_GROUPS_ID) ? n : curr_group[n];
+        Track* curr = track_manager->getTrack(pos);
 
-        for (int n=0; n<trackAmount; n++)
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+            && !curr->hasEasterEggs())
+            continue;
+        if (curr->isArena() || curr->isSoccer() || curr->isInternal())
+            continue;
+
+        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
         {
-            Track* curr = track_manager->getTrack( n );
-            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
-                && !curr->hasEasterEggs())
-                continue;
-            if (curr->isArena() || curr->isSoccer() || curr->isInternal())
-                continue;
-
-            if(PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                       "locked", curr->getScreenshotFile(), LOCKED_BADGE,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
-                                       curr->getScreenshotFile(), 0,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-                m_random_track_list.push_back(curr->getIdent());
-            }
+            tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
+                                   "locked", curr->getScreenshotFile(), LOCKED_BADGE,
+                                   IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
-
-    }
-    else
-    {
-        const std::vector<int>& curr_group = track_manager->getTracksInGroup( curr_group_name );
-        const int trackAmount = curr_group.size();
-
-        for (int n=0; n<trackAmount; n++)
+        else
         {
-            Track* curr = track_manager->getTrack( curr_group[n] );
-            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
-                && !curr->hasEasterEggs())
-                continue;
-            if (curr->isArena() || curr->isSoccer() || curr->isInternal())
-                continue;
-
-            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
-                                       "locked", curr->getScreenshotFile(), LOCKED_BADGE,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                tracks_widget->addItem(translations->fribidize(curr->getName()), curr->getIdent(),
-                                       curr->getScreenshotFile(), 0 /* no badge */,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-                m_random_track_list.push_back(curr->getIdent());
-            }
+            tracks_widget->addItem(translations->fribidize(curr->getName()),
+                                   curr->getIdent(), curr->getScreenshotFile(),
+                                   0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            m_random_track_list.push_back(curr->getIdent());
         }
     }
 
