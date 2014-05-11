@@ -67,7 +67,7 @@ void main(void)
 
         if (occluder_uv.x < 0. || occluder_uv.x > 1. || occluder_uv.y < 0. || occluder_uv.y > 1.) continue;
 
-        float m = round(log2(h) + 3.);
+        float m = round(log2(h)) + 7.;
 
         float occluderFragmentDepth = textureLod(dtex, occluder_uv, m).x;
         vec4 OccluderPos = getPosFromUVDepth(vec3(occluder_uv, occluderFragmentDepth), InverseProjectionMatrix);
