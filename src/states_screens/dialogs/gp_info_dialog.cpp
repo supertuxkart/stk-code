@@ -83,17 +83,8 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         const int from_y = y1 + height_of_one_line*(t+1);
 
         Track* track = track_manager->getTrack(tracks[t]);
-        stringw lineText;
-        if (track == NULL)
-        {
-            lineText = L"MISSING : ";
-            lineText.append( stringw(tracks[t].c_str()) );
-            gp_ok = false;
-        }
-        else
-        {
-            lineText = track->getName();
-        }
+        assert(track != NULL);
+        stringw lineText = track->getName();
 
         LabelWidget* widget = new LabelWidget();
         widget->setText(translations->fribidize(lineText), false);
@@ -195,7 +186,6 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->getIrrlichtElement()->setTabGroup(false);
 
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-
 }
 
 // ------------------------------------------------------------------------------------------------------

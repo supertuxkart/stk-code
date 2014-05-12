@@ -32,23 +32,24 @@ namespace GUIEngine
  */
 class GPInfoDialog : public GUIEngine::ModalDialog
 {
+private:
     std::string m_gp_ident;
     GUIEngine::IconButtonWidget* m_screenshot_widget;
-    
     float m_curr_time;
-    
+
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
+     * atm only used in track_screen.cpp
      */
-    GPInfoDialog(const std::string& gpIdent, const float percentWidth, const float percentHeight);
+    GPInfoDialog(const std::string& gpIdent, const float percentWidth,
+                 const float percentHeight);
     virtual ~GPInfoDialog();
-    
+
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual void onUpdate(float dt);
 
+    virtual void onUpdate(float dt);
 };
 
 #endif
