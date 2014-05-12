@@ -331,6 +331,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
+    if (!UserConfigParams::m_dynamic_lights)
+        return;
 
     // Render displacement
     {
