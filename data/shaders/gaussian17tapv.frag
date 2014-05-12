@@ -1,38 +1,32 @@
-// From http://rastergrid.com/blog/2010/09/efficient-gaussian-blur-with-linear-sampling/
+// From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch40.html
 
 uniform sampler2D tex;
 uniform vec2 pixel;
-
+uniform float sigma = 5.;
 
 in vec2 uv;
 out vec4 FragColor;
 
 void main()
 {
-
     float X = uv.x;
     float Y = uv.y;
 
-    float offset[5] = {
-        0.,
-        1.41176470588235,
-        3.29411764705882,
-        5.17647058823529,
-        7.05882352941176
-    };
-    float weight[5] = {
-        0.196380615234375,
-        0.1888427734375,
-        0.03631591796875,
-        0.0020751953125,
-        0.000015258789062
-    };
 
-    vec4 sum = texture(tex, vec2(X, Y)) * weight[0];
-    for (int i = 1; i < 5; i++) {
-        sum += texture(tex, vec2(X, Y - offset[i] * pixel.y)) * weight[i];
-        sum += texture(tex, vec2(X, Y + offset[i] * pixel.y)) * weight[i];
+    float g0, g1, g2;
+    g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);
+    g1 = exp(-0.5 / (sigma * sigma));
+    g2 = g1 * g1;
+    vec4 sum = texture(tex, vec2(X, Y)) * g0;
+    g0 *= g1;
+    g1 *= g2;
+    for (int i = 1; i < 9; i++) {
+        sum += texture(tex, vec2(X, Y - i * pixel.y)) * g0;
+        sum += texture(tex, vec2(X, Y + i * pixel.y)) * g0;
+        g0 *= g1;
+        g1 *= g2;
     }
 
     FragColor = sum;
 }
+
