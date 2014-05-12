@@ -423,11 +423,11 @@ void PostProcessing::renderSSAO()
 
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_LINEAR, GL_LINEAR);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
-    setTexture(2, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
+    setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(0, 1, 2);
+    FullScreenShader::SSAOShader::setUniforms(0, 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
