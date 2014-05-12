@@ -789,7 +789,7 @@ static void renderPointLights(unsigned count)
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     LightShader::PointLightShader
                ::setUniforms(core::vector2df(float(UserConfigParams::m_width),
-                             float(UserConfigParams::m_height) ), 
+                             float(UserConfigParams::m_height) ),
                              200, 0, 1);
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
@@ -870,6 +870,9 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
                 PointLightsInfo[lightnum].red = col.X;
                 PointLightsInfo[lightnum].green = col.Y;
                 PointLightsInfo[lightnum].blue = col.Z;
+
+                // Light radius
+                PointLightsInfo[lightnum].radius = 20 * light_node->getEffectiveEnergy();
             }
         }
         if (lightnum > MAXLIGHT)
