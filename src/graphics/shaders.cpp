@@ -1825,6 +1825,7 @@ namespace LightShader
     GLuint PointLightShader::attrib_Position;
     GLuint PointLightShader::attrib_Color;
     GLuint PointLightShader::attrib_Energy;
+    GLuint PointLightShader::attrib_Radius;
     GLuint PointLightShader::uniform_ntex;
     GLuint PointLightShader::uniform_dtex;
     GLuint PointLightShader::uniform_spec;
@@ -1843,6 +1844,7 @@ namespace LightShader
         attrib_Position = glGetAttribLocation(Program, "Position");
         attrib_Color = glGetAttribLocation(Program, "Color");
         attrib_Energy = glGetAttribLocation(Program, "Energy");
+        attrib_Radius = glGetAttribLocation(Program, "Radius");
         uniform_ntex = glGetUniformLocation(Program, "ntex");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_spec = glGetUniformLocation(Program, "spec");
@@ -1861,10 +1863,13 @@ namespace LightShader
         glVertexAttribPointer(attrib_Energy, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(3 * sizeof(float)));
         glEnableVertexAttribArray(attrib_Color);
         glVertexAttribPointer(attrib_Color, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(4 * sizeof(float)));
+        glEnableVertexAttribArray(attrib_Radius);
+        glVertexAttribPointer(attrib_Radius, 1, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), (GLvoid*)(7 * sizeof(float)));
 
         glVertexAttribDivisor(attrib_Position, 1);
         glVertexAttribDivisor(attrib_Energy, 1);
         glVertexAttribDivisor(attrib_Color, 1);
+        glVertexAttribDivisor(attrib_Radius, 1);
     }
 
     void PointLightShader::setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
