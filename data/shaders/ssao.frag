@@ -5,6 +5,7 @@ uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2D noise_texture;
 uniform vec4 samplePoints[16];
+uniform vec2 screen = vec2(1680, 1050);
 
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
@@ -26,11 +27,11 @@ in vec2 uv;
 out float AO;
 
 const float sigma = 1.;
-const float tau = 7.;
+const float tau = 2.;
 const float beta = 0.0001;
 const float epsilon = .00001;
-const float radius = 2.;
-const float k = 1.5;
+const float radius = 1.;
+const float k = 1.;
 
 #define SAMPLES 16
 
@@ -53,7 +54,7 @@ void main(void)
     float len = dot(vec3(1.0), abs(cur.xyz));
     if (len < 0.2) discard;
 
-    int x = int(1024. * uv.x), y = int(1024. * uv.y);
+    int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     float r = radius / FragPos.z;
     float phi = 30. * (x ^ y) + 10. * x * y;
     float bl = 0.0;
@@ -62,12 +63,15 @@ void main(void)
         float alpha = (i + .5) * invSamples;
         float theta = 2. * 3.14 * tau * alpha + phi;
         float h = r * alpha;
-        vec2 occluder_uv = h * vec2(cos(theta), sin(theta));
-        occluder_uv += uv;
+        vec2 occluder_uv = h * vec2(cos(theta), sin(theta)) * screen;
+        occluder_uv += gl_FragCoord.xy;
+
+        float m = round(log2(h)) + 7;
+        ivec2 ioccluder_uv = ivec2(occluder_uv);
+        occluder_uv = (ioccluder_uv >> int(m)) << int(m);
+        occluder_uv /= screen;
 
         if (occluder_uv.x < 0. || occluder_uv.x > 1. || occluder_uv.y < 0. || occluder_uv.y > 1.) continue;
-
-        float m = round(log2(h)) + 7.;
 
         float occluderFragmentDepth = textureLod(dtex, occluder_uv, m).x;
         vec4 OccluderPos = getPosFromUVDepth(vec3(occluder_uv, occluderFragmentDepth), InverseProjectionMatrix);
