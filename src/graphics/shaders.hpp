@@ -707,12 +707,12 @@ class SSAOShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints;
+    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints, uniform_screen;
     static GLuint vao;
     static float SSAOSamples[64];
     
     static void init();
-    static void setUniforms(unsigned TU_dtex, unsigned TU_noise);
+    static void setUniforms(const core::vector2df &screen, unsigned TU_dtex, unsigned TU_noise);
 };
 
 class FogShader

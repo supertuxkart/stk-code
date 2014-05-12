@@ -2497,6 +2497,7 @@ namespace FullScreenShader
     GLuint SSAOShader::uniform_dtex;
     GLuint SSAOShader::uniform_noise_texture;
     GLuint SSAOShader::uniform_samplePoints;
+    GLuint SSAOShader::uniform_screen;
     GLuint SSAOShader::vao;
     float SSAOShader::SSAOSamples[64];
 
@@ -2511,6 +2512,7 @@ namespace FullScreenShader
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_noise_texture = glGetUniformLocation(Program, "noise_texture");
         uniform_samplePoints = glGetUniformLocation(Program, "samplePoints[0]");
+        uniform_screen = glGetUniformLocation(Program, "screen");
         vao = createVAO(Program);
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -2629,14 +2631,15 @@ namespace FullScreenShader
                     }*/
     }
 
-    void SSAOShader::setUniforms(unsigned TU_dtex, unsigned TU_noise)
+    void SSAOShader::setUniforms(const core::vector2df &screen, unsigned TU_dtex, unsigned TU_noise)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
-        glUniform4fv(FullScreenShader::SSAOShader::uniform_samplePoints, 16, FullScreenShader::SSAOShader::SSAOSamples);
+        glUniform4fv(uniform_samplePoints, 16, SSAOSamples);
+        glUniform2f(uniform_screen, screen.X, screen.Y);
 
-        glUniform1i(FullScreenShader::SSAOShader::uniform_dtex, TU_dtex);
-        glUniform1i(FullScreenShader::SSAOShader::uniform_noise_texture, TU_noise);
+        glUniform1i(uniform_dtex, TU_dtex);
+        glUniform1i(uniform_noise_texture, TU_noise);
     }
 
     GLuint FogShader::Program;

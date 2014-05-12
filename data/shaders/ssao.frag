@@ -5,7 +5,7 @@ uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2D noise_texture;
 uniform vec4 samplePoints[16];
-uniform vec2 screen = vec2(1680, 1050);
+uniform vec2 screen;
 
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
