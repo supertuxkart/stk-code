@@ -610,6 +610,16 @@ public:
     static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
 };
 
+class Gaussian17TapHShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_pixel;
+    static GLuint vao;
+
+    static void init();
+};
+
 class Gaussian6HBlurShader
 {
 public:
@@ -621,6 +631,16 @@ public:
 };
 
 class Gaussian3HBlurShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_pixel;
+    static GLuint vao;
+
+    static void init();
+};
+
+class Gaussian17TapVShader
 {
 public:
     static GLuint Program;

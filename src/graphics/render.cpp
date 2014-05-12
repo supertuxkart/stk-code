@@ -898,7 +898,7 @@ void IrrDriver::renderSSAO()
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
     m_post_processing->renderSSAO();
     // Blur it to reduce noise.
-    m_post_processing->renderGaussian6Blur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
+    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
         irr_driver->getFBO(FBO_TMP4), irr_driver->getRenderTargetTexture(RTT_TMP4), UserConfigParams::m_width, UserConfigParams::m_height);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }

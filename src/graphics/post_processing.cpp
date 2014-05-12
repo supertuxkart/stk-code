@@ -383,6 +383,39 @@ void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
     }
 }
 
+void PostProcessing::renderGaussian17TapBlur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height)
+{
+    float inv_width = 1.f / width, inv_height = 1.f / height;
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
+        glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
+
+        glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
+
+        setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+        glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
+
+        glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
+
+        setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+}
+
 void PostProcessing::renderPassThrough(GLuint tex)
 {
 
