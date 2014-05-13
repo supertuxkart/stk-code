@@ -341,6 +341,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         renderDisplacement();
         PROFILER_POP_CPU_MARKER();
     }
+    // Ensure that no object will be drawn after that by using invalid pass
+    irr_driver->setPhase(PASS_COUNT);
 }
 
 // --------------------------------------------
