@@ -22,8 +22,8 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -39,28 +39,38 @@ using namespace irr::gui;
 using namespace irr::core;
 
 // -----------------------------------------------------------------------------
-
-PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, const float h) : ModalDialog(w, h)
+/** Creates a modal dialog with given percentage of screen width and height.
+ */
+PlayerInfoDialog::PlayerInfoDialog(PlayerProfile* player, const float w, 
+                                  const float h)
+                : ModalDialog(w, h)
 {
     m_player = player;
+    doInit();
 
     showRegularDialog();
-}
+}   // PlayerInfoDialog
 
 // -----------------------------------------------------------------------------
-
+/** When the dialog is finished, select the just edited player again in the
+ *  option screen.
+ */
 PlayerInfoDialog::~PlayerInfoDialog()
 {
     if (m_player != NULL)
     {
-        OptionsScreenPlayers::getInstance()->selectPlayer( translations->fribidize(m_player->getName()) );
+        OptionsScreenPlayers::getInstance()->selectPlayer( 
+                                translations->fribidize(m_player->getName()) );
     }
-}
+}   // ~PlayerInfoDialog
 
 // -----------------------------------------------------------------------------
+/** Show the current data of this player.
+ */
 void PlayerInfoDialog::showRegularDialog()
 {
-    clearWindow();
+    if (m_irrlicht_window)
+        clearWindow();
 
     const int y1 = m_area.getHeight()/6;
     const int y2 = m_area.getHeight()*2/6;
@@ -91,7 +101,8 @@ void PlayerInfoDialog::showRegularDialog()
         //I18N: In the player info dialog
         widget->setText( _("Rename") );
 
-        const int textWidth = font->getDimension( widget->getText().c_str() ).Width + 40;
+        const int textWidth = 
+                    font->getDimension( widget->getText().c_str() ).Width + 40;
 
         widget->m_x = m_area.getWidth()/2 - textWidth/2;
         widget->m_y = y2;
@@ -138,14 +149,14 @@ void PlayerInfoDialog::showRegularDialog()
     }
 
     textCtrl->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-}
+}   // showRegularDialog
 
 // -----------------------------------------------------------------------------
-
+/** Changes this dialog to confirm the changes.
+ */
 void PlayerInfoDialog::showConfirmDialog()
 {
     clearWindow();
-
 
     IGUIFont* font = GUIEngine::getFont();
     const int textHeight = GUIEngine::getFontHeight();
@@ -156,9 +167,10 @@ void PlayerInfoDialog::showConfirmDialog()
         _("Do you really want to delete player '%s' ?", m_player->getName());
 
 
-    if (PlayerManager::get()->getCurrentPlayer() == m_player)
+    if (PlayerManager::getCurrentPlayer() == m_player)
     {
-        message = _("You cannot delete this player because it is currently in use.");
+        message = _("You cannot delete this player "
+                    "because it is currently in use.");
     }
 
     core::rect< s32 > area_left(5, 0, m_area.getWidth()-5, m_area.getHeight()/2);
@@ -167,11 +179,12 @@ void PlayerInfoDialog::showConfirmDialog()
     // we can add irrlicht labels directly
     // (more complicated uses require the use of our widget set)
     IGUIStaticText* a = GUIEngine::getGUIEnv()->addStaticText( message.c_str(),
-                                              area_left, false /* border */, true /* word wrap */,
+                                              area_left, false /* border */,
+                                              true /* word wrap */,
                                               m_irrlicht_window);
     a->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
-    if (PlayerManager::get()->getCurrentPlayer() != m_player)
+    if (PlayerManager::getCurrentPlayer() != m_player)
     {
         ButtonWidget* widget = new ButtonWidget();
         widget->m_properties[PROP_ID] = "confirmremove";
@@ -212,22 +225,23 @@ void PlayerInfoDialog::showConfirmDialog()
         widget->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
     }
 
-}
+}   // showConfirmDialog
 
 // -----------------------------------------------------------------------------
 
 void PlayerInfoDialog::onEnterPressedInternal()
 {
-}
+}   // onEnterPressedInternal
 
 // -----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation 
+                 PlayerInfoDialog::processEvent(const std::string& eventSource)
 {
     if (eventSource == "renameplayer")
     {
         // accept entered name
-        stringw playerName = textCtrl->getText().trim();
+        stringw player_name = textCtrl->getText().trim();
 
         const int player_amount =  PlayerManager::get()->getNumPlayers();
         for(int n=0; n<player_amount; n++)
@@ -235,7 +249,7 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
             const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
             if (player == m_player) continue;
 
-            if (player->getName() == playerName)
+            if (player->getName() == player_name)
             {
                 ButtonWidget* label = getWidget<ButtonWidget>("renameplayer");
                 label->setBadge(BAD_BADGE);
@@ -244,9 +258,9 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
             }
         }
 
-        if (playerName.size() <= 0) return GUIEngine::EVENT_BLOCK;
+        if (player_name.size() <= 0) return GUIEngine::EVENT_BLOCK;
 
-        OptionsScreenPlayers::getInstance()->renamePlayer( playerName, m_player );
+        OptionsScreenPlayers::getInstance()->renamePlayer(player_name,m_player);
 
         // irrLicht is too stupid to remove focus from deleted widgets
         // so do it by hand
@@ -292,7 +306,7 @@ GUIEngine::EventPropagation PlayerInfoDialog::processEvent(const std::string& ev
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
-}
+}    // processEvent
 
 // -----------------------------------------------------------------------------
 

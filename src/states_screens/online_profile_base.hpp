@@ -29,14 +29,17 @@
 namespace GUIEngine { class Widget; }
 
 
-/**
-  * \brief Online profile base screen
-  * \ingroup states_screens
-  */
+/** Online profile base screen. Used for displaying friends, achievements,
+ *  overview, and settings. It handles the tabs which are common to each
+ *  of those screens, and keeps track of the profile to display.
+ * \ingroup states_screens
+ */
 class OnlineProfileBase : public GUIEngine::Screen
 {
 protected:
     OnlineProfileBase(const char* filename);
+
+    /** Pointer to the various widgets on the screen. */
     GUIEngine::LabelWidget * m_header;
     GUIEngine::RibbonWidget* m_profile_tabs;
     GUIEngine::IconButtonWidget * m_overview_tab;
@@ -44,7 +47,8 @@ protected:
     GUIEngine::IconButtonWidget * m_achievements_tab;
     GUIEngine::IconButtonWidget * m_settings_tab;
 
-    Online::Profile *           m_visiting_profile;
+    /** The profile that should be shown. */
+    Online::OnlineProfile *m_visiting_profile;
 
 public:
 
@@ -52,7 +56,9 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID) OVERRIDE;
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name,
+                               const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;

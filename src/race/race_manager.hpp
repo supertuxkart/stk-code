@@ -42,10 +42,10 @@ static const std::string IDENT_STD      ("STANDARD"        );
 static const std::string IDENT_TTRIAL   ("STD_TIMETRIAL"   );
 static const std::string IDENT_FTL      ("FOLLOW_LEADER"   );
 static const std::string IDENT_STRIKES  ("BATTLE_3_STRIKES");
-static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT");
+static const std::string IDENT_EASTER   ("EASTER_EGG_HUNT" );
 static const std::string IDENT_SOCCER   ("SOCCER"          );
-static const std::string IDENT_OVERWORLD("OVERWORLD"   );
-static const std::string IDENT_CUSTSCENE("CUTSCENE"   );
+static const std::string IDENT_OVERWORLD("OVERWORLD"       );
+static const std::string IDENT_CUTSCENE ("CUTSCENE"        );
 
 /**
  * The race manager has two functions:
@@ -198,7 +198,7 @@ public:
             case MINOR_MODE_3_STRIKES:      return false;
             case MINOR_MODE_EASTER_EGG:     return false;
             case MINOR_MODE_SOCCER:         return false;
-            default: assert(false); return NULL;
+            default: assert(false);         return false;
         }
     }
 
@@ -682,7 +682,7 @@ public:
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence
       */
-    void  startGP(const GrandPrixData* gp, bool from_overworld, 
+    void  startGP(const GrandPrixData* gp, bool from_overworld,
                   bool continue_saved_gp);
 
     /**

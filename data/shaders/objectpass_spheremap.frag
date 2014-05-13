@@ -1,22 +1,41 @@
-#version 330
-uniform sampler2D tex;
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+#else
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
+#endif
 
-noperspective in vec3 nor;
+uniform samplerCube tex;
+uniform vec2 screen;
+
+#if __VERSION__ >= 130
+in vec3 nor;
 out vec4 FragColor;
+#else
+varying vec3 nor;
+#define FragColor gl_FragColor
+#endif
+
 
 void main() {
-	// Calculate the spherical UV
-	const vec3 forward = vec3(0.0, 0.0, 1.0);
+    vec3 fpos = gl_FragCoord.xyz / vec3(screen, 1.);
+    vec4 xpos = 2.0 * vec4(fpos, 1.0) - 1.0;
+    xpos = InverseProjectionMatrix * xpos;
 
-	// get the angle between the forward vector and the horizontal portion of the normal
-	vec3 normal_x = normalize(vec3(nor.x, 0.0, nor.z));
-	float sin_theta_x = length(cross( forward, normal_x )) * nor.x / abs(nor.x);
+    xpos.xyz /= xpos.w;
+    vec3 viewSampleDir = reflect(xpos.xyz, nor);
+    // Convert sampleDir in world space (where tex was generated)
+    vec4 sampleDir = transpose(InverseViewMatrix) * vec4(viewSampleDir, 0.);
+    vec4 detail0 = texture(tex, sampleDir.xyz);
 
-	// get the angle between the forward vector and the vertical portion of the normal
-	vec3 normal_y = normalize(vec3(0.0, nor.y, nor.z));
-	float sin_theta_y = length(cross( forward, normal_y )) * nor.y / abs(nor.y);
-
-	vec4 detail0 = texture(tex, 0.5 * vec2(sin_theta_x, sin_theta_y) + 0.5);
-
-	FragColor = vec4(detail0.xyz, 1.);
+    FragColor = vec4(detail0.xyz, 1.);
 }

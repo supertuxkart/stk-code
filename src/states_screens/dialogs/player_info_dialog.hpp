@@ -19,8 +19,9 @@
 #ifndef HEADER_PLAYERINFO_DIALOG_HPP
 #define HEADER_PLAYERINFO_DIALOG_HPP
 
-#include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
+
+class PlayerProfile;
 
 namespace GUIEngine
 {
@@ -39,9 +40,6 @@ class PlayerInfoDialog : public GUIEngine::ModalDialog
     void showRegularDialog();
     void showConfirmDialog();
 public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
     PlayerInfoDialog(PlayerProfile* PlayerInfoDialog,
                      const float percentWidth, const float percentHeight);
     

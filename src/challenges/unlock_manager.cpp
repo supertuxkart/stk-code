@@ -18,13 +18,13 @@
 
 #include "challenges/unlock_manager.hpp"
 
-
 #include "achievements/achievements_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/challenge_data.hpp"
-#include "config/player.hpp"
+#include "challenges/challenge_status.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "karts/kart_properties_manager.hpp"
@@ -182,12 +182,12 @@ void UnlockManager::addChallenge(const std::string& filename)
  *  challenge exist.
  *  \param id Id of the challenge.
  */
-const ChallengeData* UnlockManager::getChallenge(const std::string& id)
+const ChallengeData* UnlockManager::getChallengeData(const std::string& id)
 {
     AllChallengesType::const_iterator it = m_all_challenges.find(id);
     if(it==m_all_challenges.end()) return NULL;
     return it->second;
-}   // getChallenge
+}   // getChallengeData
 
 //-----------------------------------------------------------------------------
 /** Creates a game slot. It initialises the game slot's status with the
@@ -195,24 +195,24 @@ const ChallengeData* UnlockManager::getChallenge(const std::string& id)
  *  states for a player.
  *  \param node The XML game-slots node with all data for a player.
  */
-GameSlot *UnlockManager::createGameSlot(const XMLNode *node)
+StoryModeStatus* UnlockManager::createStoryModeStatus(const XMLNode *node)
 {
 
-    GameSlot *slot = new GameSlot(node);
+    StoryModeStatus *status = new StoryModeStatus(node);
 
     for(AllChallengesType::iterator i = m_all_challenges.begin();
                                     i!=m_all_challenges.end();  i++)
     {
         ChallengeData* cd = i->second;
-        Challenge *challenge = new Challenge(cd);
+        ChallengeStatus *challenge_status = new ChallengeStatus(cd);
         if(node)
-            challenge->load(node);
-        slot->m_challenges_state[cd->getId()] = challenge;
+            challenge_status->load(node);
+        status->addStatus(challenge_status);
     }
 
-    slot->computeActive();
-    return slot;
-}   // createGameSlot
+    status->computeActive();
+    return status;
+}   // createStoryModeStatus
 
 //-----------------------------------------------------------------------------
 void UnlockManager::playLockSound() const
@@ -247,12 +247,12 @@ void UnlockManager::findWhatWasUnlocked(int points_before, int points_now,
         {
             if (c->getMode() == ChallengeData::CM_SINGLE_RACE && c->getTrackId() != "")
             {
-                if (!PlayerManager::get()->getCurrentPlayer()->isLocked(c->getTrackId()))
+                if (!PlayerManager::getCurrentPlayer()->isLocked(c->getTrackId()))
                     tracks.push_back(c->getTrackId());
             }
             else if (c->getMode() == ChallengeData::CM_GRAND_PRIX && c->getGPId() != "")
             {
-                if (!PlayerManager::get()->getCurrentPlayer()->isLocked(c->getGPId()))
+                if (!PlayerManager::getCurrentPlayer()->isLocked(c->getGPId()))
                     gps.push_back(c->getGPId());
             }
         }

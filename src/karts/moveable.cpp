@@ -105,17 +105,19 @@ void Moveable::flyUp()
 {
     m_body->setGravity(btVector3(0.0, 8.0, 0.0));
     m_body->applyCentralImpulse(btVector3(0.0, 100.0, 0.0));
-}
+}   // flyUp
 
+// ----------------------------------------------------------------------------
 void Moveable::flyDown()
 {
     m_body->applyCentralImpulse(btVector3(0.0, -100.0, 0.0));
-}
+}   // flyDown
 
+// ----------------------------------------------------------------------------
 void Moveable::stopFlying()
 {
     m_body->setGravity(btVector3(0.0, -World::getWorld()->getTrack()->getGravity(), 0.0));
-}
+}   // stopFlying
 
 //-----------------------------------------------------------------------------
 /** Updates the current position and rotation from the corresponding physics

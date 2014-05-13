@@ -86,7 +86,9 @@ private:
     float           m_rotation_range;
 
     /** The kart that the camera follows. It can't be const,
-     *  since in profile mode the camera might change its owner. */
+     *  since in profile mode the camera might change its owner.
+     *  May be NULL (example: cutscene camera)
+     */
     AbstractKart   *m_kart;
 
     /** A pointer to the original kart the camera was pointing at when it
@@ -186,8 +188,7 @@ private:
     unsigned int  m_next_end_camera;
 
     void setupCamera();
-    void smoothMoveCamera(float dt, const Vec3 &wanted_position,
-                          const Vec3 &wanted_target);
+    void smoothMoveCamera(float dt);
     void computeNormalCameraPosition(Vec3 *wanted_position,
                                      Vec3 *wanted_target);
     void handleEndCamera(float dt);

@@ -32,9 +32,6 @@
 #include "tracks/track_manager.hpp"
 
 ChallengeData::ChallengeData(const std::string& filename)
-#ifndef WIN32
-                                                      throw(std::runtime_error)
-#endif
 {
     m_filename     = filename;
     m_mode         = CM_SINGLE_RACE;

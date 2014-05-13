@@ -22,6 +22,7 @@
 #include "audio/sfx_base.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/material.hpp"
 #include "guiengine/engine.hpp"
@@ -29,6 +30,7 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
+#include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
@@ -80,6 +82,30 @@ void RaceResultGUI::init()
 
     music_manager->stopMusic();
     m_finish_sound = sfx_manager->quickSound("race_finish");
+
+    // Calculate how many track screenshots can fit into the "result-table" widget
+    GUIEngine::Widget* result_table = getWidget("result-table");
+    assert(result_table != NULL);
+    m_sshot_height = (int)(UserConfigParams::m_height*0.1275);
+    m_max_tracks = std::max (1, ((result_table->m_h - getFontHeight () * 5) /
+        (m_sshot_height + SSHOT_SEPARATION))); //Show at least one
+
+    // Calculate screenshot scrolling parameters
+    const std::vector<std::string> tracks =
+        race_manager->getGrandPrix()->getTrackNames();
+    int n_tracks = tracks.size();
+    int currentTrack = race_manager->getTrackNumber();
+    m_start_track = currentTrack;
+    if (n_tracks > m_max_tracks)
+    {
+        m_start_track = std::min(currentTrack, n_tracks - m_max_tracks);
+        m_end_track = std::min(currentTrack + m_max_tracks, n_tracks);
+    }
+    else
+    {
+        m_start_track = 0;
+        m_end_track = tracks.size();
+    }
 }   // init
 
 //-----------------------------------------------------------------------------
@@ -131,7 +157,7 @@ void RaceResultGUI::enableAllButtons()
 
     // If something was unlocked
     // -------------------------
-    int n = PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges().size();
+    int n = PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
         top->setText(n==1 ? _("You completed a challenge!")
@@ -182,11 +208,25 @@ void RaceResultGUI::enableAllButtons()
 void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                                   const std::string& name, const int playerID)
 {
+    int n_tracks = race_manager->getGrandPrix()->getNumberOfTracks();
+    if (name == "up_button" && n_tracks > m_max_tracks && m_start_track > 0)
+    {
+        m_start_track--;
+        m_end_track--;
+        displayScreenShots();
+    }
+    else if (name == "down_button" && n_tracks > m_max_tracks &&
+        m_start_track < (n_tracks - m_max_tracks))
+    {
+        m_start_track++;
+        m_end_track++;
+        displayScreenShots();
+    }
 
     // If something was unlocked, the 'continue' button was
     // actually used to display "Show unlocked feature(s)" text.
     // ---------------------------------------------------------
-    int n = PlayerManager::get()->getCurrentPlayer()
+    int n = PlayerManager::getCurrentPlayer()
                                 ->getRecentlyCompletedChallenges().size();
     if(n>0)
     {
@@ -198,7 +238,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
 
             std::vector<const ChallengeData*> unlocked =
-                PlayerManager::get()->getCurrentPlayer()->getRecentlyCompletedChallenges();
+                PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
 
             bool gameCompleted = false;
             for (unsigned int n = 0; n < unlocked.size(); n++)
@@ -210,7 +250,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                 }
             }
 
-            PlayerManager::get()->getCurrentPlayer()->clearUnlocked();
+            PlayerManager::getCurrentPlayer()->clearUnlocked();
 
             if (gameCompleted)
             {
@@ -461,7 +501,7 @@ void RaceResultGUI::determineTableLayout()
                  ? 27
                  : (int)(40*(table_area->m_w/800.0f));
 
-    m_width_column_space  = 20;
+    m_width_column_space  = 10;
 
     // Determine width of new points column
 
@@ -488,8 +528,6 @@ void RaceResultGUI::determineTableLayout()
                       + 2 * m_width_column_space;
 
     m_leftmost_column = table_area->m_x;
-
-    m_gp_progress_x = (int)(UserConfigParams::m_width*0.65);
 }   // determineTableLayout
 
 //-----------------------------------------------------------------------------
@@ -571,7 +609,7 @@ void RaceResultGUI::onUpdate(float dt)
 void RaceResultGUI::renderGlobal(float dt)
 {
     bool isSoccerWorld = race_manager->getMinorMode() == RaceManager::MINOR_MODE_SOCCER;
-    
+
     m_timer               += dt;
     assert(World::getWorld()->getPhase()==WorldStatus::RESULT_DISPLAY_PHASE);
     unsigned int num_karts = m_all_row_infos.size();
@@ -820,7 +858,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                                                     source_rect, NULL, NULL,
                                                     true);
     }
-    
+
     current_x += m_width_icon + m_width_column_space;
 
     // Draw the name
@@ -832,7 +870,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
                     true /* ignoreRTL */);
     current_x += m_width_kart_name + m_width_column_space;
 
-   
+
     // Draw the time except in FTL mode
     // --------------------------------
     if(race_manager->getMinorMode()!=RaceManager::MINOR_MODE_FOLLOW_LEADER)
@@ -888,10 +926,10 @@ void RaceResultGUI::displaySoccerResults()
     gui::IGUIFont* font = GUIEngine::getTitleFont();
     int currX = UserConfigParams::m_width/2;
     RowInfo *ri = &(m_all_row_infos[0]);
-    int currY = (int)ri->m_y_pos; 
+    int currY = (int)ri->m_y_pos;
     SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
     int teamScore[2] = {soccerWorld->getScore(0), soccerWorld->getScore(1)};
-    
+
     GUIEngine::Widget *table_area = getWidget("result-table");
     int height = table_area->m_h + table_area->m_y;
 
@@ -910,7 +948,7 @@ void RaceResultGUI::displaySoccerResults()
     }
     core::rect<s32> pos(currX, currY, currX, currY);
     font->draw(resultText.c_str(), pos, color, true, true);
-    
+
     core::dimension2du rect = m_font->getDimension(resultText.c_str());
 
     //Draw team scores:
@@ -931,7 +969,7 @@ void RaceResultGUI::displaySoccerResults()
         currY+redTeamIcon->getSize().Height/2);
     draw2DImage(blueTeamIcon,destRect,sourceRect,
         NULL, NULL, true);
-    
+
     resultText = StringUtils::toWString(teamScore[1]);
     rect = m_font->getDimension(resultText.c_str());
     currX += redTeamIcon->getSize().Width/4;
@@ -944,7 +982,7 @@ void RaceResultGUI::displaySoccerResults()
     resultText = StringUtils::toWString(teamScore[0]);
     pos = core::rect<s32>(currX,currY,currX,currY);
     font->draw(resultText.c_str(), pos, color, true, false);
-    
+
     int centerX = UserConfigParams::m_width/2;
     pos = core::rect<s32>(centerX, currY, centerX, currY);
     font->draw("-", pos, color, true, false);
@@ -996,7 +1034,7 @@ void RaceResultGUI::displaySoccerResults()
         resultText.append(" ");
         resultText.append(StringUtils::timeToString(scoreTimes.at(i)).c_str());
         rect = m_font->getDimension(resultText.c_str());
-        
+
         if(height-prevY < ((short)scorers.size()+1)*(short)rect.Height)
             currY += (height-prevY)/((short)scorers.size()+1);
         else
@@ -1044,83 +1082,127 @@ void RaceResultGUI::enableGPProgress()
 {
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
     {
-        const std::vector<std::string>& tracks =
-            race_manager->getGrandPrix()->getTrackNames();
-        size_t currentTrack = race_manager->getTrackNumber();
+        GUIEngine::Widget* result_table = getWidget("result-table");
+        assert(result_table != NULL);
 
-        // Assume 5 is the max amount we can render in any given height
-        size_t startTrack = 0;
-        size_t endTrack = tracks.size();
-        if (tracks.size() > 5)
-        {
-            if (currentTrack == 0)
-            {
-                startTrack = 0;
-                endTrack = 5;
-            }
-            else if (currentTrack + 4 > tracks.size())
-            {
-                startTrack = tracks.size() - 5;
-                endTrack = tracks.size();
-            }
-            else {
-                startTrack = currentTrack - 1;
-                endTrack = currentTrack + 4;
-            }
-        }
+        int currentTrack = race_manager->getTrackNumber();
+        int font_height = getFontHeight ();
+        int w = (int)(UserConfigParams::m_width*0.17);
+        int x = (int)(result_table->m_x + result_table->m_w - w - 15);
+        int y = (m_top + font_height + 5);
 
-        for(size_t i=startTrack; i<endTrack; i++)
+        //Current progress
+        GUIEngine::LabelWidget* status_label = new GUIEngine::LabelWidget();
+        status_label->m_properties[GUIEngine::PROP_ID] = "status_label";
+        status_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "center";
+        status_label->m_x = x;
+        status_label->m_y = y;
+        status_label->m_w = w;
+        status_label->m_h = font_height;
+        status_label->add();
+        status_label->setText(_("Track %i/%i", currentTrack + 1,
+            race_manager->getGrandPrix()->getNumberOfTracks()), true);
+        addGPProgressWidget(status_label);
+        y = (status_label->m_y + status_label->m_h + 5);
+
+        //Scroll up button
+        GUIEngine::IconButtonWidget* up_button = new GUIEngine::IconButtonWidget(
+            GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+            false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        up_button->m_properties[GUIEngine::PROP_ID] = "up_button";
+        up_button->m_x = x;
+        up_button->m_y = y;
+        up_button->m_w = w;
+        up_button->m_h = font_height;
+        up_button->add();
+        up_button->setImage(file_manager->getAsset(FileManager::GUI,"scroll_up.png"));
+        addGPProgressWidget(up_button);
+        y = (up_button->m_y + up_button->m_h + SSHOT_SEPARATION);
+
+        //Track screenshots and labels
+        int n_sshot = 1;
+        for(int i=m_start_track; i<m_end_track; i++)
         {
-            Track* track = track_manager->getTrack(tracks[i]);
-            GUIEngine::IconButtonWidget* m_screenshot_widget =
-                new GUIEngine::IconButtonWidget(GUIEngine::IconButtonWidget::
+            //Screenshot
+            GUIEngine::IconButtonWidget* screenshot_widget =
+                new GUIEngine::IconButtonWidget(
+                         GUIEngine::IconButtonWidget::
                          SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                          false, false,
                          GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
-            m_screenshot_widget->m_x = (int)(UserConfigParams::m_width*0.67);
-            m_screenshot_widget->m_y =
-                (int)(UserConfigParams::m_height
-                * (0.10+(i-startTrack)*0.135));
-            m_screenshot_widget->m_w = (int)(UserConfigParams::m_width*0.17);
-            m_screenshot_widget->m_h =
-                (int)(UserConfigParams::m_height*0.1275);
+            screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
+            screenshot_widget->m_x = x;
+            screenshot_widget->m_y = y;
+            screenshot_widget->m_w = w;
+            screenshot_widget->m_h = m_sshot_height;
+            screenshot_widget->m_properties[GUIEngine::PROP_ID] =
+                ("sshot_" + StringUtils::toString(n_sshot));
+            screenshot_widget->add();
+            addGPProgressWidget(screenshot_widget);
 
-            m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] =
-                (track ? track->getScreenshotFile()
-                       : file_manager->getAsset(FileManager::GUI,"main_help.png"));
-            m_screenshot_widget->m_properties[GUIEngine::PROP_ID] = tracks[i];
+            //Label
+            GUIEngine::LabelWidget* sshot_label = new GUIEngine::LabelWidget();
+            sshot_label->m_properties[GUIEngine::PROP_ID] =
+                ("sshot_label_" + StringUtils::toString(n_sshot));
+            sshot_label->m_properties[GUIEngine::PROP_TEXT_ALIGN] = "left";
+            sshot_label->m_x = (x + w + 5);
+            sshot_label->m_y = (y + (m_sshot_height / 2) - (font_height / 2));
+            sshot_label->m_w = (w / 2);
+            sshot_label->m_h = font_height;
+            sshot_label->add();
+            addGPProgressWidget(sshot_label);
 
-            if(i <= currentTrack)
-                m_screenshot_widget->setBadge(GUIEngine::OK_BADGE);
-
-            m_screenshot_widget->add();
-            m_widgets.push_back(m_screenshot_widget);
+            y += (m_sshot_height + SSHOT_SEPARATION);
+            n_sshot++;
         }   // for
+        displayScreenShots();
+
+        //Scroll down button
+        GUIEngine::IconButtonWidget* down_button = new GUIEngine::IconButtonWidget(
+            GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+            false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        down_button->m_properties[GUIEngine::PROP_ID] = "down_button";
+        down_button->m_x = x;
+        down_button->m_y = y;
+        down_button->m_w = w;
+        down_button->m_h = font_height;
+        down_button->add();
+        down_button->setImage(file_manager->getAsset(FileManager::GUI,"scroll_down.png"));
+        addGPProgressWidget(down_button);
+
     }   // if MAJOR_MODE_GRAND_PRIX)
 
 }   // enableGPProgress
 
 // ----------------------------------------------------------------------------
+void RaceResultGUI::addGPProgressWidget(GUIEngine::Widget* widget)
+{
+    m_widgets.push_back(widget);
+    m_gp_progress_widgets.push_back(widget);
+}
+
+// ----------------------------------------------------------------------------
 void RaceResultGUI::displayGPProgress()
 {
-    video::SColor color = video::SColor(255,255,0,0);
-    core::recti dest_rect(m_gp_progress_x, m_top, 0, 0);
+    const wchar_t* msg = _("Grand Prix progress:");
 
-    m_font->draw(_("Grand Prix progress:"), dest_rect, color, false, false, NULL, true);
+    GUIEngine::Widget* result_table = getWidget("result-table");
+    assert(result_table != NULL);
+
+    video::SColor color = video::SColor(255,255,0,0);
+    core::recti dest_rect(
+        result_table->m_x + result_table->m_w - m_font->getDimension(msg).Width - 5,
+        m_top, 0, 0);
+
+    m_font->draw(msg, dest_rect, color, false, false, NULL, true);
 }   // displayGPProgress
 
 // ----------------------------------------------------------------------------
 void RaceResultGUI::cleanupGPProgress()
 {
-    const std::vector<std::string>& tracks =
-        race_manager->getGrandPrix()->getTrackNames();
-    for(size_t i=0; i<tracks.size(); i++)
-    {
-        GUIEngine::Widget *trackWidget = getWidget(tracks[i].c_str());
-        m_widgets.remove(trackWidget);
-        delete trackWidget;
-    }
+    for (size_t i = 0; i < m_gp_progress_widgets.size(); i++)
+        m_widgets.remove(m_gp_progress_widgets.get(i));
+    m_gp_progress_widgets.clearAndDeleteAll();
 }   // cleanupGPProgress
 
 // ----------------------------------------------------------------------------
@@ -1136,7 +1218,7 @@ void RaceResultGUI::displayHighScores()
     {
         video::SColor white_color = video::SColor(255,255,255,255);
 
-        int x = (int)(UserConfigParams::m_width*0.55f);
+        int x = (int)(UserConfigParams::m_width*0.65f);
         int y = m_top;
 
         // First draw title
@@ -1208,4 +1290,40 @@ void RaceResultGUI::displayHighScores()
                 false, false, NULL, true /* ignoreRTL */);
         }
     }
+}
+
+// ----------------------------------------------------------------------------
+void RaceResultGUI::displayScreenShots()
+{
+    const std::vector<std::string> tracks =
+        race_manager->getGrandPrix()->getTrackNames();
+    int currentTrack = race_manager->getTrackNumber();
+
+    int n_sshot = 1;
+    for(int i = m_start_track; i < m_end_track; i++)
+    {
+        Track* track = track_manager->getTrack(tracks[i]);
+        GUIEngine::IconButtonWidget* sshot = getWidget<GUIEngine::IconButtonWidget>(
+            ("sshot_" + StringUtils::toString(n_sshot)).c_str());
+        GUIEngine::LabelWidget* label = getWidget<GUIEngine::LabelWidget>(
+            ("sshot_label_" + StringUtils::toString(n_sshot)).c_str());
+        assert(track != NULL && sshot != NULL && label != NULL);
+
+        sshot->setImage(track->getScreenshotFile());
+        if (i <= currentTrack)
+            sshot->setBadge(GUIEngine::OK_BADGE);
+        else
+            sshot->resetAllBadges();
+
+        label->setText(StringUtils::toWString(i + 1), true);
+
+        n_sshot++;
+    }
+}
+
+// ----------------------------------------------------------------------------
+int RaceResultGUI::getFontHeight () const
+{
+    assert(m_font != NULL);
+    return m_font->getDimension(L"A").Height; //Could be any capital letter
 }

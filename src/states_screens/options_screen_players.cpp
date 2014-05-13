@@ -18,9 +18,10 @@
 #include "states_screens/options_screen_players.hpp"
 
 #include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
-#include "config/player_manager.hpp"
 #include "config/device_config.hpp"
+#include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
@@ -79,7 +80,7 @@ void OptionsScreenPlayers::init()
     refreshPlayerList();
 
     ButtonWidget* you = getWidget<ButtonWidget>("playername");
-    unsigned int playerID = PlayerManager::get()->getCurrentPlayer()->getUniqueID();
+    unsigned int playerID = PlayerManager::getCurrentPlayer()->getUniqueID();
     core::stringw player_name = L"-";
     const PlayerProfile* curr = PlayerManager::get()->getPlayerById(playerID);
     if(curr)
@@ -183,8 +184,8 @@ void OptionsScreenPlayers::eventCallback(Widget* widget, const std::string& name
     }
     else if (name == "playername")
     {
-        UserConfigParams::m_default_player = L"";
         race_manager->clearKartLastPositionOnOverworld();
+        PlayerManager::get()->setCurrentPlayer(NULL,false);
         StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
     }
 

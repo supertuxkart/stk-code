@@ -19,8 +19,8 @@
 #include "states_screens/kart_selection.hpp"
 
 #include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
@@ -40,7 +40,7 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "modes/overworld.hpp"
-#include "online/profile.hpp"
+#include "online/online_profile.hpp"
 #include "states_screens/race_setup_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/log.hpp"
@@ -127,18 +127,21 @@ static FocusDispatcher* g_dispatcher = NULL;
 /** A small extension to the spinner widget to add features like player ID
  *  management or badging */
 
-PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent, 
+PlayerNameSpinner::PlayerNameSpinner(KartSelectionScreen* parent,
                                      const int player_id)
 {
     m_player_id       = player_id;
     m_incorrect       = false;
     m_red_mark_widget = NULL;
     m_parent          = parent;
+    setUseBackgroundColor();//except for multiplayer kart selection, this is false
+    setSpinnerWidgetPlayerID(m_player_id);
 }   // PlayerNameSpinner
 // ------------------------------------------------------------------------
 void PlayerNameSpinner::setID(const int m_player_id)
 {
     PlayerNameSpinner::m_player_id = m_player_id;
+    setSpinnerWidgetPlayerID(m_player_id);
 }   // setID
 // ------------------------------------------------------------------------
 /** Add a red mark on the spinner to mean "invalid choice" */
@@ -174,7 +177,6 @@ void PlayerNameSpinner::markAsCorrect()
         m_incorrect = false;
     }
 }   // markAsCorrect
-
 // ============================================================================
 
 #if 0
@@ -187,7 +189,7 @@ void PlayerNameSpinner::markAsCorrect()
 
 PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
                                    StateManager::ActivePlayer* associated_player,
-                                   Online::Profile* associated_user,
+                                   Online::OnlineProfile* associated_user,
                                    core::recti area, const int player_id,
                                    std::string kart_group,
                                    const int irrlicht_widget_id) : Widget(WTYPE_DIV)
@@ -270,6 +272,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
+    
 
 
     // ----- Kart model view
@@ -377,7 +380,6 @@ PlayerKartWidget::~PlayerKartWidget()
 
     if (m_kart_name->getIrrlichtElement() != NULL)
         m_kart_name->getIrrlichtElement()->remove();
-
     getCurrentScreen()->manualRemoveWidget(this);
 
 #ifdef DEBUG
@@ -410,12 +412,14 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
 
     // Change the player ID
     m_player_id = newPlayerID;
-
+    m_player_ident_spinner->setID(m_player_id);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
     if (m_player_ident_spinner != NULL)
+    {
         m_player_ident_spinner->setID(m_player_id);
+    }
 }   // setPlayerID
 
 // ------------------------------------------------------------------------
@@ -1100,7 +1104,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
                           kartsAreaWidget->m_y + kartsAreaWidget->m_h);
 
     // ---- Create new active player
-    PlayerProfile* profile_to_use = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
 
     if (!firstPlayer)
     {
@@ -2009,7 +2013,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
         {
             const KartProperties* prop =
                 kart_properties_manager->getKartById(n);
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(prop->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
             {
                 w->addItem(
                     _("Locked : solve active challenges to gain access "
@@ -2041,7 +2045,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
                 kart_properties_manager->getKartById(group[n]);
             const std::string &icon_path = prop->getAbsoluteIconFile();
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(prop->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
             {
                 w->addItem(
                     _("Locked : solve active challenges to gain access "

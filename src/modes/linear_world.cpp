@@ -17,11 +17,12 @@
 
 #include "modes/linear_world.hpp"
 
-#include <iostream>
-
+#include "achievements/achievements_manager.hpp"
+#include "config/player_manager.hpp"
 #include "audio/music_manager.hpp"
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/user_config.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/controller/controller.hpp"
 #include "karts/kart_properties.hpp"
@@ -33,6 +34,8 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
+
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 /** Constructs the linear world. Note that here no functions can be called
@@ -234,6 +237,14 @@ void LinearWorld::newLap(unsigned int kart_index)
 {
     KartInfo &kart_info = m_kart_info[kart_index];
     AbstractKart *kart  = m_karts[kart_index];
+
+    // Reset reset-after-lap achievements
+    StateManager::ActivePlayer *c = kart->getController()->getPlayer();
+    PlayerProfile *p = PlayerManager::getCurrentPlayer();
+    if (c && c->getConstProfile() == p)
+    {
+        p->getAchievementsStatus()->onLapEnd();
+    }
 
     // Only update the kart controller if a kart that has already finished
     // the race crosses the start line again. This avoids 'fastest lap'
@@ -599,7 +610,7 @@ float LinearWorld::estimateFinishTimeForKart(AbstractKart* kart)
 }   // estimateFinishTimeForKart
 
 // ------------------------------------------------------------------------
-/** Returns the number of rescue positions on a given track, which in 
+/** Returns the number of rescue positions on a given track, which in
  *  linear races is just the number of driveline quads.
   */
 unsigned int LinearWorld::getNumberOfRescuePositions() const

@@ -17,11 +17,7 @@
 
 #include "guiengine/event_handler.hpp"
 
-#include <iostream>
-
-#include <IGUIEnvironment.h>
-#include <IGUIListBox.h>
-
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -36,6 +32,12 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/debug.hpp"
 #include "utils/profiler.hpp"
+
+
+#include <IGUIEnvironment.h>
+#include <IGUIListBox.h>
+
+#include <iostream>
 
 using GUIEngine::EventHandler;
 using GUIEngine::EventPropagation;
@@ -157,8 +159,12 @@ bool EventHandler::OnEvent (const SEvent &event)
              event.EventType == EET_JOYSTICK_INPUT_EVENT)
     {
         // Remember the mouse position
-        m_mouse_pos.X = event.MouseInput.X;
-        m_mouse_pos.Y = event.MouseInput.Y;
+        if (event.EventType == EET_MOUSE_INPUT_EVENT &&
+            event.MouseInput.Event == EMIE_MOUSE_MOVED)
+        {
+            m_mouse_pos.X = event.MouseInput.X;
+            m_mouse_pos.Y = event.MouseInput.Y;
+        }
 
         // Notify the profiler of mouse events
         if(UserConfigParams::m_profiler_enabled &&

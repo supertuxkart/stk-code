@@ -21,8 +21,8 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "online/current_user.hpp"
 #include "online/messages.hpp"
+#include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/guest_login_screen.hpp"
@@ -124,8 +124,15 @@ void RegisterScreen::acceptTerms()
     core::stringw password_confirm= getWidget<TextBoxWidget>("password_confirm")->getText().trim();
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 
-    m_signup_request = CurrentUser::get()->requestSignUp(username, password, 
-                                                         password_confirm, email);
+     m_signup_request = new XMLRequest();
+    m_signup_request->setServerURL("client-user.php");
+    m_signup_request->addParameter("action",           "register"      );
+    m_signup_request->addParameter("username",         username        );
+    m_signup_request->addParameter("password",         password        );
+    m_signup_request->addParameter("password_confirm", password_confirm);
+    m_signup_request->addParameter("email",            email           );
+    m_signup_request->addParameter("terms",            "on"            );
+    m_signup_request->queue();
 }   // acceptTerms
 
 // -----------------------------------------------------------------------------
@@ -144,7 +151,7 @@ void RegisterScreen::onUpdate(float dt)
                 new MessageDialog(
                     _("You will receive an email with further instructions "
                     "regarding account activation. Please be patient and be "
-                    "sure to check your spam folder."), 
+                    "sure to check your spam folder."),
                     MessageDialog::MESSAGE_DIALOG_OK, NULL, false);
                 // Set the flag that the message was shown, which will triger
                 // a pop of this menu and so a return to the main menu
@@ -170,18 +177,18 @@ void RegisterScreen::onUpdate(float dt)
 
 // -----------------------------------------------------------------------------
 
-void RegisterScreen::eventCallback(Widget* widget, const std::string& name, 
+void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
                                 const int playerID)
 {
     if (name == "login_tabs")
     {
-        const std::string selection = 
+        const std::string selection =
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         StateManager *sm = StateManager::get();
         if (selection == "tab_login")
             sm->replaceTopMostScreen(LoginScreen::getInstance());
         else if (selection == "tab_guest_login")
-            sm->replaceTopMostScreen(GuestLoginScreen::getInstance());    
+            sm->replaceTopMostScreen(GuestLoginScreen::getInstance());
     }
     else if (name=="options")
     {
@@ -193,6 +200,10 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else if(button=="cancel")
             StateManager::get()->escapePressed();
+    }
+    else if (name == "back")
+    {
+        StateManager::get()->escapePressed();
     }
 
 }   // eventCallback

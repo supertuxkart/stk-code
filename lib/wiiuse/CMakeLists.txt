@@ -2,6 +2,16 @@
 
 cmake_minimum_required(VERSION 2.8.1)
 
+# libbluetooth is required on Unix platforms
+if(UNIX)
+    include(FindPkgConfig)
+    pkg_check_modules(BLUETOOTH bluez)
+    if(NOT BLUETOOTH_FOUND)
+        message(FATAL_ERROR "Bluetooth library not found. "
+            "Either install libbluetooth or disable wiiuse support with -DUSE_WIIUSE=0")
+    endif()
+endif()
+
 set(WIIUSE_SOURCES
     classic.c
     dynamics.c

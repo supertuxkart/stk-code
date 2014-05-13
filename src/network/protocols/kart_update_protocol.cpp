@@ -4,6 +4,7 @@
 #include "modes/world.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
+#include "utils/time.hpp"
 
 KartUpdateProtocol::KartUpdateProtocol()
     : Protocol(NULL, PROTOCOL_KART_UPDATE)

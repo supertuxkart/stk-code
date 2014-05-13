@@ -17,7 +17,6 @@
 
 
 // Creates a bubble (wave) effect by distorting the texture depending on time
-#version 330 compatibility
 uniform mat4 ModelViewProjectionMatrix;
 uniform float time;
 

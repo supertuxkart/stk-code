@@ -19,7 +19,6 @@
 #ifndef HEADER_TUTORIAL_DIALOG_HPP
 #define HEADER_TUTORIAL_DIALOG_HPP
 
-#include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.h"
 #include "utils/leak_check.hpp"

@@ -305,7 +305,7 @@ void RibbonWidget::add()
                 (float)m_active_children[i].m_w / (float)m_active_children[i].m_h;
 
             // calculate the size of the image
-            std::string filename = 
+            std::string filename =
                 file_manager->getAsset(m_active_children[i].m_properties[PROP_ICON]);
             video::ITexture* image =
                 irr_driver->getTexture((filename).c_str());

@@ -22,7 +22,6 @@
 #include <string>
 #include <iostream>
 
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/scalable_font.hpp"

@@ -462,7 +462,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     irr_driver->grabAllTextures(m_mesh);
 
     Vec3 kart_min, kart_max;
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
                         &kart_min, &kart_max);
 
 #undef MOVE_KART_MESHES
@@ -480,7 +480,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
     core::matrix4 translate(core::matrix4::EM4CONST_IDENTITY);
     translate.setTranslation(offset_from_center.toIrrVector());
     mani->transform(m_mesh, translate);
-    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]), 
+    MeshTools::minMax3D(m_mesh->getMesh(m_animation_frame[AF_STRAIGHT]),
                         &kart_min, &kart_max);
 #endif
     m_kart_highest_point = kart_max.getY();
@@ -770,7 +770,7 @@ void KartModel::OnAnimationEnd(scene::IAnimatedMeshSceneNode *node)
  *  \param suspension Suspension height for all four wheels.
  *  \param speed The speed of the kart in meters/sec, used for the speed-weighted objects' animations
  */
-void KartModel::update(float dt, float rotation_dt, float steer, 
+void KartModel::update(float dt, float rotation_dt, float steer,
                        const float height_above_terrain[4], float speed)
 {
    core::vector3df wheel_steer(0, steer*30.0f, 0);
@@ -789,7 +789,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,
         }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y = m_kart_lowest_point -  height_above_terrain[i] 
+        pos.Y = m_kart_lowest_point -  height_above_terrain[i]
               + m_wheel_graphics_radius[i];
         m_wheel_node[i]->setPosition(pos);
 
@@ -854,7 +854,7 @@ void KartModel::update(float dt, float rotation_dt, float steer,
                     core::matrix4 *m = &irrMaterial.getTextureMatrix(j);
                     m->setTextureTranslate(obj.m_texture_cur_offset.X, obj.m_texture_cur_offset.Y);
                 }   // for j<MATERIAL_MAX_TEXTURES
-            }   // for i<getMaterialCount 
+            }   // for i<getMaterialCount
         }
 #undef GET_VALUE
     }

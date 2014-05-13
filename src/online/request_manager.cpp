@@ -20,7 +20,7 @@
 
 #include "online/request_manager.hpp"
 
-#include "online/current_user.hpp"
+#include "config/player_manager.hpp"
 #include "states_screens/state_manager.hpp"
 
 #include <iostream>
@@ -102,6 +102,9 @@ namespace Online
      *  variable has not been assigned at that stage, and the thread might
      *  use network_http - a very subtle race condition. So the thread can
      *  only be started after the assignment (in main) has been done.
+     *  \pre PlayerManager was created and has read the main data for each
+     *                     player so that all data for automatic login is 
+     *                     availale.
      */
     void RequestManager::startNetworkThread()
     {
@@ -125,7 +128,10 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        CurrentUser::get()->requestSavedSession();
+        // In case that login id was not saved (or first start of stk), 
+        // current player would not be defined at this stage.
+        if(PlayerManager::getCurrentPlayer())
+            PlayerManager::resumeSavedSession();
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------
@@ -143,7 +149,7 @@ namespace Online
         // a download, which mean we can get the mutex and ask the service
         // thread here to cancel properly.
         //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
-        CurrentUser::get()->onSTKQuit();
+        PlayerManager::onSTKQuit();
         addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
 
@@ -155,7 +161,7 @@ namespace Online
     void RequestManager::cancelAllDownloads()
     {
         m_abort.setAtomic(true);
-        // FIXME doesn't get called at the moment. When using this again, 
+        // FIXME doesn't get called at the moment. When using this again,
         // be sure that HTTP_MAX_PRIORITY requests still get executed.
     }   // cancelAllDownloads
 
@@ -189,7 +195,7 @@ namespace Online
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while( me->m_request_queue.getData().empty() || 
+        while( me->m_request_queue.getData().empty() ||
                me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
         {
             bool empty = me->m_request_queue.getData().empty();
@@ -263,7 +269,7 @@ namespace Online
             else
                 request->setDone();
         }
-    }
+    }   // handleResultQueue
 
     // ------------------------------------------------------------------------
     /** Should be called every frame and takes care of processing the result
@@ -273,8 +279,12 @@ namespace Online
     {
         handleResultQueue();
 
-        //Database polling starts here, only needed for registered users
-        if(!CurrentUser::get()->isRegisteredUser())
+        // Database polling starts here, only needed for registered users. If
+        // there is no player data yet (i.e. either because first time start
+        // of stk, and loging screen hasn't finished yet, or no default player
+        // was saved), don't do anything
+        if (!PlayerManager::getCurrentPlayer() ||
+            !PlayerManager::isCurrentLoggedIn())
             return;
 
         m_time_since_poll += dt;
@@ -284,7 +294,7 @@ namespace Online
         if(m_time_since_poll > interval)
         {
             m_time_since_poll = 0;
-            CurrentUser::get()->requestPoll();
+            PlayerManager::requestOnlinePoll();
         }
 
     }   // update

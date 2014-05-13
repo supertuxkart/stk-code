@@ -19,7 +19,9 @@
 #include "items/attachment.hpp"
 
 #include <algorithm>
+#include "achievements/achievement_info.hpp"
 #include "audio/sfx_base.hpp"
+#include "config/player_manager.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/explosion.hpp"
@@ -33,7 +35,7 @@
 #include "karts/explosion_animation.hpp"
 #include "karts/kart_properties.hpp"
 #include "modes/three_strikes_battle.hpp"
-#include "modes/world.hpp" 
+#include "modes/world.hpp"
 #include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "physics/triangle_mesh.hpp"
@@ -223,6 +225,11 @@ void Attachment::clear()
 */
 void Attachment::hitBanana(Item *item, int new_attachment)
 {
+    const StateManager::ActivePlayer *const ap = m_kart->getController()
+                                                       ->getPlayer();
+    if(ap && ap->getConstProfile()==PlayerManager::getCurrentPlayer())
+        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_BANANA,
+                                           "banana",1                      );
     //Bubble gum shield effect:
     if(m_type == ATTACH_BUBBLEGUM_SHIELD ||
        m_type == ATTACH_NOLOK_BUBBLEGUM_SHIELD)
@@ -388,7 +395,7 @@ void Attachment::update(float dt)
     if (m_node_scale < m_wanted_node_scale)
     {
         m_node_scale += dt*1.5f;
-        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale; 
+        if (m_node_scale > m_wanted_node_scale) m_node_scale = m_wanted_node_scale;
         m_node->setScale(core::vector3df(m_node_scale,m_node_scale,m_node_scale));
     }
 
@@ -405,13 +412,22 @@ void Attachment::update(float dt)
     switch (m_type)
     {
     case ATTACH_PARACHUTE:
+        {
         // Partly handled in Kart::updatePhysics
         // Otherwise: disable if a certain percantage of
         // initial speed was lost
-        if(m_kart->getSpeed() <=
-            m_initial_speed*stk_config->m_parachute_done_fraction)
+        // This percentage is based on the ratio of
+        // initial_speed / initial_max_speed
+
+        float f = m_initial_speed / stk_config->m_parachute_max_speed;
+        if (f > 1.0f) f = 1.0f;   // cap fraction
+        if (m_kart->getSpeed() <= m_initial_speed *
+                                 (stk_config->m_parachute_lbound_fraction +
+                                  f * (  stk_config->m_parachute_ubound_fraction
+                                       - stk_config->m_parachute_lbound_fraction)))
         {
             m_time_left = -1;
+        }
         }
         break;
     case ATTACH_ANVIL:     // handled in Kart::updatePhysics

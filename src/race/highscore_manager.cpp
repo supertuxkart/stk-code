@@ -30,6 +30,7 @@
 #include "utils/translation.hpp"
 
 HighscoreManager* highscore_manager=0;
+const unsigned int HighscoreManager::CURRENT_HSCORE_FILE_VERSION = 3;
 
 HighscoreManager::HighscoreManager()
 {
@@ -75,7 +76,7 @@ void HighscoreManager::loadHighscores()
         saveHighscores();
         if(m_can_write)
         {
-            Log::error("Highscore Manager", "New highscore file '%s' created.\n",
+            Log::info("Highscore Manager", "New highscore file '%s' created.\n",
                     m_filename.c_str());
         }
         delete root;

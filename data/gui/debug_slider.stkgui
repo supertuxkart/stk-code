@@ -1,0 +1,6 @@
+<stkgui>
+    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+        <label id="title" width="100%"/>
+        <gauge id="value_slider" min_value="0" max_value="100" width="100%" />
+    </div>
+</stkgui>

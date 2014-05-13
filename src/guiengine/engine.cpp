@@ -487,6 +487,14 @@ namespace GUIEngine
 
 
  \n
+ \subsection prop20 PROP_KEEP_SELECTION
+ <em> Name in XML files: </em> \c "keep_selection"
+
+ Used on lists, indicates that the list should keep showing the selected item
+ even when it doesn't have the focus
+
+
+ \n
  <HR>
  \section code Using the engine in code
  <HR>
@@ -648,9 +656,10 @@ namespace GUIEngine
 
 #include "guiengine/engine.hpp"
 
-#include "io/file_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "input/input_manager.hpp"
+#include "io/file_manager.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -723,20 +732,6 @@ namespace GUIEngine
     std::vector<MenuMessage> gui_messages;
 
     // ------------------------------------------------------------------------
-    Screen* getScreenNamed(const char* name)
-    {
-        const int screenCount = g_loaded_screens.size();
-        for (int n=0; n<screenCount; n++)
-        {
-            if (g_loaded_screens[n].getName() == name)
-            {
-                return g_loaded_screens.get(n);
-            }
-        }
-        return NULL;
-    }   // getScreenNamed
-
-    // ------------------------------------------------------------------------
     void showMessage(const wchar_t* message, const float time)
     {
         // check for duplicates
@@ -799,13 +794,14 @@ namespace GUIEngine
     {
         return Private::small_font_height;
     }   // getSmallFontHeight
-
+ 
     // ------------------------------------------------------------------------
     int getLargeFontHeight()
-    {
+   {
+
         return Private::large_font_height;
     }   // getSmallFontHeight
-
+        
     // ------------------------------------------------------------------------
     void clear()
     {
@@ -1052,7 +1048,12 @@ namespace GUIEngine
         const int screen_width = irr_driver->getFrameSize().Width;
         const int screen_height = irr_driver->getFrameSize().Height;
         float scale = std::max(0, screen_width - 640)/564.0f;
-        if (screen_height < 700) scale = std::min(scale, 0.25f); // attempt to compensate for small screens
+
+        // attempt to compensate for small screens
+        if (screen_width < 1200) scale = std::max(0, screen_width - 640) / 750.0f;
+        if (screen_width < 900 || screen_height < 700) scale = std::min(scale, 0.05f);
+
+        Log::info("GUIEngine", "scale: %f", scale);
 
         float normal_text_scale = 0.7f + 0.2f*scale;
         float title_text_scale = 0.2f + 0.2f*scale;

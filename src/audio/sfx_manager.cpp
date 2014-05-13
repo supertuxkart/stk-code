@@ -262,7 +262,7 @@ SFXBuffer* SFXManager::loadSingleSfx(const XMLNode* node,
 
     // Only use the filename if no full path is specified. This is used
     // to load terrain specific sfx.
-    const std::string full_path = (path == "") 
+    const std::string full_path = (path == "")
                                 ? file_manager->getAsset(FileManager::SFX,filename)
                                 : path;
 
@@ -313,16 +313,6 @@ SFXBase* SFXManager::createSoundSource(SFXBuffer* buffer,
 
     return sfx;
 }   // createSoundSource
-
-//----------------------------------------------------------------------------
-
-void SFXManager::dump()
-{
-    for(int n=0; n<(int)m_all_sfx.size(); n++)
-    {
-        Log::debug("SFXManager", "Sound %i : %s \n", n, m_all_sfx[n]->getBuffer()->getFileName().c_str());
-    }
-}
 
 //----------------------------------------------------------------------------
 SFXBase* SFXManager::createSoundSource(const std::string &name,

@@ -19,6 +19,7 @@
 #include "modes/demo_world.hpp"
 
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "input/device_manager.hpp"
 #include "input/input_manager.hpp"

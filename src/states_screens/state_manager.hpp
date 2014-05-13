@@ -27,7 +27,7 @@
 
 #include <string>
 
-#include "config/player.hpp"
+#include "config/player_profile.hpp"
 #include "guiengine/abstract_state_manager.hpp"
 #include "utils/ptr_vector.hpp"
 
@@ -36,7 +36,7 @@ class InputDevice;
 struct Input;
 namespace Online
 {
-    class Profile;
+    class OnlineProfile;
 }
 
 namespace GUIEngine
@@ -76,7 +76,7 @@ public:
     {
         friend class StateManager;
 
-        Online::Profile  *m_online_user;
+        Online::OnlineProfile  *m_online_user;
         PlayerProfile *m_player;
         InputDevice   *m_device;
 
@@ -86,7 +86,8 @@ public:
         /** ID of this player within the list of active players */
         int m_id;
 
-        ActivePlayer(PlayerProfile* player, InputDevice* device, Online::Profile* user);
+        ActivePlayer(PlayerProfile* player, InputDevice* device,
+                     Online::OnlineProfile* user);
 
 #ifdef DEBUG
         unsigned int m_magic_number;
@@ -128,14 +129,17 @@ public:
         void setPlayerProfile(PlayerProfile* player);
 
         // --------------------------------------------------------------------
-        Online::Profile* getOnlineUser()
+        Online::OnlineProfile* getOnlineUser()
         {
             return m_online_user;
-        }
+        }   // getOnlineUser
         // --------------------------------------------------------------------
         /** Call to change the identity of this player (useful when player is
          *  selecting his identity) */
-        void setOnlineUser(Online::Profile* user) { m_online_user = user; }
+        void setOnlineUser(Online::OnlineProfile* user)
+        {
+            m_online_user = user;
+        }
 
         // --------------------------------------------------------------------
         /** ID of this player within the list of active players */
@@ -193,7 +197,8 @@ public:
       */
     const PlayerProfile* getActivePlayerProfile(const int id);
 
-    int createActivePlayer(PlayerProfile *profile, InputDevice *device, Online::Profile* use);
+    int createActivePlayer(PlayerProfile *profile, InputDevice *device,
+                           Online::OnlineProfile* use);
     void removeActivePlayer(int id);
 
     unsigned int activePlayerCount();

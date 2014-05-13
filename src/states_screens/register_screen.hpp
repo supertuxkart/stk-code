@@ -43,7 +43,8 @@ private:
     /** Save the pointer to the options widget, it is widely used. */
     GUIEngine::RibbonWidget *m_options_widget;
 
-    const Online::XMLRequest *m_signup_request;
+    /** The XML request to the server. */
+    Online::XMLRequest *m_signup_request;
 
     /** True if the info message (email was sent...) is shown. */
     bool m_info_message_shown;

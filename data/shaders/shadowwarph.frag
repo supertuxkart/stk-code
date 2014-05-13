@@ -1,4 +1,3 @@
-#version 330 compatibility
 uniform sampler2D tex;
 uniform int size;
 uniform vec2 pixel;

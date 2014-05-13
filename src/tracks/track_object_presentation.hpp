@@ -40,7 +40,8 @@ class SFXBase;
 class ParticleEmitter;
 class PhysicalObject;
 class ThreeDAnimation;
-class LodNodeLoader;
+class ModelDefinitionLoader;
+class STKInstancedSceneNode;
 
 /**
  * \ingroup tracks
@@ -115,6 +116,16 @@ public:
         m_node = NULL;
     }
 
+    TrackObjectPresentationSceneNode(
+        scene::ISceneNode* node,
+        const core::vector3df& xyz,
+        const core::vector3df& hpr,
+        const core::vector3df& scale) :
+        TrackObjectPresentation(xyz, hpr, scale)
+    {
+        m_node = node;
+    }
+
     virtual const core::vector3df& getPosition() const OVERRIDE;
     virtual const core::vector3df  getAbsolutePosition() const OVERRIDE;
     virtual const core::vector3df& getRotation() const OVERRIDE;
@@ -152,8 +163,21 @@ public:
 
     TrackObjectPresentationLOD(const XMLNode& xml_node,
                                scene::ISceneNode* parent,
-                               LodNodeLoader& lod_loader);
+                               ModelDefinitionLoader& model_def_loader);
     virtual ~TrackObjectPresentationLOD();
+};
+
+class TrackObjectPresentationInstancing : public TrackObjectPresentationSceneNode
+{
+    STKInstancedSceneNode* m_instancing_group;
+public:
+
+    TrackObjectPresentationInstancing(const XMLNode& xml_node,
+        scene::ISceneNode* parent,
+        ModelDefinitionLoader& model_def_loader);
+    virtual ~TrackObjectPresentationInstancing();
+
+    STKInstancedSceneNode* getInstancingGroup() { return m_instancing_group;  }
 };
 
 /**
@@ -179,6 +203,8 @@ private:
     /** End frame of the animation to be played. */
     unsigned int            m_frame_end;
 
+    std::string             m_model_file;
+
     void init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled);
 
 public:
@@ -187,10 +213,15 @@ public:
     TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale);
+    TrackObjectPresentationMesh(
+        scene::IAnimatedMesh* mesh, const core::vector3df& xyz,
+        const core::vector3df& hpr, const core::vector3df& scale);
 
     virtual ~TrackObjectPresentationMesh();
 
     virtual void reset() OVERRIDE;
+
+    const std::string& getModelFile() const { return m_model_file; }
 };
 
 /**

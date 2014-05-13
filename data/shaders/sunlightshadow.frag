@@ -1,4 +1,3 @@
-#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform sampler2DArrayShadow shadowtex;
@@ -7,33 +6,47 @@ uniform sampler2DArrayShadow shadowtex;
 
 uniform vec3 direction;
 uniform vec3 col;
-uniform mat4 invproj;
-uniform mat4 shadowmat[4];
 //uniform int hasclouds;
 //uniform vec2 wind;
 //uniform float shadowoffset;
+
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+uniform mat4 ShadowViewProjMatrixes[4];
+#else
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
+#endif
 
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
 
-vec3 DecodeNormal(vec2 n)
-{
-  float z = dot(n, n) * 2. - 1.;
-  vec2 xy = normalize(n) * sqrt(1. - z * z);
-  return vec3(xy,z);
-}
+vec3 DecodeNormal(vec2 n);
+vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 float getShadowFactor(vec3 pos, float bias, int index)
 {
-	const vec2 shadowoffset[] = {
+  //float a[5] = float[](3.4, 4.2, 5.0, 5.2, 1.1);
+  
+	vec2 shadowoffset[4] = vec2[](
 		vec2(-1., -1.),
 		vec2(-1., 1.),
 		vec2(1., -1.),
 		vec2(1., 1.)
-	};
+	);
 
-	vec4 shadowcoord = (shadowmat[index] * vec4(pos, 1.0));
+	vec4 shadowcoord = (ShadowViewProjMatrixes[index] * InverseViewMatrix * vec4(pos, 1.0));
 	shadowcoord /= shadowcoord.w;
 	vec2 shadowtexcoord = shadowcoord.xy * 0.5 + 0.5;
 //	shadowcoord = (shadowcoord * 0.5) + vec3(0.5);
@@ -49,26 +62,26 @@ float getShadowFactor(vec3 pos, float bias, int index)
 	float sum = 0.;
 	for (int i = 0; i < 4; i++)
 	{
-		sum += texture(shadowtex, vec4(shadowtexcoord + 0.0005 * shadowoffset[i], float(index), 0.5 * (shadowcoord.z + bias * 0.001) + 0.5));
+		sum += texture(shadowtex, vec4(shadowtexcoord + shadowoffset[i] / 2048., float(index), 0.5 * shadowcoord.z + 0.5));
 	}
 	return sum / 4.;
 }
 
 void main() {
 	float z = texture(dtex, uv).x;
-	vec4 xpos = 2.0 * vec4(uv, z, 1.0) - 1.0;
-	xpos = invproj * xpos;
-	xpos.xyz /= xpos.w;
+	vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 
 	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
+    float roughness =texture(ntex, uv).z;
+    vec3 eyedir = -normalize(xpos.xyz);
 
 	// Normalized on the cpu
-	vec3 L = direction;
+    vec3 L = direction;
 
-	float NdotL = max(0.0, dot(norm, L));
-	vec3 R = reflect(L, norm);
-	float RdotE = max(0.0, dot(R, normalize(xpos.xyz)));
-	float Specular = pow(RdotE, 200);
+    float NdotL = max(0., dot(norm, L));
+
+    vec3 Specular = getSpecular(norm, eyedir, L, col, roughness) * NdotL;
+
 
 	vec3 outcol = NdotL * col;
 
@@ -82,34 +95,40 @@ void main() {
 //	}
 
 	// Shadows
-	float bias = 0.002 * tan(acos(NdotL)); // According to the slope
-	bias = clamp(bias, 0.001, 0.014);
+	float bias = 0.005 * tan(acos(NdotL)); // According to the slope
+	bias = clamp(bias, 0., 0.01);
 	float factor;
-	if (xpos.z < 20.)
+	if (xpos.z < 5.)
 		factor = getShadowFactor(xpos.xyz, bias, 0);
-	else if (xpos.z < 25.)
+	else if (xpos.z < 6.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 0), b = getShadowFactor(xpos.xyz, bias, 1);
-		factor = mix(a, b, (xpos.z - 20.) / 5.);
+		factor = mix(a, b, (xpos.z - 5.));
 	}
-	else if (xpos.z < 50.)
+	else if (xpos.z < 20.)
 		factor = getShadowFactor(xpos.xyz, bias, 1);
-	else if (xpos.z < 60.)
+	else if (xpos.z < 21.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 1), b = getShadowFactor(xpos.xyz, bias, 2);
-		factor = mix(a, b, (xpos.z - 50.) / 10.);
+		factor = mix(a, b, (xpos.z - 20.));
 	}
-	else if (xpos.z < 100.)
+	else if (xpos.z < 50.)
 		factor = getShadowFactor(xpos.xyz, bias, 2);
-	else if (xpos.z < 120.)
+	else if (xpos.z < 55.)
 	{
 		float a = getShadowFactor(xpos.xyz, bias, 2), b = getShadowFactor(xpos.xyz, bias, 3);
-		factor = mix(a, b, (xpos.z - 100.) / 20.);
+		factor = mix(a, b, (xpos.z - 50.) / 5.);
+	}
+	else if (xpos.z < 145.)
+		factor = getShadowFactor(xpos.xyz, bias, 3);
+	else if (xpos.z < 150.)
+	{
+		factor = mix(getShadowFactor(xpos.xyz, bias, 3), 1., (xpos.z - 145.) / 5.);
 	}
 	else
-		factor = getShadowFactor(xpos.xyz, bias, 3);
+		factor = 1.;
 	Diff = vec4(factor * NdotL * col, 1.);
-	Spec = vec4(factor * Specular * col, 1.);
+	Spec = vec4(factor * Specular, 1.);
 	return;
 
 //	float moved = (abs(dx) + abs(dy)) * 0.5;

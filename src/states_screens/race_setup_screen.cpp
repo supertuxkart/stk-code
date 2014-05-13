@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
@@ -179,7 +180,7 @@ void RaceSetupScreen::assignDifficulty()
     }
     else if (difficultySelection == "best")
     {
-        if (PlayerManager::get()->getCurrentPlayer()->isLocked("difficulty_best"))
+        if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
         {
             unlock_manager->playLockSound();
             UserConfigParams::m_difficulty = RaceManager::DIFFICULTY_HARD;
@@ -230,7 +231,7 @@ void RaceSetupScreen::init()
     assert( w != NULL );
 
     if (UserConfigParams::m_difficulty == RaceManager::DIFFICULTY_BEST &&
-        PlayerManager::get()->getCurrentPlayer()->isLocked("difficulty_best"))
+        PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
         w->setSelection(RaceManager::DIFFICULTY_HARD, PLAYER_ID_GAME_MASTER);
     }
@@ -268,7 +269,7 @@ void RaceSetupScreen::init()
     name2 += _("Contains no powerups, so only your driving skills matter!");
     w2->addItem( name2, IDENT_TTRIAL, RaceManager::getIconOf(RaceManager::MINOR_MODE_TIME_TRIAL));
 
-    if (PlayerManager::get()->getCurrentPlayer()->isLocked(IDENT_FTL))
+    if (PlayerManager::getCurrentPlayer()->isLocked(IDENT_FTL))
     {
         w2->addItem( _("Locked : solve active challenges to gain access to more!"),
                     "locked", RaceManager::getIconOf(RaceManager::MINOR_MODE_FOLLOW_LEADER), true);
@@ -344,7 +345,7 @@ void RaceSetupScreen::init()
     w2->registerHoverListener(m_mode_listener);
 
 
-    if (PlayerManager::get()->getCurrentPlayer()->isLocked("difficulty_best"))
+    if (PlayerManager::getCurrentPlayer()->isLocked("difficulty_best"))
     {
         RibbonWidget* w = getWidget<RibbonWidget>("difficulty");
         assert(w != NULL);

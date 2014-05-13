@@ -1,4 +1,3 @@
-#version 330
 uniform mat4 ProjectionMatrix;
 uniform mat4 ViewMatrix;
 
@@ -13,6 +12,7 @@ in float anglespeed;
 
 out float lf;
 out vec2 tc;
+out vec3 pc;
 
 void main(void)
 {
@@ -58,4 +58,5 @@ void main(void)
 
 	vec4 viewpos = ViewMatrix * vec4(newposition + newquadcorner, 1.0);
 	gl_Position = ProjectionMatrix * viewpos;
+	pc = vec3(1.);
 }

@@ -19,11 +19,8 @@
 #ifndef HEADER_REGISTRATION_DIALOG_HPP
 #define HEADER_REGISTRATION_DIALOG_HPP
 
-#include <irrString.h>
-
 #include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
+
 /**
  * \brief Dialog that allows a user to register
  * \ingroup states_screens

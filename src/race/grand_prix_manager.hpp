@@ -30,17 +30,39 @@
 class GrandPrixManager
 {
 private:
-    std::vector<GrandPrixData*> m_gp_data;
-public:
-                         GrandPrixManager();
-                        ~GrandPrixManager();
-    void                 load(const std::string &filename);
-    const GrandPrixData* getGrandPrix(int i)    const { return m_gp_data[i];     }
-    const GrandPrixData* getGrandPrix(const std::string& s) const;
-    unsigned int         getNumberOfGrandPrix() const { return m_gp_data.size(); }
-    void                 checkConsistency();
+    static const char* SUFFIX;
 
+    std::vector<GrandPrixData*> m_gp_data;
+
+    /** Load all the grands prix from the 3 directories known */
+    void loadFiles();
+    /** Load all the grands prix in one directory */
+    void loadDir(const std::string& dir);
+    /** Load a grand prix and add it to m_gp_data*/
+    void load(const std::string &filename);
+
+    /** Generates a new unique indentifier for a user defined grand prix */
+    std::string generateId();
+
+    bool existsName(const irr::core::stringw& name) const;
+
+public:
+                   GrandPrixManager();
+                  ~GrandPrixManager();
+    void           reload();
+    GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
+    GrandPrixData* getGrandPrix(const std::string& s) const;
+    unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
+    void           checkConsistency();
+
+    // Methods for the gp editor
+    GrandPrixData* editGrandPrix(const std::string& s) const;
+    GrandPrixData* createNewGP(const irr::core::stringw& newName);
+    GrandPrixData* copy(const std::string& id,
+                        const irr::core::stringw& newName);
+    void           remove(const std::string& id);
 };   // GrandPrixManager
 
 extern GrandPrixManager *grand_prix_manager;
+
 #endif

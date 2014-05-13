@@ -65,7 +65,7 @@ RaceGUI::RaceGUI()
     // Marker texture has to be power-of-two for (old) OpenGL compliance
     m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
     m_marker_ai_size        = (int)( 14.0f * scaling);
-    m_marker_player_size    = (int)( 16.0f * scaling);    
+    m_marker_player_size    = (int)( 16.0f * scaling);
     m_map_width             = (int)(100.0f * scaling);
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
@@ -183,7 +183,7 @@ void RaceGUI::renderGlobal(float dt)
 
     drawGlobalMiniMap();
 
-    if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height); 
+    if (!m_is_tutorial)               drawGlobalPlayerIcons(m_map_height);
     if(world->getTrack()->isSoccer()) drawScores();
 }   // renderGlobal
 
@@ -610,7 +610,6 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
     offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
 
-    video::IVideoDriver *video = irr_driver->getVideoDriver();
     const core::rect<s32> meter_pos((int)offset.X,
                                     (int)(offset.Y-meter_height),
                                     (int)(offset.X+meter_width),

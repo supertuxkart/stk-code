@@ -21,7 +21,6 @@
 #include <iostream>
 #include <fstream>
 
-#include "config/player.hpp"
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "input/wiimote_manager.hpp"

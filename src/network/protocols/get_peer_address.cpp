@@ -18,11 +18,11 @@
 
 #include "network/protocols/get_peer_address.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/network_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/current_user.hpp"
-#include "config/user_config.hpp"
 #include "utils/log.hpp"
 
 GetPeerAddress::GetPeerAddress(uint32_t peer_id, CallbackObject* callback_object) : Protocol(callback_object, PROTOCOL_SILENT)
@@ -45,11 +45,9 @@ void GetPeerAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        m_request->setServerURL("address-management.php");
-        m_request->addParameter("id",Online::CurrentUser::get()->getID());
-        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+        PlayerManager::setUserDetails(m_request, "get",
+                                      "address-management.php");
         m_request->addParameter("peer_id",m_peer_id);
-        m_request->addParameter("action","get");
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

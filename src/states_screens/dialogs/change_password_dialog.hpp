@@ -19,12 +19,16 @@
 #ifndef HEADER_CHANGE_PASSWORD_DIALOG_HPP
 #define HEADER_CHANGE_PASSWORD_DIALOG_HPP
 
+#include "guiengine/modaldialog.hpp"
+
 #include <irrString.h>
 
-#include "online/current_user.hpp"
-
-#include "guiengine/modaldialog.hpp"
-#include "guiengine/widgets.hpp"
+namespace GUIEngine
+{
+    class IconButtonWidget;
+    class LabelWidget;
+    class RibbonWidget;
+}
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -35,9 +39,6 @@ class ChangePasswordDialog : public GUIEngine::ModalDialog
 
 public:
 
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
     ChangePasswordDialog();
     ~ChangePasswordDialog();
 
@@ -49,6 +50,8 @@ public:
     virtual void onUpdate(float dt);
     void success();
     void error(const irr::core::stringw & error_message);
+    void changePassword(const irr::core::stringw &current_password,
+                        const irr::core::stringw &new_password);
 
 private:
 

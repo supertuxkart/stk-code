@@ -292,6 +292,10 @@ public:
          }
     }   // insertionSort
 
+    bool empty() const
+    {
+        return m_contents_vector.empty();
+    }
 
 };   // class ptrVector
 

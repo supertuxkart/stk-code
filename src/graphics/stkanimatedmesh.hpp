@@ -5,17 +5,18 @@
 #include <IAnimatedMesh.h>
 #include <irrTypes.h>
 #include "graphics/stkmesh.hpp"
-
+#include "utils/ptr_vector.hpp"
 
 class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode
 {
 protected:
-	bool firstTime;
-	std::vector<GLMesh> GLmeshes;
-	core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
-	void drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-	void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
-    void drawShadow(const GLMesh &mesh);
+    bool firstTime;
+    PtrVector<GLMesh, REF> GeometricMesh[FPSM_COUNT];
+    PtrVector<GLMesh, REF> ShadedMesh[SM_COUNT];
+    PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
+    std::vector<GLMesh> GLmeshes;
+    core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+    void cleanGLMeshes();
 public:
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
      irr::scene::ISceneManager* mgr, irr::s32 id,

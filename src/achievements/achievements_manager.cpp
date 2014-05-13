@@ -1,6 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 Glenn De Jonghe
+//  Copyright (C) 2013-2014 Glenn De Jonghe
+//                     2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -18,11 +19,12 @@
 
 #include "achievements/achievements_manager.hpp"
 
-#include "config/player.hpp"
+#include "achievements/achievement_info.hpp"
+#include "achievements/achievements_status.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/user_config.hpp"
 #include "io/file_manager.hpp"
-#include "online/current_user.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -30,223 +32,74 @@
 #include <stdlib.h>
 #include <assert.h>
 
-static AchievementsManager* achievements_manager_singleton(NULL);
+AchievementsManager* AchievementsManager::m_achievements_manager = NULL;
 
-AchievementsManager* AchievementsManager::get()
-{
-    if (achievements_manager_singleton == NULL)
-        achievements_manager_singleton = new AchievementsManager();
-    return achievements_manager_singleton;
-}
-
-void AchievementsManager::deallocate()
-{
-    delete achievements_manager_singleton;
-    achievements_manager_singleton = NULL;
-}   // deallocate
-
-// ============================================================================
+// ----------------------------------------------------------------------------
+/** Constructor, which reads data/achievements.xml and stores the information
+ *  in AchievementInfo objects.
+ */
 AchievementsManager::AchievementsManager()
 {
-    parseAssetFile();
-}
+    const std::string file_name = file_manager->getAsset("achievements.xml");
+    const XMLNode *root = file_manager->createXMLTree(file_name);
+    unsigned int num_nodes = root->getNumNodes();
+    for (unsigned int i = 0; i < num_nodes; i++)
+    {
+        const XMLNode *node = root->getNode(i);
+        std::string type("");
+        node->get("type", &type);
+        AchievementInfo * achievement_info = new AchievementInfo(node);
+        m_achievements_info[achievement_info->getID()] = achievement_info;
+    }
+    if (num_nodes != m_achievements_info.size())
+        Log::error("AchievementsManager",
+                   "Multiple achievements with the same id!");
 
+    delete root;
+}   // AchievementsManager
 
-// ============================================================================
-void AchievementsManager::init()
-{
-    parseUserConfigFile();
-}
-
-// ============================================================================
+// ----------------------------------------------------------------------------
 AchievementsManager::~AchievementsManager()
 {
-    save();
-    m_slots.clearAndDeleteAll();
     std::map<uint32_t, AchievementInfo *>::iterator it;
     for ( it = m_achievements_info.begin(); it != m_achievements_info.end(); ++it ) {
         delete it->second;
     }
     m_achievements_info.clear();
-}
+}   // ~AchievementsManager
 
-// ============================================================================
-void AchievementsManager::parseAssetFile()
-{
-    const std::string file_name = file_manager->getAsset("achievements.xml");
-    const XMLNode *root         = file_manager->createXMLTree(file_name);
-    unsigned int num_nodes = root->getNumNodes();
-    for(unsigned int i = 0; i < num_nodes; i++)
-    {
-        const XMLNode *node = root->getNode(i);
-        std::string type("");
-        node->get("type", &type);
-        AchievementInfo * achievement_info;
-        if(type == "single")
-        {
-            achievement_info = new SingleAchievementInfo(node);
-        }
-        else if(type == "map")
-        {
-            achievement_info = new MapAchievementInfo(node);
-        }
-        else
-        {
-            Log::error("AchievementsManager::parseAchievements",
-                       "Non-existent achievement type. Skipping - "
-                       "definitely results in unwanted behaviour.");
-            continue;
-        }
-        m_achievements_info[achievement_info->getID()] = achievement_info;
-    }
-    if(num_nodes != m_achievements_info.size())
-        Log::error("AchievementsManager::parseAchievements",
-                   "Multiple achievements with the same id!");
-
-    delete root;
-}
-
-
-// ============================================================================
-void AchievementsManager::parseUserConfigFile()
-{
-    const std::string filename=file_manager->getUserConfigFile("achievements.xml");
-    XMLNode* root = file_manager->createXMLTree(filename);
-    if(!root || root->getName() != "achievements")
-    {
-        Log::info("AchievementsManager", 
-                  "Achievements file '%s' will be created.",filename.c_str());
-        createSlotsIfNeeded();
-        if (root) delete root;
-        return;
-    }
-
-    std::vector<XMLNode*> xml_slots;
-    root->getNodes("slot", xml_slots);
-    for (unsigned int n=0; n < xml_slots.size(); n++)
-    {
-        AchievementsSlot * slot = new AchievementsSlot(xml_slots[n]);
-        if(!slot->isValid())
-        {
-            Log::warn("AchievementsManager", "Found game slot with faulty or missing information. Discarding it.");
-            delete slot;
-            continue;
-        }
-        m_slots.push_back(slot);
-    }
-    delete root;
-}   // load
-
-
-AchievementsSlot * AchievementsManager::createNewSlot(unsigned int id, bool online)
-{
-    AchievementsSlot* slot = new AchievementsSlot(id, online);
-    m_slots.push_back(slot);
-    return slot;
-}
-
-
-//-----------------------------------------------------------------------------
-/** Creates a slot for players that don't have one yet
- *  \return true if any were created
+// ----------------------------------------------------------------------------
+/** Create a new AchievementStatus object that stores all achievement status
+ *  information for a single player.
+ *  \param node The XML of saved data, or NULL if no saved data exists.
  */
-void AchievementsManager::createSlotsIfNeeded()
+AchievementsStatus*
+             AchievementsManager::createAchievementsStatus(const XMLNode *node)
 {
-    bool something_changed = false;
+    AchievementsStatus *status = new AchievementsStatus();
 
-    // make sure all players have at least one game slot associated
-    for (unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
+    // First add all achievements, before restoring the saved data.
+    std::map<uint32_t, AchievementInfo *>::const_iterator it;
+    for (it  = m_achievements_info.begin();
+         it != m_achievements_info.end(); ++it)
     {
-        const PlayerProfile *player = PlayerManager::get()->getPlayer(i);
-        if (getSlot(player->getUniqueID(), false) == NULL )
-        {
-            createNewSlot(player->getUniqueID(), false);
-            something_changed = true;
-        }
+        Achievement * achievement;
+        achievement = new Achievement(it->second);
+        status->add(achievement);
     }
 
-    if(something_changed){
-        save();
-    }
-} // UnlockManager::createSlotsIfNeeded
+    if (node)
+        status->load(node);
 
+    return status;
+}   // createAchievementStatus
 
-// ============================================================================
-void AchievementsManager::save()
+// ----------------------------------------------------------------------------
+AchievementInfo * AchievementsManager::getAchievementInfo(uint32_t id) const
 {
-    std::string filename = file_manager->getUserConfigFile("achievements.xml");
-
-    std::ofstream achievements_file(filename.c_str(), std::ios::out);
-
-    if (!achievements_file.is_open())
-    {
-        Log::warn("AchievementsManager::save",
-                  "Failed to open '%s' for writing, achievements won't be saved\n",
-                  filename.c_str());
-        return;
-    }
-
-    achievements_file << "<?xml version=\"1.0\"?>\n";
-    achievements_file << "<achievements>\n";
-
-    for (unsigned int i = 0; i < m_slots.size(); i++)
-    {
-        m_slots[i].save(achievements_file);
-    }
-
-    achievements_file << "</achievements>\n\n";
-    achievements_file.close();
-}
-
-
-// ============================================================================
-void AchievementsManager::onRaceEnd()
-{
-    //reset all values that need to be reset
-    m_active_slot->onRaceEnd();
-}
-
-// ============================================================================
-AchievementsSlot * AchievementsManager::getSlot(unsigned int id, bool online)
-{
-    for(unsigned int i = 0; i < m_slots.size(); i++)
-    {
-        if(m_slots[i].isOnline() == online && m_slots[i].getID() == id)
-        {
-            return m_slots.get(i);
-        }
-    }
-    return NULL;
-}
-
-// ============================================================================
-void AchievementsManager::updateCurrentPlayer()
-{
-    if(Online::CurrentUser::get()->isRegisteredUser())
-    {
-        m_active_slot = getSlot(Online::CurrentUser::get()->getID(), true);
-        if(m_active_slot == NULL)
-        {
-            m_active_slot = createNewSlot(Online::CurrentUser::get()->getID(), true);
-            save();
-        }
-    }
-    else
-    {
-        m_active_slot = getSlot(PlayerManager::get()->getCurrentPlayer()->getUniqueID(), false);
-        if(m_active_slot == NULL)
-        {
-            m_active_slot = createNewSlot(PlayerManager::get()->getCurrentPlayer()->getUniqueID(), false);
-            save();
-        }
-    }
-}
-
-
-// ============================================================================
-AchievementInfo * AchievementsManager::getAchievementInfo(uint32_t id)
-{
-    if ( m_achievements_info.find(id) != m_achievements_info.end())
-        return m_achievements_info[id];
+    std::map<uint32_t, AchievementInfo*>::const_iterator info =
+        m_achievements_info.find(id);
+    if (info != m_achievements_info.end())
+        return info->second;
     return NULL;
 }

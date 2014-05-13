@@ -19,16 +19,15 @@
 #ifndef HEADER_SERVER_INFO_DIALOG_HPP
 #define HEADER_SERVER_INFO_DIALOG_HPP
 
-#include <irrString.h>
-
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
+#include "network/protocols/request_connection.hpp"
 #include "online/server.hpp"
-#include "online/current_user.hpp"
 #include "utils/types.hpp"
 
+#include <irrString.h>
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -42,7 +41,7 @@ private:
     bool m_self_destroy;
     bool m_enter_lobby;
     bool m_from_server_creation;
-    const Online::CurrentUser::ServerJoinRequest * m_server_join_request;
+    const RequestConnection::ServerJoinRequest * m_server_join_request;
 
     const uint32_t m_server_id;
     uint32_t m_host_id;

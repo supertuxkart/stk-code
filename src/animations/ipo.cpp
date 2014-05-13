@@ -20,6 +20,7 @@
 
 #include "io/xml_node.hpp"
 #include "utils/vs.hpp"
+#include "utils/log.hpp"
 
 #include <string.h>
 #include <algorithm>

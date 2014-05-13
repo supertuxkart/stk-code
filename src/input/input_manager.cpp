@@ -17,13 +17,14 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "input/input_manager.hpp"
-#include "main_loop.hpp"
+
+#include "config/user_config.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/screen.hpp"
-#include "graphics/irr_driver.hpp"
 #include "input/device_manager.hpp"
 #include "input/input.hpp"
 #include "karts/controller/controller.hpp"
@@ -480,13 +481,13 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
         m_mode == INPUT_SENSE_GAMEPAD)
     {
         // Do not pick disabled gamepads for input sensing
- 	    if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
+         if (type == Input::IT_STICKBUTTON || type == Input::IT_STICKMOTION)
         {
- 	        GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID); 
- 	        DeviceConfig *conf = gPad->getConfiguration(); 
- 	        if (!conf->isEnabled()) 
- 	            return; 
- 	    }
+             GamePadDevice *gPad = m_device_manager->getGamePadFromIrrID(deviceID);
+             DeviceConfig *conf = gPad->getConfiguration();
+             if (!conf->isEnabled())
+                 return;
+         }
 
         inputSensing(type, deviceID, button, axisDirection,  value);
         return;

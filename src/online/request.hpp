@@ -36,28 +36,28 @@
 namespace Online
 {
 
-    /** Stores a request for the HTTP Manager. They will be sorted by 
+    /** Stores a request for the HTTP Manager. They will be sorted by
      *  prioritiy.  Requests have four different states they can be in, and
      *  this state determines which thread can access it. This allows
      *  the use of threading without adding more synchronisation overhead
      *  and code to the main thread. The states are:
-     *  - Preparing\n The request is created, and parameter are set. 
+     *  - Preparing\n The request is created, and parameter are set.
      *        Only the main thread can access this object.
      *  - Busy\n The request is put into the request_manager queue. It remains
      *        in this states till its operation is finished. No more changes
      *        to this object by the main thread are allowed, only the manager
      *        thread can change it now.
-     *  - Executed\n The request was executed (its operation called and 
+     *  - Executed\n The request was executed (its operation called and
      *        finished), but callbacks still need to be done by the manager
      *        thread (main reason for this state is to have asserts in
      *        function accessing data).
-     *  - Done\n All callbacks are done (they will be executed by the main 
+     *  - Done\n All callbacks are done (they will be executed by the main
      *        thread), the request was moved from the manager's request queue
      *        to its finished queue, executed its callbacks and was removed
      *        from the queue. The manager thread will not access this object
      *        anymore, and the main thread is now able to access the request
      *        object again.
-     *        
+     *
      * \ingroup online
      */
     class Request : public NoCopy
@@ -66,20 +66,22 @@ namespace Online
         LEAK_CHECK()
 
         /** Type of the request. Has 0 as default value. */
-        const int              m_type;
+        const int m_type;
+
         /** True if the memory for this Request should be managed by
         *  http connector (i.e. this object is freed once the request
         *  is handled). Otherwise the memory is not freed, so it must
         *  be freed by the calling function. */
-        const bool             m_manage_memory;
+        bool m_manage_memory;
+
         /** The priority of this request. The higher the value the more
         important this request is. */
-        const int              m_priority;
+        const int m_priority;
 
         /** The different state of the requst:
          *  - S_PREPARING:\n The request is created and can be configured, it
          *      is not yet started.
-         *  - S_BUSY:\n The request is added to the execution queue of the 
+         *  - S_BUSY:\n The request is added to the execution queue of the
          *      request_manager (and potentially executing). This implies that
          *      now only the request_manager thread should access the requests's
          *      data structures.
@@ -108,7 +110,7 @@ namespace Online
         Synchronised<State>             m_state;
 
         // --------------------------------------------------------------------
-        /** The actual operation to be executed. Empty as default, which 
+        /** The actual operation to be executed. Empty as default, which
          *  allows to create a 'quit' request without any additional code. */
         virtual void operation() {}
         // --------------------------------------------------------------------
@@ -140,6 +142,11 @@ namespace Online
         *  by network_http (i.e. freed once the request is handled). */
         bool manageMemory() const   { return m_manage_memory; }
         // --------------------------------------------------------------------
+        /** Sets the memory management flag of this request. This function
+         *  must only be called by the main thread, since it is only tested by
+         *  the main thread. */
+        void setManageMemory(bool m) { m_manage_memory = m;  }
+        // --------------------------------------------------------------------
         /** Returns the priority of this request. */
         int getPriority() const   { return m_priority; }
         // --------------------------------------------------------------------
@@ -151,16 +158,16 @@ namespace Online
         // --------------------------------------------------------------------
         /** Sets the request state to busy. */
         void setBusy()
-        { 
+        {
             assert(m_state.getAtomic()==S_PREPARING);
-            m_state.setAtomic(S_BUSY); 
+            m_state.setAtomic(S_BUSY);
         }   // setBusy
         // --------------------------------------------------------------------
         /** Sets the request to be completed. */
-        void setExecuted() 
+        void setExecuted()
         {
             assert(m_state.getAtomic()==S_BUSY);
-            m_state.setAtomic(S_EXECUTED); 
+            m_state.setAtomic(S_EXECUTED);
         }   // setExecuted
         // --------------------------------------------------------------------
         /** Should only be called by the manager */
@@ -180,20 +187,20 @@ namespace Online
         bool isBusy() const   { return m_state.getAtomic() == S_BUSY; }
         // --------------------------------------------------------------------
         /** Checks if the request has completed or done (i.e. callbacks were
-         *  executed). 
+         *  executed).
         */
-        bool hasBeenExecuted() const 
+        bool hasBeenExecuted() const
         {
             State s = m_state.getAtomic();
             return s==S_EXECUTED || s==S_DONE;
         }   // hasBeenExecuted
         // --------------------------------------------------------------------
-        /** Virtual method to check if a request has initialized all needed 
+        /** Virtual method to check if a request has initialized all needed
          *  members to a valid value. */
         virtual bool isAllowedToAdd()   const   { return isPreparing(); }
 
         // ====================================================================
-        /** This class is used by the priority queue to sort requests by 
+        /** This class is used by the priority queue to sort requests by
          *  priority.
          */
         class Compare

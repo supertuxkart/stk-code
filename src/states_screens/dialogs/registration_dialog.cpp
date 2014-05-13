@@ -17,17 +17,16 @@
 
 #include "states_screens/dialogs/registration_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
-#include "config/player.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/register_screen.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "online/messages.hpp"
 
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;

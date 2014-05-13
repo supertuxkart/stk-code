@@ -22,12 +22,14 @@
 #include "karts/abstract_kart.hpp"
 #include "graphics/irr_driver.hpp"
 #include "items/powerup_manager.hpp"
+#include "items/attachment.hpp"
 #include "modes/world.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "main_loop.hpp"
 #include "replay/replay_recorder.hpp"
+#include "states_screens/dialogs/debug_slider.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
 #include <IGUIEnvironment.h>
@@ -72,8 +74,14 @@ enum DebugMenuCommand
     DEBUG_POWERUP_SWITCH,
     DEBUG_POWERUP_ZIPPER,
     DEBUG_POWERUP_NITRO,
+    DEBUG_ATTACHMENT_PARACHUTE,
+    DEBUG_ATTACHMENT_BOMB,
+    DEBUG_ATTACHMENT_ANVIL,
     DEBUG_TOGGLE_GUI,
-    DEBUG_THROTTLE_FPS
+    DEBUG_HIDE_KARTS,
+    DEBUG_THROTTLE_FPS,
+    DEBUG_TWEAK_SHADER_EXPOSURE,
+    DEBUG_TWEAK_SHADER_LWHITE
 };
 
 // -----------------------------------------------------------------------------
@@ -88,6 +96,38 @@ void addPowerup(PowerupManager::PowerupType powerup)
         kart->setPowerup(powerup, 10000);
     }
 }
+
+
+void addAttachment(Attachment::AttachmentType type)
+{
+    World* world = World::getWorld();
+        if (world == NULL) return;
+        for(unsigned int i = 0; i < world->getNumKarts(); i++)
+        {
+        AbstractKart *kart = world->getKart(i);
+        if (kart->getController()->isPlayerController()) {
+            if (type == Attachment::ATTACH_ANVIL)
+            {
+                kart->getAttachment()
+                    ->set(type, stk_config->m_anvil_time);
+                kart->adjustSpeed(stk_config->m_anvil_speed_factor);
+                kart->updateWeight();
+            }
+            else if (type == Attachment::ATTACH_PARACHUTE)
+            {
+                kart->getAttachment()
+                        ->set(type, stk_config->m_parachute_time);
+            }
+            else if (type == Attachment::ATTACH_BOMB)
+            {
+                kart->getAttachment()
+                        ->set(type, stk_config->m_bomb_time);
+            }
+        }
+        }
+
+}
+
 
 // -----------------------------------------------------------------------------
 // Debug menu handling
@@ -136,6 +176,17 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Zipper", DEBUG_POWERUP_ZIPPER );
             sub->addItem(L"Nitro", DEBUG_POWERUP_NITRO );
             
+            mnu->addItem(L"Attachments >",-1,true, true);
+            sub = mnu->getSubMenu(2);
+            sub->addItem(L"Bomb", DEBUG_ATTACHMENT_BOMB);
+            sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
+            sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
+
+            //mnu->addItem(L"Adjust shaders >", -1, true, true);
+            //sub = mnu->getSubMenu(3);
+            //sub->addItem(L"Exposure", DEBUG_TWEAK_SHADER_EXPOSURE);
+            //sub->addItem(L"LWhite", DEBUG_TWEAK_SHADER_LWHITE);
+
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
                 mnu->addItem(L"Toggle capture profiler report", DEBUG_PROFILER_GENERATE_REPORT);
@@ -144,6 +195,7 @@ bool onEvent(const SEvent &event)
             mnu->addItem(L"Save replay", DEBUG_SAVE_REPLAY);
             mnu->addItem(L"Save history", DEBUG_SAVE_HISTORY);
             mnu->addItem(L"Toggle GUI", DEBUG_TOGGLE_GUI);
+            mnu->addItem(L"Hide karts", DEBUG_HIDE_KARTS);
 
 
             g_debug_menu_visible = true;
@@ -325,20 +377,44 @@ bool onEvent(const SEvent &event)
                         kart->setEnergy(100.0f);
                     }
                 }
+                else if (cmdID == DEBUG_ATTACHMENT_ANVIL)
+                {
+                    addAttachment(Attachment::ATTACH_ANVIL);
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_BOMB)
+                {
+                    addAttachment(Attachment::ATTACH_BOMB);
+                }
+                else if (cmdID == DEBUG_ATTACHMENT_PARACHUTE)
+                {
+                    addAttachment(Attachment::ATTACH_PARACHUTE);
+                }
                 else if (cmdID == DEBUG_TOGGLE_GUI)
                 {
                     World* world = World::getWorld();
                     if (world == NULL) return false;
                     RaceGUIBase* gui = world->getRaceGUI();
                     if (gui != NULL) gui->m_enabled = !gui->m_enabled;
-
+                }
+                else if (cmdID == DEBUG_HIDE_KARTS)
+                {
+                    World* world = World::getWorld();
+                    if (world == NULL) return false;
                     const int count = World::getWorld()->getNumKarts();
-                    for (int n=0; n<count; n++)
+                    for (int n = 0; n<count; n++)
                     {
                         AbstractKart* kart = world->getKart(n);
                         if (kart->getController()->isPlayerController())
-                            kart->getNode()->setVisible(gui->m_enabled);
+                            kart->getNode()->setVisible(false);
                     }
+                }
+                else if (cmdID == DEBUG_TWEAK_SHADER_EXPOSURE)
+                {
+                    new DebugSliderDialog("exposure", "Exposure");
+                }
+                else if (cmdID == DEBUG_TWEAK_SHADER_LWHITE)
+                {
+                    new DebugSliderDialog("lwhite", "LWhite");
                 }
             }
 

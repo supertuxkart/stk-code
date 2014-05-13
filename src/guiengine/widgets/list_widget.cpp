@@ -299,7 +299,8 @@ void ListWidget::unfocused(const int playerID, Widget* new_focus)
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
 
     // remove selection when leaving list
-    if (list != NULL) list->setSelected(-1);
+    if (list != NULL && m_properties[PROP_KEEP_SELECTION] != "true")
+        list->setSelected(-1);
 }
 
 // -----------------------------------------------------------------------------

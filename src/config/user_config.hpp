@@ -68,11 +68,11 @@ protected:
     std::string m_comment;
 public:
     virtual     ~UserConfigParam();
-    virtual void write(UTFWriter& stream) const = 0;
-    virtual void writeInner(UTFWriter& stream, int level = 0) const;
+    virtual void write(std::ofstream & stream) const = 0;
+    virtual void writeInner(std::ofstream & stream, int level = 0) const;
     virtual void findYourDataInAChildOf(const XMLNode* node) = 0;
     virtual void findYourDataInAnAttributeOf(const XMLNode* node) = 0;
-    virtual irr::core::stringw toString() const = 0;
+    virtual irr::core::stringc toString() const = 0;
 };   // UserConfigParam
 
 // ============================================================================
@@ -85,8 +85,8 @@ public:
     GroupUserConfigParam(const char* param_name,
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
-    void write(UTFWriter& stream) const;
-    void writeInner(UTFWriter& stream, int level = 0) const;
+    void write(std::ofstream& stream) const;
+    void writeInner(std::ofstream& stream, int level = 0) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -94,7 +94,7 @@ public:
     void addChild(GroupUserConfigParam* child);
     void clearChildren();
 
-    irr::core::stringw toString() const;
+    irr::core::stringc toString() const;
 };   // GroupUserConfigParam
 
 // ============================================================================
@@ -119,13 +119,13 @@ public:
                          int nb_elts,
                          ...);
 
-    void write(UTFWriter& stream) const;
+    void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
     void addElement(T element);
 
-    irr::core::stringw toString() const;
+    irr::core::stringc toString() const;
 
     operator std::vector<T>() const
             { return m_elements; }
@@ -150,11 +150,11 @@ public:
                        GroupUserConfigParam* group,
                        const char* comment = NULL);
 
-    void write(UTFWriter& stream) const;
+    void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
-    irr::core::stringw toString() const;
+    irr::core::stringc toString() const;
     void revertToDefaults()      { m_value = m_default_value;        }
 
     operator int() const         { return m_value;                   }
@@ -177,11 +177,11 @@ public:
     TimeUserConfigParam(StkTime::TimeType default_value, const char* param_name,
                         GroupUserConfigParam* group, const char* comment=NULL);
 
-    void write(UTFWriter& stream) const;
+    void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
-    irr::core::stringw toString() const;
+    irr::core::stringc toString() const;
     void revertToDefaults()               { m_value = m_default_value;        }
     operator StkTime::TimeType() const       { return m_value;                   }
     StkTime::TimeType& operator=(const StkTime::TimeType& v)
@@ -204,7 +204,7 @@ public:
                           GroupUserConfigParam* group,
                           const char* comment = NULL);
 
-    void write(UTFWriter& stream) const;
+    void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
@@ -212,7 +212,7 @@ public:
 
     std::string getDefaultValue() const { return m_default_value; }
 
-    irr::core::stringw toString() const { return m_value.c_str(); }
+    irr::core::stringc toString() const { return m_value.c_str(); }
 
     operator std::string() const  { return m_value; }
     std::string& operator=(const std::string& v)
@@ -222,37 +222,6 @@ public:
 
     const char* c_str() const { return m_value.c_str(); }
 };   // StringUserConfigParam
-
-// ============================================================================
-class WStringUserConfigParam : public UserConfigParam
-{
-    stringw m_value;
-    stringw m_default_value;
-
-public:
-
-    WStringUserConfigParam(const stringw& default_value,
-                           const char* param_name,
-                           const char* comment = NULL);
-    WStringUserConfigParam(const stringw& default_value,
-                           const char* param_name,
-                           GroupUserConfigParam* group,
-                           const char* comment = NULL);
-
-    void write(UTFWriter& stream) const;
-    void findYourDataInAChildOf(const XMLNode* node);
-    void findYourDataInAnAttributeOf(const XMLNode* node);
-
-    void revertToDefaults() { m_value = m_default_value; }
-
-    irr::core::stringw toString() const { return m_value; }
-
-    operator stringw() const { return m_value; }
-    stringw& operator=(const stringw& v) { m_value = v; return m_value;  }
-    stringw& operator=(const WStringUserConfigParam& v)
-                                 { m_value = (stringw)v; return m_value; }
-    const wchar_t* c_str() const { return m_value.c_str(); }
-};   // WStringUserConfigParam
 
 // ============================================================================
 class BoolUserConfigParam : public UserConfigParam
@@ -266,11 +235,11 @@ public:
     BoolUserConfigParam(bool default_value, const char* param_name,
                         GroupUserConfigParam* group,
                         const char* comment = NULL);
-    void write(UTFWriter& stream) const;
+    void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
-    irr::core::stringw toString() const;
+    irr::core::stringc toString() const;
     void revertToDefaults() { m_value = m_default_value; }
 
     operator bool() const { return m_value; }
@@ -292,11 +261,11 @@ public:
                          GroupUserConfigParam* group,
                          const char* comment = NULL);
 
-    void write(UTFWriter& stream) const;
+    void write(std::ofstream& stream) const;
     void findYourDataInAChildOf(const XMLNode* node);
     void findYourDataInAnAttributeOf(const XMLNode* node);
 
-    irr::core::stringw toString() const;
+    irr::core::stringc toString() const;
     void revertToDefaults() { m_value = m_default_value; }
 
     operator float() const { return m_value; }
@@ -427,6 +396,9 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "player_last",
             &m_gp_start_order,
             "Always put the player at the back or not (Bully mode).") );
+    PARAM_PREFIX StringUserConfigParam       m_additional_gp_directory
+        PARAM_DEFAULT( StringUserConfigParam("", "additional_gp_directory",
+                                            "Directory with additional GP's."));
 
     // ---- Video
     PARAM_PREFIX GroupUserConfigParam        m_video_group
@@ -468,6 +440,30 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
+    PARAM_PREFIX BoolUserConfigParam        m_texture_compression
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
+        &m_video_group, "Enable Texture Compression"));
+    PARAM_PREFIX BoolUserConfigParam        m_high_definition_textures
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_high_definition_textures",
+        &m_video_group, "Enable high definition textures"));
+    PARAM_PREFIX BoolUserConfigParam        m_ubo_disabled
+        PARAM_DEFAULT(BoolUserConfigParam(false, "disable_ubo_support",
+        &m_video_group, "Disable UBO support"));
+    PARAM_PREFIX BoolUserConfigParam        m_glow
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
+        &m_video_group, "Enable Glow"));
+    PARAM_PREFIX BoolUserConfigParam        m_bloom
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_bloom",
+        &m_video_group, "Enable Bloom"));
+    PARAM_PREFIX BoolUserConfigParam        m_light_shaft
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
+        &m_video_group, "Enable Light Shafts"));
+    PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+        &m_video_group, "Enable Dynamic Lights"));
+    PARAM_PREFIX BoolUserConfigParam        m_dof
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
+        &m_video_group, "Enable Depth of Field"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -588,7 +584,7 @@ namespace UserConfigParams
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode
             PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
-                            &m_graphics_quality, "Christmas hats: 0 use calendar, 1 always on, 2 always off") );
+                            &m_graphics_quality, "Christmas hats: 0 use current date, 1 always on, 2 always off") );
 
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
@@ -617,10 +613,6 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
                            "Whether vertical sync is enabled") );
-    PARAM_PREFIX BoolUserConfigParam         m_pixel_shaders
-    PARAM_DEFAULT( BoolUserConfigParam(true, "pixel_shaders",
-                                       &m_graphics_quality,
-                                       "Whether to enable pixel shaders (splatting, normal maps, ...)") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,
@@ -629,10 +621,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "mlaa", &m_graphics_quality,
                            "Whether MLAA anti-aliasing should be enabled") );
-    PARAM_PREFIX IntUserConfigParam          m_ssao
-            PARAM_DEFAULT( IntUserConfigParam(0,
+    PARAM_PREFIX BoolUserConfigParam          m_ssao
+            PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
-                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+                           "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows", &m_graphics_quality,
@@ -677,10 +669,6 @@ namespace UserConfigParams
             PARAM_DEFAULT(  StringUserConfigParam("Peach.stkskin", "skin_file",
                                                   "Name of the skin to use") );
 
-    PARAM_PREFIX WStringUserConfigParam     m_default_player
-        PARAM_DEFAULT( WStringUserConfigParam(L"", "default_player",
-                                              "Which player to use by default (if empty, will prompt)") );
-
     // ---- Internet related
 
     PARAM_PREFIX IntUserConfigParam        m_internet_status
@@ -700,25 +688,6 @@ namespace UserConfigParams
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
-
-    PARAM_PREFIX BoolUserConfigParam        m_saved_session
-            PARAM_DEFAULT(  BoolUserConfigParam(    false,
-                                                    "saved_session",
-                                                    &m_online_group,
-                                                    "Is there a saved session?") );
-
-    PARAM_PREFIX IntUserConfigParam         m_saved_user
-            PARAM_DEFAULT(  IntUserConfigParam(     0,
-                                                    "saved_user",
-                                                    &m_online_group,
-                                                    "User ID of the saved session.") );
-
-    PARAM_PREFIX StringUserConfigParam      m_saved_token
-            PARAM_DEFAULT(  StringUserConfigParam(  "",
-                                                    "saved_token",
-                                                    &m_online_group,
-                                                    "Token of the saved session.") );
-
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group

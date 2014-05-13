@@ -20,8 +20,10 @@
 #include <IGUIEnvironment.h>
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/online_profile_achievements.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "utils/translation.hpp"
 
@@ -33,12 +35,11 @@ using namespace Online;
 
 // -----------------------------------------------------------------------------
 
-NotificationDialog::NotificationDialog(Type type, const core::stringw info, bool from_queue)
+NotificationDialog::NotificationDialog(Type type, const core::stringw &info)
         : ModalDialog(0.8f,0.5f)
 {
     m_info = info;
     m_type = type;
-    if(!from_queue) load();
 }
 
 void NotificationDialog::load()
@@ -129,17 +130,22 @@ void NotificationDialog::onUpdate(float dt)
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
     {
+        // Since dismiss deletes this object, store the instance values which
+        // we still need
+        bool view = m_view;
+        NotificationDialog::Type type = m_type;
         ModalDialog::dismiss();
-        if (m_view)
+        if (view)
         {
-            if(m_type == T_Friends)
+            if(type == T_Friends)
             {
-                ProfileManager::get()->setVisiting(CurrentUser::get()->getID());
+                ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
                 StateManager::get()->pushScreen(OnlineProfileFriends::getInstance());
             }
-            else if (m_type == T_Achievements)
+            else if (type == T_Achievements)
             {
-                    //FIXME
+                ProfileManager::get()->setVisiting(PlayerManager::getCurrentOnlineId());
+                StateManager::get()->pushScreen(OnlineProfileAchievements::getInstance());
             }
         }
         return;

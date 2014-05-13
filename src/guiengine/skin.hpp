@@ -132,7 +132,6 @@ using namespace irr;
  */
 namespace GUIEngine
 {
-
     /**
       * In order to avoid calculating render information every frame, it's
       * stored in a SkinWidgetContainer for each widget (or each widget part
@@ -269,11 +268,8 @@ namespace GUIEngine
 
 
         video::ITexture* bg_image;
-
-
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
-
 #ifdef USE_PER_LINE_BACKGROUND
     public:
 #endif
@@ -323,12 +319,12 @@ namespace GUIEngine
 
         void drawTooltip(Widget* widget, bool atMouse);
 
+
     public:
 
         // dirty way to have dialogs that zoom in
         bool m_dialog;
         float m_dialog_size;
-
         /**
           * \brief load a skin from the file specified in the user configuration file
           * \throw std::runtime_error if file cannot be read

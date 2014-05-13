@@ -218,6 +218,70 @@ public:
 
 };   // WindAffector
 
+// ============================================================================
+
+class ScaleAffector : public scene::IParticleAffector
+{
+public:
+    ScaleAffector(const core::vector2df& scaleFactor = core::vector2df(1.0f, 1.0f)) : ScaleFactor(scaleFactor)
+    {
+    }
+
+    virtual void affect(u32 now, scene::SParticle *particlearray, u32 count)
+    {
+        for (u32 i = 0; i<count; i++)
+        {
+            const u32 maxdiff = particlearray[i].endTime - particlearray[i].startTime;
+            const u32 curdiff = now - particlearray[i].startTime;
+            const f32 timefraction = (f32)curdiff / maxdiff;
+            core::dimension2df destsize = particlearray[i].startSize * ScaleFactor;
+            particlearray[i].size = particlearray[i].startSize + (destsize - particlearray[i].startSize) * timefraction;
+        }
+    }
+
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        return scene::EPAT_SCALE;
+    }
+
+protected:
+    core::vector2df ScaleFactor;
+};
+
+// ============================================================================
+
+class ColorAffector : public scene::IParticleAffector
+{
+protected:
+    core::vector3df m_color_from;
+    core::vector3df m_color_to;
+
+public:
+    ColorAffector(const core::vector3df& colorFrom, const core::vector3df& colorTo) :
+        m_color_from(colorFrom), m_color_to(colorTo)
+    {
+    }
+
+    virtual void affect(u32 now, scene::SParticle *particlearray, u32 count)
+    {
+        for (u32 i = 0; i<count; i++)
+        {
+            const u32 maxdiff = particlearray[i].endTime - particlearray[i].startTime;
+            const u32 curdiff = now - particlearray[i].startTime;
+            const f32 timefraction = (f32)curdiff / maxdiff;
+            core::vector3df curr_color = m_color_from + (m_color_to - m_color_from)* timefraction;
+            particlearray[i].color = video::SColor(255, (int)curr_color.X, (int)curr_color.Y, (int)curr_color.Z);
+        }
+    }
+
+    virtual scene::E_PARTICLE_AFFECTOR_TYPE getType() const
+    {
+        return scene::EPAT_SCALE;
+    }
+
+};
+
+
 
 // ============================================================================
 
@@ -233,6 +297,8 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_particle_type       = NULL;
     m_parent              = parent;
     m_emission_decay_rate = 0;
+    m_is_glsl = irr_driver->isGLSL();
+
 
     setParticleType(type);
     assert(m_node != NULL);
@@ -324,21 +390,21 @@ void ParticleEmitter::setCreationRateAbsolute(float f)
 
     if (f <= 0.0f && m_node->getEmitter())
     {
-		m_node->clearParticles();
+        m_node->clearParticles();
     }
     else if (m_node->getEmitter() == NULL)
     {
         m_node->setEmitter(m_emitter);
     }
 #endif
-/*	if (f <= 0.0f)
-	{
-		m_node->setVisible(false);
-	}
-	else
-	{
-		m_node->setVisible(true);
-	}*/
+/*    if (f <= 0.0f)
+    {
+        m_node->setVisible(false);
+    }
+    else
+    {
+        m_node->setVisible(true);
+    }*/
 }   // setCreationRateAbsolute
 
 //-----------------------------------------------------------------------------
@@ -381,8 +447,12 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
         }
         else
         {
-            m_node = ParticleSystemProxy::addParticleNode();
-            if (irr_driver->isGLSL())
+            if (m_is_glsl)
+                m_node = ParticleSystemProxy::addParticleNode(m_is_glsl);
+            else
+                m_node = irr_driver->addParticleNode();
+            
+            if (m_is_glsl)
                 static_cast<ParticleSystemProxy *>(m_node)->setAlphaAdditive(type->getMaterial()->isAlphaAdditive());
         }
 
@@ -450,8 +520,8 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             case EMITTER_POINT:
             {
                 m_emitter = m_node->createPointEmitter(velocity,
-													   type->getMinRate(),  type->getMaxRate(),
-                                                       type->getMinColor(), type->getMaxColor(),
+                                                       type->getMinRate(),  type->getMaxRate(),
+                                                       type->getMinColor(), type->getMinColor(),
                                                        lifeTimeMin, lifeTimeMax,
                                                        m_particle_type->getAngleSpread() /* angle */
                                                        );
@@ -467,7 +537,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                                      box_size_x,  box_size_y,  -0.6f - type->getBoxSizeZ()),
                                                      velocity,
                                                      type->getMinRate(),  type->getMaxRate(),
-                                                     type->getMinColor(), type->getMaxColor(),
+                                                     type->getMinColor(), type->getMinColor(),
                                                      lifeTimeMin, lifeTimeMax,
                                                      m_particle_type->getAngleSpread()
                                                      );
@@ -500,7 +570,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
                                                         m_particle_type->getSphereRadius(),
                                                         velocity,
                                                         type->getMinRate(),  type->getMaxRate(),
-                                                        type->getMinColor(), type->getMaxColor(),
+                                                        type->getMinColor(), type->getMinColor(),
                                                         lifeTimeMin, lifeTimeMax,
                                                         m_particle_type->getAngleSpread()
                                                  );
@@ -550,14 +620,51 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
         if (type->hasScaleAffector())
         {
-            core::dimension2df factor = core::dimension2df(type->getScaleAffectorFactorX(),
-                                                           type->getScaleAffectorFactorY());
-            scene::IParticleAffector* scale_affector =
-                m_node->createScaleParticleAffector(factor);
-            m_node->addAffector(scale_affector);
-            scale_affector->drop();
-            if (irr_driver->isGLSL())
+            if (m_is_glsl)
+            {
                 static_cast<ParticleSystemProxy *>(m_node)->setIncreaseFactor(type->getScaleAffectorFactorX());
+            }
+            else
+            {
+                core::vector2df factor = core::vector2df(type->getScaleAffectorFactorX(),
+                    type->getScaleAffectorFactorY());
+                scene::IParticleAffector* scale_affector = new ScaleAffector(factor);
+                m_node->addAffector(scale_affector);
+                scale_affector->drop();
+            }
+        }
+
+        if (type->getMinColor() != type->getMaxColor())
+        {
+            if (m_is_glsl)
+            {
+                video::SColor color_from = type->getMinColor();
+                static_cast<ParticleSystemProxy *>(m_node)->setColorFrom(color_from.getRed() / 255.0f,
+                    color_from.getGreen() / 255.0f,
+                    color_from.getBlue() / 255.0f);
+
+                video::SColor color_to = type->getMaxColor();
+                static_cast<ParticleSystemProxy *>(m_node)->setColorTo(color_to.getRed() / 255.0f,
+                    color_to.getGreen() / 255.0f,
+                    color_to.getBlue() / 255.0f);
+            }
+            else
+            {
+                video::SColor color_from = type->getMinColor();
+                core::vector3df color_from_v =
+                    core::vector3df(float(color_from.getRed()),
+                                    float(color_from.getGreen()),
+                                    float(color_from.getBlue()));
+
+                video::SColor color_to = type->getMaxColor();
+                core::vector3df color_to_v = core::vector3df(float(color_to.getRed()),
+                                                             float(color_to.getGreen()),
+                                                             float(color_to.getBlue()));
+
+                ColorAffector* affector = new ColorAffector(color_from_v, color_to_v);
+                m_node->addAffector(affector);
+                affector->drop();
+            }
         }
 
         const float windspeed = type->getWindSpeed();
@@ -566,14 +673,15 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             WindAffector *waf = new WindAffector(windspeed);
             m_node->addAffector(waf);
             waf->drop();
-    }
+
+            // TODO: wind affector for GLSL particles
+        }
 
         const bool flips = type->getFlips();
         if (flips)
         {
-			if (irr_driver->isGLSL())
-				static_cast<ParticleSystemProxy *>(m_node)->setFlip();
-            //m_node->getMaterial(0).BlendOperation = video::EBO_ADD;
+            if (m_is_glsl)
+                static_cast<ParticleSystemProxy *>(m_node)->setFlip();
         }
     }
 }   // setParticleType
@@ -582,10 +690,9 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
 
 void ParticleEmitter::addHeightMapAffector(Track* t)
 {
-    HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
-    m_node->addAffector(hmca);
-    hmca->drop();
-    if (irr_driver->isGLSL()) {
+    
+    if (m_is_glsl)
+    {
         const Vec3* aabb_min;
         const Vec3* aabb_max;
         t->getAABB(&aabb_min, &aabb_max);
@@ -595,6 +702,12 @@ void ParticleEmitter::addHeightMapAffector(Track* t)
         const float track_z_len = aabb_max->getZ() - aabb_min->getZ();
         static_cast<ParticleSystemProxy *>(m_node)->setHeightmap(t->buildHeightMap(),
             track_x, track_z, track_x_len, track_z_len);
+    }
+    else
+    {
+        HeightMapCollisionAffector* hmca = new HeightMapCollisionAffector(t);
+        m_node->addAffector(hmca);
+        hmca->drop();
     }
 }
 

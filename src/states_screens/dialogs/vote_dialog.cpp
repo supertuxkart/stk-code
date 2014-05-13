@@ -17,17 +17,16 @@
 
 #include "states_screens/dialogs/vote_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
+#include "addons/addons_manager.hpp"
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/current_user.hpp"
-#include "online/messages.hpp"
 
-
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -35,13 +34,14 @@ using namespace irr::gui;
 using namespace Online;
 
 // -----------------------------------------------------------------------------
-
+/** Constructor.
+ */
 VoteDialog::VoteDialog(const std::string & addon_id)
-        : ModalDialog(0.8f,0.6f), m_addon_id(addon_id)
+         : ModalDialog(0.8f,0.6f), m_addon_id(addon_id)
 {
-    m_fetch_vote_request = NULL;
+    m_fetch_vote_request   = NULL;
     m_perform_vote_request = NULL;
-    m_self_destroy = false;
+    m_self_destroy         = false;
     loadFromFile("online/vote_dialog.stkgui");
 
     m_info_widget = getWidget<LabelWidget>("info");
@@ -57,43 +57,94 @@ VoteDialog::VoteDialog(const std::string & addon_id)
     assert(m_cancel_widget != NULL);
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-    m_fetch_vote_request = CurrentUser::get()->requestGetAddonVote(m_addon_id);
+
+    m_fetch_vote_request = new XMLRequest();
+    PlayerManager::setUserDetails(m_fetch_vote_request, "get-addon-vote");
+    m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
+    m_fetch_vote_request->queue();
 
     m_rating_widget->setDeactivated();
     m_cancel_widget->setDeactivated();
-}
+}    // VoteDialog
 
 // -----------------------------------------------------------------------------
+/** Destructor, frees the various requests.
+ */
 VoteDialog::~VoteDialog()
 {
     delete m_fetch_vote_request;
     delete m_perform_vote_request;
-}
+}   // ~VoteDialog
 
 // -----------------------------------------------------------------------------
-
+/** When escape is pressed, trigger a self destroy.
+ */
 bool VoteDialog::onEscapePressed()
 {
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
     return false;
-}
+}   // onEscapePressed
+
+// ----------------------------------------------------------------------------
+/** A request to the server, to perform a vote on an addon.
+ *  \param rating the voted rating.
+ */
+void VoteDialog::sendVote()
+{
+    /** A vote request. The callback will update the addon manager with the
+     *  new average. The VoteDialog polls this request till it is finished
+     *  to inform the user about the new average.
+     */
+    class SetAddonVoteRequest : public XMLRequest
+    {
+        virtual void callback()
+        {
+            if (isSuccess())
+            {
+                std::string addon_id;
+                getXMLData()->get("addon-id", &addon_id);
+                float average;
+                getXMLData()->get("new-average", &average);
+                addons_manager->getAddon(Addon::createAddonId(addon_id))
+                              ->setRating(average);
+            }   // isSuccess
+        }   // callbac
+    public:
+        SetAddonVoteRequest() : XMLRequest() {}
+    };   // SetAddonVoteRequest
+
+    // ------------------------------------------------------------------------
+
+
+    m_perform_vote_request = new SetAddonVoteRequest();
+    PlayerManager::setUserDetails(m_perform_vote_request, "set-addon-vote");
+    m_perform_vote_request->addParameter("addonid", m_addon_id.substr(6));
+    m_perform_vote_request->addParameter("rating", m_rating_widget->getRating());
+    m_perform_vote_request->queue();
+
+    m_rating_widget->setDeactivated();
+    m_cancel_widget->setDeactivated();
+
+}   // sendVote
 
 // -----------------------------------------------------------------------------
-GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSource)
+/** Callback when a user event is triggered.
+ *  \param event Information about the event that was triggered.
+ */
+GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& event)
 {
 
-    if (eventSource == m_rating_widget->m_properties[PROP_ID])
+    if (event == m_rating_widget->m_properties[PROP_ID])
     {
-        m_perform_vote_request = CurrentUser::get()->requestSetAddonVote(m_addon_id, m_rating_widget->getRating());
-        m_rating_widget->setDeactivated();
-        m_cancel_widget->setDeactivated();
+        sendVote();
         return GUIEngine::EVENT_BLOCK;
     }
 
-    if (eventSource == m_options_widget->m_properties[PROP_ID])
+    if (event == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selection = 
+            m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
@@ -101,50 +152,66 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& eventSou
         }
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
+/** Updates a potentiall still outstanding fetch vote request.
+ */
+void VoteDialog::updateFetchVote()
+{
+    // No request, nothing to do
+    if (!m_fetch_vote_request) return;
+    if (!m_fetch_vote_request->isDone())
+    {
+        // request still pending
+        m_info_widget->setText(irr::core::stringw(_("Fetching last vote")) 
+                               + Messages::loadingDots(),               false);
+        return;
+    }   // !isDone
 
+    if (m_fetch_vote_request->isSuccess())
+    {
+        m_info_widget->setDefaultColor();
+        std::string voted("");
+        m_fetch_vote_request->getXMLData()->get("voted", &voted);
+        if (voted == "yes")
+        {
+            float rating;
+            m_fetch_vote_request->getXMLData()->get("rating", &rating);
+            m_rating_widget->setRating(rating);
+            m_info_widget->setText(_("You can adapt your previous rating by "
+                                     "clicking the stars beneath."), false);
+        }
+        else if (voted == "no")
+        {
+            m_info_widget->setText(_("You have not yet voted for this addon. "
+                                     "Select your desired rating by clicking "
+                                     "the stars beneath"),              false);
+        }
+        m_cancel_widget->setActivated();
+        m_rating_widget->setActivated();
+    }   // isSuccess
+    else
+    {
+        sfx_manager->quickSound("anvil");
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(m_fetch_vote_request->getInfo(), false);
+        m_cancel_widget->setActivated();
+    }   // !isSuccess
+
+    delete m_fetch_vote_request;
+    m_fetch_vote_request = NULL;
+
+}   // updateFetchVote
+
+// -----------------------------------------------------------------------------
+/** Called every frame. Checks if any of the pending requests are finished.
+ *  \param dt Time step size.
+ */
 void VoteDialog::onUpdate(float dt)
 {
-    if(m_fetch_vote_request != NULL)
-    {
-        if(m_fetch_vote_request->isDone())
-        {
-            if(m_fetch_vote_request->isSuccess())
-            {
-                m_info_widget->setDefaultColor();
-                std::string voted("");
-                m_fetch_vote_request->getXMLData()->get("voted", &voted);
-                if(voted == "yes")
-                {
-                    float rating;
-                    m_fetch_vote_request->getXMLData()->get("rating", &rating);
-                    m_rating_widget->setRating(rating);
-                    m_info_widget->setText(_("You can adapt your previous rating by clicking the stars beneath."), false);
-                }
-                else if(voted == "no")
-                {
-                    m_info_widget->setText(_("You have not yet voted for this addon. Select your desired rating by clicking the stars beneath"), false);
-                }
-                m_cancel_widget->setActivated();
-                m_rating_widget->setActivated();
-            }
-            else
-            {
-                sfx_manager->quickSound( "anvil" );
-                m_info_widget->setErrorColor();
-                m_info_widget->setText(m_fetch_vote_request->getInfo(), false);
-                m_cancel_widget->setActivated();
-            }
-            delete m_fetch_vote_request;
-            m_fetch_vote_request = NULL;
-        }
-        else
-        {
-            m_info_widget->setText(irr::core::stringw(_("Fetching last vote")) + Messages::loadingDots(), false);
-        }
-    }
+    updateFetchVote();
+
     if(m_perform_vote_request != NULL)
     {
         if(m_perform_vote_request->isDone())
@@ -152,9 +219,10 @@ void VoteDialog::onUpdate(float dt)
             if(m_perform_vote_request->isSuccess())
             {
                 m_info_widget->setDefaultColor();
-                m_info_widget->setText(_("Vote successful! You can now close the window."), false);
+                m_info_widget->setText(_("Vote successful! You can now close "
+                                         "the window."),                false);
                 m_cancel_widget->setActivated();
-            }
+            }   // isSuccess
             else
             {
                 sfx_manager->quickSound( "anvil" );
@@ -162,15 +230,18 @@ void VoteDialog::onUpdate(float dt)
                 m_info_widget->setText(m_perform_vote_request->getInfo(), false);
                 m_cancel_widget->setActivated();
                 m_rating_widget->setActivated();
-            }
+            }   // !isSuccess
             delete m_perform_vote_request;
             m_perform_vote_request = NULL;
-        }
+        }   // isDone
         else
         {
-            m_info_widget->setText(irr::core::stringw(_("Performing vote")) + Messages::loadingDots(), false);
-        }
+            m_info_widget->setText(irr::core::stringw(_("Performing vote")) 
+                                   + Messages::loadingDots(), false);
+        }   // !isDone
     }
+
     if (m_self_destroy)
         ModalDialog::dismiss();
-}
+
+}   // onUpdate

@@ -19,7 +19,6 @@
 #ifndef HEADER_ADD_DEVICE_DIALOG_HPP
 #define HEADER_ADD_DEVICE_DIALOG_HPP
 
-#include "config/player.hpp"
 #include "guiengine/modaldialog.hpp"
 
 /**

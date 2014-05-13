@@ -21,11 +21,13 @@
 #include "guiengine/event_handler.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
-#include "io/utf_writer.hpp"
+#include "utils/vs.hpp"
+
 #include <assert.h>
 #include <stack>
 #include <sstream>
 #include <algorithm>
+#include <fstream>
 
 Profiler profiler;
 
@@ -35,6 +37,7 @@ Profiler profiler;
 #define LINE_HEIGHT 0.030f   // height of a line representing a thread
 
 #define MARKERS_NAMES_POS      core::rect<s32>(50,100,150,200)
+#define GPU_MARKERS_NAMES_POS      core::rect<s32>(50,165,150,250)
 
 #define TIME_DRAWN_MS 30.0f // the width of the profiler corresponds to TIME_DRAWN_MS milliseconds
 
@@ -42,7 +45,7 @@ Profiler profiler;
 #ifdef WIN32
     #include <windows.h>
 
-    static double _getTimeMilliseconds()
+    double getTimeMilliseconds()
     {
         LARGE_INTEGER freq;
         QueryPerformanceFrequency(&freq);
@@ -55,7 +58,7 @@ Profiler profiler;
 
 #else
     #include <sys/time.h>
-    static double _getTimeMilliseconds()
+    double getTimeMilliseconds()
     {
         struct timeval tv;
         gettimeofday(&tv, NULL);
@@ -69,7 +72,7 @@ Profiler::Profiler()
 {
     m_thread_infos.resize(1);    // TODO: monothread now, should support multithreading
     m_write_id = 0;
-    m_time_last_sync = _getTimeMilliseconds();
+    m_time_last_sync = getTimeMilliseconds();
     m_time_between_sync = 0.0;
     m_freeze_state = UNFROZEN;
     m_capture_report = false;
@@ -98,8 +101,9 @@ void Profiler::setCaptureReport(bool captureReport)
     {
         // when disabling capture to file, flush captured data to a file
         {
-            UTFWriter writer(file_manager->getUserConfigFile("profiling.csv").c_str());
-            writer << m_capture_report_buffer->getRawBuffer();
+            std::ofstream filewriter(file_manager->getUserConfigFile("profiling.csv").c_str(), std::ios::out | std::ios::binary);
+            const char* str = m_capture_report_buffer->getRawBuffer();
+            filewriter.write(str, strlen(str));
         }
         m_capture_report = false;
         delete m_capture_report_buffer;
@@ -117,7 +121,7 @@ void Profiler::pushCpuMarker(const char* name, const video::SColor& color)
 
     ThreadInfo& ti = getThreadInfo();
     MarkerStack& markers_stack = ti.markers_stack[m_write_id];
-    double  start = _getTimeMilliseconds() - m_time_last_sync;
+    double  start = getTimeMilliseconds() - m_time_last_sync;
     size_t  layer = markers_stack.size();
 
     // Add to the stack of current markers
@@ -140,7 +144,7 @@ void Profiler::popCpuMarker()
 
     // Update the date of end of the marker
     Marker&     marker = markers_stack.top();
-    marker.end = _getTimeMilliseconds() - m_time_last_sync;
+    marker.end = getTimeMilliseconds() - m_time_last_sync;
 
     // Remove the marker from the stack and add it to the list of markers done
     markers_done.push_front(marker);
@@ -155,8 +159,8 @@ void Profiler::synchronizeFrame()
     if(m_freeze_state == FROZEN)
         return;
 
-    // Avoid using several times _getTimeMilliseconds(), which would yield different results
-    double now = _getTimeMilliseconds();
+    // Avoid using several times getTimeMilliseconds(), which would yield different results
+    double now = getTimeMilliseconds();
 
     // Swap buffers
     int old_write_id = m_write_id;
@@ -312,6 +316,48 @@ void Profiler::draw()
         }
     }
 
+    QueryPerf hovered_gpu_marker = Q_LAST;
+    long hovered_gpu_marker_elapsed = 0;
+    if (hovered_markers.size() == 0)
+    {
+        int gpu_y = y_offset + nb_thread_infos*line_height + line_height/2;
+        float total = 0;
+        for (unsigned i = 0; i < Q_LAST; i++)
+        {
+            total += irr_driver->getGPUTimer(i).elapsedTimeus();
+        }
+
+        static video::SColor colors[] = {
+            video::SColor(255, 255, 0, 0),
+            video::SColor(255, 0, 255, 0),
+            video::SColor(255, 0, 0, 255),
+            video::SColor(255, 255, 255, 0),
+            video::SColor(255, 255, 0, 255),
+            video::SColor(255, 0, 255, 255)
+        };
+
+        float curr_val = 0;
+        for (unsigned i = 0; i < Q_LAST; i++)
+        {
+            //Log::info("GPU Perf", "Phase %d : %d us\n", i, irr_driver->getGPUTimer(i).elapsedTimeus());
+
+            float elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+            core::rect<s32> pos((s32)(x_offset + (curr_val / total)*profiler_width),
+                (s32)(y_offset + gpu_y),
+                (s32)(x_offset + ((curr_val + elapsed) / total)*profiler_width),
+                (s32)(y_offset + gpu_y + line_height));
+
+            curr_val += elapsed;
+            GL32_draw2DRectangle(colors[i % 6], pos);
+
+            if (pos.isPointInside(mouse_pos))
+            {
+                hovered_gpu_marker = (QueryPerf)i;
+                hovered_gpu_marker_elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+            }
+        }
+    }
+
     // Draw the end of the frame
     {
         s32 x_sync = (s32)(x_offset + factor*m_time_between_sync);
@@ -340,6 +386,33 @@ void Profiler::draw()
             hovered_markers.pop();
         }
         font->draw(text, MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+
+        if (hovered_gpu_marker != Q_LAST)
+        {
+            static const char *Phase[Q_LAST] =
+            {
+                "Solid Pass 1",
+                "Shadows",
+                "Lights",
+                "SSAO",
+                "Solid Pass 2",
+                "Transparent",
+                "Particles",
+                "Displacement",
+                "Godrays",
+                "Bloom",
+                "Tonemap",
+                "Motion Blur"
+            };
+            std::ostringstream oss;
+            oss << Phase[hovered_gpu_marker] << " : " << hovered_gpu_marker_elapsed << " us";
+            font->draw(oss.str().c_str(), GPU_MARKERS_NAMES_POS, video::SColor(0xFF, 0xFF, 0x00, 0x00));
+        }
+    }
+
+    if (m_capture_report)
+    {
+        font->draw("Capturing profiler report...", MARKERS_NAMES_POS, video::SColor(0xFF, 0x00, 0x90, 0x00));
     }
 }
 
@@ -389,6 +462,6 @@ void Profiler::drawBackground()
                                    (int)((1.0-MARGIN_X)                * screen_size.Width),
                                    (int)((MARGIN_Y + 1.75f*LINE_HEIGHT) * screen_size.Height));
 
-    video::SColor   color(0xFF, 0xFF, 0xFF, 0xFF);
+    video::SColor   color(0x88, 0xFF, 0xFF, 0xFF);
     GL32_draw2DRectangle(color, background_rect);
 }

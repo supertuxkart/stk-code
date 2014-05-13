@@ -18,10 +18,10 @@
 
 #include "network/protocols/hide_public_address.hpp"
 
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "network/protocol_manager.hpp"
 #include "online/request_manager.hpp"
-#include "online/current_user.hpp"
-#include "config/user_config.hpp"
 #include "utils/log.hpp"
 
 HidePublicAddress::HidePublicAddress() : Protocol(NULL, PROTOCOL_SILENT)
@@ -42,10 +42,8 @@ void HidePublicAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        m_request->setServerURL("address-management.php");
-        m_request->addParameter("id",Online::CurrentUser::get()->getID());
-        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
-        m_request->addParameter("action","unset");
+        PlayerManager::setUserDetails(m_request, "unset",
+                                      "address-management.php");
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

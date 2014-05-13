@@ -146,8 +146,8 @@
 #include "audio/music_manager.hpp"
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
-#include "config/player.hpp"
 #include "config/player_manager.hpp"
+#include "config/player_profile.hpp"
 #include "config/stk_config.hpp"
 #include "config/user_config.hpp"
 #include "graphics/hardware_skinning.hpp"
@@ -158,8 +158,8 @@
 #include "guiengine/engine.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/dialog_queue.hpp"
-#include "input/input_manager.hpp"
 #include "input/device_manager.hpp"
+#include "input/input_manager.hpp"
 #include "input/wiimote_manager.hpp"
 #include "io/file_manager.hpp"
 #include "items/attachment_manager.hpp"
@@ -170,20 +170,16 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "modes/profile_world.hpp"
+#include "network/client_network_manager.hpp"
 #include "network/network_manager.hpp"
+#include "network/protocol_manager.hpp"
+#include "network/protocols/server_lobby_room_protocol.hpp"
 #include "network/client_network_manager.hpp"
 #include "network/server_network_manager.hpp"
 #include "network/protocol_manager.hpp"
 #include "network/protocols/server_lobby_room_protocol.hpp"
-#include "online/current_user.hpp"
-#include "online/request_manager.hpp"
-#include "network/client_network_manager.hpp"
-#include "network/server_network_manager.hpp"
-#include "network/protocol_manager.hpp"
-#include "network/protocols/server_lobby_room_protocol.hpp"
-#include "online/current_user.hpp"
-#include "online/request_manager.hpp"
 #include "online/profile_manager.hpp"
+#include "online/request_manager.hpp"
 #include "online/servers_manager.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/highscore_manager.hpp"
@@ -205,6 +201,7 @@
 #include "utils/translation.hpp"
 
 static void cleanSuperTuxKart();
+static void cleanUserConfig();
 
 // ============================================================================
 //                        gamepad visualisation screen
@@ -362,15 +359,15 @@ void gamepadVisualisation()
 }   // gamepadVisualisation
 
 // ============================================================================
-/** Sets the Christmas flag (m_xmas_enabled), depending on currently set
- *  Christ mode (m_xmas_mode)
+/** Sets the hat mesh name depending on the current christmas mode 
+ *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
 void handleXmasMode()
 {
     bool xmas = false;
     switch(UserConfigParams::m_xmas_mode)
     {
-    case 0:  
+    case 0:
         {
             int day, month;
             StkTime::getDate(&day, &month);
@@ -403,6 +400,9 @@ void cmdLineHelp()
                               " and the music.\n"
     "  -t,  --track=NAME       Start at track NAME.\n"
     "       --gp=NAME          Start the specified Grand Prix.\n"
+    "       --add-gp-dir=DIR   Load Grand Prix in DIR. Setting will be saved "
+                              "inconfig.xml under additional_gp_directory. Use "
+                              "--add-gp-dir=\"\" to unset.\n"
     "       --stk-config=FILE  use ./data/FILE instead of "
                               "./data/stk_config.xml\n"
     "  -k,  --numkarts=NUM     Number of karts on the racetrack.\n"
@@ -463,25 +463,42 @@ void cmdLineHelp()
  */
 int handleCmdLinePreliminary()
 {
-    if( CommandLine::has("--help") || CommandLine::has("-help") ||
-        CommandLine::has("-h")                                      )
+    if (CommandLine::has("--help") || CommandLine::has("-help") ||
+        CommandLine::has("-h"))
     {
         cmdLineHelp();
+        cleanUserConfig();
         exit(0);
     }
-    if( CommandLine::has("--gamepad-visualisation") ||
-        CommandLine::has("--gamepad-visualization")    )
+
+    if(CommandLine::has("--version") || CommandLine::has("-v"))
+    {
+        Log::info("main", "==============================");
+        Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
+        // IRRLICHT_VERSION_SVN
+        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
+                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
+                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
+        Log::info("main", "==============================");
+        cleanUserConfig();
+        exit(0);
+    }
+
+    if(CommandLine::has("--gamepad-visualisation") ||   // only BE
+       CommandLine::has("--gamepad-visualization")    ) // both AE and BE
         UserConfigParams::m_gamepad_visualisation=true;
-    if( CommandLine::has("--debug=memory"))
+    if(CommandLine::has("--debug=memory"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MEMORY;
-    if( CommandLine::has("--debug=addons"))
+    if(CommandLine::has("--debug=addons"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_ADDONS;
-    if( CommandLine::has("--debug=mgui"))
+    if(CommandLine::has("--debug=mgui"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_GUI;
-    if( CommandLine::has("--debug=flyable"))
+    if(CommandLine::has("--debug=flyable"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_FLYABLE;
-    if( CommandLine::has("--debug=mist"))
+    if(CommandLine::has("--debug=mist"))
         UserConfigParams::m_verbosity |= UserConfigParams::LOG_MISC;
+    if(CommandLine::has("--debug=all") )
+        UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
     if(CommandLine::has("--console"))
         UserConfigParams::m_log_errors_to_console=true;
     if(CommandLine::has("--no-console"))
@@ -493,36 +510,32 @@ int handleCmdLinePreliminary()
         Log::disableColor();
         Log::verbose("main", "Colours disabled.");
     }
-    if(CommandLine::has("--debug=all") )
-        UserConfigParams::m_verbosity |= UserConfigParams::LOG_ALL;
 
     std::string s;
-    if( CommandLine::has( "--stk-config", &s))
+    if(CommandLine::has("--stk-config", &s))
     {
         stk_config->load(file_manager->getAsset(s));
         Log::info("main", "STK config will be read from %s.",s.c_str());
     }
-    if( CommandLine::has( "--trackdir", &s))
+    if(CommandLine::has("--trackdir", &s))
         TrackManager::addTrackSearchDir(s);
-    if( CommandLine::has( "--kartdir", &s))
+    if(CommandLine::has("--kartdir", &s))
         KartPropertiesManager::addKartSearchDir(s);
 
-    if( CommandLine::has( "--no-graphics") ||
-        CommandLine::has("-l"            )    )
+    if(CommandLine::has("--no-graphics") || CommandLine::has("-l"))
     {
         ProfileWorld::disableGraphics();
         UserConfigParams::m_log_errors_to_console=true;
     }
 
-    if(CommandLine::has("--screensize", &s) || 
-       CommandLine::has("-s", &s)              )
+    if(CommandLine::has("--screensize", &s) || CommandLine::has("-s", &s))
     {
         //Check if fullscreen and new res is blacklisted
         int width, height;
         if (sscanf(s.c_str(), "%dx%d", &width, &height) == 2)
         {
             // Reassemble the string in case that the original width or
-            // height contained a leading 0 
+            // height contained a leading 0
             std::ostringstream o;
             o << width << "x" << height;
             std::string res = o.str();
@@ -550,8 +563,6 @@ int handleCmdLinePreliminary()
         }
     }
 
-
-//#if !defined(WIN32) && !defined(__CYGWIN)
     if(CommandLine::has("--fullscreen") || CommandLine::has("-f"))
     {
         // Check that current res is not blacklisted
@@ -566,24 +577,22 @@ int handleCmdLinePreliminary()
             Log::warn("main", "Resolution %s has been blacklisted, so it "
             "is not available!", res.c_str());
     }
+
     if(CommandLine::has("--windowed") || CommandLine::has("-w"))
         UserConfigParams::m_fullscreen = false;
-//#endif
 
-    if(CommandLine::has("--version") || CommandLine::has("-v"))
+    // Enable loading grand prix from local directory
+    if(CommandLine::has("--add-gp-dir", &s))
     {
-        Log::info("main", "==============================");
-        Log::info("main", "SuperTuxKart, %s.", STK_VERSION ) ;
-#ifdef SVNVERSION
-        Log::info("main", "SuperTuxKart, SVN revision number '%s'.",
-                          SVNVERSION ) ;
-#endif
-        // IRRLICHT_VERSION_SVN
-        Log::info("main", "Irrlicht version %i.%i.%i (%s)",
-                          IRRLICHT_VERSION_MAJOR , IRRLICHT_VERSION_MINOR,
-                          IRRLICHT_VERSION_REVISION, IRRLICHT_SDK_VERSION );
-        Log::info("main", "==============================");
-    }   // --verbose or -v
+        // Ensure that the path ends with a /
+        if (s[s.size()] == '/')
+            UserConfigParams::m_additional_gp_directory = s;
+        else
+            UserConfigParams::m_additional_gp_directory = s + "/";
+
+        Log::info("main", "Additional Grand Prix's will be loaded from %s",
+                           UserConfigParams::m_additional_gp_directory.c_str());
+    }
 
     int n;
     if(CommandLine::has("--xmas", &n))
@@ -681,9 +690,9 @@ int handleCmdLine()
 
     if(CommandLine::has("--kart", &s))
     {
-        const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+        const PlayerProfile *player = PlayerManager::getCurrentPlayer();
 
-        if(!player->isLocked(s))
+        if(player && !player->isLocked(s))
         {
             const KartProperties *prop =
                 kart_properties_manager->getKart(s);
@@ -709,9 +718,12 @@ int handleCmdLine()
         }
         else   // kart locked
         {
-            Log::warn("main", "Kart '%s' has not been unlocked yet.",
-                       s.c_str());
-            return 0;
+            if (player)
+                Log::warn("main", "Kart '%s' has not been unlocked yet.",
+                          s.c_str());
+            else
+                Log::warn("main",
+                        "A default player must exist in order to use --kart.");
         }   // if kart locked
     }   // if --kart
 
@@ -750,8 +762,8 @@ int handleCmdLine()
 
     if(CommandLine::has("--track", &s) || CommandLine::has("-t", &s))
     {
-        const PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
-        if (!player->isLocked(s))
+        const PlayerProfile *player = PlayerManager::getCurrentPlayer();
+        if (player && !player->isLocked(s))
         {
             race_manager->setTrack(s);
             Log::verbose("main", "You choose to start in track '%s'.",
@@ -783,9 +795,12 @@ int handleCmdLine()
         }
         else
         {
-            Log::warn("main", "Track '%s' has not been unlocked yet.",
-                      s.c_str());
-            return 0;
+            if (player)
+                Log::warn("main", "Track '%s' has not been unlocked yet.",
+                          s.c_str());
+            else
+                Log::warn("main",
+                       "A default player must exist in order to use --track.");
         }
     }   // --track
 
@@ -817,7 +832,7 @@ int handleCmdLine()
                      (int)UserConfigParams::m_num_karts);
     }   // --numkarts
 
-    if(CommandLine::has( "--no-start-screen") || 
+    if(CommandLine::has( "--no-start-screen") ||
         CommandLine::has("-N")                   )
         UserConfigParams::m_no_start_screen = true;
     if(CommandLine::has("--race-now") || CommandLine::has("-R"))
@@ -947,7 +962,7 @@ int handleCmdLine()
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
-                Online::CurrentUser::get()->requestSignIn(login, password, false, false);
+                PlayerManager::requestSignIn(login, password, false, false);
         request->executeNow();
 
         if (request->isSuccess())
@@ -967,7 +982,7 @@ void initUserConfig()
     irr_driver              = new IrrDriver();
     file_manager            = new FileManager();
     user_config             = new UserConfig();     // needs file_manager
-    user_config->loadConfig();    
+    user_config->loadConfig();
     if (UserConfigParams::m_language.toString() != "system")
     {
 #ifdef WIN32
@@ -1009,7 +1024,13 @@ void initRest()
     // online section of the addons manager will be initialised from a
     // separate thread running in network http.
     addons_manager          = new AddonsManager();
+    Online::ProfileManager::create();
 
+    // The request manager will start the login process in case of a saved
+    // session, so we need to read the main data from the players.xml file.
+    // The rest will be read later (since the rest needs the unlock- and
+    // achievement managers to be created, which can only be created later).
+    PlayerManager::create();
     Online::RequestManager::get()->startNetworkThread();
     NewsManager::get();   // this will create the news manager
 
@@ -1034,7 +1055,7 @@ void initRest()
     track_manager->loadTrackList();
     music_manager->addMusicToTracks();
 
-    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI, 
+    GUIEngine::addLoadingIcon(irr_driver->getTexture(FileManager::GUI,
                                                      "notes.png"      ) );
 
     grand_prix_manager      = new GrandPrixManager     ();
@@ -1056,18 +1077,43 @@ void initRest()
 }   // initRest
 
 //=============================================================================
-#ifdef BREAKPAD
-bool ShowDumpResults(const wchar_t* dump_path,
-                     const wchar_t* minidump_id,
-                     void* context,
-                     EXCEPTION_POINTERS* exinfo,
-                     MDRawAssertionInfo* assertion,
-                     bool succeeded)
+void askForInternetPermission()
 {
-    wprintf(L"Path: %s id %s.\n", dump_path, minidump_id);
-    return succeeded;
-}
-#endif
+    if (UserConfigParams::m_internet_status ==
+        Online::RequestManager::IPERM_NOT_ASKED)
+    {
+        class ConfirmServer :
+            public MessageDialog::IConfirmDialogListener
+        {
+        public:
+            virtual void onConfirm()
+            {
+                UserConfigParams::m_internet_status =
+                    Online::RequestManager::IPERM_ALLOWED;
+                GUIEngine::ModalDialog::dismiss();
+            }   // onConfirm
+            // --------------------------------------------------------
+            virtual void onCancel()
+            {
+                UserConfigParams::m_internet_status =
+                    Online::RequestManager::IPERM_NOT_ALLOWED;
+                GUIEngine::ModalDialog::dismiss();
+            }   // onCancel
+        };   // ConfirmServer
+
+        new MessageDialog(_("SuperTuxKart may connect to a server "
+            "to download add-ons and notify you of updates. Would you "
+            "like this feature to be enabled? (To change this setting "
+            "at a later time, go to options, select tab "
+            "'User Interface', and edit \"Allow STK to connect to the "
+            "Internet\")."),
+            MessageDialog::MESSAGE_DIALOG_CONFIRM,
+            new ConfirmServer(), true);
+    }
+
+}   // askForInternetPermission
+
+//=============================================================================
 
 #if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
 #pragma comment(linker, "/SUBSYSTEM:console")
@@ -1076,17 +1122,13 @@ bool ShowDumpResults(const wchar_t* dump_path,
 // ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
-#ifdef BREAKPAD
-    google_breakpad::ExceptionHandler eh(L"C:\\Temp", NULL, ShowDumpResults,
-                                         NULL, google_breakpad::ExceptionHandler::HANDLER_ALL);
-#endif
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();
 
     srand(( unsigned ) time( 0 ));
 
-    try 
+    try
     {
         std::string s;
         if(CommandLine::has("--root", &s))
@@ -1097,7 +1139,7 @@ int main(int argc, char *argv[] )
         // Init the minimum managers so that user config exists, then
         // handle all command line options that do not need (or must
         // not have) other managers initialised:
-        initUserConfig(); 
+        initUserConfig();
 
         handleCmdLinePreliminary();
 
@@ -1124,15 +1166,17 @@ int main(int argc, char *argv[] )
         handleXmasMode();
 
         // Needs the kart and track directories to load potential challenges
-        // in those dirs.
+        // in those dirs, so it can only be created after reading tracks
+        // and karts.
         unlock_manager = new UnlockManager();
-        // Needs the unlock manager to initialise the game slots of all players
-        PlayerManager::create();
+        AchievementsManager::create();
 
-        // Needs the player manager
-        AchievementsManager::get()->init();
+        // Reading the rest of the player data needs the unlock manager to
+        // initialise the game slots of all players and the AchievementsManager
+        // to initialise the AchievementsStatus, so it is done only now.
+        PlayerManager::get()->initRemainingData();
 
-        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI, 
+        GUIEngine::addLoadingIcon( irr_driver->getTexture(FileManager::GUI,
                                                           "gui_lock.png"  ) );
         projectile_manager->loadData();
 
@@ -1172,8 +1216,10 @@ int main(int argc, char *argv[] )
         // If the server has been created (--server option), this will do nothing (just a warning):
         NetworkManager::getInstance<ClientNetworkManager>();
         if (NetworkManager::getInstance()->isServer())
+        {
             ServerNetworkManager::getInstance()->setMaxPlayers(
                     UserConfigParams::m_server_max_players);
+        }
         NetworkManager::getInstance()->run();
         if (NetworkManager::getInstance()->isServer())
         {
@@ -1184,13 +1230,21 @@ int main(int argc, char *argv[] )
 
         // Load addons.xml to get info about addons even when not
         // allowed to access the internet
-        if (UserConfigParams::m_internet_status != 
+        if (UserConfigParams::m_internet_status !=
             Online::RequestManager::IPERM_ALLOWED)
         {
-            std::string xml_file = file_manager->getAddonsFile("addons.xml");
-            if (file_manager->fileExists(xml_file)) {
-                const XMLNode *xml = new XMLNode (xml_file);
-                addons_manager->initAddons(xml);
+            std::string xml_file = file_manager->getAddonsFile("addonsX.xml");
+            if (file_manager->fileExists(xml_file))
+            {
+                try
+                {
+                    const XMLNode *xml = new XMLNode(xml_file);
+                    addons_manager->initAddons(xml);
+                }
+                catch (std::runtime_error& e)
+                {
+                    Log::warn("Addons", "Exception thrown when initializing addons manager : %s", e.what());
+                }
             }
         }
 
@@ -1204,40 +1258,15 @@ int main(int argc, char *argv[] )
                 wiimote_manager->askUserToConnectWiimotes();
             }
 #endif
-            if(UserConfigParams::m_internet_status ==
-                Online::RequestManager::IPERM_NOT_ASKED)
-            {
-                class ConfirmServer :
-                      public MessageDialog::IConfirmDialogListener
-                {
-                public:
-                    virtual void onConfirm()
-                    {
-                        UserConfigParams::m_internet_status =
-                                 Online::RequestManager::IPERM_ALLOWED;
-                        GUIEngine::ModalDialog::dismiss();
-                    }   // onConfirm
-                    // --------------------------------------------------------
-                    virtual void onCancel()
-                    {
-                        UserConfigParams::m_internet_status =
-                            Online::RequestManager::IPERM_NOT_ALLOWED;
-                        GUIEngine::ModalDialog::dismiss();
-                    }   // onCancel
-                };   // ConfirmServer
-
-                new MessageDialog(_("SuperTuxKart may connect to a server "
-                    "to download add-ons and notify you of updates. Would you "
-                    "like this feature to be enabled? (To change this setting "
-                    "at a later time, go to options, select tab "
-                    "'User Interface', and edit \"Allow STK to connect to the "
-                    "Internet\")."),
-                    MessageDialog::MESSAGE_DIALOG_CONFIRM,
-                    new ConfirmServer(), true);
-            }
+            askForInternetPermission();
         }
         else
         {
+            // Skip the start screen. This esp. means that no login screen is
+            // displayed (if necessary), so we have to make sure there is
+            // a current player
+            PlayerManager::get()->enforceCurrentPlayer();
+            
             InputDevice *device;
 
             // Use keyboard 0 by default in --no-start-screen
@@ -1369,7 +1398,7 @@ int main(int argc, char *argv[] )
 // ============================================================================
 #ifdef WIN32
 //routine for running under windows
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
+int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                      LPTSTR lpCmdLine, int nCmdShow)
 {
     return main(__argc, __argv);
@@ -1393,12 +1422,12 @@ static void cleanSuperTuxKart()
     //see InitTuxkart()
     Online::RequestManager::deallocate();
     Online::ServersManager::deallocate();
-    Online::ProfileManager::deallocate();
-    AchievementsManager::deallocate();
-    Online::CurrentUser::deallocate();
+    Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
 
+    AchievementsManager::destroy();
     Referee::cleanup();
+
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
     NewsManager::deallocate();
@@ -1419,15 +1448,24 @@ static void cleanSuperTuxKart()
     if(sfx_manager)             delete sfx_manager;
     if(music_manager)           delete music_manager;
     delete ParticleKindManager::get();
-    if(stk_config)              delete stk_config;
-    if(user_config)             delete user_config;
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
-    if(translations)            delete translations;
-    if(file_manager)            delete file_manager;
-    if(irr_driver)              delete irr_driver;
+
+    cleanUserConfig();
 
     StateManager::deallocate();
     GUIEngine::EventHandler::deallocate();
 }   // cleanSuperTuxKart
 
+//=============================================================================
+/**
+ * Frees all the memory of initUserConfig()
+ */
+static void cleanUserConfig()
+{
+    if(stk_config)              delete stk_config;
+    if(translations)            delete translations;
+    if(user_config)             delete user_config;
+    if(file_manager)            delete file_manager;
+    if(irr_driver)              delete irr_driver;
+}

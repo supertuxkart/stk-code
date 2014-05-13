@@ -22,11 +22,13 @@
 #ifndef GAME_SETUP_HPP
 #define GAME_SETUP_HPP
 
-#include "online/profile.hpp"
 #include "network/race_config.hpp"
 
 #include <vector>
 #include <string>
+
+namespace Online { class OnlineProfile; }
+
 
 /*! \class PlayerProfile
  *  \brief Contains the profile of a player.
@@ -39,7 +41,7 @@ class NetworkPlayerProfile
 
         uint8_t race_id; //!< The id of the player for the race
         std::string kart_name; //!< The selected kart.
-        Online::Profile* user_profile; //!< Pointer to the lobby profile
+        Online::OnlineProfile* user_profile; //!< Pointer to the lobby profile
         uint8_t world_kart_id; //!< the kart id in the World class (pointer to AbstractKart)
 };
 
@@ -59,7 +61,7 @@ class GameSetup
         void setPlayerKart(uint8_t id, std::string kart_name); //!< Set the kart of a player
         void bindKartsToProfiles(); //!< Sets the right world_kart_id in profiles
 
-        /** \brief Get the players that are in the game 
+        /** \brief Get the players that are in the game
          *  \return A vector containing pointers on the players profiles.
          */
         std::vector<NetworkPlayerProfile*> getPlayers() { return m_players; }

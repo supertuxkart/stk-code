@@ -183,11 +183,11 @@ public:
     // ------------------------------------------------------------------------
     /** Returns true if both rear visual wheels touch the ground. */
     bool visualWheelsTouchGround() const
-    { 
-        return m_visual_wheels_touch_ground; 
+    {
+        return m_visual_wheels_touch_ground;
     }   // visualWheelsTouchGround
     // ------------------------------------------------------------------------
-    /** Returns the contact point of a visual wheel. 
+    /** Returns the contact point of a visual wheel.
      *  \param n Index of the wheel, must be 2 or 3 since only the two rear
      *           wheels define the visual position
      */
@@ -257,7 +257,7 @@ public:
     float getCentralImpulseTime() const { return m_time_additional_impulse; }
     // ------------------------------------------------------------------------
     /** Sets a visual rotation to be applied, which the physics use to provide
-     *  the location where the graphical wheels touch the ground (for 
+     *  the location where the graphical wheels touch the ground (for
      *  skidmarks). */
     void setVisualRotation(float angle)
     {

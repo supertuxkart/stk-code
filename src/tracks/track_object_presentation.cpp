@@ -21,10 +21,12 @@
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_buffer.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -33,7 +35,7 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 
 #include <ISceneManager.h>
@@ -137,10 +139,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 // ----------------------------------------------------------------------------
 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
-    scene::ISceneNode* parent, LodNodeLoader& lod_loader) :
+    scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader) :
     TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = lod_loader.instanciate(&xml_node, parent);
+    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -151,6 +153,39 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 {
     if (m_node)
         irr_driver->removeNode(m_node);
+}
+
+// ----------------------------------------------------------------------------
+
+TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNode& xml_node,
+    scene::ISceneNode* parent,
+    ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
+{
+    m_instancing_group = NULL;
+
+    std::string instancing_model;
+    xml_node.get("instancing_model", &instancing_model);
+
+    m_node = irr_driver->getSceneManager()->addEmptySceneNode(parent);
+    m_node->setPosition(m_init_xyz);
+    m_node->setRotation(m_init_hpr);
+    m_node->setScale(m_init_scale);
+    m_node->updateAbsolutePosition();
+    if (irr_driver->isGLSL())
+    {
+        m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
+            m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
+            instancing_model);
+    }
+    else
+    {
+        m_instancing_group = new STKInstancedSceneNode(model_def_loader.getFirstMeshFor(instancing_model),
+            m_node, irr_driver->getSceneManager(), -1);
+    }
+}
+
+TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
+{
 }
 
 // ----------------------------------------------------------------------------
@@ -167,6 +202,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_model_file = model_name;
     m_is_in_skybox = false;
     std::string render_pass;
     xml_node.get("renderpass", &render_pass);
@@ -186,10 +222,10 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     //    World::getWorld()->getTrack()->getTrackFile(model_name);
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
-                     World::getWorld()->getIdent() == IDENT_CUSTSCENE);
-	bool displacing = false;
-	xml_node.get("displacing", &displacing);
-	animated &= !displacing;
+                     World::getWorld()->getIdent() == IDENT_CUTSCENE);
+    bool displacing = false;
+    xml_node.get("displacing", &displacing);
+    animated &= !displacing;
 
     if (animated)
     {
@@ -216,6 +252,22 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 }
 
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
+    scene::IAnimatedMesh* model, const core::vector3df& xyz,
+    const core::vector3df& hpr, const core::vector3df& scale) :
+    TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    m_is_looped = false;
+    m_mesh = NULL;
+    m_node = NULL;
+
+    bool animated = (UserConfigParams::m_graphical_effects ||
+        World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_mesh = model;
+    init(NULL, NULL, true);
+}
+
+TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale) :
         TrackObjectPresentationSceneNode(xyz, hpr, scale)
@@ -225,7 +277,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
     m_node       = NULL;
 
     bool animated = (UserConfigParams::m_graphical_effects ||
-             World::getWorld()->getIdent() == IDENT_CUSTSCENE);
+             World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_model_file = model_file;
 
     if (file_manager->fileExists(model_file))
     {
@@ -250,13 +304,15 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
 void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNode* parent, bool enabled)
 {
     bool skeletal_animation = true; // for backwards compatibility, if unspecified assume there is
-    xml_node->get("skeletal-animation", &skeletal_animation);
+    if(xml_node)
+        xml_node->get("skeletal-animation", &skeletal_animation);
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
-             World::getWorld()->getIdent() == IDENT_CUSTSCENE);
-	bool displacing = false;
-	xml_node->get("displacing", &displacing);
-	animated &= !displacing;
+             World::getWorld()->getIdent() == IDENT_CUTSCENE);
+    bool displacing = false;
+    if(xml_node)
+        xml_node->get("displacing", &displacing);
+    animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
@@ -280,11 +336,11 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         m_node = node;
 
         m_frame_start = node->getStartFrame();
-        if (xml_node != NULL)
+        if (xml_node)
             xml_node->get("frame-start", &m_frame_start);
 
         m_frame_end = node->getEndFrame();
-        if (xml_node != NULL)
+        if (xml_node)
             xml_node->get("frame-end", &m_frame_end);
     }
     else
@@ -337,10 +393,9 @@ void TrackObjectPresentationMesh::reset()
         a_node->OnAnimate(0);
         a_node->OnAnimate(0);
 
-        if(m_is_looped)
-        {
-            a_node->setFrameLoop(m_frame_start, m_frame_end);
-        }
+        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
+        // last frame, even if looping is disabled
+        a_node->setFrameLoop(m_frame_start, m_frame_end);
     }
 }
 
@@ -578,7 +633,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
     }
     catch (std::runtime_error& e)
     {
-        fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+        Log::warn ("Track", "Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
     }
 }
 
@@ -722,6 +777,16 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
         new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!", fire),
                                 true);
+    }
+    else if (m_action == "tutorial_backgiftboxes")
+    {
+        m_action_active = false;
+        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        DeviceConfig* config = device->getConfiguration();
+        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
+        
+        new TutorialMessageDialog(_("Press <B> to look behind, to fire the weapon with <%s> while pressing <B> to to fire behind!", fire),
+                                  true);
     }
     else if (m_action == "tutorial_nitro_collect")
     {

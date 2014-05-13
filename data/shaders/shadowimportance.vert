@@ -1,4 +1,3 @@
-#version 330 compatibility
 uniform sampler2D dtex;
 uniform mat4 ipvmat;
 uniform mat4 shadowmat;

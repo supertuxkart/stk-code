@@ -24,6 +24,7 @@
 #include "graphics/irr_driver.hpp"
 #include "graphics/mlaa_areamap.hpp"
 #include "graphics/shaders.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_model.hpp"
@@ -57,11 +58,11 @@ PostProcessing::PostProcessing(IVideoDriver* video_driver)
     io::IReadFile *areamap = irr_driver->getDevice()->getFileSystem()->
                          createMemoryReadFile((void *) AreaMap33, sizeof(AreaMap33),
                          "AreaMap33", false);
-	if (!areamap)
-	{
-		Log::fatal("postprocessing", "Failed to load the areamap");
-		return;
-	}
+    if (!areamap)
+    {
+        Log::fatal("postprocessing", "Failed to load the areamap");
+        return;
+    }
     m_areamap = irr_driver->getVideoDriver()->getTexture(areamap);
     areamap->drop();
 
@@ -204,128 +205,60 @@ void PostProcessing::update(float dt)
 }   // update
 
 static
-void renderBloom(ITexture *in)
+void renderBloom(GLuint in)
 {
-	const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
-	glUseProgram(FullScreenShader::BloomShader::Program);
-	glBindVertexArray(FullScreenShader::BloomShader::vao);
-	glUniform1f(FullScreenShader::BloomShader::uniform_low, threshold);
+    const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
+    glUseProgram(FullScreenShader::BloomShader::Program);
+    glBindVertexArray(FullScreenShader::BloomShader::vao);
 
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::BloomShader::uniform_texture, 0);
+    setTexture(0, in, GL_NEAREST, GL_NEAREST);
+    FullScreenShader::BloomShader::setUniforms(0);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 static
-void renderBloomBlend(ITexture *in)
+void renderColorLevel(GLuint in)
 {
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_ONE, GL_ONE);
-	glDisable(GL_DEPTH_TEST);
+    core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
+    core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
 
-	glUseProgram(FullScreenShader::BloomBlendShader::Program);
-	glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
 
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glUniform1i(FullScreenShader::BloomBlendShader::uniform_texture, 0);
+    glUseProgram(FullScreenShader::ColorLevelShader::Program);
+    glBindVertexArray(FullScreenShader::ColorLevelShader::vao);
+    glUniform3f(FullScreenShader::ColorLevelShader::uniform_inlevel, m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
+    glUniform2f(FullScreenShader::ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+    setTexture(0, in, GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
+    glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
+    setTexture(2, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
+    glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-static
-void renderPPDisplace(ITexture *in)
+void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff)
 {
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_ONE, GL_ONE);
-	glDisable(GL_DEPTH_TEST);
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_ONE, GL_ONE);
 
-	glUseProgram(FullScreenShader::PPDisplaceShader::Program);
-	glBindVertexArray(FullScreenShader::PPDisplaceShader::vao);
-	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_viz, irr_driver->getDistortViz());
+    glUseProgram(FullScreenShader::DiffuseEnvMapShader::Program);
+    glBindVertexArray(FullScreenShader::DiffuseEnvMapShader::vao);
 
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_tex, 0);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
+    FullScreenShader::DiffuseEnvMapShader::setUniforms(TVM, bSHCoeff, gSHCoeff, rSHCoeff, 0);
 
-	glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(irr_driver->getRTT(RTT_DISPLACE)));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::PPDisplaceShader::uniform_dtex, 1);
-	
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-}
-
-static
-void renderColorLevel(ITexture *in)
-{
-	core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
-	core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
-
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(FullScreenShader::ColorLevelShader::Program);
-	glBindVertexArray(FullScreenShader::ColorLevelShader::vao);
-	glUniform3f(FullScreenShader::ColorLevelShader::uniform_inlevel, m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
-	glUniform2f(FullScreenShader::ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
-
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-}
-
-void PostProcessing::renderPointlight(const std::vector<float> &positions, const std::vector<float> &colors, const std::vector<float> &energy)
-{
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_ONE, GL_ONE);
-	glDisable(GL_DEPTH_TEST);
-
-	glUseProgram(FullScreenShader::PointLightShader::Program);
-	glBindVertexArray(FullScreenShader::PointLightShader::vao);
-
-    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-	FullScreenShader::PointLightShader::setUniforms(irr_driver->getInvProjMatrix(), irr_driver->getViewMatrix(), positions, colors, energy, 200, 0, 1);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
 }
 
 void PostProcessing::renderSunlight()
@@ -339,9 +272,9 @@ void PostProcessing::renderSunlight()
 
   glUseProgram(FullScreenShader::SunLightShader::Program);
   glBindVertexArray(FullScreenShader::SunLightShader::vao);
-  setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-  setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
+  setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+  setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
   glBindVertexArray(0);
 }
@@ -355,10 +288,8 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
 
-    glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
-    glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
-    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D_ARRAY, depthtex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -367,116 +298,126 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    FullScreenShader::ShadowedSunLightShader::setUniforms(sun_ortho_matrix, cb->getPosition(), irr_driver->getInvProjMatrix(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+
+    if (irr_driver->getShadowViz())
+    {
+        glUseProgram(FullScreenShader::ShadowedSunLightDebugShader::Program);
+        glBindVertexArray(FullScreenShader::ShadowedSunLightDebugShader::vao);
+        FullScreenShader::ShadowedSunLightDebugShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+
+    }
+    else
+    {
+        glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
+        glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
+        FullScreenShader::ShadowedSunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+    }
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
 }
 
 
-void PostProcessing::renderGaussian3Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height)
+void PostProcessing::renderGaussian3Blur(GLuint in_fbo, GLuint in_tex, GLuint tmp_fbo, GLuint tmp_tex, size_t width, size_t height)
 {
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	{
-		irr_driver->getVideoDriver()->setRenderTarget(temprtt, false, false);
-		glUseProgram(FullScreenShader::Gaussian3VBlurShader::Program);
-		glBindVertexArray(FullScreenShader::Gaussian3VBlurShader::vao);
+    float inv_width = 1.0f / width, inv_height = 1.0f / height;
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
+        glUseProgram(FullScreenShader::Gaussian3VBlurShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian3VBlurShader::vao);
 
-		glUniform2f(FullScreenShader::Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
+        glUniform2f(FullScreenShader::Gaussian3VBlurShader::uniform_pixel, inv_width, inv_height);
 
-		glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
+        setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-	{
-		irr_driver->getVideoDriver()->setRenderTarget(in, false, false);
-		glUseProgram(FullScreenShader::Gaussian3HBlurShader::Program);
-		glBindVertexArray(FullScreenShader::Gaussian3HBlurShader::vao);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+        glUseProgram(FullScreenShader::Gaussian3HBlurShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian3HBlurShader::vao);
 
-		glUniform2f(FullScreenShader::Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
+        glUniform2f(FullScreenShader::Gaussian3HBlurShader::uniform_pixel, inv_width, inv_height);
 
-		glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(temprtt));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
+        setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
 }
 
-void PostProcessing::renderGaussian6Blur(video::ITexture *in, video::ITexture *temprtt, float inv_width, float inv_height)
+void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tmp_fbo, GLuint tmp_tex, size_t width, size_t height)
 {
-	glDisable(GL_BLEND);
-	glDisable(GL_DEPTH_TEST);
-	{
-		irr_driver->getVideoDriver()->setRenderTarget(temprtt, false, false);
-		glUseProgram(FullScreenShader::Gaussian6VBlurShader::Program);
-		glBindVertexArray(FullScreenShader::Gaussian6VBlurShader::vao);
+    float inv_width = 1.f / width, inv_height = 1.f / height;
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
+        glUseProgram(FullScreenShader::Gaussian6VBlurShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian6VBlurShader::vao);
 
-		glUniform2f(FullScreenShader::Gaussian6VBlurShader::uniform_pixel, inv_width, inv_height);
+        glUniform2f(FullScreenShader::Gaussian6VBlurShader::uniform_pixel, inv_width, inv_height);
 
-		glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(in));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
+        setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-	{
-		irr_driver->getVideoDriver()->setRenderTarget(in, false, false);
-		glUseProgram(FullScreenShader::Gaussian6HBlurShader::Program);
-		glBindVertexArray(FullScreenShader::Gaussian6HBlurShader::vao);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+        glUseProgram(FullScreenShader::Gaussian6HBlurShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian6HBlurShader::vao);
 
-		glUniform2f(FullScreenShader::Gaussian6HBlurShader::uniform_pixel, inv_width, inv_height);
+        glUniform2f(FullScreenShader::Gaussian6HBlurShader::uniform_pixel, inv_width, inv_height);
 
-		glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, getTextureGLuint(temprtt));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
+        setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
 
-		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	}
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
 }
 
-void PostProcessing::renderPassThrough(ITexture *tex)
+void PostProcessing::renderGaussian17TapBlur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height)
 {
-	glDisable(GL_DEPTH_TEST);
+    float inv_width = 1.f / width, inv_height = 1.f / height;
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
+        glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
 
-	glUseProgram(FullScreenShader::PassThroughShader::Program);
-	glBindVertexArray(FullScreenShader::PassThroughShader::vao);
+        glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
 
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
+        setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+        glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
+
+        glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
+
+        setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
 }
 
 void PostProcessing::renderPassThrough(GLuint tex)
 {
-    glDisable(GL_DEPTH_TEST);
 
     glUseProgram(FullScreenShader::PassThroughShader::Program);
     glBindVertexArray(FullScreenShader::PassThroughShader::vao);
@@ -488,6 +429,70 @@ void PostProcessing::renderPassThrough(GLuint tex)
     glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void PostProcessing::renderGlow(unsigned tex)
+{
+
+    glUseProgram(FullScreenShader::GlowShader::Program);
+    glBindVertexArray(FullScreenShader::GlowShader::vao);
+
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    glUniform1i(FullScreenShader::GlowShader::uniform_tex, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+ITexture *noise_tex = 0;
+
+void PostProcessing::renderSSAO()
+{
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+    glDisable(GL_ALPHA_TEST);
+
+    if (!noise_tex)
+        noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
+
+    glUseProgram(FullScreenShader::SSAOShader::Program);
+    glBindVertexArray(FullScreenShader::SSAOShader::vao);
+    setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
+
+    FullScreenShader::SSAOShader::setUniforms(core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void PostProcessing::renderFog()
+{
+    const Track * const track = World::getWorld()->getTrack();
+
+    // This function is only called once per frame - thus no need for setters.
+    const float fogmax = track->getFogMax();
+    const float startH = track->getFogStartHeight();
+    const float endH = track->getFogEndHeight();
+    const float start = track->getFogStart();
+    const float end = track->getFogEnd();
+    const SColor tmpcol = track->getFogColor();
+
+    core::vector3df col( tmpcol.getRed() / 255.0f,
+        tmpcol.getGreen() / 255.0f,
+        tmpcol.getBlue() / 255.0f );
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    glUseProgram(FullScreenShader::FogShader::Program);
+    glBindVertexArray(FullScreenShader::FogShader::vao);
+
+    setTexture(0, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::FogShader::setUniforms(fogmax, startH, endH, start, end, col, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -495,208 +500,224 @@ void PostProcessing::renderPassThrough(GLuint tex)
     glDisable(GL_BLEND);
 }
 
-void PostProcessing::renderGlow(ITexture *tex)
+void PostProcessing::renderMotionBlur(unsigned cam, GLuint in_rtt, GLuint out_fbo)
 {
-	glDisable(GL_DEPTH_TEST);
 
-	glUseProgram(FullScreenShader::GlowShader::Program);
-	glBindVertexArray(FullScreenShader::GlowShader::vao);
+    MotionBlurProvider * const cb = (MotionBlurProvider *)irr_driver->
+        getCallback(ES_MOTIONBLUR);
 
-	glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, getTextureGLuint(tex));
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glUniform1i(FullScreenShader::GlowShader::uniform_tex, 0);
+    scene::ICameraSceneNode * const camnode =
+        Camera::getCamera(cam)->getCameraSceneNode();
+    // Calculate the kart's Y position on screen
+    const core::vector3df pos =
+        Camera::getCamera(cam)->getKart()->getNode()->getPosition();
+    float ndc[4];
+    core::matrix4 trans = camnode->getProjectionMatrix();
+    trans *= camnode->getViewMatrix();
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+    trans.transformVect(ndc, pos);
+    const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
+    setMotionBlurCenterY(cam, karty);
+
+    glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(FullScreenShader::MotionBlurShader::Program);
+    glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
+
+    setTexture(0, in_rtt, GL_NEAREST, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    FullScreenShader::MotionBlurShader
+                    ::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam),
+                                  cb->getDirection(cam), 0.15f, 
+                                  cb->getMaxHeight(cam) * 0.7f, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-ITexture *noise_tex = 0;
-
-void PostProcessing::renderSSAO(const core::matrix4 &invprojm, const core::matrix4 &projm)
+static void renderGodFade(GLuint tex, const SColor &col)
 {
-	glDisable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
-	glDisable(GL_ALPHA_TEST);
+    glUseProgram(FullScreenShader::GodFadeShader::Program);
+    glBindVertexArray(FullScreenShader::GodFadeShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodFadeShader::setUniforms(col, 0);
 
-	if (!noise_tex)
-		noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
-
-	glUseProgram(FullScreenShader::SSAOShader::Program);
-	glBindVertexArray(FullScreenShader::SSAOShader::vao);
-    setTexture(0, getTextureGLuint(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-    setTexture(1, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_LINEAR, GL_LINEAR);
-    setTexture(2, getTextureGLuint(noise_tex), GL_NEAREST, GL_NEAREST);
-
-	FullScreenShader::SSAOShader::setUniforms(projm, invprojm, 0, 1, 2);
-
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
-void PostProcessing::renderFog(const core::matrix4 &ipvmat)
+static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 {
-	irr_driver->getVideoDriver()->setRenderTarget(irr_driver->getRTT(RTT_COLOR), false, false);
-	const Track * const track = World::getWorld()->getTrack();
+    glUseProgram(FullScreenShader::GodRayShader::Program);
+    glBindVertexArray(FullScreenShader::GodRayShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodRayShader::setUniforms(sunpos, 0);
 
-	// This function is only called once per frame - thus no need for setters.
-	const float fogmax = track->getFogMax();
-	const float startH = track->getFogStartHeight();
-	const float endH = track->getFogEndHeight();
-	const float start = track->getFogStart();
-	const float end = track->getFogEnd();
-	const SColor tmpcol = track->getFogColor();
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
 
-	core::vector3df col( tmpcol.getRed() / 255.0f,
-		tmpcol.getGreen() / 255.0f,
-		tmpcol.getBlue() / 255.0f );
+static void toneMap(GLuint fbo, GLuint rtt)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glUseProgram(FullScreenShader::ToneMapShader::Program);
+    glBindVertexArray(FullScreenShader::ToneMapShader::vao);
+    setTexture(0, rtt, GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
+    FullScreenShader::ToneMapShader::setUniforms(irr_driver->getExposure(), irr_driver->getLwhite(), 0, 1);
 
-	glDisable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
 
-	glUseProgram(FullScreenShader::FogShader::Program);
-	glBindVertexArray(FullScreenShader::FogShader::vao);
+static void renderDoF(GLuint fbo, GLuint rtt)
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    glUseProgram(FullScreenShader::DepthOfFieldShader::Program);
+    glBindVertexArray(FullScreenShader::DepthOfFieldShader::vao);
+    setTexture(0, rtt, GL_LINEAR, GL_LINEAR);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::DepthOfFieldShader::setUniforms(irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
 
-    setTexture(0, getDepthTexture(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH)), GL_NEAREST, GL_NEAREST);
-	FullScreenShader::FogShader::setUniforms(ipvmat, fogmax, startH, endH, start, end, col, 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
 
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_BLEND);
+static void averageTexture(GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glGenerateMipmap(GL_TEXTURE_2D);
+}
+
+static void computeLogLuminance(GLuint tex)
+{
+    glViewport(0, 0, 1024, 1024);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_LOG_LUMINANCE));
+    glUseProgram(FullScreenShader::LogLuminanceShader::Program);
+    glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
+    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LogLuminanceShader::setUniforms(0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    averageTexture(irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE));
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+}
+
+void PostProcessing::applyMLAA()
+{
+    const core::vector2df &PIXEL_SIZE = core::vector2df(1.0f / UserConfigParams::m_width, 1.0f / UserConfigParams::m_height);
+    IVideoDriver *const drv = irr_driver->getVideoDriver();
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP1_WITH_DS));
+    glEnable(GL_STENCIL_TEST);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+    glStencilFunc(GL_ALWAYS, 1, ~0);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+    // Pass 1: color edge detection
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS), GL_NEAREST, GL_NEAREST);
+    glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::Program);
+    FullScreenShader::MLAAColorEdgeDetectionSHader::setUniforms(PIXEL_SIZE, 0);
+
+    glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    glStencilFunc(GL_EQUAL, 1, ~0);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+    // Pass 2: blend weights
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP2_WITH_DS));
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    glUseProgram(FullScreenShader::MLAABlendWeightSHader::Program);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR);
+    setTexture(1, getTextureGLuint(m_areamap), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MLAABlendWeightSHader::setUniforms(PIXEL_SIZE, 0, 1);
+
+    glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // Blit in to tmp1
+    blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_TMP1_WITH_DS), UserConfigParams::m_width, UserConfigParams::m_height);
+
+    // Pass 3: gather
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_MLAA_COLORS));
+
+    glUseProgram(FullScreenShader::MLAAGatherSHader::Program);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP2), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MLAAGatherSHader::setUniforms(PIXEL_SIZE, 0, 1);
+
+    glBindVertexArray(FullScreenShader::MLAAGatherSHader::vao);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+
+    // Done.
+    glDisable(GL_STENCIL_TEST);
+
 }
 
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
-void PostProcessing::render()
+void PostProcessing::render(scene::ICameraSceneNode * const camnode)
 {
-    if (!irr_driver->isGLSL()) return;
-
     IVideoDriver * const drv = irr_driver->getVideoDriver();
-    drv->setTransform(ETS_WORLD, core::IdentityMatrix);
-    drv->setTransform(ETS_VIEW, core::IdentityMatrix);
-    drv->setTransform(ETS_PROJECTION, core::IdentityMatrix);
 
     MotionBlurProvider * const mocb = (MotionBlurProvider *) irr_driver->
                                                            getCallback(ES_MOTIONBLUR);
     GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
                                                                  getCallback(ES_GAUSSIAN3H);
 
-    const u32 cams = Camera::getNumCameras();
-    for(u32 cam = 0; cam < cams; cam++)
+    GLuint in_rtt = irr_driver->getRenderTargetTexture(RTT_COLOR), in_fbo = irr_driver->getFBO(FBO_COLORS);
+    GLuint out_rtt = irr_driver->getRenderTargetTexture(RTT_TMP1), out_fbo = irr_driver->getFBO(FBO_TMP1_WITH_DS);
+    // Each effect uses these as named, and sets them up for the next effect.
+    // This allows chaining effects where some may be disabled.
+
+    // As the original color shouldn't be touched, the first effect can't be disabled.
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    if (UserConfigParams::m_dof)
     {
-        scene::ICameraSceneNode * const camnode =
-            Camera::getCamera(cam)->getCameraSceneNode();
-        mocb->setCurrentCamera(cam);
-        ITexture *in = irr_driver->getRTT(RTT_COLOR);
-        ITexture *out = irr_driver->getRTT(RTT_TMP1);
-	// Each effect uses these as named, and sets them up for the next effect.
-	// This allows chaining effects where some may be disabled.
+        renderDoF(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);
+    }
 
-	// As the original color shouldn't be touched, the first effect can't be disabled.
-
-        PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
-        if (1) // bloom
-        {
-			// Blit the base to tmp1
-			drv->setRenderTarget(out, true, false);
-			renderPassThrough(in);
-
-            const bool globalbloom = World::getWorld()->getTrack()->getBloom();
-
-            if (globalbloom)
-            {
-				drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
-				renderBloom(in);
-            }
-
-
-            if (globalbloom)
-            {
-                // Clear the alpha to a suitable value, stencil
-                glClearColor(0, 0, 0, 0.1f);
-                glColorMask(0, 0, 0, 1);
-
-                glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-                glClearColor(0, 0, 0, 0);
-                glColorMask(1, 1, 1, 1);
-
-                // To half
-                drv->setRenderTarget(irr_driver->getRTT(RTT_HALF1), true, false);
-				renderPassThrough(irr_driver->getRTT(RTT_TMP3));
-
-
-                // To quarter
-				drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), true, false);
-				renderPassThrough(irr_driver->getRTT(RTT_HALF1));
-                
-                // To eighth
-				drv->setRenderTarget(irr_driver->getRTT(RTT_EIGHTH1), true, false);
-				renderPassThrough(irr_driver->getRTT(RTT_QUARTER1));
-
-                // Blur it for distribution.
-				renderGaussian6Blur(irr_driver->getRTT(RTT_EIGHTH1), irr_driver->getRTT(RTT_EIGHTH2), 8.f / UserConfigParams::m_width, 8.f / UserConfigParams::m_height);
-
-                // Additively blend on top of tmp1
-				drv->setRenderTarget(out, false, false);
-				renderBloomBlend(irr_driver->getRTT(RTT_EIGHTH1));
-				m_material.MaterialType = irr_driver->getShader(ES_RAIN);
-				drv->setMaterial(m_material);
-				static_cast<irr::video::COpenGLDriver*>(drv)->setRenderStates3DMode();
-            } // end if bloom
-
-            in = irr_driver->getRTT(RTT_TMP1);
-            out = irr_driver->getRTT(RTT_TMP2);
-        }
-        PROFILER_POP_CPU_MARKER();
-
+    {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
-        if (World::getWorld()->getTrack()->hasGodRays() && m_sunpixels > 30) // god rays
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
+        const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+        if (UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
+            glEnable(GL_DEPTH_TEST);
             // Grab the sky
-            drv->setRenderTarget(out, true, false);
-            irr_driver->getSceneManager()->drawAll(ESNRP_SKY_BOX);
+            glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
+            glClear(GL_COLOR_BUFFER_BIT);
+            irr_driver->renderSkybox(camnode);
 
             // Set the sun's color
-            ColorizeProvider * const colcb = (ColorizeProvider *) irr_driver->getCallback(ES_COLORIZE);
             const SColor col = World::getWorld()->getTrack()->getSunColor();
+            ColorizeProvider * const colcb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
             colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
 
             // The sun interposer
-            IMeshSceneNode * const sun = irr_driver->getSunInterposer();
-            sun->getMaterial(0).ColorMask = ECP_ALL;
+            STKMeshSceneNode *sun = irr_driver->getSunInterposer();
             irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
-            irr_driver->getSceneManager()->setCurrentRendertime(ESNRP_SOLID);
-
+            irr_driver->setPhase(GLOW_PASS);
             sun->render();
-
-            sun->getMaterial(0).ColorMask = ECP_NONE;
+            glDisable(GL_DEPTH_TEST);
 
             // Fade to quarter
-            m_material.MaterialType = irr_driver->getShader(ES_GODFADE);
-            m_material.setTexture(0, out);
-            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), false, false);
-
-            drawQuad(cam, m_material);
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
+            glViewport(0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4);
+            renderGodFade(out_rtt, col);
 
             // Blur
-			renderGaussian3Blur(irr_driver->getRTT(RTT_QUARTER1),
-                                irr_driver->getRTT(RTT_QUARTER2),
-                                4.f / UserConfigParams::m_width,
-                                4.f / UserConfigParams::m_height);
+            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2),
+                UserConfigParams::m_width / 4,
+                UserConfigParams::m_height / 4);
+
+
 
             // Calculate the sun's position in texcoords
             const core::vector3df pos = sun->getPosition();
@@ -706,168 +727,148 @@ void PostProcessing::render()
 
             trans.transformVect(ndc, pos);
 
-            const float texh = m_vertices[cam].v1.TCoords.Y - m_vertices[cam].v0.TCoords.Y;
-            const float texw = m_vertices[cam].v3.TCoords.X - m_vertices[cam].v0.TCoords.X;
+            const float texh = m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
+            const float texw = m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
 
             const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
             const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
 
-            ((GodRayProvider *) irr_driver->getCallback(ES_GODRAY))->
-                setSunPosition(sunx, suny);
-
             // Rays please
-            m_material.MaterialType = irr_driver->getShader(ES_GODRAY);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-            drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), true, false);
-
-            drawQuad(cam, m_material);
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER2));
+            renderGodRay(irr_driver->getRenderTargetTexture(RTT_QUARTER1), core::vector2df(sunx, suny));
 
             // Blur
-            {
-                gacb->setResolution(UserConfigParams::m_width / 4,
-                                    UserConfigParams::m_height / 4);
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER1), true, false);
+            renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER2), irr_driver->getRenderTargetTexture(RTT_QUARTER2),
+                irr_driver->getFBO(FBO_QUARTER1), irr_driver->getRenderTargetTexture(RTT_QUARTER1),
+                UserConfigParams::m_width / 4,
+                UserConfigParams::m_height / 4);
 
-                drawQuad(cam, m_material);
+            glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+            // Blend
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_ONE, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
 
-                m_material.MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-                m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER1));
-                drv->setRenderTarget(irr_driver->getRTT(RTT_QUARTER2), false, false);
-
-                drawQuad(cam, m_material);
-            }
-
-            // Overlay
-            m_material.MaterialType = EMT_TRANSPARENT_ADD_COLOR;
-            m_material.setTexture(0, irr_driver->getRTT(RTT_QUARTER2));
-            drv->setRenderTarget(in, false, false);
-
-            drawQuad(cam, m_material);
+            glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_QUARTER2));
+            glDisable(GL_BLEND);
         }
         PROFILER_POP_CPU_MARKER();
+    }
 
+    // Simulate camera defects from there
+
+    {
+        PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
+        if (UserConfigParams::m_bloom)
+        {
+            glClear(GL_STENCIL_BUFFER_BIT);
+
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, in_fbo);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_1024));
+            glBlitFramebuffer(0, 0, UserConfigParams::m_width, UserConfigParams::m_height, 0, 0, 1024, 1024, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+            glViewport(0, 0, 512, 512);
+            renderBloom(irr_driver->getRenderTargetTexture(RTT_BLOOM_1024));
+
+            // Downsample
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_512));
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+            glBlitFramebuffer(0, 0, 512, 512, 0, 0, 256, 256, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_256));
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_BLOOM_128));
+            glBlitFramebuffer(0, 0, 256, 256, 0, 0, 128, 128, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+            // Blur
+            glViewport(0, 0, 512, 512);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_512), irr_driver->getRenderTargetTexture(RTT_BLOOM_512),
+                irr_driver->getFBO(FBO_TMP_512), irr_driver->getRenderTargetTexture(RTT_TMP_512), 512, 512);
+
+            glViewport(0, 0, 256, 256);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_256),
+                irr_driver->getFBO(FBO_TMP_256), irr_driver->getRenderTargetTexture(RTT_TMP_256), 256, 256);
+
+            glViewport(0, 0, 128, 128);
+            renderGaussian6Blur(irr_driver->getFBO(FBO_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_128),
+                irr_driver->getFBO(FBO_TMP_128), irr_driver->getRenderTargetTexture(RTT_TMP_128), 128, 128);
+
+            glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+
+            // Additively blend on top of tmp1
+            glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
+            glBlendEquation(GL_FUNC_ADD);
+            glBlendColor(.125, .125, .125, .125);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
+            glBlendColor(.25, .25, .25, .25);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
+            glBlendColor(.5, .5, .5, .5);
+            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+            glDisable(GL_BLEND);
+        } // end if bloom
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    //computeLogLuminance(in_rtt);
+    {
+        PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
+        toneMap(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);
+        PROFILER_POP_CPU_MARKER();
+    }
+
+    {
+        PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
-            PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
-            // Calculate the kart's Y position on screen
-            const core::vector3df pos =
-                Camera::getCamera(cam)->getKart()->getNode()->getPosition();
-            float ndc[4];
-            core::matrix4 trans = camnode->getProjectionMatrix();
-            trans *= camnode->getViewMatrix();
-
-            trans.transformVect(ndc, pos);
-            const float karty = (ndc[1] / ndc[3]) * 0.5f + 0.5f;
-            setMotionBlurCenterY(cam, karty);
-
-
-            m_material.MaterialType = irr_driver->getShader(ES_MOTIONBLUR);
-            m_material.setTexture(0, in);
-            drv->setRenderTarget(out, true, false);
-
-            drawQuad(cam, m_material);
-
-            ITexture *tmp = in;
-            in = out;
-            out = tmp;
-            PROFILER_POP_CPU_MARKER();
+            renderMotionBlur(0, in_rtt, out_fbo);
+            std::swap(in_fbo, out_fbo);
+            std::swap(in_rtt, out_rtt);
         }
+        PROFILER_POP_CPU_MARKER();
+    }
 
-        if (irr_driver->getDisplacingNodes().size()) // Displacement
-        {
-            PROFILER_PUSH_CPU_MARKER("- Displacement", 0xFF, 0x00, 0x00);
-			drv->setRenderTarget(out, true, false);
-			renderPPDisplace(in);
-
-            ITexture *tmp = in;
-            in = out;
-            out = tmp;
-            PROFILER_POP_CPU_MARKER();
-        }
-
-        if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
-        {
-            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
-            drv->setRenderTarget(out, false, false);
-
-            glEnable(GL_STENCIL_TEST);
-            glClearColor(0.0, 0.0, 0.0, 1.0);
-            glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-            glStencilFunc(GL_ALWAYS, 1, ~0);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-            // Pass 1: color edge detection
-            m_material.setFlag(EMF_BILINEAR_FILTER, false);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, false);
-            m_material.MaterialType = irr_driver->getShader(ES_MLAA_COLOR1);
-            m_material.setTexture(0, in);
-
-            drawQuad(cam, m_material);
-            m_material.setFlag(EMF_BILINEAR_FILTER, true);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, true);
-
-            glStencilFunc(GL_EQUAL, 1, ~0);
-            glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-
-            // Pass 2: blend weights
-            drv->setRenderTarget(irr_driver->getRTT(RTT_TMP3), true, false);
-
-            m_material.MaterialType = irr_driver->getShader(ES_MLAA_BLEND2);
-            m_material.setTexture(0, out);
-            m_material.setTexture(1, m_areamap);
-            m_material.TextureLayer[1].BilinearFilter = false;
-            m_material.TextureLayer[1].TrilinearFilter = false;
-
-            drawQuad(cam, m_material);
-
-            m_material.TextureLayer[1].BilinearFilter = true;
-            m_material.TextureLayer[1].TrilinearFilter = true;
-            m_material.setTexture(1, 0);
-
-            // Pass 3: gather
-            drv->setRenderTarget(in, false, false);
-
-            m_material.setFlag(EMF_BILINEAR_FILTER, false);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, false);
-            m_material.MaterialType = irr_driver->getShader(ES_MLAA_NEIGH3);
-            m_material.setTexture(0, irr_driver->getRTT(RTT_TMP3));
-            m_material.setTexture(1, irr_driver->getRTT(RTT_COLOR));
-
-            drawQuad(cam, m_material);
-
-            m_material.setFlag(EMF_BILINEAR_FILTER, true);
-            m_material.setFlag(EMF_TRILINEAR_FILTER, true);
-            m_material.setTexture(1, 0);
-
-            // Done.
-            glDisable(GL_STENCIL_TEST);
-            PROFILER_POP_CPU_MARKER();
-        }
-
-        // Final blit
-		// TODO : Use glBlitFramebuffer
-		drv->setRenderTarget(ERT_FRAME_BUFFER, false, false);
-        if (irr_driver->getNormals())
-			renderPassThrough(irr_driver->getRTT(RTT_NORMAL_AND_DEPTH));
-        else if (irr_driver->getSSAOViz())
-			renderPassThrough(irr_driver->getRTT(RTT_SSAO));
-        else
-			renderColorLevel(in);
+    if (irr_driver->getNormals())
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderPassThrough(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+        glDisable(GL_FRAMEBUFFER_SRGB);
+    }
+    else if (irr_driver->getSSAOViz())
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderPassThrough(irr_driver->getRenderTargetTexture(RTT_SSAO));
+        glDisable(GL_FRAMEBUFFER_SRGB);
+    }
+    else if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
+    {
+        PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_MLAA_COLORS));
+        renderPassThrough(in_rtt);
+        glDisable(GL_FRAMEBUFFER_SRGB);
+        applyMLAA();
+        blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), 0, UserConfigParams::m_width, UserConfigParams::m_height);
+        PROFILER_POP_CPU_MARKER();
+    }
+    else
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderPassThrough(in_rtt);
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }   // render
-
-void PostProcessing::drawQuad(u32 cam, const SMaterial &mat)
-{
-    const u16 indices[6] = {0, 1, 2, 3, 0, 2};
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-    drv->setTransform(ETS_WORLD, core::IdentityMatrix);
-    drv->setTransform(ETS_VIEW, core::IdentityMatrix);
-    drv->setTransform(ETS_PROJECTION, core::IdentityMatrix);
-
-    drv->setMaterial(mat);
-    drv->drawIndexedTriangleList(&(m_vertices[cam].v0),
-                                      4, indices, 2);
-}

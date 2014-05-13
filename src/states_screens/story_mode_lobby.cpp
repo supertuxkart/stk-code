@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "states_screens/dialogs/enter_player_name_dialog.hpp"
@@ -54,18 +55,11 @@ void StoryModeLobbyScreen::init()
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
 
-    core::stringw name = UserConfigParams::m_default_player.toString();
-
-
-    if (UserConfigParams::m_default_player.toString().size() > 0)
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
+    if(player)
     {
-        PlayerProfile *player = PlayerManager::get()->getPlayer(name);
-        if(player)
-        {
-            PlayerManager::get()->setCurrentPlayer(player);
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            return;
-        }
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
     }
 
     for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
@@ -109,19 +103,13 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
     {
         ListWidget* list = getWidget<ListWidget>("gameslots");
 
-        bool slot_found = false;
-
         PlayerProfile *player = PlayerManager::get()
                               ->getPlayer(list->getSelectionLabel());
         if(player)
         {
-            PlayerManager::get()->setCurrentPlayer(player);
             player->computeActive();
             CheckBoxWidget* cb = getWidget<CheckBoxWidget>("rememberme");
-            if (cb->getState())
-            {
-                UserConfigParams::m_default_player = list->getSelectionLabel();
-            }
+            PlayerManager::get()->setCurrentPlayer(player,cb->getState());
         }
         else
         {
@@ -131,6 +119,11 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         }
 
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        // Since only now the current player is defined, we have to request 
+        // a login (if an online login was saved). If the current player was
+        // saved, this request will be started much earlier in the startup
+        // sequence from the RequestManager.
+        PlayerManager::resumeSavedSession();
     }
 }   // eventCallback
 
@@ -147,7 +140,7 @@ void StoryModeLobbyScreen::onNewPlayerWithName(const stringw& new_name)
     PlayerProfile *player = PlayerManager::get()->getPlayer(new_name);
     if(player)
     {
-        PlayerManager::get()->setCurrentPlayer(player);
+        PlayerManager::get()->setCurrentPlayer(player,false);
         player->computeActive();
     }
     else

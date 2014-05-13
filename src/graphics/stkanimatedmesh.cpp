@@ -6,6 +6,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "utils/profiler.hpp"
 
 using namespace irr;
 
@@ -16,169 +17,264 @@ const core::vector3df& rotation,
 const core::vector3df& scale) :
     CAnimatedMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-	firstTime = true;
+    firstTime = true;
+}
+
+void STKAnimatedMesh::cleanGLMeshes()
+{
+    for (u32 i = 0; i < GLmeshes.size(); ++i)
+    {
+        GLMesh mesh = GLmeshes[i];
+        if (!mesh.vertex_buffer)
+            continue;
+        if (mesh.vao_first_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_first_pass));
+        if (mesh.vao_second_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_second_pass));
+        if (mesh.vao_glow_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
+        if (mesh.vao_displace_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
+        if (mesh.vao_displace_mask_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
+        if (mesh.vao_shadow_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
+        glDeleteBuffers(1, &(mesh.vertex_buffer));
+        glDeleteBuffers(1, &(mesh.index_buffer));
+    }
 }
 
 void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 {
-	firstTime = true;
-	GLmeshes.clear();
-	CAnimatedMeshSceneNode::setMesh(mesh);
-}
-
-void STKAnimatedMesh::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-	assert(irr_driver->getPhase() == TRANSPARENT_PASS);
-
-	computeMVP(ModelViewProjectionMatrix);
-
-    if (World::getWorld()->getTrack()->isFogEnabled())
-        drawTransparentFogObject(mesh, ModelViewProjectionMatrix);
-    else
-        drawTransparentObject(mesh, ModelViewProjectionMatrix);
-
-	return;
-}
-
-void STKAnimatedMesh::drawSolid(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-	switch (irr_driver->getPhase())
-	{
-	case SOLID_NORMAL_AND_DEPTH_PASS:
-	{
-			  computeMVP(ModelViewProjectionMatrix);
-			  computeTIMV(TransposeInverseModelView);
-
-			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-				  drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-			  else
-				  drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-			  break;
-	}
-	case SOLID_LIT_PASS:
-	{
-			  if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-				  drawObjectRefPass2(mesh, ModelViewProjectionMatrix);
-			  else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-				  drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-			  else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-				  drawObjectUnlit(mesh, ModelViewProjectionMatrix);
-			  else if (mesh.textures[1])
-				  drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
-			  else
-				  drawObjectPass2(mesh, ModelViewProjectionMatrix);
-			  break;
-	}
-	default:
-	{
-			   assert(0 && "wrong pass");
-	}
-	}
-}
-
-static bool
-isObjectPass(video::E_MATERIAL_TYPE type)
-{
-	if (type == irr_driver->getShader(ES_OBJECTPASS))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_REF))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT))
-		return true;
-	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-		return true;
-	if (type == video::EMT_ONETEXTURE_BLEND)
-		return true;
-	if (type == video::EMT_TRANSPARENT_ADD_COLOR)
-		return true;
-	return false;
-}
-
-void STKAnimatedMesh::drawShadow(const GLMesh &mesh)
-{
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-    assert(irr_driver->getPhase() == SHADOW_PASS);
-    std::vector<core::matrix4> ShadowMVP(irr_driver->getShadowViewProj());
-    for (unsigned i = 0; i < ShadowMVP.size(); i++)
-        ShadowMVP[i] *= irr_driver->getVideoDriver()->getTransform(video::ETS_WORLD);
-    glUseProgram(MeshShader::ShadowShader::Program);
-    MeshShader::ShadowShader::setUniforms(ShadowMVP);
-    glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElements(ptype, count, itype, 0);
+    firstTime = true;
+    GLmeshes.clear();
+    for (unsigned i = 0; i < FPSM_COUNT; i++)
+        GeometricMesh[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < SM_COUNT; i++)
+        ShadedMesh[i].clearWithoutDeleting();
+    CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
 void STKAnimatedMesh::render()
 {
-	video::IVideoDriver* driver = SceneManager->getVideoDriver();
+    video::IVideoDriver* driver = SceneManager->getVideoDriver();
 
-	bool isTransparentPass =
-		SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
+    bool isTransparentPass =
+        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
 
-	++PassCount;
+    ++PassCount;
 
-	scene::IMesh* m = getMeshForCurrentFrame();
+    scene::IMesh* m = getMeshForCurrentFrame();
 
-	if (m)
-	{
-		Box = m->getBoundingBox();
-	}
-	else
-	{
-		Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
-		return;
-	}
+    if (m)
+    {
+        Box = m->getBoundingBox();
+    }
+    else
+    {
+        Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
+        return;
+    }
 
-	driver->setTransform(video::ETS_WORLD, AbsoluteTransformation);
+    if (firstTime)
+    {
+        for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+            GLmeshes.push_back(allocateMeshBuffer(mb));
+        }
 
-	if (firstTime)
-	for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
-	{
-		scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-		GLmeshes.push_back(allocateMeshBuffer(mb));
-	}
-	firstTime = false;
-
-	// render original meshes
-	for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
-	{
-		video::IMaterialRenderer* rnd = driver->getMaterialRenderer(Materials[i].MaterialType);
-		bool transparent = (rnd && rnd->isTransparent());
-
-		// only render transparent buffer if this is the transparent render pass
-		// and solid only in solid pass
-		if (transparent != isTransparentPass)
-			continue;
-		scene::IMeshBuffer* mb = m->getMeshBuffer(i);
-		const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
-		if (RenderFromIdentity)
-			driver->setTransform(video::ETS_WORLD, core::IdentityMatrix);
-		else if (Mesh->getMeshType() == scene::EAMT_SKINNED)
-			driver->setTransform(video::ETS_WORLD, AbsoluteTransformation * ((scene::SSkinMeshBuffer*)mb)->Transformation);
-		if (isObjectPass(material.MaterialType))
-		{
-			irr_driver->IncreaseObjectCount();
-			initvaostate(GLmeshes[i], material.MaterialType);
-			if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
-			{
-				glBindVertexArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
-				glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
-			}
-            if (irr_driver->getPhase() == SHADOW_PASS)
-                drawShadow(GLmeshes[i]);
-			else if (isTransparentPass)
-				drawTransparent(GLmeshes[i], material.MaterialType);
-			else
-				drawSolid(GLmeshes[i], material.MaterialType);
-		}
-		else 
-		{
+        for (u32 i = 0; i < m->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+            if (!mb)
+                continue;
+            video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
+            f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
+            video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
+            if (!isObject(type))
+            {
 #ifdef DEBUG
-			Log::warn("material", "Unhandled (animated) material type : %d", material.MaterialType);
+                Log::warn("material", "Unhandled (animated) material type : %d", type);
 #endif
-			continue;
-		}
-	}
+                continue;
+            }
+            GLMesh &mesh = GLmeshes[i];
+            if (rnd->isTransparent())
+            {
+                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
+                initvaostate(mesh, TranspMat);
+                TransparentMesh[TranspMat].push_back(&mesh);
+            }
+            else
+            {
+                GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type);
+                ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures);
+                initvaostate(mesh, GeometricType, ShadedType);
+                GeometricMesh[GeometricType].push_back(&mesh);
+                ShadedMesh[ShadedType].push_back(&mesh);
+            }
+        }
+    }
+    firstTime = false;
+
+    for (u32 i = 0; i<m->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = m->getMeshBuffer(i);
+        const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
+        if (isObject(material.MaterialType))
+        {
+           if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+           {
+               glBindVertexArray(0);
+               glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
+               glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+           }
+        }
+        if (mb)
+            GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
+
+        video::IMaterialRenderer* rnd = driver->getMaterialRenderer(Materials[i].MaterialType);
+        bool transparent = (rnd && rnd->isTransparent());
+
+       // only render transparent buffer if this is the transparent render pass
+       // and solid only in solid pass
+       if (transparent != isTransparentPass)
+          continue;
+    }
+
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+    {
+        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
+        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
+        core::matrix4 invmodel;
+        AbsoluteTransformation.getInverse(invmodel);
+
+        PROFILER_PUSH_CPU_MARKER("GATHER SOLID MESHES", 0xFC, 0xFA, 0x68);
+
+        GLMesh* mesh;
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
+        {
+            GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(mesh);
+            GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
+        {
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
+        }
+
+        PROFILER_POP_CPU_MARKER();
+        return;
+    }
+
+    if (irr_driver->getPhase() == SOLID_LIT_PASS)
+    {
+        PROFILER_PUSH_CPU_MARKER("GATHER TRANSPARENT MESHES", 0xFC, 0xFA, 0x68);
+
+        core::matrix4 invmodel;
+        AbsoluteTransformation.getInverse(invmodel);
+
+        GLMesh* mesh;
+        for_in(mesh, ShadedMesh[SM_DEFAULT])
+        {
+            GroupedSM<SM_DEFAULT>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DEFAULT>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
+        {
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, ShadedMesh[SM_RIMLIT])
+        {
+            GroupedSM<SM_RIMLIT>::MeshSet.push_back(mesh);
+            GroupedSM<SM_RIMLIT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_RIMLIT>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in (mesh, ShadedMesh[SM_UNLIT])
+        {
+            GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
+            GroupedSM<SM_UNLIT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_UNLIT>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, ShadedMesh[SM_DETAILS])
+        {
+            GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, ShadedMesh[SM_UNTEXTURED])
+        {
+            GroupedSM<SM_UNTEXTURED>::MeshSet.push_back(mesh);
+            GroupedSM<SM_UNTEXTURED>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_UNTEXTURED>::TIMVSet.push_back(invmodel);
+        }
+
+        PROFILER_POP_CPU_MARKER();
+        return;
+    }
+
+    if (irr_driver->getPhase() == SHADOW_PASS)
+    {
+        if (!GeometricMesh[FPSM_DEFAULT].empty())
+            glUseProgram(MeshShader::ShadowShader::Program);
+
+        GLMesh* mesh;
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
+            drawShadow(*mesh, AbsoluteTransformation);
+
+        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
+            glUseProgram(MeshShader::RefShadowShader::Program);
+
+        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
+            drawShadowRef(*mesh, AbsoluteTransformation);
+        return;
+    }
+
+    if (irr_driver->getPhase() == TRANSPARENT_PASS)
+    {
+        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
+
+        if (!TransparentMesh[TM_BUBBLE].empty())
+            glUseProgram(MeshShader::BubbleShader::Program);
+
+        GLMesh* mesh;
+        for_in(mesh, TransparentMesh[TM_BUBBLE])
+            drawBubble(*mesh, ModelViewProjectionMatrix);
+
+        if (World::getWorld()->isFogEnabled())
+        {
+            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
+                glUseProgram(MeshShader::TransparentFogShader::Program);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            glBlendFunc(GL_ONE, GL_ONE);
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+        }
+        else
+        {
+            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
+                glUseProgram(MeshShader::TransparentShader::Program);
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            glBlendFunc(GL_ONE, GL_ONE);
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+        }
+        return;
+    }
 }

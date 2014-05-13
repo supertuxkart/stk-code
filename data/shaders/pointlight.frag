@@ -1,58 +1,60 @@
-#version 330
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-
-uniform vec4 center[16];
-uniform vec4 col[16];
-uniform float energy[16];
 uniform float spec;
-uniform mat4 invproj;
-uniform mat4 viewm;
+uniform vec2 screen;
 
-in vec2 uv;
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+#else
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
+#endif
+
+flat in vec3 center;
+flat in float energy;
+flat in vec3 col;
+flat in float radius;
+
 out vec4 Diffuse;
 out vec4 Specular;
 
-vec3 DecodeNormal(vec2 n)
+vec3 DecodeNormal(vec2 n);
+vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+
+void main()
 {
-  float z = dot(n, n) * 2. - 1.;
-  vec2 xy = normalize(n) * sqrt(1. - z * z);
-  return vec3(xy,z);
-}
+    vec2 texc = gl_FragCoord.xy / screen;
+    float z = texture(dtex, texc).x;
+    vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
+    float roughness = texture(ntex, texc).z;
 
-void main() {
-	vec2 texc = uv;
-	float z = texture(dtex, texc).x;
-	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, texc).xy - 1.));
+    vec4 xpos = getPosFromUVDepth(vec3(texc, z), InverseProjectionMatrix);
+    vec3 eyedir = -normalize(xpos.xyz);
 
-	vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
-	xpos = invproj * xpos;
-	xpos /= xpos.w;
-	vec3 eyedir = normalize(xpos.xyz);
+    vec4 pseudocenter = ViewMatrix * vec4(center.xyz, 1.0);
+    pseudocenter /= pseudocenter.w;
+    vec3 light_pos = pseudocenter.xyz;
+    vec3 light_col = col.xyz;
+    float d = distance(light_pos, xpos.xyz);
+    float att = energy * 20. / (1. + d * d);
+    att *= (radius - d) / radius;
+    if (att <= 0.) discard;
 
-	vec3 diffuse = vec3(0.), specular = vec3(0.);
+    // Light Direction
+    vec3 L = -normalize(xpos.xyz - light_pos);
 
-	for (int i = 0; i < 16; ++i) {
-		vec4 pseudocenter = viewm * vec4(center[i].xyz, 1.0);
-		pseudocenter /= pseudocenter.w;
-		vec3 light_pos = pseudocenter.xyz;
-		vec3 light_col = col[i].xyz;
-		float d = distance(light_pos, xpos.xyz);
-		float att = energy[i] * 200. / (4. * 3.14 * d * d);
-		float spec_att = (energy[i] + 10.) * 200. / (4. * 3.14 * d * d);
+    float NdotL = max(0., dot(norm, L));
 
-		// Light Direction
-		vec3 L = normalize(xpos.xyz - light_pos);
-
-		float NdotL = max(0.0, dot(norm, -L));
-		diffuse += NdotL * light_col * att;
-		// Reflected light dir
-		vec3 R = reflect(-L, norm);
-		float RdotE = max(0.0, dot(R, eyedir));
-		float Specular = pow(RdotE, spec);
-		specular += Specular * light_col * spec_att;
-	}
-
-	Diffuse = vec4(diffuse, 1.);
-	Specular = vec4(specular , 1.);
+    Diffuse = vec4(NdotL * light_col * att, 1.);
+    Specular = vec4(getSpecular(norm, eyedir, L, light_col, roughness) * NdotL * att, 1.);
 }

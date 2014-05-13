@@ -121,15 +121,15 @@ public:
         m_amplitude = amp;
     }
 
-	float getSpeed() const
-	{
-		return m_speed;
-	}
+    float getSpeed() const
+    {
+        return m_speed;
+    }
 
-	float getAmplitude() const
-	{
-		return m_amplitude;
-	}
+    float getAmplitude() const
+    {
+        return m_amplitude;
+    }
 
 private:
     float m_amplitude, m_speed;
@@ -229,10 +229,20 @@ public:
         m_maxheight[who] = height;
     }
 
+    float getMaxHeight(u32 who) const
+    {
+        return m_maxheight[who];
+    }
+
     void setBoostTime(u32 who, float time)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_boost_time[who] = time;
+    }
+
+    float getBoostTime(u32 who) const
+    {
+        return m_boost_time[who];
     }
 
     void setCenter(u32 who, float X, float Y)
@@ -242,11 +252,21 @@ public:
         m_center[who].Y = Y;
     }
 
+    core::vector2df getCenter(u32 who) const
+    {
+        return core::vector2df(m_center[who].X, m_center[who].Y);
+    }
+
     void setDirection(u32 who, float X, float Y)
     {
         assert(who < MAX_PLAYER_COUNT);
         m_direction[who].X = X;
         m_direction[who].Y = Y;
+    }
+
+    core::vector2df getDirection(u32 who) const
+    {
+        return core::vector2df(m_direction[who].X, m_direction[who].Y);
     }
 
     void setCurrentCamera(u32 who)
@@ -307,20 +327,20 @@ public:
         m_color[2] = b;
     }
 
-	float getRed() const
-	{
-		return m_color[0];
-	}
+    float getRed() const
+    {
+        return m_color[0];
+    }
 
-	float getGreen() const
-	{
-		return m_color[1];
-	}
+    float getGreen() const
+    {
+        return m_color[1];
+    }
 
-	float getBlue() const
-	{
-		return m_color[2];
-	}
+    float getBlue() const
+    {
+        return m_color[2];
+    }
 
 private:
     float m_color[3];
@@ -375,7 +395,7 @@ public:
     {
         const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
         // Sun "position" is actually a direction and not a position
-        core::matrix4 m_view = drv->getTransform(video::ETS_VIEW);
+        core::matrix4 m_view = irr_driver->getViewMatrix();
         m_view.makeInverse();
         m_view = m_view.getTransposed();
         core::vector3df pos(x, y, z);
@@ -402,44 +422,6 @@ private:
     float m_pos[3];
     float m_screen[2];
     float m_wind[2];
-};
-
-//
-
-class MLAAColor1Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAABlend2Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class MLAANeigh3Provider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-};
-
-//
-
-class GodRayProvider: public CallBase
-{
-public:
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-    // In texcoords
-    void setSunPosition(float x, float y) { m_sunpos[0] = x; m_sunpos[1] = y; }
-
-private:
-    float m_sunpos[2];
 };
 
 //
@@ -536,19 +518,6 @@ public:
 
 //
 
-class CausticsProvider: public CallBase
-{
-public:
-    CausticsProvider() { m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0; }
-
-    virtual void OnSetConstants(video::IMaterialRendererServices *srv, int);
-
-private:
-    float m_dir[2], m_dir2[2];
-};
-
-//
-
 class DisplaceProvider: public CallBase
 {
 public:
@@ -562,27 +531,27 @@ public:
         m_dir[0] = m_dir[1] = m_dir2[0] = m_dir2[1] = 0;
     }
 
-	void update();
+    void update();
 
-	float getDirX() const
-	{
-		return m_dir[0];
-	}
+    float getDirX() const
+    {
+        return m_dir[0];
+    }
 
-	float getDirY() const
-	{
-		return m_dir[1];
-	}
+    float getDirY() const
+    {
+        return m_dir[1];
+    }
 
-	float getDir2X() const
-	{
-		return m_dir2[0];
-	}
+    float getDir2X() const
+    {
+        return m_dir2[0];
+    }
 
-	float getDir2Y() const
-	{
-		return m_dir2[1];
-	}
+    float getDir2Y() const
+    {
+        return m_dir2[1];
+    }
 
 private:
     float m_screen[2];

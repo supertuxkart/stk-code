@@ -19,6 +19,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
@@ -65,7 +66,7 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
         InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
         // Create player and associate player with keyboard
-        StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
+        StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                                 device, NULL);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)

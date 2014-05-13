@@ -48,6 +48,7 @@ using namespace GUIEngine;
 
 GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
 {
+    doInit();
     m_curr_time = 0.0f;
 
     const int y1 = m_area.getHeight()/7;
@@ -74,7 +75,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
 
 
     // ---- Track listings
-    const std::vector<std::string>& tracks = gp->getTrackNames();
+    const std::vector<std::string> tracks = gp->getTrackNames();
     const int trackAmount = tracks.size();
 
     int height_of_one_line = (y2 - y1)/(trackAmount+1);
@@ -129,7 +130,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     m_screenshot_widget->m_w = m_area.getWidth()/2;
     m_screenshot_widget->m_h = y2 - y1 - 10;
 
-    Track* track = track_manager->getTrack(tracks[0]);
+    Track* track = (tracks.size() == 0 ? NULL : track_manager->getTrack(tracks[0]));
 
     m_screenshot_widget->m_properties[PROP_ICON] = (track  != NULL ?
                                                     track->getScreenshotFile().c_str() :
@@ -151,7 +152,12 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
                                                race_manager->getNumberOfKarts(),
                                                race_manager->getNumLocalPlayers());
 
-    if (gp_ok)
+    if (tracks.size() == 0)
+    {
+        okBtn->m_properties[PROP_ID] = "cannot_start";
+        okBtn->setText(_("Sorry, no tracks available"));
+    }
+    else if (gp_ok)
     {
         okBtn->m_properties[PROP_ID] = "start";
         okBtn->setText(_("Start Grand Prix"));
@@ -220,7 +226,7 @@ void GPInfoDialog::onEnterPressedInternal()
     std::string gp_id = m_gp_ident;
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
-    PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge("");
+    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
     race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 
@@ -264,14 +270,15 @@ void GPInfoDialog::onUpdate(float dt)
 
     const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
     assert(gp != NULL);
-    const std::vector<std::string>& tracks = gp->getTrackNames();
+    const std::vector<std::string> tracks = gp->getTrackNames();
     if (frameAfter >= (int)tracks.size())
     {
         frameAfter = 0;
         m_curr_time = 0;
     }
 
-    Track* track = track_manager->getTrack(tracks[frameAfter]);
+    Track* track = (tracks.size() == 0 ? NULL :
+        track_manager->getTrack(tracks[frameAfter]));
     std::string fn = track ? track->getScreenshotFile()
                            : file_manager->getAsset(FileManager::GUI, "main_help.png");
     m_screenshot_widget->setImage(fn.c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);

@@ -46,10 +46,10 @@ class FileManager : public NoCopy
 public:
     /** The various asset types (and directories) STK might request.
      *  The last entry ASSET_COUNT specifies the number of entries. */
-    enum AssetType {ASSET_MIN, 
-                    CHALLENGE=ASSET_MIN, 
+    enum AssetType {ASSET_MIN,
+                    CHALLENGE=ASSET_MIN,
                     FONT, GFX, GRANDPRIX, GUI, MODEL, MUSIC,
-                    SFX, SHADER, SKIN, TEXTURE, TRANSLATION, 
+                    SFX, SHADER, SKIN, TEXTURE, TRANSLATION,
                     ASSET_MAX = TRANSLATION,
                     ASSET_COUNT};
 private:
@@ -72,6 +72,12 @@ private:
     /** Directory to store screenshots in. */
     std::string       m_screenshot_dir;
 
+    /** Directory where resized textures are cached. */
+    std::string       m_cached_textures_dir;
+
+    /** Directory where user-defined grand prix are stored. */
+    std::string       m_gp_dir;
+
     std::vector<std::string>
                       m_texture_search_path,
                       m_model_search_path,
@@ -88,6 +94,8 @@ private:
     bool              isDirectory(const std::string &path) const;
     void              checkAndCreateAddonsDir();
     void              checkAndCreateScreenshotDir();
+    void              checkAndCreateCachedTexturesDir();
+    void              checkAndCreateGPDir();
 #if !defined(WIN32) && !defined(__CYGWIN__) && !defined(__APPLE__)
     std::string       checkAndCreateLinuxDir(const char *env_name,
                                              const char *dir_name,
@@ -106,6 +114,9 @@ public:
     XMLNode          *createXMLTreeFromString(const std::string & content);
 
     std::string       getScreenshotDir() const;
+    std::string       getCachedTexturesDir() const;
+    std::string       getGPDir() const;
+    std::string       getTextureCacheLocation(const std::string& filename);
     bool              checkAndCreateDirectoryP(const std::string &path);
     const std::string &getAddonsDir() const;
     std::string        getAddonsFile(const std::string &name);
@@ -127,10 +138,14 @@ public:
 
 
     void       pushTextureSearchPath(const std::string& path);
-    void       pushModelSearchPath  (const std::string& path);
-    void       popTextureSearchPath ();
-    void       popModelSearchPath   ();
+    void       pushModelSearchPath(const std::string& path);
+    void       popTextureSearchPath();
+    void       popModelSearchPath();
+    void       popMusicSearchPath();
     void       redirectOutput();
+
+    bool       fileIsNewer(const std::string& f1, const std::string& f2) const;
+
     // ------------------------------------------------------------------------
     /** Adds a directory to the music search path (or stack).
      */
@@ -138,10 +153,7 @@ public:
     {
         m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
-    // ------------------------------------------------------------------------
-    /** Removes the last added directory from the music search path.
-     */
-    void popMusicSearchPath() {m_music_search_path.pop_back(); }
+
     // ------------------------------------------------------------------------
     /** Returns true if the specified file exists.
      */

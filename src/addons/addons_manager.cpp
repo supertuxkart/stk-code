@@ -22,6 +22,7 @@
 
 #include "addons/news_manager.hpp"
 #include "addons/zip.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "karts/kart_properties.hpp"
@@ -105,7 +106,7 @@ void AddonsManager::init(const XMLNode *xml,
     include->get("mtime", &tmp);
     mtime = tmp;
 
-    bool download = 
+    bool download =
         ( mtime > UserConfigParams::m_addons_last_updated +frequency ||
           force_refresh                                              ||
           !file_manager->fileExists(filename)                          )
@@ -115,7 +116,7 @@ void AddonsManager::init(const XMLNode *xml,
     {
         Log::info("NetworkHttp", "Downloading updated addons.xml");
         Online::HTTPRequest *download_request = new Online::HTTPRequest("addons.xml");
-        download_request->setURL(addon_list_url);            
+        download_request->setURL(addon_list_url);
         download_request->executeNow();
         if(download_request->hadDownloadError())
         {
@@ -374,7 +375,7 @@ void AddonsManager::downloadIcons()
                     m_addon->setIconReady();
                 }   // callback
             public:
-                IconRequest(const std::string &filename, 
+                IconRequest(const std::string &filename,
                             const std::string &url,
                             Addon *addon     ) : HTTPRequest(filename, true, 1)
                 {
@@ -557,8 +558,8 @@ bool AddonsManager::uninstall(const Addon &addon)
         // some files were successfully removed. Since we can not
         // know if the addon is still functional, better remove it.
         // On the other hand, in case of a problem the user will have
-        // the option in the GUI to try again. In this case 
-        // removeTrack/Kart would not find the addon and assert. So 
+        // the option in the GUI to try again. In this case
+        // removeTrack/Kart would not find the addon and assert. So
         // check first if the track is still known.
         if(addon.getType()=="kart")
         {

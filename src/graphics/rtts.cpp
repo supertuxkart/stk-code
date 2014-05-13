@@ -22,6 +22,35 @@
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
+static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, GLint format, GLint type)
+{
+    GLuint result;
+    glGenTextures(1, &result);
+    glBindTexture(GL_TEXTURE_2D, result);
+    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
+    return result;
+}
+
+static GLuint generateFBO(GLuint ColorAttachement)
+{
+    GLuint fbo;
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ColorAttachement, 0);
+    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    return fbo;
+}
+
+static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
+{
+    GLuint fbo = generateFBO(ColorAttachement);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DepthAttachement, 0);
+    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+    return fbo;
+}
+
 RTT::RTT()
 {
     initGL();
@@ -35,135 +64,106 @@ RTT::RTT()
     const dimension2du eighth = res/8;
     const dimension2du sixteenth = res/16;
 
-    const dimension2du ssaosize = UserConfigParams::m_ssao == 2 ? res : quarter;
-
     const u16 shadowside = 1024;
     const dimension2du shadowsize0(shadowside, shadowside);
     const dimension2du shadowsize1(shadowside / 2, shadowside / 2);
     const dimension2du shadowsize2(shadowside / 4, shadowside / 4);
+    const dimension2du shadowsize3(shadowside / 8, shadowside / 8);
     const dimension2du warpvsize(1, 512);
     const dimension2du warphsize(512, 1);
 
-    // The last parameter stands for "has stencil". The name is used in the texture
-    // cache, and when saving textures to files as the default name.
-    //
-    // All RTTs are currently RGBA8 with stencil. The four tmp RTTs are the same size
+    glGenTextures(1, &DepthStencilTexture);
+    glBindTexture(GL_TEXTURE_2D, DepthStencilTexture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, res.Width, res.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
+
+    // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
-    //
-    // Optionally, the collapse ones use a smaller format.
 
-    bool stencil = true;
-    rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
-    if(!rtts[RTT_TMP1])
+    RenderTargetTextures[RTT_TMP1] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+    RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB, GL_BGR, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+
+    RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+
+    RenderTargetTextures[RTT_HALF2] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+
+    RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
+
+    FrameBuffers[FBO_SSAO] = generateFBO(RenderTargetTextures[RTT_SSAO]);
+    // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    FrameBuffers[FBO_NORMAL_AND_DEPTHS] = generateFBO(RenderTargetTextures[RTT_NORMAL_AND_DEPTH], DepthStencilTexture);
+    FrameBuffers[FBO_COLORS] = generateFBO(RenderTargetTextures[RTT_COLOR], DepthStencilTexture);
+    FrameBuffers[FBO_MLAA_COLORS] = generateFBO(RenderTargetTextures[RTT_MLAA_COLORS], DepthStencilTexture);
+    FrameBuffers[FBO_LOG_LUMINANCE] = generateFBO(RenderTargetTextures[RTT_LOG_LUMINANCE]);
+    FrameBuffers[FBO_TMP1_WITH_DS] = generateFBO(RenderTargetTextures[RTT_TMP1], DepthStencilTexture);
+    FrameBuffers[FBO_TMP2_WITH_DS] = generateFBO(RenderTargetTextures[RTT_TMP2], DepthStencilTexture);
+    FrameBuffers[FBO_TMP4] = generateFBO(RenderTargetTextures[RTT_TMP4], DepthStencilTexture);
+    FrameBuffers[FBO_DISPLACE] = generateFBO(RenderTargetTextures[RTT_DISPLACE], DepthStencilTexture);
+    FrameBuffers[FBO_HALF1] = generateFBO(RenderTargetTextures[RTT_HALF1]);
+    FrameBuffers[FBO_HALF2] = generateFBO(RenderTargetTextures[RTT_HALF2]);
+    FrameBuffers[FBO_QUARTER1] = generateFBO(RenderTargetTextures[RTT_QUARTER1]);
+    FrameBuffers[FBO_QUARTER2] = generateFBO(RenderTargetTextures[RTT_QUARTER2]);
+    FrameBuffers[FBO_EIGHTH1] = generateFBO(RenderTargetTextures[RTT_EIGHTH1]);
+    FrameBuffers[FBO_EIGHTH2] = generateFBO(RenderTargetTextures[RTT_EIGHTH2]);
+
+    FrameBuffers[FBO_BLOOM_1024] = generateFBO(RenderTargetTextures[RTT_BLOOM_1024]);
+    FrameBuffers[FBO_BLOOM_512] = generateFBO(RenderTargetTextures[RTT_BLOOM_512]);
+    FrameBuffers[FBO_TMP_512] = generateFBO(RenderTargetTextures[RTT_TMP_512]);
+    FrameBuffers[FBO_BLOOM_256] = generateFBO(RenderTargetTextures[RTT_BLOOM_256]);
+    FrameBuffers[FBO_TMP_256] = generateFBO(RenderTargetTextures[RTT_TMP_256]);
+    FrameBuffers[FBO_BLOOM_128] = generateFBO(RenderTargetTextures[RTT_BLOOM_128]);
+    FrameBuffers[FBO_TMP_128] = generateFBO(RenderTargetTextures[RTT_TMP_128]);
+
+    FrameBuffers[FBO_COMBINED_TMP1_TMP2] = generateFBO(RenderTargetTextures[RTT_TMP1], DepthStencilTexture);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, RenderTargetTextures[RTT_TMP2], 0);
+
+    if (irr_driver->getGLSLVersion() >= 150)
     {
-        // Work around for intel hd3000 cards :(
-        stencil = false;
-        rtts[RTT_TMP1] = drv->addRenderTargetTexture(res, "rtt.tmp1", ECF_A8R8G8B8, stencil);
-        Log::error("rtts", "Stencils for rtt not available, most likely a driver bug.");
-        if(UserConfigParams::m_pixel_shaders)
-        {
-            Log::error("rtts", "This requires pixel shaders to be disabled.");
-            UserConfigParams::m_pixel_shaders = false;
-        }
-        irr_driver->disableGLSL();
+        glGenFramebuffers(1, &shadowFBO);
+        glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
+        glGenTextures(1, &shadowColorTex);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
+        glGenTextures(1, &shadowDepthTex);
+        glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
+        GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     }
-    rtts[RTT_TMP2] = drv->addRenderTargetTexture(res, "rtt.tmp2", ECF_A8R8G8B8, stencil);
-    rtts[RTT_TMP3] = drv->addRenderTargetTexture(res, "rtt.tmp3", ECF_A8R8G8B8, stencil);
-    rtts[RTT_TMP4] = drv->addRenderTargetTexture(res, "rtt.tmp4", ECF_R8, stencil);
-	rtts[RTT_NORMAL_AND_DEPTH] = drv->addRenderTargetTexture(res, "rtt.normal_and_depth", ECF_G16R16F, stencil);
-    rtts[RTT_COLOR] = drv->addRenderTargetTexture(res, "rtt.color", ECF_A16B16G16R16F, stencil);
-    rtts[RTT_SPECULARMAP] = drv->addRenderTargetTexture(res, "rtt.specularmap", ECF_R8, stencil);
-
-    rtts[RTT_HALF1] = drv->addRenderTargetTexture(half, "rtt.half1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_HALF2] = drv->addRenderTargetTexture(half, "rtt.half2", ECF_A8R8G8B8, stencil);
-
-    rtts[RTT_QUARTER1] = drv->addRenderTargetTexture(quarter, "rtt.q1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_QUARTER2] = drv->addRenderTargetTexture(quarter, "rtt.q2", ECF_A8R8G8B8, stencil);
-    rtts[RTT_QUARTER3] = drv->addRenderTargetTexture(quarter, "rtt.q3", ECF_A8R8G8B8, stencil);
-    rtts[RTT_QUARTER4] = drv->addRenderTargetTexture(quarter, "rtt.q4", ECF_R8, stencil);
-
-    rtts[RTT_EIGHTH1] = drv->addRenderTargetTexture(eighth, "rtt.e1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_EIGHTH2] = drv->addRenderTargetTexture(eighth, "rtt.e2", ECF_A8R8G8B8, stencil);
-
-    rtts[RTT_SIXTEENTH1] = drv->addRenderTargetTexture(sixteenth, "rtt.s1", ECF_A8R8G8B8, stencil);
-    rtts[RTT_SIXTEENTH2] = drv->addRenderTargetTexture(sixteenth, "rtt.s2", ECF_A8R8G8B8, stencil);
-
-    rtts[RTT_SSAO] = drv->addRenderTargetTexture(ssaosize, "rtt.ssao", ECF_R8, stencil);
-
-    rtts[RTT_WARPV] = drv->addRenderTargetTexture(warpvsize, "rtt.warpv", ECF_A8R8G8B8, stencil);
-    rtts[RTT_WARPH] = drv->addRenderTargetTexture(warphsize, "rtt.warph", ECF_A8R8G8B8, stencil);
-
-    rtts[RTT_DISPLACE] = drv->addRenderTargetTexture(res, "rtt.displace", ECF_A8R8G8B8, stencil);
-
-    if (((COpenGLDriver *) drv)->queryOpenGLFeature(COpenGLDriver::IRR_ARB_texture_rg))
-    {
-        // Use optimized formats if supported
-        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize0, "rtt.collapse", ECF_R8, stencil);
-
-        rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_R8, stencil);
-        rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_R8, stencil);
-        rtts[RTT_COLLAPSEV2] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev2", ECF_R8, stencil);
-        rtts[RTT_COLLAPSEH2] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh2", ECF_R8, stencil);
-
-        rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_R8, stencil);
-    } else
-    {
-        rtts[RTT_COLLAPSE] = drv->addRenderTargetTexture(shadowsize0, "rtt.collapse", ECF_A8R8G8B8, stencil);
-
-        rtts[RTT_COLLAPSEV] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev", ECF_A8R8G8B8, stencil);
-        rtts[RTT_COLLAPSEH] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh", ECF_A8R8G8B8, stencil);
-        rtts[RTT_COLLAPSEV2] = drv->addRenderTargetTexture(warpvsize, "rtt.collapsev2", ECF_A8R8G8B8, stencil);
-        rtts[RTT_COLLAPSEH2] = drv->addRenderTargetTexture(warphsize, "rtt.collapseh2", ECF_A8R8G8B8, stencil);
-
-        rtts[RTT_HALF_SOFT] = drv->addRenderTargetTexture(half, "rtt.halfsoft", ECF_A8R8G8B8, stencil);
-    }
-
-    u32 i;
-    for (i = 0; i < RTT_COUNT; i++)
-    {
-        if (!rtts[i])
-            Log::fatal("RTT", "Failed to create a RTT");
-    }
-
-    // Clear those that should be cleared
-    drv->beginScene(false, false);
-
-    drv->setRenderTarget(rtts[RTT_SSAO], true, false, SColor(255, 255, 255, 255));
-
-    drv->setRenderTarget(rtts[RTT_COLLAPSEV], true, false);
-    drv->setRenderTarget(rtts[RTT_COLLAPSEH], true, false);
-    drv->setRenderTarget(rtts[RTT_COLLAPSEV2], true, false);
-    drv->setRenderTarget(rtts[RTT_COLLAPSEH2], true, false);
-
-    drv->setRenderTarget(0, false, false);
-
-    drv->endScene();
-    glGenFramebuffers(1, &shadowFBO);
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
-    glGenTextures(1, &shadowColorTex);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
-    glGenTextures(1, &shadowDepthTex);
-    glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
-    glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
-    glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
-    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 RTT::~RTT()
 {
-    u32 i;
-    for (i = 0; i < RTT_COUNT; i++)
+    glDeleteFramebuffers(FBO_COUNT, FrameBuffers);
+    glDeleteTextures(RTT_COUNT, RenderTargetTextures);
+    glDeleteTextures(1, &DepthStencilTexture);
+    if (irr_driver->getGLSLVersion() >= 150)
     {
-        irr_driver->removeTexture(rtts[i]);
+        glDeleteFramebuffers(1, &shadowFBO);
+        glDeleteTextures(1, &shadowColorTex);
+        glDeleteTextures(1, &shadowDepthTex);
     }
-}
-
-ITexture *RTT::getRTT(TypeRTT which)
-{
-    assert(which < RTT_COUNT);
-    return rtts[which];
 }

@@ -20,7 +20,7 @@
 #define HEADER_KART_CONTROL_HPP
 
 
-/** 
+/**
   * \ingroup controller
   */
 class KartControl
@@ -37,13 +37,13 @@ public:
     /** The skidding control state: SC_NONE: not pressed;
         SC_NO_DIRECTION: pressed, but no steering;
         SC_LEFT/RIGHT: pressed in the specified direction. */
-    enum  SkidControl {SC_NONE, SC_NO_DIRECTION, SC_LEFT, SC_RIGHT}  
+    enum  SkidControl {SC_NONE, SC_NO_DIRECTION, SC_LEFT, SC_RIGHT}
           m_skid;
     /** True if rescue is selected. */
     bool  m_rescue;
     /** True if fire is selected. */
     bool  m_fire;
-    /** True if the kart looks (and shoots) backwards. */ 
+    /** True if the kart looks (and shoots) backwards. */
     bool  m_look_back;
 
     KartControl()
@@ -52,7 +52,7 @@ public:
     }
     // ------------------------------------------------------------------------
     /** Resets all controls. */
-    void reset() 
+    void reset()
     {
         m_steer     = 0.0f;
         m_accel     = 0.0f;
@@ -66,7 +66,7 @@ public:
     // ------------------------------------------------------------------------
     void uncompress(char *c)
     {
-        m_steer = ((float*)c)[0];  
+        m_steer = ((float*)c)[0];
         m_accel = ((float*)c)[1];
         setButtonsCompressed(c[8]);
     }   // uncompress

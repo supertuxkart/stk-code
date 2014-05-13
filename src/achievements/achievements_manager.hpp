@@ -19,50 +19,66 @@
 #ifndef HEADER_ACHIEVEMENTS_MANAGER_HPP
 #define HEADER_ACHIEVEMENTS_MANAGER_HPP
 
+#include "achievements/achievements_status.hpp"
+
 #include "utils/types.hpp"
 #include "utils/ptr_vector.hpp"
-#include "achievements/achievement_info.hpp"
-#include "achievements/achievements_slot.hpp"
 
+class AchievementInfo;
+class AchievementsStatus;
 
-#include <irrString.h>
 #include <string>
-#include <vector>
 #include <map>
 
 
-// ============================================================================
-
-/**
-  * \brief Class that takes care of online profiles
+/** This class manages the list of all achievements. It reads the
+ *  data/achievements.xml file, which contains the conditions for
+ *  each achievement.
   * \ingroup online
   */
 class AchievementsManager
 {
-private :
-    AchievementsSlot * m_active_slot;
-    PtrVector<AchievementsSlot> m_slots;
+private:
+    /** Pointer to the single instance. */
+    static AchievementsManager* m_achievements_manager;
+
     std::map<uint32_t, AchievementInfo *> m_achievements_info;
+
     AchievementsManager      ();
     ~AchievementsManager     ();
-    AchievementsSlot * createNewSlot(unsigned int id, bool online);
-    void parseAssetFile();
-    void parseUserConfigFile();
+    AchievementsStatus * createNewSlot(unsigned int id, bool online);
 
 public:
-    /**Singleton */
-    static AchievementsManager *            get();
-    static void                             deallocate();
+    /** Static function to create the instance of the achievement manager. */
+    static void create()
+    {
+        assert(!m_achievements_manager);
+        m_achievements_manager = new AchievementsManager();
+    }   // create
+    // ------------------------------------------------------------------------
+    /** Static function to get the achievement manager. */
+    static AchievementsManager* get()
+    {
+        assert(m_achievements_manager);
+        return m_achievements_manager;
+    }   // get
+    // ------------------------------------------------------------------------
+    static void destroy()
+    {
+        assert(m_achievements_manager);
+        delete m_achievements_manager;
+        m_achievements_manager = NULL;
+    }   // destroy
+    // ========================================================================
 
-    void init();
-    void save();
-    void onRaceEnd();
-    void updateCurrentPlayer();
-    AchievementsSlot * getActive() const { return m_active_slot; }
-    AchievementsSlot * getSlot(unsigned int id, bool online);
-    void createSlotsIfNeeded();
-    AchievementInfo * getAchievementInfo(uint32_t id);
-    const std::map<uint32_t, AchievementInfo *> & getAllInfo() { return m_achievements_info;}
+    AchievementInfo* getAchievementInfo(uint32_t id) const;
+    AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
+    // ------------------------------------------------------------------------
+    const std::map<uint32_t, AchievementInfo *> & getAllInfo()
+    {
+        return m_achievements_info;
+    }  // getAllInfo
+
 };   // class AchievementsManager
 
 #endif

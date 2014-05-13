@@ -20,7 +20,7 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
+#include "online/xml_request.hpp"
 
 
 namespace GUIEngine { class Widget; class ListWidget; }
@@ -46,7 +46,22 @@ private:
     GUIEngine::IconButtonWidget * m_create_widget;
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
-    const Online::CurrentUser::ServerCreationRequest * m_server_creation_request;
+    // --------------------------------------------------------------------
+    class ServerCreationRequest : public Online::XMLRequest
+    {
+        virtual void callback();
+        uint32_t m_created_server_id;
+    public:
+        const uint32_t getCreatedServerID() const
+        {
+            assert(isDone());
+            return m_created_server_id;
+        }   // getCreatedServerID
+    };   // ServerCreationRequest
+    // --------------------------------------------------------------------
+
+
+    ServerCreationRequest *m_server_creation_request;
 
     /** \brief Sets which widget has to be focused. Depends on the user state. */
     void setInitialFocus();

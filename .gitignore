@@ -1,4 +1,4 @@
-bld/
+bld*/
 build/
 build-32/
 build-64/
@@ -17,6 +17,9 @@ data/sfx
 data/textures
 data/tracks
 data/.svn
+
+# Ignore doxygen output
+src/html
 
 *.o
 *.d

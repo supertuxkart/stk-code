@@ -14,14 +14,22 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
-#version 330
+
 uniform sampler2D tex;
 uniform float transparency;
+
+#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
+
 
 void main()
 {
-	FragColor = texture(tex, uv);
-	FragColor.a *= transparency;
+    vec4 Color = texture(tex, uv);
+    Color.a *= transparency;
+    FragColor = vec4(Color.rgb * Color.a, Color.a);
 }

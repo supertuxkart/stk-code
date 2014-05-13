@@ -22,7 +22,6 @@
 
 #include "audio/music_manager.hpp"
 #include "challenges/challenge_data.hpp"
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
@@ -145,7 +144,7 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
 {
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     int points_before = player->getPoints();
     int points_now = points_before + CHALLENGE_POINTS[difficulty];
 
@@ -271,7 +270,8 @@ void FeatureUnlockedCutScene::init()
         video::ITexture *t = irr_driver->getTexture(texture_names[i]);
         textures.push_back(t);
     }
-    m_sky = irr_driver->addSkyBox(textures);
+    std::vector<video::ITexture*> sh_textures;
+    m_sky = irr_driver->addSkyBox(textures, sh_textures);
 #ifdef DEBUG
     m_sky->setName("skybox");
 #endif
@@ -411,7 +411,7 @@ void FeatureUnlockedCutScene::tearDown()
     m_all_kart_models.clearAndDeleteAll();
 
     // update point count and the list of locked/unlocked stuff
-    PlayerManager::get()->getCurrentPlayer()->computeActive();
+    PlayerManager::getCurrentPlayer()->computeActive();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -626,7 +626,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
     }
     else
     {
-        const std::vector<std::string>& gptracks = gp->getTrackNames();
+        const std::vector<std::string> gptracks = gp->getTrackNames();
         const int trackAmount = gptracks.size();
 
         if (trackAmount == 0)

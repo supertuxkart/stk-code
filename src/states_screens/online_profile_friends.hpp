@@ -31,22 +31,22 @@
 namespace GUIEngine { class Widget; }
 
 
-/**
-  * \brief Online profiel overview screen
-  * \ingroup states_screens
-  */
+/** Online profile overview screen.
+ * \ingroup states_screens
+ */
 class OnlineProfileFriends : public OnlineProfileBase, public GUIEngine::ScreenSingleton<OnlineProfileFriends>
 {
 private:
     OnlineProfileFriends();
 
-    GUIEngine::ListWidget *     m_friends_list_widget;
-    GUIEngine::ButtonWidget *   m_search_button_widget;
-    GUIEngine::TextBoxWidget *  m_search_box_widget;
+    /** Pointer to the various widgets on the screen. */
+    GUIEngine::ListWidget    *m_friends_list_widget;
+    GUIEngine::ButtonWidget  *m_search_button_widget;
+    GUIEngine::TextBoxWidget *m_search_box_widget;
 
-    int                         m_selected_friend_index;
     bool                        m_waiting_for_friends;
 
+    void displayResults();
 public:
     friend class GUIEngine::ScreenSingleton<OnlineProfileFriends>;
 
@@ -54,16 +54,19 @@ public:
     virtual void loadedFromFile() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID) OVERRIDE;
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name,
+                               const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init() OVERRIDE;
 
     virtual void onUpdate(float delta) OVERRIDE;
-
     virtual void beforeAddingWidget() OVERRIDE;
 
-    virtual void refreshFriendsList() {m_waiting_for_friends = true; }
+    // ------------------------------------------------------------------------
+    /** Triggers a reload of the friend list next time this menu is shown. */
+    void refreshFriendsList() {m_waiting_for_friends = true; }
 };
 
 #endif

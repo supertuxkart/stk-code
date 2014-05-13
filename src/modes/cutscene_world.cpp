@@ -20,9 +20,9 @@
 #include "animations/animation_base.hpp"
 #include "animations/three_d_animation.hpp"
 #include "audio/music_manager.hpp"
-#include "challenges/game_slot.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "io/file_manager.hpp"
 #include "karts/abstract_kart.hpp"
@@ -44,6 +44,8 @@
 #include <ISceneManager.h>
 
 #include <string>
+
+bool CutsceneWorld::s_use_duration = false;
 
 //-----------------------------------------------------------------------------
 /** Constructor. Sets up the clock mode etc.
@@ -74,9 +76,11 @@ void CutsceneWorld::init()
 
     //const btTransform &s = getTrack()->getStartTransform(0);
     //const Vec3 &v = s.getOrigin();
-    m_camera = irr_driver->getSceneManager()
-             ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
-                                  core::vector3df(0.0f, 0.0f, 0.0f));
+    Camera* stk_cam = Camera::createCamera(NULL);
+    m_camera = stk_cam->getCameraSceneNode();
+    //m_camera = irr_driver->getSceneManager()
+    //         ->addCameraSceneNode(NULL, core::vector3df(0.0f, 0.0f, 0.0f),
+    //                              core::vector3df(0.0f, 0.0f, 0.0f));
     m_camera->setFOV(0.61f);
     m_camera->bindTargetAndRotation(true); // no "look-at"
 
@@ -150,6 +154,9 @@ void CutsceneWorld::init()
         }
     }
 
+    if (!s_use_duration)
+        m_duration = 999999.0f;
+
     if (m_duration <= 0.0f)
     {
         Log::error("[CutsceneWorld]", "WARNING: cutscene has no duration");
@@ -169,7 +176,7 @@ CutsceneWorld::~CutsceneWorld()
  */
 const std::string& CutsceneWorld::getIdent() const
 {
-    return IDENT_CUSTSCENE;
+    return IDENT_CUTSCENE;
 }   // getIdent
 
 //-----------------------------------------------------------------------------
@@ -365,6 +372,7 @@ void CutsceneWorld::enterRaceOverState()
 
     if (m_aborted || partId == -1 || partId == (int)m_parts.size() - 1)
     {
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         if (m_parts.size() == 1 && m_parts[0] == "endcutscene")
         {
             CreditsScreen* credits = CreditsScreen::getInstance();
@@ -375,10 +383,27 @@ void CutsceneWorld::enterRaceOverState()
             StateManager::get()->resetAndSetStack(newStack);
             StateManager::get()->pushScreen(credits);
         }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            if (race_manager->raceWasStartedFromOverworld())
+                OverWorld::enterOverWorld();
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else  if (m_parts.size() == 1 && m_parts[0] == "gplose")
+        {
+            race_manager->exitRace();
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            if (race_manager->raceWasStartedFromOverworld())
+                OverWorld::enterOverWorld();
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (race_manager->getTrackName() == "introcutscene" ||
                  race_manager->getTrackName() == "introcutscene2")
         {
-            PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+            PlayerProfile *player = PlayerManager::getCurrentPlayer();
             if (player->isFirstTime())
             {
                 race_manager->exitRace();
@@ -415,6 +440,9 @@ void CutsceneWorld::enterRaceOverState()
  */
 bool CutsceneWorld::isRaceOver()
 {
+    if (!s_use_duration && !m_aborted)
+        return false;
+
     return m_time > m_duration;
 }   // isRaceOver
 

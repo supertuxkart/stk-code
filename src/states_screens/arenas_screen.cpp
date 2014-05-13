@@ -17,6 +17,7 @@
 
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "guiengine/widget.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
@@ -235,7 +236,7 @@ void ArenasScreen::buildTrackList()
                 if(!curr->isArena()) continue;
             }
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );
@@ -265,7 +266,7 @@ void ArenasScreen::buildTrackList()
                 if(!curr->isArena()) continue;
             }
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 w->addItem( _("Locked : solve active challenges to gain access to more!"),
                            "locked", curr->getScreenshotFile(), LOCKED_BADGE );

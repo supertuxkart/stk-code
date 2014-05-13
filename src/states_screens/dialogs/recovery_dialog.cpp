@@ -17,16 +17,15 @@
 
 #include "states_screens/dialogs/recovery_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
-#include "config/player.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/messages.hpp"
 
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -34,27 +33,33 @@ using namespace irr::gui;
 using namespace Online;
 
 // -----------------------------------------------------------------------------
-
-RecoveryDialog::RecoveryDialog() :
-        ModalDialog(0.8f,0.8f)
+/** Constructor for the recovery dialog.
+ */
+RecoveryDialog::RecoveryDialog() : ModalDialog(0.8f,0.8f)
 {
-    m_recovery_request = NULL;
-    m_self_destroy = false;
+    m_recovery_request    = NULL;
+    m_self_destroy        = false;
     m_show_recovery_input = true;
-}
+    m_show_recovery_info  = false;
+    showRecoveryInput();
+}   // RecoveryDialog
 
 // -----------------------------------------------------------------------------
-
+/** Destructor, destroys the recovery request.
+ */
 RecoveryDialog::~RecoveryDialog()
 {
     delete m_recovery_request;
-}
+}   //~RecoverDialog
 
 // -----------------------------------------------------------------------------
-
-void RecoveryDialog::showRecoveryInput(){
+/** Shows the input screen to get the account name and email address.
+ */
+void RecoveryDialog::showRecoveryInput()
+{
     m_show_recovery_input = false;
-    clearWindow();
+    if (m_irrlicht_window)
+        clearWindow();
     m_phase = Input;
     loadFromFile("online/recovery_input.stkgui");
 
@@ -74,11 +79,13 @@ void RecoveryDialog::showRecoveryInput(){
     assert(m_submit_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-}
+}   // showRecoveryInput
 
 // -----------------------------------------------------------------------------
-
-void RecoveryDialog::showRecoveryInfo(){
+/** Informs the user that an email will be sent.
+ */
+void RecoveryDialog::showRecoveryInfo()
+{
     m_show_recovery_info = false;
     clearWindow();
     m_phase = Info;
@@ -91,44 +98,56 @@ void RecoveryDialog::showRecoveryInfo(){
     assert(m_options_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-}
+}   // showRecoveryInfo
 
 // -----------------------------------------------------------------------------
-
+/** Let esc act as cancel.
+ */
 bool RecoveryDialog::onEscapePressed()
 {
     return m_cancel_widget->isActivated();
-}
+}   // onEscapePressed
 
 // -----------------------------------------------------------------------------
 
 void RecoveryDialog::processInput()
 {
-    const stringw username = m_username_widget->getText().trim();
-    const stringw email = m_email_widget->getText().trim();
-    if (username.size() < 4 || username.size() > 30 || email.size() < 4 || email.size() > 50)
+    const core::stringw username = m_username_widget->getText().trim();
+    const core::stringw email = m_email_widget->getText().trim();
+    if (username.size() < 4 || username.size() > 30 ||
+        email.size() < 4    || email.size() > 50       )
     {
         sfx_manager->quickSound("anvil");
         m_info_widget->setErrorColor();
-        m_info_widget->setText(_("Username and/or email address invalid."), false);
+        m_info_widget->setText(_("Username and/or email address invalid."),
+                               false);
     }
     else
     {
         m_info_widget->setDefaultColor();
         m_options_widget->setDeactivated();
-        m_recovery_request = CurrentUser::get()->requestRecovery(username, email);
+        m_recovery_request = new XMLRequest();
+        // This function also works when the current user is not logged in
+        PlayerManager::setUserDetails(m_recovery_request, "recovery");
+        m_recovery_request->addParameter("username", username);
+        m_recovery_request->addParameter("email",    email   );
+        m_recovery_request->queue();
     }
-}
+}   // processInput
 
 // -----------------------------------------------------------------------------
-
-GUIEngine::EventPropagation RecoveryDialog::processEvent(const std::string& eventSource)
+/** Handle a user event.
+ */
+GUIEngine::EventPropagation
+                   RecoveryDialog::processEvent(const std::string& eventSource)
 {
     std::string selection;
     if (eventSource == m_options_widget->m_properties[PROP_ID])
-        selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        selection =
+                 m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
     else
         selection = eventSource;
+
     if (selection == m_cancel_widget->m_properties[PROP_ID])
     {
         m_self_destroy = true;
@@ -140,10 +159,11 @@ GUIEngine::EventPropagation RecoveryDialog::processEvent(const std::string& even
         return GUIEngine::EVENT_BLOCK;
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
 // -----------------------------------------------------------------------------
-
+/** Called when the user pressed enter.
+ */
 void RecoveryDialog::onEnterPressedInternal()
 {
 
@@ -154,7 +174,10 @@ void RecoveryDialog::onEnterPressedInternal()
 }
 
 // -----------------------------------------------------------------------------
-
+/** This is called every frame and checks if an outstanding recovery request
+ *  was finished. If so, it displays the results.
+ *  \param dt Time step size.
+ */
 void RecoveryDialog::onUpdate(float dt)
 {
     if(m_recovery_request  != NULL)
@@ -187,4 +210,4 @@ void RecoveryDialog::onUpdate(float dt)
         showRecoveryInput();
     else if (m_show_recovery_info)
         showRecoveryInfo();
-}
+}   // onUpdates

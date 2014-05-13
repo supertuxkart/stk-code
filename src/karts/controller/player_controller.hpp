@@ -21,7 +21,6 @@
 #ifndef HEADER_PLAYERKART_HPP
 #define HEADER_PLAYERKART_HPP
 
-#include "config/player.hpp"
 #include "karts/controller/controller.hpp"
 
 class AbstractKart;
@@ -56,7 +55,7 @@ private:
 
     void           steer(float, int);
 public:
-                   PlayerController  (AbstractKart *kart, 
+                   PlayerController  (AbstractKart *kart,
                                       StateManager::ActivePlayer *_player,
                                       unsigned int player_index);
                   ~PlayerController  ();

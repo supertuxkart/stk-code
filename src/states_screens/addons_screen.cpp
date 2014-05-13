@@ -17,10 +17,9 @@
 
 #include "states_screens/addons_screen.hpp"
 
-#include <iostream>
-
 #include "addons/addons_manager.hpp"
 #include "addons/news_manager.hpp"
+#include "config/user_config.hpp"
 #include "guiengine/CGUISpriteBank.h"
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -33,6 +32,8 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/ptr_vector.hpp"
+
+#include <iostream>
 
 DEFINE_SCREEN_SINGLETON( AddonsScreen );
 
@@ -112,7 +113,7 @@ void AddonsScreen::beforeAddingWidget()
     GUIEngine::SpinnerWidget* w_filter_date =
                         getWidget<GUIEngine::SpinnerWidget>("filter_date");
     w_filter_date->m_properties[GUIEngine::PROP_MIN_VALUE] = "0";
-    w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] = 
+    w_filter_date->m_properties[GUIEngine::PROP_MAX_VALUE] =
                             StringUtils::toString(m_date_filters.size() - 1);
     
     for (unsigned int n = 0; n < m_date_filters.size(); n++)
@@ -210,9 +211,9 @@ void AddonsScreen::loadList()
                         getWidget<GUIEngine::SpinnerWidget>("filter_date");
     int date_index = w_filter_date->getValue();
     StkTime::TimeType date = StkTime::getTimeSinceEpoch();
-    date = StkTime::addInterval(date, 
-                -m_date_filters[date_index].year, 
-                -m_date_filters[date_index].month, 
+    date = StkTime::addInterval(date,
+                -m_date_filters[date_index].year,
+                -m_date_filters[date_index].month,
                 -m_date_filters[date_index].day);
 
     // Get the filter by rating.
@@ -401,11 +402,11 @@ void AddonsScreen::onColumnClicked(int column_id)
 
     switch(column_id)
     {
-    case 0: 
-        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_NAME); 
+    case 0:
+        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_NAME);
         break;
     case 1:
-        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_DATE); 
+        Addon::setSortOrder(m_sort_default ? Addon::SO_DEFAULT : Addon::SO_DATE);
         break;
     default: assert(0); break;
     }   // switch

@@ -39,7 +39,7 @@ public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    RacePausedDialog(const float percentWidth, const float percentHeight);  
+    RacePausedDialog(const float percentWidth, const float percentHeight);
     virtual ~RacePausedDialog();
     
     void onEnterPressedInternal();
