@@ -1,9 +1,7 @@
 // From paper http://graphics.cs.williams.edu/papers/AlchemyHPG11/
 // and improvements here http://graphics.cs.williams.edu/papers/SAOHPG12/
 
-uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform sampler2D noise_texture;
 uniform vec4 samplePoints[16];
 uniform vec2 screen;
 
@@ -37,24 +35,25 @@ const float k = 1.;
 
 const float invSamples = 1. / SAMPLES;
 
-vec3 DecodeNormal(vec2 n);
-vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
+vec3 getXcYcZc(int x, int y, float zC)
+{
+    // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
+    float xC= (1. - 2 * (float(x) + 0.5) / screen.x) * zC / ProjectionMatrix[0][0];
+    float yC= (1. + 2 * (float(y) + 0.5) / screen.y) * zC / ProjectionMatrix[1][1];
+    return vec3(xC, yC, zC);
+}
 
 void main(void)
 {
-    vec4 cur = texture(ntex, uv);
-    float curdepth = texture(dtex, uv).x;
-    vec4 FragPos = getPosFromUVDepth(vec3(uv, curdepth), InverseProjectionMatrix);
+    float lineardepth = textureLod(dtex, uv, 0.).x;
+    int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
+    vec3 FragPos = getXcYcZc(x, y, lineardepth);
 
     // get the normal of current fragment
-    vec3 ddx = dFdx(FragPos.xyz);
-    vec3 ddy = dFdy(FragPos.xyz);
-    vec3 norm = normalize(cross(ddy, ddx));
-    // Workaround for nvidia and skyboxes
-    float len = dot(vec3(1.0), abs(cur.xyz));
-    if (len < 0.2) discard;
+    vec3 ddx = dFdx(FragPos);
+    vec3 ddy = dFdy(FragPos);
+    vec3 norm = -normalize(cross(ddy, ddx));
 
-    int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     float r = radius / FragPos.z;
     float phi = 30. * (x ^ y) + 10. * x * y;
     float bl = 0.0;
@@ -63,20 +62,18 @@ void main(void)
         float alpha = (i + .5) * invSamples;
         float theta = 2. * 3.14 * tau * alpha + phi;
         float h = r * alpha;
-        vec2 occluder_uv = h * vec2(cos(theta), sin(theta)) * screen;
-        occluder_uv += gl_FragCoord.xy;
+        vec2 offset = h * vec2(cos(theta), sin(theta)) * screen;
 
-        float m = round(log2(h)) + 7;
-        ivec2 ioccluder_uv = ivec2(occluder_uv);
-        occluder_uv = (ioccluder_uv >> int(m)) << int(m);
-        occluder_uv /= screen;
+        float m = round(log2(h) + 7);
+        ivec2 ioccluder_uv = ivec2(x, y) + ivec2(offset);
+        ioccluder_uv = (ioccluder_uv << int(m)) >> int(m);
 
-        if (occluder_uv.x < 0. || occluder_uv.x > 1. || occluder_uv.y < 0. || occluder_uv.y > 1.) continue;
+        if (ioccluder_uv.x < 0 || ioccluder_uv.x > screen.x || ioccluder_uv.y < 0 || ioccluder_uv.y > screen.y) continue;
 
-        float occluderFragmentDepth = textureLod(dtex, occluder_uv, m).x;
-        vec4 OccluderPos = getPosFromUVDepth(vec3(occluder_uv, occluderFragmentDepth), InverseProjectionMatrix);
+        float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / screen, m).x;
+        vec3 OccluderPos = getXcYcZc(ioccluder_uv.x, ioccluder_uv.y, LinearoccluderFragmentDepth);
 
-        vec3 vi = (OccluderPos - FragPos).xyz;
+        vec3 vi = OccluderPos - FragPos;
         bl += max(0, dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
     }
 

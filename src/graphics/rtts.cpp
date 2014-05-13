@@ -83,6 +83,7 @@ RTT::RTT()
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB, GL_BGR, GL_UNSIGNED_BYTE);
@@ -118,6 +119,7 @@ RTT::RTT()
     FrameBuffers[FBO_TMP1_WITH_DS] = generateFBO(RenderTargetTextures[RTT_TMP1], DepthStencilTexture);
     FrameBuffers[FBO_TMP2_WITH_DS] = generateFBO(RenderTargetTextures[RTT_TMP2], DepthStencilTexture);
     FrameBuffers[FBO_TMP4] = generateFBO(RenderTargetTextures[RTT_TMP4], DepthStencilTexture);
+    FrameBuffers[FBO_LINEAR_DEPTH] = generateFBO(RenderTargetTextures[RTT_LINEAR_DEPTH]);
     FrameBuffers[FBO_DISPLACE] = generateFBO(RenderTargetTextures[RTT_DISPLACE], DepthStencilTexture);
     FrameBuffers[FBO_HALF1] = generateFBO(RenderTargetTextures[RTT_HALF1]);
     FrameBuffers[FBO_HALF2] = generateFBO(RenderTargetTextures[RTT_HALF2]);

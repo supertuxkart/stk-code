@@ -713,6 +713,17 @@ public:
     static void init();
 };
 
+class LinearizeDepthShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_zn, uniform_zf, uniform_texture;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(float zn, float zf, unsigned TU_tex);
+};
+
 class GlowShader
 {
 public:
