@@ -302,7 +302,7 @@ void FeatureUnlockedCutScene::init()
                                                                  120, 120));
 
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1., 1, 1, 1);
+    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1., 1, 1, 1, true);
 #ifdef DEBUG
     m_light->setName("light");
 #endif
