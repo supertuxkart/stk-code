@@ -311,6 +311,7 @@ void Shaders::loadShaders()
     FullScreenShader::PenumbraVShader::init();
     FullScreenShader::GlowShader::init();
     FullScreenShader::PassThroughShader::init();
+    FullScreenShader::LinearizeDepthShader::init();
     FullScreenShader::SSAOShader::init();
     FullScreenShader::SunLightShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
@@ -2508,6 +2509,29 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
         uniform_texture = glGetUniformLocation(Program, "texture");
         vao = createVAO(Program);
+    }
+
+    GLuint LinearizeDepthShader::Program;
+    GLuint LinearizeDepthShader::uniform_zn;
+    GLuint LinearizeDepthShader::uniform_zf;
+    GLuint LinearizeDepthShader::uniform_texture;
+    GLuint LinearizeDepthShader::vao;
+    void LinearizeDepthShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/linearizedepth.frag").c_str());
+        uniform_texture = glGetUniformLocation(Program, "texture");
+        uniform_zf = glGetUniformLocation(Program, "zf");
+        uniform_zn = glGetUniformLocation(Program, "zn");
+        vao = createVAO(Program);
+    }
+
+    void LinearizeDepthShader::setUniforms(float zn, float zf, unsigned TU_tex)
+    {
+        glUniform1f(uniform_zn, zn);
+        glUniform1f(uniform_zf, zf);
+        glUniform1i(uniform_texture, TU_tex);
     }
 
     GLuint GlowShader::Program;

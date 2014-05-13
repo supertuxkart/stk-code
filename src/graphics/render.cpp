@@ -874,7 +874,7 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
                 PointLightsInfo[lightnum].blue = col.Z;
 
                 // Light radius
-                PointLightsInfo[lightnum].radius = 20 * light_node->getEffectiveEnergy();
+                PointLightsInfo[lightnum].radius = light_node->getRadius();
             }
         }
         if (lightnum > MAXLIGHT)

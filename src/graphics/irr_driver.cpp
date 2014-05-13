@@ -2305,7 +2305,7 @@ void IrrDriver::applyObjectPassShader()
 
 // ----------------------------------------------------------------------------
 
-scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
+scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy, float radius,
     float r, float g, float b, bool sun, scene::ISceneNode* parent)
 {
     if (m_glsl)
@@ -2314,7 +2314,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         LightNode *light = NULL;
 
         if (!sun)
-            light = new LightNode(m_scene_manager, parent, energy, r, g, b);
+            light = new LightNode(m_scene_manager, parent, energy, radius, r, g, b);
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 
