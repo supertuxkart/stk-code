@@ -610,6 +610,16 @@ public:
     static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
 };
 
+class Gaussian17TapHShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_pixel;
+    static GLuint vao;
+
+    static void init();
+};
+
 class Gaussian6HBlurShader
 {
 public:
@@ -621,6 +631,16 @@ public:
 };
 
 class Gaussian3HBlurShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_tex, uniform_pixel;
+    static GLuint vao;
+
+    static void init();
+};
+
+class Gaussian17TapVShader
 {
 public:
     static GLuint Program;
@@ -693,6 +713,17 @@ public:
     static void init();
 };
 
+class LinearizeDepthShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_zn, uniform_zf, uniform_texture;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(float zn, float zf, unsigned TU_tex);
+};
+
 class GlowShader
 {
 public:
@@ -707,12 +738,12 @@ class SSAOShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints;
+    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints, uniform_screen;
     static GLuint vao;
     static float SSAOSamples[64];
     
     static void init();
-    static void setUniforms(unsigned TU_dtex, unsigned TU_noise);
+    static void setUniforms(const core::vector2df &screen, unsigned TU_dtex, unsigned TU_noise);
 };
 
 class FogShader

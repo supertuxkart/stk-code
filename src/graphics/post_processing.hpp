@@ -84,6 +84,7 @@ public:
     /** Blur the in texture */
     void renderGaussian3Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t inv_width, size_t inv_height);
     void renderGaussian6Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
+    void renderGaussian17TapBlur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
 
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex);

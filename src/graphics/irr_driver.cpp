@@ -841,8 +841,7 @@ scene::IMesh *IrrDriver::getMesh(const std::string &filename)
                    filename.c_str());
         return NULL;
     }
-    scene::IMeshManipulator *mani = irr_driver->getVideoDriver()->getMeshManipulator();
-    return mani->createMeshWelded(am->getMesh(0));
+    return am->getMesh(0);
 }   // getMesh
 
 // ----------------------------------------------------------------------------
@@ -1628,7 +1627,7 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) KTris - LightDst : ~%d",
+        sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) - LightDst : ~%d",
                 min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;

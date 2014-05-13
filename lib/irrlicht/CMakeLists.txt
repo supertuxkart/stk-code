@@ -21,6 +21,12 @@ else()
   set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
 endif()
 
+# Xrandr
+if(UNIX AND USE_XRANDR)
+    add_definitions(-DNO_IRR_LINUX_X11_VIDMODE_)
+    add_definitions(-D_IRR_LINUX_X11_RANDR_)
+endif()
+
 set(IRRLICHT_SOURCES
 source/Irrlicht/CTRStencilShadow.cpp
 source/Irrlicht/CGUIListBox.cpp
