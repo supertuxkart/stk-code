@@ -436,16 +436,24 @@ void IrrDriver::initDevice()
 
     GLMajorVersion = 2;
     GLMinorVersion = 1;
-    glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
-    glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+    // Call to glGetIntegerv should not be made if --no-graphics is used
+    if(!ProfileWorld::isNoGraphics())
+    {
+        glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
+        glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+    }
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
     // Parse extensions
     hasVSLayer = false;
-    const GLubyte *extensions = glGetString(GL_EXTENSIONS);
-    if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
+    // Default false value for hasVSLayer if --no-graphics argument is used
+    if (!ProfileWorld::isNoGraphics())
+    {
+        const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+        if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
         hasVSLayer = true;
+    }
 
 
 
@@ -1201,7 +1209,7 @@ void IrrDriver::suppressSkyBox()
 {
     SkyboxTextures.clear();
     SphericalHarmonicsTextures.clear();
-    if (SkyboxCubeMap)
+    if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
         glDeleteTextures(1, &SkyboxCubeMap);
     SkyboxCubeMap = 0;
 }
