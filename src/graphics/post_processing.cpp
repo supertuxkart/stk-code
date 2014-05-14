@@ -383,6 +383,39 @@ void PostProcessing::renderGaussian6Blur(GLuint in_fbo, GLuint in_tex, GLuint tm
     }
 }
 
+void PostProcessing::renderGaussian17TapBlur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height)
+{
+    float inv_width = 1.f / width, inv_height = 1.f / height;
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, tmp_fbo);
+        glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
+
+        glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
+
+        setTexture(0, in_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+    {
+        glBindFramebuffer(GL_FRAMEBUFFER, in_fbo);
+        glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
+        glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
+
+        glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
+
+        setTexture(0, tmp_tex, GL_LINEAR, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
+
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    }
+}
+
 void PostProcessing::renderPassThrough(GLuint tex)
 {
 
@@ -418,16 +451,26 @@ void PostProcessing::renderSSAO()
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
 
+    // Generate linear depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_LINEAR_DEPTH));
+    glUseProgram(FullScreenShader::LinearizeDepthShader::Program);
+    glBindVertexArray(FullScreenShader::LinearizeDepthShader::vao);
+    setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LinearizeDepthShader::setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue(), 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_SSAO));
+
     if (!noise_tex)
         noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_LINEAR, GL_LINEAR);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
-    setTexture(2, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(0, 1, 2);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
+
+    FullScreenShader::SSAOShader::setUniforms(core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -624,10 +667,8 @@ void PostProcessing::applyMLAA()
 
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
-void PostProcessing::render()
+void PostProcessing::render(scene::ICameraSceneNode * const camnode)
 {
-    if (!irr_driver->isGLSL()) return;
-
     IVideoDriver * const drv = irr_driver->getVideoDriver();
 
     MotionBlurProvider * const mocb = (MotionBlurProvider *) irr_driver->
@@ -635,29 +676,25 @@ void PostProcessing::render()
     GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
                                                                  getCallback(ES_GAUSSIAN3H);
 
-    const u32 cams = Camera::getNumCameras();
-    for(u32 cam = 0; cam < cams; cam++)
+    GLuint in_rtt = irr_driver->getRenderTargetTexture(RTT_COLOR), in_fbo = irr_driver->getFBO(FBO_COLORS);
+    GLuint out_rtt = irr_driver->getRenderTargetTexture(RTT_TMP1), out_fbo = irr_driver->getFBO(FBO_TMP1_WITH_DS);
+    // Each effect uses these as named, and sets them up for the next effect.
+    // This allows chaining effects where some may be disabled.
+
+    // As the original color shouldn't be touched, the first effect can't be disabled.
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_BLEND);
+
+    if (UserConfigParams::m_dof)
     {
-        scene::ICameraSceneNode * const camnode =
-            Camera::getCamera(cam)->getCameraSceneNode();
-        mocb->setCurrentCamera(cam);
-        GLuint in_rtt = irr_driver->getRenderTargetTexture(RTT_COLOR), in_fbo = irr_driver->getFBO(FBO_COLORS);
-        GLuint out_rtt = irr_driver->getRenderTargetTexture(RTT_TMP1), out_fbo = irr_driver->getFBO(FBO_TMP1_WITH_DS);
-        // Each effect uses these as named, and sets them up for the next effect.
-        // This allows chaining effects where some may be disabled.
+        renderDoF(out_fbo, in_rtt);
+        std::swap(in_rtt, out_rtt);
+        std::swap(in_fbo, out_fbo);
+    }
 
-        // As the original color shouldn't be touched, the first effect can't be disabled.
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_BLEND);
-
-        if (UserConfigParams::m_dof)
-        {
-            renderDoF(out_fbo, in_rtt);
-            std::swap(in_rtt, out_rtt);
-            std::swap(in_fbo, out_fbo);
-        }
-
+    {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
         const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
         if (UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
@@ -665,7 +702,7 @@ void PostProcessing::render()
             // Grab the sky
             glBindFramebuffer(GL_FRAMEBUFFER, out_fbo);
             glClear(GL_COLOR_BUFFER_BIT);
-//            irr_driver->renderSkybox();
+            irr_driver->renderSkybox(camnode);
 
             // Set the sun's color
             const SColor col = World::getWorld()->getTrack()->getSunColor();
@@ -700,8 +737,8 @@ void PostProcessing::render()
 
             trans.transformVect(ndc, pos);
 
-            const float texh = m_vertices[cam].v1.TCoords.Y - m_vertices[cam].v0.TCoords.Y;
-            const float texw = m_vertices[cam].v3.TCoords.X - m_vertices[cam].v0.TCoords.X;
+            const float texh = m_vertices[0].v1.TCoords.Y - m_vertices[0].v0.TCoords.Y;
+            const float texw = m_vertices[0].v3.TCoords.X - m_vertices[0].v0.TCoords.X;
 
             const float sunx = ((ndc[0] / ndc[3]) * 0.5f + 0.5f) * texw;
             const float suny = ((ndc[1] / ndc[3]) * 0.5f + 0.5f) * texh;
@@ -727,10 +764,13 @@ void PostProcessing::render()
             glDisable(GL_BLEND);
         }
         PROFILER_POP_CPU_MARKER();
+    }
 
-        // Simulate camera defects from there
+    // Simulate camera defects from there
 
+    {
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
         if (UserConfigParams::m_bloom)
         {
             glClear(GL_STENCIL_BUFFER_BIT);
@@ -785,52 +825,60 @@ void PostProcessing::render()
             glDisable(GL_BLEND);
         } // end if bloom
         PROFILER_POP_CPU_MARKER();
+    }
 
-        computeLogLuminance(in_rtt);
+    //computeLogLuminance(in_rtt);
+    {
+        PROFILER_PUSH_CPU_MARKER("- Tonemap", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_TONEMAP));
         toneMap(out_fbo, in_rtt);
         std::swap(in_rtt, out_rtt);
         std::swap(in_fbo, out_fbo);
+        PROFILER_POP_CPU_MARKER();
+    }
 
+    {
+        PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
         if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
         {
-            PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
-            renderMotionBlur(cam, in_rtt, out_fbo);
+            renderMotionBlur(0, in_rtt, out_fbo);
             std::swap(in_fbo, out_fbo);
             std::swap(in_rtt, out_rtt);
-            PROFILER_POP_CPU_MARKER();
         }
+        PROFILER_POP_CPU_MARKER();
+    }
 
-        if (irr_driver->getNormals())
-        {
-            glEnable(GL_FRAMEBUFFER_SRGB);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
-            glDisable(GL_FRAMEBUFFER_SRGB);
-        }
-        else if (irr_driver->getSSAOViz())
-        {
-            glEnable(GL_FRAMEBUFFER_SRGB);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_SSAO));
-            glDisable(GL_FRAMEBUFFER_SRGB);
-        }
-        else if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
-        {
-            PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
-            glEnable(GL_FRAMEBUFFER_SRGB);
-            glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_MLAA_COLORS));
-            renderPassThrough(in_rtt);
-            glDisable(GL_FRAMEBUFFER_SRGB);
-            applyMLAA();
-            blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), 0, UserConfigParams::m_width, UserConfigParams::m_height);
-            PROFILER_POP_CPU_MARKER();
-        }
-        else
-        {
-            glEnable(GL_FRAMEBUFFER_SRGB);
-            glBindFramebuffer(GL_FRAMEBUFFER, 0);
-            renderPassThrough(in_rtt);
-            glDisable(GL_FRAMEBUFFER_SRGB);
-        }
+    if (irr_driver->getNormals())
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderPassThrough(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
+        glDisable(GL_FRAMEBUFFER_SRGB);
+    }
+    else if (irr_driver->getSSAOViz())
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderPassThrough(irr_driver->getRenderTargetTexture(RTT_SSAO));
+        glDisable(GL_FRAMEBUFFER_SRGB);
+    }
+    else if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
+    {
+        PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_MLAA_COLORS));
+        renderPassThrough(in_rtt);
+        glDisable(GL_FRAMEBUFFER_SRGB);
+        applyMLAA();
+        blitFBO(irr_driver->getFBO(FBO_MLAA_COLORS), 0, UserConfigParams::m_width, UserConfigParams::m_height);
+        PROFILER_POP_CPU_MARKER();
+    }
+    else
+    {
+        glEnable(GL_FRAMEBUFFER_SRGB);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        renderPassThrough(in_rtt);
+        glDisable(GL_FRAMEBUFFER_SRGB);
     }
 }   // render

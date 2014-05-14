@@ -17,10 +17,12 @@ layout (std140) uniform MatrixesData
 in vec3 Position;
 in float Energy;
 in vec3 Color;
+in float Radius;
 
 flat out vec3 center;
 flat out float energy;
 flat out vec3 col;
+flat out float radius;
 
 const float zNear = 1.;
 
@@ -86,12 +88,11 @@ vec4 ComputeClipRegion(vec3 lightPosView, float lightRadius)
 
 void main(void)
 {
-    float radius = 5. * Energy;
     vec4 Center = ViewMatrix * vec4(Position, 1.);
     Center /= Center.w;
 
     vec2 ProjectedCornerPosition;
-    vec4 clip = ComputeClipRegion(Center.xyz, radius);
+    vec4 clip = ComputeClipRegion(Center.xyz, Radius);
     switch (gl_VertexID)
     {
     case 0:
@@ -110,7 +111,7 @@ void main(void)
 
     // Work out nearest depth for quad Z
     // Clamp to near plane in case this light intersects the near plane... don't want our quad to be clipped
-    float quadDepth = max(zNear, Center.z - radius);
+    float quadDepth = max(zNear, Center.z - Radius);
 
     // Project quad depth into clip space
     vec4 quadClip = ProjectionMatrix * vec4(0., 0., quadDepth, 1.0f);
@@ -119,4 +120,5 @@ void main(void)
     col = Color;
     center = Position;
     energy = Energy;
+    radius = Radius;
 }

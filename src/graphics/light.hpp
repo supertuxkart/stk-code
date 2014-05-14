@@ -40,7 +40,7 @@ class LightNode: public scene::ISceneNode
 #endif
 
 public:
-    LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float energy, float r, float g, float b);
+    LightNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float energy, float d, float r, float g, float b);
     virtual ~LightNode();
 
     virtual void render() OVERRIDE;
@@ -55,7 +55,7 @@ public:
     virtual u32 getMaterialCount() const OVERRIDE { return 1; }
     virtual bool isPointLight() { return true; }
 
-    //float getRadius() const { return m_radius; }
+    float getRadius() const { return m_radius; }
     float getEnergy() const { return m_energy; }
     float getEffectiveEnergy() const { return m_energy_multiplier * m_energy; }
     core::vector3df getColor() const { return core::vector3df(m_color[0], m_color[1], m_color[2]); }
@@ -66,7 +66,7 @@ public:
 protected:
     static core::aabbox3df box;
 
-    //float m_radius;
+    float m_radius;
     float m_color[3];
     float m_energy;
 

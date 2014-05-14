@@ -22,7 +22,9 @@
 #include "karts/abstract_kart.hpp"
 #include "modes/world.hpp"
 
+#include <ISceneManager.h>
 #include <ISceneNode.h>
+#include <ICameraSceneNode.h>
 
 IrrDebugDrawer::IrrDebugDrawer()
 {
@@ -58,8 +60,32 @@ void IrrDebugDrawer::drawLine(const btVector3& from, const btVector3& to,
 {
     video::SColor c(255, (int)(color.getX()*255), (int)(color.getY()*255),
                          (int)(color.getZ()*255)                          );
-    irr_driver->getVideoDriver()->draw3DLine((const core::vector3df&)from,
-                                             (const core::vector3df&)to, c);
+
+    //World::getWorld()->getCa
+
+    if (from.distance2(m_camera_pos) > 10000) return;
+
+    std::vector<float>& v = m_lines[c];
+    v.push_back(from.getX());
+    v.push_back(from.getY());
+    v.push_back(from.getZ());
+    v.push_back(to.getX());
+    v.push_back(to.getY());
+    v.push_back(to.getZ());
+    //draw3DLine((const core::vector3df&)from, (const core::vector3df&)to, c);
+}
+
+// -----------------------------------------------------------------------------
+
+void IrrDebugDrawer::beginNextFrame()
+{
+    for (std::map<video::SColor, std::vector<float> >::iterator it = m_lines.begin(); it != m_lines.end(); it++)
+    {
+        it->second.clear();
+    }
+
+    scene::ICameraSceneNode* camera = irr_driver->getSceneManager()->getActiveCamera();
+    m_camera_pos = camera->getPosition();
 }
 
 /* EOF */

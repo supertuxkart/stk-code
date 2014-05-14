@@ -12,5 +12,5 @@ varying vec2 uv;
 void main(void)
 {
     vec4 color = texture(tex, uv);
-    FragColor = vec4(color.rgb * color.a, color.a);
+    FragColor = vec4(color.rgb, color.a);
 }

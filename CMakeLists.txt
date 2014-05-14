@@ -17,6 +17,7 @@ option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
 if(UNIX)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
+    option(USE_XRANDR "Use xrandr instead of vidmode" OFF)
 endif()
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -115,6 +116,11 @@ if(USE_FRIBIDI)
             "Either install fribidi or disable bidi support with -DUSE_FRIBIDI=0 "
             "(if you don't use a right-to-left language then you don't need this).")
     endif()
+endif()
+
+# Xrandr
+if(UNIX AND USE_XRANDR)
+    find_package(Xrandr REQUIRED)
 endif()
 
 if(UNIX)
@@ -276,6 +282,11 @@ if(USE_WIIUSE)
     endif()
     add_definitions(-DENABLE_WIIUSE)
 
+endif()
+
+# Xrandr
+if(UNIX AND USE_XRANDR)
+    target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
 endif()
 
 if(MSVC)

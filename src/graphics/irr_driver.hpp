@@ -77,9 +77,17 @@ enum STKRenderingPass
 enum QueryPerf
 {
     Q_SOLID_PASS1,
-    Q_SOLID_PASS2,
-    Q_LIGHT,
     Q_SHADOWS,
+    Q_LIGHT,
+    Q_SSAO,
+    Q_SOLID_PASS2,
+    Q_TRANSPARENT,
+    Q_PARTICLES,
+    Q_DISPLACEMENT,
+    Q_GODRAYS,
+    Q_BLOOM,
+    Q_TONEMAP,
+    Q_MOTIONBLUR,
     Q_LAST
 };
 
@@ -134,6 +142,8 @@ private:
     float greenSHCoeff[9];
     float redSHCoeff[9];
 
+    /** Keep a trace of the origin file name of a texture. */
+    std::map<video::ITexture*, std::string> m_texturesFileName;
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -269,7 +279,8 @@ private:
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
-    void renderLights(float dt);
+    void renderSSAO();
+    void renderLights(scene::ICameraSceneNode * const camnode, float dt);
     void renderDisplacement();
     void doScreenShot();
 public:
@@ -296,6 +307,8 @@ public:
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
+    std::string           generateSmallerTextures(const std::string& dir);
+    std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
                                      const std::string &filename,
                                      bool is_premul=false,
@@ -305,6 +318,8 @@ public:
                                      bool is_premul=false,
                                      bool is_prediv=false,
                                      bool complain_if_not_found=true);
+    void                  clearTexturesFileName();
+    std::string           getTextureName(video::ITexture* tex);
     void                  grabAllTextures(const scene::IMesh *mesh);
     void                  dropAllTextures(const scene::IMesh *mesh);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL,
@@ -548,8 +563,8 @@ public:
     void applyObjectPassShader();
     void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
     // ------------------------------------------------------------------------
-    scene::ISceneNode *addLight(const core::vector3df &pos, float energy = 1., float r = 1.0f,
-                  float g = 1.0f, float b = 1.0f, bool sun = false, scene::ISceneNode* parent = NULL);
+    scene::ISceneNode *addLight(const core::vector3df &pos, float energy, float radius, float r,
+                  float g, float b, bool sun = false, scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
