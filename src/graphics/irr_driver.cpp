@@ -1209,7 +1209,7 @@ void IrrDriver::suppressSkyBox()
 {
     SkyboxTextures.clear();
     SphericalHarmonicsTextures.clear();
-    if (SkyboxCubeMap)
+    if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
         glDeleteTextures(1, &SkyboxCubeMap);
     SkyboxCubeMap = 0;
 }
