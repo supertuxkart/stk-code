@@ -97,10 +97,6 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
 
         m_widgets.push_back(widget);
         widget->add();
-
-        // IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
-        //                                       entry_area, false , true , // border, word wrap
-        //                                       m_irrlicht_window);
     }
 
     // ---- Track screenshot
@@ -111,7 +107,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
 
-    m_screenshot_widget->m_x = m_area.getWidth()/2;
+    m_screenshot_widget->m_x = m_area.getWidth()/2-20;
     m_screenshot_widget->m_y = y1;
     m_screenshot_widget->m_w = m_area.getWidth()/2;
     m_screenshot_widget->m_h = y2 - y1 - 10;
