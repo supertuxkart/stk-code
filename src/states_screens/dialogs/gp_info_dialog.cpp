@@ -28,6 +28,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "race/grand_prix_manager.hpp"
+#include "race/grand_prix_data.hpp"
 #include "race/race_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/tracks_screen.hpp"
@@ -67,6 +68,8 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
                                                                m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+
+    InitAfterDrawingTheHeader(gp, y1, y2, gp_ident);
 }
 
 // ----------------------------------------------------------------------------
@@ -85,8 +88,9 @@ GPInfoDialog::~GPInfoDialog()
 
 // ----------------------------------------------------------------------------
 
-void GPInfoDialog::InitAfterDrawingTheHeader(GrandPrixData gp, const float y1,
-                                             const float y2,
+void GPInfoDialog::InitAfterDrawingTheHeader(const GrandPrixData* gp,
+                                             const int y1,
+                                             const int y2,
                                              const std::string& gp_ident)
 {
     // ---- Track listings

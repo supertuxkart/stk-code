@@ -20,6 +20,7 @@
 #define HEADER_GP_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+#include "race/grand_prix_data.hpp"
 
 namespace GUIEngine
 {
@@ -46,6 +47,9 @@ public:
      */
     GPInfoDialog(const std::string& gpIdent);
     virtual ~GPInfoDialog();
+
+    void InitAfterDrawingTheHeader(const GrandPrixData* gp, const int y1,
+                                   const int y2, const std::string& gp_ident);
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
