@@ -856,7 +856,7 @@ int handleCmdLine()
         }
     }   // --laps
 
-    if(CommandLine::has("--profile-laps=",  &n))
+    if(CommandLine::has("--profile-laps",  &n))
     {
         if (n < 0)
         {
