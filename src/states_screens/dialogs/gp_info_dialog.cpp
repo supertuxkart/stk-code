@@ -44,9 +44,10 @@ using namespace irr::video;
 using namespace irr::core;
 using namespace GUIEngine;
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const float h) : ModalDialog(w, h)
+GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
+    ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT)
 {
     doInit();
     m_curr_time = 0.0f;
@@ -54,9 +55,9 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     const int y1 = m_area.getHeight()/7;
     const int y2 = m_area.getHeight()*6/7;
 
-    m_gp_ident = gpIdent;
+    m_gp_ident = gp_ident;
 
-    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gpIdent);
+    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gp_ident);
     assert (gp != NULL);
 
     // ---- GP Name
@@ -117,7 +118,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
 
     Track* track = (tracks.size() == 0 ? NULL : track_manager->getTrack(tracks[0]));
 
-    m_screenshot_widget->m_properties[PROP_ICON] = (track  != NULL ?
+    m_screenshot_widget->m_properties[PROP_ICON] = (track != NULL ?
                                                     track->getScreenshotFile().c_str() :
                                                     file_manager->getAsset(FileManager::GUI,"main_help.png"));
     m_screenshot_widget->setParent(m_irrlicht_window);
@@ -132,7 +133,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP( StateManager::get()
                                                ->getActivePlayerProfile(0)
                                                ->getUniqueID(),
-                                               gpIdent,
+                                               gp_ident,
                                                race_manager->getDifficulty(),
                                                race_manager->getNumberOfKarts(),
                                                race_manager->getNumLocalPlayers());
@@ -188,7 +189,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 GPInfoDialog::~GPInfoDialog()
 {
@@ -202,7 +203,7 @@ GPInfoDialog::~GPInfoDialog()
 
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void GPInfoDialog::onEnterPressedInternal()
 {
@@ -214,7 +215,7 @@ void GPInfoDialog::onEnterPressedInternal()
     race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventSource)
 {
@@ -242,7 +243,7 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
     return GUIEngine::EVENT_LET;
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void GPInfoDialog::onUpdate(float dt)
 {
@@ -268,4 +269,4 @@ void GPInfoDialog::onUpdate(float dt)
     m_screenshot_widget->setImage(fn.c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 }
 
-// ------------------------------------------------------------------------------------------------------
+// ----------------------------------------------------------------------------

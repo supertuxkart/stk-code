@@ -38,12 +38,13 @@ private:
     float m_curr_time;
 
 public:
+    static const float PERCENT_WIDTH  = 0.8f;
+    static const float PERCENT_HEIGHT = 0.7f;
     /**
      * Creates a modal dialog with given percentage of screen width and height
      * atm only used in track_screen.cpp
      */
-    GPInfoDialog(const std::string& gpIdent, const float percentWidth,
-                 const float percentHeight);
+    GPInfoDialog(const std::string& gpIdent);
     virtual ~GPInfoDialog();
 
     void onEnterPressedInternal();

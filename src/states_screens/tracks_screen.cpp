@@ -115,7 +115,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         if (selection == "locked")
             unlock_manager->playLockSound();
         else
-            new GPInfoDialog(selection, 0.8f, 0.7f);
+            new GPInfoDialog(selection);
     }
     else if (name == "trackgroups")
     {
