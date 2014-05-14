@@ -139,7 +139,8 @@ void RegisterScreen::doRegister()
     // If no online account is requested, don't register
     if(!getWidget<CheckBoxWidget>("online")->getState())
     {
-        UserScreen::getInstance()->newUserAdded(local_name, L"");
+        if(local_name.size()>0)
+            UserScreen::getInstance()->newUserAdded(local_name, L"");
         StateManager::get()->popMenu();
         return;
     }
@@ -183,7 +184,8 @@ void RegisterScreen::doRegister()
     }
 
     sfx_manager->quickSound( "anvil" );
-    UserScreen::getInstance()->newUserAdded(local_name, username);
+    if(local_name.size()>0)
+        UserScreen::getInstance()->newUserAdded(local_name, username);
 }   // doRegister
 
 // -----------------------------------------------------------------------------
