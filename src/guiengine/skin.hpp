@@ -381,6 +381,11 @@ namespace GUIEngine
                                            const core::rect< s32 > &rect,
                                            const core::rect< s32 > *clip,
                                            core::rect<s32>* checkClientArea=0);
+
+        virtual void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+            const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+            const video::SColor* const colors, bool useAlphaChannelOfTexture);
+
         virtual void drawIcon (gui::IGUIElement *element,
                                gui::EGUI_DEFAULT_ICON icon,
                                const core::position2di position,
