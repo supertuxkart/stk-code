@@ -17,11 +17,13 @@
                     <label proportion="1" height="100%" text_align="left" I18N="In the login screen" text="Online"/>
                     <checkbox id="online" I18N="In the login screen" text_align="left"/>
                 </div>
+                <!-- Disable guest accounts for now
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label id="label_guest" proportion="1" height="100%" text_align="left"
                            I18N="In the login screen" text="Guest login"/>
                     <checkbox id="guest" I18N="In the login screen" text_align="left"/>
                 </div>
+                -->
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label id="label_username" proportion="1" height="100%" text_align="left"
                            I18N="In the login screen" text="Username"/>
