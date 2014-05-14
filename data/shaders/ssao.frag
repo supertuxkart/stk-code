@@ -24,11 +24,11 @@ layout (std140) uniform MatrixesData
 in vec2 uv;
 out float AO;
 
-const float sigma = 2.;
+const float sigma = 1.;
 const float tau = 7.;
 const float beta = 0.001;
 const float epsilon = .00001;
-const float radius = 1.5;
+const float radius = 1.;
 const float k = 1.5;
 
 #define SAMPLES 16
@@ -66,7 +66,6 @@ void main(void)
 
         float m = round(log2(h) + 6);
         ivec2 ioccluder_uv = ivec2(x, y) + ivec2(offset);
-        ioccluder_uv = (ioccluder_uv << int(m)) >> int(m);
 
         if (ioccluder_uv.x < 0 || ioccluder_uv.x > screen.x || ioccluder_uv.y < 0 || ioccluder_uv.y > screen.y) continue;
 
