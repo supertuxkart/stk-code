@@ -131,6 +131,25 @@
             <label text="Depth of field" I18N="Video settings"/>
         </div>
     </div>
+	
+    <spacer height="4" width="10" />
+    
+    <div layout="horizontal-row" width="100%" height="fit">
+        <div layout="horizontal-row" proportion="1" height="fit">
+            <checkbox id="hd-textures"/>
+            <spacer width="10" height="10"/>
+            <label text="Use high definition textures" I18N="Video settings"/>
+        </div>
+        
+        <spacer height="4" width="10" />
+        <!--
+        <div layout="horizontal-row" proportion="1" height="fit">
+            <checkbox id="anim_gfx"/>
+            <spacer width="10" height="10"/>
+            <label text="Animated Scenery" I18N="Video settings"/>
+        </div>
+        -->
+    </div>
     
     <spacer height="20" width="10" />
     

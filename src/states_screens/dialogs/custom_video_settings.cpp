@@ -53,6 +53,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     getWidget<CheckBoxWidget>("weather_gfx")->setState( UserConfigParams::m_weather_effects );
     getWidget<CheckBoxWidget>("ubo")->setState(!UserConfigParams::m_ubo_disabled);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
+    getWidget<CheckBoxWidget>("hd-textures")->setState(UserConfigParams::m_high_definition_textures);
 
     SpinnerWidget* kart_anim = getWidget<SpinnerWidget>("steering_animations");
     kart_anim->addLabel( _("Disabled") ); // 0
@@ -107,10 +108,12 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
             getWidget<CheckBoxWidget>("anim_gfx")->getState();
         UserConfigParams::m_weather_effects =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
-        UserConfigParams::m_ubo_disabled =
+        UserConfigParams::m_ubo_disabled             =
             !getWidget<CheckBoxWidget>("ubo")->getState();
         UserConfigParams::m_dof =
             getWidget<CheckBoxWidget>("dof")->getState();
+        UserConfigParams::m_high_definition_textures =
+            getWidget<CheckBoxWidget>("hd-textures")->getState();
 
         UserConfigParams::m_motionblur      =
             getWidget<CheckBoxWidget>("motionblur")->getState();

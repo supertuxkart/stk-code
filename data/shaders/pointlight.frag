@@ -22,6 +22,7 @@ layout (std140) uniform MatrixesData
 flat in vec3 center;
 flat in float energy;
 flat in vec3 col;
+flat in float radius;
 
 out vec4 Diffuse;
 out vec4 Specular;
@@ -46,8 +47,7 @@ void main()
     vec3 light_col = col.xyz;
     float d = distance(light_pos, xpos.xyz);
     float att = energy * 20. / (1. + d * d);
-    float max_d = 5. * energy;
-    att *= (max_d - d) / max_d;
+    att *= (radius - d) / radius;
     if (att <= 0.) discard;
 
     // Light Direction

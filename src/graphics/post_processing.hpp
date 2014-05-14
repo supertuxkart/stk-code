@@ -21,6 +21,7 @@
 #include "IShaderConstantSetCallBack.h"
 #include "S3DVertex.h"
 #include "SMaterial.h"
+#include "graphics/camera.hpp"
 
 #include <vector>
 
@@ -83,6 +84,7 @@ public:
     /** Blur the in texture */
     void renderGaussian3Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t inv_width, size_t inv_height);
     void renderGaussian6Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
+    void renderGaussian17TapBlur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
 
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex);
@@ -92,7 +94,7 @@ public:
     void renderGlow(unsigned tex);
 
     /** Render the post-processed scene */
-    void         render();
+    void         render(scene::ICameraSceneNode * const camnode);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);

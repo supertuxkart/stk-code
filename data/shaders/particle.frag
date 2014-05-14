@@ -20,6 +20,5 @@ void main(void)
 	EnvPos /= EnvPos.w;
 	float alpha = clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
     vec4 color = texture(tex, tc) * vec4(pc, 1.0);
-    color.a *= alpha * smoothstep(1., 0.8, lf);
-    FragColor = vec4(color.rgb * color.a, color.a);
+    FragColor = color * alpha * smoothstep(1., 0.8, lf);
 }
