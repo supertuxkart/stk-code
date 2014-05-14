@@ -490,6 +490,7 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
 
+#ifdef GL_TIME_ELAPSED
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     if (!timer.initialised)
     {
@@ -497,14 +498,17 @@ ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
         timer.initialised = true;
     }
     gl_driver->extGlBeginQuery(GL_TIME_ELAPSED, timer.query);
+#endif
 }
 ScopedGPUTimer::~ScopedGPUTimer()
 {
     if (!UserConfigParams::m_profiler_enabled) return;
     if (profiler.isFrozen()) return;
     
+#ifdef GL_TIME_ELAPSED
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver *)irr_driver->getDevice()->getVideoDriver();
     gl_driver->extGlEndQuery(GL_TIME_ELAPSED);
+#endif
 }
 
 GPUTimer::GPUTimer() : initialised(false)

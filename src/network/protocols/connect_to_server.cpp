@@ -153,7 +153,7 @@ void ConnectToServer::asynchronousUpdate()
                 if (m_server_address.ip == 0 || m_server_address.port == 0)
                 { // server data not correct, hide address and stop
                     m_state = HIDING_ADDRESS;
-                    Log::error("ConnectToServer", "Server address is "ADDRESS_FORMAT, ADDRESS_ARGS(m_server_address.ip, m_server_address.port));
+                    Log::error("ConnectToServer", "Server address is " ADDRESS_FORMAT, ADDRESS_ARGS(m_server_address.ip, m_server_address.port));
                     m_current_protocol_id = m_listener->requestStart(new HidePublicAddress());
                     return;
                 }

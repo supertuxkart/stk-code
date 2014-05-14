@@ -35,7 +35,7 @@ using namespace scene;
 using namespace core;
 
 SunNode::SunNode(scene::ISceneManager* mgr, scene::ISceneNode* parent, float r, float g, float b):
-                     LightNode(mgr, parent, 0., r, g, b)
+                     LightNode(mgr, parent, 0., 0., r, g, b)
 {
     m_color[0] = r;
     m_color[1] = g;

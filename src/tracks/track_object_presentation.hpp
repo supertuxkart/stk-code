@@ -307,7 +307,7 @@ class TrackObjectPresentationLight : public TrackObjectPresentationSceneNode
 {
 private:
     video::SColor m_color;
-    //float m_distance;
+    float m_distance;
     float m_energy;
 
 public:

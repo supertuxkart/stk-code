@@ -451,12 +451,22 @@ void PostProcessing::renderSSAO()
     glDisable(GL_BLEND);
     glDisable(GL_ALPHA_TEST);
 
+    // Generate linear depth buffer
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_LINEAR_DEPTH));
+    glUseProgram(FullScreenShader::LinearizeDepthShader::Program);
+    glBindVertexArray(FullScreenShader::LinearizeDepthShader::vao);
+    setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LinearizeDepthShader::setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue(), 0);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_SSAO));
+
     if (!noise_tex)
         noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
-    setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
+
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
     glGenerateMipmap(GL_TEXTURE_2D);
     setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
