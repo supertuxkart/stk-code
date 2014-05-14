@@ -58,18 +58,18 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
 
     m_gp_ident = gp_ident;
 
-    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gp_ident);
-    assert (gp != NULL);
+    m_gp = grand_prix_manager->getGrandPrix(gp_ident);
+    assert (m_gp != NULL);
 
     // ---- GP Name
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
-    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(gp->getName()),
+    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(m_gp->getName()),
                                                                area_top, false, true, // border, word wrap
                                                                m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
-    InitAfterDrawingTheHeader(gp, y1, y2, gp_ident);
+    InitAfterDrawingTheHeader(y1, y2, gp_ident);
 }
 
 // ----------------------------------------------------------------------------
@@ -88,13 +88,12 @@ GPInfoDialog::~GPInfoDialog()
 
 // ----------------------------------------------------------------------------
 
-void GPInfoDialog::InitAfterDrawingTheHeader(const GrandPrixData* gp,
-                                             const int y1,
+void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
                                              const int y2,
                                              const std::string& gp_ident)
 {
     // ---- Track listings
-    const std::vector<std::string> tracks = gp->getTrackNames();
+    const std::vector<std::string> tracks = m_gp->getTrackNames();
     const int trackAmount = tracks.size();
 
     int height_of_one_line = (y2 - y1)/(trackAmount+1);
@@ -257,9 +256,7 @@ void GPInfoDialog::onUpdate(float dt)
 
     if (frameAfter == frameBefore) return; // if nothing changed, return right now
 
-    const GrandPrixData* gp = grand_prix_manager->getGrandPrix(m_gp_ident);
-    assert(gp != NULL);
-    const std::vector<std::string> tracks = gp->getTrackNames();
+    const std::vector<std::string> tracks = m_gp->getTrackNames();
     if (frameAfter >= (int)tracks.size())
     {
         frameAfter = 0;

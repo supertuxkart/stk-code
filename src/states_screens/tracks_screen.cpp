@@ -29,6 +29,7 @@
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
+#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -113,9 +114,17 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         std::string selection = gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "locked")
+        {
             unlock_manager->playLockSound();
+        }
         else
-            new GPInfoDialog(selection);
+        {
+            std::cout << selection << std::endl;
+            if (selection != "Random")
+                new GPInfoDialog(selection);
+            else
+                new randomGPInfoDialog();
+        }
     }
     else if (name == "trackgroups")
     {

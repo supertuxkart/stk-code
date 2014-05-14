@@ -15,4 +15,43 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "guiengine/engine.hpp"
+#include "race/grand_prix_manager.hpp"
 #include "states_screens/dialogs/random_gp_dialog.hpp"
+
+#include <IGUIEnvironment.h>
+#include <IGUIStaticText.h>
+
+using namespace irr::gui;
+using namespace irr::video;
+using namespace irr::core;
+using namespace GUIEngine;
+
+randomGPInfoDialog::randomGPInfoDialog()
+{
+    // Defaults - loading selection from last time frrom a file would be better
+    int m_number_of_tracks = 4;
+    std::string m_track_group = "standart";
+    bool m_use_reverse = true;
+
+    doInit();
+    m_curr_time = 0.0f;
+
+    const int y1 = m_area.getHeight()/7;
+    const int y2 = m_area.getHeight()*6/7;
+
+    m_gp_ident = "random";
+
+    //const GrandPrixData* gp = grand_prix_manager->newRandomGP(m_number_of_tracks, m_track_group, m_use_reverse);
+    m_gp = grand_prix_manager->getGrandPrix("1_penguinplayground");
+
+    // ---- GP Name
+    core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
+    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText(translations->fribidize("Random Grand Prix"),
+                                                               area_top, false, true, // border, word wrap
+                                                               m_irrlicht_window);
+    title->setTabStop(false);
+    title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+
+    InitAfterDrawingTheHeader(y1, y2, "random");
+}

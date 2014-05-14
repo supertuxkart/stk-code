@@ -29,7 +29,7 @@ private:
     std::string m_track_group;
     bool m_use_reverse;
 public:
-    randomGPInfoDialog(const std::string& gp_ident) : GPInfoDialog(gp_ident) {}
+    randomGPInfoDialog();
 };
 
 #endif
