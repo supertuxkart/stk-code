@@ -97,10 +97,6 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
 
         m_widgets.push_back(widget);
         widget->add();
-
-        // IGUIStaticText* line = GUIEngine::getGUIEnv()->addStaticText( lineText.c_str(),
-        //                                       entry_area, false , true , // border, word wrap
-        //                                       m_irrlicht_window);
     }
 
     // ---- Track screenshot
@@ -113,7 +109,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
 
     m_screenshot_widget->m_x = m_area.getWidth()/2;
     m_screenshot_widget->m_y = y1;
-    m_screenshot_widget->m_w = m_area.getWidth()/2;
+    m_screenshot_widget->m_w = m_area.getWidth()/2-20;
     m_screenshot_widget->m_h = y2 - y1 - 10;
 
     Track* track = (tracks.size() == 0 ? NULL : track_manager->getTrack(tracks[0]));
