@@ -67,8 +67,28 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
                                                                m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+}
 
+// ----------------------------------------------------------------------------
 
+GPInfoDialog::~GPInfoDialog()
+{
+    // Place focus back on selected GP, in case the dialog was cancelled and we're back to
+    // the track selection screen after
+    Screen* curr_screen = GUIEngine::getCurrentScreen();
+    if (curr_screen->getName() == "tracks.stkgui")
+    {
+        ((TracksScreen*)curr_screen)->setFocusOnGP(m_gp_ident);
+    }
+
+}
+
+// ----------------------------------------------------------------------------
+
+void GPInfoDialog::InitAfterDrawingTheHeader(GrandPrixData gp, const float y1,
+                                             const float y2,
+                                             const std::string& gp_ident)
+{
     // ---- Track listings
     const std::vector<std::string> tracks = gp->getTrackNames();
     const int trackAmount = tracks.size();
@@ -184,22 +204,6 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
 
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 }
-
-// ----------------------------------------------------------------------------
-
-GPInfoDialog::~GPInfoDialog()
-{
-    // Place focus back on selected GP, in case the dialog was cancelled and we're back to
-    // the track selection screen after
-    Screen* curr_screen = GUIEngine::getCurrentScreen();
-    if (curr_screen->getName() == "tracks.stkgui")
-    {
-        ((TracksScreen*)curr_screen)->setFocusOnGP(m_gp_ident);
-    }
-
-}
-
-// ----------------------------------------------------------------------------
 
 void GPInfoDialog::onEnterPressedInternal()
 {
