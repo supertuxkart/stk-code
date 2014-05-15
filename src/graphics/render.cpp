@@ -341,6 +341,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         renderDisplacement();
         PROFILER_POP_CPU_MARKER();
     }
+    // Ensure that no object will be drawn after that by using invalid pass
+    irr_driver->setPhase(PASS_COUNT);
 }
 
 // --------------------------------------------
@@ -684,7 +686,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
-    delete tmp;
+    delete []tmp;
 }
 
 void IrrDriver::renderShadows()
@@ -874,7 +876,7 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
                 PointLightsInfo[lightnum].blue = col.Z;
 
                 // Light radius
-                PointLightsInfo[lightnum].radius = 20 * light_node->getEffectiveEnergy();
+                PointLightsInfo[lightnum].radius = light_node->getRadius();
             }
         }
         if (lightnum > MAXLIGHT)

@@ -249,11 +249,16 @@ void CGUIButton::draw()
 			pos.X -= ImageRect.getWidth() / 2;
 			pos.Y -= ImageRect.getHeight() / 2;
 
-			driver->draw2DImage(Image,
-					ScaleImage? AbsoluteRect :
-						core::recti(pos, ImageRect.getSize()),
-					ImageRect, &AbsoluteClippingRect,
-					0, UseAlphaChannel);
+            skin->draw2DImage(Image,
+                ScaleImage ? AbsoluteRect :
+                core::recti(pos, ImageRect.getSize()),
+                ImageRect, &AbsoluteClippingRect,
+                0, UseAlphaChannel);
+			//driver->draw2DImage(Image,
+			//		ScaleImage? AbsoluteRect :
+			//			core::recti(pos, ImageRect.getSize()),
+			//		ImageRect, &AbsoluteClippingRect,
+			//		0, UseAlphaChannel);
 		}
 	}
 	else

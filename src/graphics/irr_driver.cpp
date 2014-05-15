@@ -112,6 +112,7 @@ IrrDriver::IrrDriver()
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = 0;
+    SkyboxCubeMap = 0;
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -436,16 +437,24 @@ void IrrDriver::initDevice()
 
     GLMajorVersion = 2;
     GLMinorVersion = 1;
-    glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
-    glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+    // Call to glGetIntegerv should not be made if --no-graphics is used
+    if(!ProfileWorld::isNoGraphics())
+    {
+        glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
+        glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+    }
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
     // Parse extensions
     hasVSLayer = false;
-    const GLubyte *extensions = glGetString(GL_EXTENSIONS);
-    if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
+    // Default false value for hasVSLayer if --no-graphics argument is used
+    if (!ProfileWorld::isNoGraphics())
+    {
+        const GLubyte *extensions = glGetString(GL_EXTENSIONS);
+        if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
         hasVSLayer = true;
+    }
 
 
 
@@ -1201,7 +1210,7 @@ void IrrDriver::suppressSkyBox()
 {
     SkyboxTextures.clear();
     SphericalHarmonicsTextures.clear();
-    if (SkyboxCubeMap)
+    if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
         glDeleteTextures(1, &SkyboxCubeMap);
     SkyboxCubeMap = 0;
 }
@@ -2305,7 +2314,7 @@ void IrrDriver::applyObjectPassShader()
 
 // ----------------------------------------------------------------------------
 
-scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
+scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy, float radius,
     float r, float g, float b, bool sun, scene::ISceneNode* parent)
 {
     if (m_glsl)
@@ -2314,7 +2323,7 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
         LightNode *light = NULL;
 
         if (!sun)
-            light = new LightNode(m_scene_manager, parent, energy, r, g, b);
+            light = new LightNode(m_scene_manager, parent, energy, radius, r, g, b);
         else
             light = new SunNode(m_scene_manager, parent, r, g, b);
 

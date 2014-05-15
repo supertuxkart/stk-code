@@ -1719,7 +1719,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     const video::SColorf tmpf(m_sun_diffuse_color);
-    m_sun = irr_driver->addLight(m_sun_position, 0., tmpf.r, tmpf.g, tmpf.b, true);
+    m_sun = irr_driver->addLight(m_sun_position, 0., 0., tmpf.r, tmpf.g, tmpf.b, true);
 
     if (!irr_driver->isGLSL())
     {

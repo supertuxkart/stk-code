@@ -5,6 +5,12 @@
 #    include <OpenGL/gl.h>
 #    include <OpenGL/gl3.h>
 #    define OGL32CTX
+#    ifdef GL_ARB_instanced_arrays
+#        define glVertexAttribDivisor glVertexAttribDivisorARB
+#    endif
+#    ifndef GL_TEXTURE_SWIZZLE_RGBA
+#        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
+#    endif
 #elif defined(ANDROID)
 #    include <GLES/gl.h>
 #elif defined(WIN32)

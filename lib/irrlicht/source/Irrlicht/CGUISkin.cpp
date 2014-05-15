@@ -179,6 +179,13 @@ CGUISkin::~CGUISkin()
 }
 
 
+void CGUISkin::draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    const video::SColor* const colors, bool useAlphaChannelOfTexture)
+{
+    Driver->draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
+}
+
 //! returns default color
 video::SColor CGUISkin::getColor(EGUI_DEFAULT_COLOR color) const
 {

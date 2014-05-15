@@ -2267,6 +2267,15 @@ void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon,
 
 // -----------------------------------------------------------------------------
 
+void Skin::draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    const video::SColor* const colors, bool useAlphaChannelOfTexture)
+{
+    ::draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
+}
+
+// -----------------------------------------------------------------------------
+
 video::SColor Skin::getColor (EGUI_DEFAULT_COLOR color) const
 {
     /*
