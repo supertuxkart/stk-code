@@ -20,7 +20,7 @@
 #include "log.hpp"
 #include <string.h>
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(DEBUG)
     // --------------------- Windows version -----------------
     #include <Windows.h>
     #include <DbgHelp.h>
