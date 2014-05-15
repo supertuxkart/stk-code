@@ -177,7 +177,6 @@ void RegisterScreen::doRegister()
     }
     else
     {
-        PlayerManager::get()->addOnlineId(username);
         m_info_widget->setDefaultColor();
         new RegistrationDialog();
         return;

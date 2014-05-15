@@ -190,19 +190,6 @@ void PlayerManager::load()
         return;
     }
 
-    const XMLNode *online = m_player_data->getNode("online-ids");
-    if (online)
-    {
-        for (unsigned int i = 0; i < online->getNumNodes(); i++)
-        {
-            core::stringw s;
-            online->getNode(i)->get("name", &s);
-            if (s.size()>0) m_all_online_ids.push_back(s);
-        }   // for i<online->getNumNodes()
-    }
-    else
-        m_all_online_ids.clear();
-
     m_current_player = NULL;
     std::vector<XMLNode*> player_list;
     m_player_data->getNodes("player", player_list);
@@ -262,14 +249,6 @@ void PlayerManager::save()
 
         players_file << L"<?xml version=\"1.0\"?>\n";
         players_file << L"<players version=\"1\" >\n";
-
-        players_file << L"    <online-ids>\n";
-        for (unsigned int i = 0; i < m_all_online_ids.size(); i++)
-        {
-            players_file << L"      <id name=\""<<m_all_online_ids[i]
-                         << "\"/>\n";
-        }
-        players_file << L"    </online-ids>\n";
 
         PlayerProfile *player;
         for_in(player, m_all_players)
@@ -446,29 +425,3 @@ void PlayerManager::setCurrentPlayer(PlayerProfile *player)
     }
 }   // setCurrentPlayer
 
-// ----------------------------------------------------------------------------
-/** Adds an online id to the list of all online ids, if that id is not already
- *  in the list. An added id is always moved to the front of the list, so that
- *  the list of online ids shown to the user is sorted by recently-used ids.
- *  \param online_id An online id.
- */
-void PlayerManager::addOnlineId(const core::stringw &online_id)
-{
-    std::vector<core::stringw>::iterator i = std::find(m_all_online_ids.begin(),
-        m_all_online_ids.end(),
-        online_id);
-    if (i == m_all_online_ids.end())
-    {
-        m_all_online_ids.insert(m_all_online_ids.begin(), online_id);
-    }
-    else
-    {
-        // If the online_id is not already at the front of the list,
-        // move it to the front.
-        if (i != m_all_online_ids.begin())
-        {
-            m_all_online_ids.erase(i);
-            m_all_online_ids.insert(m_all_online_ids.begin(), online_id);
-        }
-    }
-}   // addOnlineId
