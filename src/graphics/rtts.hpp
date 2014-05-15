@@ -17,6 +17,8 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
+#include "graphics/glwrap.hpp"
+
 namespace irr {
     namespace video {
         class ITexture;
@@ -117,9 +119,10 @@ public:
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
-    unsigned getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+    FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
-    unsigned RenderTargetTextures[RTT_COUNT], FrameBuffers[FBO_COUNT];
+    unsigned RenderTargetTextures[RTT_COUNT];
+    std::vector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
     unsigned shadowFBO, shadowColorTex, shadowDepthTex;

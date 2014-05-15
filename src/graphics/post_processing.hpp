@@ -22,6 +22,7 @@
 #include "S3DVertex.h"
 #include "SMaterial.h"
 #include "graphics/camera.hpp"
+#include "graphics/glwrap.hpp"
 
 #include <vector>
 
@@ -82,15 +83,15 @@ public:
     void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
 
     /** Blur the in texture */
-    void renderGaussian3Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t inv_width, size_t inv_height);
-    void renderGaussian6Blur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
-    void renderGaussian17TapBlur(unsigned in_fbo, unsigned in_tex, unsigned tmp_fbo, unsigned tmp_tex, size_t width, size_t height);
+    void renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+    void renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
+    void renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);
 
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex);
     void applyMLAA();
 
-    void renderMotionBlur(unsigned cam, unsigned in_rtt, unsigned out_fbo);
+    void renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBuffer &out_fbo);
     void renderGlow(unsigned tex);
 
     /** Render the post-processed scene */

@@ -476,15 +476,6 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     glGetError();
 }
 
-void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height)
-{
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, Src);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-}
-
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
 {
     if (!UserConfigParams::m_profiler_enabled) return;
@@ -524,6 +515,64 @@ unsigned GPUTimer::elapsedTimeus()
     gl_driver->extGlGetQueryObjectuiv(query, GL_QUERY_RESULT, &result);
     return result / 1000;
 }
+
+FrameBuffer::FrameBuffer() {}
+
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h) :
+    DepthTexture(0), RenderTargets(RTTs), width(w), height(h)
+{
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    for (unsigned i = 0; i < RTTs.size(); i++)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
+    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+}
+
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, GLuint DS, size_t w, size_t h) :
+    DepthTexture(DS), RenderTargets(RTTs), width(w), height(h)
+{
+    glGenFramebuffers(1, &fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    for (unsigned i = 0; i < RTTs.size(); i++)
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, DS, 0);
+    GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+}
+
+FrameBuffer::~FrameBuffer()
+{
+    glDeleteFramebuffers(1, &fbo);
+}
+
+void FrameBuffer::Bind()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+    glViewport(0, 0, width, height);
+    irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver*)irr_driver->getDevice()->getVideoDriver();
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    gl_driver->extGlDrawBuffers(RenderTargets.size(), bufs);
+}
+
+void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask, GLenum filter)
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, Src.fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, Dst.fbo);
+    glBlitFramebuffer(0, 0, Src.width, Src.height, 0, 0, Dst.width, Dst.height, mask, filter);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
+void FrameBuffer::BlitToDefault()
+{
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+}
+
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color)
