@@ -95,6 +95,7 @@ public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
+    virtual bool onEscapePressed();
 
     void loginSuccessful();
     void loginError(const irr::core::stringw &error_message);
@@ -111,7 +112,6 @@ private:
     {};
 public:
     friend class GUIEngine::ScreenSingleton<UserScreen>;
-    virtual void init();
 };   // class UserScreenTabed
 
 // ============================================================================

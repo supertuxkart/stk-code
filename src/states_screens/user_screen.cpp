@@ -194,6 +194,14 @@ void BaseUserScreen::makeEntryFieldsVisible(bool online)
 }   // makeEntryFieldsVisible
 
 // ----------------------------------------------------------------------------
+/** Make sure that a current player is defined when escape is pressed.
+ */
+bool BaseUserScreen::onEscapePressed()
+{
+    return Screen::onEscapePressed();
+}   // onEscapePressed
+
+// ----------------------------------------------------------------------------
 /** Called when the user selects anything on the screen.
  */
 void BaseUserScreen::eventCallback(Widget* widget,
@@ -461,21 +469,6 @@ void BaseUserScreen::onDialogClose()
 
 
 // ============================================================================
-/** If there already is a player (i.e. default player is saved), no need to
- *  show this dialog, go directly to the main menu screen.
- */
-void UserScreen::init()
-{
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if (player)
-    {
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        return;
-    }
-    BaseUserScreen::init();
-}   // init
-
-// ============================================================================
 /** In the tab version, make sure the right tab is selected.
  */
 void TabbedUserScreen::init()
@@ -494,7 +487,7 @@ void TabbedUserScreen::init()
  */
 void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
                                      const std::string& name, 
-                                     const int playerID)
+                                     const int player_id)
 {
     if (name == "options_choice")
     {
@@ -509,5 +502,7 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
         assert(s);
         StateManager::get()->replaceTopMostScreen(s);
     }
+    else
+        BaseUserScreen::eventCallback(widget, name, player_id);
 
 }   // eventCallback

@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
@@ -1286,7 +1287,13 @@ int main(int argc, char *argv[] )
 
         if(!UserConfigParams::m_no_start_screen)
         {
-            StateManager::get()->pushScreen(UserScreen::getInstance());
+            // If there is a current player, it was saved in the config file,
+            // so we immediately start the main menu. Otherwise show the login
+            // screen first.
+            if(PlayerManager::getCurrentPlayer())
+                StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            else
+                StateManager::get()->pushScreen(UserScreen::getInstance());
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())
