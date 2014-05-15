@@ -42,6 +42,7 @@ public:
     /** The various log levels used in STK. */
     enum LogLevel { LL_DEBUG,
                     LL_VERBOSE,
+                    LL_PROFILE,
                     LL_INFO,
                     LL_WARN,
                     LL_ERROR,
@@ -86,6 +87,7 @@ public:
         }                                                            \
     }
     LOG(verbose, LL_VERBOSE);
+    LOG(profile, LL_PROFILE);
     LOG(debug,   LL_DEBUG);
     LOG(info,    LL_INFO);
     LOG(warn,    LL_WARN);
