@@ -203,6 +203,7 @@ void ProfileWorld::enterRaceOverState()
     // Print geometry statistics if we're not in no-graphics mode
     if(!m_no_graphics)
     {
+        //TODO change printf to Log::profile (after discussing lay-out)
         printf("Average # drawn nodes           %f k\n",
                (float)m_num_triangles/m_frame_count);
         printf("Average # culled nodes:         %f k\n",
@@ -217,10 +218,11 @@ void ProfileWorld::enterRaceOverState()
 
     // Print race statistics for each individual kart
     float min_t=999999.9f, max_t=0.0, av_t=0.0;
-    printf("name,start_position,end_position,time,average_speed,top_speed,"
-           "skid_time,rescue_time,rescue_count,brake_count,"
-           "explosion_time,explosion_count,bonus_count,banana_count,"
-           "small_nitro_count,large_nitro_count,bubblegum_count\n");
+    //printf(output);
+    Log::profile("Kart stats", "name start_position end_position time average_speed top_speed "
+           "skid_time rescue_time rescue_count brake_count "
+           "explosion_time explosion_count bonus_count banana_count "
+           "small_nitro_count large_nitro_count bubblegum_count");
 
     std::set<std::string> all_groups;
 
@@ -231,21 +233,33 @@ void ProfileWorld::enterRaceOverState()
         max_t = std::max(max_t, kart->getFinishTime());
         min_t = std::min(min_t, kart->getFinishTime());
         av_t += kart->getFinishTime();
-        printf("%s %s,", kart->getIdent().c_str(),
-                kart->getController()->getControllerName().c_str());
+        std::stringstream ss;
+        ss << kart->getIdent().c_str() << " " << kart->getController()->getControllerName().c_str() << " ";
+        ss << 1+(int)i << " " << kart->getPosition() << " " << kart->getFinishTime() << " ";
+
+        //printf("%s %s,", kart->getIdent().c_str(),
+        //        kart->getController()->getControllerName().c_str());
         all_groups.insert(kart->getController()->getControllerName());
-        printf("%d,%d,%4.2f,", 1 + (int)i, kart->getPosition(), kart->getFinishTime());
+        //printf("%d,%d,%4.2f,", 1 + (int)i, kart->getPosition(), kart->getFinishTime());
         float distance = (float)(m_profile_mode==PROFILE_LAPS
                                  ? race_manager->getNumLaps() : 1);
         distance *= m_track->getTrackLength();
-        printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n",
-               distance/kart->getFinishTime(), kart->getTopSpeed(),
-               kart->getSkiddingTime(), kart->getRescueTime(),
-               kart->getRescueCount(), kart->getBrakeCount(),
-               kart->getExplosionTime(), kart->getExplosionCount(),
-               kart->getBonusCount(), kart->getBananaCount(),
-               kart->getSmallNitroCount(), kart->getLargeNitroCount(),
-               kart->getBubblegumCount(), kart->getOffTrackCount() );
+        ss << distance/kart->getFinishTime() << " " << kart->getTopSpeed() << " ";
+        ss << kart->getSkiddingTime() << " " << kart->getRescueTime() << " ";
+        ss << kart->getRescueCount() << " " << kart->getBrakeCount() << " ";
+        ss << kart->getExplosionTime() << " " << kart->getExplosionCount() << " ";
+        ss << kart->getBonusCount() << " " << kart->getBananaCount() << " ";
+        ss << kart->getSmallNitroCount() << " " << kart->getLargeNitroCount() << " ";
+        ss << kart->getBubblegumCount() << " " << kart->getOffTrackCount() << " ";
+        //printf("%4.2f,%3.2f,%4.2f,%4.2f,%d,%d,%4.2f,%d,%d,%d,%d,%d,%d,%d\n",
+        //       distance/kart->getFinishTime(), kart->getTopSpeed(),
+        //       kart->getSkiddingTime(), kart->getRescueTime(),
+        //       kart->getRescueCount(), kart->getBrakeCount(),
+        //       kart->getExplosionTime(), kart->getExplosionCount(),
+        //       kart->getBonusCount(), kart->getBananaCount(),
+        //       kart->getSmallNitroCount(), kart->getLargeNitroCount(),
+        //       kart->getBubblegumCount(), kart->getOffTrackCount() );
+        Log::profile("Kart stats", ss.str().c_str());
     }
 
     // Print group statistics of all karts
