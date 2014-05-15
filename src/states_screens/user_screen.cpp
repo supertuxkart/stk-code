@@ -29,31 +29,35 @@
 #include "online/messages.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/options_screen_audio.hpp"
+#include "states_screens/options_screen_input.hpp"
+#include "states_screens/options_screen_ui.hpp"
+#include "states_screens/options_screen_video.hpp"
 #include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 
 
 using namespace GUIEngine;
 
-DEFINE_SCREEN_SINGLETON( UserScreen );
+DEFINE_SCREEN_SINGLETON( UserScreen       );
+DEFINE_SCREEN_SINGLETON( TabbedUserScreen );
 
 // ----------------------------------------------------------------------------
 
-UserScreen::UserScreen() : Screen("user_screen.stkgui")
+BaseUserScreen::BaseUserScreen(const std::string &name) : Screen(name.c_str())
 {
-    m_is_popup_window = false;
-}   // UserScreen
+}   // BaseUserScreen
 
 // ----------------------------------------------------------------------------
 
-void UserScreen::loadedFromFile()
+void BaseUserScreen::loadedFromFile()
 {
 
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
 
-void UserScreen::init()
+void BaseUserScreen::init()
 {
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
@@ -76,12 +80,6 @@ void UserScreen::init()
     m_info_widget->setErrorColor();
 
     Screen::init();
-    PlayerProfile *player = PlayerManager::getCurrentPlayer();
-    if (player && !m_is_popup_window)
-    {
-        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-        return;
-    }
 
     m_players->clearItems();
     std::string current_player_index="";
@@ -121,7 +119,7 @@ void UserScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-PlayerProfile* UserScreen::getSelectedPlayer()
+PlayerProfile* BaseUserScreen::getSelectedPlayer()
 {
     const std::string &s_id = m_players
                             ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
@@ -132,7 +130,7 @@ PlayerProfile* UserScreen::getSelectedPlayer()
 
 // ----------------------------------------------------------------------------
 
-void UserScreen::tearDown()
+void BaseUserScreen::tearDown()
 {
     Screen::tearDown();
 }   // tearDown
@@ -141,7 +139,7 @@ void UserScreen::tearDown()
 /** Called when a user is selected. It updates the online checkbox and
  *  entrye fields.
  */
-void UserScreen::selectUser(int index)
+void BaseUserScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
@@ -183,7 +181,7 @@ void UserScreen::selectUser(int index)
  *  \param online Online state, which dicates if the entry fields are
  *         visible (true) or not.
  */
-void UserScreen::makeEntryFieldsVisible(bool online)
+void BaseUserScreen::makeEntryFieldsVisible(bool online)
 {
 #ifdef GUEST_ACCOUNTS_ENABLED
     getWidget<LabelWidget>("label_guest")->setVisible(online);
@@ -198,7 +196,7 @@ void UserScreen::makeEntryFieldsVisible(bool online)
 // ----------------------------------------------------------------------------
 /** Called when the user selects anything on the screen.
  */
-void UserScreen::eventCallback(Widget* widget,
+void BaseUserScreen::eventCallback(Widget* widget,
                                const std::string& name,
                                const int player_id)
 {
@@ -270,10 +268,10 @@ void UserScreen::eventCallback(Widget* widget,
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-/** Closes the UserScreen, and makes sure that the right screen is displayed
+/** Closes the BaseUserScreen, and makes sure that the right screen is displayed
  *  next.
  */
-void UserScreen::closeScreen()
+void BaseUserScreen::closeScreen()
 {
     StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 }   // closeScreen
@@ -284,7 +282,7 @@ void UserScreen::closeScreen()
  *  \param remember_me True if the login details should be remembered,
  *         so that next time this menu can be skipped.
  */
-void UserScreen::login()
+void BaseUserScreen::login()
 {
     // If an error occurs, the callback informing this screen about the
     // problem will activate the widget again.
@@ -344,7 +342,7 @@ void UserScreen::login()
 /** Called once every frame. It will replace this screen with the main menu
  *  screen if a successful login happened.
  */
-void UserScreen::onUpdate(float dt)
+void BaseUserScreen::onUpdate(float dt)
 {
     if (!m_options_widget->isActivated())
         m_info_widget->setText(Online::Messages::loadingDots( _("Signing in")),
@@ -354,7 +352,7 @@ void UserScreen::onUpdate(float dt)
 // ----------------------------------------------------------------------------
 /** Callback from player profile if login was successful.
  */
-void UserScreen::loginSuccessful()
+void BaseUserScreen::loginSuccessful()
 {
     m_options_widget->setActivated();
     // Clean any error message still shown
@@ -369,7 +367,7 @@ void UserScreen::loginSuccessful()
 /** Callback from player profile if login was unsuccessful.
  *  \param error_message Contains the error message.
  */
-void UserScreen::loginError(const irr::core::stringw & error_message)
+void BaseUserScreen::loginError(const irr::core::stringw & error_message)
 {
     sfx_manager->quickSound("anvil");
     m_info_widget->setErrorColor();
@@ -378,7 +376,7 @@ void UserScreen::loginError(const irr::core::stringw & error_message)
 }   // loginError
 
 // ----------------------------------------------------------------------------
-void UserScreen::newUserAdded(const irr::core::stringw &local_name,
+void BaseUserScreen::newUserAdded(const irr::core::stringw &local_name,
                               const irr::core::stringw &online_name)
 {
     PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
@@ -389,7 +387,7 @@ void UserScreen::newUserAdded(const irr::core::stringw &local_name,
 // ----------------------------------------------------------------------------
 /** Called when a player will be deleted.
  */
-void UserScreen::deletePlayer()
+void BaseUserScreen::deletePlayer()
 {
     PlayerProfile *player = getSelectedPlayer();
     irr::core::stringw message =
@@ -398,23 +396,29 @@ void UserScreen::deletePlayer()
 
     class ConfirmServer : public MessageDialog::IConfirmDialogListener
     {
+        BaseUserScreen *m_parent_screen;
     public:
         virtual void onConfirm()
         {
-            UserScreen::getInstance()->doDeletePlayer();
+            m_parent_screen->doDeletePlayer();
         }   // onConfirm
+        // ------------------------------------------------------------
+        ConfirmServer(BaseUserScreen *parent)
+        {
+            m_parent_screen = parent;
+        }
     };   // ConfirmServer
 
     new MessageDialog(message, MessageDialog::MESSAGE_DIALOG_CONFIRM,
-                      new ConfirmServer(), true);
+                      new ConfirmServer(this), true);
 }   // deletePlayer
 
 // ----------------------------------------------------------------------------
 /** Callback when the user confirms to delete a player. This function actually
- *  deletes the player, discards the dialog, and re-initialised the UserScreen
+ *  deletes the player, discards the dialog, and re-initialised the BaseUserScreen
  *  to display only the available players.
  */
-void UserScreen::doDeletePlayer()
+void BaseUserScreen::doDeletePlayer()
 {
     PlayerProfile *player = getSelectedPlayer();
     PlayerManager::get()->deletePlayer(player);
@@ -423,7 +427,7 @@ void UserScreen::doDeletePlayer()
 }   // doDeletePlayer
 
 // ----------------------------------------------------------------------------
-void UserScreen::unloaded()
+void BaseUserScreen::unloaded()
 {
 }   // unloaded
 
@@ -434,7 +438,7 @@ void UserScreen::unloaded()
  *  to open the next dialog, which is the one to create a new player (which
  *  is conventient on a first start).
  */
-void UserScreen::onDialogClose()
+void BaseUserScreen::onDialogClose()
 {
     // To allow players to exit the game without creating a player, we count
     // how often this function was called. The first time is after the 
@@ -455,5 +459,55 @@ void UserScreen::onDialogClose()
     }   // getNumPlayers == 0
 }   // onDialogClose
 
-// -----------------------------------------------------------------------------
 
+// ============================================================================
+/** If there already is a player (i.e. default player is saved), no need to
+ *  show this dialog, go directly to the main menu screen.
+ */
+void UserScreen::init()
+{
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
+    if (player)
+    {
+        StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        return;
+    }
+    BaseUserScreen::init();
+}   // init
+
+// ============================================================================
+/** In the tab version, make sure the right tab is selected.
+ */
+void TabbedUserScreen::init()
+{
+    RibbonWidget* tab_bar = this->getWidget<RibbonWidget>("options_choice");
+    if (tab_bar != NULL) tab_bar->select("tab_players", PLAYER_ID_GAME_MASTER);
+    tab_bar->getRibbonChildren()[0].setTooltip( _("Graphics") );
+    tab_bar->getRibbonChildren()[1].setTooltip( _("Audio") );
+    tab_bar->getRibbonChildren()[2].setTooltip(_("User Interface"));
+    tab_bar->getRibbonChildren()[4].setTooltip( _("Controls") );
+    BaseUserScreen::init();
+}   // init
+
+// ----------------------------------------------------------------------------
+/** Switch to the correct tab.
+ */
+void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
+                                     const std::string& name, 
+                                     const int playerID)
+{
+    if (name == "options_choice")
+    {
+        const std::string &selection = 
+            ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        Screen *s;
+        if      (selection=="tab_audio"   ) s = OptionsScreenAudio::getInstance();
+        else if (selection=="tab_video"   ) s = OptionsScreenVideo::getInstance();
+        else if (selection=="tab_players" ) s = TabbedUserScreen::getInstance();
+        else if (selection=="tab_controls") s = OptionsScreenInput::getInstance();
+        else if (selection=="tab_ui"      ) s = OptionsScreenUI::getInstance();
+        assert(s);
+        StateManager::get()->replaceTopMostScreen(s);
+    }
+
+}   // eventCallback

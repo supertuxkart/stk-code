@@ -36,19 +36,20 @@ class PlayerProfile;
 
 
 /**
-  * \brief Audio options screen
-  * \ingroup states_screens
+  * \brief The user management screen. The screen cames in two variations:
+  *  either as a stand-alone screen before the main menu (on first time STK
+  *  is started, or it the user is not remembered), but also as tab in the
+  *  options menu. To implement this, we use one common base class that 
+  *  implements nearly all functionality, and derive to classes - one for
+  *  the stand alone version, one for the version with tabs.
+  * \ingroup states_screens.
   */
-class UserScreen : public GUIEngine::Screen, 
-                   public GUIEngine::ScreenSingleton<UserScreen>
+class BaseUserScreen : public GUIEngine::Screen
 {
-    UserScreen();
+protected:
+    BaseUserScreen(const std::string &name);
 
 private:
-
-    /** True if this window is a popup window, which means it will not
-     *  immediately go to the main menu if a current player is defined. */
-    bool m_is_popup_window;
 
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;
@@ -79,13 +80,12 @@ private:
     virtual void onUpdate(float dt) OVERRIDE;
 
 public:
-    friend class GUIEngine::ScreenSingleton<UserScreen>;
-
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile();
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name, const int playerID);
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name, const int playerID);
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void init();
@@ -100,10 +100,34 @@ public:
     void loginError(const irr::core::stringw &error_message);
     void newUserAdded(const irr::core::stringw &local_name,
                       const irr::core::stringw &online_name);
-    // ------------------------------------------------------------------------
-    /** True if this window is a popup window (i.e. it should not exit even if
-     *  the current player exists. */
-    void setIsPopup(bool popup) { m_is_popup_window = popup; }
-};   // class UserScreen
+};   // class BaseUserScreen
+
+// ============================================================================
+class UserScreen : public BaseUserScreen,
+                   public GUIEngine::ScreenSingleton<UserScreen>
+{
+private:
+    UserScreen() : BaseUserScreen("user_screen.stkgui")
+    {};
+public:
+    friend class GUIEngine::ScreenSingleton<UserScreen>;
+    virtual void init();
+};   // class UserScreenTabed
+
+// ============================================================================
+class TabbedUserScreen : public BaseUserScreen,
+                         public GUIEngine::ScreenSingleton<TabbedUserScreen>
+{
+private:
+    TabbedUserScreen() : BaseUserScreen("user_screen_tab.stkgui")
+    {}
+
+public:
+    friend class GUIEngine::ScreenSingleton<TabbedUserScreen>;
+
+    virtual void init();
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name, const int playerID);
+};   // class TabbedUserScreen
 
 #endif

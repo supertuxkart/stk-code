@@ -425,8 +425,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
             StateManager::get()->pushScreen(OnlineScreen::getInstance());
         else
         {
-            UserScreen *login = UserScreen::getInstance();
-            login->setIsPopup(true);
+            BaseUserScreen *login = UserScreen::getInstance();
             StateManager::get()->pushScreen(login);
         }
     }

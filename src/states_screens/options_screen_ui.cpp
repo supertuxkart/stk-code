@@ -35,9 +35,9 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -210,7 +210,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
-        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
+        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(TabbedUserScreen::getInstance());
         else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
     else if(name == "back")
