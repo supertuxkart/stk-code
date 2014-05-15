@@ -686,7 +686,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
-    delete tmp;
+    delete []tmp;
 }
 
 void IrrDriver::renderShadows()
