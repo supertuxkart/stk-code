@@ -185,9 +185,25 @@ void IrrDriver::renderGLSL(float dt)
 
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
-            m_post_processing->render(camnode);
+        {
+            FrameBuffer *fbo = m_post_processing->render(camnode);
+
+            if (!UserConfigParams::m_mlaa) // MLAA_COLORS already in srgb space
+                glEnable(GL_FRAMEBUFFER_SRGB);
+
+            if (irr_driver->getNormals())
+                irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS);
+            else if (irr_driver->getSSAOViz())
+                irr_driver->getFBO(FBO_SSAO).BlitToDefault();
+            else
+                fbo->BlitToDefault();
+
+            if (!UserConfigParams::m_mlaa)
+                glDisable(GL_FRAMEBUFFER_SRGB);
+        }
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
+
 
         PROFILER_POP_CPU_MARKER();
     }   // for i<world->getNumKarts()

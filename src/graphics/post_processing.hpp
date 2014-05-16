@@ -95,7 +95,7 @@ public:
     void renderGlow(unsigned tex);
 
     /** Render the post-processed scene */
-    void         render(scene::ICameraSceneNode * const camnode);
+    FrameBuffer *render(scene::ICameraSceneNode * const camnode);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);

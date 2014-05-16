@@ -667,7 +667,7 @@ void PostProcessing::applyMLAA()
 
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
-void PostProcessing::render(scene::ICameraSceneNode * const camnode)
+FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
 {
     IVideoDriver * const drv = irr_driver->getVideoDriver();
 
@@ -817,21 +817,7 @@ void PostProcessing::render(scene::ICameraSceneNode * const camnode)
         PROFILER_POP_CPU_MARKER();
     }
 
-    if (irr_driver->getNormals())
-    {
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        renderPassThrough(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH));
-        glDisable(GL_FRAMEBUFFER_SRGB);
-    }
-    else if (irr_driver->getSSAOViz())
-    {
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        renderPassThrough(irr_driver->getRenderTargetTexture(RTT_SSAO));
-        glDisable(GL_FRAMEBUFFER_SRGB);
-    }
-    else if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
+    if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
         glEnable(GL_FRAMEBUFFER_SRGB);
@@ -839,14 +825,9 @@ void PostProcessing::render(scene::ICameraSceneNode * const camnode)
         renderPassThrough(in_fbo->getRTT()[0]);
         glDisable(GL_FRAMEBUFFER_SRGB);
         applyMLAA();
-        irr_driver->getFBO(FBO_MLAA_COLORS).BlitToDefault();
+        out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
         PROFILER_POP_CPU_MARKER();
     }
-    else
-    {
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        renderPassThrough(in_fbo->getRTT()[0]);
-        glDisable(GL_FRAMEBUFFER_SRGB);
-    }
+
+    return out_fbo;
 }   // render
