@@ -427,8 +427,7 @@ void OptionsScreenVideo::updateTooltip()
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
-        UserConfigParams::m_ssao == 1 ? "low" : UserConfigParams::m_ssao == 2 ?
-                                    "high" : disabled);
+        UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Shadows: %s",
         UserConfigParams::m_shadows == 1 ? "low" : UserConfigParams::m_shadows == 2 ?
