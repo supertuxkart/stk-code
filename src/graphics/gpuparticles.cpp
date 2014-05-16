@@ -195,7 +195,7 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
         memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
         generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
             initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionZ), 4 * sizeof(float));
+        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
     }
     glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
     glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);

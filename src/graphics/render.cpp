@@ -50,8 +50,6 @@
 
 #include <algorithm>
 
-STKInstancedSceneNode *InstancedBox = 0;
-
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
@@ -686,7 +684,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
-    delete tmp;
+    delete []tmp;
 }
 
 void IrrDriver::renderShadows()
