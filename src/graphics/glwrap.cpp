@@ -564,11 +564,11 @@ void FrameBuffer::Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }
 
-void FrameBuffer::BlitToDefault()
+void FrameBuffer::BlitToDefault(size_t x0, size_t y0, size_t x1, size_t y1)
 {
     glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, width, height, 0, 0, width, height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glBlitFramebuffer(0, 0, width, height, x0, y0, x1, y1, GL_COLOR_BUFFER_BIT, GL_NEAREST);
     glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

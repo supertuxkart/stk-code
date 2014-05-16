@@ -183,6 +183,8 @@ void IrrDriver::renderGLSL(float dt)
             }
         }
 
+        const core::recti &viewport = camera->getViewport();
+
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
         {
@@ -192,11 +194,11 @@ void IrrDriver::renderGLSL(float dt)
                 glEnable(GL_FRAMEBUFFER_SRGB);
 
             if (irr_driver->getNormals())
-                irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS);
+                irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
-                irr_driver->getFBO(FBO_SSAO).BlitToDefault();
+                irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else
-                fbo->BlitToDefault();
+                fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
 
             if (!UserConfigParams::m_mlaa)
                 glDisable(GL_FRAMEBUFFER_SRGB);
