@@ -590,6 +590,10 @@ public:
     }   // addDebugMesh
 
 #endif
+
+    void onLoadWorld();
+    void onUnloadWorld();
+
     // --------------------- RTT --------------------
     /**
       * Class that provides RTT (currently, only when no other 3D rendering

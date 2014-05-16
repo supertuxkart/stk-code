@@ -19,6 +19,7 @@
 
 #include "graphics/glwrap.hpp"
 #include "utils/ptr_vector.hpp"
+#include "utils/leak_check.hpp"
 
 namespace irr {
     namespace video {
@@ -127,6 +128,8 @@ private:
     unsigned DepthStencilTexture;
 
     unsigned shadowFBO, shadowColorTex, shadowDepthTex;
+
+    LEAK_CHECK();
 };
 
 #endif

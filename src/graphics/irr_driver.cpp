@@ -472,9 +472,6 @@ void IrrDriver::initDevice()
     if (m_glsl)
     {
         Log::info("irr_driver", "GLSL supported.");
-
-        // Order matters, create RTTs as soon as possible, as they are the largest blocks.
-        m_rtts = new RTT();
     }
     // m_glsl might be reset in rtt if an error occurs.
     if(m_glsl)
@@ -1560,7 +1557,20 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
     mask->drop();
     return t;
 }   // applyMask
-
+// ----------------------------------------------------------------------------
+void IrrDriver::onLoadWorld()
+{
+    if (m_glsl)
+    {
+        m_rtts = new RTT();
+    }
+}
+// ----------------------------------------------------------------------------
+void IrrDriver::onUnloadWorld()
+{
+    delete m_rtts;
+    m_rtts = NULL;
+}
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
  *  \param light The colour of the light to set.
