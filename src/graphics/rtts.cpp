@@ -107,35 +107,35 @@ RTT::RTT()
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
 
-    FrameBuffers.reserve(FBO_COUNT);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_SSAO]}, res.Width, res.Height);
+
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_SSAO]}, res.Width, res.Height));
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_NORMAL_AND_DEPTH]}, DepthStencilTexture, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP1], RenderTargetTextures[RTT_TMP2]}, DepthStencilTexture, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_COLOR]}, DepthStencilTexture, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_LOG_LUMINANCE]}, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_MLAA_COLORS]}, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP1]}, DepthStencilTexture, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP2]}, DepthStencilTexture, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP4]}, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_LINEAR_DEPTH]}, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_HALF1]}, half.Width, half.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_HALF2]}, half.Width, half.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_QUARTER1]}, quarter.Width, quarter.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_QUARTER2]}, quarter.Width, quarter.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_EIGHTH1]}, eighth.Width, eighth.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_EIGHTH2]}, eighth.Width, eighth.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_DISPLACE]}, DepthStencilTexture, res.Width, res.Height);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_1024]}, 1024, 1024);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_512]}, 512, 512);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_512]}, 512, 512);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_256]}, 256, 256);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_256]}, 256, 256);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_128]}, 128, 128);
-    FrameBuffers.emplace_back(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_128]}, 128, 128);
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_NORMAL_AND_DEPTH]}, DepthStencilTexture, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP1], RenderTargetTextures[RTT_TMP2]}, DepthStencilTexture, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_COLOR]}, DepthStencilTexture, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_LOG_LUMINANCE]}, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_MLAA_COLORS]}, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP1]}, DepthStencilTexture, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP2]}, DepthStencilTexture, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP4]}, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_LINEAR_DEPTH]}, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_HALF1]}, half.Width, half.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_HALF2]}, half.Width, half.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_QUARTER1]}, quarter.Width, quarter.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_QUARTER2]}, quarter.Width, quarter.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_EIGHTH1]}, eighth.Width, eighth.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_EIGHTH2]}, eighth.Width, eighth.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_DISPLACE]}, DepthStencilTexture, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_1024]}, 1024, 1024));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_512]}, 512, 512));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_512]}, 512, 512));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_256]}, 256, 256));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_256]}, 256, 256));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_128]}, 128, 128));
+    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_128]}, 128, 128));
 
     if (irr_driver->getGLSLVersion() >= 150)
     {

@@ -18,6 +18,7 @@
 #define HEADER_RTTS_HPP
 
 #include "graphics/glwrap.hpp"
+#include "utils/ptr_vector.hpp"
 
 namespace irr {
     namespace video {
@@ -122,7 +123,7 @@ public:
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
-    std::vector<FrameBuffer> FrameBuffers;
+    PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
     unsigned shadowFBO, shadowColorTex, shadowDepthTex;
