@@ -190,7 +190,6 @@ void PlayerManager::load()
         return;
     }
 
-    m_current_player = NULL;
     std::vector<XMLNode*> player_list;
     m_player_data->getNodes("player", player_list);
     for(unsigned int i=0; i<player_list.size(); i++)
@@ -198,8 +197,14 @@ void PlayerManager::load()
         const XMLNode *player_xml = player_list[i];
         PlayerProfile *player = new Online::OnlinePlayerProfile(player_xml);
         m_all_players.push_back(player);
-        if(player->isDefault())
-            m_current_player = player;
+    }
+    m_current_player = NULL;
+    const XMLNode *current = m_player_data->getNode("current");
+    if(current)
+    {
+        stringw name;
+        current->get("player", &name);
+        m_current_player = getPlayer(name);
     }
 
 }   // load
@@ -249,6 +254,12 @@ void PlayerManager::save()
 
         players_file << L"<?xml version=\"1.0\"?>\n";
         players_file << L"<players version=\"1\" >\n";
+
+        if(m_current_player && UserConfigParams::m_remember_user)
+        {
+            players_file << L"    <current player=\"" 
+                         << m_current_player->getName() << L"\"/>\n";
+        }
 
         PlayerProfile *player;
         for_in(player, m_all_players)
@@ -404,23 +415,14 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 }   // getPlayer
 // ----------------------------------------------------------------------------
 /** Sets the current player. This is the player that is used for story mode
- *  and achievements. If 'remember_me' is set, this information will be
- *  stored in the players.xml file, and automatically loaded next time
- *  STK is started.
+ *  and achievements. 
  *  \param Player profile to be the current player.
- *  \param remember_me If this player should be marked as default
- *         player in players.xml
  */
 void PlayerManager::setCurrentPlayer(PlayerProfile *player)
 {
-    bool remember_me = UserConfigParams::m_remember_user;
-    // Reset current default player
-    if(m_current_player)
-        m_current_player->setDefault(false);
     m_current_player = player;
     if(m_current_player)
     {
-        m_current_player->setDefault(remember_me);
         m_current_player->computeActive();
     }
 }   // setCurrentPlayer

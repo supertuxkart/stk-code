@@ -83,9 +83,6 @@ private:
     /** A unique number for this player, used to link it to challenges etc. */
     unsigned int m_unique_id;
 
-    /** True if this is the default (last used) player. */
-    bool m_is_default;
-
     /** True if this user has a saved session. */
     bool m_saved_session;
 
@@ -177,12 +174,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the unique id of this player. */
     unsigned int getUniqueID() const { return m_unique_id; }
-    // -----------------------------------------------------------------------
-    /** Returns true if this is the default (last used) player. */
-    bool isDefault() const { return m_is_default; }
-    // ------------------------------------------------------------------------
-    /** Sets if this player is the default player or not. */
-    void setDefault(bool is_default) { m_is_default = is_default; }
     // ------------------------------------------------------------------------
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const

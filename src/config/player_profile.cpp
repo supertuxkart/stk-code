@@ -43,8 +43,6 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
-    m_is_default          = false;
-    m_is_default          = false;
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
@@ -80,7 +78,6 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     node->get("guest",            &m_is_guest_account);
     node->get("use-frequency",    &m_use_frequency   );
     node->get("unique-id",        &m_unique_id       );
-    node->get("is-default",       &m_is_default      );
     node->get("saved-session",    &m_saved_session   );
     node->get("saved-user",       &m_saved_user_id   );
     node->get("saved-token",      &m_saved_token     );
@@ -136,8 +133,7 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
-    out << L"            is-default=\"" << m_is_default
-        << L"\" unique-id=\""           << m_unique_id
+    out << L"            unique-id=\""  << m_unique_id
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";
 
     out << L"            saved-user=\"" << m_saved_user_id 
