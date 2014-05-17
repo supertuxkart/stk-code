@@ -333,7 +333,16 @@ endif()
 
 # ==== Checking if stk-assets folder exists ====
 if(CHECK_ASSETS)
-  if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../stk-assets)
+  if((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../stk-assets) OR
+     (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../supertuxkart-assets) OR
+     ((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/karts) AND 
+      (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/library) AND 
+      (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/music) AND 
+      (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/sfx) AND
+      (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/textures) AND
+      (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/tracks)))
+    message(STATUS "Assets found")
+  else()
     set (CUR_DIR ${CMAKE_CURRENT_SOURCE_DIR})
     get_filename_component(PARENT_DIR ${CUR_DIR} PATH)
     message( FATAL_ERROR "${PARENT_DIR}/stk-assets folder doesn't exist. "
