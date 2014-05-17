@@ -193,8 +193,19 @@ void BaseUserScreen::makeEntryFieldsVisible()
     bool online = m_online_cb->getState();
     getWidget<LabelWidget>("label_username")->setVisible(online);
     m_username_tb->setVisible(online);
-    getWidget<LabelWidget>("label_password")->setVisible(online);
-    m_password_tb->setVisible(online);
+    PlayerProfile *player = getSelectedPlayer();
+    if(player && player->hasSavedSession() && online)
+    {
+        // If we show the online login fields, but the player has a
+        // saved session, don't show the password field.
+        getWidget<LabelWidget>("label_password")->setVisible(false);
+        m_password_tb->setVisible(false);
+    }
+    else
+    {
+        getWidget<LabelWidget>("label_password")->setVisible(online);
+        m_password_tb->setVisible(online);
+    }
 }   // makeEntryFieldsVisible
 
 // ----------------------------------------------------------------------------
@@ -352,6 +363,17 @@ void BaseUserScreen::onUpdate(float dt)
     if (!m_options_widget->isActivated())
         m_info_widget->setText(Online::Messages::loadingDots( _("Signing in")),
                                false);
+    PlayerProfile *player = getSelectedPlayer();
+    if(player)
+    {
+        // If the player changes the online name, clear the saved session
+        // flag, and make the password field visible again.
+        if (m_username_tb->getText()!=player->getLastOnlineName())
+        {
+            player->clearSession();
+            makeEntryFieldsVisible();
+        }
+    }
 }   // onUpdate
 
 // ----------------------------------------------------------------------------
@@ -376,6 +398,12 @@ void BaseUserScreen::loginSuccessful()
  */
 void BaseUserScreen::loginError(const irr::core::stringw & error_message)
 {
+    PlayerProfile *player = getSelectedPlayer();
+    // Clear information about saved session in case of a problem,
+    // which allows the player to enter a new password.
+    if(player && player->hasSavedSession())
+        player->clearSession();
+    makeEntryFieldsVisible();
     sfx_manager->quickSound("anvil");
     m_info_widget->setErrorColor();
     m_info_widget->setText(error_message, false);
