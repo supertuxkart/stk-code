@@ -1562,7 +1562,9 @@ void IrrDriver::onLoadWorld()
 {
     if (m_glsl)
     {
-        m_rtts = new RTT();
+        const core::recti &viewport = Camera::getCamera(0)->getViewport();
+        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        m_rtts = new RTT(width, height);
     }
 }
 // ----------------------------------------------------------------------------

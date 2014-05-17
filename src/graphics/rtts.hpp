@@ -113,7 +113,7 @@ enum TypeFBO
 class RTT
 {
 public:
-    RTT();
+    RTT(size_t width, size_t height);
     ~RTT();
 
     unsigned getShadowFBO() const { return shadowFBO; }

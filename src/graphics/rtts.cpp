@@ -51,14 +51,14 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
     return fbo;
 }
 
-RTT::RTT()
+RTT::RTT(size_t width, size_t height)
 {
     initGL();
     using namespace video;
     using namespace core;
 
     IVideoDriver * const drv = irr_driver->getVideoDriver();
-    const dimension2du res(UserConfigParams::m_width, UserConfigParams::m_height);
+    const dimension2du res(width, height);
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
