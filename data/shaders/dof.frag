@@ -1,7 +1,15 @@
 uniform sampler2D tex;
 uniform sampler2D dtex;
-uniform mat4 invprojm;
-uniform vec2 screen;
+
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 
 in vec2 uv;
 out vec4 FragColor;
@@ -13,7 +21,7 @@ float range = 100.;
 void main()
 {
     float curdepth = texture(dtex, uv).x;
-    vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
+    vec4 FragPos = InverseProjectionMatrix * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
     FragPos /= FragPos.w;
 
     float depth = FragPos.z;

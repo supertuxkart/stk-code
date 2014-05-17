@@ -35,7 +35,7 @@ public:
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
-    ~STKMeshSceneNode();
+    virtual ~STKMeshSceneNode();
 };
 
 #endif

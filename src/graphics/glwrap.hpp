@@ -24,6 +24,7 @@
 #    include <GL/gl.h>
 #endif
 
+#include <vector>
 #include "utils/log.hpp"
 
 // already includes glext.h, which defines useful GL constants.
@@ -180,6 +181,27 @@ public:
     unsigned elapsedTimeus();
 };
 
+class FrameBuffer
+{
+private:
+    GLuint fbo;
+    std::vector<GLuint> RenderTargets;
+    GLuint DepthTexture;
+    size_t width, height;
+public:
+    FrameBuffer();
+    FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h);
+    FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h);
+    ~FrameBuffer();
+    void Bind();
+    std::vector<GLuint> &getRTT() { return RenderTargets; }
+    GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
+    size_t getWidth() const { return width; }
+    size_t getHeight() const { return height; }
+    static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
+    void BlitToDefault(size_t, size_t, size_t, size_t);
+};
+
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
@@ -190,7 +212,6 @@ void resetTextureTable();
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
-void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height);
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);

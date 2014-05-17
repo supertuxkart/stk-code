@@ -24,7 +24,7 @@
 #include <IAnimatedMeshSceneNode.h>
 namespace irr
 {
-    namespace scene { class IAnimatedMesh; class ISceneNode; }
+    namespace scene { class IAnimatedMesh; class IMeshSceneNode; class ISceneNode; }
 }
 using namespace irr;
 
@@ -170,6 +170,7 @@ public:
 class TrackObjectPresentationInstancing : public TrackObjectPresentationSceneNode
 {
     STKInstancedSceneNode* m_instancing_group;
+    scene::IMeshSceneNode* m_fallback_scene_node;
 public:
 
     TrackObjectPresentationInstancing(const XMLNode& xml_node,

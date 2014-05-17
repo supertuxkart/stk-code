@@ -8,6 +8,9 @@ STKInstancedSceneNode::STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
+    m_ref_count = 0;
+    irr_driver->grabAllTextures(mesh);
+
     if (irr_driver->isGLSL())
     {
         createGLMeshes();
@@ -42,6 +45,9 @@ void STKInstancedSceneNode::cleanGL()
 
 STKInstancedSceneNode::~STKInstancedSceneNode()
 {
+    irr_driver->dropAllTextures(getMesh());
+    irr_driver->removeMeshFromCache(getMesh());
+
     if (irr_driver->isGLSL())
         cleanGL();
 }

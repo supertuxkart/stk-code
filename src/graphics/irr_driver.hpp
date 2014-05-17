@@ -276,7 +276,7 @@ private:
     void renderParticles();
     void computeSunVisibility();
     void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
-    void computeCameraMatrix(scene::ICameraSceneNode * const camnode);
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
@@ -478,7 +478,7 @@ public:
     }
     // ------------------------------------------------------------------------
     inline GLuint getRenderTargetTexture(TypeRTT which)  { return m_rtts->getRenderTarget(which); }
-    inline GLuint getFBO(TypeFBO which)  { return m_rtts->getFBO(which); }
+    inline FrameBuffer& getFBO(TypeFBO which)  { return m_rtts->getFBO(which); }
     inline GLuint getDepthStencilTexture()  { return m_rtts->getDepthStencilTexture(); }
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
@@ -590,6 +590,10 @@ public:
     }   // addDebugMesh
 
 #endif
+
+    void onLoadWorld();
+    void onUnloadWorld();
+
     // --------------------- RTT --------------------
     /**
       * Class that provides RTT (currently, only when no other 3D rendering
