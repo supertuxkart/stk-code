@@ -147,7 +147,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
 
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
-    irr_driver->getFBO(FBO_TMP4).Bind();
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
 
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
     MeshShader::DisplaceMaskShader::setUniforms(ModelViewProjectionMatrix);
@@ -161,7 +161,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     irr_driver->getFBO(FBO_DISPLACE).Bind();
     setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP4), GL_LINEAR, GL_LINEAR, true);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
     MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix,

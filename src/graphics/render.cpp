@@ -1400,7 +1400,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 
 void IrrDriver::renderDisplacement()
 {
-    irr_driver->getFBO(FBO_TMP4).Bind();
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
     irr_driver->getFBO(FBO_DISPLACE).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
