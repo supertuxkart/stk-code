@@ -142,6 +142,9 @@ void IrrDriver::renderGLSL(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 
+        const core::recti &viewport = camera->getViewport();
+
+        computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         renderScene(camnode, glows, dt, track->hasShadows());
 
         // Debug physic
@@ -183,9 +186,25 @@ void IrrDriver::renderGLSL(float dt)
 
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
-            m_post_processing->render(camnode);
+        {
+            FrameBuffer *fbo = m_post_processing->render(camnode);
+
+            if (!UserConfigParams::m_mlaa) // MLAA_COLORS already in srgb space
+                glEnable(GL_FRAMEBUFFER_SRGB);
+
+            if (irr_driver->getNormals())
+                irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            else if (irr_driver->getSSAOViz())
+                irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            else
+                fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+
+            if (!UserConfigParams::m_mlaa)
+                glDisable(GL_FRAMEBUFFER_SRGB);
+        }
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
+
 
         PROFILER_POP_CPU_MARKER();
     }   // for i<world->getNumKarts()
@@ -238,7 +257,6 @@ void IrrDriver::renderGLSL(float dt)
 
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow)
 {
-    computeCameraMatrix(camnode);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -284,9 +302,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
     else
-    {
-        glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
-    }
+        m_rtts->getFBO(FBO_COLORS).Bind();
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
@@ -454,8 +470,7 @@ void IrrDriver::computeSunVisibility()
 
 void IrrDriver::renderSolidFirstPass()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS));
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
     glClearColor(0., 0., 0., 0.);
     glDepthMask(GL_TRUE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
@@ -586,7 +601,7 @@ void IrrDriver::renderParticles()
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
-void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
+void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
@@ -672,7 +687,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
 
-    float *tmp = new float[16 * 8];
+    float *tmp = new float[18 * 8];
 
     memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
@@ -681,9 +696,11 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
     size_t size = irr_driver->getShadowViewProj().size();
     for (unsigned i = 0; i < size; i++)
         memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+    tmp[128] = width;
+    tmp[129] = height;
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 8 + 2) * sizeof(float), tmp);
     delete []tmp;
 }
 
@@ -710,7 +727,7 @@ void IrrDriver::renderShadows()
 void IrrDriver::renderGlow(std::vector<GlowData>& glows)
 {
     m_scene_manager->setCurrentRendertime(scene::ESNRP_SOLID);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_TMP1_WITH_DS));
+    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
     glClearStencil(0);
     glClearColor(0, 0, 0, 0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -747,25 +764,18 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glDisable(GL_BLEND);
 
     // To half
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP1_WITH_DS));
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
-    glBlitFramebuffer(0, 0, UserConfigParams::m_width, UserConfigParams::m_height, 0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    FrameBuffer::Blit(irr_driver->getFBO(FBO_TMP1_WITH_DS), irr_driver->getFBO(FBO_HALF1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
     // To quarter
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, irr_driver->getFBO(FBO_HALF1));
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, irr_driver->getFBO(FBO_QUARTER1));
-    glBlitFramebuffer(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, 0, 0, UserConfigParams::m_width / 4, UserConfigParams::m_height / 4, GL_COLOR_BUFFER_BIT, GL_LINEAR);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    FrameBuffer::Blit(irr_driver->getFBO(FBO_HALF1), irr_driver->getFBO(FBO_QUARTER1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
 	glEnable(GL_BLEND);
 	glBlendEquation(GL_FUNC_ADD);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glStencilFunc(GL_EQUAL, 0, ~0);
 	glEnable(GL_STENCIL_TEST);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COLORS));
+    m_rtts->getFBO(FBO_COLORS).Bind();
     m_post_processing->renderGlow(m_rtts->getRenderTarget(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
 }
@@ -802,16 +812,13 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2));
-    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
-    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
-    gl_driver->extGlDrawBuffers(2, bufs);
+    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
     if (!UserConfigParams::m_dynamic_lights)
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
     {
-        gl_driver->extGlDrawBuffers(1, bufs);
+        //gl_driver->extGlDrawBuffers(1, bufs);
         return;
     }
 
@@ -889,20 +896,17 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
     renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-    gl_driver->extGlDrawBuffers(1, bufs);
+//    gl_driver->extGlDrawBuffers(1, bufs);
 }
 
 void IrrDriver::renderSSAO()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getFBO(FBO_SSAO));
+    m_rtts->getFBO(FBO_SSAO).Bind();
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
     m_post_processing->renderSSAO();
     // Blur it to reduce noise.
-    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_SSAO), irr_driver->getRenderTargetTexture(RTT_SSAO),
-        irr_driver->getFBO(FBO_TMP4), irr_driver->getRenderTargetTexture(RTT_TMP4), UserConfigParams::m_width, UserConfigParams::m_height );
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_SSAO), irr_driver->getFBO(FBO_TMP4));
 }
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
@@ -1394,9 +1398,9 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 
 void IrrDriver::renderDisplacement()
 {
-    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_TMP4));
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
-    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_DISPLACE));
+    irr_driver->getFBO(FBO_DISPLACE).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
 	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
@@ -1419,7 +1423,7 @@ void IrrDriver::renderDisplacement()
         m_displacing[i]->render();
     }
 
-    glBindFramebuffer(GL_FRAMEBUFFER, irr_driver->getFBO(FBO_COLORS));
+    irr_driver->getFBO(FBO_COLORS).Bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
     m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE));
     glDisable(GL_STENCIL_TEST);

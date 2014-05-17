@@ -17,6 +17,10 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
+#include "graphics/glwrap.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/leak_check.hpp"
+
 namespace irr {
     namespace video {
         class ITexture;
@@ -109,7 +113,7 @@ enum TypeFBO
 class RTT
 {
 public:
-    RTT();
+    RTT(size_t width, size_t height);
     ~RTT();
 
     unsigned getShadowFBO() const { return shadowFBO; }
@@ -117,12 +121,15 @@ public:
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
-    unsigned getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+    FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
-    unsigned RenderTargetTextures[RTT_COUNT], FrameBuffers[FBO_COUNT];
+    unsigned RenderTargetTextures[RTT_COUNT];
+    PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
     unsigned shadowFBO, shadowColorTex, shadowDepthTex;
+
+    LEAK_CHECK();
 };
 
 #endif

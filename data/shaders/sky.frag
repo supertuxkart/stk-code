@@ -11,12 +11,11 @@ layout (std140) uniform MatrixesData
     mat4 InverseViewMatrix;
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
 };
 #endif
 
 uniform samplerCube tex;
-uniform vec2 screen;
-
 
 #if __VERSION__ >= 130
 out vec4 FragColor;
