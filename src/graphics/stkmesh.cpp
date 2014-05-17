@@ -312,6 +312,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const c
   glActiveTexture(GL_TEXTURE0 + MeshShader::SphereMapShader::TU_tex);
   if (!irr_driver->SkyboxCubeMap)
   {
+      glBindTexture(GL_TEXTURE_CUBE_MAP, irr_driver->FakeSkybox);
       GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
       glTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
