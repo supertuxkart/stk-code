@@ -139,7 +139,7 @@ namespace Online
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
-        UserScreen *login = dynamic_cast<UserScreen*>(screen);
+        BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
         if(login)
         {
             if(isSuccess())
