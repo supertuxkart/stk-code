@@ -36,6 +36,15 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
+//#include "graphics/rtts.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/wind.hpp"
+#include "io/file_manager.hpp"
+#include "utils/aligned_array.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/vec3.hpp"
+
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -45,17 +54,9 @@ namespace irr
 }
 using namespace irr;
 
+class RTT;
+class FrameBuffer;
 class ShadowImportanceProvider;
-
-#include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
-#include "graphics/wind.hpp"
-#include "io/file_manager.hpp"
-#include "utils/aligned_array.hpp"
-#include "utils/no_copy.hpp"
-#include "utils/ptr_vector.hpp"
-#include "utils/vec3.hpp"
-
 class AbstractKart;
 class Camera;
 class PerCameraNode;
@@ -74,6 +75,35 @@ enum STKRenderingPass
     PASS_COUNT,
 };
 
+enum TypeFBO
+{
+    FBO_SSAO,
+    FBO_NORMAL_AND_DEPTHS,
+    FBO_COMBINED_TMP1_TMP2,
+    FBO_COLORS,
+    FBO_LOG_LUMINANCE,
+    FBO_MLAA_COLORS,
+    FBO_TMP1_WITH_DS,
+    FBO_TMP2_WITH_DS,
+    FBO_TMP4,
+    FBO_LINEAR_DEPTH,
+    FBO_HALF1,
+    FBO_HALF2,
+    FBO_QUARTER1,
+    FBO_QUARTER2,
+    FBO_EIGHTH1,
+    FBO_EIGHTH2,
+    FBO_DISPLACE,
+    FBO_BLOOM_1024,
+    FBO_BLOOM_512,
+    FBO_TMP_512,
+    FBO_BLOOM_256,
+    FBO_TMP_256,
+    FBO_BLOOM_128,
+    FBO_TMP_128,
+    FBO_COUNT
+};
+
 enum QueryPerf
 {
     Q_SOLID_PASS1,
@@ -89,6 +119,57 @@ enum QueryPerf
     Q_TONEMAP,
     Q_MOTIONBLUR,
     Q_LAST
+};
+
+enum TypeRTT
+{
+    RTT_TMP1 = 0,
+    RTT_TMP2,
+    RTT_TMP3,
+    RTT_TMP4,
+    RTT_LINEAR_DEPTH,
+    RTT_NORMAL_AND_DEPTH,
+    RTT_COLOR,
+    RTT_LOG_LUMINANCE,
+
+    RTT_HALF1,
+    RTT_HALF2,
+
+    RTT_QUARTER1,
+    RTT_QUARTER2,
+    //    RTT_QUARTER3,
+    //    RTT_QUARTER4,
+
+    RTT_EIGHTH1,
+    RTT_EIGHTH2,
+
+    //    RTT_SIXTEENTH1,
+    //    RTT_SIXTEENTH2,
+
+    RTT_SSAO,
+
+    //    RTT_COLLAPSE,
+    //    RTT_COLLAPSEH,
+    //    RTT_COLLAPSEV,
+    //    RTT_COLLAPSEH2,
+    //    RTT_COLLAPSEV2,
+    //    RTT_WARPH,
+    //    RTT_WARPV,
+
+    //    RTT_HALF_SOFT,
+
+    RTT_DISPLACE,
+    RTT_MLAA_COLORS,
+
+    RTT_BLOOM_1024,
+    RTT_BLOOM_512,
+    RTT_TMP_512,
+    RTT_BLOOM_256,
+    RTT_TMP_256,
+    RTT_BLOOM_128,
+    RTT_TMP_128,
+
+    RTT_COUNT
 };
 
 /**
@@ -477,9 +558,9 @@ public:
         return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
     }
     // ------------------------------------------------------------------------
-    inline GLuint getRenderTargetTexture(TypeRTT which)  { return m_rtts->getRenderTarget(which); }
-    inline FrameBuffer& getFBO(TypeFBO which)  { return m_rtts->getFBO(which); }
-    inline GLuint getDepthStencilTexture()  { return m_rtts->getDepthStencilTexture(); }
+    GLuint getRenderTargetTexture(TypeRTT which);
+    FrameBuffer& getFBO(TypeFBO which);
+    GLuint getDepthStencilTexture();
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
