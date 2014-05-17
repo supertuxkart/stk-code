@@ -70,7 +70,7 @@ private:
     GUIEngine::DynamicRibbonWidget* m_players;
 
     void selectUser(int index);
-    void makeEntryFieldsVisible(bool online);
+    void makeEntryFieldsVisible();
     void login();
     void closeScreen();
     void deletePlayer();
@@ -95,7 +95,6 @@ public:
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     virtual void unloaded();
-    virtual bool onEscapePressed();
 
     void loginSuccessful();
     void loginError(const irr::core::stringw &error_message);

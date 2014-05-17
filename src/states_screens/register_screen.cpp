@@ -97,7 +97,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
     getWidget<LabelWidget  >("label_email")->setVisible(online);
     getWidget<TextBoxWidget>("email_confirm")->setVisible(online);
     getWidget<LabelWidget  >("label_email_confirm")->setVisible(online);
-}   // makeEntryFieldvisible
+}   // makeEntryFieldsVisible
 
 // -----------------------------------------------------------------------------
 /** If necessary creates the local user.
@@ -268,7 +268,12 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
             doRegister();
         }
         else if(button=="cancel")
-            StateManager::get()->escapePressed();
+        {
+            // We poop this menu, onEscapePress will handle the special case
+            // of e.g. a fresh start of stk that is aborted.
+            StateManager::get()->popMenu();
+            onEscapePressed();
+        }
     }
     else if (name == "back")
     {
@@ -278,3 +283,18 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
 }   // eventCallback
 
 // -----------------------------------------------------------------------------
+bool RegisterScreen::onEscapePressed()
+{
+    if (PlayerManager::get()->getNumPlayers() == 0)
+    {
+        // Must be first time start, and player cancelled player creation
+        // so quit stk. At this stage there are two menus on the stack:
+        // 1) The UserScreen,  2) RegisterStreen
+        // Popping them both will trigger STK to close.
+        StateManager::get()->popMenu();
+        return true;
+    }
+    StateManager::get()->escapePressed();
+    return true;
+}   // onEscapePressed
+

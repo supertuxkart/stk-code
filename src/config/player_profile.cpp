@@ -47,6 +47,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_saved_token         = "";
     m_saved_user_id       = 0;
     m_last_online_name    = "";
+    m_last_was_online     = false;
     initRemainingData();
 }   // PlayerProfile
 
@@ -71,6 +72,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_saved_token         = "";
     m_saved_user_id       = 0;
     m_last_online_name    = "";
+    m_last_was_online     = false;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
 
@@ -82,6 +84,7 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     node->get("saved-user",       &m_saved_user_id   );
     node->get("saved-token",      &m_saved_token     );
     node->get("last-online-name", &m_last_online_name);
+    node->get("last-was-online",  &m_last_was_online );
 
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
@@ -138,7 +141,8 @@ void PlayerProfile::save(UTFWriter &out)
 
     out << L"            saved-user=\"" << m_saved_user_id 
         << L"\" saved-token=\""         << m_saved_token << L"\"\n";
-    out << L"            last-online-name=\"" << m_last_online_name<< L"\">\n";
+    out << L"            last-online-name=\"" << m_last_online_name
+        << L"\" last-was-online=\""           << m_last_was_online<< L"\">\n";
     {
         if(m_story_mode_status)
             m_story_mode_status->save(out);

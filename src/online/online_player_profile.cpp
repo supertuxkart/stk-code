@@ -94,7 +94,7 @@ namespace Online
     void OnlinePlayerProfile::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if (m_online_state == OS_SIGNED_OUT  && hasSavedSession() )
+        if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
             request = new SignInRequest(true);
             request->setServerURL("client-user.php");

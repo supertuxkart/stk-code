@@ -95,6 +95,9 @@ private:
     /** The online user name used last (empty if not used online). */
     core::stringw m_last_online_name;
 
+    /** True if the last time this player was used as online. */
+    bool m_last_was_online;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -255,6 +258,13 @@ public:
         assert(m_saved_session);
         return m_saved_token;
     }   // getSavedToken
+    // ------------------------------------------------------------------------
+    /** Returns if the last time this player was used it was used online or
+     *  offline. */
+    bool wasOnlineLastTime() const { return m_last_was_online; }
+    // ------------------------------------------------------------------------
+    /** Sets if this player was logged in last time it was used. */
+    void setWasOnlineLastTime(bool b) { m_last_was_online = b; }
     // ------------------------------------------------------------------------
 };   // class PlayerProfile
 

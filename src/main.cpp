@@ -189,6 +189,7 @@
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -1293,7 +1294,14 @@ int main(int argc, char *argv[] )
             if(PlayerManager::getCurrentPlayer())
                 StateManager::get()->pushScreen(MainMenuScreen::getInstance());
             else
+            {
                 StateManager::get()->pushScreen(UserScreen::getInstance());
+                // If there is no player, push the RegisterScreen on top of
+                // the login screen. This way on first start players are
+                // forced to create a player.
+                if(PlayerManager::get()->getNumPlayers()==0)
+                    StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())
