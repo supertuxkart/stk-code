@@ -3,7 +3,8 @@
 
 <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
-    <header align="center" width="80%" text="Login" text_align="center"/>
+    <header align="center" width="80%" text="Create User" text_align="center"
+            I18N="In the registration dialog" />
     <spacer height="15" width="10"/>
 
     <box proportion="1" width="100%" layout="vertical-row">
