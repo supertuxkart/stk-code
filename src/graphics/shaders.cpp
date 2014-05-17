@@ -1382,7 +1382,6 @@ namespace MeshShader
     GLuint TransparentFogShader::uniform_start;
     GLuint TransparentFogShader::uniform_end;
     GLuint TransparentFogShader::uniform_col;
-    GLuint TransparentFogShader::uniform_ipvmat;
 
     void TransparentFogShader::init()
     {
@@ -1401,10 +1400,11 @@ namespace MeshShader
         uniform_start = glGetUniformLocation(Program, "start");
         uniform_end = glGetUniformLocation(Program, "end");
         uniform_col = glGetUniformLocation(Program, "col");
-        uniform_ipvmat = glGetUniformLocation(Program, "ipvmat");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
+    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
@@ -1414,7 +1414,6 @@ namespace MeshShader
         glUniform1f(uniform_start, start);
         glUniform1f(uniform_end, end);
         glUniform3f(uniform_col, col.X, col.Y, col.Z);
-        glUniformMatrix4fv(uniform_ipvmat, 1, GL_FALSE, ipvmat.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
 
@@ -2108,7 +2107,6 @@ namespace FullScreenShader
     GLuint DepthOfFieldShader::Program;
     GLuint DepthOfFieldShader::uniform_tex;
     GLuint DepthOfFieldShader::uniform_depth;
-    GLuint DepthOfFieldShader::uniform_invproj;
     GLuint DepthOfFieldShader::vao;
 
     void DepthOfFieldShader::init()
@@ -2118,13 +2116,13 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/dof.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_depth = glGetUniformLocation(Program, "dtex");
-        uniform_invproj = glGetUniformLocation(Program, "invprojm");
         vao = createVAO(Program);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DepthOfFieldShader::setUniforms(const core::matrix4 &invproj, const core::vector2df &screen, unsigned TU_tex, unsigned TU_dtex)
+    void DepthOfFieldShader::setUniforms(unsigned TU_tex, unsigned TU_dtex)
     {
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, invproj.pointer());
         glUniform1i(uniform_tex, TU_tex);
         glUniform1i(uniform_depth, TU_dtex);
     }

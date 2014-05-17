@@ -308,10 +308,10 @@ class TransparentFogShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord, attrib_color;
-    static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col, uniform_ipvmat;
+    static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, const core::matrix4 &ipvmat, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
 };
 
 class BillboardShader
@@ -549,11 +549,11 @@ class DepthOfFieldShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_depth, uniform_invproj;
+    static GLuint uniform_tex, uniform_depth;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const core::matrix4 &invproj, const core::vector2df &screen, unsigned TU_tex, unsigned TU_depth);
+    static void setUniforms(unsigned TU_tex, unsigned TU_depth);
 };
 
 class ColorLevelShader

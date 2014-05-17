@@ -587,7 +587,7 @@ static void renderDoF(FrameBuffer &fbo, GLuint rtt)
     glBindVertexArray(FullScreenShader::DepthOfFieldShader::vao);
     setTexture(0, rtt, GL_LINEAR, GL_LINEAR);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::DepthOfFieldShader::setUniforms(irr_driver->getInvProjMatrix(), core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
+    FullScreenShader::DepthOfFieldShader::setUniforms(0, 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
