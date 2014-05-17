@@ -144,6 +144,9 @@ void IrrDriver::renderGLSL(float dt)
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
 
+        const core::recti &viewport = camera->getViewport();
+
+        computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         renderScene(camnode, glows, dt, track->hasShadows());
 
         // Debug physic
@@ -182,8 +185,6 @@ void IrrDriver::renderGLSL(float dt)
                 glBindVertexArray(0);
             }
         }
-
-        const core::recti &viewport = camera->getViewport();
 
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
@@ -258,7 +259,6 @@ void IrrDriver::renderGLSL(float dt)
 
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow)
 {
-    computeCameraMatrix(camnode);
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
@@ -603,7 +603,7 @@ void IrrDriver::renderParticles()
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
-void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
+void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
@@ -689,7 +689,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
 
-    float *tmp = new float[16 * 8];
+    float *tmp = new float[18 * 8];
 
     memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
@@ -698,9 +698,11 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode)
     size_t size = irr_driver->getShadowViewProj().size();
     for (unsigned i = 0; i < size; i++)
         memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+    tmp[128] = width;
+    tmp[129] = height;
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
-    glBufferSubData(GL_UNIFORM_BUFFER, 0, 16 * 8 * sizeof(float), tmp);
+    glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 8 + 2) * sizeof(float), tmp);
     delete []tmp;
 }
 
