@@ -143,7 +143,7 @@ void STKAnimatedMesh::render()
           continue;
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
@@ -222,23 +222,6 @@ void STKAnimatedMesh::render()
         }
 
         PROFILER_POP_CPU_MARKER();
-        return;
-    }
-
-    if (irr_driver->getPhase() == SHADOW_PASS)
-    {
-        if (!GeometricMesh[FPSM_DEFAULT].empty())
-            glUseProgram(MeshShader::ShadowShader::Program);
-
-        GLMesh* mesh;
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
-            drawShadow(*mesh, AbsoluteTransformation);
-
-        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::RefShadowShader::Program);
-
-        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-            drawShadowRef(*mesh, AbsoluteTransformation);
         return;
     }
 
