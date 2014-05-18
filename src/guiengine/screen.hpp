@@ -94,7 +94,7 @@ namespace GUIEngine
      *
      * \ingroup guiengine
      */
-    class GUIEngine::Screen : public AbstractTopLevelContainer
+    class Screen : public AbstractTopLevelContainer
     {
     private:
         /** True if the race (if it is running) should be paused when this
