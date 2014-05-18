@@ -310,7 +310,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const c
   size_t count = mesh.IndexCount;
 
   compressTexture(mesh.textures[0], true);
-  setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  setTexture(MeshShader::SphereMapShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix);
   assert(mesh.vao_second_pass);
