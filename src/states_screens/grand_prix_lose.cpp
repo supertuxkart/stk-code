@@ -243,7 +243,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         {
             KartModel* kart_model = kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
-            scene::ISceneNode* kart_main_node = kart_model->attachModel(false);
+            scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
 
             core::vector3df kart_pos(m_kart_x + n*DISTANCE_BETWEEN_KARTS,
                 m_kart_y,
