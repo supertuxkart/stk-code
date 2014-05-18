@@ -197,7 +197,7 @@ RTT::RTT(size_t width, size_t height)
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
-        shadowFBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024);
+        shadowFBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

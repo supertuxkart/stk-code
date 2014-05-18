@@ -191,7 +191,7 @@ private:
 public:
     FrameBuffer();
     FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h);
-    FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h);
+    FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
     ~FrameBuffer();
     void Bind();
     std::vector<GLuint> &getRTT() { return RenderTargets; }
