@@ -37,7 +37,7 @@ public:
     RTT(size_t width, size_t height);
     ~RTT();
 
-    unsigned getShadowFBO() const { return shadowFBO; }
+    FrameBuffer &getShadowFBO() { return shadowFBO; }
     unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
@@ -48,7 +48,8 @@ private:
     PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
-    unsigned shadowFBO, shadowColorTex, shadowDepthTex;
+    unsigned shadowColorTex, shadowDepthTex;
+    FrameBuffer shadowFBO;
 
     LEAK_CHECK();
 };

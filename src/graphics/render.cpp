@@ -33,7 +33,6 @@
 #include "graphics/rtts.hpp"
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_importance.hpp"
 #include "graphics/stkmeshscenenode.hpp"
 #include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
@@ -713,8 +712,7 @@ void IrrDriver::renderShadows()
     glDisable(GL_BLEND);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5, 0.);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
-    glViewport(0, 0, 1024, 1024);
+    m_rtts->getShadowFBO().Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
 

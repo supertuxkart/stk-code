@@ -139,18 +139,14 @@ RTT::RTT(size_t width, size_t height)
 
     if (irr_driver->getGLSLVersion() >= 150)
     {
-        glGenFramebuffers(1, &shadowFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
         glGenTextures(1, &shadowColorTex);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
         glGenTextures(1, &shadowDepthTex);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
-        GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+
+        shadowFBO = FrameBuffer(std::vector<GLuint> {shadowColorTex}, shadowDepthTex, 1024, 1024);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -161,7 +157,6 @@ RTT::~RTT()
     glDeleteTextures(1, &DepthStencilTexture);
     if (irr_driver->getGLSLVersion() >= 150)
     {
-        glDeleteFramebuffers(1, &shadowFBO);
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }
