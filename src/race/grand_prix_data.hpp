@@ -76,6 +76,10 @@ public:
     GrandPrixData(const std::string& filename);
     /** Needed for simple creation of an instance of GrandPrixData */
     GrandPrixData() {};
+    /** TODO */
+    GrandPrixData(const unsigned int number_of_tracks,
+                  const std::string& m_track_group,
+                  const bool use_reverse);
 
     // Methods for the GP editor
     void setId(const std::string& id);
@@ -117,7 +121,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
-
 };   // GrandPrixData
 
 #endif

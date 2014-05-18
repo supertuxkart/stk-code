@@ -25,11 +25,13 @@
 class randomGPInfoDialog : public GPInfoDialog
 {
 private:
-    int m_number_of_laps;
+    unsigned int m_number_of_tracks;
     std::string m_track_group;
     bool m_use_reverse;
+
 public:
     randomGPInfoDialog();
+    ~randomGPInfoDialog() { delete m_gp; }
 };
 
 #endif

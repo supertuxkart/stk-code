@@ -119,7 +119,6 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            std::cout << selection << std::endl;
             if (selection != "Random")
                 new GPInfoDialog(selection);
             else

@@ -33,7 +33,7 @@ namespace GUIEngine
  */
 class GPInfoDialog : public GUIEngine::ModalDialog
 {
-protected: // Needed for randomGPInfoDialog
+protected: // Necessary for randomGPInfoDialog
     std::string m_gp_ident;
     GUIEngine::IconButtonWidget* m_screenshot_widget;
     float m_curr_time;
@@ -46,7 +46,7 @@ public:
      * Creates a modal dialog with given percentage of screen width and height
      * atm only used in track_screen.cpp
      */
-    GPInfoDialog() : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT) {} // FIXME: This line's only here for compiling
+    GPInfoDialog() : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT) {}
     GPInfoDialog(const std::string& gpIdent);
     virtual ~GPInfoDialog();
 

@@ -30,9 +30,9 @@ using namespace GUIEngine;
 randomGPInfoDialog::randomGPInfoDialog()
 {
     // Defaults - loading selection from last time frrom a file would be better
-    int m_number_of_tracks = 4;
-    std::string m_track_group = "standart";
-    bool m_use_reverse = true;
+    m_number_of_tracks = 2;
+    m_track_group = "nextgen";
+    m_use_reverse = true;
 
     doInit();
     m_curr_time = 0.0f;
@@ -41,9 +41,7 @@ randomGPInfoDialog::randomGPInfoDialog()
     const int y2 = m_area.getHeight()*6/7;
 
     m_gp_ident = "random";
-
-    //const GrandPrixData* gp = grand_prix_manager->newRandomGP(m_number_of_tracks, m_track_group, m_use_reverse);
-    m_gp = grand_prix_manager->getGrandPrix("1_penguinplayground");
+    m_gp = new GrandPrixData(m_number_of_tracks, m_track_group, m_use_reverse);
 
     // ---- GP Name
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);

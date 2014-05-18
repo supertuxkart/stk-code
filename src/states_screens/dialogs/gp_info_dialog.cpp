@@ -123,7 +123,6 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
     }
 
     // ---- Track screenshot
-
     m_screenshot_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
                                                false /* tab stop */, false /* focusable */,
                                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE /* Track gives us absolute paths */);
@@ -215,7 +214,7 @@ void GPInfoDialog::onEnterPressedInternal()
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
-    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
+    race_manager->startGP(m_gp, false, false);
 }
 
 // ----------------------------------------------------------------------------
@@ -225,9 +224,8 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
     if (eventSource == "start")
     {
         // Save GP identifier, since dismiss will delete this object.
-        std::string gp_id = m_gp_ident;
         ModalDialog::dismiss();
-        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
+        race_manager->startGP(m_gp, false, false);
         return GUIEngine::EVENT_BLOCK;
     }
     if (eventSource == "continue")

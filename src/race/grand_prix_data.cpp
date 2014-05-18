@@ -28,9 +28,10 @@
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
+#include <algorithm>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
-#include <algorithm>
 #include <stdexcept>
 
 
@@ -42,6 +43,33 @@ GrandPrixData::GrandPrixData(const std::string& filename)
                                         StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
     reload();
+}
+
+// ----------------------------------------------------------------------------
+GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
+                             const std::string& track_group,
+                             const bool         use_reverse)
+{
+    m_filename = "Random GP - Not loaded from a file!";
+    m_id       = "random";
+    m_name     = L"Random";
+    m_editable = false;
+
+    const std::vector<int> track_indices = track_manager->getTracksInGroup(track_group);
+    const size_t available_tracks = track_indices.size();
+    assert(number_of_tracks <= available_tracks);
+
+    m_tracks.reserve(number_of_tracks);
+    m_laps.reserve(number_of_tracks);
+    m_reversed.reserve(number_of_tracks);
+
+    for (unsigned int i = 0; i < number_of_tracks; i++)
+    {
+        int index = track_indices[int(rand() % available_tracks)];
+        m_tracks.push_back(std::string(track_manager->getTrack(index)->getIdent()));
+        m_laps.push_back(3);
+        m_reversed.push_back(rand() % 2);
+    }
 }
 
 // ----------------------------------------------------------------------------
