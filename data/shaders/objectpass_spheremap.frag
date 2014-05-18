@@ -15,7 +15,7 @@ layout (std140) uniform MatrixesData
 };
 #endif
 
-uniform samplerCube tex;
+uniform sampler2D tex;
 
 #if __VERSION__ >= 130
 in vec3 nor;
@@ -27,15 +27,12 @@ varying vec3 nor;
 
 
 void main() {
-    vec3 fpos = gl_FragCoord.xyz / vec3(screen, 1.);
-    vec4 xpos = 2.0 * vec4(fpos, 1.0) - 1.0;
-    xpos = InverseProjectionMatrix * xpos;
-
-    xpos.xyz /= xpos.w;
-    vec3 viewSampleDir = reflect(xpos.xyz, nor);
-    // Convert sampleDir in world space (where tex was generated)
-    vec4 sampleDir = transpose(InverseViewMatrix) * vec4(viewSampleDir, 0.);
-    vec4 detail0 = texture(tex, sampleDir.xyz);
+    const vec3 forward = vec3(0., 0., 1.);
+    vec3 normal_x = normalize(vec3(nor.x, 0., nor.z));
+    float sin_theta_x = length(cross(forward, normal_x)) * sign(nor.x);
+    vec3 normal_y = normalize(vec3(0., nor.y, nor.z));
+    float sin_theta_y = length(cross(forward, normal_y)) * sign(nor.y);
+    vec4 detail0 = texture(tex, .5 * vec2(sin_theta_x, sin_theta_y) + .5);
 
     FragColor = vec4(detail0.xyz, 1.);
 }

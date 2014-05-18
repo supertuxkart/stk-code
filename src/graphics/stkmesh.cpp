@@ -309,31 +309,15 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const c
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  glActiveTexture(GL_TEXTURE0 + MeshShader::SphereMapShader::TU_tex);
-  if (!irr_driver->SkyboxCubeMap)
-  {
-      glBindTexture(GL_TEXTURE_CUBE_MAP, irr_driver->FakeSkybox);
-      GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-      glTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-      glBindTexture(GL_TEXTURE_CUBE_MAP, irr_driver->SkyboxCubeMap);
-      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-      glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  }
+  compressTexture(mesh.textures[0], true);
+  setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-  MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix, 
-                                           core::vector2df(float(UserConfigParams::m_width), 
+  MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix,
+                                           core::vector2df(float(UserConfigParams::m_width),
                                                            float(UserConfigParams::m_height)));
   assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
-  if (!irr_driver->SkyboxCubeMap)
-  {
-      GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-      glTexParameteriv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
 }
 
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
