@@ -202,8 +202,6 @@ private:
     float                m_lwhite;
     /** RTTs. */
     RTT                *m_rtts;
-    /** Shadow importance. */
-    ShadowImportance   *m_shadow_importance;
     std::vector<core::matrix4> sun_ortho_matrix;
 
     /** Additional details to be shown in case that a texture is not found.

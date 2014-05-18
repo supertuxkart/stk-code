@@ -477,7 +477,6 @@ void IrrDriver::initDevice()
     if(m_glsl)
     {
         m_shaders = new Shaders();
-        m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
