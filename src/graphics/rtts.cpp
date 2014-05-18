@@ -193,7 +193,9 @@ RTT::RTT(size_t width, size_t height)
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_STENCIL, 1024, 1024, 4, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
 
-        shadowFBO = new FrameBuffer(std::vector<GLuint> {shadowColorTex}, shadowDepthTex, 1024, 1024);
+        somevector.clear();
+        somevector.push_back(shadowColorTex);
+        shadowFBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
