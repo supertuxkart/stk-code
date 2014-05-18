@@ -237,7 +237,7 @@ public:
                                             float wheel_radius);
     void          finishedRace();
     scene::ISceneNode*
-                  attachModel(bool animatedModels);
+                  attachModel(bool animatedModels, bool always_animated);
     // ------------------------------------------------------------------------
     /** Returns the animated mesh of this kart model. */
     scene::IAnimatedMesh*

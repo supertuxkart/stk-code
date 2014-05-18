@@ -2383,3 +2383,24 @@ void IrrDriver::clearLights()
 
     m_lights.clear();
 }
+
+// ----------------------------------------------------------------------------
+
+GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
+{
+    return m_rtts->getRenderTarget(which);
+}
+
+// ----------------------------------------------------------------------------
+
+FrameBuffer& IrrDriver::getFBO(TypeFBO which) 
+{
+    return m_rtts->getFBO(which);
+}
+
+// ----------------------------------------------------------------------------
+
+GLuint IrrDriver::getDepthStencilTexture()
+{
+    return m_rtts->getDepthStencilTexture();
+}

@@ -254,7 +254,7 @@ public:
     static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::vector2df& screen);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix);
 };
 
 class SplattingShader
