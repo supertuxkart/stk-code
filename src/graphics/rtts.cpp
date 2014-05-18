@@ -107,13 +107,15 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
 
+    std::vector<GLuint> somevector;
+    somevector.push_back(RenderTargetTextures[RTT_SSAO]);
 
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_SSAO]}, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    std::vector<GLuint> somevector;
+    somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
