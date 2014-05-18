@@ -1187,6 +1187,7 @@ namespace MeshShader
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_normal = glGetAttribLocation(Program, "Normal");
@@ -1202,7 +1203,7 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::vector2df& screen)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);

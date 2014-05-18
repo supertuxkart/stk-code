@@ -1,3 +1,5 @@
+// See http://www.ozone3d.net/tutorials/glsl_texturing_p04.php for ref
+
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
@@ -25,14 +27,15 @@ varying vec3 nor;
 #define FragColor gl_FragColor
 #endif
 
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 void main() {
-    const vec3 forward = vec3(0., 0., 1.);
-    vec3 normal_x = normalize(vec3(nor.x, 0., nor.z));
-    float sin_theta_x = length(cross(forward, normal_x)) * sign(nor.x);
-    vec3 normal_y = normalize(vec3(0., nor.y, nor.z));
-    float sin_theta_y = length(cross(forward, normal_y)) * sign(nor.y);
-    vec4 detail0 = texture(tex, .5 * vec2(sin_theta_x, sin_theta_y) + .5);
+    vec3 texc = gl_FragCoord.xyz / vec3(screen, 1.);
+    vec3 u = getPosFromUVDepth(texc, InverseProjectionMatrix).xyz;
+    vec3 r = reflect(u, nor);
+
+    float m = 2.0 * sqrt(r.x * r.x + r.y * r.y + (r.z + 1.0) * (r.z + 1.0));
+    vec4 detail0 = texture(tex, r.xy / m + .5);
 
     FragColor = vec4(detail0.xyz, 1.);
 }

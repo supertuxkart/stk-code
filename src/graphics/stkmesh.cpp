@@ -312,9 +312,7 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const c
   compressTexture(mesh.textures[0], true);
   setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-  MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix,
-                                           core::vector2df(float(UserConfigParams::m_width),
-                                                           float(UserConfigParams::m_height)));
+  MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix);
   assert(mesh.vao_second_pass);
   glBindVertexArray(mesh.vao_second_pass);
   glDrawElements(ptype, count, itype, 0);
