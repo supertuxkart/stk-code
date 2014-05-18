@@ -35,8 +35,6 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
         return SM_GRASS;
     else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
         return SM_UNLIT;
-    else if (type == irr_driver->getShader(ES_CAUSTICS))
-        return SM_CAUSTICS;
     else if (textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))
         return SM_DETAILS;
     else if (!textures[0])
@@ -427,39 +425,6 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 
 static video::ITexture *CausticTex = 0;
 
-void drawCaustics(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector2df dir, core::vector2df dir2)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::CausticsShader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    if (!CausticTex)
-        CausticTex = irr_driver->getTexture(file_manager->getAsset("textures/caustics.png").c_str());
-    compressTexture(CausticTex, false);
-    setTexture(MeshShader::CausticsShader::TU_caustictex, getTextureGLuint(CausticTex), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-    MeshShader::CausticsShader::setUniforms(ModelViewProjectionMatrix, dir, dir2,
-                                            core::vector2df(float(UserConfigParams::m_width),
-                                                            float(UserConfigParams::m_height)));
-
-    assert(mesh.vao_second_pass);
-    glBindVertexArray(mesh.vao_second_pass);
-    glDrawElements(ptype, count, itype, 0);
-}
-
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
 {
     irr_driver->IncreaseObjectCount();
@@ -732,8 +697,6 @@ bool isObject(video::E_MATERIAL_TYPE type)
 		return true;
 	if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
 		return true;
-    if (type == irr_driver->getShader(ES_CAUSTICS))
-        return true;
 	if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
 		return true;
 	if (type == video::EMT_ONETEXTURE_BLEND)
@@ -803,10 +766,6 @@ void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedM
     case SM_UNLIT:
         mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
             MeshShader::ObjectUnlitShader::attrib_position, MeshShader::ObjectUnlitShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
-        break;
-    case SM_CAUSTICS:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::CausticsShader::attrib_position, MeshShader::CausticsShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
         break;
     case SM_DETAILS:
         mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,

@@ -269,18 +269,6 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
-class CausticsShader
-{
-public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_MVP, uniform_dir, uniform_dir2, uniform_ambient;
-    static GLuint TU_Albedo, TU_caustictex;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen);
-};
-
 class BubbleShader
 {
 public:
@@ -921,7 +909,6 @@ public:
     ACT(ES_PENUMBRAH) \
     ACT(ES_PENUMBRAV) \
     ACT(ES_SHADOWGEN) \
-    ACT(ES_CAUSTICS) \
     ACT(ES_DISPLACE) \
     ACT(ES_PASSFAR) \
 
