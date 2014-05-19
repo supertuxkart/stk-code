@@ -355,7 +355,7 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 
         KartModel* kart_model = kp->getKartModelCopy();
         m_all_kart_models.push_back(kart_model);
-        scene::ISceneNode* kart_main_node = kart_model->attachModel(false);
+        scene::ISceneNode* kart_main_node = kart_model->attachModel(false, false);
 
         m_kart_x[i] = KARTS_X + i*KARTS_DELTA_X;
         m_kart_y[i] = INITIAL_Y + KARTS_DELTA_Y;

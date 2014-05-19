@@ -2316,8 +2316,8 @@ void Kart::updateFlying()
  */
 void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 {
-
-    m_node = m_kart_model->attachModel(is_animated_model);
+    bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
+    m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );

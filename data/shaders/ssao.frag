@@ -3,7 +3,6 @@
 
 uniform sampler2D dtex;
 uniform vec4 samplePoints[16];
-uniform vec2 screen;
 
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
@@ -18,6 +17,7 @@ layout (std140) uniform MatrixesData
     mat4 InverseViewMatrix;
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
 };
 #endif
 

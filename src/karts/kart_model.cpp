@@ -325,7 +325,7 @@ KartModel* KartModel::makeCopy()
 /** Attach the kart model and wheels to the scene node.
  *  \return the node with the model attached
  */
-scene::ISceneNode* KartModel::attachModel(bool animated_models)
+scene::ISceneNode* KartModel::attachModel(bool animated_models, bool always_animated)
 {
     assert(!m_is_master);
 
@@ -342,10 +342,22 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         // as animated mesh are not cheap to render use frustum box culling
         node->setAutomaticCulling(scene::EAC_FRUSTUM_BOX);
 
-        lod_node->add(20, node, true);
-        scene::ISceneNode* static_model = attachModel(false);
-        lod_node->add(100, static_model, true);
-        m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
+        if (always_animated)
+        {
+            // give a huge LOD distance for the player's kart. the reason is that it should
+            // use its animations for the shadow pass too, where the camera can be quite far
+            lod_node->add(10000, node, true);
+            scene::ISceneNode* static_model = attachModel(false, false);
+            lod_node->add(10001, static_model, true);
+            m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
+        }
+        else
+        {
+            lod_node->add(20, node, true);
+            scene::ISceneNode* static_model = attachModel(false, false);
+            lod_node->add(100, static_model, true);
+            m_animated_node = static_cast<scene::IAnimatedMeshSceneNode*>(node);
+        }
 
         attachHat();
 
@@ -363,7 +375,7 @@ scene::ISceneNode* KartModel::attachModel(bool animated_models)
         // Become the owner of the wheels
         for(unsigned int i=0; i<4; i++)
         {
-            if(!m_wheel_model[i]) continue;
+            if (!m_wheel_model[i] || !m_wheel_node[i]) continue;
             m_wheel_node[i]->setParent(lod_node);
         }
 

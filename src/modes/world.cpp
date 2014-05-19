@@ -345,6 +345,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    irr_driver->onUnloadWorld();
+
     if(ReplayPlay::get())
     {
         // Destroy the old replay object, which also stored the ghost

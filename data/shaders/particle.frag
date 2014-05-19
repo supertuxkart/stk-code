@@ -1,7 +1,16 @@
 uniform sampler2D tex;
 uniform sampler2D dtex;
 uniform mat4 invproj;
-uniform vec2 screen;
+
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 
 in float lf;
 in vec2 tc;

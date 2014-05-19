@@ -462,6 +462,8 @@ void RaceManager::startNextRace()
     // functions.
     World::getWorld()->reset();
 
+    irr_driver->onLoadWorld();
+
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
     // The race is rerun, and the points and scores get reset ... but if

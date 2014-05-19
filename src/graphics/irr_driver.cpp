@@ -31,7 +31,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
 #include "graphics/stkmeshscenenode.hpp"
@@ -472,15 +471,11 @@ void IrrDriver::initDevice()
     if (m_glsl)
     {
         Log::info("irr_driver", "GLSL supported.");
-
-        // Order matters, create RTTs as soon as possible, as they are the largest blocks.
-        m_rtts = new RTT();
     }
     // m_glsl might be reset in rtt if an error occurs.
     if(m_glsl)
     {
         m_shaders = new Shaders();
-        m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
@@ -1560,7 +1555,22 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
     mask->drop();
     return t;
 }   // applyMask
-
+// ----------------------------------------------------------------------------
+void IrrDriver::onLoadWorld()
+{
+    if (m_glsl)
+    {
+        const core::recti &viewport = Camera::getCamera(0)->getViewport();
+        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        m_rtts = new RTT(width, height);
+    }
+}
+// ----------------------------------------------------------------------------
+void IrrDriver::onUnloadWorld()
+{
+    delete m_rtts;
+    m_rtts = NULL;
+}
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
  *  \param light The colour of the light to set.
@@ -2370,4 +2380,25 @@ void IrrDriver::clearLights()
     }
 
     m_lights.clear();
+}
+
+// ----------------------------------------------------------------------------
+
+GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
+{
+    return m_rtts->getRenderTarget(which);
+}
+
+// ----------------------------------------------------------------------------
+
+FrameBuffer& IrrDriver::getFBO(TypeFBO which) 
+{
+    return m_rtts->getFBO(which);
+}
+
+// ----------------------------------------------------------------------------
+
+GLuint IrrDriver::getDepthStencilTexture()
+{
+    return m_rtts->getDepthStencilTexture();
 }
