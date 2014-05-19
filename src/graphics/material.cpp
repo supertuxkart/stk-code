@@ -852,13 +852,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->MaterialType = video::EMT_SOLID;
             }
         }
-    if (m_graphical_effect == GE_CAUSTICS && irr_driver->isGLSL())
-        {
-        m->MaterialType = irr_driver->getShader(ES_CAUSTICS);
-
-        m->setTexture(1, irr_driver->getTexture(FileManager::SHADER,
-                                                "caustics.png"));
-        }
 
 
     // Modify lightmap materials so that vertex colors are taken into account.

@@ -31,7 +31,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
 #include "graphics/stkmeshscenenode.hpp"
@@ -477,7 +476,6 @@ void IrrDriver::initDevice()
     if(m_glsl)
     {
         m_shaders = new Shaders();
-        m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
         m_mrt.reallocate(2);

@@ -33,7 +33,6 @@
 #include "graphics/rtts.hpp"
 #include "graphics/screenquad.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_importance.hpp"
 #include "graphics/stkmeshscenenode.hpp"
 #include "graphics/stkinstancedscenenode.hpp"
 #include "graphics/wind.hpp"
@@ -706,17 +705,31 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
 void IrrDriver::renderShadows()
 {
+    GroupedFPSM<FPSM_DEFAULT>::reset();
+    GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::reset();
+    GroupedFPSM<FPSM_NORMAL_MAP>::reset();
     irr_driver->setPhase(SHADOW_PASS);
     glDisable(GL_BLEND);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1.5, 0.);
-    glBindFramebuffer(GL_FRAMEBUFFER, m_rtts->getShadowFBO());
-    glViewport(0, 0, 1024, 1024);
+    m_rtts->getShadowFBO().Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
 
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
+
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
+
+    glUseProgram(MeshShader::ShadowShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
+        drawShadow(*GroupedFPSM<FPSM_DEFAULT>::MeshSet[i], GroupedFPSM<FPSM_DEFAULT>::MVPSet[i]);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
+        drawShadow(*GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i]);
+
+    glUseProgram(MeshShader::RefShadowShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
+        drawShadowRef(*GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i]);
+
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);

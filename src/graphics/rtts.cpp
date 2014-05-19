@@ -53,6 +53,7 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 
 RTT::RTT(size_t width, size_t height)
 {
+    m_shadow_FBO = NULL;
     initGL();
     using namespace video;
     using namespace core;
@@ -107,61 +108,108 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
 
+    std::vector<GLuint> somevector;
+    somevector.push_back(RenderTargetTextures[RTT_SSAO]);
 
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_SSAO]}, res.Width, res.Height));
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
     glClearColor(1., 1., 1., 1.);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_NORMAL_AND_DEPTH]}, DepthStencilTexture, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP1], RenderTargetTextures[RTT_TMP2]}, DepthStencilTexture, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_COLOR]}, DepthStencilTexture, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_LOG_LUMINANCE]}, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_MLAA_COLORS]}, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP1]}, DepthStencilTexture, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP2]}, DepthStencilTexture, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP4]}, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_LINEAR_DEPTH]}, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_HALF1]}, half.Width, half.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_HALF2]}, half.Width, half.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_QUARTER1]}, quarter.Width, quarter.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_QUARTER2]}, quarter.Width, quarter.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_EIGHTH1]}, eighth.Width, eighth.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_EIGHTH2]}, eighth.Width, eighth.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_DISPLACE]}, DepthStencilTexture, res.Width, res.Height));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_1024]}, 1024, 1024));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_512]}, 512, 512));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_512]}, 512, 512));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_256]}, 256, 256));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_256]}, 256, 256));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_BLOOM_128]}, 128, 128));
-    FrameBuffers.push_back(new FrameBuffer(std::vector<GLuint> {RenderTargetTextures[RTT_TMP_128]}, 128, 128));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP1]);
+    somevector.push_back(RenderTargetTextures[RTT_TMP2]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_COLOR]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LOG_LUMINANCE]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_MLAA_COLORS]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP1]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP2]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP4]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_LINEAR_DEPTH]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_HALF1]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_HALF2]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_QUARTER1]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, quarter.Width, quarter.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_QUARTER2]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, quarter.Width, quarter.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_EIGHTH1]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, eighth.Width, eighth.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_EIGHTH2]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, eighth.Width, eighth.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_DISPLACE]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_BLOOM_1024]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 1024, 1024));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_BLOOM_512]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP_512]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 512, 512));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_BLOOM_256]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP_256]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 256, 256));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_BLOOM_128]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
     if (irr_driver->getGLSLVersion() >= 150)
     {
-        glGenFramebuffers(1, &shadowFBO);
-        glBindFramebuffer(GL_FRAMEBUFFER, shadowFBO);
         glGenTextures(1, &shadowColorTex);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
         glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
         glGenTextures(1, &shadowDepthTex);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_COMPONENT24, 1024, 1024, 4, 0, GL_DEPTH_COMPONENT, GL_FLOAT, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowColorTex, 0);
-        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, shadowDepthTex, 0);
-        GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-        assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
+        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_STENCIL, 1024, 1024, 4, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
+
+        somevector.clear();
+        somevector.push_back(shadowColorTex);
+        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 RTT::~RTT()
 {
+    delete m_shadow_FBO;
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (irr_driver->getGLSLVersion() >= 150)
     {
-        glDeleteFramebuffers(1, &shadowFBO);
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }

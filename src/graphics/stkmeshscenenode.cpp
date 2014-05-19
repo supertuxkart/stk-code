@@ -236,28 +236,6 @@ void STKMeshSceneNode::drawSolidPass2(const GLMesh &mesh, ShadedMaterial type)
     case SM_UNLIT:
         drawObjectUnlit(mesh, ModelViewProjectionMatrix);
         break;
-    case SM_CAUSTICS:
-    {
-        const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
-        const float speed = World::getWorld()->getTrack()->getCausticsSpeed();
-
-        float strength = time;
-        strength = fabsf(noise2d(strength / 10.0f)) * 0.006f + 0.001f;
-
-        vector3df wind = irr_driver->getWind() * strength * speed;
-        caustic_dir.X += wind.X;
-        caustic_dir.Y += wind.Z;
-
-        strength = time * 0.56f + sinf(time);
-        strength = fabsf(noise2d(0.0, strength / 6.0f)) * 0.0095f + 0.001f;
-
-        wind = irr_driver->getWind() * strength * speed;
-        wind.rotateXZBy(cosf(time));
-        caustic_dir2.X += wind.X;
-        caustic_dir2.Y += wind.Z;
-        drawCaustics(mesh, ModelViewProjectionMatrix, caustic_dir, caustic_dir2);
-        break;
-    }
     case SM_DETAILS:
         drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
         break;
@@ -335,7 +313,7 @@ void STKMeshSceneNode::render()
         GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         if (reload_each_frame)
             glDisable(GL_CULL_FACE);
@@ -365,10 +343,13 @@ void STKMeshSceneNode::render()
             GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet.push_back(invmodel);
         }
 
-        if (!GeometricMesh[FPSM_GRASS].empty())
-            glUseProgram(MeshShader::GrassPass1Shader::Program);
-        for_in(mesh, GeometricMesh[FPSM_GRASS])
-            drawSolidPass1(*mesh, FPSM_GRASS);
+        if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+        {
+            if (!GeometricMesh[FPSM_GRASS].empty())
+                glUseProgram(MeshShader::GrassPass1Shader::Program);
+            for_in(mesh, GeometricMesh[FPSM_GRASS])
+                drawSolidPass1(*mesh, FPSM_GRASS);
+        }
 
         if (reload_each_frame)
             glEnable(GL_CULL_FACE);
@@ -445,34 +426,6 @@ void STKMeshSceneNode::render()
             glUseProgram(MeshShader::GrassPass2Shader::Program);
         for_in(mesh, ShadedMesh[SM_GRASS])
             drawSolidPass2(*mesh, SM_GRASS);
-
-        if (!ShadedMesh[SM_CAUSTICS].empty())
-            glUseProgram(MeshShader::CausticsShader::Program);
-        for_in(mesh, ShadedMesh[SM_CAUSTICS])
-            drawSolidPass2(*mesh, SM_CAUSTICS);
-
-        if (reload_each_frame)
-            glEnable(GL_CULL_FACE);
-        return;
-    }
-
-    if (irr_driver->getPhase() == SHADOW_PASS)
-    {
-        if (reload_each_frame)
-            glDisable(GL_CULL_FACE);
-
-        GLMesh* mesh;
-        if (!GeometricMesh[FPSM_DEFAULT].empty() || !GeometricMesh[FPSM_NORMAL_MAP].empty())
-            glUseProgram(MeshShader::ShadowShader::Program);
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
-            drawShadow(*mesh, AbsoluteTransformation);
-        for_in(mesh, GeometricMesh[FPSM_NORMAL_MAP])
-            drawShadow(*mesh, AbsoluteTransformation);
-
-        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::RefShadowShader::Program);
-        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-            drawShadowRef(*mesh, AbsoluteTransformation);
 
         if (reload_each_frame)
             glEnable(GL_CULL_FACE);

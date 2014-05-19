@@ -42,11 +42,6 @@ Shaders::Shaders()
     m_callbacks[ES_MIPVIZ] = new MipVizProvider();
     m_callbacks[ES_COLORIZE] = new ColorizeProvider();
     m_callbacks[ES_SUNLIGHT] = new SunLightProvider();
-    m_callbacks[ES_SHADOWPASS] = new ShadowPassProvider();
-    m_callbacks[ES_SHADOW_IMPORTANCE] = new ShadowImportanceProvider();
-    m_callbacks[ES_COLLAPSE] = new CollapseProvider();
-    m_callbacks[ES_MULTIPLY_ADD] = new MultiplyProvider();
-    m_callbacks[ES_SHADOWGEN] = new ShadowGenProvider();
     m_callbacks[ES_DISPLACE] = new DisplaceProvider();
 
     for (s32 i = 0; i < ES_COUNT; i++)
@@ -212,9 +207,6 @@ void Shaders::loadShaders()
     m_shaders[ES_BUBBLES] = glslmat(dir + "pass.vert", dir + "pass.frag",
         m_callbacks[ES_BUBBLES], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
-    m_shaders[ES_RAIN] = glslmat(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_RAIN], EMT_TRANSPARENT_ALPHA_CHANNEL);
-
     m_shaders[ES_MOTIONBLUR] = glsl(dir + "pass.vert", dir + "pass.frag",
         m_callbacks[ES_MOTIONBLUR]);
 
@@ -235,32 +227,6 @@ void Shaders::loadShaders()
     m_shaders[ES_OBJECTPASS_RIMLIT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
     m_shaders[ES_SUNLIGHT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
-
-    m_shaders[ES_SHADOWPASS] = glsl(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_SHADOWPASS]);
-
-    m_shaders[ES_SHADOW_IMPORTANCE] = glsl(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_SHADOW_IMPORTANCE]);
-
-    m_shaders[ES_COLLAPSE] = glsl(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_COLLAPSE]);
-    m_shaders[ES_SHADOW_WARPH] = glsl(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_COLLAPSE]);
-    m_shaders[ES_SHADOW_WARPV] = glsl(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_COLLAPSE]);
-
-    m_shaders[ES_MULTIPLY_ADD] = glslmat(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_MULTIPLY_ADD], EMT_ONETEXTURE_BLEND);
-
-    m_shaders[ES_PENUMBRAH] = glslmat(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_PENUMBRAV] = glslmat(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_GAUSSIAN3H], EMT_SOLID);
-    m_shaders[ES_SHADOWGEN] = glslmat(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_SHADOWGEN], EMT_SOLID);
-
-    m_shaders[ES_CAUSTICS] = glslmat(dir + "pass.vert", dir + "pass.frag",
-        m_callbacks[ES_CAUSTICS], EMT_SOLID);
 
     m_shaders[ES_DISPLACE] = glsl(dir + "pass.vert", dir + "pass.frag",
         m_callbacks[ES_DISPLACE]);
@@ -345,7 +311,6 @@ void Shaders::loadShaders()
     MeshShader::SplattingShader::init();
     MeshShader::GrassPass1Shader::init();
     MeshShader::GrassPass2Shader::init();
-    MeshShader::CausticsShader::init();
     MeshShader::BubbleShader::init();
     MeshShader::TransparentShader::init();
     MeshShader::TransparentFogShader::init();
@@ -1263,54 +1228,6 @@ namespace MeshShader
     void SplattingShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-        glUniform3f(uniform_ambient, s.r, s.g, s.b);
-    }
-
-    GLuint CausticsShader::Program;
-    GLuint CausticsShader::attrib_position;
-    GLuint CausticsShader::attrib_texcoord;
-    GLuint CausticsShader::uniform_MVP;
-    GLuint CausticsShader::uniform_dir;
-    GLuint CausticsShader::uniform_dir2;
-    GLuint CausticsShader::uniform_ambient;
-    GLuint CausticsShader::TU_Albedo;
-    GLuint CausticsShader::TU_caustictex;
-
-    void CausticsShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/caustics.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_dir = glGetUniformLocation(Program, "dir");
-        uniform_dir2 = glGetUniformLocation(Program, "dir2");
-        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
-        GLuint uniform_caustictex = glGetUniformLocation(Program, "caustictex");
-        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
-        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
-        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
-        TU_Albedo = 3;
-        TU_caustictex = 4;
-
-        glUseProgram(Program);
-        glUniform1i(uniform_DiffuseMap, 0);
-        glUniform1i(uniform_SpecularMap, 1);
-        glUniform1i(uniform_SSAO, 2);
-        glUniform1i(uniform_Albedo, TU_Albedo);
-        glUniform1i(uniform_caustictex, TU_caustictex);
-        glUseProgram(0);
-    }
-
-    void CausticsShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniform2f(uniform_dir, dir.X, dir.Y);
-        glUniform2f(uniform_dir2, dir2.X, dir2.Y);
         const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
