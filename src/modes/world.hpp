@@ -310,7 +310,7 @@ public:
     /** Returns a pointer to the Scripting Engine. */
     ScriptEngine   *getScriptEngine() const { return m_script_engine; }
 
-------------------------------------------------------------------------
+	//------------------------------------------------------------------------
     bool            isFogEnabled() const;
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
