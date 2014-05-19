@@ -37,8 +37,7 @@ randomGPInfoDialog::randomGPInfoDialog()
     doInit();
     m_curr_time = 0.0f;
 
-    const int y1 = m_area.getHeight()/7;
-    const int y2 = m_area.getHeight()*6/7;
+    int y1 = m_area.getHeight()/7;
 
     m_gp_ident = "random";
     m_gp = new GrandPrixData(m_number_of_tracks, m_track_group, m_use_reverse);
@@ -51,5 +50,5 @@ randomGPInfoDialog::randomGPInfoDialog()
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
-    InitAfterDrawingTheHeader(y1, y2, "random");
+    InitAfterDrawingTheHeader(m_area.getHeight()/7 + 50, m_area.getHeight()*6/7, "random");
 }

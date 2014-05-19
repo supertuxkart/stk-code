@@ -52,24 +52,20 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
 {
     doInit();
     m_curr_time = 0.0f;
-
-    const int y1 = m_area.getHeight()/7;
-    const int y2 = m_area.getHeight()*6/7;
-
     m_gp_ident = gp_ident;
 
     m_gp = grand_prix_manager->getGrandPrix(gp_ident);
     assert (m_gp != NULL);
 
     // ---- GP Name
-    core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
+    core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/7);
     IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(m_gp->getName()),
                                                                area_top, false, true, // border, word wrap
                                                                m_irrlicht_window);
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
-    InitAfterDrawingTheHeader(y1, y2, gp_ident);
+    InitAfterDrawingTheHeader(m_area.getHeight()/7, m_area.getHeight()*6/7, gp_ident);
 }
 
 // ----------------------------------------------------------------------------
@@ -88,24 +84,23 @@ GPInfoDialog::~GPInfoDialog()
 
 // ----------------------------------------------------------------------------
 
-void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
-                                             const int y2,
+void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
+                                             const int lower_bound,
                                              const std::string& gp_ident)
 {
     // ---- Track listings
     const std::vector<std::string> tracks = m_gp->getTrackNames();
     const int trackAmount = tracks.size();
 
-    int height_of_one_line = (y2 - y1)/(trackAmount+1);
+    int height_of_one_line = (lower_bound - upper_bound)/(trackAmount+1);
     const int textHeight = GUIEngine::getFontHeight();
-    if (height_of_one_line > (int)(textHeight*1.5f)) height_of_one_line = (int)(textHeight*1.5f);
+    if (height_of_one_line > (int)(textHeight*1.5f))
+        height_of_one_line = (int)(textHeight*1.5f);
 
     bool gp_ok = true;
 
     for (int t=0; t<trackAmount; t++)
     {
-        const int from_y = y1 + height_of_one_line*(t+1);
-
         Track* track = track_manager->getTrack(tracks[t]);
         assert(track != NULL);
         stringw lineText = track->getName();
@@ -113,7 +108,7 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
         LabelWidget* widget = new LabelWidget();
         widget->setText(translations->fribidize(lineText), false);
         widget->m_x = 20;
-        widget->m_y = from_y;
+        widget->m_y = upper_bound + height_of_one_line*(t+1);
         widget->m_w = m_area.getWidth()/2 - 20;
         widget->m_h = height_of_one_line;
         widget->setParent(m_irrlicht_window);
@@ -130,9 +125,18 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
 
     m_screenshot_widget->m_x = m_area.getWidth()/2-20;
-    m_screenshot_widget->m_y = y1;
-    m_screenshot_widget->m_w = m_area.getWidth()/2;
-    m_screenshot_widget->m_h = y2 - y1 - 10;
+    m_screenshot_widget->m_y = upper_bound + 10;
+    // Scale the picture to the biggest possible size without an overflow
+    if (lower_bound - upper_bound - 20 < m_area.getWidth()/2*3/4)
+    {
+        m_screenshot_widget->m_w = (lower_bound - upper_bound - 30)*4/3;
+        m_screenshot_widget->m_h = lower_bound - upper_bound - 30;
+    }
+    else
+    {
+        m_screenshot_widget->m_w = m_area.getWidth()/2;
+        m_screenshot_widget->m_h = m_area.getWidth()*3/8; // *(3/4)*(1/2)
+    }
 
     Track* track = (tracks.size() == 0 ? NULL : track_manager->getTrack(tracks[0]));
 
@@ -179,9 +183,9 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
     if (saved_gp && gp_ok)
     {
         continueBtn->m_x = m_area.getWidth()/2 + 110;
-        continueBtn->m_y = y2;
+        continueBtn->m_y = lower_bound;
         continueBtn->m_w = 200;
-        continueBtn->m_h = m_area.getHeight() - y2 - 15;
+        continueBtn->m_h = m_area.getHeight() - lower_bound - 15;
         continueBtn->setParent(m_irrlicht_window);
         m_widgets.push_back(continueBtn);
         continueBtn->add();
@@ -195,9 +199,9 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
         okBtn->m_x = m_area.getWidth()/2 - 200;
     }
 
-    okBtn->m_y = y2;
+    okBtn->m_y = lower_bound;
     okBtn->m_w = 400;
-    okBtn->m_h = m_area.getHeight() - y2 - 15;
+    okBtn->m_h = m_area.getHeight() - lower_bound - 15;
     okBtn->setParent(m_irrlicht_window);
     m_widgets.push_back(okBtn);
     okBtn->add();
@@ -209,8 +213,6 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int y1,
 
 void GPInfoDialog::onEnterPressedInternal()
 {
-    // Save the gp identifier, since dismiss will delete this object.
-    std::string gp_id = m_gp_ident;
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
@@ -223,7 +225,6 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
 {
     if (eventSource == "start")
     {
-        // Save GP identifier, since dismiss will delete this object.
         ModalDialog::dismiss();
         race_manager->startGP(m_gp, false, false);
         return GUIEngine::EVENT_BLOCK;
