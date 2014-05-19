@@ -336,6 +336,17 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
+class RSMShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_normal;
+    static GLuint uniform_MM, uniform_tex, uniform_RSMMatrix;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix, unsigned TU_tex);
+};
+
 class InstancedShadowShader
 {
 public:

@@ -203,6 +203,7 @@ private:
     /** RTTs. */
     RTT                *m_rtts;
     std::vector<core::matrix4> sun_ortho_matrix;
+    core::matrix4      rsm_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */

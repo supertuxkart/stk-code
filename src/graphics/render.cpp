@@ -195,6 +195,12 @@ void IrrDriver::renderGLSL(float dt)
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
                 irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            else if (irr_driver->getRSM())
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
+            }
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
 
@@ -630,6 +636,8 @@ void IrrDriver::renderParticles()
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
+    static int tick = 0;
+    tick++;
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -710,6 +718,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
+    if (!(tick % 100))
+        rsm_matrix = sun_ortho_matrix[3];
     assert(sun_ortho_matrix.size() == 4);
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
@@ -760,7 +770,19 @@ void IrrDriver::renderShadows()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    m_rtts->getRSM().Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(MeshShader::RSMShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
+    {
+        const GLMesh mesh = *GroupedFPSM<FPSM_DEFAULT>::MeshSet[i];
+        if (!mesh.textures[0])
+            continue;
+        compressTexture(mesh.textures[0], true);
+        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        draw<MeshShader::RSMShader>(mesh, mesh.vao_rsm_pass, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
+    }
 }
 
 // ----------------------------------------------------------------------------
