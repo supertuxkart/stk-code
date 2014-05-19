@@ -23,6 +23,7 @@
 #include "achievements/achievement_info.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "io/utf_writer.hpp"
+#include "config/player_manager.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -180,6 +181,15 @@ void Achievement::onRaceEnd()
 }   // onRaceEnd
 
 // ----------------------------------------------------------------------------
+/** Called at the end of a lap to potentially reset values.
+*/
+void Achievement::onLapEnd()
+{
+    if (m_achievement_info->needsResetAfterLap())
+        reset();
+}   // onLapEnd
+
+// ----------------------------------------------------------------------------
 /** Checks if this achievement has been achieved.
  */
 void Achievement::check()
@@ -195,8 +205,16 @@ void Achievement::check()
         GUIEngine::DialogQueue::get()->pushDialog(
             new NotificationDialog(NotificationDialog::T_Achievements, s));
 
-        //send to server
-        Online::CurrentUser::get()->onAchieving(m_id);
+        // Sends a confirmation to the server that an achievement has been
+        // completed, if a user is signed in.
+        if (PlayerManager::isCurrentLoggedIn())
+        {
+            Online::HTTPRequest * request = new Online::HTTPRequest(true);
+            PlayerManager::setUserDetails(request, "achieving");
+            request->addParameter("achievementid", m_id);
+            request->queue();
+        }
+
         m_achieved = true;
     }
 }   // check

@@ -88,7 +88,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
 
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s':",
                                                 clickedTrack->getFilename()   );
@@ -111,7 +111,7 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name, const 
                 Track* clickedTrack = track_manager->getTrack(selection);
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s'",
                                                 clickedTrack->getFilename());
@@ -215,7 +215,7 @@ void TracksScreen::init()
     {
         const GrandPrixData* gp = grand_prix_manager->getGrandPrix(n);
 
-        const std::vector<std::string> &tracks = gp->getTrackNames();
+        const std::vector<std::string> tracks = gp->getTrackNames(true);
 
         std::vector<std::string> sshot_files;
         for (unsigned int t=0; t<tracks.size(); t++)
@@ -238,7 +238,7 @@ void TracksScreen::init()
             sshot_files.push_back("gui/main_help.png");
         }
 
-        if (PlayerManager::get()->getCurrentPlayer()->isLocked(gp->getId()))
+        if (PlayerManager::getCurrentPlayer()->isLocked(gp->getId()))
         {
             gps_widget->addAnimatedItem(_("Locked!"),
                                         "locked", sshot_files, 1.5f, LOCKED_BADGE | TROPHY_BADGE,
@@ -303,7 +303,7 @@ void TracksScreen::buildTrackList()
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if(PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if(PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,
@@ -334,7 +334,7 @@ void TracksScreen::buildTrackList()
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,

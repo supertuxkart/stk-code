@@ -36,6 +36,15 @@
 #include <SColor.h>
 #include "IrrlichtDevice.h"
 #include "ISkinnedMesh.h"
+//#include "graphics/rtts.hpp"
+#include "graphics/shaders.hpp"
+#include "graphics/wind.hpp"
+#include "io/file_manager.hpp"
+#include "utils/aligned_array.hpp"
+#include "utils/no_copy.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/vec3.hpp"
+
 namespace irr
 {
     namespace scene { class ISceneManager; class IMesh; class IAnimatedMeshSceneNode; class IAnimatedMesh;
@@ -45,17 +54,9 @@ namespace irr
 }
 using namespace irr;
 
+class RTT;
+class FrameBuffer;
 class ShadowImportanceProvider;
-
-#include "graphics/rtts.hpp"
-#include "graphics/shaders.hpp"
-#include "graphics/wind.hpp"
-#include "io/file_manager.hpp"
-#include "utils/aligned_array.hpp"
-#include "utils/no_copy.hpp"
-#include "utils/ptr_vector.hpp"
-#include "utils/vec3.hpp"
-
 class AbstractKart;
 class Camera;
 class PerCameraNode;
@@ -65,13 +66,110 @@ class ShadowImportance;
 
 enum STKRenderingPass
 {
-	SOLID_NORMAL_AND_DEPTH_PASS,
-	SOLID_LIT_PASS,
-	TRANSPARENT_PASS,
-	GLOW_PASS,
-	DISPLACEMENT_PASS,
-	SHADOW_PASS,
-	PASS_COUNT,
+    SOLID_NORMAL_AND_DEPTH_PASS,
+    SOLID_LIT_PASS,
+    TRANSPARENT_PASS,
+    GLOW_PASS,
+    DISPLACEMENT_PASS,
+    SHADOW_PASS,
+    PASS_COUNT,
+};
+
+enum TypeFBO
+{
+    FBO_SSAO,
+    FBO_NORMAL_AND_DEPTHS,
+    FBO_COMBINED_TMP1_TMP2,
+    FBO_COLORS,
+    FBO_LOG_LUMINANCE,
+    FBO_MLAA_COLORS,
+    FBO_TMP1_WITH_DS,
+    FBO_TMP2_WITH_DS,
+    FBO_TMP4,
+    FBO_LINEAR_DEPTH,
+    FBO_HALF1,
+    FBO_HALF2,
+    FBO_QUARTER1,
+    FBO_QUARTER2,
+    FBO_EIGHTH1,
+    FBO_EIGHTH2,
+    FBO_DISPLACE,
+    FBO_BLOOM_1024,
+    FBO_BLOOM_512,
+    FBO_TMP_512,
+    FBO_BLOOM_256,
+    FBO_TMP_256,
+    FBO_BLOOM_128,
+    FBO_TMP_128,
+    FBO_COUNT
+};
+
+enum QueryPerf
+{
+    Q_SOLID_PASS1,
+    Q_SHADOWS,
+    Q_LIGHT,
+    Q_SSAO,
+    Q_SOLID_PASS2,
+    Q_TRANSPARENT,
+    Q_PARTICLES,
+    Q_DISPLACEMENT,
+    Q_GODRAYS,
+    Q_BLOOM,
+    Q_TONEMAP,
+    Q_MOTIONBLUR,
+    Q_LAST
+};
+
+enum TypeRTT
+{
+    RTT_TMP1 = 0,
+    RTT_TMP2,
+    RTT_TMP3,
+    RTT_TMP4,
+    RTT_LINEAR_DEPTH,
+    RTT_NORMAL_AND_DEPTH,
+    RTT_COLOR,
+    RTT_LOG_LUMINANCE,
+
+    RTT_HALF1,
+    RTT_HALF2,
+
+    RTT_QUARTER1,
+    RTT_QUARTER2,
+    //    RTT_QUARTER3,
+    //    RTT_QUARTER4,
+
+    RTT_EIGHTH1,
+    RTT_EIGHTH2,
+
+    //    RTT_SIXTEENTH1,
+    //    RTT_SIXTEENTH2,
+
+    RTT_SSAO,
+
+    //    RTT_COLLAPSE,
+    //    RTT_COLLAPSEH,
+    //    RTT_COLLAPSEV,
+    //    RTT_COLLAPSEH2,
+    //    RTT_COLLAPSEV2,
+    //    RTT_WARPH,
+    //    RTT_WARPV,
+
+    //    RTT_HALF_SOFT,
+
+    RTT_DISPLACE,
+    RTT_MLAA_COLORS,
+
+    RTT_BLOOM_1024,
+    RTT_BLOOM_512,
+    RTT_TMP_512,
+    RTT_BLOOM_256,
+    RTT_TMP_256,
+    RTT_BLOOM_128,
+    RTT_TMP_128,
+
+    RTT_COUNT
 };
 
 /**
@@ -82,6 +180,8 @@ enum STKRenderingPass
 class IrrDriver : public IEventReceiver, public NoCopy
 {
 private:
+    int GLMajorVersion, GLMinorVersion;
+    bool hasVSLayer;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -98,10 +198,10 @@ private:
     Shaders              *m_shaders;
     /** Wind. */
     Wind                 *m_wind;
+    float                m_exposure;
+    float                m_lwhite;
     /** RTTs. */
     RTT                *m_rtts;
-    /** Shadow importance. */
-    ShadowImportance   *m_shadow_importance;
     std::vector<core::matrix4> sun_ortho_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
@@ -114,12 +214,15 @@ private:
     /** Matrixes used in several places stored here to avoid recomputation. */
     core::matrix4 m_ViewMatrix, m_InvViewMatrix, m_ProjMatrix, m_InvProjMatrix, m_ProjViewMatrix, m_InvProjViewMatrix;
 
-	std::vector<video::ITexture *> SkyboxTextures;
+    std::vector<video::ITexture *> SkyboxTextures;
+    std::vector<video::ITexture *> SphericalHarmonicsTextures;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];
     float redSHCoeff[9];
 
+    /** Keep a trace of the origin file name of a texture. */
+    std::map<video::ITexture*, std::string> m_texturesFileName;
 
     /** Flag to indicate if a resolution change is pending (which will be
      *  acted upon in the next update). None means no change, yes means
@@ -130,7 +233,7 @@ private:
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
 public:
-    GLuint SkyboxCubeMap, ConvolutedSkyboxCubeMap;
+    GLuint SkyboxCubeMap, FakeSkybox;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -147,6 +250,41 @@ public:
         scene::ISceneNode * node;
         float power;
     };
+
+    unsigned getGLSLVersion() const
+    {
+        if (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion == 3))
+            return GLMajorVersion * 100 + GLMinorVersion * 10;
+        else if (GLMajorVersion == 3)
+            return 100 + (GLMinorVersion + 3) * 10;
+        else
+            return 120;
+    }
+
+    bool hasVSLayerExtension() const
+    {
+        return hasVSLayer;
+    }
+
+    float getExposure() const
+    {
+        return m_exposure;
+    }
+
+    void setExposure(float v)
+    {
+        m_exposure = v;
+    }
+
+    float getLwhite() const
+    {
+      return m_lwhite;
+    }
+
+    void setLwhite(float v)
+    {
+        m_lwhite = v;
+    }
 
 private:
     std::vector<VideoMode> m_modes;
@@ -172,9 +310,9 @@ private:
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
-	/** Performance stats */
+    /** Performance stats */
     unsigned             m_last_light_bucket_distance;
-	unsigned             object_count[PASS_COUNT];
+    unsigned             object_count[PASS_COUNT];
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     bool                 m_query_issued;
@@ -197,7 +335,7 @@ private:
 
     std::vector<scene::ISceneNode *> m_background;
 
-	STKRenderingPass m_phase;
+    STKRenderingPass m_phase;
 
 #ifdef DEBUG
     /** Used to visualise skeletons. */
@@ -211,20 +349,18 @@ private:
 
     void renderFixed(float dt);
     void renderGLSL(float dt);
-    void renderShadows(//ShadowImportanceProvider * const sicb,
-                       scene::ICameraSceneNode * const camnode,
-                       //video::SOverrideMaterial &overridemat,
-                       Camera * const camera);
-    void renderGlow(video::SOverrideMaterial &overridemat,
-                    std::vector<GlowData>& glows,
-                    const core::aabbox3df& cambox,
-                    int cam);
-    void renderLights(const core::aabbox3df& cambox,
-                      scene::ICameraSceneNode * const camnode,
-                      video::SOverrideMaterial &overridemat,
-                      int cam, float dt);
-    void renderDisplacement(video::SOverrideMaterial &overridemat,
-                            int cam);
+    void renderSolidFirstPass();
+    void renderSolidSecondPass();
+    void renderTransparent();
+    void renderParticles();
+    void computeSunVisibility();
+    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
+    void renderShadows();
+    void renderGlow(std::vector<GlowData>& glows);
+    void renderSSAO();
+    void renderLights(scene::ICameraSceneNode * const camnode, float dt);
+    void renderDisplacement();
     void doScreenShot();
 public:
          IrrDriver();
@@ -232,14 +368,14 @@ public:
     void initDevice();
     void reset();
     void generateSkyboxCubemap();
-    void renderSkybox();
-	void setPhase(STKRenderingPass);
-	STKRenderingPass getPhase() const;
+    void renderSkybox(const scene::ICameraSceneNode *camera);
+    void setPhase(STKRenderingPass);
+    STKRenderingPass getPhase() const;
     const std::vector<core::matrix4> &getShadowViewProj() const
     {
         return sun_ortho_matrix;
     }
-	void IncreaseObjectCount();
+    void IncreaseObjectCount();
     core::array<video::IRenderTarget> &getMainSetup();
     void updateConfigIfRelevant();
     void setAllMaterialFlags(scene::IMesh *mesh) const;
@@ -250,7 +386,9 @@ public:
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
     void                  setAmbientLight(const video::SColor &light);
-    video::ITexture      *getTexture(FileManager::AssetType type, 
+    std::string           generateSmallerTextures(const std::string& dir);
+    std::string           getSmallerTexture(const std::string& texture);
+    video::ITexture      *getTexture(FileManager::AssetType type,
                                      const std::string &filename,
                                      bool is_premul=false,
                                      bool is_prediv=false,
@@ -259,6 +397,8 @@ public:
                                      bool is_premul=false,
                                      bool is_prediv=false,
                                      bool complain_if_not_found=true);
+    void                  clearTexturesFileName();
+    std::string           getTextureName(video::ITexture* tex);
     void                  grabAllTextures(const scene::IMesh *mesh);
     void                  dropAllTextures(const scene::IMesh *mesh);
     scene::IMesh         *createQuadMesh(const video::SMaterial *material=NULL,
@@ -285,8 +425,9 @@ public:
     scene::ISceneNode    *addSkyDome(video::ITexture *texture, int hori_res,
                                      int vert_res, float texture_percent,
                                      float sphere_percent);
-    scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names);
-	void suppressSkyBox();
+    scene::ISceneNode    *addSkyBox(const std::vector<video::ITexture*> &texture_names,
+                                    const std::vector<video::ITexture*> &sphericalHarmonics);
+    void suppressSkyBox();
     void                  removeNode(scene::ISceneNode *node);
     void                  removeMeshFromCache(scene::IMesh *mesh);
     void                  removeTexture(video::ITexture *t);
@@ -317,6 +458,7 @@ public:
     void                  setTextureErrorMessage(const std::string &error,
                                                  const std::string &detail="");
     void                  unsetTextureErrorMessage();
+    class GPUTimer        &getGPUTimer(unsigned);
 
     void draw2dTriangle(const core::vector2df &a, const core::vector2df &b,
                         const core::vector2df &c,
@@ -358,7 +500,7 @@ public:
                                 char *detail=NULL)
     {
         if(!detail)
-            return getTexture(filename, std::string(error_message), 
+            return getTexture(filename, std::string(error_message),
                               std::string(""));
 
         return getTexture(filename, std::string(error_message),
@@ -373,7 +515,7 @@ public:
      */
     const std::string &getTextureErrorMessage()
     {
-        return m_texture_error_message; 
+        return m_texture_error_message;
     }   // getTextureErrorMessage
 
     // ------------------------------------------------------------------------
@@ -409,12 +551,14 @@ public:
     // -----------------------------------------------------------------------
     inline void updateShaders()  {m_shaders->loadShaders();}
     // ------------------------------------------------------------------------
-    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num) 
+    inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
     {
         return (m_shaders == NULL ? NULL : m_shaders->m_callbacks[num]);
     }
     // ------------------------------------------------------------------------
-    inline video::ITexture* getRTT(TypeRTT which)  {return m_rtts->getRTT(which);}
+    GLuint getRenderTargetTexture(TypeRTT which);
+    FrameBuffer& getFBO(TypeFBO which);
+    GLuint getDepthStencilTexture();
     // ------------------------------------------------------------------------
     inline bool isGLSL() const { return m_glsl; }
     // ------------------------------------------------------------------------
@@ -498,8 +642,8 @@ public:
     void applyObjectPassShader();
     void applyObjectPassShader(scene::ISceneNode * const node, bool rimlit = false);
     // ------------------------------------------------------------------------
-    scene::ISceneNode *addLight(const core::vector3df &pos, float energy = 1., float r = 1.0f,
-                  float g = 1.0f, float b = 1.0f, bool sun = false, scene::ISceneNode* parent = NULL);
+    scene::ISceneNode *addLight(const core::vector3df &pos, float energy, float radius, float r,
+                  float g, float b, bool sun = false, scene::ISceneNode* parent = NULL);
     // ------------------------------------------------------------------------
     void clearLights();
     // ------------------------------------------------------------------------
@@ -525,6 +669,10 @@ public:
     }   // addDebugMesh
 
 #endif
+
+    void onLoadWorld();
+    void onUnloadWorld();
+
     // --------------------- RTT --------------------
     /**
       * Class that provides RTT (currently, only when no other 3D rendering

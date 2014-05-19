@@ -17,6 +17,11 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/leak_check.hpp"
+
 namespace irr {
     namespace video {
         class ITexture;
@@ -25,59 +30,28 @@ namespace irr {
 
 using irr::video::ITexture;
 
-enum TypeRTT
-{
-    RTT_TMP1 = 0,
-    RTT_TMP2,
-    RTT_TMP3,
-    RTT_TMP4,
-    RTT_NORMAL_AND_DEPTH,
-    RTT_COLOR,
-
-    RTT_HALF1,
-    RTT_HALF2,
-
-    RTT_QUARTER1,
-    RTT_QUARTER2,
-    RTT_QUARTER3,
-    RTT_QUARTER4,
-
-    RTT_EIGHTH1,
-    RTT_EIGHTH2,
-
-    RTT_SIXTEENTH1,
-    RTT_SIXTEENTH2,
-
-    RTT_SSAO,
-
-    RTT_COLLAPSE,
-    RTT_COLLAPSEH,
-    RTT_COLLAPSEV,
-    RTT_COLLAPSEH2,
-    RTT_COLLAPSEV2,
-    RTT_WARPH,
-    RTT_WARPV,
-
-    RTT_HALF_SOFT,
-
-    RTT_DISPLACE,
-
-    RTT_COUNT
-};
 
 class RTT
 {
 public:
-    RTT();
+    RTT(size_t width, size_t height);
     ~RTT();
 
-    ITexture *getRTT(TypeRTT which);
-    unsigned getShadowFBO() const { return shadowFBO; }
+    FrameBuffer &getShadowFBO() { return *shadowFBO; }
     unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
+    unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
+    unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
+    FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
-    ITexture *rtts[RTT_COUNT];
-    unsigned shadowFBO, shadowColorTex, shadowDepthTex;
+    unsigned RenderTargetTextures[RTT_COUNT];
+    PtrVector<FrameBuffer> FrameBuffers;
+    unsigned DepthStencilTexture;
+
+    unsigned shadowColorTex, shadowDepthTex;
+    FrameBuffer* shadowFBO;
+
+    LEAK_CHECK();
 };
 
 #endif

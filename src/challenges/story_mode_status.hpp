@@ -111,9 +111,9 @@ public:
     /** Returns if this is the first time the intro is shown. */
     bool       isFirstTime() const   { return m_first_time; }
     // ------------------------------------------------------------------------
-    const ChallengeStatus *getCurrentChallengeStatus() const 
+    const ChallengeStatus *getCurrentChallengeStatus() const
     {
-        return m_current_challenge; 
+        return m_current_challenge;
     }   // getCurrentChallengeStatus
     // ------------------------------------------------------------------------
     /** Returns a challenge given the challenge id.

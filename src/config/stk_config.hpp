@@ -67,7 +67,7 @@ public:
     float m_parachute_ubound_fraction; /**<Upper bound fraction of speed when
                                            lost will detach parachute.         */
     float m_parachute_lbound_fraction; /**<Lower bound fraction of speed when
-                                           lost will detach parachute.	       */
+                                           lost will detach parachute.           */
     float m_parachute_max_speed;       /**<Max speed to rate current speed     */
     float m_parachute_time;            /**<Time a parachute is active.         */
     float m_parachute_time_other;      /**<Time a parachute attached to other
@@ -137,8 +137,7 @@ public:
     std::vector<int> m_score_increase;
 
     /** Filename of the title music to play.*/
-    MusicInformation
-         *m_title_music;
+    MusicInformation *m_title_music;
 
     /** Minimum time between consecutive saved tranform events.  */
     float m_replay_dt;

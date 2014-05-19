@@ -347,6 +347,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    irr_driver->onUnloadWorld();
+
     if(ReplayPlay::get())
     {
         // Destroy the old replay object, which also stored the ghost
@@ -447,6 +449,7 @@ void World::terminateRace()
                      &best_player);
     }
 
+    // Check achievements
     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_COLUMBUS,
                                        getTrack()->getIdent(), 1);
     if (raceHasLaps())
@@ -454,7 +457,65 @@ void World::terminateRace()
         PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_MARATHONER,
                                            "laps", race_manager->getNumLaps());
     }
-    PlayerManager::get()->getCurrentPlayer()->raceFinished();
+    
+    Achievement *achiev = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER);
+    if (achiev)
+    {
+        std::string mode_name = getIdent(); // Get the race mode name
+        int winner_position = 1;
+        unsigned int opponents = achiev->getInfo()->getGoalValue("opponents"); // Get the required opponents number
+        if (mode_name == IDENT_FTL)
+        {
+            winner_position = 2;
+            opponents++;
+        }
+        for(unsigned int i = 0; i < kart_amount; i++)
+        {
+            // Retrieve the current player
+            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
+            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            {
+                // Check if the player has won
+                if (m_karts[i]->getPosition() == winner_position && kart_amount > opponents )
+                {
+                    // Update the achievement
+                    mode_name = StringUtils::toLowerCase(mode_name);
+                    if (achiev->getValue("opponents") <= 0)
+                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
+                                                            "opponents", opponents);
+                    PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_GOLD_DRIVER,
+                                                        mode_name, 1);
+                }
+            }
+        } // for i < kart_amount
+    } // if (achiev)
+    
+    Achievement *win = PlayerManager::getCurrentAchievementsStatus()->getAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE);
+    //if achivement has been unlocked
+    if (win->getValue("wins") < 5 )
+    {
+        for(unsigned int i = 0; i < kart_amount; i++)
+        {
+            // Retrieve the current player
+            StateManager::ActivePlayer* p = m_karts[i]->getController()->getPlayer();
+            if (p && p->getConstProfile() == PlayerManager::getCurrentPlayer())
+            {
+                // Check if the player has won
+                if (m_karts[i]->getPosition() == 1 )
+                {
+                    // Increase number of consecutive wins
+                       PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_UNSTOPPABLE,
+                                                            "wins", 1);
+                }
+                else
+                {
+                      //Set number of consecutive wins to 0
+                      win->reset();
+                }
+            }
+         }
+    }
+    PlayerManager::getCurrentPlayer()->raceFinished();
 
     if (m_race_gui) m_race_gui->clearAllMessages();
     // we can't delete the race gui here, since it is needed in case of
@@ -564,8 +625,14 @@ void World::resetAllKarts()
     // Stil wait will all karts are in rest (and handle the case that a kart
     // fell through the ground, which can happen if a kart falls for a long
     // time, therefore having a high speed when hitting the ground.
+    int count = 0;
     while(!all_finished)
     {
+        if (count++ > 100)
+        {
+            Log::error("World", "Infitine loop waiting for all_finished?");
+            break;
+        }
         m_physics->update(1.f/60.f);
         all_finished=true;
         for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
@@ -758,7 +825,7 @@ void World::updateWorld(float dt)
                 InputDevice* device = input_manager->getDeviceList()->getKeyboard(0);
 
                 // Create player and associate player with keyboard
-                StateManager::get()->createActivePlayer(PlayerManager::get()->getCurrentPlayer(),
+                StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
                                                         device, NULL);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
@@ -1121,6 +1188,13 @@ void World::delayedSelfDestruct()
 void World::escapePressed()
 {
     new RacePausedDialog(0.8f, 0.6f);
+}
+
+//-----------------------------------------------------------------------------
+
+bool World::isFogEnabled() const
+{
+    return m_track != NULL && m_track->isFogEnabled();
 }
 
 /* EOF */

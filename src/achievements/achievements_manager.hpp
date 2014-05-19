@@ -71,13 +71,12 @@ public:
     }   // destroy
     // ========================================================================
 
-    void onRaceEnd();
     AchievementInfo* getAchievementInfo(uint32_t id) const;
     AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);
     // ------------------------------------------------------------------------
     const std::map<uint32_t, AchievementInfo *> & getAllInfo()
     {
-        return m_achievements_info; 
+        return m_achievements_info;
     }  // getAllInfo
 
 };   // class AchievementsManager

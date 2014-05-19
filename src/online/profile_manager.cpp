@@ -19,7 +19,6 @@
 
 #include "online/profile_manager.hpp"
 
-#include "online/current_user.hpp"
 #include "online/online_profile.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -124,7 +123,7 @@ void ProfileManager::addDirectToCache(OnlineProfile* profile)
     assert(profile != NULL);
     if (m_profiles_cache.size() == m_max_cache_size)
     {
-        // We have to replace a cached entry, find one entry that 
+        // We have to replace a cached entry, find one entry that
         // doesn't have its used bit set
         ProfilesMap::iterator iter;
         for (iter = m_profiles_cache.begin(); iter != m_profiles_cache.end();)
@@ -203,7 +202,7 @@ bool ProfileManager::inPersistent(const uint32_t id)
 }   // inPersistent
 
 // ------------------------------------------------------------------------
-/** Adds a profile to the persistent map. If a profile with the same id 
+/** Adds a profile to the persistent map. If a profile with the same id
  *  is already in there, the profiles are "merged" with the goal to save as
  *  much information (i.e. one profile instance could have already fetched
  *  the friends, while the other could have fetched the achievements.)
@@ -244,7 +243,7 @@ void ProfileManager::deleteFromPersistent(const uint32_t id)
 void ProfileManager::clearPersistent()
 {
     ProfilesMap::iterator it;
-    for (it  = m_profiles_persistent.begin(); 
+    for (it  = m_profiles_persistent.begin();
          it != m_profiles_persistent.end(); ++it)
     {
         delete it->second;
@@ -266,7 +265,7 @@ void ProfileManager::moveToCache(const uint32_t id)
         addToCache(profile);
     }
     else
-        Log::warn("ProfileManager", 
+        Log::warn("ProfileManager",
                   "Tried to move profile with id %d from persistent to "
                   "cache while not present", id);
 }   // moveToCache

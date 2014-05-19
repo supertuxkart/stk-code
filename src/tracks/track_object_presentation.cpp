@@ -26,6 +26,7 @@
 #include "graphics/material_manager.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "input/device_manager.hpp"
@@ -34,7 +35,7 @@
 #include "modes/world.hpp"
 #include "states_screens/dialogs/race_paused_dialog.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "tracks/lod_node_loader.hpp"
+#include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "scriptengine/script_engine.hpp";
@@ -142,10 +143,10 @@ TrackObjectPresentationEmpty::~TrackObjectPresentationEmpty()
 // ----------------------------------------------------------------------------
 
 TrackObjectPresentationLOD::TrackObjectPresentationLOD(const XMLNode& xml_node,
-    scene::ISceneNode* parent, LodNodeLoader& lod_loader) :
+    scene::ISceneNode* parent, ModelDefinitionLoader& model_def_loader) :
     TrackObjectPresentationSceneNode(xml_node)
 {
-    m_node = lod_loader.instanciate(&xml_node, parent);
+    m_node = model_def_loader.instanciateAsLOD(&xml_node, parent);
     if (m_node == NULL) throw std::runtime_error("Cannot load LOD node");
     m_node->setPosition(m_init_xyz);
     m_node->setRotation(m_init_hpr);
@@ -156,6 +157,59 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 {
     if (m_node)
         irr_driver->removeNode(m_node);
+}
+
+// ----------------------------------------------------------------------------
+
+TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNode& xml_node,
+    scene::ISceneNode* parent,
+    ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
+{
+    m_instancing_group = NULL;
+    m_fallback_scene_node = NULL;
+
+    std::string instancing_model;
+    xml_node.get("instancing_model", &instancing_model);
+
+    m_node = irr_driver->getSceneManager()->addEmptySceneNode(parent);
+    m_node->setPosition(m_init_xyz);
+    m_node->setRotation(m_init_hpr);
+    m_node->setScale(m_init_scale);
+    m_node->updateAbsolutePosition();
+    if (irr_driver->isGLSL())
+    {
+        m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
+            m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
+            instancing_model);
+    }
+    else
+    {
+        scene::IMesh* mesh = model_def_loader.getFirstMeshFor(instancing_model);
+        scene::IMeshSceneNode* node = irr_driver->addMesh(mesh, m_node);
+        node->grab();
+        irr_driver->grabAllTextures(mesh);
+        mesh->grab();
+        World::getWorld()->getTrack()->addNode(node);
+
+        m_fallback_scene_node = node;
+    }
+}
+
+TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
+{
+    if (m_instancing_group != NULL)
+        m_instancing_group->instanceDrop();
+
+    if (m_fallback_scene_node != NULL)
+    {
+        scene::IMesh* mesh = m_fallback_scene_node->getMesh();
+        irr_driver->dropAllTextures(mesh);
+        mesh->drop();
+        if (mesh->getReferenceCount() == 1)
+            irr_driver->removeMeshFromCache(mesh);
+
+        m_fallback_scene_node->drop();
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -172,6 +226,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     std::string model_name;
     xml_node.get("model",   &model_name  );
 
+    m_model_file = model_name;
     m_is_in_skybox = false;
     std::string render_pass;
     xml_node.get("renderpass", &render_pass);
@@ -192,9 +247,9 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
                      World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	xml_node.get("displacing", &displacing);
-	animated &= !displacing;
+    bool displacing = false;
+    xml_node.get("displacing", &displacing);
+    animated &= !displacing;
 
     if (animated)
     {
@@ -221,6 +276,22 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
 }
 
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(
+    scene::IAnimatedMesh* model, const core::vector3df& xyz,
+    const core::vector3df& hpr, const core::vector3df& scale) :
+    TrackObjectPresentationSceneNode(xyz, hpr, scale)
+{
+    m_is_looped = false;
+    m_mesh = NULL;
+    m_node = NULL;
+
+    bool animated = (UserConfigParams::m_graphical_effects ||
+        World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_mesh = model;
+    init(NULL, NULL, true);
+}
+
+TrackObjectPresentationMesh::TrackObjectPresentationMesh(
         const std::string& model_file, const core::vector3df& xyz,
         const core::vector3df& hpr, const core::vector3df& scale) :
         TrackObjectPresentationSceneNode(xyz, hpr, scale)
@@ -231,6 +302,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(
 
     bool animated = (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
+
+    m_model_file = model_file;
 
     if (file_manager->fileExists(model_file))
     {
@@ -260,10 +333,10 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
 
     bool animated = skeletal_animation && (UserConfigParams::m_graphical_effects ||
              World::getWorld()->getIdent() == IDENT_CUTSCENE);
-	bool displacing = false;
-	if(xml_node)
+    bool displacing = false;
+    if(xml_node)
         xml_node->get("displacing", &displacing);
-	animated &= !displacing;
+    animated &= !displacing;
 
     m_mesh->grab();
     irr_driver->grabAllTextures(m_mesh);
@@ -344,10 +417,9 @@ void TrackObjectPresentationMesh::reset()
         a_node->OnAnimate(0);
         a_node->OnAnimate(0);
 
-        if(m_is_looped)
-        {
-            a_node->setFrameLoop(m_frame_start, m_frame_end);
-        }
+        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
+        // last frame, even if looping is disabled
+        a_node->setFrameLoop(m_frame_start, m_frame_end);
     }
 }
 
@@ -585,7 +657,7 @@ TrackObjectPresentationParticles::TrackObjectPresentationParticles(const XMLNode
     }
     catch (std::runtime_error& e)
     {
-        fprintf(stderr, "[Track] WARNING: Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
+        Log::warn ("Track", "Could not load particles '%s'; cause :\n    %s", path.c_str(), e.what());
     }
 }
 
@@ -627,15 +699,15 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
     xml_node.get("color", &m_color);
     const video::SColorf colorf(m_color);
 
-    //m_distance = 25.0f;
-    //xml_node.get("distance", &m_distance);
-
     m_energy = 1.0f;
     xml_node.get("energy", &m_energy);
 
+    m_distance = 20. * m_energy;
+    xml_node.get("distance", &m_distance);
+
     if (irr_driver->isGLSL())
     {
-        m_node = irr_driver->addLight(m_init_xyz, m_energy, colorf.r, colorf.g, colorf.b, false, parent);
+        m_node = irr_driver->addLight(m_init_xyz, m_energy, m_distance, colorf.r, colorf.g, colorf.b, false, parent);
     }
     else
     {
@@ -740,6 +812,16 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
         new TutorialMessageDialog(_("Collect gift boxes, and fire the weapon with <%s> to blow away these boxes!", fire),
                                 true);
+    }
+    else if (m_action == "tutorial_backgiftboxes")
+    {
+        m_action_active = false;
+        InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+        DeviceConfig* config = device->getConfiguration();
+        irr::core::stringw fire = config->getBindingAsString(PA_FIRE);
+        
+        new TutorialMessageDialog(_("Press <B> to look behind, to fire the weapon with <%s> while pressing <B> to to fire behind!", fire),
+                                  true);
     }
     else if (m_action == "tutorial_nitro_collect")
     {

@@ -20,6 +20,7 @@
 #define HEADER_PLAYER_PROFILE_HPP
 
 #include "challenges/story_mode_status.hpp"
+#include "utils/leak_check.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/types.hpp"
 
@@ -28,23 +29,46 @@ using namespace irr;
 
 #include <string>
 
-class UTFWriter;
 class AchievementsStatus;
+namespace Online
+{
+    class CurrentUser; 
+    class HTTPRequest;
+    class OnlineProfile;
+    class XMLRequest;
+}
+class UTFWriter;
 
-/** Class for managing player profiles (name, usage frequency, 
+/** Class for managing player profiles (name, usage frequency,
  *  etc.). All PlayerProfiles are managed by the PlayerManager.
  *  A PlayerProfile keeps track of the story mode progress using an instance
  *  of StoryModeStatus, and achievements with AchievementsStatus. All data
  *  is saved in the players.xml file.
+ *  This class also defines the interface for handling online data. All of
+ *  the online handling is done in the derived class OnlinePlayerProfile,
+ *  where the interface is fully implemented.
  * \ingroup config
  */
 class PlayerProfile : public NoCopy
 {
-private:
+public:
+    /** The online state a player can be in. */
+    enum OnlineState
+    {
+        OS_SIGNED_OUT = 0,
+        OS_SIGNED_IN,
+        OS_GUEST,
+        OS_SIGNING_IN,
+        OS_SIGNING_OUT
+    };
 
-    /** The name of the player (wide string, so it can be in native 
+
+private:
+    LEAK_CHECK()
+
+    /** The name of the player (wide string, so it can be in native
      *  language). */
-    core::stringw m_name;
+    core::stringw m_local_name;
 
     /** True if this account is a guest account. */
     bool m_is_guest_account;
@@ -62,6 +86,15 @@ private:
     /** True if this is the default (last used) player. */
     bool m_is_default;
 
+    /** True if this user has a saved session. */
+    bool m_saved_session;
+
+    /** If a session was saved, this will be the online user id to use. */
+    int m_saved_user_id;
+
+    /** The token of the saved session. */
+    std::string m_saved_token;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -69,24 +102,37 @@ private:
 
 public:
 
-    PlayerProfile(const core::stringw& name, bool is_guest = false);
-
-    PlayerProfile(const XMLNode* node);
-
+         PlayerProfile(const core::stringw &name, bool is_guest = false);
+         PlayerProfile(const XMLNode *node);
+    virtual ~PlayerProfile();
     void save(UTFWriter &out);
+    void loadRemainingData(const XMLNode *node);
+    void initRemainingData();
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
     bool operator>(const PlayerProfile &other);
     void raceFinished();
+    void saveSession(int user_id, const std::string &token);
+    void clearSession();
 
-    // ------------------------------------------------------------------------
-    ~PlayerProfile()
-    {
-        #ifdef DEBUG
-        m_magic_number = 0xDEADBEEF;
-        #endif
-    }   // ~PlayerProfile
-
+    /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
+    virtual void setUserDetails(Online::HTTPRequest *request,
+                                const std::string &action,
+                                const std::string &php_script = "") = 0;
+    virtual uint32_t getOnlineId() const = 0;
+    virtual PlayerProfile::OnlineState getOnlineState() const = 0;
+    virtual Online::OnlineProfile* getProfile() const = 0;
+    virtual void requestPoll() const = 0;
+    virtual void requestSavedSession() = 0;
+    virtual void onSTKQuit() const = 0;
+    virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
+                                              const irr::core::stringw &password,
+                                              bool save_session,
+                                              bool request_now = true) = 0;
+    virtual void signIn(bool success, const XMLNode * input) = 0;
+    virtual void signOut(bool success, const XMLNode * input) = 0;
+    virtual void requestSignOut() = 0;
+    virtual bool isLoggedIn() const { return false;  }
     // ------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)
@@ -94,17 +140,15 @@ public:
         #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
         #endif
-        m_name = name;
+        m_local_name = name;
     }   // setName
 
     // ------------------------------------------------------------------------
     /** Returns the name of this player. */
     core::stringw getName() const
     {
-        #ifdef DEBUG
         assert(m_magic_number == 0xABCD1234);
-        #endif
-        return m_name.c_str();
+        return m_local_name.c_str();
     }   // getName
 
     // ------------------------------------------------------------------------
@@ -130,14 +174,14 @@ public:
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
     {
-        return m_story_mode_status->isLocked(feature); 
+        return m_story_mode_status->isLocked(feature);
     }   // isLocked
     // ------------------------------------------------------------------------
     /** Returns all active challenges. */
     void computeActive() { m_story_mode_status->computeActive(); }
     // ------------------------------------------------------------------------
     /** Returns the list of recently completed challenges. */
-    std::vector<const ChallengeData*> getRecentlyCompletedChallenges() 
+    std::vector<const ChallengeData*> getRecentlyCompletedChallenges()
     {
         return m_story_mode_status->getRecentlyCompletedChallenges();
     }   // getRecently Completed Challenges
@@ -173,7 +217,7 @@ public:
     // ------------------------------------------------------------------------
     unsigned int getNumEasyTrophies() const
     {
-        return m_story_mode_status->getNumEasyTrophies(); 
+        return m_story_mode_status->getNumEasyTrophies();
     }   // getNumEasyTrophies
     // ------------------------------------------------------------------------
     unsigned int getNumMediumTrophies() const
@@ -183,14 +227,31 @@ public:
     // -----------------------------------------------------------------------
     unsigned int getNumHardTrophies() const
     {
-        return m_story_mode_status->getNumHardTrophies(); 
+        return m_story_mode_status->getNumHardTrophies();
     }   // getNumHardTropies
     // ------------------------------------------------------------------------
-    AchievementsStatus* getAchievementsStatus() 
+    AchievementsStatus* getAchievementsStatus()
     {
         return m_achievements_status;
     }   // getAchievementsStatus
-
+    // ------------------------------------------------------------------------
+    /** Returns true if a session was saved for this player. */
+    bool hasSavedSession() const { return m_saved_session;  }
+    // ------------------------------------------------------------------------
+    /** If a session was saved, return the id of the saved user. */
+    int getSavedUserId() const
+    { 
+        assert(m_saved_session);
+        return m_saved_user_id;
+    }   // getSavedUserId
+    // ------------------------------------------------------------------------
+    /** If a session was saved, return the token to use. */
+    const std::string& getSavedToken() const
+    {
+        assert(m_saved_session);
+        return m_saved_token;
+    }   // getSavedToken
+    // ------------------------------------------------------------------------
 };   // class PlayerProfile
 
 #endif

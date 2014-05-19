@@ -69,7 +69,7 @@ private:
     IConfirmDialogListener* m_listener;
     bool m_own_listener;
     irr::core::stringw m_msg;
-    void doInit(MessageDialogType type, IConfirmDialogListener* listener, 
+    void doInit(MessageDialogType type, IConfirmDialogListener* listener,
                 bool own_listener);
 
 public:
@@ -80,7 +80,7 @@ public:
       * \param If set to true, 'listener' will be owned by this dialog and deleted
       *        along with the dialog.
       */
-    MessageDialog(const irr::core::stringw &msg, MessageDialogType type, 
+    MessageDialog(const irr::core::stringw &msg, MessageDialogType type,
                   IConfirmDialogListener* listener, bool delete_listener);
     
     /**

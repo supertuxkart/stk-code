@@ -25,6 +25,7 @@ using namespace irr;
 
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
+#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
@@ -78,8 +79,8 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
     else if(shape=="sphere"   ) m_body_type = MP_SPHERE;
     else if(shape=="exact"    ) m_body_type = MP_EXACT;
 
-    else 
-        Log::error("PhysicalObject", "Unknown shape type : %s.", 
+    else
+        Log::error("PhysicalObject", "Unknown shape type : %s.",
                    shape.c_str());
 }   // Settings(XMLNode)
 
@@ -241,6 +242,16 @@ void PhysicalObject::init()
             max = 1.0f;
             min = 0.0f;
             assert(false);
+        }
+    }
+    else if (dynamic_cast<TrackObjectPresentationInstancing*>(presentation) != NULL)
+    {
+        TrackObjectPresentationInstancing* instancing = dynamic_cast<TrackObjectPresentationInstancing*>(presentation);
+        STKInstancedSceneNode* instancing_group = instancing->getInstancingGroup();
+        if (instancing_group != NULL)
+        {
+            scene::IMesh* mesh = instancing_group->getMesh();
+            MeshTools::minMax3D(mesh, &min, &max);
         }
     }
     else
@@ -458,7 +469,8 @@ void PhysicalObject::init()
                          btVector3(0,extend.getY()*0.5f, 0));
     m_motion_state = new btDefaultMotionState(m_init_pos);
     btVector3 inertia;
-    m_shape->calculateLocalInertia(m_mass, inertia);
+    if (m_body_type != MP_EXACT)
+        m_shape->calculateLocalInertia(m_mass, inertia);
     btRigidBody::btRigidBodyConstructionInfo info(m_mass, m_motion_state,
                                                   m_shape, inertia);
 
@@ -554,7 +566,7 @@ void PhysicalObject::handleExplosion(const Vec3& pos, bool direct_hit)
  */
 bool PhysicalObject::isSoccerBall() const
 {
-    return m_object->isSoccerBall(); 
+    return m_object->isSoccerBall();
 }   // is SoccerBall
 
 // ----------------------------------------------------------------------------
@@ -565,7 +577,7 @@ bool PhysicalObject::isSoccerBall() const
  */
 void PhysicalObject::hit(const Material *m, const Vec3 &normal)
 {
-    if(isSoccerBall() && m != NULL && 
+    if(isSoccerBall() && m != NULL &&
        m->getCollisionReaction() == Material::PUSH_SOCCER_BALL)
     {
         m_body->applyCentralImpulse(normal * 1000.0f);

@@ -1,13 +1,14 @@
-#version 330 compatibility
 uniform vec2 PIXEL_SIZE;
-uniform mat4 ModelViewProjectionMatrix;
+
+in vec2 Position;
+in vec2 Texcoord;
 
 out vec4 offset[2];
 out vec2 uv;
 
 void main() {
-	gl_Position = ModelViewProjectionMatrix * gl_Vertex;
-	vec4 invy = gl_MultiTexCoord0;
+	gl_Position = vec4(Position, 0., 1.);
+	vec4 invy = vec4(Texcoord, Texcoord);
 //	invy.y = 1.0 - invy.y;
 	uv = invy.st;
 

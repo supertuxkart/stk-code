@@ -284,8 +284,8 @@ void RaceManager::startNew(bool from_overworld)
     {
         // GP: get tracks, laps and reverse info from grand prix
         m_tracks        = m_grand_prix.getTrackNames();
-        m_grand_prix.getLaps(&m_num_laps);
-        m_grand_prix.getReverse(&m_reverse_track);
+        m_num_laps      = m_grand_prix.getLaps();
+        m_reverse_track = m_grand_prix.getReverse();
     }
     //assert(m_player_karts.size() > 0);
 
@@ -340,7 +340,7 @@ void RaceManager::startNew(bool from_overworld)
     }
 
     m_track_number = 0;
-    if(m_major_mode==MAJOR_MODE_GRAND_PRIX && 
+    if(m_major_mode==MAJOR_MODE_GRAND_PRIX &&
         !NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // offline mode only
     {
         //We look if Player 1 has a saved version of this GP.
@@ -461,6 +461,8 @@ void RaceManager::startNextRace()
     // Calling this here reduces code duplication in init and restartRace()
     // functions.
     World::getWorld()->reset();
+
+    irr_driver->onLoadWorld();
 
     // Save the current score and set last time to zero. This is necessary
     // if someone presses esc after finishing a gp, and selects restart:
@@ -632,7 +634,7 @@ void RaceManager::exitRace(bool delete_world)
     // were finished, and not when a race is aborted.
     if (m_major_mode==MAJOR_MODE_GRAND_PRIX && m_track_number==(int)m_tracks.size())
     {
-        PlayerManager::get()->getCurrentPlayer()->grandPrixFinished();
+        PlayerManager::getCurrentPlayer()->grandPrixFinished();
         if(m_major_mode==MAJOR_MODE_GRAND_PRIX&& !NetworkWorld::getInstance()->isRunning())
         {
             //Delete saved GP
@@ -685,23 +687,43 @@ void RaceManager::exitRace(bool delete_world)
 
         if (someHumanPlayerWon)
         {
-            StateManager::get()->pushScreen( GrandPrixWin::getInstance()  );
-            GrandPrixWin::getInstance()->setKarts(winners);
+            if (delete_world) World::deleteWorld();
+            delete_world = false;
+
+            StateManager::get()->enterGameState();
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+            race_manager->setNumKarts(0);
+            race_manager->setNumPlayers(0);
+            race_manager->setNumLocalPlayers(0);
+            race_manager->startSingleRace("gpwin", 999, false);
+            GrandPrixWin* scene = GrandPrixWin::getInstance();
+            StateManager::get()->pushScreen(scene);
+            scene->setKarts(winners);
         }
         else
         {
-            StateManager::get()->pushScreen( GrandPrixLose::getInstance()  );
+            if (delete_world) World::deleteWorld();
+            delete_world = false;
+
+            StateManager::get()->enterGameState();
+            race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+            race_manager->setNumKarts(0);
+            race_manager->setNumPlayers(0);
+            race_manager->setNumLocalPlayers(0);
+            race_manager->startSingleRace("gplose", 999, false);
+            GrandPrixLose* scene = GrandPrixLose::getInstance();
+            StateManager::get()->pushScreen(scene);
 
             if (humanLosers.size() >= 1)
             {
-                GrandPrixLose::getInstance()->setKarts( humanLosers );
+                scene->setKarts(humanLosers);
             }
             else
             {
                 std::cerr << "RaceManager::exitRace() : what's going on?? no winners and no losers??\n";
                 std::vector<std::string> karts;
                 karts.push_back(UserConfigParams::m_default_kart);
-                GrandPrixLose::getInstance()->setKarts( karts );
+                scene->setKarts(karts);
             }
         }
     }
@@ -752,7 +774,7 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld, 
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
                           bool continue_saved_gp)
 {
     assert(gp != NULL);

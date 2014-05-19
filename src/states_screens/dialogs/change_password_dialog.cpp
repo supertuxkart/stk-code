@@ -18,11 +18,13 @@
 #include "states_screens/dialogs/change_password_dialog.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets.hpp"
+#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/messages.hpp"
 
 #include <IGUIEnvironment.h>
 #include <irrString.h>
@@ -33,10 +35,12 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace Online;
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
-ChangePasswordDialog::ChangePasswordDialog() :
-        ModalDialog(0.8f,0.7f)
+/** Creates a modal dialog with given percentage of screen width and height
+ */
+ChangePasswordDialog::ChangePasswordDialog() 
+                    : ModalDialog(0.8f,0.7f)
 {
     m_self_destroy = false;
     m_success = false;
@@ -65,15 +69,59 @@ ChangePasswordDialog::ChangePasswordDialog() :
     assert(m_submit_widget != NULL);
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-}
+}   // ChangePasswordDialog
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 ChangePasswordDialog::~ChangePasswordDialog()
 {
-}
+}   // ~ChangePasswordDialog
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
+/** Create and submit the request to the server to change the password.
+ *  \param current_password The current password.
+ *  \param new_password The new password.
+ */
+void ChangePasswordDialog::changePassword(const stringw &current_password,
+                                          const stringw &new_password      )
+{
+
+    // ----------------------------------------------------------------
+    class ChangePasswordRequest : public XMLRequest
+    {
+        /** Callback for the change password request. If the matching dialog is
+         *  still open, show a confirmation message. */
+        virtual void callback()
+        {
+            if (!GUIEngine::ModalDialog::isADialogActive()) return;
+            ChangePasswordDialog * dialog =
+                dynamic_cast<ChangePasswordDialog*>(GUIEngine::ModalDialog
+                                                     ::getCurrent());
+            if (dialog)
+            {
+                if (isSuccess())
+                    dialog->success();
+                else
+                    dialog->error(getInfo());
+            }   // if dialog
+        }   // callback
+
+    public:
+        ChangePasswordRequest() : XMLRequest(true) {}
+    };   // ChangePasswordRequest
+    // ------------------------------------------------------------------------
+
+    ChangePasswordRequest * request = new ChangePasswordRequest();
+    PlayerManager::setUserDetails(request, "change_password");
+    request->addParameter("current", current_password);
+    // The server code expects two passwords (and verifies again that they
+    // are identical), so send the passwod twice.
+    request->addParameter("new1", new_password);
+    request->addParameter("new2", new_password);
+    request->queue();
+}   // changePassword
+
+// ----------------------------------------------------------------------------
 void ChangePasswordDialog::submit()
 {
     const stringw current_password = m_current_password_widget->getText().trim();
@@ -89,7 +137,8 @@ void ChangePasswordDialog::submit()
     {
         sfx_manager->quickSound("anvil");
         m_info_widget->setErrorColor();
-        m_info_widget->setText(_("Password has to be between 8 and 30 characters long!"), false);
+        m_info_widget->setText(_("Password has to be between 8 and 30 "
+                                 "characters long!"),                   false);
     }
     else if (new_password1 != new_password2)
     {
@@ -101,17 +150,21 @@ void ChangePasswordDialog::submit()
     {
         m_options_widget->setDeactivated();
         m_info_widget->setDefaultColor();
-        Online::CurrentUser::get()->requestPasswordChange(current_password, new_password1, new_password2);
+        // We don't need to use password 2 anymore, it was already confirmed
+        // that both passwords are identical.
+        changePassword(current_password, new_password1);
     }
-}
+}   // submit
 
-// -----------------------------------------------------------------------------
-GUIEngine::EventPropagation ChangePasswordDialog::processEvent(const std::string& eventSource)
+// ----------------------------------------------------------------------------
+GUIEngine::EventPropagation 
+             ChangePasswordDialog::processEvent(const std::string& eventSource)
 {
 
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        const std::string& selection = 
+                 m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
@@ -124,9 +177,9 @@ GUIEngine::EventPropagation ChangePasswordDialog::processEvent(const std::string
         }
     }
     return GUIEngine::EVENT_LET;
-}
+}   // processEvent
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 void ChangePasswordDialog::onEnterPressedInternal()
 {
@@ -135,18 +188,18 @@ void ChangePasswordDialog::onEnterPressedInternal()
         return;
     if (m_submit_widget->isActivated())
         submit();
-}
+}   // onEnterPressedInternal
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 
 bool ChangePasswordDialog::onEscapePressed()
 {
     if (m_cancel_widget->isActivated())
         m_self_destroy = true;
     return false;
-}
+}   // onEscapePressed
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void ChangePasswordDialog::success()
 {
     m_info_widget->setDefaultColor();
@@ -155,9 +208,9 @@ void ChangePasswordDialog::success()
     m_current_password_widget->setText("");
     m_new_password1_widget->setText("");
     m_new_password2_widget->setText("");
-}
+}   // success
 
-// -----------------------------------------------------------------------------
+// ----------------------------------------------------------------------------
 void ChangePasswordDialog::error(const irr::core::stringw & error)
 {
     sfx_manager->quickSound("anvil");
@@ -167,7 +220,7 @@ void ChangePasswordDialog::error(const irr::core::stringw & error)
     m_current_password_widget->setText("");
     m_new_password1_widget->setText("");
     m_new_password2_widget->setText("");
-}
+}   // error
 
 // -----------------------------------------------------------------------------
 
@@ -181,4 +234,4 @@ void ChangePasswordDialog::onUpdate(float dt)
     {
         ModalDialog::dismiss();
     }
-}
+}   // onUpdate

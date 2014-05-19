@@ -111,9 +111,9 @@ void MaterialManager::setAllMaterialFlags(video::ITexture* t,
 
     mb->getMaterial().ColorMaterial = video::ECM_DIFFUSE_AND_AMBIENT;
 
-    if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+    if (World::getWorld() != NULL)
     {
-        mb->getMaterial().FogEnable = World::getWorld()->getTrack()->isFogEnabled();
+        mb->getMaterial().FogEnable = World::getWorld()->isFogEnabled();
     }
 
 
@@ -183,7 +183,7 @@ void MaterialManager::loadMaterial()
     // Use temp material for reading, but then set the shared
     // material index later, so that these materials are not popped
     //
-    addSharedMaterial(file_manager->getAssetChecked(FileManager::TEXTURE, 
+    addSharedMaterial(file_manager->getAssetChecked(FileManager::TEXTURE,
                                                     "materials.xml", true));
     std::string deprecated = file_manager->getAssetChecked(FileManager::TEXTURE,
                                                            "deprecated/materials.xml");

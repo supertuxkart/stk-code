@@ -69,9 +69,9 @@ protected:
     /** Which of the successors of a node was selected by the AI. */
     std::vector<int> m_successor_index;
     /** For each node in the graph this list contains the chosen next node.
-     *  For normal lap track without branches we always have 
+     *  For normal lap track without branches we always have
      *  m_next_node_index[i] = (i+1) % size;
-     *  but if a branch is possible, the AI will select one option here. 
+     *  but if a branch is possible, the AI will select one option here.
      *  If the node is not used, m_next_node_index will be -1. */
     std::vector<int> m_next_node_index;
     /** For each graph node this list contains a list of the next X

@@ -95,7 +95,7 @@ SelectChallengeDialog::SelectChallengeDialog(const float percentWidth,
             break;
     }
 
-    const ChallengeStatus* c = PlayerManager::get()->getCurrentPlayer()
+    const ChallengeStatus* c = PlayerManager::getCurrentPlayer()
                              ->getChallengeStatus(challenge_id);
 
     if (c->isSolved(RaceManager::DIFFICULTY_EASY))
@@ -173,7 +173,7 @@ GUIEngine::EventPropagation SelectChallengeDialog::processEvent(const std::strin
             return GUIEngine::EVENT_LET;
         }
 
-        PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge(m_challenge_id);
+        PlayerManager::getCurrentPlayer()->setCurrentChallenge(m_challenge_id);
 
         ModalDialog::dismiss();
 

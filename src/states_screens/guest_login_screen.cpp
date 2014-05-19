@@ -44,12 +44,12 @@ void GuestLoginScreen::init()
 
 // -----------------------------------------------------------------------------
 
-void GuestLoginScreen::eventCallback(Widget* widget, const std::string& name, 
+void GuestLoginScreen::eventCallback(Widget* widget, const std::string& name,
                                     const int playerID)
 {
     if (name == "login_tabs")
     {
-        const std::string selection = 
+        const std::string selection =
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == "tab_login")
             StateManager::get()->replaceTopMostScreen(LoginScreen::getInstance());
@@ -58,7 +58,7 @@ void GuestLoginScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name=="options")
     {
-        const std::string button = 
+        const std::string button =
              getWidget<RibbonWidget>("options")
              ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if(button=="sign_in")
@@ -67,6 +67,10 @@ void GuestLoginScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else if(button=="cancel")
             StateManager::get()->escapePressed();
+    }
+    else if (name == "back")
+    {
+        StateManager::get()->escapePressed();
     }
 
 }   // eventCallback

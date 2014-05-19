@@ -638,7 +638,7 @@ void QuadGraph::computeDistanceFromStart(unsigned int node, float new_distance)
  *  distance from start.
  *  \param indx Index of the node for which to increase the distance.
  *  \param delta Amount by which to increase the distance.
- *  \param recursive_count Counts how often this function was called 
+ *  \param recursive_count Counts how often this function was called
  *         recursively in order to catch incorrect graphs that contain loops.
  */
 void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
@@ -669,7 +669,7 @@ void QuadGraph::updateDistancesForAllSuccessors(unsigned int indx, float delta,
         if(g.getDistanceFromStart()+g.getDistanceToSuccessor(i) >
             g_next.getDistanceFromStart())
         {
-            updateDistancesForAllSuccessors(g.getSuccessor(i), delta, 
+            updateDistancesForAllSuccessors(g.getSuccessor(i), delta,
                                             recursive_count);
         }
     }
@@ -1055,25 +1055,6 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
                         "mini-map will not be available.");
         return NULL;
     }
-
-    if (!irr_driver->isGLSL())
-    return texture;
-
-    GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->getCallback(ES_GAUSSIAN3H);
-    gacb->setResolution(UserConfigParams::m_width, UserConfigParams::m_height);
-
-    ScreenQuad sq(irr_driver->getVideoDriver());
-    sq.getMaterial().MaterialType = irr_driver->getShader(ES_GAUSSIAN3H);
-    sq.setTexture(texture);
-
-    // Horizontal pass
-    sq.render(irr_driver->getRTT(RTT_TMP1));
-
-    // Vertical pass
-    sq.getMaterial().MaterialType = irr_driver->getShader(ES_GAUSSIAN3V);
-    sq.setTexture(irr_driver->getRTT(RTT_TMP1));
-
-    sq.render(texture);
 
     return texture;
 }   // makeMiniMap

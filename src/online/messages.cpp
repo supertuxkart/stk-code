@@ -46,12 +46,6 @@ namespace Online
         }
         // ------------------------------------------------------------------------
 
-        irr::core::stringw signedInAs(const irr::core::stringw & name)
-        {
-            return irr::core::stringw(_("Signed in as : ")) + name + ".";
-        }
-        // ------------------------------------------------------------------------
-
         irr::core::stringw joiningServer()
         {
             return irr::core::stringw(_("Joining server")) + loadingDots();
@@ -94,13 +88,12 @@ namespace Online
         // ------------------------------------------------------------------------
         /**
           * Shows a increasing number of dots.
-          * \param spaces   Flag if unshowed dots should be replaced by spaces
           * \param interval A float representing the time it takes to add a new dot
           * \param max_dots The number of dots used. Defaults to 3.
           */
-        irr::core::stringw loadingDots(bool spaces, float interval, int max_dots)
+        irr::core::stringw loadingDots(float interval, int max_dots)
         {
-            int nr_dots = int(floor(StkTime::getRealTime() * (1 / interval))) % (max_dots+1);
+            int nr_dots = int(floor(StkTime::getRealTime() / interval)) % (max_dots+1);
             return irr::core::stringw((std::string(nr_dots,'.') + std::string(max_dots-nr_dots,' ')).c_str());
         }
     } // namespace messages

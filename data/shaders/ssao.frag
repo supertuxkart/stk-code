@@ -1,73 +1,80 @@
-uniform sampler2D ntex;
+// From paper http://graphics.cs.williams.edu/papers/AlchemyHPG11/
+// and improvements here http://graphics.cs.williams.edu/papers/SAOHPG12/
+
 uniform sampler2D dtex;
-uniform sampler2D noise_texture;
-uniform mat4 invprojm;
-uniform mat4 projm;
 uniform vec4 samplePoints[16];
 
-#if __VERSION__ >= 130
-in vec2 uv;
-out float AO;
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
 #else
-varying vec2 uv;
-#define AO gl_FragColor.x
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 #endif
 
-const float strengh = 4.;
-const float radius = .4f;
+in vec2 uv;
+out float AO;
+
+const float sigma = 1.;
+const float tau = 7.;
+const float beta = 0.001;
+const float epsilon = .00001;
+const float radius = 1.;
+const float k = 1.5;
 
 #define SAMPLES 16
 
-const float invSamples = strengh / SAMPLES;
+const float invSamples = 1. / SAMPLES;
 
-vec3 rand(vec2 co)
+vec3 getXcYcZc(int x, int y, float zC)
 {
-   return texture(noise_texture, co*20.16).xyz;
-}
-
-vec3 DecodeNormal(vec2 n)
-{
-  float z = dot(n, n) * 2. - 1.;
-  vec2 xy = normalize(n) * sqrt(1. - z * z);
-  return vec3(xy,z);
+    // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
+    float xC= (1. - 2 * (float(x) + 0.5) / screen.x) * zC / ProjectionMatrix[0][0];
+    float yC= (1. + 2 * (float(y) + 0.5) / screen.y) * zC / ProjectionMatrix[1][1];
+    return vec3(xC, yC, zC);
 }
 
 void main(void)
 {
-	vec4 cur = texture(ntex, uv);
-	float curdepth = texture(dtex, uv).x;
-	vec4 FragPos = invprojm * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
-	FragPos /= FragPos.w;
+    float lineardepth = textureLod(dtex, uv, 0.).x;
+    int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
+    vec3 FragPos = getXcYcZc(x, y, lineardepth);
 
-	// get the normal of current fragment
-	vec3 norm = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
-	// Workaround for nvidia and skyboxes
-	float len = dot(vec3(1.0), abs(cur.xyz));
-	if (len < 0.2 || curdepth > 0.9955) discard;
-	// Make a tangent as random as possible
-	vec3 randvect = rand(uv);
-	vec3 tangent = normalize(cross(norm, randvect));
-	vec3 bitangent = cross(norm, tangent);
+    // get the normal of current fragment
+    vec3 ddx = dFdx(FragPos);
+    vec3 ddy = dFdy(FragPos);
+    vec3 norm = -normalize(cross(ddy, ddx));
 
-	float bl = 0.0;
+    float r = radius / FragPos.z;
+    float phi = 30. * (x ^ y) + 10. * x * y;
+    float bl = 0.0;
 
-	for(int i = 0; i < SAMPLES; ++i) {
-		vec3 sampleDir = samplePoints[i].x * tangent + samplePoints[i].y * bitangent + samplePoints[i].z * norm;
-		sampleDir *= samplePoints[i].w;
-		vec4 samplePos = FragPos + radius * vec4(sampleDir, 0.0);
-		vec4 sampleProj = projm * samplePos;
-		sampleProj /= sampleProj.w;
+    for(int i = 0; i < SAMPLES; ++i) {
+        float alpha = (i + .5) * invSamples;
+        float theta = 2. * 3.14 * tau * alpha + phi;
+        float h = r * alpha;
+        vec2 offset = h * vec2(cos(theta), sin(theta)) * screen;
 
-		bool isInsideTexture = (sampleProj.x > -1.) && (sampleProj.x < 1.) && (sampleProj.y > -1.) && (sampleProj.y < 1.);
-		// get the depth of the occluder fragment
-		float occluderFragmentDepth = texture(dtex, (sampleProj.xy * 0.5) + 0.5).x;
-		// Position of the occluder fragment in worldSpace
-		vec4 occluderPos = invprojm * vec4(sampleProj.xy, 2.0 * occluderFragmentDepth - 1.0, 1.0f);
-		occluderPos /= occluderPos.w;
+        float m = round(log2(h) + 6);
+        ivec2 ioccluder_uv = ivec2(x, y) + ivec2(offset);
 
-		bool isOccluded = isInsideTexture && (sampleProj.z > (2. * occluderFragmentDepth - 1.0)) && (distance(FragPos, occluderPos) < radius);
-		bl += isOccluded ? smoothstep(radius, 0, distance(samplePos, FragPos)) : 0.;
-	}
+        if (ioccluder_uv.x < 0 || ioccluder_uv.x > screen.x || ioccluder_uv.y < 0 || ioccluder_uv.y > screen.y) continue;
 
-	AO = 1.0 - bl * invSamples;
+        float LinearoccluderFragmentDepth = textureLod(dtex, vec2(ioccluder_uv) / screen, m).x;
+        vec3 OccluderPos = getXcYcZc(ioccluder_uv.x, ioccluder_uv.y, LinearoccluderFragmentDepth);
+
+        vec3 vi = OccluderPos - FragPos;
+        bl += max(0, dot(vi, norm) - FragPos.z * beta) / (dot(vi, vi) + epsilon);
+    }
+
+    AO = max(pow(1.0 - 2. * sigma * bl * invSamples, k), 0.);
 }

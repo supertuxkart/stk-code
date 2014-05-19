@@ -440,6 +440,30 @@ namespace UserConfigParams
     PARAM_PREFIX IntUserConfigParam         m_max_fps
             PARAM_DEFAULT(  IntUserConfigParam(120, "max_fps",
                        &m_video_group, "Maximum fps, should be at least 60") );
+    PARAM_PREFIX BoolUserConfigParam        m_texture_compression
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_texture_compression",
+        &m_video_group, "Enable Texture Compression"));
+    PARAM_PREFIX BoolUserConfigParam        m_high_definition_textures
+        PARAM_DEFAULT(BoolUserConfigParam(true, "enable_high_definition_textures",
+        &m_video_group, "Enable high definition textures"));
+    PARAM_PREFIX BoolUserConfigParam        m_ubo_disabled
+        PARAM_DEFAULT(BoolUserConfigParam(false, "disable_ubo_support",
+        &m_video_group, "Disable UBO support"));
+    PARAM_PREFIX BoolUserConfigParam        m_glow
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
+        &m_video_group, "Enable Glow"));
+    PARAM_PREFIX BoolUserConfigParam        m_bloom
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_bloom",
+        &m_video_group, "Enable Bloom"));
+    PARAM_PREFIX BoolUserConfigParam        m_light_shaft
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_light_shaft",
+        &m_video_group, "Enable Light Shafts"));
+    PARAM_PREFIX BoolUserConfigParam        m_dynamic_lights
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dynamic_lights",
+        &m_video_group, "Enable Dynamic Lights"));
+    PARAM_PREFIX BoolUserConfigParam        m_dof
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
+        &m_video_group, "Enable Depth of Field"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -560,7 +584,7 @@ namespace UserConfigParams
     // This saves the actual user preference.
     PARAM_PREFIX IntUserConfigParam        m_xmas_mode
             PARAM_DEFAULT(  IntUserConfigParam(0, "christmas-mode",
-                            &m_graphics_quality, "Christmas hats: 0 use calendar, 1 always on, 2 always off") );
+                            &m_graphics_quality, "Christmas hats: 0 use current date, 1 always on, 2 always off") );
 
     PARAM_PREFIX BoolUserConfigParam        m_weather_effects
             PARAM_DEFAULT(  BoolUserConfigParam(true, "weather_gfx",
@@ -589,10 +613,6 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false, "vsync",
                            &m_graphics_quality,
                            "Whether vertical sync is enabled") );
-    PARAM_PREFIX BoolUserConfigParam         m_pixel_shaders
-    PARAM_DEFAULT( BoolUserConfigParam(false, "pixel_shaders",
-                                       &m_graphics_quality,
-                                       "Whether to enable pixel shaders (splatting, normal maps, ...)") );
     PARAM_PREFIX BoolUserConfigParam         m_motionblur
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "motionblur_enabled", &m_graphics_quality,
@@ -601,10 +621,10 @@ namespace UserConfigParams
             PARAM_DEFAULT( BoolUserConfigParam(false,
                            "mlaa", &m_graphics_quality,
                            "Whether MLAA anti-aliasing should be enabled") );
-    PARAM_PREFIX IntUserConfigParam          m_ssao
-            PARAM_DEFAULT( IntUserConfigParam(0,
+    PARAM_PREFIX BoolUserConfigParam          m_ssao
+            PARAM_DEFAULT(BoolUserConfigParam(false,
                            "ssao", &m_graphics_quality,
-                           "Whether SSAO is enabled (0 = disabled, 1 = low, 2 = high") );
+                           "Enable Screen Space Ambient Occlusion") );
     PARAM_PREFIX IntUserConfigParam          m_shadows
             PARAM_DEFAULT( IntUserConfigParam(0,
                            "shadows", &m_graphics_quality,
@@ -668,25 +688,6 @@ namespace UserConfigParams
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
-
-    PARAM_PREFIX BoolUserConfigParam        m_saved_session
-            PARAM_DEFAULT(  BoolUserConfigParam(    false,
-                                                    "saved_session",
-                                                    &m_online_group,
-                                                    "Is there a saved session?") );
-
-    PARAM_PREFIX IntUserConfigParam         m_saved_user
-            PARAM_DEFAULT(  IntUserConfigParam(     0,
-                                                    "saved_user",
-                                                    &m_online_group,
-                                                    "User ID of the saved session.") );
-
-    PARAM_PREFIX StringUserConfigParam      m_saved_token
-            PARAM_DEFAULT(  StringUserConfigParam(  "",
-                                                    "saved_token",
-                                                    &m_online_group,
-                                                    "Token of the saved session.") );
-
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group

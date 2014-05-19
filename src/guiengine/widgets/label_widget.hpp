@@ -88,7 +88,7 @@ namespace GUIEngine
         /** Overloaded function which takes a stringw. */
         virtual void setText(const irr::core::stringw &s, bool expandAsNeeded)
         {
-            setText(s.c_str(), expandAsNeeded); 
+            setText(s.c_str(), expandAsNeeded);
         }
 
         // --------------------------------------------------------------------
@@ -98,7 +98,7 @@ namespace GUIEngine
         
         // --------------------------------------------------------------------
         
-        /** 
+        /**
           * \brief Check if the current has been fully scrolled
           * \return true if the text has completely scrolled off
           * \pre May only be called after this widget has been add()ed

@@ -18,6 +18,9 @@
 
 #include "items/powerup.hpp"
 
+#include "achievements/achievement_info.hpp"
+#include "config/player_manager.hpp"
+
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
 #include "config/stk_config.hpp"
@@ -170,6 +173,14 @@ void  Powerup::adjustSound()
  */
 void Powerup::use()
 {
+    // The player gets an achievement point for using a powerup
+    StateManager::ActivePlayer * player = m_owner->getController()->getPlayer();
+    if (m_type != PowerupManager::POWERUP_NOTHING &&
+        player != NULL && player->getConstProfile() == PlayerManager::getCurrentPlayer())
+    {
+        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_POWERUP_LOVER, "poweruplover");
+    }
+
     // Play custom kart sound when collectible is used //TODO: what about the bubble gum?
     if (m_type != PowerupManager::POWERUP_NOTHING &&
         m_type != PowerupManager::POWERUP_SWATTER &&
@@ -237,7 +248,7 @@ void Powerup::use()
             m_sound_use->play();
 
             pos.setY(hit_point.getY()-0.05f);
-        
+
             ItemManager::get()->newItem(Item::ITEM_BUBBLEGUM, pos, normal, m_owner);
         }
         else // if the kart is looking forward, use the bubblegum as a shield

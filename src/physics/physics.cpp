@@ -271,13 +271,13 @@ void Physics::update(float dt)
                 // to the kart, and it's the current player. At this stage
                 // only the current player can get achievements.
                 if (target_kart != kart && c &&
-                    c->getPlayer()->getConstProfile() == PlayerManager::get()->getCurrentPlayer())
+                    c->getPlayer()->getConstProfile() == PlayerManager::getCurrentPlayer())
                 {
                     PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_ARCH_ENEMY,
                                                        target_kart->getIdent(), 1);
                     if (type == PowerupManager::POWERUP_BOWLING)
                     {
-                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE, 
+                        PlayerManager::increaseAchievement(AchievementInfo::ACHIEVE_STRIKE,
                                                           "ball", 1);
                     }   // is bowling ball
                 }   // if target_kart != kart && is a player kart and is current player

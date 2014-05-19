@@ -18,9 +18,10 @@
 #include "states_screens/online_user_search.hpp"
 
 #include "audio/sfx_manager.hpp"
+#include "config/player_manager.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "online/current_user.hpp"
 #include "online/messages.hpp"
+#include "online/profile_manager.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -184,14 +185,18 @@ void OnlineUserSearch::showList()
 
 // ----------------------------------------------------------------------------
 /** Called when a search is triggered. When it is a new search (and not just
- *  searching for the same string again), a request will be queued to 
+ *  searching for the same string again), a request will be queued to
  *  receive the search results
  */
 void OnlineUserSearch::search()
 {
     if (m_search_string != "" && m_last_search_string != m_search_string)
     {
-        m_search_request = CurrentUser::get()->requestUserSearch(m_search_string);
+        m_search_request = new XMLRequest();
+        PlayerManager::setUserDetails(m_search_request, "user-search");
+        m_search_request->addParameter("search-string", m_search_string);
+        m_search_request->queue();
+
         m_user_list_widget->clear();
         m_user_list_widget->addItem("spacer", L"");
         m_user_list_widget->addItem("loading", Messages::searching());
@@ -199,7 +204,7 @@ void OnlineUserSearch::search()
         m_search_box_widget->setDeactivated();
         m_search_button_widget->setDeactivated();
     }
-}   // sarch
+}   // search
 
 
 // ----------------------------------------------------------------------------
@@ -244,7 +249,7 @@ void OnlineUserSearch::setLastSelected() //FIXME actually use this here and in s
 }   // setLastSelected
 
 // ----------------------------------------------------------------------------
-/** Called every frame. It queries the search request for results and 
+/** Called every frame. It queries the search request for results and
  *  displays them if necessary.
  */
 void OnlineUserSearch::onUpdate(float dt)

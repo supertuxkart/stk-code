@@ -20,10 +20,10 @@
 #ifndef HEADER_ACHIEVEMENTS_SLOT_HPP
 #define HEADER_ACHIEVEMENTS_SLOT_HPP
 
-#include "utils/types.hpp"
 #include "achievements/achievement.hpp"
 #include "online/request_manager.hpp"
 #include "online/xml_request.hpp"
+#include "utils/types.hpp"
 
 #include <irrString.h>
 #include <string>
@@ -60,8 +60,9 @@ public :
     void add(Achievement *achievement);
     void sync(const std::vector<uint32_t> & achieved_ids);
     void onRaceEnd();
+    void onLapEnd();
     // ------------------------------------------------------------------------
-    const std::map<uint32_t, Achievement *>& getAllAchievements() 
+    const std::map<uint32_t, Achievement *>& getAllAchievements()
     {
         return m_achievements;
     }

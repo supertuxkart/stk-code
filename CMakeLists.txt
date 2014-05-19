@@ -3,7 +3,7 @@ project(SuperTuxKart)
 set(PROJECT_VERSION "0.8.1")
 
 cmake_minimum_required(VERSION 2.8.1)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${PROJECT_SOURCE_DIR}/cmake)
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 
 include(BuildTypeSTKRelease)
 if (NOT CMAKE_BUILD_TYPE)
@@ -13,8 +13,11 @@ endif()
 
 option(USE_WIIUSE "Support for wiimote input devices" ON)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
+option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
+
 if(UNIX)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
+    option(USE_XRANDR "Use xrandr instead of vidmode" OFF)
 endif()
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -59,9 +62,11 @@ if(USE_WIIUSE)
     include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
+
 # Build the angelscript library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
 include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+
 
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
@@ -94,8 +99,6 @@ else()
     include_directories(${OPENAL_INCLUDE_DIR})
 endif()
 
-
-
 # OggVorbis
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
@@ -120,9 +123,14 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
+# Xrandr
+if(UNIX AND USE_XRANDR)
+    find_package(Xrandr REQUIRED)
+endif()
+
 if(UNIX)
     if(USE_CPP2011)
-        add_definitions("-std=gnu++11")
+        add_definitions("-std=c++0x")
     endif()
 endif()
 
@@ -138,6 +146,7 @@ else()
 endif()
 
 
+    
 # Set some compiler options
 if(UNIX)
     add_definitions(-Wall)
@@ -189,8 +198,6 @@ if(APPLE)
     find_library(AUDIOUNIT_LIBRARY AudioUnit)
     find_library(COCOA_LIBRARY Cocoa)
 
-
-
     target_link_libraries(supertuxkart
          ${IOKIT_LIBRARY}
          ${QUICKTIME_LIBRARY}
@@ -226,8 +233,6 @@ else()
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
-
-
 # CURL
 if(WIN32)
     target_link_libraries(supertuxkart ${PROJECT_SOURCE_DIR}/dependencies/lib/libcurldll.a)
@@ -235,7 +240,6 @@ else()
     find_package(CURL REQUIRED)
     include_directories(${CURL_INCLUDE_DIRS})
 endif()
-
 
 # Common library dependencies
 target_link_libraries(supertuxkart
@@ -250,7 +254,7 @@ target_link_libraries(supertuxkart
     ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
- 
+
 
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
@@ -260,9 +264,6 @@ if(APPLE)
     set_target_properties(supertuxkart PROPERTIES LINK_FLAGS "-arch i386 -F/Library/Frameworks -framework OpenAL -framework Ogg -framework Vorbis")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I/Library/Frameworks/OpenAL.framework/Versions/A/Headers")
 endif()
-
-
-
 
 if(USE_FRIBIDI)
     target_link_libraries(supertuxkart ${FRIBIDI_LIBRARIES})
@@ -289,16 +290,19 @@ if(USE_WIIUSE)
 
 endif()
 
+# Xrandr
+if(UNIX AND USE_XRANDR)
+    target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
+endif()
+
 if(MSVC)
   target_link_libraries(supertuxkart iphlpapi.lib)
   add_custom_command(TARGET supertuxkart POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
         $<TARGET_FILE_DIR:supertuxkart>) 
+  add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
-
-
-
 
 # Optional tools
 add_subdirectory(tools/font_tool)
@@ -321,12 +325,46 @@ else()
   )
 endif()
 
+
+# ==== Checking if data folder exists ====
+if(NOT IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data)
+  message( FATAL_ERROR "${CMAKE_CURRENT_SOURCE_DIR}/data folder doesn't exist" )
+endif()
+
+# ==== Checking if stk-assets folder exists ====
+if(CHECK_ASSETS)
+  if((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/karts) AND 
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/library) AND 
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/music) AND 
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/sfx) AND
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/textures) AND
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/tracks))
+    message(STATUS "Assets found in data directory")
+  elseif(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../stk-assets)
+    set(STK_ASSETS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../stk-assets/)
+    message(STATUS "Assets found")
+  elseif(IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../supertuxkart-assets)
+    set(STK_ASSETS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../supertuxkart-assets/)
+    message(STATUS "Assets found")
+  else()
+    set (CUR_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+    get_filename_component(PARENT_DIR ${CUR_DIR} PATH)
+    message( FATAL_ERROR "${PARENT_DIR}/stk-assets folder doesn't exist. "
+      "Please download the stk-assets, or disable this test with -DCHECK_ASSETS=off." )
+  endif()
+endif()
+
+
 # ==== Install target ====
 install(TARGETS supertuxkart RUNTIME DESTINATION ${STK_INSTALL_BINARY_DIR} BUNDLE DESTINATION .)
-install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".svn" EXCLUDE)
+install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
+if(STK_ASSETS_DIR AND CHECK_ASSETS)
+  install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
+endif()
 install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
+
 
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)

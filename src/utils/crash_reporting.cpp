@@ -20,7 +20,7 @@
 #include "log.hpp"
 #include <string.h>
 
-#ifdef WIN32
+#if defined(WIN32) && !defined(DEBUG)
     // --------------------- Windows version -----------------
     #include <Windows.h>
     #include <DbgHelp.h>
@@ -198,16 +198,24 @@
                 if(last_separator)
                     last_separator[0] = '\0';
 
-                // Finally initialize the symbol handler.
-                BOOL    bOk = _SymInitialize(hProcess, filepath ? filepath : NULL, TRUE);
-                if(!bOk)
-                {
-                    Log::warn("CrashReporting", "SymInitialize() failed");
-                    FreeLibrary(hImageHlpDll);
-                    return;
-                }
+                // Since the stack trace can also be used for leak checks, don't
+                // initialise this all the time.
+                static bool first_time = true;
 
-                _SymSetOptions(SYMOPT_LOAD_LINES);
+                if (first_time)
+                {
+                    // Finally initialize the symbol handler.
+                    BOOL    bOk = _SymInitialize(hProcess, filepath ? filepath : NULL, TRUE);
+                    if (!bOk)
+                    {
+                        Log::warn("CrashReporting", "SymInitialize() failed");
+                        FreeLibrary(hImageHlpDll);
+                        return;
+                    }
+
+                    _SymSetOptions(SYMOPT_LOAD_LINES);
+                    first_time = false;
+                }
             }
 
             // Get the stack trace
@@ -223,7 +231,7 @@
                 STACKFRAME64    stackframe;
                 memset(&stackframe, 0, sizeof(stackframe));
                 stackframe.AddrPC.Offset    = pContext->Eip;
-                stackframe.AddrPC.Mode      = AddrModeFlat; 
+                stackframe.AddrPC.Mode      = AddrModeFlat;
                 stackframe.AddrStack.Offset = pContext->Esp;
                 stackframe.AddrStack.Mode   = AddrModeFlat;
                 stackframe.AddrFrame.Offset = pContext->Ebp;

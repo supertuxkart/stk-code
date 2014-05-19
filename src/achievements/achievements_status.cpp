@@ -26,7 +26,6 @@
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 #include "utils/translation.hpp"
-#include "online/current_user.hpp"
 
 #include <sstream>
 #include <fstream>
@@ -132,3 +131,12 @@ void AchievementsStatus::onRaceEnd()
         iter->second->onRaceEnd();
     }
 }   // onRaceEnd
+
+void AchievementsStatus::onLapEnd()
+{
+    //reset all values that need to be reset
+    std::map<uint32_t, Achievement *>::iterator iter;
+    for (iter = m_achievements.begin(); iter != m_achievements.end(); ++iter) {
+        iter->second->onLapEnd();
+    }
+}   // onLapEnd

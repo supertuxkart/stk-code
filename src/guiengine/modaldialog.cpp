@@ -52,6 +52,7 @@ ModalDialog::ModalDialog(const float percentWidth, const float percentHeight,
 {
     m_dialog_location = location;
     m_init            = false;
+    m_fade_background = true;
     m_percent_width   = percentWidth;
     m_percent_height  = percentHeight;
     m_irrlicht_window = NULL;
@@ -89,7 +90,7 @@ void ModalDialog::doInit()
     pointer_was_shown = irr_driver->isPointerShown();
     irr_driver->showPointer();
 
-    const core::dimension2d<u32>& frame_size = 
+    const core::dimension2d<u32>& frame_size =
         GUIEngine::getDriver()->getCurrentRenderTargetSize();
 
     const int w = (int)(frame_size.Width* m_percent_width);
@@ -131,7 +132,7 @@ void ModalDialog::doInit()
     }
     modalWindow = this;
 
-    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area, 
+    m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area,
                                                           true /* modal */);
 
     GUIEngine::getSkin()->m_dialog = true;
@@ -174,6 +175,8 @@ ModalDialog::~ModalDialog()
 
 void ModalDialog::clearWindow()
 {
+    assert(m_irrlicht_window != NULL);
+
     Widget* w;
     for_in (w, m_widgets)
     {
@@ -182,8 +185,7 @@ void ModalDialog::clearWindow()
     elementsWereDeleted();
     m_widgets.clearAndDeleteAll();
 
-    if(m_irrlicht_window)
-        m_irrlicht_window->remove();
+    m_irrlicht_window->remove();
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow( m_area, true /* modal */ );
 }   // clearWindow
 

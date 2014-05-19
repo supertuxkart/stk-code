@@ -264,6 +264,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		// enumerate video modes
 		s32 modeCount;
 		XF86VidModeModeInfo** modes;
+		float refresh_rate;
 
 		XF86VidModeGetAllModeLines(display, screennr, &modeCount, &modes);
 
@@ -271,13 +272,37 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		for (s32 i = 0; i<modeCount; ++i)
 		{
 			if (bestMode==-1 && modes[i]->hdisplay >= Width && modes[i]->vdisplay >= Height)
+			{
+				float pixels_per_second = modes[i]->dotclock * 1000.0; 
+				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
+				refresh_rate = pixels_per_second / pixels_per_frame;
 				bestMode = i;
+			}
+			else if (bestMode!=-1 &&
+					modes[i]->hdisplay == modes[bestMode]->hdisplay &&
+					modes[i]->vdisplay == modes[bestMode]->vdisplay)
+			{
+				float pixels_per_second = modes[i]->dotclock * 1000.0; 
+				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
+				float refresh_rate_tmp = pixels_per_second / pixels_per_frame;
+				
+				if (refresh_rate_tmp > refresh_rate)
+				{
+					refresh_rate = refresh_rate_tmp;
+					bestMode = i;
+				}					
+			}
 			else if (bestMode!=-1 &&
 					modes[i]->hdisplay >= Width &&
 					modes[i]->vdisplay >= Height &&
 					modes[i]->hdisplay <= modes[bestMode]->hdisplay &&
 					modes[i]->vdisplay <= modes[bestMode]->vdisplay)
+			{
+				float pixels_per_second = modes[i]->dotclock * 1000.0; 
+				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
+				refresh_rate = pixels_per_second / pixels_per_frame;
 				bestMode = i;
+			}
 		}
 		if (bestMode != -1)
 		{
@@ -368,6 +393,65 @@ void IrrPrintXGrabError(int grabResult, const c8 * grabCommand )
 }
 #endif
 
+static GLXContext getMeAGLContext(Display *display, GLXFBConfig glxFBConfig)
+{
+	GLXContext Context;
+	int compat33ctx[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+			None
+		};
+	int core33ctx[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 3,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+			None
+		};
+	int core31ctx[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+			GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_CORE_PROFILE_BIT_ARB,
+			GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
+			None
+		};
+	int legacyctx[] =
+		{
+			GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
+			GLX_CONTEXT_MINOR_VERSION_ARB, 1,
+			None
+		};
+	PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
+	glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
+						glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
+
+	// create compat 3.3 context (for proprietary drivers)
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, compat33ctx);
+	if (!XErrorSignaled)
+		return Context;
+
+	XErrorSignaled = false;
+	// create core 3.3 context (for mesa)
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, core33ctx);
+	if (!XErrorSignaled)
+		return Context;
+
+	XErrorSignaled = false;
+	// create core 3.1 context (for older mesa)
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, core31ctx);
+	if (!XErrorSignaled)
+		return Context;
+
+	XErrorSignaled = false;
+	// fall back to legacy context
+	Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, legacyctx);
+	return Context;
+}
 
 bool CIrrDeviceLinux::createWindow()
 {
@@ -741,30 +825,7 @@ bool CIrrDeviceLinux::createWindow()
 		glxWin=glXCreateWindow(display,glxFBConfig,window,NULL);
 		if (glxWin)
 		{
-			int context_attribs[] =
-				{
-					GLX_CONTEXT_MAJOR_VERSION_ARB, 3,
-					GLX_CONTEXT_MINOR_VERSION_ARB, 3,
-                    GLX_CONTEXT_PROFILE_MASK_ARB, GLX_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB, //GLX_CONTEXT_CORE_PROFILE_BIT_ARB
-					GLX_CONTEXT_FLAGS_ARB, GLX_CONTEXT_DEBUG_BIT_ARB,
-					None
-				};
-			PFNGLXCREATECONTEXTATTRIBSARBPROC glXCreateContextAttribsARB = 0;
-			glXCreateContextAttribsARB = (PFNGLXCREATECONTEXTATTRIBSARBPROC)
-								glXGetProcAddressARB( (const GLubyte *) "glXCreateContextAttribsARB" );
-			// create glx context
-			Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, context_attribs);
-			if (XErrorSignaled)
-			{
-				int context_attribs[] =
-					{
-						GLX_CONTEXT_MAJOR_VERSION_ARB, 2,
-						GLX_CONTEXT_MINOR_VERSION_ARB, 1,
-						None
-					};
-				Context = glXCreateContextAttribsARB(display, glxFBConfig, 0, True, context_attribs);
-				XErrorSignaled = false;
-			}
+			Context = getMeAGLContext(display, glxFBConfig);
 			if (Context)
 			{
 				if (!glXMakeContextCurrent(display, glxWin, glxWin, Context))

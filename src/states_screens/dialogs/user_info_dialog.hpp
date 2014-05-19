@@ -21,11 +21,14 @@
 
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
-#include "online/profile_manager.hpp"
 #include "utils/types.hpp"
 
 #include <irrString.h>
+
+namespace Online
+{
+    class OnlineProfile;
+}
 
 /**
  * \brief Dialog that allows a user to sign in
@@ -44,7 +47,7 @@ private:
     irr::core::stringw m_info;
 
     const uint32_t m_showing_id;
-    Online::OnlineProfile * m_profile;
+    Online::OnlineProfile * m_online_profile;
 
     GUIEngine::LabelWidget * m_name_widget;
     GUIEngine::LabelWidget * m_info_widget;
@@ -63,6 +66,8 @@ private:
     void sendFriendRequest();
     void acceptFriendRequest();
     void declineFriendRequest();
+    void removeExistingFriend();
+    void removePendingFriend();
 
 public:
     UserInfoDialog(uint32_t showing_id, const core::stringw info = "", bool error = false, bool from_queue = false);

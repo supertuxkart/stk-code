@@ -25,15 +25,15 @@
  * \brief Dialog that allows the player to select custom video settings
  * \ingroup states_screens
  */
-class CustomVideoSettingsialog : public GUIEngine::ModalDialog
+class CustomVideoSettingsDialog : public GUIEngine::ModalDialog
 {
     
 public:
     /**
      * Creates a modal dialog with given percentage of screen width and height
      */
-    CustomVideoSettingsialog(const float percentWidth, const float percentHeight);
-    ~CustomVideoSettingsialog();
+    CustomVideoSettingsDialog(const float percentWidth, const float percentHeight);
+    ~CustomVideoSettingsDialog();
 
     virtual void beforeAddingWidgets();
 

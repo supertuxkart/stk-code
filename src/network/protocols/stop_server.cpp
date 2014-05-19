@@ -18,10 +18,10 @@
 
 #include "network/protocols/stop_server.hpp"
 
-#include "network/network_manager.hpp"
-#include "online/current_user.hpp"
-#include "online/request_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/network_manager.hpp"
+#include "online/request_manager.hpp"
 
 StopServer::StopServer() : Protocol(NULL, PROTOCOL_SILENT)
 {
@@ -47,12 +47,10 @@ void StopServer::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        m_request->setServerURL( "address-management.php");
-        m_request->addParameter("id",Online::CurrentUser::get()->getID());
-        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
+        PlayerManager::setUserDetails(m_request, "stop-server",
+                                      "address-management.php");
         m_request->addParameter("address",addr.ip);
         m_request->addParameter("port",addr.port);
-        m_request->addParameter("action","stop-server");
         Log::info("StopServer", "address %u, port %d", addr.ip, addr.port);
 
         Online::RequestManager::get()->addRequest(m_request);

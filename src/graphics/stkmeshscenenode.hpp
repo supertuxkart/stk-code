@@ -2,13 +2,14 @@
 #define STKMESHSCENENODE_H
 
 #include "stkmesh.hpp"
+#include "utils/ptr_vector.hpp"
 
 class STKMeshSceneNode : public irr::scene::CMeshSceneNode
 {
 protected:
-    std::vector<GLMesh *> GeometricMesh[FPSM_COUNT];
-    std::vector<GLMesh *> ShadedMesh[SM_COUNT];
-    std::vector<GLMesh *> TransparentMesh[TM_COUNT];
+    PtrVector<GLMesh, REF> GeometricMesh[FPSM_COUNT];
+    PtrVector<GLMesh, REF> ShadedMesh[SM_COUNT];
+    PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
     core::vector3df windDir;
@@ -23,16 +24,18 @@ protected:
     void createGLMeshes();
     void cleanGLMeshes();
     void setFirstTimeMaterial();
+    void updatevbo();
     bool isMaterialInitialized;
+    bool reload_each_frame;
 public:
+    void setReloadEachFrame(bool);
     STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
         const irr::core::vector3df& position = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& rotation = irr::core::vector3df(0, 0, 0),
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f));
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
-    void MovingTexture(unsigned, unsigned);
-    ~STKMeshSceneNode();
+    virtual ~STKMeshSceneNode();
 };
 
 #endif

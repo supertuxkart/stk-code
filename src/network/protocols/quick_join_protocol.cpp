@@ -18,10 +18,10 @@
 
 #include "quick_join_protocol.hpp"
 
-#include "network/network_manager.hpp"
-#include "online/current_user.hpp"
-#include "online/request_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+#include "network/network_manager.hpp"
+#include "online/request_manager.hpp"
 #include "utils/log.hpp"
 
 QuickJoinProtocol::QuickJoinProtocol(CallbackObject* callback_object, uint32_t* server_id) : Protocol(callback_object, PROTOCOL_SILENT)
@@ -44,10 +44,8 @@ void QuickJoinProtocol::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
+        PlayerManager::setUserDetails(m_request, "quick-join");
         m_request->setServerURL("address-management.php");
-        m_request->addParameter("id",Online::CurrentUser::get()->getID());
-        m_request->addParameter("token",Online::CurrentUser::get()->getToken());
-        m_request->addParameter("action","quick-join");
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

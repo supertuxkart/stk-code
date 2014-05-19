@@ -103,7 +103,8 @@ namespace GUIEngine
         PROP_LABELS_LOCATION,
         PROP_MAX_ROWS,
         PROP_WRAP_AROUND,
-        PROP_DIV_PADDING
+        PROP_DIV_PADDING,
+        PROP_KEEP_SELECTION,
     };
 
     bool isWithinATextBox();

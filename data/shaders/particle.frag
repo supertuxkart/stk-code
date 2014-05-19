@@ -1,11 +1,21 @@
 uniform sampler2D tex;
 uniform sampler2D dtex;
 uniform mat4 invproj;
-uniform vec2 screen;
+
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 
 in float lf;
 in vec2 tc;
-out vec4 color;
+in vec3 pc;
+out vec4 FragColor;
 
 
 void main(void)
@@ -18,6 +28,6 @@ void main(void)
 	vec4 EnvPos = invproj * (2. * vec4(xy, EnvZ, 1.0) - 1.);
 	EnvPos /= EnvPos.w;
 	float alpha = clamp((EnvPos.z - FragmentPos.z) * 0.3, 0., 1.);
-	color = texture(tex, tc);
-    color.a *= alpha * smoothstep(1., 0.8, lf);
+    vec4 color = texture(tex, tc) * vec4(pc, 1.0);
+    FragColor = color * alpha * smoothstep(1., 0.8, lf);
 }

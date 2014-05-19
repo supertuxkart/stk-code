@@ -21,6 +21,7 @@
 #include <pthread.h>
 
 #include "addons/addons_manager.hpp"
+#include "config/player_manager.hpp"
 #include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
@@ -46,8 +47,6 @@ using namespace irr::gui;
 AddonsLoading::AddonsLoading(const std::string &id)
              : ModalDialog(0.8f, 0.8f)
 {
-    m_vote_clicked     = false;
-
     m_addon            = *(addons_manager->getAddon(id));
     m_icon_shown       = false;
     m_download_request = NULL;
@@ -254,19 +253,19 @@ GUIEngine::EventPropagation AddonsLoading::processEvent(const std::string& event
 // ----------------------------------------------------------------------------
 void AddonsLoading::voteClicked()
 {
-    if (Online::CurrentUser::get()->isRegisteredUser())
-        new VoteDialog(m_addon.getId());
+    if (PlayerManager::isCurrentLoggedIn())
+    {
+        // We need to keep a copy of the addon id, since dismiss() will
+        // delete this object (and the copy of the addon).
+        std::string addon_id = m_addon.getId();
+        dismiss();
+        new VoteDialog(addon_id);
+    }
 }   // voteClicked
 
 // ----------------------------------------------------------------------------
 void AddonsLoading::onUpdate(float delta)
 {
-    if(m_vote_clicked)
-    {
-        voteClicked();
-        return;
-    }
-
     if(m_progress->isVisible())
     {
         float progress = m_download_request->getProgress();
@@ -307,7 +306,7 @@ void AddonsLoading::startDownload()
 {
     std::string save   = "tmp/"
                        + StringUtils::getBasename(m_addon.getZipFileName());
-    m_download_request = new Online::HTTPRequest(save, /*manage mem*/false, 
+    m_download_request = new Online::HTTPRequest(save, /*manage mem*/false,
                                                  /*priority*/5);
     m_download_request->setURL(m_addon.getZipFileName());
     m_download_request->queue();

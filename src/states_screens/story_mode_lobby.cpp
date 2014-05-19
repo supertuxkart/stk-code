@@ -55,7 +55,7 @@ void StoryModeLobbyScreen::init()
     ListWidget* list = getWidget<ListWidget>("gameslots");
     list->clear();
 
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     if(player)
     {
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
@@ -119,6 +119,11 @@ void StoryModeLobbyScreen::eventCallback(Widget* widget,
         }
 
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+        // Since only now the current player is defined, we have to request 
+        // a login (if an online login was saved). If the current player was
+        // saved, this request will be started much earlier in the startup
+        // sequence from the RequestManager.
+        PlayerManager::resumeSavedSession();
     }
 }   // eventCallback
 

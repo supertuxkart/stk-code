@@ -1,6 +1,14 @@
-uniform mat4 ModelViewProjectionMatrix;
-uniform mat4 TransposeInverseModelView;
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+};
 
+uniform mat4 ModelMatrix;
+uniform mat4 InverseModelMatrix;
 
 #if __VERSION__ >= 130
 in vec3 Position;
@@ -23,6 +31,8 @@ varying vec2 uv;
 
 void main()
 {
+	mat4 ModelViewProjectionMatrix = ProjectionMatrix * ViewMatrix * ModelMatrix;
+	mat4 TransposeInverseModelView = transpose(InverseModelMatrix * InverseViewMatrix);
 	uv = Texcoord;
 	tangent = (TransposeInverseModelView * vec4(Tangent, 1.)).xyz;
 	bitangent = (TransposeInverseModelView * vec4(Bitangent, 1.)).xyz;

@@ -173,7 +173,7 @@ TrackInfoDialog::~TrackInfoDialog()
 {
     // Place focus back on selected track, in case the dialog was cancelled and we're back to
     // the track selection screen after
-    Screen* curr_screen = GUIEngine::getCurrentScreen();
+    GUIEngine::Screen* curr_screen = GUIEngine::getCurrentScreen();
     if (curr_screen->getName() == "tracks.stkgui")
     {
         ((TracksScreen*)curr_screen)->setFocusOnTrack(m_ribbon_item);
@@ -252,7 +252,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
     // Disable accidentally unlocking of a challenge
-    PlayerManager::get()->getCurrentPlayer()->setCurrentChallenge("");
+    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 
     ModalDialog::dismiss();
     race_manager->startSingleRace(track_ident, num_laps, false);

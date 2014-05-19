@@ -17,16 +17,16 @@
 
 #include "states_screens/dialogs/registration_dialog.hpp"
 
-#include <IGUIEnvironment.h>
-
 #include "audio/sfx_manager.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/register_screen.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
 #include "online/messages.hpp"
 
+#include <IGUIEnvironment.h>
 
 using namespace GUIEngine;
 using namespace irr;
@@ -74,7 +74,7 @@ EventPropagation RegistrationDialog::processEvent(const std::string& event_sourc
         std::string s = rib->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if(s=="accept")
         {
-            Screen *s = GUIEngine::getCurrentScreen();
+            GUIEngine::Screen *s = GUIEngine::getCurrentScreen();
             RegisterScreen *r = dynamic_cast<RegisterScreen*>(s);
             assert(r);
             r->acceptTerms();

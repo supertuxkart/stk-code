@@ -85,7 +85,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
 
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s':",
                                                 clickedTrack->getFilename()   );
@@ -108,7 +108,7 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 Track* clickedTrack = track_manager->getTrack(selection);
                 if (clickedTrack != NULL)
                 {
-                    ITexture* screenshot = 
+                    ITexture* screenshot =
                         irr_driver->getTexture( clickedTrack->getScreenshotFile(),
                                                 "While loading screenshot for track '%s'",
                                                 clickedTrack->getFilename());
@@ -236,7 +236,7 @@ void EasterEggScreen::buildTrackList()
             if (curr->isArena() || curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,
@@ -267,7 +267,7 @@ void EasterEggScreen::buildTrackList()
             if (curr->isSoccer()) continue;
             if (curr->isInternal()) continue;
 
-            if (PlayerManager::get()->getCurrentPlayer()->isLocked(curr->getIdent()))
+            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
             {
                 tracks_widget->addItem( _("Locked : solve active challenges to gain access to more!"),
                                        "locked", curr->getScreenshotFile(), LOCKED_BADGE,

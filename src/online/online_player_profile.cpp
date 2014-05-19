@@ -1,0 +1,413 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2013 Glenn De Jonghe
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+
+
+#include "online/online_player_profile.hpp"
+
+#include "achievements/achievements_manager.hpp"
+#include "config/player_manager.hpp"
+#include "config/user_config.hpp"
+#include "guiengine/dialog_queue.hpp"
+#include "guiengine/screen.hpp"
+#include "online/online_profile.hpp"
+#include "online/profile_manager.hpp"
+#include "online/servers_manager.hpp"
+#include "states_screens/login_screen.hpp"
+#include "states_screens/online_profile_friends.hpp"
+#include "states_screens/dialogs/change_password_dialog.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
+#include "states_screens/dialogs/notification_dialog.hpp"
+#include "utils/log.hpp"
+#include "utils/translation.hpp"
+
+#include <sstream>
+#include <stdlib.h>
+#include <assert.h>
+#include <algorithm>
+
+using namespace irr;
+using namespace Online;
+
+namespace Online
+{
+    // ------------------------------------------------------------------------
+    /** Adds the login credential to a http request. It sets the name of
+     *  the script to invokce, token, and user id.
+     *  \param request The http request.
+     *  \param action If not empty, the action to be set.
+     */
+    void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
+                                     const std::string &action,
+                                     const std::string &php_script)
+    {
+        if (php_script.size()>0)
+            request->setServerURL(php_script);
+        else
+            request->setServerURL("client-user.php");
+
+        if (m_profile)
+            request->addParameter("userid", m_profile->getID());
+        if(m_online_state == OS_SIGNED_IN)
+            request->addParameter("token", m_token);
+        if (action.size() > 0)
+            request->addParameter("action", action);
+    }   // setUserDetails
+
+    // ========================================================================
+    OnlinePlayerProfile::OnlinePlayerProfile(const XMLNode *player)
+               : PlayerProfile(player)
+    {
+        m_online_state = OS_SIGNED_OUT;
+        m_token        = "";
+        m_save_session = false;
+        m_profile      = NULL;
+    }   // OnlinePlayerProfile
+
+    // ------------------------------------------------------------------------
+    OnlinePlayerProfile::OnlinePlayerProfile(const core::stringw &name, bool is_guest)
+        : PlayerProfile(name, is_guest)
+    {
+        m_online_state = OS_SIGNED_OUT;
+        m_token        = "";
+        m_save_session = false;
+        m_profile      = NULL;
+
+    }   // OnlinePlayerProfile
+    // ------------------------------------------------------------------------
+    /** Request a login using the saved credentials of the user.
+     */
+    void OnlinePlayerProfile::requestSavedSession()
+    {
+        SignInRequest * request = NULL;
+        if (m_online_state == OS_SIGNED_OUT  && hasSavedSession() )
+        {
+            request = new SignInRequest(true);
+            request->setServerURL("client-user.php");
+            request->addParameter("action", "saved-session" );
+            request->addParameter("userid", getSavedUserId());
+            request->addParameter("token",  getSavedToken() );
+            request->queue();
+            m_online_state = OS_SIGNING_IN;
+        }
+    }   // requestSavedSession
+
+    // ------------------------------------------------------------------------
+    /** Create a signin request.
+     *  \param username Name of user.
+     *  \param password Password.
+     *  \param save_session If true, the login credential will be saved to
+     *         allow a password-less login.
+     *  \param request_now Immediately submit this request to the
+     *         RequestManager.
+     */
+    OnlinePlayerProfile::SignInRequest*
+        OnlinePlayerProfile::requestSignIn(const core::stringw &username,
+                                   const core::stringw &password,
+                                   bool save_session, bool request_now)
+    {
+        assert(m_online_state == OS_SIGNED_OUT);
+        m_save_session = save_session;
+        SignInRequest * request = new SignInRequest(false);
+        request->setServerURL("client-user.php");
+        request->addParameter("action","connect");
+        request->addParameter("username",username);
+        request->addParameter("password",password);
+        request->addParameter("save-session", save_session);
+        if (request_now)
+        {
+            request->queue();
+            m_online_state = OS_SIGNING_IN;
+        }
+        return request;
+    }   // requestSignIn
+
+    // ------------------------------------------------------------------------
+    /** Called when the signin request is finished.
+     */
+    void OnlinePlayerProfile::SignInRequest::callback()
+    {
+        PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
+        GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
+        LoginScreen *login = dynamic_cast<LoginScreen*>(screen);
+        if(login)
+        {
+            if(isSuccess())
+                login->loginSuccessful();
+            else
+                login->loginError(getInfo());
+        }   // if dialog
+    }   // SignInRequest::callback
+
+    // ------------------------------------------------------------------------
+    /** Checks the server respond after a login attempt. If the login
+     *  was successful, it marks the user as logged in, and (if requested)
+     *  saves data to be able to login next time.
+     *  \param success If the answer from the server indicated a
+     *         successful login attemp.
+     *  \param input Xml tree with the complete server response.
+     */
+    void OnlinePlayerProfile::signIn(bool success, const XMLNode * input)
+    {
+        if (success)
+        {
+            int token_fetched       = input->get("token", &m_token);
+            core::stringw username("");
+            int username_fetched    = input->get("username", &username);
+            uint32_t userid(0);
+            int userid_fetched      = input->get("userid", &userid);
+            m_profile = new OnlineProfile(userid, username, true);
+            assert(token_fetched && username_fetched && userid_fetched);
+            m_online_state = OS_SIGNED_IN;
+            if(doSaveSession())
+            {
+                saveSession(getOnlineId(), getToken() );
+            }
+            ProfileManager::get()->addPersistent(m_profile);
+            std::string achieved_string("");
+            if(input->get("achieved", &achieved_string) == 1)
+            {
+                std::vector<uint32_t> achieved_ids =
+                    StringUtils::splitToUInt(achieved_string, ' ');
+                PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
+            }
+            m_profile->fetchFriends();
+        }   // if success
+        else
+        {
+            m_online_state = OS_SIGNED_OUT;
+        }
+    }   // signIn
+
+    // ------------------------------------------------------------------------
+    void OnlinePlayerProfile::requestSignOut()
+    {
+        assert(m_online_state == OS_SIGNED_IN || m_online_state == OS_GUEST);
+        SignOutRequest * request = new SignOutRequest();
+        request->setServerURL("client-user.php");
+        request->addParameter("action","disconnect");
+        request->addParameter("token", getToken());
+        request->addParameter("userid", getOnlineId());
+        request->queue();
+        m_online_state = OS_SIGNING_OUT;
+    }   // requestSignOut
+
+    // --------------------------------------------------------------------
+    void OnlinePlayerProfile::SignOutRequest::callback()
+    {
+        PlayerManager::getCurrentPlayer()->signOut(isSuccess(), getXMLData());
+    }   // SignOutRequest::callback
+
+    // ------------------------------------------------------------------------
+    void OnlinePlayerProfile::signOut(bool success, const XMLNode * input)
+    {
+        if(!success)
+        {
+            Log::warn("OnlinePlayerProfile::signOut", "%s",
+                      "There were some connection issues while signing out. "
+                      "Report a bug if this caused issues.");
+        }
+        m_token = "";
+        ProfileManager::get()->clearPersistent();
+        m_profile = NULL;
+        m_online_state = OS_SIGNED_OUT;
+        PlayerManager::getCurrentPlayer()->clearSession();
+    }   // signOut
+
+    // ------------------------------------------------------------------------
+    /** Sends a request to the server to see if any new information is
+     *  available. (online friends, notifications, etc.).
+     */
+    void OnlinePlayerProfile::requestPoll() const
+    {
+        assert(m_online_state == OS_SIGNED_IN);
+        OnlinePlayerProfile::PollRequest * request = new OnlinePlayerProfile::PollRequest();
+        request->setServerURL("client-user.php");
+        request->addParameter("action", "poll");
+        request->addParameter("token", getToken());
+        request->addParameter("userid", getOnlineId());
+        request->queue();
+    }   // requestPoll()
+
+    // ------------------------------------------------------------------------
+    /** Callback for the poll request. Parses the information and spawns
+     *  notifications accordingly.
+     */
+    void OnlinePlayerProfile::PollRequest::callback()
+    {
+        if(isSuccess())
+        {
+            if (!PlayerManager::getCurrentPlayer()->isLoggedIn())
+                return;
+            if (PlayerManager::getCurrentPlayer()->getProfile()->hasFetchedFriends())
+            {
+                std::string online_friends_string("");
+                if(getXMLData()->get("online", &online_friends_string) == 1)
+                {
+                    std::vector<uint32_t> online_friends =
+                          StringUtils::splitToUInt(online_friends_string, ' ');
+                    bool went_offline = false;
+                    std::vector<uint32_t> friends =
+                        PlayerManager::getCurrentPlayer()->getProfile()->getFriends();
+                    std::vector<core::stringw> to_notify;
+                    for(unsigned int i = 0; i < friends.size(); ++i)
+                    {
+                         bool now_online = false;
+                         std::vector<uint32_t>::iterator iter =
+                             std::find(online_friends.begin(),
+                                       online_friends.end(), friends[i]);
+                         if (iter != online_friends.end())
+                         {
+                             now_online = true;
+                             online_friends.erase(iter);
+                         }
+                         OnlineProfile * profile =
+                             ProfileManager::get()->getProfileByID(friends[i]);
+                         OnlineProfile::RelationInfo * relation_info =
+                                                    profile->getRelationInfo();
+                         if( relation_info->isOnline() )
+                         {
+                             if (!now_online)
+                             {
+                                 relation_info->setOnline(false);
+                                 went_offline = true;
+                             }
+                         }
+                         else
+                         {
+                             if (now_online)
+                             {
+                                 //User came online
+                                 relation_info->setOnline(true);
+                                 // Do this because a user might have accepted
+                                 // a pending friend request.
+                                 profile->setFriend();
+                                 to_notify.push_back(profile->getUserName());
+                             }
+                         }
+
+                    }
+
+                    if(to_notify.size() > 0)
+                    {
+                        core::stringw message("");
+                        if(to_notify.size() == 1)
+                        {
+                            message = _("%s is now online.", to_notify[0]);
+                        }
+                        else if(to_notify.size() == 2)
+                        {
+                            message = _("%s and %s are now online.",
+                                        to_notify[0], to_notify[1]    );
+                        }
+                        else if(to_notify.size() == 3)
+                        {
+                            message = _("%s, %s and %s are now online.",
+                                     to_notify[0], to_notify[1], to_notify[2]);
+                        }
+                        else if(to_notify.size() > 3)
+                        {
+                            message = _("%d friends are now online.",
+                                        to_notify.size());
+                        }
+                        NotificationDialog *dia =
+                            new NotificationDialog(NotificationDialog::T_Friends,
+                                                   message);
+                        GUIEngine::DialogQueue::get()->pushDialog(dia, false);
+                        OnlineProfileFriends::getInstance()->refreshFriendsList();
+                    }
+                    else if(went_offline)
+                    {
+                        OnlineProfileFriends::getInstance()->refreshFriendsList();
+                    }
+                }
+            }
+            else
+            {
+                PlayerManager::getCurrentPlayer()->getProfile()->fetchFriends();
+            }
+
+            int friend_request_count = 0;
+            for(unsigned int i = 0; i < getXMLData()->getNumNodes(); i++)
+            {
+                const XMLNode * node = getXMLData()->getNode(i);
+                if(node->getName() == "new_friend_request")
+                {
+                    OnlineProfile::RelationInfo * ri =
+                        new OnlineProfile::RelationInfo("New", false, true, true);
+                    OnlineProfile * p = new OnlineProfile(node);
+                    p->setRelationInfo(ri);
+                    ProfileManager::get()->addPersistent(p);
+                    friend_request_count++;
+                }
+            }
+            if(friend_request_count > 0)
+            {
+                core::stringw message("");
+                if(friend_request_count > 1)
+                {
+                    message = _("You have %d new friend requests!",
+                                friend_request_count);
+                }
+                else
+                {
+                    message = _("You have a new friend request!");
+                }
+                NotificationDialog *dia =
+                    new NotificationDialog(NotificationDialog::T_Friends,
+                                           message);
+                GUIEngine::DialogQueue::get()->pushDialog(dia, false);
+                OnlineProfileFriends::getInstance()->refreshFriendsList();
+            }
+        }
+        // FIXME show connection error??
+        // Perhaps show something after 2 misses.
+
+    }   // PollRequest::callback
+
+    // ------------------------------------------------------------------------
+    /** Sends a message to the server that the client has been closed, if a
+     *  user is signed in.
+     */
+    void OnlinePlayerProfile::onSTKQuit() const
+    {
+        if(isLoggedIn())
+        {
+            HTTPRequest * request =
+                      new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
+            request->setServerURL("client-user.php");
+            request->addParameter("action", "client-quit");
+            request->addParameter("token", getToken());
+            request->addParameter("userid", getOnlineId());
+            request->queue();
+        }
+    }
+
+    // ------------------------------------------------------------------------
+    /** \return the online id, or 0 if the user is not signed in.
+     */
+    uint32_t OnlinePlayerProfile::getOnlineId() const 
+    {
+        if((m_online_state == OS_SIGNED_IN ))
+        {
+            assert(m_profile != NULL);
+            return m_profile->getID();
+        }
+        return 0;
+    }   // getOnlineId
+
+} // namespace Online

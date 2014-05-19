@@ -6,27 +6,34 @@ uniform float endH;
 uniform float start;
 uniform float end;
 uniform vec3 col;
-uniform mat4 ipvmat;
 
-#if __VERSION__ >= 130
-in vec2 uv;
-out vec4 FragColor;
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
 #else
-varying vec2 uv;
-#define FragColor gl_FragColor
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 #endif
 
+in vec2 uv;
+out vec4 FragColor;
+
+
+vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 void main()
 {
 	float z = texture(tex, uv).x;
-
-	vec3 tmp = vec3(uv, z);
-	tmp = tmp * 2.0 - 1.0;
-
-	vec4 xpos = vec4(tmp, 1.0);
-	xpos = ipvmat * xpos;
-	xpos.xyz /= xpos.w;
+	vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 
 	float dist = length(xpos.xyz);
 	float fog = smoothstep(start, end, dist);

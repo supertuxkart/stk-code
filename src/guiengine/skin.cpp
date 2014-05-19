@@ -856,7 +856,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         
         int step = ratingBar->getStepsOfStar(i);
         
-        const core::recti source_area(texture_w * step, 0, 
+        const core::recti source_area(texture_w * step, 0,
                                       texture_w * (step + 1), texture_h);
 
         draw2DImage(texture,
@@ -2097,7 +2097,7 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
         core::recti innerArea = borderArea;
         innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
         innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
-		GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
+        GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)
@@ -2161,7 +2161,7 @@ void Skin::drawBGFadeColor()
     SColor color = SkinConfig::m_colors["dialog_background::neutral"];
     if (m_dialog_size < 1.0f)
         color.setAlpha( (unsigned int)(color.getAlpha()*m_dialog_size ));
-	GL32_draw2DRectangle(color,
+    GL32_draw2DRectangle(color,
                                             core::recti(position2d< s32 >(0,0),
                        GUIEngine::getDriver()->getCurrentRenderTargetSize()) );
 }   // drawBGFadeColor
@@ -2177,7 +2177,8 @@ core::recti Skin::draw3DWindowBackground(IGUIElement *element,
 {
     if (ModalDialog::getCurrent() == NULL) return rect;
 
-    drawBGFadeColor();
+    if (ModalDialog::getCurrent()->fadeBackground())
+        drawBGFadeColor();
 
     // draw frame
     if (m_dialog_size < 1.0f)
@@ -2211,7 +2212,7 @@ void Skin::draw3DMenuPane (IGUIElement *element, const core::recti &rect,
                            const core::recti *clip)
 {
     SColor color = SColor(150, 96, 74, 196);
-	GL32_draw2DRectangle(color, rect);
+    GL32_draw2DRectangle(color, rect);
 }   // draw3DMenuPane
 
 // -----------------------------------------------------------------------------
@@ -2262,6 +2263,15 @@ void Skin::drawIcon (IGUIElement *element, EGUI_DEFAULT_ICON icon,
     // we won't let irrLicht decide when to call this, we draw them ourselves.
     /* m_fallback_skin->drawIcon(element, icon, position, starttime,
                                  currenttime, loop, clip); */
+}
+
+// -----------------------------------------------------------------------------
+
+void Skin::draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    const video::SColor* const colors, bool useAlphaChannelOfTexture)
+{
+    ::draw2DImage(texture, destRect, sourceRect, clipRect, colors, useAlphaChannelOfTexture);
 }
 
 // -----------------------------------------------------------------------------

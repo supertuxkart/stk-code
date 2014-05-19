@@ -19,12 +19,11 @@
 #ifndef HEADER_NOTIFICATION_DIALOG_HPP
 #define HEADER_NOTIFICATION_DIALOG_HPP
 
-#include <irrString.h>
-
 #include "guiengine/modaldialog.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/current_user.hpp"
 #include "utils/types.hpp"
+
+#include <irrString.h>
 
 
 /**
@@ -53,7 +52,7 @@ private:
     GUIEngine::IconButtonWidget * m_cancel_widget;
 
 public:
-    NotificationDialog(Type type, const core::stringw info, bool from_queue = true);
+    NotificationDialog(Type type, const core::stringw &info);
     ~NotificationDialog();
 
     virtual void beforeAddingWidgets();

@@ -86,7 +86,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     else if (s=="" || s=="none")
         m_adjust_image = ADJ_NONE;
     else
-        Log::warn("material", 
+        Log::warn("material",
                   "Incorrect adjust-image specification: '%s' - ignored.",
                   s.c_str());
     node->get("alpha",            &m_alpha_blending    );
@@ -121,7 +121,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     }
     else if (creaction.size() > 0)
     {
-        Log::warn("Material","Unknown collision reaction '%s'", 
+        Log::warn("Material","Unknown collision reaction '%s'",
                   creaction.c_str());
     }
 
@@ -239,7 +239,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     }
     else if (s != "")
     {
-        Log::warn("material", 
+        Log::warn("material",
                   "Invalid graphical effect specification: '%s' - ignored.",
                   s.c_str());
     }
@@ -261,7 +261,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         }
         else
         {
-            Log::warn("material", 
+            Log::warn("material",
                       "Could not find normal map image in materials.xml");
         }
 
@@ -650,22 +650,22 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     //            materials.xml, if you want to set flags for all surfaces, see
     //            'MaterialManager::setAllMaterialFlags'
 
-    if (m_deprecated || 
-        (m->getTexture(0) != NULL && 
+    if (m_deprecated ||
+        (m->getTexture(0) != NULL &&
          ((core::stringc)m->getTexture(0)->getName()).find("deprecated") != -1))
     {
-        Log::warn("material", "Track uses deprecated texture '%s'", 
+        Log::warn("material", "Track uses deprecated texture '%s'",
                   m_texname.c_str());
     }
 
 
     int modes = 0;
 
-	if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
-	{
-		m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
-		modes++;
-	}
+    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
+    {
+        m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+        modes++;
+    }
 
     if (m_alpha_testing)
     {
@@ -765,8 +765,8 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         if (irr_driver->isGLSL())
         {
 
-			if (mb->getVertexType() != video::EVT_TANGENTS)
-				Log::error("material", "Requiring normal map without tangent enabled mesh");
+            if (mb->getVertexType() != video::EVT_TANGENTS)
+                Log::error("material", "Requiring normal map without tangent enabled mesh");
             ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
             if (m_is_heightmap)
             {
@@ -851,13 +851,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             {
             m->MaterialType = video::EMT_SOLID;
             }
-        }
-    if (m_graphical_effect == GE_CAUSTICS && irr_driver->isGLSL())
-        {
-        m->MaterialType = irr_driver->getShader(ES_CAUSTICS);
-
-        m->setTexture(1, irr_driver->getTexture(FileManager::SHADER,
-                                                "caustics.png"));
         }
 
 

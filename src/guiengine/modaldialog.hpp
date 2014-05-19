@@ -61,10 +61,10 @@ namespace GUIEngine
         float m_percent_width, m_percent_height;
         bool m_init;
 
-
     protected:
         irr::gui::IGUIWindow* m_irrlicht_window;
         irr::core::rect< irr::s32 > m_area;
+        bool m_fade_background;
 
         InputManager::InputDriverMode m_previous_mode;
 
@@ -135,6 +135,8 @@ namespace GUIEngine
           * \brief Implementing callback from AbstractTopLevelContainer
           */
         virtual int getHeight() { return m_area.getHeight(); }
+
+        bool fadeBackground() const { return m_fade_background; }
 
         bool isMyIrrChild(irr::gui::IGUIElement* widget) const { return m_irrlicht_window->isMyChild(widget); }
     };

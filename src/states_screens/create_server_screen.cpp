@@ -21,6 +21,7 @@
 
 #include "audio/sfx_manager.hpp"
 #include "challenges/unlock_manager.hpp"
+#include "config/player_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "online/servers_manager.hpp"
 #include "online/messages.hpp"
@@ -57,7 +58,7 @@ void CreateServerScreen::loadedFromFile()
 
     m_name_widget = getWidget<TextBoxWidget>("name");
     assert(m_name_widget != NULL);
-    m_name_widget->setText(CurrentUser::get()->getUserName() + _("'s server"));
+    m_name_widget->setText(PlayerManager::getCurrentOnlineUserName() + _("'s server"));
     m_max_players_widget = getWidget<SpinnerWidget>("max_players");
     assert(m_max_players_widget != NULL);
     m_max_players_widget->setValue(8);
@@ -138,8 +139,7 @@ void CreateServerScreen::serverCreationRequest()
     {
 
         m_server_creation_request = new ServerCreationRequest();
-        CurrentUser::setUserDetails(m_server_creation_request);
-        m_server_creation_request->addParameter("action", "create_server");
+        PlayerManager::setUserDetails(m_server_creation_request,"create_server");
         m_server_creation_request->addParameter("name", name);
         m_server_creation_request->addParameter("max_players", max_players);
         m_server_creation_request->queue();

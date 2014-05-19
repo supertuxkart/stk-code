@@ -144,7 +144,7 @@ void FeatureUnlockedCutScene::loadedFromFile()
 
 void FeatureUnlockedCutScene::findWhatWasUnlocked(RaceManager::Difficulty difficulty)
 {
-    PlayerProfile *player = PlayerManager::get()->getCurrentPlayer();
+    PlayerProfile *player = PlayerManager::getCurrentPlayer();
     int points_before = player->getPoints();
     int points_now = points_before + CHALLENGE_POINTS[difficulty];
 
@@ -270,7 +270,8 @@ void FeatureUnlockedCutScene::init()
         video::ITexture *t = irr_driver->getTexture(texture_names[i]);
         textures.push_back(t);
     }
-    m_sky = irr_driver->addSkyBox(textures);
+    std::vector<video::ITexture*> sh_textures;
+    m_sky = irr_driver->addSkyBox(textures, sh_textures);
 #ifdef DEBUG
     m_sky->setName("skybox");
 #endif
@@ -301,7 +302,7 @@ void FeatureUnlockedCutScene::init()
                                                                  120, 120));
 
     const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1, 1, 1);
+    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1., 1, 1, 1, true);
 #ifdef DEBUG
     m_light->setName("light");
 #endif
@@ -329,7 +330,7 @@ void FeatureUnlockedCutScene::init()
             KartModel *kart_model =
                 m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
-            m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true);
+            m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true, false);
             kart_model->setAnimation(KartModel::AF_DEFAULT);
             float susp[4]={0,0,0,0};
             kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
@@ -410,7 +411,7 @@ void FeatureUnlockedCutScene::tearDown()
     m_all_kart_models.clearAndDeleteAll();
 
     // update point count and the list of locked/unlocked stuff
-    PlayerManager::get()->getCurrentPlayer()->computeActive();
+    PlayerManager::getCurrentPlayer()->computeActive();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -625,7 +626,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
     }
     else
     {
-        const std::vector<std::string>& gptracks = gp->getTrackNames();
+        const std::vector<std::string> gptracks = gp->getTrackNames();
         const int trackAmount = gptracks.size();
 
         if (trackAmount == 0)

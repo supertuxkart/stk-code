@@ -30,13 +30,26 @@
 #include <cstddef>  // NULL
 
 class AchievementsStatus;
+
+namespace Online 
+{
+    class CurrentUser;
+    class HTTPRequest;
+    class OnlineProfile;
+    class XMLRequest;
+}
 class PlayerProfile;
 
 /** A special class that manages all local player accounts. It reads all player
- *  accounts from the players.xml file in the user config directory. It also
- *  keeps track of the currently logged in player. For each player an instance
- *  of PlayerProfile is created, which keeps track of story mode progress,
- *  achievements and other data.
+ *  accounts from the players.xml file in the user config directory. For each
+ *  player an instance of PlayerProfile is created, which keeps track of 
+ *  story mode progress, achievements and other data. It also keeps track of
+ *  the currently logged in player.
+ *  It includes several handy static functions which avoid long call 
+ *  sequences, e.g.:
+ *    PlayerManager::getCurrentOnlineId()
+ *  which is just:
+ *    PlayerManager::get()->getCurrentUser()->getID();
  */
 class PlayerManager : public NoCopy
 {
@@ -47,6 +60,10 @@ private:
 
     /** A pointer to the current player. */
     PlayerProfile* m_current_player;
+
+    /** Saves the XML tree from players.xml for use in the 2nd
+     * loading stage (initRemainingData). */
+    const XMLNode *m_player_data;
 
     void load();
      PlayerManager();
@@ -69,9 +86,9 @@ public:
         delete m_player_manager;
         m_player_manager = NULL;
     }   // destroy
-    // ------------------------------------------------------------------------
-    
+
     void save();
+    void initRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     void addNewPlayer(const irr::core::stringw& name);
@@ -79,9 +96,31 @@ public:
     void setCurrentPlayer(PlayerProfile *player, bool remember_me);
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
+    static void setUserDetails(Online::HTTPRequest *request,
+                               const std::string &action,
+                               const std::string &php_name = "");
+    static unsigned int getCurrentOnlineId();
+    static bool isCurrentLoggedIn();
+    static Online::OnlineProfile* getCurrentOnlineProfile();
+
+    static PlayerProfile::OnlineState getCurrentOnlineState();
+    static const irr::core::stringw& getCurrentOnlineUserName();
+    static void requestOnlinePoll();
+    static void resumeSavedSession();
+    static void onSTKQuit();
+    static void requestSignOut();
+    static Online::XMLRequest *requestSignIn(const irr::core::stringw &username,
+                                             const irr::core::stringw &password,
+                                             bool save_session,
+                                              bool request_now = true);
+
     // ------------------------------------------------------------------------
     /** Returns the current player. */
-    PlayerProfile* getCurrentPlayer() { return m_current_player; }
+    static PlayerProfile* getCurrentPlayer() 
+    {
+        return get()->m_current_player; 
+    }   // getCurrentPlayer
+
     // ------------------------------------------------------------------------
     PlayerProfile *getPlayer(const irr::core::stringw &name);
     // ------------------------------------------------------------------------
@@ -100,7 +139,7 @@ public:
     /** A handy shortcut funtion. */
     static AchievementsStatus* getCurrentAchievementsStatus()
     {
-        return get()->getCurrentPlayer()->getAchievementsStatus();
+        return PlayerManager::getCurrentPlayer()->getAchievementsStatus();
     }   // getCurrentAchievementsStatus
     // ------------------------------------------------------------------------
     /** A handy shortcut to increase points for an achievement key of the
