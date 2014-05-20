@@ -115,8 +115,8 @@ void PlayerManager::resumeSavedSession()
  */
 void PlayerManager::onSTKQuit()
 {
-    if (getCurrentPlayer())
-        getCurrentPlayer()->onSTKQuit();
+    if (getCurrentPlayer() && getCurrentPlayer()->isLoggedIn())
+        getCurrentPlayer()->requestSignOut();
 }   // onSTKQuit
 
 // ----------------------------------------------------------------------------

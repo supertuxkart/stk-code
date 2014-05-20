@@ -127,11 +127,11 @@ public:
     virtual Online::OnlineProfile* getProfile() const = 0;
     virtual void requestPoll() const = 0;
     virtual void requestSavedSession() = 0;
-    virtual void onSTKQuit() const = 0;
     virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
                                               const irr::core::stringw &password) = 0;
     virtual void signIn(bool success, const XMLNode * input) = 0;
-    virtual void signOut(bool success, const XMLNode * input) = 0;
+    virtual void signOut(bool success, const XMLNode * input,
+                         const irr::core::stringw &info) = 0;
     virtual void requestSignOut() = 0;
     virtual bool isLoggedIn() const { return false;  }
     // ------------------------------------------------------------------------

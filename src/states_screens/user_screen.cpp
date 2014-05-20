@@ -145,10 +145,6 @@ void BaseUserScreen::selectUser(int index)
 {
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
-    PlayerProfile *cp = PlayerManager::getCurrentPlayer();
-    // If the current user is logged in, a logout is required now.
-    if(profile!=cp && cp && cp->isLoggedIn())
-        cp->requestSignOut();
 
     getWidget<TextBoxWidget >("username")->setText(profile
                                                    ->getLastOnlineName());
@@ -300,24 +296,34 @@ void BaseUserScreen::login()
     // If an error occurs, the callback informing this screen about the
     // problem will activate the widget again.
     m_options_widget->setDeactivated();
+    m_state = STATE_NONE;
 
     PlayerProfile *player = getSelectedPlayer();
+    PlayerProfile *current = PlayerManager::getCurrentPlayer();
+    // If a different player is connecting, log out the current player.
+    if(player!=current && current && current->isLoggedIn())
+    {
+        current->requestSignOut();
+        m_state = (UserScreenState)(m_state | STATE_LOGOUT);
+    }
     PlayerManager::get()->setCurrentPlayer(player);
     assert(player);
 
-    // If no online login requested, go straight to the main menu screen.
+    // If no online login requested, log the player out (if necessary)
+    // and go to the main menu screen (though logout needs to finish first)
     if(!m_online_cb->getState())
     {
         if(player->isLoggedIn())
         {
-            // The player is logged in, but online is now disabled,
-            // so log the player out. There is no error handling of
-            // a failed logout request
             player->requestSignOut();
+            m_state =(UserScreenState)(m_state| STATE_LOGOUT);
         }
 
         player->setWasOnlineLastTime(false);
-        closeScreen();
+        if(m_state==STATE_NONE)
+        {
+            closeScreen();
+        }
         return;
     }
 
@@ -328,7 +334,7 @@ void BaseUserScreen::login()
         closeScreen();
         return;
     }
-
+    m_state = (UserScreenState) (m_state | STATE_LOGIN);
     // Now we need to start a login request to the server
     // This implies that this screen will wait till the server responds, so
     // that error messages ('invalid password') can be shown, and the user
@@ -361,8 +367,11 @@ void BaseUserScreen::login()
 void BaseUserScreen::onUpdate(float dt)
 {
     if (!m_options_widget->isActivated())
-        m_info_widget->setText(Online::Messages::loadingDots( _("Signing in")),
-                               false);
+    {
+        const wchar_t *message = (m_state & STATE_LOGOUT) ? _("Signing out")
+                                                   : _("Signing in");
+        m_info_widget->setText(Online::Messages::loadingDots(message), false);
+    }
     PlayerProfile *player = getSelectedPlayer();
     if(player)
     {
@@ -398,6 +407,7 @@ void BaseUserScreen::loginSuccessful()
  */
 void BaseUserScreen::loginError(const irr::core::stringw & error_message)
 {
+    m_state = (UserScreenState) (m_state & ~STATE_LOGIN);
     PlayerProfile *player = getSelectedPlayer();
     // Clear information about saved session in case of a problem,
     // which allows the player to enter a new password.
@@ -411,11 +421,43 @@ void BaseUserScreen::loginError(const irr::core::stringw & error_message)
 }   // loginError
 
 // ----------------------------------------------------------------------------
+/** Callback from player profile if logout was successful.
+ */
+void BaseUserScreen::logoutSuccessful()
+{
+    m_state = (UserScreenState) (m_state & ~STATE_LOGOUT);
+    if(m_state==STATE_NONE)
+        closeScreen();
+    // Otherwise the screen still has to wait for a login request to finish.
+}   // loginSuccessful
+
+// ----------------------------------------------------------------------------
+/** Callback from player profile if login was unsuccessful.
+ *  \param error_message Contains the error message.
+ */
+void BaseUserScreen::logoutError(const irr::core::stringw & error_message)
+{
+    m_state = (UserScreenState) (m_state & ~STATE_LOGOUT);
+    PlayerProfile *player = getSelectedPlayer();
+    // Clear information about saved session in case of a problem,
+    // which allows the player to enter a new password.
+    if(player && player->hasSavedSession())
+        player->clearSession();
+    makeEntryFieldsVisible();
+    sfx_manager->quickSound("anvil");
+    m_info_widget->setErrorColor();
+    m_info_widget->setText(error_message, false);
+    m_options_widget->setActivated();
+}   // logoutError
+
+// ----------------------------------------------------------------------------
 void BaseUserScreen::newUserAdded(const irr::core::stringw &local_name,
                               const irr::core::stringw &online_name)
 {
     PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
-    PlayerManager::get()->setCurrentPlayer(player);
+    // Set the online name, only if the user clicks on 'ok' will this
+    // new player become the current player (since we potentially have to 
+    // log out the old current player).
     player->setLastOnlineName(online_name);
 }   // newUserAdded
 

@@ -51,6 +51,10 @@ protected:
 
 private:
 
+    /** The state of the user screen. Note that this is a bit mask, since the
+     *  current user can be logged out, and the new one logged in at the
+     *  same time. */
+    enum UserScreenState { STATE_NONE=0, STATE_LOGIN=1, STATE_LOGOUT=2} m_state;
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;
 
@@ -98,6 +102,8 @@ public:
 
     void loginSuccessful();
     void loginError(const irr::core::stringw &error_message);
+    void logoutSuccessful();
+    void logoutError(const irr::core::stringw &error_message);
     void newUserAdded(const irr::core::stringw &local_name,
                       const irr::core::stringw &online_name);
 };   // class BaseUserScreen

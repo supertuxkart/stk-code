@@ -59,14 +59,6 @@ namespace Online
             };   // SignInRequest
 
             // ----------------------------------------------------------------
-            class SignOutRequest : public XMLRequest
-            {
-                virtual void callback ();
-            public:
-                SignOutRequest() : XMLRequest(true,/*priority*/10) {}
-            };   // SignOutRequest
-
-            // ----------------------------------------------------------------
             class PollRequest : public XMLRequest {
                 virtual void callback ();
             public:
@@ -85,7 +77,8 @@ namespace Online
 
 
             virtual void signIn(bool success, const XMLNode * input);
-            virtual void signOut(bool success, const XMLNode * input);
+            virtual void signOut(bool success, const XMLNode * input, 
+                                const irr::core::stringw &info);
 
             // For now declare functions that will become part of PlayerManager
             // or Playerprofile to be private, and give only PlayerManager
@@ -106,7 +99,6 @@ namespace Online
                                         const std::string &php_script = "");
 
             virtual void requestPoll() const;
-            virtual void onSTKQuit() const;
             // ----------------------------------------------------------------
             /** Returns if this user is logged in. */
             virtual bool isLoggedIn() const 

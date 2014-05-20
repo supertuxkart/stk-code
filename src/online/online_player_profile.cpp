@@ -191,38 +191,77 @@ namespace Online
     }   // signIn
 
     // ------------------------------------------------------------------------
+    /** Requests a sign out from the server. If the user should be remembered,
+     *  a 'client-quit' request is sent (which will log the user out, but 
+     *  remember the token), otherwise a 'disconnect' is sent.
+     */
     void OnlinePlayerProfile::requestSignOut()
     {
         assert(m_online_state == OS_SIGNED_IN || m_online_state == OS_GUEST);
-        SignOutRequest * request = new SignOutRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action","disconnect");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getOnlineId());
+        // ----------------------------------------------------------------
+        class SignOutRequest : public XMLRequest
+        {
+        private:
+            PlayerProfile *m_player;
+            virtual void callback()
+            {
+                m_player->signOut(isSuccess(), getXMLData(), getInfo());
+            }
+        public:
+            /** Sign out request, with a higher priority than signin requests,
+             *  so that when a user is changed the signout is done first
+             *  (to avoid potential problems with a local user logged in twice
+             *  - even if it's only a short period of time). */
+            SignOutRequest(PlayerProfile *player)
+                        : XMLRequest(true,/*priority*/20)
+            {
+                m_player = player;
+                m_player->setUserDetails(this, 
+                    UserConfigParams::m_remember_user ? "client-quit" 
+                                                      :"disconnect");
+            }   // SignOutRequest
+        };   // SignOutRequest
+        // ----------------------------------------------------------------
+
+        HTTPRequest *request = new SignOutRequest(this);
         request->queue();
         m_online_state = OS_SIGNING_OUT;
     }   // requestSignOut
 
-    // --------------------------------------------------------------------
-    void OnlinePlayerProfile::SignOutRequest::callback()
-    {
-        PlayerManager::getCurrentPlayer()->signOut(isSuccess(), getXMLData());
-    }   // SignOutRequest::callback
-
     // ------------------------------------------------------------------------
-    void OnlinePlayerProfile::signOut(bool success, const XMLNode * input)
+    /** Callback once the logout event has been processed. 
+     *  \param success If the request was successful.
+     *  \param input
+     */
+    void OnlinePlayerProfile::signOut(bool success, const XMLNode *input,
+                                      const irr::core::stringw &info)
     {
-        if(!success)
+        GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
+        BaseUserScreen *user_screen = dynamic_cast<BaseUserScreen*>(screen);
+        // We can't do much of error handling here, no screen waits for
+        // a logout to finish, so we can only log the message to screen,
+        // and otherwise mark the player logged out internally.
+        if (!success)
         {
-            Log::warn("OnlinePlayerProfile::signOut", "%s",
+            Log::warn("OnlinePlayerProfile::signOut",
                       "There were some connection issues while signing out. "
                       "Report a bug if this caused issues.");
+            Log::warn("OnlinePlayerProfile::signOut", core::stringc(info.c_str()).c_str());
+            if(user_screen)
+                user_screen->logoutError(info);
         }
-        m_token = "";
+        else
+        {
+            if(user_screen)
+                user_screen->logoutSuccessful();
+        }
+
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         m_online_state = OS_SIGNED_OUT;
-        PlayerManager::getCurrentPlayer()->clearSession();
+        // Discard token if session should not be saved.
+        if(!UserConfigParams::m_remember_user)
+            clearSession();
     }   // signOut
 
     // ------------------------------------------------------------------------
@@ -375,24 +414,6 @@ namespace Online
         // Perhaps show something after 2 misses.
 
     }   // PollRequest::callback
-
-    // ------------------------------------------------------------------------
-    /** Sends a message to the server that the client has been closed, if a
-     *  user is signed in.
-     */
-    void OnlinePlayerProfile::onSTKQuit() const
-    {
-        if(isLoggedIn())
-        {
-            HTTPRequest * request =
-                      new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
-            request->setServerURL("client-user.php");
-            request->addParameter("action", "client-quit");
-            request->addParameter("token", getToken());
-            request->addParameter("userid", getOnlineId());
-            request->queue();
-        }
-    }
 
     // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
