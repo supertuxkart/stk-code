@@ -305,7 +305,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
-    if (UserConfigParams::m_dynamic_lights && World::getWorld()->isFogEnabled())
+    if (UserConfigParams::m_dynamic_lights && World::getWorld() != NULL &&
+        World::getWorld()->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
         m_post_processing->renderFog();
@@ -437,8 +438,15 @@ void IrrDriver::renderFixed(float dt)
 void IrrDriver::computeSunVisibility()
 {
     // Is the lens flare enabled & visible? Check last frame's query.
-    const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
-    const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+    bool hasflare = false;
+    bool hasgodrays = false;
+
+    if (World::getWorld() != NULL)
+    {
+        hasflare = World::getWorld()->getTrack()->hasLensFlare();
+        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+    }
+
     irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
     if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
     {
@@ -510,7 +518,10 @@ void IrrDriver::renderSolidFirstPass()
 
 void IrrDriver::renderSolidSecondPass()
 {
-    SColor clearColor = World::getWorld()->getClearColor();
+    SColor clearColor(255, 150, 150, 150);
+    if (World::getWorld() != NULL)
+        clearColor = World::getWorld()->getClearColor();
+
     glClearColor(clearColor.getRed()  / 255.f, clearColor.getGreen() / 255.f,
                  clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT);

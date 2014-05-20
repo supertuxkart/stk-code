@@ -1556,6 +1556,11 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
     return t;
 }   // applyMask
 // ----------------------------------------------------------------------------
+void IrrDriver::setRTT(RTT* rtt)
+{
+    m_rtts = rtt;
+}
+// ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {
     if (m_glsl)

@@ -207,7 +207,10 @@ void PostProcessing::update(float dt)
 static
 void renderBloom(GLuint in)
 {
-    const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
+    float threshold = 1.0f;
+    if (World::getWorld() != NULL)
+        threshold = World::getWorld()->getTrack()->getBloomThreshold();
+
     glUseProgram(FullScreenShader::BloomShader::Program);
     glBindVertexArray(FullScreenShader::BloomShader::vao);
 
@@ -694,7 +697,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
-        const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+        bool hasgodrays = false;
+        if (World::getWorld() != NULL)
+            hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+
         if (UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
             glEnable(GL_DEPTH_TEST);
@@ -809,7 +815,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
+        if (UserConfigParams::m_motionblur && m_any_boost && World::getWorld() != NULL) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);

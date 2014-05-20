@@ -286,6 +286,11 @@ public:
         m_lwhite = v;
     }
 
+    struct GlowData {
+        scene::ISceneNode * node;
+        float r, g, b;
+    };
+
 private:
     std::vector<VideoMode> m_modes;
 
@@ -320,11 +325,6 @@ private:
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
 
-    struct GlowData {
-        scene::ISceneNode * node;
-        float r, g, b;
-    };
-
     std::vector<GlowData> m_glowing;
 
     std::vector<LightNode *> m_lights;
@@ -354,7 +354,6 @@ private:
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
-    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
@@ -517,7 +516,10 @@ public:
     {
         return m_texture_error_message;
     }   // getTextureErrorMessage
-
+    // ------------------------------------------------------------------------
+    void setRTT(RTT* rtt);
+    // ------------------------------------------------------------------------
+    RTT* getRTT() { return m_rtts; }
     // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
@@ -672,6 +674,8 @@ public:
 
     void onLoadWorld();
     void onUnloadWorld();
+
+    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
 
     // --------------------- RTT --------------------
     /**
