@@ -53,6 +53,7 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 
 RTT::RTT(size_t width, size_t height)
 {
+    m_shadow_FBO = NULL;
     initGL();
     using namespace video;
     using namespace core;
@@ -197,14 +198,14 @@ RTT::RTT(size_t width, size_t height)
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
-        shadowFBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+        m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 RTT::~RTT()
 {
-    delete shadowFBO;
+    delete m_shadow_FBO;
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (irr_driver->getGLSLVersion() >= 150)
