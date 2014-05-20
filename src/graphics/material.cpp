@@ -157,6 +157,60 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     s = "";
     if (node->get("shader", &s))
     {
+        if (s == "solid")
+        {
+            m_shader_type = SHADERTYPE_SOLID;
+        }
+        else if (s == "unlit")
+        {
+            m_shader_type = SHADERTYPE_SOLID_UNLIT;
+        }
+        else if (s == "additive")
+        {
+            m_shader_type = SHADERTYPE_ADDITIVE;
+        }
+        else if (s == "alphatest")
+        {
+            m_shader_type = SHADERTYPE_ALPHA_TEST;
+        }
+        else if (s == "alphablend")
+        {
+            m_shader_type = SHADERTYPE_ALPHA_BLEND;
+        }
+        else if (s == "spheremap")
+        {
+            m_shader_type = SHADERTYPE_SPHERE_MAP;
+        }
+        else if (s == "water_shader")
+        {
+            m_shader_type = SHADERTYPE_WATER;
+            node->get("water-shader-speed-1", &m_water_shader_speed_1);
+            node->get("water-shader-speed-2", &m_water_shader_speed_2);
+        }
+        else if (s == "grass")
+        {
+            m_shader_type = SHADERTYPE_VEGETATION;
+            m_grass_speed = 1.5f;
+            m_grass_amplitude = 0.25f;
+            node->get("grass-speed", &m_grass_speed);
+            node->get("grass-amplitude", &m_grass_amplitude);
+        }
+        else if (s == "splatting")
+        {
+            m_shader_type = SHADERTYPE_SPLATTING;
+            node->get("splatting-texture-1", &m_splatting_texture_1);
+            node->get("splatting-texture-2", &m_splatting_texture_2);
+            node->get("splatting-texture-3", &m_splatting_texture_3);
+            node->get("splatting-texture-4", &m_splatting_texture_4);
+        }
+        else if (s == "bubble")
+        {
+            m_shader_type = SHADERTYPE_BUBBLE;
+        }
+        else
+        {
+            Log::warn("Material", "Unknown shader type <%s> for <%s>", s.c_str(), m_texname.c_str());
+        }
     }
     else
     {
