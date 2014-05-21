@@ -45,12 +45,12 @@ namespace GUIEngine
         /**  Change the label on the widget */
         void setLabel(const irr::core::stringw label);
         int m_value;
+        bool m_show_label;
         
     public:
         
         LEAK_CHECK()
-        
-        ProgressBarWidget();
+        ProgressBarWidget(bool show_label = true);
         virtual ~ProgressBarWidget() {}
         
         /** Change the value of the widget, it must be a percent. */
