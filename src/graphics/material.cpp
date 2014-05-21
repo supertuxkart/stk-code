@@ -243,6 +243,17 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         if (b)
             m_shader_type = SHADERTYPE_SPHERE_MAP;
 
+
+        if (node->get("compositing", &s))
+        {
+            if (s == "blend")         m_shader_type = SHADERTYPE_ALPHA_BLEND;
+            else if (s == "test")     m_shader_type = SHADERTYPE_ALPHA_TEST;
+            else if (s == "additive") m_shader_type = SHADERTYPE_ADDITIVE;
+            else if (s == "coverage") m_shader_type = SHADERTYPE_ALPHA_TEST;
+            else if (s != "none")
+                Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
+        }
+
         s = "";
         node->get("graphical-effect", &s);
 
@@ -320,16 +331,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
         if (sphere_map)
         {
             m_shader_type = SHADERTYPE_SPHERE_MAP;
-        }
-
-        if (node->get("compositing", &s))
-        {
-            if (s == "blend")         m_shader_type = SHADERTYPE_ALPHA_BLEND;
-            else if (s == "test")     m_shader_type = SHADERTYPE_ALPHA_TEST;
-            else if (s == "additive") m_shader_type = SHADERTYPE_ADDITIVE;
-            else if (s == "coverage") m_shader_type = SHADERTYPE_ALPHA_TEST;
-            else if (s != "none")
-                Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
         }
 
         bool water_shader = false;
