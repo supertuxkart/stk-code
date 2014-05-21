@@ -139,6 +139,23 @@ namespace Online
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
         BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
+
+        // If the login is successful, reset any saved session of other
+        // local players using the same online account (which are now invalid)
+        if(isSuccess())
+        {
+            PlayerProfile *current = PlayerManager::getCurrentPlayer();
+            for(unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
+            {
+                PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+                if(player!=current &&
+                    player->hasSavedSession() && 
+                    player->getLastOnlineName() == current->getLastOnlineName())
+                {
+                    player->clearSession();
+                }
+            }
+        }
         if(login)
         {
             if(isSuccess())
