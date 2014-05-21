@@ -620,6 +620,16 @@ public:
     static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ctex, unsigned TU_ntex, unsigned TU_dtex);
 };
 
+class RHDebug
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
+};
+
 class GlobalIlluminationReconstructionShader
 {
 public:

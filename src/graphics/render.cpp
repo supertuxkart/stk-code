@@ -334,8 +334,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[1]);
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[2]);
-        FullScreenShader::RHDebug::setUniforms(rh_extend, 0, 1, 2);
-        glDrawArrays(GL_POINTS, 0, 128 * 128 * 128);
+        FullScreenShader::RHDebug::setUniforms(rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
         glDisable(GL_PROGRAM_POINT_SIZE);
     }
 

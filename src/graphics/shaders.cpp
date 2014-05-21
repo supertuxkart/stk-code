@@ -282,6 +282,7 @@ void Shaders::loadShaders()
     FullScreenShader::ShadowedSunLightShader::init();
     FullScreenShader::ShadowedSunLightDebugShader::init();
     FullScreenShader::RadianceHintsConstructionShader::init();
+    FullScreenShader::RHDebug::init();
     FullScreenShader::GlobalIlluminationReconstructionShader::init();
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
@@ -2350,6 +2351,36 @@ namespace FullScreenShader
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
         glUniform3f(uniform_extents, extents.X, extents.Y, extents.Z);
+    }
+
+    GLuint RHDebug::Program;
+    GLuint RHDebug::uniform_extents;
+    GLuint RHDebug::uniform_SHR;
+    GLuint RHDebug::uniform_SHG;
+    GLuint RHDebug::uniform_SHB;
+    GLuint RHDebug::uniform_RHMatrix;
+
+    void RHDebug::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/rhdebug.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rhdebug.frag").c_str());
+        uniform_extents = glGetUniformLocation(Program, "extents");
+        uniform_SHR = glGetUniformLocation(Program, "SHR");
+        uniform_SHG = glGetUniformLocation(Program, "SHG");
+        uniform_SHB = glGetUniformLocation(Program, "SHB");
+        uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    void RHDebug::setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
+    {
+        glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
+        glUniform3f(uniform_extents, extents.X, extents.Y, extents.Z);
+        glUniform1i(uniform_SHR, TU_SHR);
+        glUniform1i(uniform_SHG, TU_SHG);
+        glUniform1i(uniform_SHB, TU_SHB);
     }
 
     GLuint GlobalIlluminationReconstructionShader::Program;
