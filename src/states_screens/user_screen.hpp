@@ -55,6 +55,15 @@ private:
      *  current user can be logged out, and the new one logged in at the
      *  same time. */
     enum UserScreenState { STATE_NONE=0, STATE_LOGIN=1, STATE_LOGOUT=2} m_state;
+
+    /** The user name that is currently being logged out. Used to
+     *  display more meaningful sign-out message. */
+    irr::core::stringw m_sign_out_name;
+
+    /** The user name that is currently being logged out. Used to
+     *  display more meaningful sign-out message. */
+    irr::core::stringw m_sign_in_name;
+
     /** Online check box. */
     GUIEngine::CheckBoxWidget *m_online_cb;
 

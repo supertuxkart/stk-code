@@ -73,6 +73,9 @@ void BaseUserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
+    m_sign_out_name = "";
+    m_sign_in_name  = "";
+
     // It should always be activated ... but just in case
     m_options_widget->setActivated();
     // Clean any error message still shown
@@ -303,6 +306,7 @@ void BaseUserScreen::login()
     // If a different player is connecting, log out the current player.
     if(player!=current && current && current->isLoggedIn())
     {
+        m_sign_out_name = current->getLastOnlineName();
         current->requestSignOut();
         m_state = (UserScreenState)(m_state | STATE_LOGOUT);
     }
@@ -315,6 +319,7 @@ void BaseUserScreen::login()
     {
         if(player->isLoggedIn())
         {
+            m_sign_out_name =player->getLastOnlineName();
             player->requestSignOut();
             m_state =(UserScreenState)(m_state| STATE_LOGOUT);
         }
@@ -341,6 +346,7 @@ void BaseUserScreen::login()
     // can decide what to do about them.
     if (player->hasSavedSession())
     {
+        m_sign_in_name = player->getLastOnlineName();
         // Online login with saved token
         player->requestSavedSession();
     }
@@ -354,6 +360,7 @@ void BaseUserScreen::login()
             m_options_widget->setActivated();
             return;
         }
+        m_sign_in_name = m_username_tb->getText();
         player->requestSignIn(m_username_tb->getText(),
                                m_password_tb->getText());
     }   // !hasSavedSession
@@ -368,9 +375,11 @@ void BaseUserScreen::onUpdate(float dt)
 {
     if (!m_options_widget->isActivated())
     {
-        const wchar_t *message = (m_state & STATE_LOGOUT) ? _("Signing out")
-                                                   : _("Signing in");
-        m_info_widget->setText(Online::Messages::loadingDots(message), false);
+        core::stringw message = (m_state & STATE_LOGOUT) 
+                              ? _(L"Signing out '%s'",m_sign_out_name.c_str())
+                              : _(L"Signing in '%s'", m_sign_in_name.c_str());
+        m_info_widget->setText(Online::Messages::loadingDots(message.c_str()),
+                               false                                           );
     }
     PlayerProfile *player = getSelectedPlayer();
     if(player)
