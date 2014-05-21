@@ -114,7 +114,10 @@ namespace Online
         OnlinePlayerProfile::requestSignIn(const core::stringw &username,
                                            const core::stringw &password)
     {
-        assert(m_online_state == OS_SIGNED_OUT);
+        // If the player changes the online account, there can be a
+        // logout stil happening.
+        assert(m_online_state == OS_SIGNED_OUT || 
+               m_online_state == OS_SIGNING_OUT   );
         SignInRequest * request = new SignInRequest(false);
         // We can't use setUserDetail here, since there is no token yet
         request->setServerURL("client-user.php");

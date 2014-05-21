@@ -303,12 +303,20 @@ void BaseUserScreen::login()
 
     PlayerProfile *player = getSelectedPlayer();
     PlayerProfile *current = PlayerManager::getCurrentPlayer();
-    // If a different player is connecting, log out the current player.
-    if(player!=current && current && current->isLoggedIn())
+    core::stringw  new_username = m_username_tb->getText();
+    // If a different player is connecting, or the same local player with
+    // a different online account, log out the current player.
+    if(current && current->isLoggedIn() &&
+        (player!=current || current->getLastOnlineName()!=new_username) )
     {
         m_sign_out_name = current->getLastOnlineName();
         current->requestSignOut();
         m_state = (UserScreenState)(m_state | STATE_LOGOUT);
+        // If the online user name was changed, reset the save data
+        // for this user (otherwise later the saved session will be
+        // resumed, not logging the user with the new account).
+        if(current->getLastOnlineName()!=new_username)
+            current->clearSession();
     }
     PlayerManager::get()->setCurrentPlayer(player);
     assert(player);
