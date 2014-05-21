@@ -78,7 +78,7 @@ void RegisterScreen::doRegister()
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
     core::stringw email_confirm = getWidget<TextBoxWidget>("email_confirm")
                                 ->getText().trim();
-    
+
     m_info_widget->setErrorColor();
 
     if (password != password_confirm)
