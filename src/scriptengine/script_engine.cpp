@@ -18,8 +18,6 @@ asIScriptEngine *m_engine;
 // Function prototypes for binding. TODO:put these in their right place
 void configureEngine(asIScriptEngine *engine);
 int  compileScript(asIScriptEngine *engine,std::string scriptName);
-void printString(std::string &str);
-void printString_Generic(asIScriptGeneric *gen);
 
 ScriptEngine::ScriptEngine(){
 	// Create the script engine
@@ -41,7 +39,6 @@ ScriptEngine::~ScriptEngine(){
 // Displays the message specified in displayMessage( string message ) within the script
 void displayMessage(asIScriptGeneric *gen){
 	std::string *input = (std::string*)gen->GetArgAddress(0);
-	irr::core::stringw msgtodisp;
 	irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
 	new TutorialMessageDialog((out),true); 
 }
@@ -113,7 +110,7 @@ void ScriptEngine::runScript(std::string scriptName)
 		return;
 	}
 
-	// Now we can pass parameters to the script function. 
+	// Here, we can pass parameters to the script functions. 
 	//ctx->setArgType(index, value);
 	//for example : ctx->SetArgFloat(0, 3.14159265359f);
 
@@ -158,29 +155,12 @@ void configureEngine(asIScriptEngine *engine)
 	// Register the script string type
 	RegisterStdString(engine);
 
-	if( !strstr(asGetLibraryOptions(), "AS_MAX_PORTABILITY") )
-	{
-		// Register the functions that the scripts will be allowed to use.
-		// Note how the return code is validated with an assert(). This helps
-		// us discover where a problem occurs, and doesn't pollute the code
-		// with a lot of if's. If an error occurs in release mode it will
-		// be caught when a script is being built, so it is not necessary
-		// to do the verification here as well.
-		r = engine->RegisterGlobalFunction("void Print(string &in)", asFUNCTION(printString), asCALL_CDECL); assert( r >= 0 );
-		
-	}
-	else
-	{
-		// Notice how the registration is almost identical to the above. 
-		r = engine->RegisterGlobalFunction("void Print(string &in)", asFUNCTION(printString_Generic), asCALL_GENERIC); assert( r >= 0 );
-		
-	}
 	r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r>=0);
 	r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
 	r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
 
 	// It is possible to register the functions, properties, and types in 
-	// configuration groups as well. When compiling the scripts it then
+	// configuration groups as well. When compiling the scripts it can then
 	// be defined which configuration groups should be available for that
 	// script. If necessary a configuration group can also be removed from
 	// the engine, so that the engine configuration could be changed 
@@ -254,23 +234,9 @@ int compileScript(asIScriptEngine *engine, std::string scriptName)
 
 	// If we want to have several scripts executing at different times but 
 	// that have no direct relation with each other, then we can compile them
-	// into separate script modules. Each module use their own namespace and 
+	// into separate script modules. Each module uses their own namespace and 
 	// scope, so function names, and global variables will not conflict with
 	// each other.
 
 	return 0;
-}
-
-
-// Function implementation with native calling convention
-void printString(std::string &str)
-{
-	std::cout << str;
-}
-
-// Function implementation with generic script interface
-void printString_Generic(asIScriptGeneric *gen)
-{
-	std::string *str = (std::string*)gen->GetArgAddress(0);
-	std::cout << *str;
 }
