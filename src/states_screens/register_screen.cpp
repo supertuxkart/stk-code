@@ -76,8 +76,6 @@ void RegisterScreen::doRegister()
     core::stringw password_confirm =  getWidget<TextBoxWidget>("password_confirm")
                           ->getText().trim();
     core::stringw email =  getWidget<TextBoxWidget>("email")->getText().trim();
-    std::wstring stdEmail( getWidget<TextBoxWidget>("email")->getText().trim().c_str() );
-    std::wstring atSign(L"@"); std::wstring dotSign(L".");
     core::stringw email_confirm = getWidget<TextBoxWidget>("email_confirm")
                                 ->getText().trim();
     m_info_widget->setErrorColor();
@@ -102,9 +100,9 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
     }
-    else if (stdEmail.find(atSign)== -1 || stdEmail.find(dotSign)== -1 ||\
-               ( stdEmail.find_last_of(dotSign) - stdEmail.find_last_of(atSign) <= 2 ) ||\
-                stdEmail.find_last_of(atSign)==0 )
+    else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
+              (email.findLast(L'.') - email.findLast(L'@') <= 2 ) ||
+                email.findLast(L'@')==0 )
     {
        m_info_widget->setText(_("Email is invalid!"), false);
     }
