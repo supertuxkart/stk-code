@@ -67,36 +67,18 @@ namespace Online
 
         private:
             std::string                 m_token;
-            bool                        m_save_session;
             OnlineProfile              *m_profile;
 
             /** The state of the player (logged in, logging in, ...) */
             PlayerProfile::OnlineState  m_online_state;
 
-            bool doSaveSession()  const { return m_save_session; }
-
-
             virtual void signIn(bool success, const XMLNode * input);
             virtual void signOut(bool success, const XMLNode * input, 
                                 const irr::core::stringw &info);
-
-            // For now declare functions that will become part of PlayerManager
-            // or Playerprofile to be private, and give only PlayerManager
-            // access to them. FIXME
-
-            // FIXME: This apparently does not compile on linux :(
-            // So for now (while this is needed) I'll only add this on
-            // windows only (where it works).
-#ifdef WIN32
-             friend class PlayerManager;
-    public:
-#else
-    public:
-#endif
             virtual uint32_t getOnlineId() const;
             virtual void setUserDetails(Online::HTTPRequest *request,
                                         const std::string &action,
-                                        const std::string &php_script = "");
+                                        const std::string &php_script = "") const;
 
             virtual void requestPoll() const;
             // ----------------------------------------------------------------

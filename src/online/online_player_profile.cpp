@@ -52,8 +52,8 @@ namespace Online
      *  \param action If not empty, the action to be set.
      */
     void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
-                                     const std::string &action,
-                                     const std::string &php_script)
+                                             const std::string &action,
+                                             const std::string &php_script) const
     {
         if (php_script.size()>0)
             request->setServerURL(php_script);
@@ -74,7 +74,6 @@ namespace Online
     {
         m_online_state = OS_SIGNED_OUT;
         m_token        = "";
-        m_save_session = false;
         m_profile      = NULL;
     }   // OnlinePlayerProfile
 
@@ -84,7 +83,6 @@ namespace Online
     {
         m_online_state = OS_SIGNED_OUT;
         m_token        = "";
-        m_save_session = false;
         m_profile      = NULL;
 
     }   // OnlinePlayerProfile
@@ -97,8 +95,9 @@ namespace Online
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
             request = new SignInRequest(true);
-            request->setServerURL("client-user.php");
-            request->addParameter("action", "saved-session" );
+            setUserDetails(request, "saved-session");
+            // The userid must be taken from the saved data,
+            // setUserDetails takes it from current data.
             request->addParameter("userid", getSavedUserId());
             request->addParameter("token",  getSavedToken() );
             request->queue();
@@ -110,23 +109,20 @@ namespace Online
     /** Create a signin request.
      *  \param username Name of user.
      *  \param password Password.
-     *  \param save_session If true, the login credential will be saved to
-     *         allow a password-less login.
-     *  \param request_now Immediately submit this request to the
-     *         RequestManager.
      */
     OnlinePlayerProfile::SignInRequest*
         OnlinePlayerProfile::requestSignIn(const core::stringw &username,
-                                   const core::stringw &password)
+                                           const core::stringw &password)
     {
         assert(m_online_state == OS_SIGNED_OUT);
-        m_save_session = UserConfigParams::m_remember_user;
         SignInRequest * request = new SignInRequest(false);
+        // We can't use setUserDetail here, since there is no token yet
         request->setServerURL("client-user.php");
         request->addParameter("action","connect");
         request->addParameter("username",username);
         request->addParameter("password",password);
-        request->addParameter("save-session", m_save_session);
+        request->addParameter("save-session",
+                              UserConfigParams::m_remember_user);
         request->queue();
         m_online_state = OS_SIGNING_IN;
         return request;
@@ -166,11 +162,11 @@ namespace Online
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
-            PlayerManager::getCurrentPlayer()->setLastOnlineName(username);
+            setLastOnlineName(username);
             m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
-            if(doSaveSession())
+            if(UserConfigParams::m_remember_user)
             {
                 saveSession(getOnlineId(), getToken() );
             }
@@ -272,10 +268,7 @@ namespace Online
     {
         assert(m_online_state == OS_SIGNED_IN);
         OnlinePlayerProfile::PollRequest * request = new OnlinePlayerProfile::PollRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "poll");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getOnlineId());
+        setUserDetails(request, "poll");
         request->queue();
     }   // requestPoll()
 
