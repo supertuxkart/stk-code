@@ -323,6 +323,28 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         renderSkybox(camnode);
     PROFILER_POP_CPU_MARKER();
 
+    if (getRH())
+    {
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        m_rtts->getFBO(FBO_COLORS).Bind();
+        glUseProgram(FullScreenShader::RHDebug::Program);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[1]);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[2]);
+        FullScreenShader::RHDebug::setUniforms(rh_extend, 0, 1, 2);
+        glDrawArrays(GL_POINTS, 0, 128 * 128 * 128);
+        glDisable(GL_PROGRAM_POINT_SIZE);
+    }
+
+    if (getGI())
+    {
+        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+    }
+
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
     // Render anything glowing.
     if (!m_mipviz && !m_wireframe && UserConfigParams::m_glow)
@@ -895,10 +917,9 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
-    {
-        //gl_driver->extGlDrawBuffers(1, bufs);
         return;
-    }
+
+    m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
 
     if (SkyboxCubeMap)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
@@ -974,7 +995,6 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
     renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-//    gl_driver->extGlDrawBuffers(1, bufs);
 }
 
 void IrrDriver::renderSSAO()
