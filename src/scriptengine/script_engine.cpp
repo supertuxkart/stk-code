@@ -51,7 +51,7 @@ void disableAnimation(asIScriptGeneric *gen){
 }
 
 void squashKart(asIScriptGeneric *gen){
-		int id = (int)gen->GetArgAddress(0);
+		int id = (int)gen->GetArgDWord(0);
 		float time = gen->GetArgFloat(1);
 		AbstractKart* kart = World::getWorld()->getKart(id);
 		kart->setSquash(time,0.5);  //0.5 * max speed is new max for squashed duration
@@ -193,8 +193,8 @@ int compileScript(asIScriptEngine *engine, std::string scriptName)
 
 	// For now we will load the script directtly from a file on the disk.
 	//TODO use filemanager to do this.
-	std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
-	//std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
+	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
+	std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
 	load_dir += scriptName + ".as";
 	FILE *f = fopen(load_dir.c_str(), "rb");
 	if( f == 0 )
