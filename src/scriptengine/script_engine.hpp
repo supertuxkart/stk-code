@@ -1,7 +1,6 @@
-
 //
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2009-2013 Joerg Henrichs
+//  Copyright (C) 2014  SuperTuxKart Team
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -20,7 +19,8 @@
 #ifndef HEADER_SCRIPT_ENGINE_HPP
 #define HEADER_SCRIPT_ENGINE_HPP
 
-#include<string>
+#include <string>
+#include <angelscript.h>
 
 class TrackObjectPresentation;
 
@@ -30,8 +30,14 @@ public:
 
          ScriptEngine();
 		 ~ScriptEngine();
+		 
+		 void runScript(std::string scriptName);
 
-	void runScript(std::string scriptName);
+private:
+	asIScriptEngine *m_engine;
+	
+	void configureEngine(asIScriptEngine *engine);
+	int  compileScript(asIScriptEngine *engine,std::string scriptName);
 
 };   // class ScriptEngine
 #endif

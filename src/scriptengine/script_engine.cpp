@@ -1,3 +1,20 @@
+//
+//  SuperTuxKart - a fun racing game with go-kart
+//  Copyright (C) 2014  SuperTuxKart Team
+//
+//  This program is free software; you can redistribute it and/or
+//  modify it under the terms of the GNU General Public License
+//  as published by the Free Software Foundation; either version 3
+//  of the License, or (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+//
+//  You should have received a copy of the GNU General Public License
+//  along with this program; if not, write to the Free Software
+//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include <iostream>  // cout
 #include <assert.h>  // assert()
@@ -14,11 +31,13 @@
 using namespace irr;
 
 
-asIScriptEngine *m_engine;
-// Function prototypes for binding. TODO:put these in their right place
-void configureEngine(asIScriptEngine *engine);
-int  compileScript(asIScriptEngine *engine,std::string scriptName);
 
+
+// Function prototypes for binding.
+	void displayMessage(asIScriptGeneric *gen);
+	void disableAnimation(asIScriptGeneric *gen);
+	void squashKart(asIScriptGeneric *gen);
+	
 ScriptEngine::ScriptEngine(){
 	// Create the script engine
 	m_engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
@@ -36,6 +55,8 @@ ScriptEngine::~ScriptEngine(){
 	// Release the engine
 	m_engine->Release();
 }
+
+
 // Displays the message specified in displayMessage( string message ) within the script
 void displayMessage(asIScriptGeneric *gen){
 	std::string *input = (std::string*)gen->GetArgAddress(0);
@@ -148,7 +169,11 @@ void ScriptEngine::runScript(std::string scriptName)
 	ctx->Release();
 
 }
-void configureEngine(asIScriptEngine *engine)
+
+
+
+
+void ScriptEngine::configureEngine(asIScriptEngine *engine)
 {
 	int r;
 
@@ -167,14 +192,18 @@ void configureEngine(asIScriptEngine *engine)
 	// without having to recompile all the scripts.
 }
 
-int compileScript(asIScriptEngine *engine, std::string scriptName)
+
+
+
+int ScriptEngine::compileScript(asIScriptEngine *engine, std::string scriptName)
 {
 	int r;
 
 	// For now we will load the script directtly from a file on the disk.
 	//TODO use filemanager to do this.
 	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
-	std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
+	//std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
+	std::string load_dir = "..//..//src//scriptengine//";
 	load_dir += scriptName + ".as";
 	FILE *f = fopen(load_dir.c_str(), "rb");
 	if( f == 0 )
