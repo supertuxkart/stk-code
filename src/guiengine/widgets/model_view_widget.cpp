@@ -15,6 +15,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "graphics/irr_driver.hpp"
@@ -168,6 +169,7 @@ void ModelViewWidget::update(float delta)
     std::vector<IrrDriver::GlowData> glows;
     irr_driver->renderScene(m_camera, glows, GUIEngine::getLatestDt(), false);
     FrameBuffer* fb = irr_driver->getPostProcessing()->render(m_camera);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
     /*
     if (m_texture != NULL)
