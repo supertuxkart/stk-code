@@ -91,7 +91,7 @@ void TrackObjectManager::disable(std::string name){
      TrackObject* curr;
      for_in (curr,m_all_objects){
             if (curr->getName() == (name)){
-            //OutputDebugString("came here2");
+
              curr->setEnable(false);
             
             }
@@ -101,7 +101,7 @@ void TrackObjectManager::enable(std::string name){
      TrackObject* curr;
      for_in (curr,m_all_objects){
             if (curr->getName() == (name)){
-            //OutputDebugString("came here2");
+
              curr->setEnable(true);
             
             }
