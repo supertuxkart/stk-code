@@ -24,6 +24,7 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widgets/progress_bar_widget.hpp"
 #include "states_screens/state_manager.hpp"
 
 #include <IGUIImage.h>
@@ -267,6 +268,7 @@ public:
 
     /** Sub-widgets created by this widget */
     PlayerNameSpinner* m_player_ident_spinner;
+    GUIEngine::ProgressBarWidget* m_kart_stat_mass;
     GUIEngine::ModelViewWidget* m_model_view;
     GUIEngine::LabelWidget* m_kart_name;
 

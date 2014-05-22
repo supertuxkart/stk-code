@@ -232,6 +232,16 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
 
+    // ---- Progressbar widget
+    m_kart_stat_mass = NULL;
+
+    m_kart_stat_mass = new GUIEngine::ProgressBarWidget(false);
+    m_kart_stat_mass->setValue(25);
+    m_kart_stat_mass->m_x = player_name_x;
+    m_kart_stat_mass->m_y = player_name_y;
+    m_kart_stat_mass->m_w = player_name_w+100;
+    m_kart_stat_mass->m_h = player_name_h+100;
+
     if (parent->m_multiplayer && associated_player)
     {
         if (associated_player->getDevice()->getType() == DT_KEYBOARD)
@@ -272,7 +282,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
-    
+    m_kart_stat_mass->m_properties[PROP_ID] =
+            StringUtils::insertValues("@p%i_mass", m_player_id);
+    m_children.push_back(m_kart_stat_mass);
 
 
     // ----- Kart model view
@@ -473,7 +485,7 @@ void PlayerKartWidget::add()
     m_player_ident_spinner->add();
     m_player_ident_spinner->getIrrlichtElement()->setTabStop(false);
     m_player_ident_spinner->setListener(this);
-
+    m_kart_stat_mass->add();
     m_model_view->add();
     m_kart_name->add();
 
