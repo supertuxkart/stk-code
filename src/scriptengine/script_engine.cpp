@@ -27,6 +27,7 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
 #include "karts/kart.hpp"
+#include "io/file_manager.hpp"
 
 using namespace irr;
 
@@ -80,6 +81,32 @@ void squashKart(asIScriptGeneric *gen){
 }
 
 
+std::string getScript(std::string scriptName){
+	std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
+	
+	script_dir += scriptName + ".as";
+	FILE *f = fopen(script_dir.c_str(), "rb");
+	if( f == 0 )
+	{
+		std::cout << "Failed to open the script file " + scriptName + ".as" << std::endl;
+	}
+
+	// Determine the size of the file	
+	fseek(f, 0, SEEK_END);
+	int len = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	// Read the entire file
+	std::string script;
+	script.resize(len);
+	int c =	fread(&script[0], len, 1, f);
+	fclose(f);
+	if( c == 0 ) 
+	{
+		std::cout << "Failed to load script file." << std::endl;
+	}
+	return script;
+}
 void ScriptEngine::runScript(std::string scriptName)
 {
 
@@ -204,42 +231,14 @@ int ScriptEngine::compileScript(asIScriptEngine *engine, std::string scriptName)
 {
 	int r;
 
-	// For now we will load the script directtly from a file on the disk.
-	//TODO use filemanager to do this.
-	//std::string load_dir = "D:\\Github\\stk\\stk-code\\src\\scriptengine\\";
-	//std::string load_dir = "//media//New Volume//Github//stk//stk-code//src//scriptengine//";
-	std::string load_dir = "..//..//src//scriptengine//";
-	load_dir += scriptName + ".as";
-	FILE *f = fopen(load_dir.c_str(), "rb");
-	if( f == 0 )
-	{
-		std::cout << "Failed to open the script file " + scriptName + ".as" << std::endl;
-		return -1;
-	}
-
-	// Determine the size of the file	
-	fseek(f, 0, SEEK_END);
-	int len = ftell(f);
-	fseek(f, 0, SEEK_SET);
-
-	// Read the entire file
-	std::string script;
-	script.resize(len);
-	int c =	fread(&script[0], len, 1, f);
-	fclose(f);
-	if( c == 0 ) 
-	{
-		std::cout << "Failed to load script file." << std::endl;
-		return -1;
-	}
-
+	std::string script = getScript(scriptName);
 	// Add the script sections that will be compiled into executable code.
 	// If we want to combine more than one file into the same script, then 
 	// we can call AddScriptSection() several times for the same module and
 	// the script engine will treat them all as if they were one. The script
 	// section name, will allow us to localize any errors in the script code.
 	asIScriptModule *mod = engine->GetModule(0, asGM_ALWAYS_CREATE);
-	r = mod->AddScriptSection("script", &script[0], len);
+	r = mod->AddScriptSection("script", &script[0], script.size());
 	if( r < 0 ) 
 	{
 		std::cout << "AddScriptSection() failed" << std::endl;

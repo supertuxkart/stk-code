@@ -118,6 +118,7 @@ FileManager::FileManager()
     m_subdir_name[MUSIC      ] = "music";
     m_subdir_name[TRANSLATION] = "po";
     m_subdir_name[TEXTURE    ] = "textures";
+    m_subdir_name[SCRIPT     ] = "scripts";
     m_subdir_name[SFX        ] = "sfx";
     m_subdir_name[SKIN       ] = "skins";
     m_subdir_name[SHADER     ] = "shaders";
