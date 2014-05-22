@@ -1375,20 +1375,6 @@ void IrrDriver::generateSkyboxCubemap()
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
-    if (SkyboxTextures.empty() && FakeSkybox)
-    {
-        glGenTextures(1, &FakeSkybox);
-
-        unsigned w = 1, h = 1;
-
-        char *rgba[6];
-        for (unsigned i = 0; i < 6; i++)
-            rgba[i] = new char[w * h * 4];
-        for (unsigned i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
-        return;
-    }
-
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
