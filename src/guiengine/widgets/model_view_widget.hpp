@@ -64,6 +64,8 @@ namespace GUIEngine
 
         scene::ILightSceneNode     *m_light;
 
+        FrameBuffer                *m_frame_buffer;
+
     public:
         
         LEAK_CHECK()
@@ -100,6 +102,8 @@ namespace GUIEngine
             AlignedArray<Vec3>& mesh_location,
             AlignedArray<Vec3>& mesh_scale,
             const std::vector<int>& model_frames);
+
+        FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
     };
     
 }

@@ -35,7 +35,10 @@ using namespace irr::gui;
 ModelViewWidget::ModelViewWidget() :
     IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
-    //FIXME: find nicer way than overriding what IconButtonWidget's constructor already set...
+    m_frame_buffer = NULL;
+    m_rtt_main_node = NULL;
+    m_camera = NULL;
+    m_light = NULL;
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
@@ -161,31 +164,20 @@ void ModelViewWidget::update(float delta)
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
         m_rtt_provider = new RTT(512, 512);
-        setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
+
+        if (m_rtt_main_node == NULL)
+            setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
     }
     
     irr_driver->setRTT(m_rtt_provider);
 
     std::vector<IrrDriver::GlowData> glows;
     irr_driver->renderScene(m_camera, glows, GUIEngine::getLatestDt(), false);
-    FrameBuffer* fb = irr_driver->getPostProcessing()->render(m_camera);
+    m_frame_buffer = irr_driver->getPostProcessing()->render(m_camera);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
-    /*
-    if (m_texture != NULL)
-    {
-        setImage(m_texture);
-    }
-    else
-    {
-        m_rtt_unsupported = true;
-    }
-    */
-
-    //irr_driver->setRTT(NULL);
-
-    irr_driver->onUnloadWorld();
-    m_rtt_provider = NULL;
+    irr_driver->setRTT(NULL);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
 }
