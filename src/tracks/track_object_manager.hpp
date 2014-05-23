@@ -55,8 +55,8 @@ public:
                          bool secondary_hits=true);
     void reset();
     void init();
-	void disable(std::string name);
-	void enable(std::string name);
+	void disable(std::string name , std::string type);
+	void enable (std::string name , std::string type);
 	bool getStatus(std::string name);
 
     /** Enable or disable fog on objects */

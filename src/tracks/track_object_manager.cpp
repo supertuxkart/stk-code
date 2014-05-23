@@ -87,22 +87,27 @@ void TrackObjectManager::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-void TrackObjectManager::disable(std::string name){
+void TrackObjectManager::disable(std::string name , std::string type){
      TrackObject* curr;
      for_in (curr,m_all_objects){
+		 if (type != curr->getType())continue;
+		 
             if (curr->getName() == (name)){
 
-             curr->setEnable(false);
+				curr->setEnable(false);
             
             }
      }
 }
-void TrackObjectManager::enable(std::string name){
+void TrackObjectManager::enable(std::string name , std::string type){
      TrackObject* curr;
      for_in (curr,m_all_objects){
+		if (type != curr->getType())continue;
+		
             if (curr->getName() == (name)){
-
-             curr->setEnable(true);
+			
+				curr->reset();
+				curr->setEnable(true);
             
             }
      }
@@ -111,8 +116,8 @@ bool TrackObjectManager::getStatus(std::string name){
      TrackObject* curr;
      for_in (curr,m_all_objects){
             if (curr->getName() == (name)){
-            //OutputDebugString("came here2");
-             return curr->isEnabled();
+
+				return curr->isEnabled();
             
             }
      }

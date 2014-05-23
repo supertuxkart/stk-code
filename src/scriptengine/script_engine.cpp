@@ -67,11 +67,23 @@ void displayMessage(asIScriptGeneric *gen){
 }
 void disableAnimation(asIScriptGeneric *gen){
 		std::string *str = (std::string*)gen->GetArgAddress(0);
-		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+		std::string type = "mesh";
+		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str,type);
 }
 void enableAnimation(asIScriptGeneric *gen){
 		std::string *str = (std::string*)gen->GetArgAddress(0);
-		World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
+		std::string type = "mesh";
+		World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
+}
+void disableTrigger(asIScriptGeneric *gen){
+		std::string *str = (std::string*)gen->GetArgAddress(0);
+		std::string type = "action-trigger";
+		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str,type);
+}
+void enableTrigger(asIScriptGeneric *gen){
+		std::string *str = (std::string*)gen->GetArgAddress(0);
+		std::string type = "action-trigger";
+		World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
 }
 void squashKart(asIScriptGeneric *gen){
 		int id = (int)gen->GetArgDWord(0);
@@ -215,6 +227,8 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
 	r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
 	r = engine->RegisterGlobalFunction("void enableAnimation(string &in)", asFUNCTION(enableAnimation), asCALL_GENERIC); assert(r>=0);
 	r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
+	r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r>=0);
+	r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r>=0);
 
 	// It is possible to register the functions, properties, and types in 
 	// configuration groups as well. When compiling the scripts it can then

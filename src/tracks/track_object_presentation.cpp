@@ -47,9 +47,6 @@
 #include <ILightSceneNode.h>
 #include <IMeshManipulator.h>
 
-//for testing
-#include <time.h>
-#include <iostream>
 // ----------------------------------------------------------------------------
 
 TrackObjectPresentation::TrackObjectPresentation(const XMLNode& xml_node)
@@ -896,9 +893,18 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         return;
     }
     else
-    {
-        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
+    {	
+		//TODO move all above functions into scripts and remove the ifs
+        ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+        m_action_active = false;
+		m_script_engine->runScript(m_action);
+		
+		/*
+		Catch exception -> script not found
+		fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
                 m_action.c_str());
+		
+		 */
     }
 }
 
