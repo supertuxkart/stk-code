@@ -83,6 +83,9 @@ private:
     /** A unique number for this player, used to link it to challenges etc. */
     unsigned int m_unique_id;
 
+    /** Absolute path of the icon file for this player. */
+    std::string m_icon_filename;
+
     /** True if this user has a saved session. */
     bool m_saved_session;
 
@@ -134,6 +137,7 @@ public:
                          const irr::core::stringw &info) = 0;
     virtual void requestSignOut() = 0;
     virtual bool isLoggedIn() const { return false;  }
+    const std::string getIconFilename() const;
     // ------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)
@@ -161,7 +165,6 @@ public:
         #endif
         return m_is_guest_account;
     }   // isGuestAccount
-
     // ------------------------------------------------------------------------
     /** Returns the last used online name. */
     const core::stringw& getLastOnlineName() const 

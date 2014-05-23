@@ -92,8 +92,8 @@ void BaseUserScreen::init()
         const PlayerProfile *player = PlayerManager::get()->getPlayer(n);
         if (player->isGuestAccount()) continue;
         std::string s = StringUtils::toString(n);
-        m_players->addItem(player->getName(), s, "/karts/nolok/nolokicon.png", 0, 
-                           IconButtonWidget::ICON_PATH_TYPE_RELATIVE);
+        m_players->addItem(player->getName(), s, player->getIconFilename(), 0,
+                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         if(player==PlayerManager::getCurrentPlayer())
             current_player_index = s;
     }
