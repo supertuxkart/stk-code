@@ -89,9 +89,22 @@ std::vector<core::matrix4> GroupedFPSM<T>::MVPSet;
 template<enum GeometricMaterial T>
 std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
 
-void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
-void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const core::matrix4 &InverseModelMatrix);
-void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
+
+template<typename Shader, typename...uniforms>
+void draw(const GLMesh &mesh, GLuint vao, uniforms... Args)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    Shader::setUniforms(Args...);
+
+    assert(vao);
+    glBindVertexArray(vao);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)
