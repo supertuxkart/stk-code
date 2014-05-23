@@ -277,8 +277,8 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera->updateAbsolutePosition();
 
     // Detach the note from the scene so we can render it independently
-    m_rtt_main_node->setVisible(false);
-    m_light->setVisible(false);
+    //m_rtt_main_node->setVisible(false);
+    //m_light->setVisible(false);
 }
 
 void ModelViewWidget::setRotateOff()
