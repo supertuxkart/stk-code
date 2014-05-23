@@ -170,6 +170,7 @@ void ModelViewWidget::update(float delta)
     }
     
     irr_driver->setRTT(m_rtt_provider);
+    irr_driver->getSceneManager()->setActiveCamera(m_camera);
 
     std::vector<IrrDriver::GlowData> glows;
     irr_driver->renderScene(m_camera, glows, GUIEngine::getLatestDt(), false);
@@ -189,8 +190,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
 {
     if (model_frames[0] == -1)
     {
-        scene::ISceneNode* node =
-            irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(0), NULL);
+        scene::ISceneNode* node = irr_driver->addMesh(mesh.get(0), NULL);
         node->setPosition(mesh_location[0].toIrrVector());
         node->setScale(mesh_scale[0].toIrrVector());
         node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
@@ -199,8 +199,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     else
     {
         scene::IAnimatedMeshSceneNode* node =
-            irr_driver->getSceneManager()->addAnimatedMeshSceneNode(
-            (scene::IAnimatedMesh*)mesh.get(0), NULL);
+            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(0), NULL);
         node->setPosition(mesh_location[0].toIrrVector());
         node->setFrameLoop(model_frames[0], model_frames[0]);
         node->setAnimationSpeed(0);
@@ -220,8 +219,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         if (model_frames[n] == -1)
         {
             scene::ISceneNode* node =
-                irr_driver->getSceneManager()->addMeshSceneNode(mesh.get(n),
-                m_rtt_main_node);
+                irr_driver->addMesh(mesh.get(n), m_rtt_main_node);
             node->setPosition(mesh_location[n].toIrrVector());
             node->updateAbsolutePosition();
             node->setScale(mesh_scale[n].toIrrVector());
@@ -229,8 +227,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
         else
         {
             scene::IAnimatedMeshSceneNode* node =
-                irr_driver->getSceneManager()
-                ->addAnimatedMeshSceneNode((scene::IAnimatedMesh*)mesh.get(n),
+                irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(n),
                 m_rtt_main_node);
             node->setPosition(mesh_location[n].toIrrVector());
             node->setFrameLoop(model_frames[n], model_frames[n]);
