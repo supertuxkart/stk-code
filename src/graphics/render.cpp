@@ -313,7 +313,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     }
 
     PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-    renderSkybox(camnode);
+    if (!SkyboxTextures.empty())
+        renderSkybox(camnode);
     PROFILER_POP_CPU_MARKER();
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
