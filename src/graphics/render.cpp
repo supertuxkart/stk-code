@@ -618,9 +618,6 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
 
-    //const Vec3 *vmin, *vmax;
-//    World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
-
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
@@ -638,74 +635,82 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         50.,
     };
 
-    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
-    sun_ortho_matrix.clear();
-
-    // Build the 3 ortho projection (for the 3 shadow resolution levels)
-    for (unsigned i = 0; i < 4; i++)
-    {
-        camnode->setFarValue(FarValues[i]);
-        camnode->setNearValue(NearValues[i]);
-        camnode->render();
-        const core::aabbox3df smallcambox = camnode->
-            getViewFrustum()->getBoundingBox();
-       // core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
-        //    core::vector3df(0, 30, 0));
-
-
-        // Set up a nice ortho projection that contains our camera frustum
-        core::aabbox3df box = smallcambox;
-//        box = box.intersect(trackbox);
-
-
-//        SunCamViewMatrix.transformBoxEx(trackbox);
-        SunCamViewMatrix.transformBoxEx(box);
-
-        core::vector3df extent = box.getExtent();
-        const float w = fabsf(extent.X);
-        const float h = fabsf(extent.Y);
-        float z = box.MaxEdge.Z;
-
-        // Snap to texels
-        const float units_per_w = w / 1024;
-        const float units_per_h = h / 1024;
-
-        float left = box.MinEdge.X;
-        float right = box.MaxEdge.X;
-        float up = box.MaxEdge.Y;
-        float down = box.MinEdge.Y;
-
-        core::matrix4 tmp_matrix;
-
-        // Prevent Matrix without extend
-        if (left == right || up == down)
-        {
-            Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
-            sun_ortho_matrix.push_back(tmp_matrix);
-            continue;
-        }
-
-        tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-            up, down,
-            30, z);
-        m_suncam->setProjectionMatrix(tmp_matrix, true);
-        m_suncam->render();
-
-        sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
-    }
-    assert(sun_ortho_matrix.size() == 4);
-    camnode->setNearValue(oldnear);
-    camnode->setFarValue(oldfar);
-
     float *tmp = new float[18 * 8];
 
     memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
-    size_t size = irr_driver->getShadowViewProj().size();
-    for (unsigned i = 0; i < size; i++)
-        memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+
+    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    sun_ortho_matrix.clear();
+
+    if (World::getWorld() && World::getWorld()->getTrack())
+    {
+        const Vec3 *vmin, *vmax;
+        World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
+
+        // Build the 3 ortho projection (for the 3 shadow resolution levels)
+        for (unsigned i = 0; i < 4; i++)
+        {
+            camnode->setFarValue(FarValues[i]);
+            camnode->setNearValue(NearValues[i]);
+            camnode->render();
+            const core::aabbox3df smallcambox = camnode->
+                getViewFrustum()->getBoundingBox();
+            // core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+            //    core::vector3df(0, 30, 0));
+
+
+            // Set up a nice ortho projection that contains our camera frustum
+            core::aabbox3df box = smallcambox;
+            //        box = box.intersect(trackbox);
+
+
+            //        SunCamViewMatrix.transformBoxEx(trackbox);
+            SunCamViewMatrix.transformBoxEx(box);
+
+            core::vector3df extent = box.getExtent();
+            const float w = fabsf(extent.X);
+            const float h = fabsf(extent.Y);
+            float z = box.MaxEdge.Z;
+
+            // Snap to texels
+            const float units_per_w = w / 1024;
+            const float units_per_h = h / 1024;
+
+            float left = box.MinEdge.X;
+            float right = box.MaxEdge.X;
+            float up = box.MaxEdge.Y;
+            float down = box.MinEdge.Y;
+
+            core::matrix4 tmp_matrix;
+
+            // Prevent Matrix without extend
+            if (left == right || up == down)
+            {
+                Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
+                sun_ortho_matrix.push_back(tmp_matrix);
+                continue;
+            }
+
+            tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
+                up, down,
+                30, z);
+            m_suncam->setProjectionMatrix(tmp_matrix, true);
+            m_suncam->render();
+
+            sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
+        }
+        assert(sun_ortho_matrix.size() == 4);
+        camnode->setNearValue(oldnear);
+        camnode->setFarValue(oldfar);
+
+        size_t size = irr_driver->getShadowViewProj().size();
+        for (unsigned i = 0; i < size; i++)
+            memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+    }
+
     tmp[128] = width;
     tmp[129] = height;
 
