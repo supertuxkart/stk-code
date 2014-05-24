@@ -55,7 +55,7 @@
     from BurningWell.
 
 * zipper_collect
-    by Dakal, released under CC-BY-SA 3.0
+    by Connor, released as Public Domain
 
 * rubber_ball and jump-bomb.jpg
     by Samuncle, released under CC-BY-SA
