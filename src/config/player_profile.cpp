@@ -115,6 +115,8 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
                           ->createAchievementsStatus(xml_achievements);
+    // Fix up any potentially missing icons.
+    addIcon();
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
@@ -126,6 +128,24 @@ void PlayerProfile::initRemainingData()
     m_story_mode_status = unlock_manager->createStoryModeStatus();
     m_achievements_status =
         AchievementsManager::get()->createAchievementsStatus();
+    addIcon();
+}   // initRemainingData
+
+//------------------------------------------------------------------------------
+/** Creates an icon for a player. It takes the unique player id modulo the
+ *  number of karts to pick an icon from the karts. It then uses the unique
+ *  number plus the extentsion of the original icon as the file name (it's 
+ *  not possible to use the player name, since the name is in utf-16, but
+ *  typically the file systems are not, resulting in incorrect file names).
+ *  The icon is then copied to the user config directory, so that it can
+ *  be replaced by an icon made by the user.
+ *  If there should be an error copying the file, the icon filename is set
+ *  to "". Every time stk is started, it will try to fix missing icons
+ *  (which allows it to start from old/incompatible config files).
+ *  \pre This function must only be called after all karts are read in.
+ */
+void PlayerProfile::addIcon()
+{
     int n = m_unique_id % kart_properties_manager->getNumberOfKarts();
     std::string source = kart_properties_manager->getKartById(n)
                                                 ->getAbsoluteIconFile();
@@ -142,8 +162,7 @@ void PlayerProfile::initRemainingData()
     {
         m_icon_filename = "";
     }
-
-}   // initRemainingData
+}   // addIcon
 
 //------------------------------------------------------------------------------
 /** Returns the name of the icon file for this player. If the player icon

@@ -120,6 +120,7 @@ public:
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
     void clearSession();
+    void addIcon();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
     virtual void setUserDetails(Online::HTTPRequest *request,
