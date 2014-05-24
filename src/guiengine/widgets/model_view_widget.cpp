@@ -168,6 +168,8 @@ void ModelViewWidget::update(float delta)
         if (m_rtt_main_node == NULL)
             setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
     }
+
+    m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
     
     irr_driver->setRTT(m_rtt_provider);
     irr_driver->getSceneManager()->setActiveCamera(m_camera);
