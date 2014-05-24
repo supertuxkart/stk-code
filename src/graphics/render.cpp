@@ -618,8 +618,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
 
-    const Vec3 *vmin, *vmax;
-    World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
+    //const Vec3 *vmin, *vmax;
+//    World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
 
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
@@ -649,19 +649,19 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         camnode->render();
         const core::aabbox3df smallcambox = camnode->
             getViewFrustum()->getBoundingBox();
-        core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
-            core::vector3df(0, 30, 0));
+       // core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+        //    core::vector3df(0, 30, 0));
 
 
         // Set up a nice ortho projection that contains our camera frustum
         core::aabbox3df box = smallcambox;
-        box = box.intersect(trackbox);
+//        box = box.intersect(trackbox);
 
 
-        SunCamViewMatrix.transformBoxEx(trackbox);
+//        SunCamViewMatrix.transformBoxEx(trackbox);
         SunCamViewMatrix.transformBoxEx(box);
 
-        core::vector3df extent = trackbox.getExtent();
+        core::vector3df extent = box.getExtent();
         const float w = fabsf(extent.X);
         const float h = fabsf(extent.Y);
         float z = box.MaxEdge.Z;
