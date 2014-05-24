@@ -53,13 +53,13 @@
             <buttonbar id="options" width="90%" height="13%" align="bottom">
                 <icon-button id="ok" width="64" height="64" icon="gui/green_check.png"
                              I18N="Login dialog" text="OK" label_location="bottom"/>
-                <icon-button id="new_user" width="64" height="64" icon="gui/main_help.png"
-                             I18N="Login dialog" text="Create new user" label_location="bottom"/>
-                <icon-button id="rename" width="64" height="64" icon="gui/main_help.png"
-                             I18N="Login dialog" text="Rename" label_location="bottom"/>
-                <icon-button id="delete" width="64" height="64" icon="gui/main_help.png"
+                <icon-button id="new_user" width="64" height="64" icon="gui/gp_add_track.png"
+                             I18N="Login dialog" text="Add user" label_location="bottom"/>
+                <icon-button id="delete" width="64" height="64" icon="gui/gp_remove_track.png"
                              I18N="Login dialog" text="Delete" label_location="bottom"/>
-                <icon-button id="cancel" width="64" height="64" icon="gui/main_help.png"
+                <icon-button id="rename" width="64" height="64" icon="gui/gp_rename.png"
+                             I18N="Login dialog" text="Rename" label_location="bottom"/>
+                <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
                              I18N="Login dialog" text="Cancel" label_location="bottom"/>
             </buttonbar>
         </box>
