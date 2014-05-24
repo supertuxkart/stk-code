@@ -1,11 +1,13 @@
 #ifndef STKMESH_H
 #define STKMESH_H
 
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
-#include "glwrap.hpp"
+
 #include <vector>
 
 enum GeometricMaterial
