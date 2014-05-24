@@ -765,7 +765,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
         tex_width, tex_height,
         tex_center_pos_x, tex_center_pos_y;
 
-    getSize(texture_w, texture_h, false,
+    getSize(texture_w, texture_h, true,
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
     drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
