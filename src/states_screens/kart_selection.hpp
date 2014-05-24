@@ -26,6 +26,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
 #include "states_screens/state_manager.hpp"
+#include "guiengine/widgets/kart_stats_widget.hpp"
 
 #include <IGUIImage.h>
 
@@ -237,6 +238,7 @@ class PlayerKartWidget : public GUIEngine::Widget,
     int player_name_x, player_name_y, player_name_w, player_name_h;
     int model_x, model_y, model_w, model_h;
     int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
+    int m_kart_stats_x, m_kart_stats_y, m_kart_stats_w, m_kart_stats_h;
 
     /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is
      *  reserved, widget will not be in the regular tabbing order */
@@ -269,6 +271,7 @@ public:
     /** Sub-widgets created by this widget */
     PlayerNameSpinner* m_player_ident_spinner;
     GUIEngine::ProgressBarWidget* m_kart_stat_mass;
+    GUIEngine::KartStatsWidget* m_kart_stats;
     GUIEngine::ModelViewWidget* m_model_view;
     GUIEngine::LabelWidget* m_kart_name;
 
