@@ -300,7 +300,6 @@ bool RegisterScreen::onEscapePressed()
         StateManager::get()->popMenu();
         return true;
     }
-    StateManager::get()->escapePressed();
     return true;
 }   // onEscapePressed
 
