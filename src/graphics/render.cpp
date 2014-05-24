@@ -862,10 +862,15 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
         if (!m_lights[i]->isPointLight())
         {
             m_lights[i]->render();
-            if (UserConfigParams::m_shadows && World::getWorld()->getTrack()->hasShadows())
+            if (UserConfigParams::m_shadows && World::getWorld() != NULL &&
+                World::getWorld()->getTrack()->hasShadows())
+            {
                 m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
+            }
             else
+            {
                 m_post_processing->renderSunlight();
+            }
             continue;
         }
         const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);

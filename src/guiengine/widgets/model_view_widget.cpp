@@ -191,6 +191,8 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     AlignedArray<Vec3>& mesh_scale,
     const std::vector<int>& model_frames)
 {
+    irr_driver->getSceneManager()->clear();
+
     if (model_frames[0] == -1)
     {
         scene::ISceneNode* node = irr_driver->addMesh(mesh.get(0), NULL);
@@ -244,12 +246,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35));
 
     const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
-    m_light = irr_driver->getSceneManager()
-        ->addLightSceneNode(NULL, spot_pos, video::SColorf(1.0f, 1.0f, 1.0f),
-        1600 /* radius */);
-    m_light->setLightType(video::ELT_SPOT);
-    m_light->setRotation((core::vector3df(0, 10, 0) - spot_pos).getHorizontalAngle());
-    m_light->updateAbsolutePosition();
+    m_light = irr_driver->addLight(spot_pos, 3.0f /* energy */, 100 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
 
     m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
     m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);

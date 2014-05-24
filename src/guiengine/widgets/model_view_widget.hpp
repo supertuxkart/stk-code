@@ -62,7 +62,7 @@ namespace GUIEngine
 
         scene::ICameraSceneNode    *m_camera;
 
-        scene::ILightSceneNode     *m_light;
+        scene::ISceneNode          *m_light;
 
         FrameBuffer                *m_frame_buffer;
 
