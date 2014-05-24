@@ -213,56 +213,6 @@ core::vector3df getWind()
     return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
 
-
-
-void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView)
-{
-    irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
-
-  if (mesh.textures[0])
-  {
-      compressTexture(mesh.textures[0], true);
-      setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  }
-  else
-  {
-      setTexture(0, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
-      GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  MeshShader::ObjectPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, 0);
-
-  assert(mesh.vao_first_pass);
-  glBindVertexArray(mesh.vao_first_pass);
-  glDrawElements(ptype, count, itype, 0);
-
-  if (!mesh.textures[0])
-  {
-      GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-}
-
-void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
-
-  compressTexture(mesh.textures[0], true);
-  setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-  MeshShader::ObjectRefPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix, 0);
-
-  assert(mesh.vao_first_pass);
-  glBindVertexArray(mesh.vao_first_pass);
-  glDrawElements(ptype, count, itype, 0);
-}
-
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir)
 {
     irr_driver->IncreaseObjectCount();
@@ -274,26 +224,6 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
 	MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, windDir, 0);
-
-    assert(mesh.vao_first_pass);
-	glBindVertexArray(mesh.vao_first_pass);
-	glDrawElements(ptype, count, itype, 0);
-}
-
-void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const core::matrix4 &InverseModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-	GLenum ptype = mesh.PrimitiveType;
-	GLenum itype = mesh.IndexType;
-	size_t count = mesh.IndexCount;
-
-	assert(mesh.textures[1]);
-    compressTexture(mesh.textures[1], false);
-    setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    compressTexture(mesh.textures[0], true);
-    setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-    MeshShader::NormalMapShader::setUniforms(ModelMatrix, InverseModelMatrix, 0, 1);
 
     assert(mesh.vao_first_pass);
 	glBindVertexArray(mesh.vao_first_pass);

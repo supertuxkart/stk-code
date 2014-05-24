@@ -197,17 +197,8 @@ void STKMeshSceneNode::drawSolidPass1(const GLMesh &mesh, GeometricMaterial type
     windDir = getWind();
     switch (type)
     {
-    case FPSM_NORMAL_MAP:
-        drawNormalPass(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-        break;
-    case FPSM_ALPHA_REF_TEXTURE:
-        drawObjectRefPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, mesh.TextureMatrix);
-        break;
     case FPSM_GRASS:
         drawGrassPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
-        break;
-    case FPSM_DEFAULT:
-        drawObjectPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
         break;
     default:
         assert(0 && "wrong geometric material");

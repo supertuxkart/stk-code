@@ -46,17 +46,21 @@ class ParticleKind;
 class Material : public NoCopy
 {
 public:
-    enum GraphicalEffect {GE_NONE,
-                          /** Effect where the UV texture is moved in a wave pattern */
-                          GE_BUBBLE,
-                          /** Effect that makes grass wave as in the wind */
-                          GE_GRASS,
-                          GE_WATER_SHADER,
-                          GE_SPHERE_MAP,
-                          GE_SPLATTING,
-                          GE_SKYBOX,
-                          GE_NORMAL_MAP,
-                          GE_CAUSTICS};
+    enum ShaderType
+    {
+        SHADERTYPE_SOLID,
+        SHADERTYPE_ALPHA_TEST,
+        SHADERTYPE_ALPHA_BLEND,
+        SHADERTYPE_ADDITIVE,
+        SHADERTYPE_SOLID_UNLIT,
+        /** Effect where the UV texture is moved in a wave pattern */
+        SHADERTYPE_BUBBLE,
+        /** Effect that makes grass wave as in the wind */
+        SHADERTYPE_VEGETATION,
+        SHADERTYPE_WATER,
+        SHADERTYPE_SPHERE_MAP,
+        SHADERTYPE_SPLATTING
+    };
 
     enum ParticleConditions
     {
@@ -82,7 +86,9 @@ private:
     /** Name of a special sfx to play when a kart is on this terrain, or
      *  "" if no special sfx exists. */
     std::string      m_sfx_name;
-    GraphicalEffect  m_graphical_effect;
+
+    ShaderType       m_shader_type;
+
     /** Set if being on this surface means being under some other mesh.
      *  This is used to simulate that a kart is in water: the ground under
      *  the water is marked as 'm_below_surface', which will then trigger a raycast
@@ -117,11 +123,11 @@ private:
     bool             m_has_gravity;
 
     /** Speed of the 'main' wave in the water shader. Only used if
-        m_graphical_effect == WATER_SHADER */
+        m_shader_type == SHDERTYPE_WATER */
     float            m_water_shader_speed_1;
 
     /** Speed of the 'secondary' waves in the water shader. Only used if
-        m_graphical_effect == WATER_SHADER */
+        m_shader_type == SHADERTYPE_WATER */
     float            m_water_shader_speed_2;
 
     /** If a kart is rescued when crashing into this surface. */
@@ -130,13 +136,13 @@ private:
     /** Particles to show on touch */
     std::string      m_collision_particles;
 
+    /** If m_shader_type == SHADERTYPE_VEGETATION */
     float            m_grass_speed;
     float            m_grass_amplitude;
 
     /** If the property should be ignored in the physics. Example would be
      *  plants that a kart can just drive through. */
     bool             m_ignore;
-    bool             m_add;
 
     bool             m_fog;
 
@@ -144,20 +150,9 @@ private:
 
     /** For normal maps */
     std::string      m_normal_map_tex;
-    std::string      m_normal_map_shader_lightmap;
-
-    //bool             m_normal_map_uv2; //!< Whether to use a second UV layer for normal map
-    bool             m_is_heightmap;
-    bool             m_parallax_map;
-    float            m_parallax_height;
 
     /** Texture clamp bitmask */
     unsigned int     m_clamp_tex;
-
-    bool             m_lighting;
-    bool             m_smooth_reflection_shader;
-    bool             m_alpha_testing;
-    bool             m_alpha_blending;
 
     /** True if backface culliing should be enabled. */
     bool             m_backface_culling;
@@ -167,18 +162,21 @@ private:
 
     /** Some textures need to be pre-multiplied, some divided to give
      *  the intended effect. */
-    enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
-                     m_adjust_image;
-    /** True if (blending) lightmapping is enabled for this material. */
-    bool             m_lightmap;
-    /** True if (additive) lightmapping is enabled for this material. */
-    bool             m_additive_lightmap;
+    //enum             {ADJ_NONE, ADJ_PREMUL, ADJ_DIV}
+    //                 m_adjust_image;
 
+    /** True if lightmapping is enabled for this material. */
+    //bool             m_lightmap;
+
+    /** True if the material shouldn't be "slippy" at an angle */
     bool             m_high_tire_adhesion;
+
     /** How much the top speed is reduced per second. */
     float            m_slowdown_time;
+
     /** Maximum speed at which no more slow down occurs. */
     float            m_max_speed_fraction;
+
     /** Minimum speed on this terrain. This is used for zippers on a ramp to
      *  guarantee the right jump distance. A negative value indicates no
      *  minimum speed. */
@@ -211,7 +209,7 @@ private:
     float            m_zipper_fade_out_time;
     /** Additional engine force. */
     float            m_zipper_engine_force;
-
+    
     std::string      m_mask;
 
     /** If m_splatting is true, indicates the first splatting texture */
@@ -249,7 +247,6 @@ public:
     bool  isIgnore           () const { return m_ignore;             }
     /** Returns true if this material is a zipper. */
     bool  isZipper           () const { return m_zipper;             }
-    bool  isSphereMap        () const { return m_graphical_effect == GE_SPHERE_MAP; }
     /** Returns if this material should trigger a rescue if a kart
      *  is driving on it. */
     bool  isDriveReset       () const { return m_drive_reset;        }
@@ -264,14 +261,19 @@ public:
           getTexFname        () const { return m_texname;            }
     int   getIndex           () const { return m_index;              }
 
-    bool  isTransparent      () const { return m_alpha_testing || m_alpha_blending || m_add; }
+    bool  isTransparent      () const
+    {
+        return m_shader_type == SHADERTYPE_ADDITIVE ||
+               m_shader_type == SHADERTYPE_ALPHA_BLEND ||
+               m_shader_type == SHADERTYPE_ALPHA_TEST;
+    }
 
     // ------------------------------------------------------------------------
     /** Returns true if this materials need pre-multiply of alpha. */
-    bool isPreMul() const {return m_adjust_image==ADJ_PREMUL; }
+    //bool isPreMul() const {return m_adjust_image==ADJ_PREMUL; }
     // ------------------------------------------------------------------------
     /** Returns true if this materials need pre-division of alpha. */
-    bool isPreDiv() const {return m_adjust_image==ADJ_DIV; }
+    //bool isPreDiv() const {return m_adjust_image==ADJ_DIV; }
     // ------------------------------------------------------------------------
     /** Returns the fraction of maximum speed on this material. */
     float getMaxSpeedFraction() const { return m_max_speed_fraction; }
@@ -280,9 +282,6 @@ public:
      *  It is the time it takes till the full slowdown applies to
      *  karts. So a short time will slowdown a kart much faster. */
     float getSlowDownTime() const { return m_slowdown_time;          }
-    // ------------------------------------------------------------------------
-    /** Returns true if this material should have smoke effect. */
-    //bool  hasSmoke           () const { return m_graphical_effect==GE_SMOKE;}
     // ------------------------------------------------------------------------
     /** Returns true if this material is under some other mesh and therefore
      *  requires another raycast to find the surface it is under (used for
@@ -341,14 +340,11 @@ public:
      *  on lower speeds. A negative value indicates no minimum speed. */
     float getZipperMinSpeed() const { return m_zipper_min_speed; }
     // ------------------------------------------------------------------------
-    bool isNormalMap() const { return m_graphical_effect == GE_NORMAL_MAP; }
-
+    ShaderType getShaderType() const { return m_shader_type; }
+    // ------------------------------------------------------------------------
     void onMadeVisible(scene::IMeshBuffer* who);
     void onHidden(scene::IMeshBuffer* who);
     void isInitiallyHidden(scene::IMeshBuffer* who);
-    /** For particle system : specify if the particle should be additively blended
-     */
-    bool isAlphaAdditive() const { return !m_alpha_blending;  }
 } ;
 
 

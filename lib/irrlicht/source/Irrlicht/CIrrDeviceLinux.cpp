@@ -273,7 +273,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		{
 			if (bestMode==-1 && modes[i]->hdisplay >= Width && modes[i]->vdisplay >= Height)
 			{
-				float pixels_per_second = modes[i]->dotclock * 1000.0; 
+				float pixels_per_second = modes[i]->dotclock * 1000.0;
 				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
 				refresh_rate = pixels_per_second / pixels_per_frame;
 				bestMode = i;
@@ -282,15 +282,15 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					modes[i]->hdisplay == modes[bestMode]->hdisplay &&
 					modes[i]->vdisplay == modes[bestMode]->vdisplay)
 			{
-				float pixels_per_second = modes[i]->dotclock * 1000.0; 
+				float pixels_per_second = modes[i]->dotclock * 1000.0;
 				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
 				float refresh_rate_tmp = pixels_per_second / pixels_per_frame;
-				
+
 				if (refresh_rate_tmp > refresh_rate)
 				{
 					refresh_rate = refresh_rate_tmp;
 					bestMode = i;
-				}					
+				}
 			}
 			else if (bestMode!=-1 &&
 					modes[i]->hdisplay >= Width &&
@@ -298,7 +298,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					modes[i]->hdisplay <= modes[bestMode]->hdisplay &&
 					modes[i]->vdisplay <= modes[bestMode]->vdisplay)
 			{
-				float pixels_per_second = modes[i]->dotclock * 1000.0; 
+				float pixels_per_second = modes[i]->dotclock * 1000.0;
 				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
 				refresh_rate = pixels_per_second / pixels_per_frame;
 				bestMode = i;
@@ -746,8 +746,21 @@ bool CIrrDeviceLinux::createWindow()
 
 	if (!CreationParams.WindowId)
 	{
+		Atom *list;
+		Atom type;
+		int form;
+		unsigned long remain, len;
+
+		Atom WMCheck = XInternAtom(display, "_NET_SUPPORTING_WM_CHECK", false);
+		Status s = XGetWindowProperty(display, DefaultRootWindow(display),
+									  WMCheck, 0L, 1L, False, XA_WINDOW,
+									  &type, &form, &len, &remain,
+									  (unsigned char **)&list);
+
+		bool netWM = (s == Success) && len;
+		attributes.override_redirect = !netWM && CreationParams.Fullscreen;
+
 		// create new Window
-		attributes.override_redirect = false;
 		window = XCreateWindow(display,
 				RootWindow(display, visual->screen),
 				0, 0, Width, Height, 0, visual->depth,
@@ -762,31 +775,45 @@ bool CIrrDeviceLinux::createWindow()
 
 		if (CreationParams.Fullscreen)
 		{
-			// Workaround for Gnome which sometimes creates window smaller than display
-			XSizeHints *hints = XAllocSizeHints();
-			hints->flags=PMinSize;
-			hints->min_width=Width;
-			hints->min_height=Height;
-			XSetWMNormalHints(display, window, hints);
-			XFree(hints);
+			if (netWM)
+			{
+				// Workaround for Gnome which sometimes creates window smaller than display
+				XSizeHints *hints = XAllocSizeHints();
+				hints->flags=PMinSize;
+				hints->min_width=Width;
+				hints->min_height=Height;
+				XSetWMNormalHints(display, window, hints);
+				XFree(hints);
 
-			// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
-			// Get the needed atom from there freedesktop names
-			Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
-			Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
-			// Set the fullscreen property
-			XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char *>(& WMFullscreenAtom), 1);
-		   
-			// Notify the root window
-			XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
-			   
-			xev.type = ClientMessage;
-			xev.xclient.window = window;
-			xev.xclient.message_type = WMStateAtom;
-			xev.xclient.format = 32;
-			xev.xclient.data.l[0] = 1;
-			xev.xclient.data.l[1] = WMFullscreenAtom;
-			XSendEvent(display, DefaultRootWindow(display), false, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+				// Set the fullscreen mode via the window manager. This allows alt-tabing, volume hot keys & others.
+				// Get the needed atom from there freedesktop names
+				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
+				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
+				// Set the fullscreen property
+				XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char *>(& WMFullscreenAtom), 1);
+
+				// Notify the root window
+				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
+
+				xev.type = ClientMessage;
+				xev.xclient.window = window;
+				xev.xclient.message_type = WMStateAtom;
+				xev.xclient.format = 32;
+				xev.xclient.data.l[0] = 1;
+				xev.xclient.data.l[1] = WMFullscreenAtom;
+				XSendEvent(display, DefaultRootWindow(display), false, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+			}
+			else
+			{
+				XSetInputFocus(display, window, RevertToParent, CurrentTime);
+				int grabKb = XGrabKeyboard(display, window, True, GrabModeAsync,
+					GrabModeAsync, CurrentTime);
+				IrrPrintXGrabError(grabKb, "XGrabKeyboard");
+				int grabPointer = XGrabPointer(display, window, True, ButtonPressMask,
+					GrabModeAsync, GrabModeAsync, window, None, CurrentTime);
+				IrrPrintXGrabError(grabPointer, "XGrabPointer");
+				XWarpPointer(display, None, window, 0, 0, 0, 0, 0, 0);
+			}
 		}
 	}
 	else

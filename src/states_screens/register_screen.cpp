@@ -175,6 +175,12 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setText(_("Email has to be between 4 and 50 characters long!"), false);
     }
+    else if (  email.find(L"@")== -1 || email.find(L".")== -1 ||
+              (email.findLast(L'.') - email.findLast(L'@') <= 2 ) ||
+                email.findLast(L'@')==0 )
+    {
+       m_info_widget->setText(_("Email is invalid!"), false);
+    }
     else
     {
         m_info_widget->setDefaultColor();
