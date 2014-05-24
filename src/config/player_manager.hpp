@@ -96,6 +96,7 @@ public:
     void setCurrentPlayer(PlayerProfile *player);
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
+    unsigned int getNumNonGuestPlayers() const;
     static void setUserDetails(Online::HTTPRequest *request,
                                const std::string &action,
                                const std::string &php_name = "");

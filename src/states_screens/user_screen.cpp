@@ -483,6 +483,15 @@ void BaseUserScreen::newUserAdded(const irr::core::stringw &local_name,
  */
 void BaseUserScreen::deletePlayer()
 {
+    // Check that there is at least one player left: we need to have a
+    // valid current player, so the last player can not be deleted.
+    if(PlayerManager::get()->getNumNonGuestPlayers()==1)
+    {
+        m_info_widget->setText("You can't delete the only player.", true);
+        m_info_widget->setErrorColor();
+        return;
+    }
+
     PlayerProfile *player = getSelectedPlayer();
     irr::core::stringw message =
         //I18N: In the player info dialog (when deleting)
@@ -517,6 +526,21 @@ void BaseUserScreen::doDeletePlayer()
     PlayerProfile *player = getSelectedPlayer();
     PlayerManager::get()->deletePlayer(player);
     GUIEngine::ModalDialog::dismiss();
+
+    // Special case: the current player was deleted. We have to make sure
+    // that there is still a current player (all of STK depends on that).
+    if(!PlayerManager::getCurrentPlayer())
+    {
+        for(unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
+        {
+            PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+            if(!player->isGuestAccount()) 
+            {
+                PlayerManager::get()->setCurrentPlayer(player);
+                break;
+            }
+        }
+    }
     init();
 }   // doDeletePlayer
 

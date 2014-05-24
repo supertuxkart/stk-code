@@ -367,6 +367,20 @@ void PlayerManager::addDefaultPlayer()
 }   // addDefaultPlayer
 
 // ----------------------------------------------------------------------------
+/** Returns the number of 'real' (non-guest) players.
+ */
+unsigned int PlayerManager::getNumNonGuestPlayers() const
+{
+    unsigned int count=0;
+    const PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if(!player->isGuestAccount()) count ++;
+    }
+    return count;
+}   // getNumNonGuestPlayers
+
+// ----------------------------------------------------------------------------
 /** This returns a unique id. This is 1 + largest id used so far.
  */
 unsigned int PlayerManager::getUniqueId() const
