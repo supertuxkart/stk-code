@@ -810,7 +810,7 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
         break;
     case TM_DEFAULT:
     case TM_ADDITIVE:
-        if (World::getWorld()->isFogEnabled())
+        if (World::getWorld() != NULL && World::getWorld()->isFogEnabled())
             mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
                 MeshShader::TransparentFogShader::attrib_position, MeshShader::TransparentFogShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentFogShader::attrib_color, mesh.Stride);
         else
