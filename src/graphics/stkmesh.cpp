@@ -179,7 +179,6 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
 	case scene::EPT_QUADS:
 		assert(0 && "Unsupported primitive type");
 	}
-	ITexture *tex;
 	for (unsigned i = 0; i < 6; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.TextureMatrix = 0;

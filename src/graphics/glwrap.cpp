@@ -353,10 +353,10 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
         {
             float alpha = data[4 * i + 3];
             if (alpha > 0.)
-                alpha = pow(alpha / 255., 1. / 2.2);
-            data[4 * i] *= alpha;
-            data[4 * i + 1] *= alpha;
-            data[4 * i + 2] *= alpha;
+                alpha = pow(alpha / 255.f, 1.f / 2.2f);
+            data[4 * i    ] = unsigned char(data[4 * i    ] * alpha);
+            data[4 * i + 1] = unsigned char(data[4 * i + 1] * alpha);
+            data[4 * i + 2] = unsigned char(data[4 * i + 2] * alpha);
         }
     }
 

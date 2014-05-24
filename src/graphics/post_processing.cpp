@@ -473,7 +473,9 @@ void PostProcessing::renderSSAO()
     glGenerateMipmap(GL_TEXTURE_2D);
     setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
+    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width), 
+                                                              float(UserConfigParams::m_height)),
+                                              0, 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

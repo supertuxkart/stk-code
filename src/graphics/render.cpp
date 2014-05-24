@@ -170,7 +170,7 @@ void IrrDriver::renderGLSL(float dt)
                     UtilShader::ColoredLine::setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;
                     const float *tmp = vertex.data();
-                    for (int i = 0; i < vertex.size(); i += 1024 * 6)
+                    for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
                     {
                         unsigned count = MIN2(vertex.size() - i, 1024 * 6);
                         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
@@ -723,8 +723,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     size_t size = irr_driver->getShadowViewProj().size();
     for (unsigned i = 0; i < size; i++)
         memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
-    tmp[128] = width;
-    tmp[129] = height;
+    tmp[128] = float(width);
+    tmp[129] = float(height);
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 8 + 2) * sizeof(float), tmp);
