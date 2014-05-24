@@ -354,7 +354,6 @@ private:
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
-    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
@@ -676,6 +675,7 @@ public:
     void onUnloadWorld();
 
     void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
 
     // --------------------- RTT --------------------
     /**
