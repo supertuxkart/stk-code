@@ -36,7 +36,6 @@
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
 
-#include <iostream>
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
 
@@ -65,6 +64,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
     title->setTabStop(false);
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
+    displayTracks(m_area.getHeight()/7, m_area.getHeight()*6/7);
     InitAfterDrawingTheHeader(m_area.getHeight()/7, m_area.getHeight()*6/7, gp_ident);
 }
 
@@ -83,39 +83,84 @@ GPInfoDialog::~GPInfoDialog()
 }
 
 // ----------------------------------------------------------------------------
+void GPInfoDialog::displayTracks(const int upper_bound,
+                                 const int lower_bound)
+{
+    const std::vector<std::string> tracks = m_gp->getTrackNames();
+    const unsigned int track_amount = tracks.size();
+
+    int height_of_one_line = std::min((lower_bound - upper_bound)/(track_amount+1),
+                                      (unsigned int)(GUIEngine::getFontHeight()*1.5f));
+
+    // Count the number of label already existing labels representing a track
+    unsigned int existing = 0;
+    for (unsigned int i = 0; i < m_widgets.size(); i++)
+    {
+        if (m_widgets.get(i)->m_properties[PROP_ID] == "Track label")
+            existing++;
+    }
+
+    unsigned int reuse = std::min(existing, track_amount);
+    // m_widgets has the type PtrVector<Widget, HOLD>
+    unsigned int widgets_iter = 0;
+    for (unsigned int i = 0; i < reuse; i++)
+    {
+        Track* track = track_manager->getTrack(tracks[i]);
+
+        // Find the next widget that is a track label
+        while (m_widgets.get(widgets_iter)->m_properties[PROP_ID] != "Track label")
+            widgets_iter++;
+
+        LabelWidget* widget = dynamic_cast<LabelWidget*>(m_widgets.get(widgets_iter));
+        widget->setText(translations->fribidize(track->getName()), false);
+        widget->move(20, upper_bound + height_of_one_line*(i+1),
+                     m_area.getWidth()/2 - 20, height_of_one_line);
+
+        widgets_iter++;
+    }
+
+    if (existing < track_amount)
+    {
+        // There are not enough labels for all the track names, so we have to
+        // add some more
+        for (unsigned int i = reuse; i < track_amount; i++)
+        {
+            Track* track = track_manager->getTrack(tracks[i]);
+            assert(track != NULL);
+
+            LabelWidget* widget = new LabelWidget();
+            widget->m_properties[PROP_ID] = "Track label";
+            widget->setText(translations->fribidize(track->getName()), false);
+            widget->setParent(m_irrlicht_window);
+            m_widgets.push_back(widget);
+            widget->add();
+
+            widget->move(20, upper_bound + height_of_one_line*(i+1),
+                         m_area.getWidth()/2 - 20, height_of_one_line);
+        }
+    }
+    else if (existing > track_amount)
+    {
+        // There are label which are not necessary anymore so they're deleted
+        for (unsigned int i = widgets_iter; i < m_widgets.size(); i++)
+        {
+            if (m_widgets.get(i)->m_properties[PROP_ID] == "Track label")
+            {
+                m_irrlicht_window->removeChild(m_widgets.get(i)->getIrrlichtElement());
+                m_widgets.remove(i);
+                i--;
+            }
+        }
+    }
+}
+
+// ----------------------------------------------------------------------------
 
 void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
                                              const int lower_bound,
                                              const std::string& gp_ident)
 {
-    // ---- Track listings
     const std::vector<std::string> tracks = m_gp->getTrackNames();
-    const int trackAmount = tracks.size();
-
-    int height_of_one_line = (lower_bound - upper_bound)/(trackAmount+1);
-    const int textHeight = GUIEngine::getFontHeight();
-    if (height_of_one_line > (int)(textHeight*1.5f))
-        height_of_one_line = (int)(textHeight*1.5f);
-
-    bool gp_ok = true;
-
-    for (int t=0; t<trackAmount; t++)
-    {
-        Track* track = track_manager->getTrack(tracks[t]);
-        assert(track != NULL);
-        stringw lineText = track->getName();
-
-        LabelWidget* widget = new LabelWidget();
-        widget->setText(translations->fribidize(lineText), false);
-        widget->m_x = 20;
-        widget->m_y = upper_bound + height_of_one_line*(t+1);
-        widget->m_w = m_area.getWidth()/2 - 20;
-        widget->m_h = height_of_one_line;
-        widget->setParent(m_irrlicht_window);
-
-        m_widgets.push_back(widget);
-        widget->add();
-    }
 
     // ---- Track screenshot
     m_screenshot_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
@@ -165,7 +210,7 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
         okBtn->m_properties[PROP_ID] = "cannot_start";
         okBtn->setText(_("Sorry, no tracks available"));
     }
-    else if (gp_ok)
+    else
     {
         okBtn->m_properties[PROP_ID] = "start";
         okBtn->setText(_("Start Grand Prix"));
@@ -173,14 +218,8 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
         continueBtn->m_properties[PROP_ID] = "continue";
         continueBtn->setText(_("Continue"));
     }
-    else
-    {
-        okBtn->m_properties[PROP_ID] = "cannot_start";
-        okBtn->setText(_("This Grand Prix is broken!"));
-        okBtn->setBadge(BAD_BADGE);
-    }
 
-    if (saved_gp && gp_ok)
+    if (saved_gp)
     {
         continueBtn->m_x = m_area.getWidth()/2 + 110;
         continueBtn->m_y = lower_bound;

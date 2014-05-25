@@ -17,6 +17,7 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
+#include "guiengine/widget.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track_manager.hpp"
@@ -53,30 +54,31 @@ randomGPInfoDialog::randomGPInfoDialog()
     title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
 
     // ---- Spinners
-    // Number of laps chooser
-    GUIEngine::SpinnerWidget* spinner = new GUIEngine::SpinnerWidget(false);
-    spinner->setValue(m_number_of_tracks);
-    spinner->setMin(1);
-    spinner->setMax(track_manager->getTracksInGroup(m_trackgroup).size());
-    spinner->setParent(m_irrlicht_window);
-    spinner->m_properties[PROP_ID] = "Number of tracks";
-    m_widgets.push_back(spinner);
-    spinner->add();
-    spinner->move(10, m_area.getHeight()/7, 300, 40);
-
     // Trackgroup chooser
-    spinner = new GUIEngine::SpinnerWidget(false);
+    GUIEngine::SpinnerWidget* spinner = new GUIEngine::SpinnerWidget(false);
     spinner->m_properties[PROP_ID] = "Trackgroup";
     spinner->setParent(m_irrlicht_window);
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(310, m_area.getHeight()/7, 300, 40);
+    spinner->move(10, m_area.getHeight()/7, 300, 40);
     // Fill it with with all the track group names
     spinner->addLabel("all");
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     for (unsigned int i = 1; i < groups.size() + 1; i++)
         spinner->addLabel(stringw(groups[i].c_str()));
 
+    // Number of laps chooser
+    spinner = new GUIEngine::SpinnerWidget(false);
+    spinner->setValue(m_number_of_tracks);
+    spinner->setMin(1);
+    spinner->setMax(track_manager->getNumberOfTracks()); // default is "all"
+    spinner->setParent(m_irrlicht_window);
+    spinner->m_properties[PROP_ID] = "Number of tracks";
+    m_widgets.push_back(spinner);
+    spinner->add();
+    spinner->move(310, m_area.getHeight()/7, 200, 40);
+
+    displayTracks(m_area.getHeight()/7 + 50, m_area.getHeight()*6/7);
     InitAfterDrawingTheHeader(m_area.getHeight()/7 + 50,
                               m_area.getHeight()*6/7,
                               "random");
@@ -85,7 +87,7 @@ randomGPInfoDialog::randomGPInfoDialog()
 GUIEngine::EventPropagation randomGPInfoDialog::processEvent(
                                                  const std::string& eventSource)
 {
-    if (eventSource == "Number of laps")
+    if (eventSource == "Number of tracks")
     {
         m_number_of_tracks = getWidget<GUIEngine::SpinnerWidget>("Number of tracks")->getValue();
         updateGP();
@@ -94,7 +96,13 @@ GUIEngine::EventPropagation randomGPInfoDialog::processEvent(
     {
         GUIEngine::SpinnerWidget* t = getWidget<GUIEngine::SpinnerWidget>("Trackgroup");
         GUIEngine::SpinnerWidget* s = getWidget<GUIEngine::SpinnerWidget>("Number of tracks");
+
         m_trackgroup = stringc(t->getStringValue()).c_str();
+
+        // Update the maximum for the number of tracks since it's depending on
+        // the current track. The current value in the Number-of-tracks-spinner
+        // has to be updated, since otherwise the displayed (and used) value
+        // can be bigger than the maximum. (Might be a TODO to fix this)
         unsigned int max = (m_trackgroup == "all") ?
                            track_manager->getNumberOfTracks() :
                            track_manager->getTracksInGroup(m_trackgroup).size();
@@ -115,5 +123,6 @@ void randomGPInfoDialog::updateGP()
         delete m_gp;
 
     m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+    displayTracks(m_area.getHeight()/7, m_area.getHeight()*6/7);
 }
 

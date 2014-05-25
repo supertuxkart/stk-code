@@ -53,6 +53,13 @@ public:
     void InitAfterDrawingTheHeader(const int y1, const int y2,
                                    const std::string& gp_ident);
 
+    /** \brief display all the tracks according to the current gp
+     * For a normal gp info dialog, it just creates a label with the name for
+     * every track. But in a random gp info dialog, it tries to reuse as many
+     * labels as possible by just changing their labels. If there are less than
+     * need, some are added, if there are to many, some become deleted. */
+    void displayTracks(const int y1, const int y2);
+
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 
