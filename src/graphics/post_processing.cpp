@@ -770,6 +770,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
         if (UserConfigParams::m_bloom)
         {
             glClear(GL_STENCIL_BUFFER_BIT);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
             FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_BLOOM_1024), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
@@ -799,6 +800,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
             glBlendColor(.5, .5, .5, .5);
             renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
             glDisable(GL_BLEND);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         } // end if bloom
         PROFILER_POP_CPU_MARKER();
     }
