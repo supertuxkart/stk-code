@@ -113,8 +113,6 @@ public:
     void loginError(const irr::core::stringw &error_message);
     void logoutSuccessful();
     void logoutError(const irr::core::stringw &error_message);
-    void newUserAdded(const irr::core::stringw &local_name,
-                      const irr::core::stringw &online_name);
 };   // class BaseUserScreen
 
 // ============================================================================

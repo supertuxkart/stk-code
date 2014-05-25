@@ -44,6 +44,7 @@ DEFINE_SCREEN_SINGLETON( RegisterScreen );
 
 RegisterScreen::RegisterScreen() : Screen("online/register.stkgui")
 {
+    m_existing_player = NULL;
 }   // RegisterScreen
 
 // -----------------------------------------------------------------------------
@@ -54,7 +55,11 @@ void RegisterScreen::init()
     // If there is no player (i.e. first start of STK), try to pick
     // a good default name
     stringw username = "";
-    if (PlayerManager::get()->getNumPlayers() == 0)
+    if(m_existing_player)
+    {
+        username = m_existing_player->getName();
+    }
+    else if (PlayerManager::get()->getNumPlayers() == 0)
     {
         if (getenv("USERNAME") != NULL)        // for windows
             username = getenv("USERNAME");
@@ -63,8 +68,8 @@ void RegisterScreen::init()
         else if (getenv("LOGNAME") != NULL)    // Linux, Macs
             username = getenv("LOGNAME");
     }
-    getWidget<TextBoxWidget>("local_username")->setText(username);
 
+    getWidget<TextBoxWidget>("local_username")->setText(username);
 
     TextBoxWidget *password_widget = getWidget<TextBoxWidget>("password");
     password_widget->setPasswordBox(true,L'*');
@@ -78,7 +83,14 @@ void RegisterScreen::init()
 
     m_signup_request = NULL;
     m_info_message_shown = false;
+    makeEntryFieldsVisible(true);
 }   // init
+
+// -----------------------------------------------------------------------------
+void RegisterScreen::setRename(PlayerProfile *player)
+{
+    m_existing_player = player;
+}   // setRename
 
 // -----------------------------------------------------------------------------
 /** Shows or hides the entry fields for online registration, depending on
@@ -87,6 +99,13 @@ void RegisterScreen::init()
  */
 void RegisterScreen::makeEntryFieldsVisible(bool online)
 {
+    // In case of a rename, hide all other fields.
+    if(m_existing_player)
+    {
+        m_info_widget->setVisible(false);
+        getWidget<CheckBoxWidget>("online")->setVisible(false);
+        online = false;
+    }
     getWidget<TextBoxWidget>("username")->setVisible(online);
     getWidget<LabelWidget  >("label_username")->setVisible(online);
     getWidget<TextBoxWidget>("password")->setVisible(online);
@@ -103,7 +122,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
 /** If necessary creates the local user.
  *  \param local_name Name of the local user.
  */
-void RegisterScreen::registerLocal(const stringw &local_name)
+void RegisterScreen::handleLocalName(const stringw &local_name)
 {
     if (local_name.size()==0)
         return;
@@ -111,10 +130,22 @@ void RegisterScreen::registerLocal(const stringw &local_name)
     // If a local player with that name does not exist, create one
     if(!PlayerManager::get()->getPlayer(local_name))
     {
-        PlayerProfile *player = PlayerManager::get()->addNewPlayer(local_name);
+        PlayerProfile *player;
+        // If it's a rename, change the name of the player
+        if(m_existing_player && local_name.size()>0)
+        {
+            m_existing_player->setName(local_name);
+            player = m_existing_player;
+        }
+        else
+        {
+            player = PlayerManager::get()->addNewPlayer(local_name);
+        }
         PlayerManager::get()->save();
-        if(player)
+        if (player)
+        {
             PlayerManager::get()->setCurrentPlayer(player);
+        }
         else
         {
             m_info_widget->setErrorColor();
@@ -122,8 +153,13 @@ void RegisterScreen::registerLocal(const stringw &local_name)
                                    false);
         }
     }
-
-}   // registerLocal
+    else
+    {
+        m_info_widget->setErrorColor();
+        m_info_widget->setText(_("Could not create player '%s'.", local_name),
+                               false);
+    }
+}   // handleLocalName
 
 // -----------------------------------------------------------------------------
 /** Handles the actual registration process. It does some tests on id, password
@@ -134,14 +170,13 @@ void RegisterScreen::doRegister()
     stringw local_name = getWidget<TextBoxWidget>("local_username")
                        ->getText().trim();
 
-    registerLocal(local_name);
+    handleLocalName(local_name);
     
     // If no online account is requested, don't register
-    if(!getWidget<CheckBoxWidget>("online")->getState())
+    if(!getWidget<CheckBoxWidget>("online")->getState() || m_existing_player)
     {
-        if(local_name.size()>0)
-            UserScreen::getInstance()->newUserAdded(local_name, L"");
         StateManager::get()->popMenu();
+        m_existing_player = NULL;
         return;
     }
 
@@ -190,7 +225,11 @@ void RegisterScreen::doRegister()
 
     sfx_manager->quickSound( "anvil" );
     if(local_name.size()>0)
-        UserScreen::getInstance()->newUserAdded(local_name, username);
+    {
+        PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
+        if (player)
+            player->setLastOnlineName(username);
+    }
 }   // doRegister
 
 // -----------------------------------------------------------------------------
@@ -283,6 +322,7 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "back")
     {
+        m_existing_player = NULL;
         StateManager::get()->escapePressed();
     }
 
@@ -291,6 +331,7 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
 // -----------------------------------------------------------------------------
 bool RegisterScreen::onEscapePressed()
 {
+    m_existing_player = NULL;
     if (PlayerManager::get()->getNumPlayers() == 0)
     {
         // Must be first time start, and player cancelled player creation

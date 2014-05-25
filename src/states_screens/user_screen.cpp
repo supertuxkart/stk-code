@@ -265,6 +265,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "rename")
         {
             PlayerProfile *cp = getSelectedPlayer();
+            RegisterScreen::getInstance()->setRename(cp);
             StateManager::get()->pushScreen(RegisterScreen::getInstance());
             // Init will automatically be called, which 
             // refreshes the player list
@@ -466,17 +467,6 @@ void BaseUserScreen::logoutError(const irr::core::stringw & error_message)
     m_info_widget->setText(error_message, false);
     m_options_widget->setActivated();
 }   // logoutError
-
-// ----------------------------------------------------------------------------
-void BaseUserScreen::newUserAdded(const irr::core::stringw &local_name,
-                              const irr::core::stringw &online_name)
-{
-    PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
-    // Set the online name, only if the user clicks on 'ok' will this
-    // new player become the current player (since we potentially have to 
-    // log out the old current player).
-    player->setLastOnlineName(online_name);
-}   // newUserAdded
 
 // ----------------------------------------------------------------------------
 /** Called when a player will be deleted.
