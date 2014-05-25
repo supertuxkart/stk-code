@@ -82,8 +82,14 @@ void ModelViewWidget::clearModels()
     m_model_location.clear();
     m_model_scale.clear();
     m_model_frames.clear();
-    irr_driver->getSceneManager()->clear();
+
+    if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
+    if (m_light != NULL) m_light->remove();
+    if (m_camera != NULL) m_camera->remove();
+
     m_rtt_main_node = NULL;
+    m_camera = NULL;
+    m_light = NULL;
 
     delete m_rtt_provider;
     m_rtt_provider = NULL;
@@ -173,6 +179,7 @@ void ModelViewWidget::update(float delta)
 
     m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
     
+    m_rtt_main_node->setVisible(true);
     irr_driver->setRTT(m_rtt_provider);
     irr_driver->getSceneManager()->setActiveCamera(m_camera);
 
@@ -186,6 +193,7 @@ void ModelViewWidget::update(float delta)
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     irr_driver->getSceneManager()->setActiveCamera(NULL);
+    m_rtt_main_node->setVisible(false);
 }
 
 void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
@@ -193,7 +201,14 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     AlignedArray<Vec3>& mesh_scale,
     const std::vector<int>& model_frames)
 {
-    irr_driver->getSceneManager()->clear();
+    if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
+    if (m_light != NULL) m_light->remove();
+    if (m_camera != NULL) m_camera->remove();
+
+    m_rtt_main_node = NULL;
+    m_camera = NULL;
+    m_light = NULL;
+
     irr_driver->clearLights();
 
     if (model_frames[0] == -1)
