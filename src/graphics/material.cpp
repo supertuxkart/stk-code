@@ -305,10 +305,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
                 "Invalid graphical effect specification: '%s' - ignored.",
                 s.c_str());
         }
-        else
-        {
-            m_shader_type = SHADERTYPE_SOLID;
-        }
 
         bool use_normal_map = false;
         node->get("use-normal-map", &use_normal_map);
