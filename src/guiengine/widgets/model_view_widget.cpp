@@ -275,6 +275,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     }
 
     m_camera = irr_driver->getSceneManager()->addCameraSceneNode();
+    m_camera->setAspectRatio(1.0f);
 
     m_camera->setPosition(core::vector3df(0.0, 20.0f, 70.0f));
     if (irr_driver->isGLSL())
