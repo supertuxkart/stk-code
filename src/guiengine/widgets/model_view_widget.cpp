@@ -90,11 +90,10 @@ void ModelViewWidget::clearModels()
     m_rtt_main_node = NULL;
     m_camera = NULL;
     m_light = NULL;
-
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
 }
+
 // -----------------------------------------------------------------------------
+
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
                                const Vec3& scale, const int frame)
 {
@@ -104,20 +103,8 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
-
-    /*
-     ((IGUIMeshViewer*)m_element)->setMesh( mesh );
-
-     video::SMaterial mat = mesh->getMeshBuffer(0)->getMaterial(); //mesh_view->getMaterial();
-     mat.setFlag(EMF_LIGHTING , false);
-     //mat.setFlag(EMF_GOURAUD_SHADING, false);
-     //mat.setFlag(EMF_NORMALIZE_NORMALS, true);
-     ((IGUIMeshViewer*)m_element)->setMaterial(mat);
-     */
-
-    delete m_rtt_provider;
-    m_rtt_provider = NULL;
 }
+
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
@@ -171,16 +158,20 @@ void ModelViewWidget::update(float delta)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-        m_rtt_provider = new RTT(512, 512);
 
-        if (m_rtt_main_node == NULL)
-            setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
+        m_rtt_provider = new RTT(512, 512);
+    }
+
+    if (m_rtt_main_node == NULL)
+    {
+        setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
     }
 
     m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
     
     m_rtt_main_node->setVisible(true);
     irr_driver->setRTT(m_rtt_provider);
+
     irr_driver->getSceneManager()->setActiveCamera(m_camera);
 
     std::vector<IrrDriver::GlowData> glows;
@@ -293,10 +284,6 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera->setTarget(core::vector3df(0, 10, 0.0f));
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();
-
-    // Detach the note from the scene so we can render it independently
-    //m_rtt_main_node->setVisible(false);
-    //m_light->setVisible(false);
 }
 
 void ModelViewWidget::setRotateOff()
