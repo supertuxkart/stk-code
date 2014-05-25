@@ -82,6 +82,8 @@ void ModelViewWidget::clearModels()
     m_model_location.clear();
     m_model_scale.clear();
     m_model_frames.clear();
+    irr_driver->getSceneManager()->clear();
+    m_rtt_main_node = NULL;
 
     delete m_rtt_provider;
     m_rtt_provider = NULL;
