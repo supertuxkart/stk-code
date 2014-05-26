@@ -29,15 +29,18 @@ class ScriptEngine
 public:
 
          ScriptEngine();
-		 ~ScriptEngine();
-		 
-		 void runScript(std::string scriptName);
-
+         ~ScriptEngine();
+         
+         void runScript(std::string scriptName);
+        
+         void setCollision(int kartid1,int kartid2);
+         
 private:
-	asIScriptEngine *m_engine;
-	
-	void configureEngine(asIScriptEngine *engine);
-	int  compileScript(asIScriptEngine *engine,std::string scriptName);
+    asIScriptEngine *m_engine;
+    
+    
+    void configureEngine(asIScriptEngine *engine);
+    int  compileScript(asIScriptEngine *engine,std::string scriptName);
 
 };   // class ScriptEngine
 #endif
