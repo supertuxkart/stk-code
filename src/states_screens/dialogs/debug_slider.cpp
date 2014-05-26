@@ -51,11 +51,11 @@ DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg) :
 
     float val;
     if (m_id == "lwhite")
-      val = irr_driver->getLwhite() * 10.;
+      val = irr_driver->getLwhite() * 10.f;
     if (m_id == "exposure")
-      val = irr_driver->getExposure() * 100.;
+      val = irr_driver->getExposure() * 100.f;
 
-    getWidget<SpinnerWidget>("value_slider")->setValue(val);
+    getWidget<SpinnerWidget>("value_slider")->setValue(int(val));
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -83,9 +83,9 @@ GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& e
         int value = getWidget<SpinnerWidget>("value_slider")->getValue();
         Log::info("DebugSlider", "Value for <%s> : %i", m_id.c_str(), value);
         if (m_id == "lwhite")
-            irr_driver->setLwhite(value / 10.);
+            irr_driver->setLwhite(value / 10.f);
         if (m_id == "exposure")
-            irr_driver->setExposure(value / 100.);
+            irr_driver->setExposure(value / 100.f);
         return GUIEngine::EVENT_BLOCK;
     }
 

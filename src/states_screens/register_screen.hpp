@@ -23,6 +23,9 @@
 namespace GUIEngine { class Widget; class LabelWidget;
                       class RibbonWidget;              }
 namespace Online    { class XMLRequest;                }
+
+class PlayerProfile;
+
 /**
   * \brief Screen to register an online account.
   * \ingroup states_screens
@@ -33,6 +36,8 @@ class RegisterScreen : public GUIEngine::Screen,
 private:
     friend class GUIEngine::ScreenSingleton<RegisterScreen>;
 
+    void makeEntryFieldsVisible(bool online);
+    void handleLocalName(const irr::core::stringw &local_name);
     void doRegister();
     void init();
     RegisterScreen();
@@ -46,6 +51,10 @@ private:
     /** The XML request to the server. */
     Online::XMLRequest *m_signup_request;
 
+    /** Pointer to an existing player if the screen is doing a rename,
+     *  NULL otherwise. */
+    PlayerProfile *m_existing_player;
+
     /** True if the info message (email was sent...) is shown. */
     bool m_info_message_shown;
 
@@ -54,6 +63,8 @@ public:
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE {};
     virtual void onUpdate(float dt) OVERRIDE;
+    virtual bool onEscapePressed() OVERRIDE;
+    void setRename(PlayerProfile *player);
 
     void acceptTerms();
     /** \brief implement callback from parent class GUIEngine::Screen */

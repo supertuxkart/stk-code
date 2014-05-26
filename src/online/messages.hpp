@@ -31,6 +31,7 @@ namespace Online
     namespace Messages
     {
         irr::core::stringw loadingDots          (float interval = 0.5f, int max_dots = 3);
+        irr::core::stringw loadingDots          (const wchar_t *s);
         irr::core::stringw signingIn            ();
         irr::core::stringw signingOut           ();
         irr::core::stringw validatingInfo       ();

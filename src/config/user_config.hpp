@@ -677,6 +677,11 @@ namespace UserConfigParams
                                                "wasn't asked, 1: allowed, 2: "
                                                "not allowed") );
 
+    // ---- User managerment
+
+    PARAM_PREFIX BoolUserConfigParam        m_remember_user
+            PARAM_DEFAULT(  BoolUserConfigParam(true, "remember_me",
+                                               "Automatically remember login data"));
     // ---- Online gameplay related
 
     PARAM_PREFIX GroupUserConfigParam       m_online_group

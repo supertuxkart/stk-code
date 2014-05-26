@@ -2291,7 +2291,7 @@ void Kart::updateFlying()
         {
             float orientation = getHeading();
             m_body->applyCentralImpulse(btVector3(-100.0f*sin(orientation), 0.0,
-                -100.0*cos(orientation)));
+                -100.0f*cos(orientation)));
         }
     }
 
