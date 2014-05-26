@@ -38,6 +38,7 @@
 #include "physics/physical_object.hpp"
 #include "physics/stk_dynamics_world.hpp"
 #include "physics/triangle_mesh.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/track.hpp"
 #include "utils/profiler.hpp"
 
@@ -169,6 +170,8 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
+            ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            script_engine->runScript("collisions");
             continue;
         }  // if kart-kart collision
 

@@ -18,15 +18,16 @@
 
 #include <iostream>  // cout
 #include <assert.h>  // assert()
-#include <string.h>  // strstr()
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include <angelscript.h>
+#include "karts/kart.hpp"
+#include "modes/world.hpp"
 #include "script_engine.hpp"
 #include "scriptstdstring.h"
-#include "modes/world.hpp"
+#include <string.h>  // strstr()
+#include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
-#include "karts/kart.hpp"
+
 #include "io/file_manager.hpp"
 
 using namespace irr;
@@ -39,8 +40,11 @@ using namespace irr;
 	void disableAnimation(asIScriptGeneric *gen);
 	void enableAnimation(asIScriptGeneric *gen);
 	void squashKart(asIScriptGeneric *gen);
+	void enableTrigger(asIScriptGeneric *gen);
+	void disableTrigger(asIScriptGeneric *gen);
 	
-ScriptEngine::ScriptEngine(){
+ScriptEngine::ScriptEngine()
+{
 	// Create the script engine
 	m_engine = asCreateScriptEngine(ANGELSCRIPT_VERSION);
 	if( m_engine == 0 )
@@ -53,39 +57,46 @@ ScriptEngine::ScriptEngine(){
 	// and variables that the script should be able to use.
 	configureEngine(m_engine);
 }
-ScriptEngine::~ScriptEngine(){
+ScriptEngine::~ScriptEngine()
+{
 	// Release the engine
 	m_engine->Release();
 }
 
 
 // Displays the message specified in displayMessage( string message ) within the script
-void displayMessage(asIScriptGeneric *gen){
+void displayMessage(asIScriptGeneric *gen)
+{
 	std::string *input = (std::string*)gen->GetArgAddress(0);
 	irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
 	new TutorialMessageDialog((out),true); 
 }
-void disableAnimation(asIScriptGeneric *gen){
+void disableAnimation(asIScriptGeneric *gen)
+{
 		std::string *str = (std::string*)gen->GetArgAddress(0);
 		std::string type = "mesh";
 		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str,type);
 }
-void enableAnimation(asIScriptGeneric *gen){
+void enableAnimation(asIScriptGeneric *gen)
+{
 		std::string *str = (std::string*)gen->GetArgAddress(0);
 		std::string type = "mesh";
 		World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
 }
-void disableTrigger(asIScriptGeneric *gen){
+void disableTrigger(asIScriptGeneric *gen)
+{
 		std::string *str = (std::string*)gen->GetArgAddress(0);
 		std::string type = "action-trigger";
 		World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str,type);
 }
-void enableTrigger(asIScriptGeneric *gen){
+void enableTrigger(asIScriptGeneric *gen)
+{
 		std::string *str = (std::string*)gen->GetArgAddress(0);
 		std::string type = "action-trigger";
 		World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
 }
-void squashKart(asIScriptGeneric *gen){
+void squashKart(asIScriptGeneric *gen)
+{
 		int id = (int)gen->GetArgDWord(0);
 		float time = gen->GetArgFloat(1);
 		AbstractKart* kart = World::getWorld()->getKart(id);
@@ -93,7 +104,8 @@ void squashKart(asIScriptGeneric *gen){
 }
 
 
-std::string getScript(std::string scriptName){
+std::string getScript(std::string scriptName)
+{
 	std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
 	
 	script_dir += scriptName + ".as";
@@ -151,10 +163,18 @@ void ScriptEngine::runScript(std::string scriptName)
 	// Find the function for the function we want to execute.
 	//This is how you call a normal function with arguments
 	//asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
-	asIScriptFunction *func = m_engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
+	asIScriptFunction *func;
+	if (scriptName=="collisions")//TODO Better way to handle this?
+	{
+	    func = m_engine->GetModule(0)->GetFunctionByDecl("void onCollision()");
+	}
+	else
+	{
+        func = m_engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
+    }
 	if( func == 0 )
 	{
-		std::cout << "The function 'void onTrigger()' was not found." << std::endl;
+		std::cout << "The required function was not found." << std::endl;
 		ctx->Release();
 		m_engine->Release();
 		return;
