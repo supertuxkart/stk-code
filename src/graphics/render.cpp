@@ -797,6 +797,9 @@ void IrrDriver::renderShadows()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
+    if (!UserConfigParams::m_gi)
+        return;
+
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -900,15 +903,18 @@ static void renderPointLights(unsigned count)
 void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 {
     //RH
-    glDisable(GL_BLEND);
-    m_rtts->getRH().Bind();
-    glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
-    glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
-    setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
-    setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
-    setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
-    FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
-    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
+    if (UserConfigParams::m_gi)
+    {
+        glDisable(GL_BLEND);
+        m_rtts->getRH().Bind();
+        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
+        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
+        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
+    }
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
@@ -919,7 +925,8 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
     if (!UserConfigParams::m_dynamic_lights)
         return;
 
-    m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+    if (UserConfigParams::m_gi)
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
 
     if (SkyboxCubeMap)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
