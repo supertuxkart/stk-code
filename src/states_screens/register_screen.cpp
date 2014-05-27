@@ -104,6 +104,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
     {
         m_info_widget->setVisible(false);
         getWidget<CheckBoxWidget>("online")->setVisible(false);
+        getWidget<LabelWidget>("label_online")->setVisible(false);
         online = false;
     }
     getWidget<TextBoxWidget>("username")->setVisible(online);
