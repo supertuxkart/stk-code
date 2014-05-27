@@ -80,6 +80,9 @@ public:
     GrandPrixData(const unsigned int number_of_tracks,
                   const std::string& m_track_group,
                   const bool use_reverse);
+    void changeTrackNumber(const unsigned int number_of_tracks,
+                           const std::string& track_group,
+                           const bool         use_reverse);
 
     // Methods for the GP editor
     void setId(const std::string& id);

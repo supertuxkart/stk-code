@@ -90,7 +90,8 @@ GUIEngine::EventPropagation randomGPInfoDialog::processEvent(
     if (eventSource == "Number of tracks")
     {
         m_number_of_tracks = getWidget<GUIEngine::SpinnerWidget>("Number of tracks")->getValue();
-        updateGP();
+        m_gp->changeTrackNumber(m_number_of_tracks, m_trackgroup, m_use_reverse);
+        displayTracks(m_area.getHeight()/7, m_area.getHeight()*6/7);
     }
     else if (eventSource == "Trackgroup")
     {

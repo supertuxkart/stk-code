@@ -54,10 +54,10 @@ public:
                                    const std::string& gp_ident);
 
     /** \brief display all the tracks according to the current gp
-     * For a normal gp info dialog, it just creates a label with the name for
-     * every track. But in a random gp info dialog, it tries to reuse as many
-     * labels as possible by just changing their labels. If there are less than
-     * need, some are added, if there are to many, some become deleted. */
+     * For a normal gp info dialog, it just creates a label for every track.
+     * With its name. But in a random gp info dialog, it tries to reuse as many
+     * labels as possible by just changing their text. If there are less than
+     * need, some are added, if there are to many, some are deleted. */
     void displayTracks(const int y1, const int y2);
 
     void onEnterPressedInternal();

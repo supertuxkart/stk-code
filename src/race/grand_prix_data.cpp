@@ -55,6 +55,18 @@ GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
     m_name     = L"Random";
     m_editable = false;
 
+    m_tracks.reserve(number_of_tracks);
+    m_laps.reserve(number_of_tracks);
+    m_reversed.reserve(number_of_tracks);
+
+    changeTrackNumber(number_of_tracks, track_group, use_reverse);
+}
+
+// ----------------------------------------------------------------------------
+void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
+                                      const std::string& track_group,
+                                      const bool         use_reverse)
+{
     // The problem with the track groups is that "all" isn't a track group
     // TODO: Add "all" to the track groups and rewrite this more elegant
     std::vector<int> track_indices;
@@ -70,20 +82,32 @@ GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
     }
     assert(number_of_tracks <= available_tracks);
 
-    m_tracks.reserve(number_of_tracks);
-    m_laps.reserve(number_of_tracks);
-    m_reversed.reserve(number_of_tracks);
-
-    for (unsigned int i = 0; i < number_of_tracks; i++)
+    // add or remove the right number of tracks
+    if (m_tracks.size() < number_of_tracks)
     {
-        int index = (track_group == "all") ?
-                    rand() % available_tracks :
-                    track_indices[rand() % available_tracks];
+        while (m_tracks.size() < number_of_tracks)
+        {
+            int index = (track_group == "all") ?
+                         rand() % available_tracks :
+                         track_indices[rand() % available_tracks];
 
-        m_tracks.push_back(track_manager->getTrack(index)->getIdent());
-        m_laps.push_back(3);
-        m_reversed.push_back(rand() % 2);
+            m_tracks.push_back(track_manager->getTrack(index)->getIdent());
+            m_laps.push_back(3); // TODO: Take the default number from the track
+            m_reversed.push_back(rand() % 2);
+        }
     }
+    else if (m_tracks.size() > number_of_tracks)
+    {
+        while (m_tracks.size() > number_of_tracks)
+        {
+            m_tracks.pop_back();
+            m_laps.pop_back();
+            m_reversed.pop_back();
+        }
+    }
+
+    assert(m_tracks.size() == m_laps.size()    );
+    assert(m_laps.size()   == m_reversed.size());
 }
 
 // ----------------------------------------------------------------------------
