@@ -682,6 +682,10 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_remember_user
             PARAM_DEFAULT(  BoolUserConfigParam(true, "remember_me",
                                                "Automatically remember login data"));
+
+    PARAM_PREFIX BoolUserConfigParam        m_always_show_login_screen
+            PARAM_DEFAULT(  BoolUserConfigParam(false, "always_show_login_screen",
+          "Always show the login screen even if last player's session was saved."));
     // ---- Online gameplay related
 
     PARAM_PREFIX GroupUserConfigParam       m_online_group
