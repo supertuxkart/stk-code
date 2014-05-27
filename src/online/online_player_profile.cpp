@@ -125,7 +125,8 @@ namespace Online
         request->addParameter("username",username);
         request->addParameter("password",password);
         request->addParameter("save-session",
-                              UserConfigParams::m_remember_user);
+                              UserConfigParams::m_remember_user ? "true" 
+                                                                : "false");
         request->queue();
         m_online_state = OS_SIGNING_IN;
         return request;
@@ -224,12 +225,16 @@ namespace Online
                 m_player->signOut(isSuccess(), getXMLData(), getInfo());
             }
         public:
-            /** Sign out request, with a higher priority than signin requests,
-             *  so that when a user is changed the signout is done first
-             *  (to avoid potential problems with a local user logged in twice
-             *  - even if it's only a short period of time). */
+            /** Sign out request, which have the highest priority (same as
+             *  quit-stk request). This allows the final logout request at
+             *  the end of STK to be handled, even if a quit request gets
+             *  added (otherwise if quit has higher priority, the quit can
+             *  be executed before signout, resulting in players not being
+             *  logged out properly). It also guarantees that the logout
+             *  happens before a following logout.
+             */
             SignOutRequest(PlayerProfile *player)
-                        : XMLRequest(true,/*priority*/20)
+                        : XMLRequest(true,/*priority*/RequestManager::HTTP_MAX_PRIORITY)
             {
                 m_player = player;
                 m_player->setUserDetails(this, 
