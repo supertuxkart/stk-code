@@ -153,7 +153,7 @@ void World::init()
 
     // Grab the track file
     m_track = track_manager->getTrack(race_manager->getTrackName());
-	m_script_engine = new ScriptEngine();
+	m_script_engine = new Scripting::ScriptEngine();
     if(!m_track)
     {
         std::ostringstream msg;

@@ -16,9 +16,10 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <iostream>  // cout
 #include <assert.h>  // assert()
 #include <angelscript.h>
+#include "io/file_manager.hpp"
+#include <iostream>  // cout
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "script_engine.hpp"
@@ -28,12 +29,11 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
 
-#include "io/file_manager.hpp"
-
-using namespace irr;
 
 
+using namespace Scripting;
 
+namespace Scripting{
 
 // Function prototypes for binding.
     void displayMessage(asIScriptGeneric *gen);
@@ -42,9 +42,7 @@ using namespace irr;
     void squashKart(asIScriptGeneric *gen);
     void enableTrigger(asIScriptGeneric *gen);
     void disableTrigger(asIScriptGeneric *gen);
-    
-    int m_collidingkartid1;
-    int m_collidingkartid2;
+
     
 ScriptEngine::ScriptEngine()
 {
@@ -54,8 +52,6 @@ ScriptEngine::ScriptEngine()
     {
         std::cout << "Failed to create script engine." << std::endl;
     }
-    m_collidingkartid1 = 0;
-    m_collidingkartid2 = 0;
     // Configure the script engine with all the functions, 
     // and variables that the script should be able to use.
     configureEngine(m_engine);
@@ -105,13 +101,9 @@ void squashKart(asIScriptGeneric *gen)
         AbstractKart* kart = World::getWorld()->getKart(id);
         kart->setSquash(time,0.5);  //0.5 * max speed is new max for squashed duration
 }
-void getCollidingKart1(asIScriptGeneric *gen)
+void setCollision(int kartid1,int kartid2)
 {
-    gen->SetReturnDWord(m_collidingkartid1);
-}
-void getCollidingKart2(asIScriptGeneric *gen)
-{
-    gen->SetReturnDWord(m_collidingkartid2);
+    Scripting::Physics::setCollision(kartid1,kartid2);
 }
 
 std::string getScript(std::string scriptName)
@@ -243,11 +235,6 @@ void ScriptEngine::runScript(std::string scriptName)
 
 }
 
-void ScriptEngine::setCollision(int collider1,int collider2)
-{
-    m_collidingkartid1 = collider1;
-    m_collidingkartid2 = collider2;
-}
 
 
 void ScriptEngine::configureEngine(asIScriptEngine *engine)
@@ -263,9 +250,10 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
     r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
     r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r>=0);
     r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r>=0);
-    r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
-    r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
-
+    //r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
+    //r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
+    Scripting::Physics::registerScriptFunctions(m_engine);
+    
     // It is possible to register the functions, properties, and types in 
     // configuration groups as well. When compiling the scripts it can then
     // be defined which configuration groups should be available for that
@@ -317,4 +305,6 @@ int ScriptEngine::compileScript(asIScriptEngine *engine, std::string scriptName)
     // each other.
 
     return 0;
+}
+
 }

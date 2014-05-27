@@ -170,10 +170,11 @@ void Physics::update(float dt)
                               p->getContactPointCS(0),
                               p->getUserPointer(1)->getPointerKart(),
                               p->getContactPointCS(1)                );
-            ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
-            script_engine->setCollision(kartid1,kartid2);
+            //script_engine->setCollision(kartid1,kartid2);
+            Scripting::Physics::setCollision(kartid1,kartid2);
             script_engine->runScript("collisions");
             continue;
         }  // if kart-kart collision

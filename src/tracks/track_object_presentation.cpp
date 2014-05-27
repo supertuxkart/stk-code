@@ -785,7 +785,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_bananas")
     {
-		ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+		Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
         m_action_active = false;
 		m_script_engine->runScript(m_action);
     }
@@ -797,7 +797,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
 		*/
 		m_action_active=false;
-		ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+		Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
 		m_script_engine->runScript(m_action);
 	}
 	else if (m_action == "haybail-activate")
@@ -808,7 +808,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 
 		*/
 		m_action_active=false;
-		ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+		Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
 		m_script_engine->runScript(m_action);
 	}
     else if (m_action == "tutorial_giftboxes")
@@ -895,7 +895,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     else
     {	
 		//TODO move all above functions into scripts and remove the ifs
-        ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+        Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
         m_action_active = false;
 		m_script_engine->runScript(m_action);
 		

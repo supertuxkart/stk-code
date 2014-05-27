@@ -41,7 +41,9 @@ class Controller;
 class PhysicalObject;
 class Physics;
 class Track;
-class ScriptEngine;
+namespace Scripting{
+	class ScriptEngine;
+}
 namespace irr
 {
     namespace scene { class ISceneNode; }
@@ -116,7 +118,7 @@ protected:
     Track* m_track;
 
 	/**Pointer to scripting engine  */
-	ScriptEngine* m_script_engine;
+	Scripting::ScriptEngine* m_script_engine;
 
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
@@ -308,7 +310,7 @@ public:
 
 	// ------------------------------------------------------------------------
     /** Returns a pointer to the Scripting Engine. */
-    ScriptEngine   *getScriptEngine() const { return m_script_engine; }
+    Scripting::ScriptEngine   *getScriptEngine() const { return m_script_engine; }
 
 	//------------------------------------------------------------------------
     bool            isFogEnabled() const;
