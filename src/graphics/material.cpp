@@ -694,12 +694,17 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
     if (m_shader_type == SHADERTYPE_SOLID_UNLIT)
     {
-        m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
-
-        m->AmbientColor = video::SColor(255, 255, 255, 255);
-        m->DiffuseColor = video::SColor(255, 255, 255, 255);
-        m->EmissiveColor = video::SColor(255, 255, 255, 255);
-        m->SpecularColor = video::SColor(255, 255, 255, 255);
+        if (irr_driver->isGLSL())
+        {
+            m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+        }
+        else
+        {
+            m->AmbientColor = video::SColor(255, 255, 255, 255);
+            m->DiffuseColor = video::SColor(255, 255, 255, 255);
+            m->EmissiveColor = video::SColor(255, 255, 255, 255);
+            m->SpecularColor = video::SColor(255, 255, 255, 255);
+        }
     }
 
     if (m_shader_type == SHADERTYPE_ALPHA_TEST)
