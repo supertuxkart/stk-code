@@ -320,7 +320,7 @@ void OptionsScreenInput2::updateInputButtons()
         getWidget<GUIEngine::LabelWidget>("conflict");
     if (conflicts)
         conflict_label->setText(
-           _("* A blue item means a conflict with another configuration") );
+           _("* A red item means a conflict with another configuration") );
     else
         conflict_label->setText("");
 
@@ -453,7 +453,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
     }
     else if (name == "back")
     {
-        sm->popMenu();
+        sm->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
     else if (name == "actions")
     {
