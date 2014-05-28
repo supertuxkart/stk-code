@@ -171,19 +171,6 @@ bool Track::operator<(const Track &other) const
 }   // operator<
 
 //-----------------------------------------------------------------------------
-bool Track::operator>(const Track &other) const
-{
-    PlayerProfile *p = PlayerManager::getCurrentPlayer();
-    bool this_is_locked = p->isLocked(getIdent());
-    bool other_is_locked = p->isLocked(other.getIdent());
-    if(this_is_locked == other_is_locked)
-    {
-        return !(getSortName() < other.getSortName());
-    }
-    else
-        return this_is_locked;
-}
-//-----------------------------------------------------------------------------
 /** Returns the name of the track, which is e.g. displayed on the screen.
     \note this is the LTR name, invoke fribidi as needed. */
 core::stringw Track::getName() const

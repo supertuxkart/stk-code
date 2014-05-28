@@ -616,7 +616,6 @@ public:
     float getDisplacementSpeed() const { return m_displacement_speed; }
     float getCausticsSpeed() const { return m_caustics_speed; }
     bool operator<(const Track &other) const;
-    bool operator>(const Track &other) const;
 };   // class Track
 
 #endif

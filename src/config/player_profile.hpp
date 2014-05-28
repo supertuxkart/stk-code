@@ -116,7 +116,6 @@ public:
     void initRemainingData();
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
-    bool operator>(const PlayerProfile &other);
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
     void clearSession();
