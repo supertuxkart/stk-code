@@ -720,6 +720,11 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     }
     if (!(tick % 100))
         rsm_matrix = sun_ortho_matrix[3];
+    rh_extend = core::vector3df(128, 64, 128);
+    core::vector3df campos = camnode->getAbsolutePosition();
+    core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
+    rh_matrix.setTranslation(translation);
+
     assert(sun_ortho_matrix.size() == 4);
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
@@ -872,6 +877,16 @@ static void renderPointLights(unsigned count)
 
 void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 {
+    //RH
+    glDisable(GL_BLEND);
+    m_rtts->getRH().Bind();
+    glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
+    glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
+    setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+    setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+    setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+    FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+    glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();

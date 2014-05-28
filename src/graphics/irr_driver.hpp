@@ -203,6 +203,8 @@ private:
     /** RTTs. */
     RTT                *m_rtts;
     std::vector<core::matrix4> sun_ortho_matrix;
+    core::vector3df    rh_extend;
+    core::matrix4      rh_matrix;
     core::matrix4      rsm_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
