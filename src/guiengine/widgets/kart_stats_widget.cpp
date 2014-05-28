@@ -40,10 +40,20 @@ using namespace irr;
 KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                                  std::string kart_group) : Widget(WTYPE_DIV)
 {
+
+    x_speed = 1.0f;
+    y_speed = 1.0f;
+    w_speed = 1.0f;
+    h_speed = 1.0f;
+
     m_player_id = player_id;
 
     setSize(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
             area.getWidth(), area.getHeight()               );
+    target_x = m_x;
+    target_y = m_y;
+    target_w = m_w;
+    target_h = m_h;
 
     // ---- Mass skill level widget
     m_mass_bar = NULL;
@@ -102,7 +112,7 @@ void KartStatsWidget::add()
 /** Updates the animation (moving/shrinking/etc.) */
 void KartStatsWidget::onUpdate(float delta)
 {
-    assert(m_magic_number == 0x33445566);
+    m_mass_bar->setValue(m_mass_value);
     if (target_x == m_x && target_y == m_y &&
             target_w == m_w && target_h == m_h) return;
 
@@ -178,7 +188,6 @@ void KartStatsWidget::onUpdate(float delta)
 
 void KartStatsWidget::setSize(const int x, const int y, const int w, const int h)
 {
-    assert(m_magic_number == 0x33445566);
     m_x = x;
     m_y = y;
     m_w = w;

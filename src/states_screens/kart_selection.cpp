@@ -238,8 +238,8 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         // area for the stats widget
     core::recti statsArea(m_kart_stats_x,
                           m_kart_stats_y,
-                          m_kart_stats_w,
-                          m_kart_stats_h);
+                          m_kart_stats_x+m_kart_stats_w,
+                          m_kart_stats_y+m_kart_stats_h);
 
     //m_kart_stats = new ProgressBarWidget(false);
     m_kart_stats = new GUIEngine::KartStatsWidget(statsArea, player_id, kart_group);
@@ -802,6 +802,18 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
 // -------------------------------------------------------------------------
 
+void PlayerKartWidget::setKartStats(const std::string& selection)
+{
+    assert(m_magic_number == 0x33445566);
+    const KartProperties *kp =
+                kart_properties_manager->getKart(selection);
+    if (kp != NULL)
+    {
+        m_kart_stats->setMass((int)kp->getMass()/10);
+        //TODO add other stats
+    }
+}
+
 /** Sets which kart was selected for this player */
 void PlayerKartWidget::setKartInternalName(const std::string& whichKart)
 {
@@ -879,7 +891,7 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
     }
 
     m_parent->updateKartWidgetModel(playerID, selectionID, selectionText);
-
+    m_parent->m_kart_widgets[playerID].setKartStats(selectionID);
     m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
     m_parent->validateKartChoices();
 }   // onSelectionChanged
