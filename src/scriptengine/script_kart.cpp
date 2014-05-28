@@ -31,37 +31,21 @@
 
 
 namespace Scripting{
-    
-    namespace Physics{
-        
-        int m_collidingkartid1;
-        int m_collidingkartid2;
-        
-        void getCollidingKart1(asIScriptGeneric *gen)
+
+    namespace Kart{
+
+        void squashKart(asIScriptGeneric *gen)
         {
-            gen->SetReturnDWord(m_collidingkartid1);
+            int id = (int)gen->GetArgDWord(0);
+            float time = gen->GetArgFloat(1);
+            AbstractKart* kart = World::getWorld()->getKart(id);
+            kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
         }
-        void getCollidingKart2(asIScriptGeneric *gen)
-        {
-            gen->SetReturnDWord(m_collidingkartid2);
-        }
-        void setCollision(int collider1,int collider2)
-        {
-            m_collidingkartid1 = collider1;
-            m_collidingkartid2 = collider2;
-        }
-        
-        asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine)
-        {
-            asIScriptFunction *func;
-            func = engine->GetModule(0)->GetFunctionByDecl("void onCollision()");
-            return func;
-        }
+
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
-            r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
-            r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
+            r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r >= 0);
 
         }
     }

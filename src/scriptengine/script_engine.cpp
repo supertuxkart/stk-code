@@ -94,13 +94,6 @@ void enableTrigger(asIScriptGeneric *gen)
         std::string type = "action-trigger";
         World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
 }
-void squashKart(asIScriptGeneric *gen)
-{
-        int id = (int)gen->GetArgDWord(0);
-        float time = gen->GetArgFloat(1);
-        AbstractKart* kart = World::getWorld()->getKart(id);
-        kart->setSquash(time,0.5);  //0.5 * max speed is new max for squashed duration
-}
 void setCollision(int kartid1,int kartid2)
 {
     Scripting::Physics::setCollision(kartid1,kartid2);
@@ -247,12 +240,14 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
     r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r>=0);
     r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
     r = engine->RegisterGlobalFunction("void enableAnimation(string &in)", asFUNCTION(enableAnimation), asCALL_GENERIC); assert(r>=0);
-    r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
+    Scripting::Kart::registerScriptFunctions(m_engine);
+    //r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
     r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r>=0);
     r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r>=0);
+    Scripting::Physics::registerScriptFunctions(m_engine);
     //r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
     //r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
-    Scripting::Physics::registerScriptFunctions(m_engine);
+
     
     // It is possible to register the functions, properties, and types in 
     // configuration groups as well. When compiling the scripts it can then

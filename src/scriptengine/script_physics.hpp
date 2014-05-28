@@ -26,18 +26,19 @@ namespace Scripting{
     
     namespace Physics{
         
-        private:
+        //private:
             int m_collidingkartid1;
             int m_collidingkartid2;
         
         
-        public:
+        //public:
             void setCollision(int collider1,int collider2);
             void registerScriptFunctions(asIScriptEngine *engine);
             asIScriptFunction* 
                 registerScriptCallbacks(asIScriptEngine *engine);
             void getCollidingKart1(asIScriptGeneric *gen);
             void getCollidingKart2(asIScriptGeneric *gen);
+
     }
     
     

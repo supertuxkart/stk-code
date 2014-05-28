@@ -38,7 +38,7 @@
 #include "tracks/model_definition_loader.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_object_manager.hpp"
-#include "scriptengine/script_engine.hpp";
+#include "scriptengine/script_engine.hpp"
 #include <ISceneManager.h>
 #include <IMeshSceneNode.h>
 #include <ICameraSceneNode.h>
@@ -785,32 +785,32 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else if (m_action == "tutorial_bananas")
     {
-		Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+        Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
         m_action_active = false;
-		m_script_engine->runScript(m_action);
+        m_script_engine->runScript(m_action);
     }
-	else if (m_action == "haybail")
+    else if (m_action == "haybail")
     {
-		/*to activate this add the following line to stk-assets/farm/scene.xml
+        /*to activate this add the following line to stk-assets/farm/scene.xml
 
-		<object type="action-trigger" action="haybail" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
+        <object type="action-trigger" action="haybail" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
 
-		*/
-		m_action_active=false;
-		Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
-		m_script_engine->runScript(m_action);
-	}
-	else if (m_action == "haybail-activate")
+        */
+        m_action_active=false;
+        Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+        m_script_engine->runScript(m_action);
+    }
+    else if (m_action == "haybail-activate")
     {
-		/*to activate this add the following line to stk-assets/farm/scene.xml
+        /*to activate this add the following line to stk-assets/farm/scene.xml
 
-		<object type="action-trigger" action="haybail" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
+        <object type="action-trigger" action="haybail" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
 
-		*/
-		m_action_active=false;
-		Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
-		m_script_engine->runScript(m_action);
-	}
+        */
+        m_action_active=false;
+        Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
+        m_script_engine->runScript(m_action);
+    }
     else if (m_action == "tutorial_giftboxes")
     {
         m_action_active = false;
@@ -894,17 +894,17 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
     }
     else
     {	
-		//TODO move all above functions into scripts and remove the ifs
+        //TODO move all above functions into scripts and remove the ifs
         Scripting::ScriptEngine* m_script_engine = World::getWorld()->getScriptEngine();
         m_action_active = false;
-		m_script_engine->runScript(m_action);
-		
-		/*
-		Catch exception -> script not found
-		fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
+        m_script_engine->runScript(m_action);
+        
+        /*
+        Catch exception -> script not found
+        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
                 m_action.c_str());
-		
-		 */
+        
+         */
     }
 }
 
