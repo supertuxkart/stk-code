@@ -73,6 +73,8 @@ void BaseUserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
+    getWidget<CheckBoxWidget>("remember-user")
+             ->setState(UserConfigParams::m_always_show_login_screen);
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
@@ -192,6 +194,8 @@ void BaseUserScreen::makeEntryFieldsVisible()
     bool online = m_online_cb->getState();
     getWidget<LabelWidget>("label_username")->setVisible(online);
     m_username_tb->setVisible(online);
+    getWidget<LabelWidget>("label_remember")->setVisible(online);
+    getWidget<CheckBoxWidget>("remember-user")->setVisible(online);
     PlayerProfile *player = getSelectedPlayer();
     if(player && player->hasSavedSession() && online)
     {
@@ -229,6 +233,11 @@ void BaseUserScreen::eventCallback(Widget* widget,
         unsigned int id;
         if (StringUtils::fromString(s_index, id))
             selectUser(id);
+    }
+    else if (name == "remember-user")
+    {
+        UserConfigParams::m_remember_user = 
+                       getWidget<CheckBoxWidget>("remember-user")->getState();
     }
     else if (name == "online")
     {

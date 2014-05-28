@@ -1289,10 +1289,14 @@ int main(int argc, char *argv[] )
         if(!UserConfigParams::m_no_start_screen)
         {
             // If there is a current player, it was saved in the config file,
-            // so we immediately start the main menu. Otherwise show the login
+            // so we immediately start the main menu (unless it was requested
+            // to always show the login screen). Otherwise show the login
             // screen first.
-            if(PlayerManager::getCurrentPlayer())
+            if(PlayerManager::getCurrentPlayer() && !
+                UserConfigParams::m_always_show_login_screen)
+            {
                 StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            }
             else
             {
                 StateManager::get()->pushScreen(UserScreen::getInstance());

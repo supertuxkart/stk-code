@@ -166,7 +166,18 @@ PlayerManager::PlayerManager()
  */
 PlayerManager::~PlayerManager()
 {
+    // If the passwords should not be remembered, clear all saved sessions.
+    if(!UserConfigParams::m_remember_user)
+    {
+        PlayerProfile *player;
+        for_in(player, m_all_players)
+        {
+            player->clearSession();
+        }
+
+    }
     save();
+
 }   // ~PlayerManager
 
 // ----------------------------------------------------------------------------

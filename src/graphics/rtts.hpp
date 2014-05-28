@@ -38,6 +38,8 @@ public:
     ~RTT();
 
     FrameBuffer &getShadowFBO() { return *m_shadow_FBO; }
+    FrameBuffer &getRH() { return *m_RH_FBO; }
+    FrameBuffer &getRSM() { return *m_RSM; }
     unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
@@ -48,8 +50,10 @@ private:
     PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
-    unsigned shadowColorTex, shadowDepthTex;
-    FrameBuffer* m_shadow_FBO;
+    unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
+    unsigned RSM_Color, RSM_Normal, RSM_Depth;
+    unsigned RH_Red, RH_Green, RH_Blue;
+    FrameBuffer* m_shadow_FBO, *m_RSM, *m_RH_FBO;
 
     LEAK_CHECK();
 };

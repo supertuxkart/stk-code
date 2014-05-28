@@ -132,13 +132,13 @@ void PlayerProfile::initRemainingData()
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
-/** Creates an icon for a player. It takes the unique player id modulo the
- *  number of karts to pick an icon from the karts. It then uses the unique
- *  number plus the extentsion of the original icon as the file name (it's 
- *  not possible to use the player name, since the name is in utf-16, but
- *  typically the file systems are not, resulting in incorrect file names).
- *  The icon is then copied to the user config directory, so that it can
- *  be replaced by an icon made by the user.
+/** Creates an icon for a player if non exist so far. It takes the unique
+ *  player id modulo the number of karts to pick an icon from the karts. It
+ *  then uses the unique number plus the extentsion of the original icon as the
+ *  file name (it's not possible to use the player name, since the name is in
+ *  utf-16, but typically the file systems are not, resulting in incorrect file
+ *  names). The icon is then copied to the user config directory, so that it
+ *  can be replaced by an icon made by the user.
  *  If there should be an error copying the file, the icon filename is set
  *  to "". Every time stk is started, it will try to fix missing icons
  *  (which allows it to start from old/incompatible config files).
@@ -146,6 +146,9 @@ void PlayerProfile::initRemainingData()
  */
 void PlayerProfile::addIcon()
 {
+    if (m_icon_filename.size() > 0)
+        return;
+
     int n = m_unique_id % kart_properties_manager->getNumberOfKarts();
     std::string source = kart_properties_manager->getKartById(n)
                                                 ->getAbsoluteIconFile();
