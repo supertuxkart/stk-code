@@ -31,10 +31,18 @@ namespace Scripting{
         
         
         //public:
-            void setCollision(int collider1,int collider2);
+            //script engine functions
             void registerScriptFunctions(asIScriptEngine *engine);
             asIScriptFunction* 
                 registerScriptCallbacks(asIScriptEngine *engine);
+
+
+            //game engine functions
+            void setCollision(int collider1, int collider2);
+
+
+
+            //script-bound functions
             void getCollidingKart1(asIScriptGeneric *gen);
             void getCollidingKart2(asIScriptGeneric *gen);
 

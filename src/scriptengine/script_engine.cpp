@@ -35,15 +35,6 @@ using namespace Scripting;
 
 namespace Scripting{
 
-// Function prototypes for binding.
-    void displayMessage(asIScriptGeneric *gen);
-    void disableAnimation(asIScriptGeneric *gen);
-    void enableAnimation(asIScriptGeneric *gen);
-    void squashKart(asIScriptGeneric *gen);
-    void enableTrigger(asIScriptGeneric *gen);
-    void disableTrigger(asIScriptGeneric *gen);
-
-    
 ScriptEngine::ScriptEngine()
 {
     // Create the script engine
@@ -60,43 +51,6 @@ ScriptEngine::~ScriptEngine()
 {
     // Release the engine
     m_engine->Release();
-}
-
-
-// Displays the message specified in displayMessage( string message ) within the script
-void displayMessage(asIScriptGeneric *gen)
-{
-    std::string *input = (std::string*)gen->GetArgAddress(0);
-    irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
-    new TutorialMessageDialog((out),true); 
-}
-void disableAnimation(asIScriptGeneric *gen)
-{
-        std::string *str = (std::string*)gen->GetArgAddress(0);
-        std::string type = "mesh";
-        World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str,type);
-}
-void enableAnimation(asIScriptGeneric *gen)
-{
-        std::string *str = (std::string*)gen->GetArgAddress(0);
-        std::string type = "mesh";
-        World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
-}
-void disableTrigger(asIScriptGeneric *gen)
-{
-        std::string *str = (std::string*)gen->GetArgAddress(0);
-        std::string type = "action-trigger";
-        World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str,type);
-}
-void enableTrigger(asIScriptGeneric *gen)
-{
-        std::string *str = (std::string*)gen->GetArgAddress(0);
-        std::string type = "action-trigger";
-        World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str,type);
-}
-void setCollision(int kartid1,int kartid2)
-{
-    Scripting::Physics::setCollision(kartid1,kartid2);
 }
 
 std::string getScript(std::string scriptName)
@@ -159,13 +113,13 @@ void ScriptEngine::runScript(std::string scriptName)
     //This is how you call a normal function with arguments
     //asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
     asIScriptFunction *func;
-    if (scriptName=="collisions")//TODO Better way to handle this?
+    if (scriptName=="collisions")
     {
-        func = m_engine->GetModule(0)->GetFunctionByDecl("void onCollision()");
+        func = Scripting::Physics::registerScriptCallbacks(m_engine);
     }
     else
     {
-        func = m_engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
+        func = Scripting::Track::registerScriptCallbacks(m_engine);
     }
     if( func == 0 )
     {
@@ -237,16 +191,11 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
     // Register the script string type
     RegisterStdString(engine);
 
-    r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r>=0);
-    r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r>=0);
-    r = engine->RegisterGlobalFunction("void enableAnimation(string &in)", asFUNCTION(enableAnimation), asCALL_GENERIC); assert(r>=0);
+    Scripting::Track::registerScriptFunctions(m_engine);
+
     Scripting::Kart::registerScriptFunctions(m_engine);
-    //r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r>=0);
-    r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r>=0);
-    r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r>=0);
+
     Scripting::Physics::registerScriptFunctions(m_engine);
-    //r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
-    //r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
 
     
     // It is possible to register the functions, properties, and types in 

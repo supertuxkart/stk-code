@@ -18,15 +18,12 @@
 
 #include <assert.h>
 #include <angelscript.h>
-#include "script_engine.hpp"
+#include "script_physics.hpp"
 
 
 namespace Scripting{
     
     namespace Physics{
-        
-        int m_collidingkartid1;
-        int m_collidingkartid2;
         
         void getCollidingKart1(asIScriptGeneric *gen)
         {

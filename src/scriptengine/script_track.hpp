@@ -16,51 +16,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SCRIPT_ENGINE_HPP
-#define HEADER_SCRIPT_ENGINE_HPP
+#ifndef HEADER_SCRIPT_TRACK_HPP
+#define HEADER_SCRIPT_TRACK_HPP
 
-#include <string>
 #include <angelscript.h>
-
-class TrackObjectPresentation;
 
 namespace Scripting{
 
-    namespace Physics{ 
-        void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine);
-        void setCollision(int collider1,int collider2);
-    }
-
-    namespace Kart{
-        void registerScriptFunctions(asIScriptEngine *engine);
-    }
-
     namespace Track{
+
+        //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine);
+
+
+        //script-bound functions
+        void displayMessage(asIScriptGeneric *gen);
+        void disableAnimation(asIScriptGeneric *gen);
+        void enableAnimation(asIScriptGeneric *gen);
+        void enableTrigger(asIScriptGeneric *gen);
+        void disableTrigger(asIScriptGeneric *gen);
     }
-        
-class ScriptEngine
-{
-public:
-
-         ScriptEngine();
-         ~ScriptEngine();
-         
-         void runScript(std::string scriptName);
-         
-private:
-    asIScriptEngine *m_engine;
-    
-    
-    void configureEngine(asIScriptEngine *engine);
-    int  compileScript(asIScriptEngine *engine,std::string scriptName);
-
-};   // class ScriptEngine
 
 }
 #endif
-

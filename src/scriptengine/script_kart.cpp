@@ -20,7 +20,7 @@
 #include <angelscript.h>
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
-#include "script_engine.hpp"
+#include "script_kart.hpp"
 
 
 
