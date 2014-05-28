@@ -195,6 +195,12 @@ void IrrDriver::renderGLSL(float dt)
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
                 irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            else if (irr_driver->getRSM())
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
+            }
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
 
@@ -316,6 +322,28 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     if (!SkyboxTextures.empty())
         renderSkybox(camnode);
     PROFILER_POP_CPU_MARKER();
+
+    if (getRH())
+    {
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        m_rtts->getFBO(FBO_COLORS).Bind();
+        glUseProgram(FullScreenShader::RHDebug::Program);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[1]);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[2]);
+        FullScreenShader::RHDebug::setUniforms(rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
+        glDisable(GL_PROGRAM_POINT_SIZE);
+    }
+
+    if (getGI())
+    {
+        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+    }
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
     // Render anything glowing.
@@ -630,6 +658,8 @@ void IrrDriver::renderParticles()
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
+    static int tick = 0;
+    tick++;
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -710,6 +740,13 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
+    if (!(tick % 100))
+        rsm_matrix = sun_ortho_matrix[3];
+    rh_extend = core::vector3df(128, 64, 128);
+    core::vector3df campos = camnode->getAbsolutePosition();
+    core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
+    rh_matrix.setTranslation(translation);
+
     assert(sun_ortho_matrix.size() == 4);
     camnode->setNearValue(oldnear);
     camnode->setFarValue(oldfar);
@@ -760,7 +797,22 @@ void IrrDriver::renderShadows()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    if (!UserConfigParams::m_gi)
+        return;
+
+    m_rtts->getRSM().Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(MeshShader::RSMShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
+    {
+        const GLMesh mesh = *GroupedFPSM<FPSM_DEFAULT>::MeshSet[i];
+        if (!mesh.textures[0])
+            continue;
+        compressTexture(mesh.textures[0], true);
+        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        draw<MeshShader::RSMShader>(mesh, mesh.vao_rsm_pass, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -850,6 +902,19 @@ static void renderPointLights(unsigned count)
 
 void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 {
+    //RH
+    if (UserConfigParams::m_gi)
+    {
+        glDisable(GL_BLEND);
+        m_rtts->getRH().Bind();
+        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
+        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
+        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
+    }
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
@@ -858,10 +923,10 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
-    {
-        //gl_driver->extGlDrawBuffers(1, bufs);
         return;
-    }
+
+    if (UserConfigParams::m_gi)
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
 
     if (SkyboxCubeMap)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
@@ -937,7 +1002,6 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
     renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-//    gl_driver->extGlDrawBuffers(1, bufs);
 }
 
 void IrrDriver::renderSSAO()

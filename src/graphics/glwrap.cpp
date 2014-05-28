@@ -518,13 +518,21 @@ unsigned GPUTimer::elapsedTimeus()
 
 FrameBuffer::FrameBuffer() {}
 
-FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h) :
+FrameBuffer::FrameBuffer(const std::vector<GLuint> &RTTs, size_t w, size_t h, bool layered) :
     DepthTexture(0), RenderTargets(RTTs), width(w), height(h)
 {
     glGenFramebuffers(1, &fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-    for (unsigned i = 0; i < RTTs.size(); i++)
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
+    if (layered)
+    {
+        for (unsigned i = 0; i < RTTs.size(); i++)
+            glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, RTTs[i], 0);
+    }
+    else
+    {
+        for (unsigned i = 0; i < RTTs.size(); i++)
+            glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, RTTs[i], 0);
+    }
     GLenum result = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     assert(result == GL_FRAMEBUFFER_COMPLETE_EXT);
 }
@@ -560,7 +568,7 @@ void FrameBuffer::Bind()
     glBindFramebuffer(GL_FRAMEBUFFER, fbo);
     glViewport(0, 0, width, height);
     irr::video::COpenGLDriver *gl_driver = (irr::video::COpenGLDriver*)irr_driver->getDevice()->getVideoDriver();
-    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1 };
+    GLenum bufs[] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
     gl_driver->extGlDrawBuffers(RenderTargets.size(), bufs);
 }
 

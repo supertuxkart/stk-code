@@ -281,6 +281,9 @@ void Shaders::loadShaders()
     FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::ShadowedSunLightShader::init();
     FullScreenShader::ShadowedSunLightDebugShader::init();
+    FullScreenShader::RadianceHintsConstructionShader::init();
+    FullScreenShader::RHDebug::init();
+    FullScreenShader::GlobalIlluminationReconstructionShader::init();
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
     FullScreenShader::GodRayShader::init();
@@ -317,6 +320,7 @@ void Shaders::loadShaders()
     MeshShader::DisplaceShader::init();
     MeshShader::DisplaceMaskShader::init();
     MeshShader::ShadowShader::init();
+    MeshShader::RSMShader::init();
     MeshShader::InstancedShadowShader::init();
     MeshShader::RefShadowShader::init();
     MeshShader::InstancedRefShadowShader::init();
@@ -1487,6 +1491,36 @@ namespace MeshShader
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
     }
 
+    GLuint RSMShader::Program;
+    GLuint RSMShader::attrib_position;
+    GLuint RSMShader::attrib_texcoord;
+    GLuint RSMShader::attrib_normal;
+    GLuint RSMShader::uniform_MM;
+    GLuint RSMShader::uniform_tex;
+    GLuint RSMShader::uniform_RSMMatrix;
+
+    void RSMShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
+        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
+        attrib_normal = glGetAttribLocation(Program, "Normal");
+        uniform_tex = glGetUniformLocation(Program, "tex");
+        uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    void RSMShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix, unsigned TU_tex)
+    {
+        glUniformMatrix4fv(uniform_RSMMatrix, 1, GL_FALSE, RSMMatrix.pointer());
+        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
+        glUniform1i(uniform_tex, TU_tex);
+    }
+
     GLuint InstancedShadowShader::Program;
     GLuint InstancedShadowShader::attrib_position;
     GLuint InstancedShadowShader::attrib_origin;
@@ -2271,6 +2305,122 @@ namespace FullScreenShader
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
         glUniform1i(uniform_shadowtex, TU_shadowtex);
+    }
+
+    GLuint RadianceHintsConstructionShader::Program;
+    GLuint RadianceHintsConstructionShader::uniform_ctex;
+    GLuint RadianceHintsConstructionShader::uniform_ntex;
+    GLuint RadianceHintsConstructionShader::uniform_dtex;
+    GLuint RadianceHintsConstructionShader::uniform_extents;
+    GLuint RadianceHintsConstructionShader::uniform_RHMatrix;
+    GLuint RadianceHintsConstructionShader::uniform_RSMMatrix;
+    GLuint RadianceHintsConstructionShader::vao;
+
+    void RadianceHintsConstructionShader::init()
+    {
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
+        }
+
+        uniform_ctex = glGetUniformLocation(Program, "ctex");
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_extents = glGetUniformLocation(Program, "extents");
+        uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
+        vao = createVAO(Program);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    void RadianceHintsConstructionShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ctex, unsigned TU_ntex, unsigned TU_dtex)
+    {
+        glUniformMatrix4fv(uniform_RSMMatrix, 1, GL_FALSE, RSMMatrix.pointer());
+        glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
+        glUniform1i(uniform_ctex, TU_ctex);
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1i(uniform_dtex, TU_dtex);
+        glUniform3f(uniform_extents, extents.X, extents.Y, extents.Z);
+    }
+
+    GLuint RHDebug::Program;
+    GLuint RHDebug::uniform_extents;
+    GLuint RHDebug::uniform_SHR;
+    GLuint RHDebug::uniform_SHG;
+    GLuint RHDebug::uniform_SHB;
+    GLuint RHDebug::uniform_RHMatrix;
+
+    void RHDebug::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/rhdebug.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rhdebug.frag").c_str());
+        uniform_extents = glGetUniformLocation(Program, "extents");
+        uniform_SHR = glGetUniformLocation(Program, "SHR");
+        uniform_SHG = glGetUniformLocation(Program, "SHG");
+        uniform_SHB = glGetUniformLocation(Program, "SHB");
+        uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    void RHDebug::setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
+    {
+        glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
+        glUniform3f(uniform_extents, extents.X, extents.Y, extents.Z);
+        glUniform1i(uniform_SHR, TU_SHR);
+        glUniform1i(uniform_SHG, TU_SHG);
+        glUniform1i(uniform_SHB, TU_SHB);
+    }
+
+    GLuint GlobalIlluminationReconstructionShader::Program;
+    GLuint GlobalIlluminationReconstructionShader::uniform_ntex;
+    GLuint GlobalIlluminationReconstructionShader::uniform_dtex;
+    GLuint GlobalIlluminationReconstructionShader::uniform_SHR;
+    GLuint GlobalIlluminationReconstructionShader::uniform_SHG;
+    GLuint GlobalIlluminationReconstructionShader::uniform_SHB;
+    GLuint GlobalIlluminationReconstructionShader::uniform_extents;
+    GLuint GlobalIlluminationReconstructionShader::uniform_RHMatrix;
+    GLuint GlobalIlluminationReconstructionShader::vao;
+
+    void GlobalIlluminationReconstructionShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gi.frag").c_str());
+        uniform_ntex = glGetUniformLocation(Program, "ntex");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_SHR = glGetUniformLocation(Program, "SHR");
+        uniform_SHG = glGetUniformLocation(Program, "SHG");
+        uniform_SHB = glGetUniformLocation(Program, "SHB");
+        uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        uniform_extents = glGetUniformLocation(Program, "extents");
+        vao = createVAO(Program);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    void GlobalIlluminationReconstructionShader::setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
+    {
+        glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
+        glUniform1i(uniform_ntex, TU_ntex);
+        glUniform1i(uniform_dtex, TU_dtex);
+        glUniform1i(uniform_SHR, TU_SHR);
+        glUniform1i(uniform_SHG, TU_SHG);
+        glUniform1i(uniform_SHB, TU_SHB);
+        glUniform3f(uniform_extents, extents.X, extents.Y, extents.Z);
     }
 
     GLuint Gaussian17TapHShader::Program;

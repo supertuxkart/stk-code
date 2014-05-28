@@ -464,6 +464,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_dof
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_dof",
         &m_video_group, "Enable Depth of Field"));
+    PARAM_PREFIX BoolUserConfigParam        m_gi
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_gi",
+        &m_video_group, "Enable Global Illumination"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */

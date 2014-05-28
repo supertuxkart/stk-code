@@ -659,6 +659,7 @@ void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedM
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
             MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
         mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_rsm_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::RSMShader::attrib_position, MeshShader::RSMShader::attrib_texcoord, -1, MeshShader::RSMShader::attrib_normal, -1, -1, -1, mesh.Stride);
         break;
     case FPSM_ALPHA_REF_TEXTURE:
         mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
