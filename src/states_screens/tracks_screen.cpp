@@ -282,7 +282,9 @@ void TracksScreen::init()
 }   // init
 
 // -----------------------------------------------------------------------------
-
+/** Rebuild the list of tracks and GPs. This need to be recomputed e.g. to
+ *  take unlocked tracks into account.
+ */
 void TracksScreen::buildTrackList()
 {
     DynamicRibbonWidget* tracks_widget = getWidget<DynamicRibbonWidget>("tracks");
@@ -295,71 +297,44 @@ void TracksScreen::buildTrackList()
     tracks_widget->clearItems();
     m_random_track_list.clear();
 
-    const std::string curr_group_name = tabs->getSelectionIDString(0);
+    const std::string& curr_group_name = tabs->getSelectionIDString(0);
 
-    // Build track list
-    if (curr_group_name == ALL_TRACK_GROUPS_ID)
+    const int track_amount = track_manager->getNumberOfTracks();
+
+    // First build a list of all tracks to be displayed
+    // (e.g. exclude arenas, ...)
+    PtrVector<Track, REF> tracks;
+    for (int n = 0; n < track_amount; n++)
     {
-        const int trackAmount = track_manager->getNumberOfTracks();
+        Track* curr = track_manager->getTrack(n);
+        if (race_manager->getMinorMode() == RaceManager::MINOR_MODE_EASTER_EGG
+            && !curr->hasEasterEggs())
+            continue;
+        if (curr->isArena() || curr->isSoccer()||curr->isInternal()) continue;
+        if (curr_group_name != ALL_TRACK_GROUPS_ID &&
+            !curr->isInGroup(curr_group_name)) continue;
 
-        for (int n=0; n<trackAmount; n++)
+        tracks.push_back(curr);
+    }   // for n<track_amount
+
+    tracks.insertionSort();
+    for (unsigned int i = 0; i < tracks.size(); i++)
+    {
+        Track *curr = tracks.get(i);
+        if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
         {
-            Track* curr = track_manager->getTrack( n );
-            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
-                && !curr->hasEasterEggs())
-                continue;
-            if (curr->isArena() || curr->isSoccer()) continue;
-            if (curr->isInternal()) continue;
-
-            if(PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                tracks_widget->addItem(
-                    _("Locked : solve active challenges to gain access to more!"),
-                   "locked", curr->getScreenshotFile(), LOCKED_BADGE,
-                   IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                tracks_widget->addItem(translations->fribidize(curr->getName()),
-                                       curr->getIdent(),
-                                       curr->getScreenshotFile(), 0,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-                m_random_track_list.push_back(curr->getIdent());
-            }
+            tracks_widget->addItem(
+                _("Locked : solve active challenges to gain access to more!"),
+                "locked", curr->getScreenshotFile(), LOCKED_BADGE,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
-
-    }
-    else
-    {
-        const std::vector<int>& curr_group = 
-                            track_manager->getTracksInGroup( curr_group_name );
-        const int trackAmount = curr_group.size();
-
-        for (int n=0; n<trackAmount; n++)
+        else
         {
-            Track* curr = track_manager->getTrack( curr_group[n] );
-            if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_EASTER_EGG
-                && !curr->hasEasterEggs())
-                continue;
-            if (curr->isArena()) continue;
-            if (curr->isSoccer()) continue;
-            if (curr->isInternal()) continue;
-
-            if (PlayerManager::getCurrentPlayer()->isLocked(curr->getIdent()))
-            {
-                tracks_widget->addItem( 
-                    _("Locked : solve active challenges to gain access to more!"),
-                    "locked", curr->getScreenshotFile(), LOCKED_BADGE,
-                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                tracks_widget->addItem(translations->fribidize(curr->getName()),
-                                       curr->getIdent(),
-                                       curr->getScreenshotFile(), 0 /* no badge */,
-                                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
-                m_random_track_list.push_back(curr->getIdent());
-            }
+            tracks_widget->addItem(translations->fribidize(curr->getName()),
+                curr->getIdent(),
+                curr->getScreenshotFile(), 0,
+                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            m_random_track_list.push_back(curr->getIdent());
         }
     }
 
