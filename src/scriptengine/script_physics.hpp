@@ -19,7 +19,6 @@
 #ifndef HEADER_SCRIPT_PHYSICS_HPP
 #define HEADER_SCRIPT_PHYSICS_HPP
 
-#include <string>
 #include <angelscript.h>
 
 namespace Scripting{

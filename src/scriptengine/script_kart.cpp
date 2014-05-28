@@ -16,18 +16,12 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include <assert.h>  // assert()
+#include <assert.h>
 #include <angelscript.h>
-#include "io/file_manager.hpp"
-#include <iostream>  // cout
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "script_engine.hpp"
-#include "scriptstdstring.h"
-#include <string.h>  // strstr()
-#include "states_screens/dialogs/tutorial_message_dialog.hpp"
-#include "tracks/track_object_manager.hpp"
-#include "tracks/track.hpp"
+
 
 
 namespace Scripting{

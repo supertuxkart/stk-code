@@ -19,7 +19,6 @@
 #ifndef HEADER_SCRIPT_KART_HPP
 #define HEADER_SCRIPT_KART_HPP
 
-#include <string>
 #include <angelscript.h>
 
 namespace Scripting{
