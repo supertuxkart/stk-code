@@ -370,7 +370,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_kart_name->m_y = kart_name_y;
     m_kart_name->m_w = kart_name_w;
     m_kart_name->m_h = kart_name_h;
-    //m_kart_name->setParent(this);
     m_children.push_back(m_kart_name);
 }   // PlayerKartWidget
 // ------------------------------------------------------------------------
@@ -806,7 +805,9 @@ void PlayerKartWidget::setKartStats(const std::string& selection)
     if (kp != NULL)
     {
         m_kart_stats->setMass((int)kp->getMass()/10);
-        //TODO add other stats
+        m_kart_stats->setSpeed((int)kp->getMaxSpeed()/10);
+        m_kart_stats->setAcceleration((int)kp->getTrackConnectionAccel()/10);
+        m_kart_stats->update(0);
     }
 }
 
@@ -888,6 +889,7 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
 
     m_parent->updateKartWidgetModel(playerID, selectionID, selectionText);
     m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
+    m_parent->updateKartStats(playerID, selectionID);
     m_parent->validateKartChoices();
 }   // onSelectionChanged
 
@@ -1489,6 +1491,24 @@ void KartSelectionScreen::playerConfirm(const int playerID)
 }   // playerConfirm
 
 // ----------------------------------------------------------------------------
+
+void KartSelectionScreen::updateKartStats(uint8_t widget_id,
+                                          const std::string& selection)
+{
+    KartStatsWidget* w = m_kart_widgets[widget_id].m_kart_stats;
+    assert(w != NULL);
+
+    const KartProperties *kp =
+                    kart_properties_manager->getKart(selection);
+    if (kp != NULL)
+    {
+        Log::verbose("updateKartStats", StringUtils::toString((int)kp->getMass()/10).c_str());
+        w->setMass((int)kp->getMass()/10);
+        w->setSpeed((int)kp->getMaxSpeed()/10);
+        w->setAcceleration((int)kp->getTrackConnectionAccel()/10);
+        w->update(0);
+    }
+}
 
 void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
                 const std::string& selection,

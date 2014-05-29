@@ -49,20 +49,18 @@ class KartStatsWidget : public Widget
         virtual int getHeightNeededAroundLabel() const { return 4; }
         
         /** widget coordinates */
-        int m_mass_bar_x, m_mass_bar_y, m_mass_bar_h, m_mass_bar_w;
-
-        int m_mass_value;
-        int m_accel_value;
-        int m_speed_value;
+        int m_skill_bar_x, m_skill_bar_y, m_skill_bar_h, m_skill_bar_w;
         
         int m_player_id;
+        SkillLevelWidget* m_mass_bar;
+        SkillLevelWidget* m_speed_bar;
+        SkillLevelWidget* m_accel_bar;
+
 
     public:
         
         LEAK_CHECK()
         
-        SkillLevelWidget* m_mass_bar;
-
         KartStatsWidget(core::recti area, const int player_id,
                         std::string kart_group);
         virtual ~KartStatsWidget() {};
@@ -92,9 +90,9 @@ class KartStatsWidget : public Widget
         void setSpeed(int value);
         
         /** Get the current values of the widget. */
-        int getMass() {return m_mass_value; };
-        int getAcceleration() {return m_accel_value; };
-        int getSpeed() {return m_speed_value; };
+        int getMass() {return m_mass_bar->getValue(); };
+        int getAcceleration() {return m_accel_bar->getValue(); };
+        int getSpeed() {return m_speed_bar->getValue(); };
     };
 }
 

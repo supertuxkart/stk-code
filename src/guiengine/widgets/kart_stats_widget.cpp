@@ -74,16 +74,43 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
         }
     }
 
-    irr::core::recti massArea(m_mass_bar_x, m_mass_bar_y,
-                              m_mass_bar_x + m_mass_bar_w,
-                              m_mass_bar_y + m_mass_bar_h);
+
 
     // ---- Mass skill level widget
+    irr::core::recti massArea(m_skill_bar_x, m_skill_bar_y,
+                              m_skill_bar_x + m_skill_bar_w,
+                              m_skill_bar_y + m_skill_bar_h);
     m_mass_bar = NULL;
 
-    m_mass_bar = new SkillLevelWidget(massArea, m_player_id, (int) props->getMass()/10, "Weight");
+    m_mass_bar = new SkillLevelWidget(massArea, m_player_id,
+                                      (int) props->getMass()/10, "Weight");
     m_mass_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
 
+    // ---- Speed skill level widget
+    irr::core::recti speedArea(m_skill_bar_x, m_skill_bar_y - m_skill_bar_h - 10,
+                               m_skill_bar_x + m_skill_bar_w,
+                               m_skill_bar_y + 10);
+
+    m_speed_bar = NULL;
+
+    m_speed_bar = new SkillLevelWidget(speedArea, m_player_id,
+                                       (int) props->getMaxSpeed()/10, "Speed");
+    m_speed_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
+
+    // ---- Acceleration skill level widget
+    irr::core::recti accelArea(m_skill_bar_x, m_skill_bar_y + m_skill_bar_h + 10,
+                               m_skill_bar_x + m_skill_bar_w,
+                               m_skill_bar_y + 2*m_skill_bar_y + 10);
+
+    m_accel_bar = NULL;
+
+    m_accel_bar = new SkillLevelWidget(accelArea, m_player_id,
+                                       (int) props->getTrackConnectionAccel()/10, "Accel");
+    m_accel_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_accel", m_player_id);
+
+    m_children.push_back(m_mass_bar);
+    m_children.push_back(m_speed_bar);
+    m_children.push_back(m_accel_bar);
 
 }   // KartStatsWidget
 
@@ -92,6 +119,8 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 void KartStatsWidget::add()
 {
     m_mass_bar->add();
+    m_speed_bar->add();
+    m_accel_bar->add();
 }
 
 void KartStatsWidget::move(int x, int y, int w, int h)
@@ -101,10 +130,25 @@ void KartStatsWidget::move(int x, int y, int w, int h)
 
     if (m_mass_bar != NULL)
     {
-        m_mass_bar->move(m_mass_bar_x,
-                         m_mass_bar_y,
-                         m_mass_bar_w,
-                         m_mass_bar_h);
+        m_mass_bar->move(m_skill_bar_x,
+                         m_skill_bar_y,
+                         m_skill_bar_w,
+                         m_skill_bar_h);
+    }
+
+    if (m_speed_bar != NULL)
+    {
+        m_speed_bar->move(m_skill_bar_x,
+                          m_skill_bar_y - m_skill_bar_h - 10,
+                          m_skill_bar_w,
+                          m_skill_bar_h);
+    }
+    if (m_accel_bar != NULL)
+    {
+        m_accel_bar->move(m_skill_bar_x,
+                          m_skill_bar_y + m_skill_bar_h + 10,
+                          m_skill_bar_w,
+                          m_skill_bar_h);
     }
 
 }
@@ -119,18 +163,18 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_h = h;
 
     // -- sizes
-    m_mass_bar_w = w;
-    m_mass_bar_h = 100;
+    m_skill_bar_w = w;
+    m_skill_bar_h = 100;
 
     // for shrinking effect
     if (h < 175)
     {
         const float factor = h / 175.0f;
-        m_mass_bar_h   = (int)(m_mass_bar_h*factor);
+        m_skill_bar_h   = (int)(m_skill_bar_h*factor);
     }
 
-    m_mass_bar_x = x;
-    m_mass_bar_y = y + h/2 - m_mass_bar_h/2;
+    m_skill_bar_x = x;
+    m_skill_bar_y = y + h/2 - m_skill_bar_h/2;
 }   // setSize
 
 // -----------------------------------------------------------------------------
@@ -144,14 +188,14 @@ void KartStatsWidget::setMass(int value)
 
 void KartStatsWidget::setAcceleration(int value)
 {
-    m_accel_value = value;
+    m_accel_bar->setValue(value);
 }
 
 // -----------------------------------------------------------------------------
 
 void KartStatsWidget::setSpeed(int value)
 {
-    m_speed_value = value;
+    m_speed_bar->setValue(value);
 }
 // -----------------------------------------------------------------------------
 

@@ -40,7 +40,6 @@ using namespace irr;
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
                                    const int value, const stringw& label) : Widget(WTYPE_DIV)
 {
-    m_show_bounding_box = true;
     m_bar_value = value;
     m_player_id = player_id;
 
@@ -118,9 +117,9 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
     // -- sizes
     m_bar_w = w/2;
-    m_bar_h = h;
+    m_bar_h = GUIEngine::getFontHeight();
     m_label_w = w/2;
-    m_label_h = h;
+    m_label_h = GUIEngine::getFontHeight();
 
     // for shrinking effect
     if (h < 175)

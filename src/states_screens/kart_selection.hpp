@@ -111,6 +111,10 @@ protected:
     void setKartsFromCurrentGroup();
 
     virtual void playerConfirm(const int playerID);
+
+    void updateKartStats(uint8_t widget_id,
+                         const std::string& selection);
+
     /** updates model of a kart widget, to have the good selection when the user validates */
     void updateKartWidgetModel(uint8_t widget_id,
                 const std::string& selection,
