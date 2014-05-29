@@ -266,11 +266,4 @@ bool PlayerProfile::operator<(const PlayerProfile &other)
 }   // operator<
 
 // -----------------------------------------------------------------------------
-/** \brief Needed for toggling sort order **/
-bool PlayerProfile::operator>(const PlayerProfile &other)
-{
-    return m_use_frequency > other.m_use_frequency;
-}   // operator>
-
-// -----------------------------------------------------------------------------
 
