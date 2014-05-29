@@ -17,8 +17,8 @@
 
 
 
-#ifndef HEADER_KART_STATS_HPP
-#define HEADER_KART_STATS_HPP
+#ifndef HEADER_SKILL_LEVEL_HPP
+#define HEADER_SKILL_LEVEL_HPP
 
 #include <irrString.h>
 
@@ -28,17 +28,16 @@
 
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/progress_bar_widget.hpp"
-#include "guiengine/widgets/skill_level_widget.hpp"
 
 
 namespace GUIEngine
 {
     /**
-      * \brief A progress bar widget.
+      * \brief A skill level widget.
       * \ingroup widgetsgroup
       */
 
-class KartStatsWidget : public Widget
+class SkillLevelWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -49,11 +48,11 @@ class KartStatsWidget : public Widget
         virtual int getHeightNeededAroundLabel() const { return 4; }
         
         /** widget coordinates */
-        int m_mass_bar_x, m_mass_bar_y, m_mass_bar_h, m_mass_bar_w;
+        int m_bar_x, m_bar_y, m_bar_h, m_bar_w;
+        int m_label_x, m_label_y, m_label_h, m_label_w;
 
-        int m_mass_value;
-        int m_accel_value;
-        int m_speed_value;
+        int m_bar_value;
+        std::string m_label_name;
         
         int m_player_id;
 
@@ -61,40 +60,32 @@ class KartStatsWidget : public Widget
         
         LEAK_CHECK()
         
-        SkillLevelWidget* m_mass_bar;
+        LabelWidget* m_label;
+        ProgressBarWidget* m_bar;
 
-        KartStatsWidget(core::recti area, const int player_id,
-                        std::string kart_group);
-        virtual ~KartStatsWidget() {};
+        SkillLevelWidget(core::recti area, const int player_id,
+                         const int value, const irr::core::stringw& label);
+        virtual ~SkillLevelWidget() {};
 
         // ------------------------------------------------------------------------
         /** Add the widgets to the current screen */
         virtual void add();
 
-        /** Move the widget and its children */
+        // -------------------------------------------------------------------------
+
         virtual void move(int x, int y, int w, int h);
 
         // -------------------------------------------------------------------------
-        /** Updates the animation (moving/shrinking/etc.) */
-        void onUpdate(float delta);
 
-        // -------------------------------------------------------------------------
-        /** Event callback */
-
-        // -------------------------------------------------------------------------
         /** Sets the size of the widget as a whole, and placed children widgets
          * inside itself */
         void setSize(const int x, const int y, const int w, const int h);
 
         /** Change the value of the widget, it must be a percent. */
-        void setMass(int value);
-        void setAcceleration(int value);
-        void setSpeed(int value);
+        void setValue(int value);
         
         /** Get the current values of the widget. */
-        int getMass() {return m_mass_value; };
-        int getAcceleration() {return m_accel_value; };
-        int getSpeed() {return m_speed_value; };
+        int getValue() {return m_bar_value; };
     };
 }
 

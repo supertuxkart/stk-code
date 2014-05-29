@@ -40,37 +40,14 @@ using namespace irr;
 KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
                                  std::string kart_group) : Widget(WTYPE_DIV)
 {
-
-    x_speed = 1.0f;
-    y_speed = 1.0f;
-    w_speed = 1.0f;
-    h_speed = 1.0f;
-
     m_player_id = player_id;
 
     setSize(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
             area.getWidth(), area.getHeight()               );
-    target_x = m_x;
-    target_y = m_y;
-    target_w = m_w;
-    target_h = m_h;
-
-    // ---- Mass skill level widget
-    m_mass_bar = NULL;
-
-    m_mass_bar = new ProgressBarWidget(false);
-    m_mass_bar->m_x = m_mass_bar_x;
-    m_mass_bar->m_y = m_mass_bar_y;
-    m_mass_bar->m_w = m_mass_bar_w;
-    m_mass_bar->m_h = m_mass_bar_h;
-    m_mass_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
 
     const std::string default_kart = UserConfigParams::m_default_kart;
     const KartProperties* props =
         kart_properties_manager->getKart(default_kart);
-    m_mass_bar->setValue((int)props->getMass()/10);
-    Log::verbose("Value", StringUtils::toString(m_mass_bar->getValue()).c_str());
-    m_children.push_back(m_mass_bar);
     if(!props)
     {
         // If the default kart can't be found (e.g. previously a addon
@@ -96,83 +73,30 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
             exit(-1);
         }
     }
+
+    irr::core::recti massArea(m_mass_bar_x, m_mass_bar_y,
+                              m_mass_bar_x + m_mass_bar_w,
+                              m_mass_bar_y + m_mass_bar_h);
+
+    // ---- Mass skill level widget
+    m_mass_bar = NULL;
+
+    m_mass_bar = new SkillLevelWidget(massArea, m_player_id, (int) props->getMass()/10, "Weight");
+    m_mass_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
+
+
 }   // KartStatsWidget
 
 // -----------------------------------------------------------------------------
 
 void KartStatsWidget::add()
 {
-    Log::verbose("Widget", "ADD");
-    //TODO add others, and add them properly
     m_mass_bar->add();
 }
 
-// -----------------------------------------------------------------------------
-
-/** Updates the animation (moving/shrinking/etc.) */
-void KartStatsWidget::onUpdate(float delta)
+void KartStatsWidget::move(int x, int y, int w, int h)
 {
-    m_mass_bar->setValue(m_mass_value);
-    if (target_x == m_x && target_y == m_y &&
-            target_w == m_w && target_h == m_h) return;
-
-    int move_step = (int)(delta*1000.0f);
-
-    // move x towards target
-    if (m_x < target_x)
-    {
-        m_x += (int)(move_step*x_speed);
-        // don't move to the other side of the target
-        if (m_x > target_x) m_x = target_x;
-    }
-    else if (m_x > target_x)
-    {
-        m_x -= (int)(move_step*x_speed);
-        // don't move to the other side of the target
-        if (m_x < target_x) m_x = target_x;
-    }
-
-    // move y towards target
-    if (m_y < target_y)
-    {
-        m_y += (int)(move_step*y_speed);
-        // don't move to the other side of the target
-        if (m_y > target_y) m_y = target_y;
-    }
-    else if (m_y > target_y)
-    {
-        m_y -= (int)(move_step*y_speed);
-        // don't move to the other side of the target
-        if (m_y < target_y) m_y = target_y;
-    }
-
-    // move w towards target
-    if (m_w < target_w)
-    {
-        m_w += (int)(move_step*w_speed);
-        // don't move to the other side of the target
-        if (m_w > target_w) m_w = target_w;
-    }
-    else if (m_w > target_w)
-    {
-        m_w -= (int)(move_step*w_speed);
-        // don't move to the other side of the target
-        if (m_w < target_w) m_w = target_w;
-    }
-    // move h towards target
-    if (m_h < target_h)
-    {
-        m_h += (int)(move_step*h_speed);
-        // don't move to the other side of the target
-        if (m_h > target_h) m_h = target_h;
-    }
-    else if (m_h > target_h)
-    {
-        m_h -= (int)(move_step*h_speed);
-        // don't move to the other side of the target
-        if (m_h < target_h) m_h = target_h;
-    }
-
+    Widget::move(x,y,w,h);
     setSize(m_x, m_y, m_w, m_h);
 
     if (m_mass_bar != NULL)
@@ -180,11 +104,12 @@ void KartStatsWidget::onUpdate(float delta)
         m_mass_bar->move(m_mass_bar_x,
                          m_mass_bar_y,
                          m_mass_bar_w,
-                         m_mass_bar_h );
+                         m_mass_bar_h);
     }
-}   // onUpdate
 
-// -------------------------------------------------------------------------
+}
+
+// -----------------------------------------------------------------------------
 
 void KartStatsWidget::setSize(const int x, const int y, const int w, const int h)
 {
@@ -194,7 +119,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_h = h;
 
     // -- sizes
-    m_mass_bar_w = 2*w/3;
+    m_mass_bar_w = w;
     m_mass_bar_h = 100;
 
     // for shrinking effect
@@ -204,15 +129,15 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
         m_mass_bar_h   = (int)(m_mass_bar_h*factor);
     }
 
-    m_mass_bar_x = x + w/2 - m_mass_bar_w;
-    m_mass_bar_y = y + h/2 - m_mass_bar_h;
+    m_mass_bar_x = x;
+    m_mass_bar_y = y + h/2 - m_mass_bar_h/2;
 }   // setSize
 
 // -----------------------------------------------------------------------------
 
 void KartStatsWidget::setMass(int value)
 {
-    m_mass_value = value;
+    m_mass_bar->setValue(value);
 }
 
 // -----------------------------------------------------------------------------

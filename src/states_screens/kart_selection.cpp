@@ -238,10 +238,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         // area for the stats widget
     core::recti statsArea(m_kart_stats_x,
                           m_kart_stats_y,
-                          m_kart_stats_x+m_kart_stats_w,
-                          m_kart_stats_y+m_kart_stats_h);
+                          m_kart_stats_x + m_kart_stats_w,
+                          m_kart_stats_y + m_kart_stats_h);
 
-    //m_kart_stats = new ProgressBarWidget(false);
     m_kart_stats = new GUIEngine::KartStatsWidget(statsArea, player_id, kart_group);
 
 
@@ -286,7 +285,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
     m_kart_stats->m_properties[PROP_ID] =
-            StringUtils::insertValues("@p%i_mass", m_player_id);
+            StringUtils::insertValues("@p%i_stats", m_player_id);
     m_children.push_back(m_kart_stats);
 
 
@@ -362,8 +361,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_model_view->setRotateContinuously( 35.0f );
 
     // ---- Kart name label
-    m_kart_name = new LabelWidget();
-    m_kart_name->add(); // add the widget
+    m_kart_name = new LabelWidget(true, true);
     m_kart_name->setText(props->getName(), false);
     m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
     m_kart_name->m_properties[PROP_ID] =
@@ -680,8 +678,6 @@ void PlayerKartWidget::onUpdate(float delta)
                       m_kart_stats_y,
                       m_kart_stats_w,
                       m_kart_stats_h);
-    m_kart_stats->onUpdate(delta);
-
 
     m_model_view->move(model_x,
                        model_y,
@@ -764,8 +760,8 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     kart_name_w = w;
     kart_name_h = 25;
 
-    m_kart_stats_w = 300;
-    m_kart_stats_h = GUIEngine::getFontHeight();
+    m_kart_stats_w = w/2;
+    m_kart_stats_h = h;
 
     // for shrinking effect
     if (h < 175)
@@ -796,8 +792,8 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     kart_name_x = x;
     kart_name_y = y + h - kart_name_h;
-    m_kart_stats_x = x + 3*w/4 - m_kart_stats_w/2;
-    m_kart_stats_y = y + h/2 - m_kart_stats_h/2;
+    m_kart_stats_x = x + w/2;
+    m_kart_stats_y = y;
 }   // setSize
 
 // -------------------------------------------------------------------------
@@ -891,7 +887,6 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
     }
 
     m_parent->updateKartWidgetModel(playerID, selectionID, selectionText);
-    m_parent->m_kart_widgets[playerID].setKartStats(selectionID);
     m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
     m_parent->validateKartChoices();
 }   // onSelectionChanged
