@@ -20,6 +20,7 @@
 #define HEADER_SCRIPT_PHYSICS_HPP
 
 #include <angelscript.h>
+#include <string>
 
 namespace Scripting{
     
@@ -28,7 +29,7 @@ namespace Scripting{
         //private:
             int m_collidingkartid1;
             int m_collidingkartid2;
-        
+            std::string m_collisionType;
         
         //public:
             //script engine functions
@@ -39,12 +40,14 @@ namespace Scripting{
 
             //game engine functions
             void setCollision(int collider1, int collider2);
+            void setCollisionType(std::string);
 
 
 
             //script-bound functions
             void getCollidingKart1(asIScriptGeneric *gen);
             void getCollidingKart2(asIScriptGeneric *gen);
+            void getCollsionType(asIScriptGeneric *gen);
 
     }
     

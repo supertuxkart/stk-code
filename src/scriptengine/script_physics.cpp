@@ -33,10 +33,19 @@ namespace Scripting{
         {
             gen->SetReturnDWord(m_collidingkartid2);
         }
+        void getCollisionType(asIScriptGeneric *gen)
+        {
+            void *pointer = &m_collisionType;
+            gen->SetReturnObject(pointer);
+        }
         void setCollision(int collider1,int collider2)
         {
             m_collidingkartid1 = collider1;
             m_collidingkartid2 = collider2;
+        }
+        void setCollisionType(std::string collisionType)
+        {
+            m_collisionType = collisionType;
         }
         
         asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine)
@@ -50,6 +59,7 @@ namespace Scripting{
             int r;
             r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
+            r = engine->RegisterGlobalFunction("string getCollisionType()", asFUNCTION(getCollisionType), asCALL_GENERIC); assert(r >= 0);
 
         }
     }

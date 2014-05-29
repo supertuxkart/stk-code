@@ -31,6 +31,7 @@ namespace Scripting{
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine);
         void setCollision(int collider1,int collider2);
+        void setCollisionType(std::string collisionType);
     }
 
     namespace Kart{
