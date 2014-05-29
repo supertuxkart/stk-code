@@ -570,6 +570,32 @@ bool PhysicalObject::isSoccerBall() const
 }   // is SoccerBall
 
 // ----------------------------------------------------------------------------
+/** Sets interaction type for object*/
+void PhysicalObject::setInteraction(std::string interaction){
+    if ( interaction == "flatten") m_flatten_kart = true;
+    if ( interaction == "reset") m_crash_reset = true;
+    if ( interaction == "explode") m_explode_kart = true;
+    if ( interaction == "none" )
+    {
+        m_flatten_kart = false;
+        m_crash_reset = false;
+        m_explode_kart = false;
+    }
+}   // set interaction
+
+// ----------------------------------------------------------------------------
+/** Remove body from physics dynamic world interaction type for object*/
+void PhysicalObject::removeBody(){
+    World::getWorld()->getPhysics()->removeBody(m_body);
+}   // Remove body
+
+// ----------------------------------------------------------------------------
+/** Add body to physics dynamic world */
+void PhysicalObject::addBody(){
+    World::getWorld()->getPhysics()->addBody(m_body);
+}   // Add body
+
+// ----------------------------------------------------------------------------
 /** Called when a physical object hits the track. Atm only used to push a
  *  soccer ball away from the edge of the field.
  *  \param m Material which was hit.

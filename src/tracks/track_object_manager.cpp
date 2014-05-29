@@ -95,7 +95,9 @@ void TrackObjectManager::disable(std::string name , std::string type){
             if (curr->getName() == (name)){
 
 				curr->setEnable(false);
-            
+                if (type == "mesh"){
+                    curr->getPhysicalObject()->removeBody();
+                }
             }
      }
 }
@@ -108,6 +110,9 @@ void TrackObjectManager::enable(std::string name , std::string type){
 			
 				curr->reset();
 				curr->setEnable(true);
+                if (type == "mesh"){
+                    curr->getPhysicalObject()->addBody();
+                }
             
             }
      }

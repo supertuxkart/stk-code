@@ -113,6 +113,8 @@ public:
 
 	const std::string getName() const { return m_name; }
 
+    const std::string getInteraction() const { return m_interaction; }
+
 	bool isEnabled() const { return m_enabled; }
     bool isSoccerBall() const { return m_soccer_ball; }
     bool isGarage() const { return m_garage; }

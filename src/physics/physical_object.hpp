@@ -174,7 +174,15 @@ public:
     /** Returns true if this object should cause a kart that touches it to
      *  be flattened. */
     bool isFlattenKartObject () const { return m_flatten_kart; }
-
+    // ------------------------------------------------------------------------
+    /** Sets the interaction type */
+    void setInteraction(std::string interaction);
+    // ------------------------------------------------------------------------
+    /** Remove body from dynamic world */
+    void removeBody();
+    // ------------------------------------------------------------------------
+    /** Add body to dynamic world */
+    void addBody();
 
     LEAK_CHECK()
 };  // PhysicalObject
