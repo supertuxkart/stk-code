@@ -40,7 +40,6 @@ using namespace irr;
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
                                    const int value, const stringw& label) : Widget(WTYPE_DIV)
 {
-    m_bar_value = value;
     m_player_id = player_id;
 
     setSize(area.UpperLeftCorner.X, area.UpperLeftCorner.Y,
@@ -95,7 +94,6 @@ void SkillLevelWidget::move(int x, int y, int w, int h)
                     m_bar_y,
                     m_bar_w,
                     m_bar_h );
-        m_bar->setValue(m_bar_value);
     }
     if (m_label != NULL)
     {
@@ -140,7 +138,8 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
 void SkillLevelWidget::setValue(int value)
 {
-    m_bar_value = value;
+    m_bar->setValue(value);
+
 }
 
 // -----------------------------------------------------------------------------

@@ -51,7 +51,6 @@ class SkillLevelWidget : public Widget
         int m_bar_x, m_bar_y, m_bar_h, m_bar_w;
         int m_label_x, m_label_y, m_label_h, m_label_w;
 
-        int m_bar_value;
         std::string m_label_name;
         
         int m_player_id;
@@ -85,7 +84,7 @@ class SkillLevelWidget : public Widget
         void setValue(int value);
         
         /** Get the current values of the widget. */
-        int getValue() {return m_bar_value; };
+        int getValue() {return m_bar->getValue(); };
     };
 }
 
