@@ -154,6 +154,9 @@ void ModelViewWidget::update(float delta)
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
 
+    if (!irr_driver->isGLSL())
+        return;
+
     if (m_rtt_provider == NULL)
     {
         std::string name = "model view ";

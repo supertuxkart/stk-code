@@ -768,6 +768,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
     bool useAlphaChannelOfTexture)
 {
+    glEnable(GL_BLEND);
     float width, height,
         center_pos_x, center_pos_y,
         tex_width, tex_height,
