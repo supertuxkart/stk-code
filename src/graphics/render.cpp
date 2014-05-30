@@ -759,12 +759,13 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
-    if (!(tick % 100))
-        rsm_matrix = sun_ortho_matrix[3];
-    rh_extend = core::vector3df(128, 64, 128);
-    core::vector3df campos = camnode->getAbsolutePosition();
-    core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
-    rh_matrix.setTranslation(translation);
+
+        if (!(tick % 100))
+            rsm_matrix = sun_ortho_matrix[3];
+        rh_extend = core::vector3df(128, 64, 128);
+        core::vector3df campos = camnode->getAbsolutePosition();
+        core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
+        rh_matrix.setTranslation(translation);
 
         assert(sun_ortho_matrix.size() == 4);
         camnode->setNearValue(oldnear);
@@ -773,6 +774,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         size_t size = irr_driver->getShadowViewProj().size();
         for (unsigned i = 0; i < size; i++)
             memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
+    }
+
     tmp[128] = float(width);
     tmp[129] = float(height);
 
