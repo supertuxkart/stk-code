@@ -1183,11 +1183,6 @@ int main(int argc, char *argv[] )
 
         initRest();
 
-        // Windows 32 always redirects output
-#ifndef WIN32
-        file_manager->redirectOutput();
-#endif
-
         input_manager = new InputManager ();
 
 #ifdef ENABLE_WIIUSE
