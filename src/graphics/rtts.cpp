@@ -54,6 +54,7 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 RTT::RTT(size_t width, size_t height)
 {
     m_shadow_FBO = NULL;
+    m_RH_FBO = NULL;
     m_RSM = NULL;
     using namespace video;
     using namespace core;
