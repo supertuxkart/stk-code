@@ -55,6 +55,8 @@ private:
 
 	std::string m_name;
 
+    std::string m_id;
+
 protected:
 
 
@@ -112,6 +114,8 @@ public:
     const std::string& getType() const { return m_type; }
 
 	const std::string getName() const { return m_name; }
+
+    const std::string getID() const { return m_id; }
 
     const std::string getInteraction() const { return m_interaction; }
 

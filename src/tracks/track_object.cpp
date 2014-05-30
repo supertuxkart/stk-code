@@ -91,6 +91,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
 
     m_physical_object = NULL;
 
+    xml_node.get("id",      &m_id        );
     xml_node.get("model",   &m_name      );
     xml_node.get("xyz",     &m_init_xyz  );
     xml_node.get("hpr",     &m_init_hpr  );

@@ -92,10 +92,12 @@ void TrackObjectManager::disable(std::string name , std::string type){
      for_in (curr,m_all_objects){
 		 if (type != curr->getType())continue;
 		 
-            if (curr->getName() == (name)){
+            if (curr->getName() == (name))
+            {
 
 				curr->setEnable(false);
-                if (type == "mesh"){
+                if (type == "mesh")
+                {
                     curr->getPhysicalObject()->removeBody();
                 }
             }
@@ -104,13 +106,16 @@ void TrackObjectManager::disable(std::string name , std::string type){
 void TrackObjectManager::enable(std::string name , std::string type){
      TrackObject* curr;
      for_in (curr,m_all_objects){
+
 		if (type != curr->getType())continue;
 		
-            if (curr->getName() == (name)){
+            if (curr->getName() == (name))
+            {
 			
 				curr->reset();
 				curr->setEnable(true);
-                if (type == "mesh"){
+                if (type == "mesh")
+                {
                     curr->getPhysicalObject()->addBody();
                 }
             
@@ -120,12 +125,15 @@ void TrackObjectManager::enable(std::string name , std::string type){
 bool TrackObjectManager::getStatus(std::string name){
      TrackObject* curr;
      for_in (curr,m_all_objects){
-            if (curr->getName() == (name)){
+            if (curr->getName() == (name))
+            {
 
 				return curr->isEnabled();
             
             }
      }
+     //object not found
+     return false;
 }
 /** Handles an explosion, i.e. it makes sure that all physical objects are
  *  affected accordingly.
