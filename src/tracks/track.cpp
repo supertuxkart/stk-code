@@ -181,7 +181,7 @@ core::stringw Track::getName() const
     {
         translated = translated.subString(0, index);
     }
-        return translated;
+    return translated;
 }   // getName
 
 //-----------------------------------------------------------------------------

@@ -196,10 +196,7 @@ FileManager::FileManager()
     checkAndCreateCachedTexturesDir();
     checkAndCreateGPDir();
 
-#ifdef WIN32
     redirectOutput();
-
-#endif
 
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
