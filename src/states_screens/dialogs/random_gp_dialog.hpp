@@ -18,12 +18,11 @@
 #ifndef HEADER_RANDOM_GP_INFO_DIALOG_HPP
 #define HEADER_RANDOM_GP_INFO_DIALOG_HPP
 
-#include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
 
 #include <string>
 
-class randomGPInfoDialog : public GPInfoDialog
+class RandomGPInfoDialog : public GPInfoDialog
 {
 private:
     unsigned int m_number_of_tracks;
@@ -31,10 +30,17 @@ private:
     bool m_use_reverse;
 
 public:
-    randomGPInfoDialog();
-    ~randomGPInfoDialog() { delete m_gp; }
+    static const int SPINNER_HEIGHT = 40;
+
+    RandomGPInfoDialog();
+    ~RandomGPInfoDialog() { delete m_gp; }
+
+    /** Adds a SpinnerWidgets to choose the track groups and one to choose the
+     * number of tracks */
+    void addSpinners();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
+    /** Constructs a new gp from the members */
     void updateGP();
 };
 

@@ -52,7 +52,7 @@ GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
 {
     m_filename = "Random GP - Not loaded from a file!";
     m_id       = "random";
-    m_name     = L"Random";
+    m_name     = L"Random Grand Prix";
     m_editable = false;
 
     m_tracks.reserve(number_of_tracks);

@@ -39,57 +39,60 @@
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
 
-using namespace irr::gui;
-using namespace irr::video;
-using namespace irr::core;
-using namespace GUIEngine;
+using irr::gui::IGUIStaticText;
+using GUIEngine::PROP_ID;
 
-// ----------------------------------------------------------------------------
+typedef GUIEngine::LabelWidget Label;
 
 GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
     ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT)
 {
     doInit();
     m_curr_time = 0.0f;
-    m_gp_ident = gp_ident;
 
     m_gp = grand_prix_manager->getGrandPrix(gp_ident);
-    assert (m_gp != NULL);
+    m_gp->checkConsistency();
 
-    // ---- GP Name
-    core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_area.getHeight()/7);
-    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText( translations->fribidize(m_gp->getName()),
-                                                               area_top, false, true, // border, word wrap
-                                                               m_irrlicht_window);
-    title->setTabStop(false);
-    title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    m_under_title = m_area.getHeight()/7;
+    m_over_body = m_area.getHeight()/7;
+    m_lower_bound = m_area.getHeight()*6/7;
 
-    displayTracks(m_area.getHeight()/7, m_area.getHeight()*6/7);
-    InitAfterDrawingTheHeader(m_area.getHeight()/7, m_area.getHeight()*6/7, gp_ident);
+    addTitle();
+    addTracks();
+    addScreenshot();
+    addButtons();
 }
 
 // ----------------------------------------------------------------------------
 
 GPInfoDialog::~GPInfoDialog()
 {
-    // Place focus back on selected GP, in case the dialog was cancelled and we're back to
-    // the track selection screen after
-    Screen* curr_screen = GUIEngine::getCurrentScreen();
+    GUIEngine::Screen* curr_screen = GUIEngine::getCurrentScreen();
     if (curr_screen->getName() == "tracks.stkgui")
-    {
-        ((TracksScreen*)curr_screen)->setFocusOnGP(m_gp_ident);
-    }
-
+        static_cast<TracksScreen*>(curr_screen)->setFocusOnGP(m_gp->getId());
 }
 
 // ----------------------------------------------------------------------------
-void GPInfoDialog::displayTracks(const int upper_bound,
-                                 const int lower_bound)
+
+void GPInfoDialog::addTitle()
+{
+    core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_under_title);
+    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText(
+        translations->fribidize(m_gp->getName()),
+        area_top, false, true, // border, word wrap
+        m_irrlicht_window);
+    title->setTabStop(false);
+    title->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+}
+
+// ----------------------------------------------------------------------------
+
+void GPInfoDialog::addTracks()
 {
     const std::vector<std::string> tracks = m_gp->getTrackNames();
     const unsigned int track_amount = tracks.size();
 
-    int height_of_one_line = std::min((lower_bound - upper_bound)/(track_amount+1),
+    int height_of_one_line = std::min((m_lower_bound - m_over_body)/(track_amount+1),
                                       (unsigned int)(GUIEngine::getFontHeight()*1.5f));
 
     // Count the number of label already existing labels representing a track
@@ -111,9 +114,9 @@ void GPInfoDialog::displayTracks(const int upper_bound,
         while (m_widgets.get(widgets_iter)->m_properties[PROP_ID] != "Track label")
             widgets_iter++;
 
-        LabelWidget* widget = dynamic_cast<LabelWidget*>(m_widgets.get(widgets_iter));
+        Label* widget = dynamic_cast<Label*>(m_widgets.get(widgets_iter));
         widget->setText(translations->fribidize(track->getName()), false);
-        widget->move(20, upper_bound + height_of_one_line*(i+1),
+        widget->move(20, m_over_body + height_of_one_line*(i+1),
                      m_area.getWidth()/2 - 20, height_of_one_line);
 
         widgets_iter++;
@@ -128,14 +131,14 @@ void GPInfoDialog::displayTracks(const int upper_bound,
             Track* track = track_manager->getTrack(tracks[i]);
             assert(track != NULL);
 
-            LabelWidget* widget = new LabelWidget();
+            Label* widget = new Label();
             widget->m_properties[PROP_ID] = "Track label";
             widget->setText(translations->fribidize(track->getName()), false);
             widget->setParent(m_irrlicht_window);
             m_widgets.push_back(widget);
             widget->add();
 
-            widget->move(20, upper_bound + height_of_one_line*(i+1),
+            widget->move(20, m_over_body + height_of_one_line*(i+1),
                          m_area.getWidth()/2 - 20, height_of_one_line);
         }
     }
@@ -156,26 +159,22 @@ void GPInfoDialog::displayTracks(const int upper_bound,
 
 // ----------------------------------------------------------------------------
 
-void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
-                                             const int lower_bound,
-                                             const std::string& gp_ident)
+void GPInfoDialog::addScreenshot()
 {
-    const std::vector<std::string> tracks = m_gp->getTrackNames();
-
-    // ---- Track screenshot
-    m_screenshot_widget = new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-                                               false /* tab stop */, false /* focusable */,
-                                               IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE /* Track gives us absolute paths */);
+    m_screenshot_widget = new GUIEngine::IconButtonWidget(
+        GUIEngine::IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+        false, false, GUIEngine::IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
 
     m_screenshot_widget->m_x = m_area.getWidth()/2-20;
-    m_screenshot_widget->m_y = upper_bound + 10;
+    m_screenshot_widget->m_y = m_over_body + 10;
+
     // Scale the picture to the biggest possible size without an overflow
-    if (lower_bound - upper_bound - 20 < m_area.getWidth()/2*3/4)
+    if (m_lower_bound - m_over_body - 20 < m_area.getWidth()/2*3/4)
     {
-        m_screenshot_widget->m_w = (lower_bound - upper_bound - 30)*4/3;
-        m_screenshot_widget->m_h = lower_bound - upper_bound - 30;
+        m_screenshot_widget->m_w = (m_lower_bound - m_over_body - 30)*4/3;
+        m_screenshot_widget->m_h = m_lower_bound - m_over_body - 30;
     }
     else
     {
@@ -183,48 +182,41 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
         m_screenshot_widget->m_h = m_area.getWidth()*3/8; // *(3/4)*(1/2)
     }
 
-    Track* track = (tracks.size() == 0 ? NULL : track_manager->getTrack(tracks[0]));
-
-    m_screenshot_widget->m_properties[PROP_ICON] = (track != NULL ?
-                                                    track->getScreenshotFile().c_str() :
-                                                    file_manager->getAsset(FileManager::GUI,"main_help.png"));
+    Track* track = track_manager->getTrack(m_gp->getTrackNames()[0]);
+    m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = (track->getScreenshotFile().c_str());
     m_screenshot_widget->setParent(m_irrlicht_window);
     m_screenshot_widget->add();
     m_widgets.push_back(m_screenshot_widget);
+}
 
 
+// ----------------------------------------------------------------------------
+void GPInfoDialog::addButtons()
+{
     // ---- Start button
-    ButtonWidget* okBtn = new ButtonWidget();
-    ButtonWidget* continueBtn = new ButtonWidget();
+    GUIEngine::ButtonWidget* okBtn = new GUIEngine::ButtonWidget();
+    GUIEngine::ButtonWidget* continueBtn = new GUIEngine::ButtonWidget();
 
     SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP( StateManager::get()
                                                ->getActivePlayerProfile(0)
                                                ->getUniqueID(),
-                                               gp_ident,
+                                               m_gp->getId(),
                                                race_manager->getDifficulty(),
                                                race_manager->getNumberOfKarts(),
                                                race_manager->getNumLocalPlayers());
 
-    if (tracks.size() == 0)
-    {
-        okBtn->m_properties[PROP_ID] = "cannot_start";
-        okBtn->setText(_("Sorry, no tracks available"));
-    }
-    else
-    {
-        okBtn->m_properties[PROP_ID] = "start";
-        okBtn->setText(_("Start Grand Prix"));
+    okBtn->m_properties[PROP_ID] = "start";
+    okBtn->setText(_("Start Grand Prix"));
 
-        continueBtn->m_properties[PROP_ID] = "continue";
-        continueBtn->setText(_("Continue"));
-    }
+    continueBtn->m_properties[PROP_ID] = "continue";
+    continueBtn->setText(_("Continue"));
 
     if (saved_gp)
     {
         continueBtn->m_x = m_area.getWidth()/2 + 110;
-        continueBtn->m_y = lower_bound;
+        continueBtn->m_y = m_lower_bound;
         continueBtn->m_w = 200;
-        continueBtn->m_h = m_area.getHeight() - lower_bound - 15;
+        continueBtn->m_h = m_area.getHeight() - m_lower_bound - 15;
         continueBtn->setParent(m_irrlicht_window);
         m_widgets.push_back(continueBtn);
         continueBtn->add();
@@ -238,9 +230,9 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
         okBtn->m_x = m_area.getWidth()/2 - 200;
     }
 
-    okBtn->m_y = lower_bound;
+    okBtn->m_y = m_lower_bound;
     okBtn->m_w = 400;
-    okBtn->m_h = m_area.getHeight() - lower_bound - 15;
+    okBtn->m_h = m_area.getHeight() - m_lower_bound - 15;
     okBtn->setParent(m_irrlicht_window);
     m_widgets.push_back(okBtn);
     okBtn->add();
@@ -250,35 +242,29 @@ void GPInfoDialog::InitAfterDrawingTheHeader(const int upper_bound,
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
 }
 
+// ----------------------------------------------------------------------------
+
 void GPInfoDialog::onEnterPressedInternal()
 {
+    std::string gp_id = m_gp->getId();
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
-    race_manager->startGP(m_gp, false, false);
+    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 
 // ----------------------------------------------------------------------------
 
 GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventSource)
 {
-    if (eventSource == "start")
-    {
-        ModalDialog::dismiss();
-        race_manager->startGP(m_gp, false, false);
-        return GUIEngine::EVENT_BLOCK;
-    }
-    if (eventSource == "continue")
+    if (eventSource == "start" || eventSource == "continue")
     {
         // Save GP identifier, since dismiss will delete this object.
-        std::string gp_id = m_gp_ident;
+        std::string gp_id = m_gp->getId();
         ModalDialog::dismiss();
-        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, true);
+        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false,
+                              (eventSource == "continue"));
         return GUIEngine::EVENT_BLOCK;
-    }
-    else if (eventSource == "cannot_start")
-    {
-        sfx_manager->quickSound( "anvil" );
     }
 
     return GUIEngine::EVENT_LET;
@@ -288,11 +274,11 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventS
 
 void GPInfoDialog::onUpdate(float dt)
 {
-    const int frameBefore = (int)(m_curr_time / 1.5f);
+    if (dt == 0)
+        return; // if nothing changed, return right now
+
     m_curr_time += dt;
     int frameAfter = (int)(m_curr_time / 1.5f);
-
-    if (frameAfter == frameBefore) return; // if nothing changed, return right now
 
     const std::vector<std::string> tracks = m_gp->getTrackNames();
     if (frameAfter >= (int)tracks.size())
@@ -301,11 +287,9 @@ void GPInfoDialog::onUpdate(float dt)
         m_curr_time = 0;
     }
 
-    Track* track = (tracks.size() == 0 ? NULL :
-        track_manager->getTrack(tracks[frameAfter]));
-    std::string fn = track ? track->getScreenshotFile()
-                           : file_manager->getAsset(FileManager::GUI, "main_help.png");
-    m_screenshot_widget->setImage(fn.c_str(), IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    Track* track = track_manager->getTrack(tracks[frameAfter]);
+    std::string file = track->getScreenshotFile();
+    typedef GUIEngine::IconButtonWidget Icon;
+    m_screenshot_widget->setImage(file.c_str(), Icon::ICON_PATH_TYPE_ABSOLUTE);
 }
 
-// ----------------------------------------------------------------------------

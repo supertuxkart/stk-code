@@ -33,32 +33,40 @@ namespace GUIEngine
  */
 class GPInfoDialog : public GUIEngine::ModalDialog
 {
-protected: // Necessary for randomGPInfoDialog
-    std::string m_gp_ident;
+protected: // Necessary for RandomGPInfoDialog
     GUIEngine::IconButtonWidget* m_screenshot_widget;
     float m_curr_time;
     GrandPrixData* m_gp;
 
+    /** height of the separator over the body */
+    int m_over_body;
+    /** height of the separator under the titlebar, which is equal to
+     * m_over_body in a normal GPInfoDialo and lower in RandomGPInfoDialog. */
+    int m_under_title;
+    /** height of the seperator over the buttons */
+    int m_lower_bound;
+
+    void addTitle();
+    /** \brief display all the tracks according to the current gp
+     * For a normal gp info dialog, it just creates a label for every track.
+     * But with a random gp info dialog, it tries to reuse as many
+     * labels as possible by just changing their text. */
+    void addTracks();
+    void addScreenshot();
+    /** display a ok-button and eventually a continue-button */
+    void addButtons();
+
+    /** only used for track_screen.cpp */
+    GPInfoDialog() : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT) {}
+
 public:
     static const float PERCENT_WIDTH  = 0.8f;
     static const float PERCENT_HEIGHT = 0.7f;
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     * atm only used in track_screen.cpp
-     */
-    GPInfoDialog() : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT) {}
+
     GPInfoDialog(const std::string& gpIdent);
+    /** Places the focus back on the selected GP, in the case that the dialog
+     * was cancelled and we're returning to the track selection screen */
     virtual ~GPInfoDialog();
-
-    void InitAfterDrawingTheHeader(const int y1, const int y2,
-                                   const std::string& gp_ident);
-
-    /** \brief display all the tracks according to the current gp
-     * For a normal gp info dialog, it just creates a label for every track.
-     * With its name. But in a random gp info dialog, it tries to reuse as many
-     * labels as possible by just changing their text. If there are less than
-     * need, some are added, if there are to many, some are deleted. */
-    void displayTracks(const int y1, const int y2);
 
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);

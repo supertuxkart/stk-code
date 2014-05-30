@@ -17,20 +17,21 @@
 
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
-#include "guiengine/widget.hpp"
 #include "race/grand_prix_manager.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track_manager.hpp"
 
 #include <IGUIEnvironment.h>
 #include <IGUIStaticText.h>
 
-using namespace irr::gui;
-using namespace irr::video;
-using namespace irr::core;
-using namespace GUIEngine;
+using irr::core::stringc;
+using irr::core::stringw;
+using irr::gui::IGUIStaticText;
 
-randomGPInfoDialog::randomGPInfoDialog()
+typedef GUIEngine::SpinnerWidget Spinner;
+
+RandomGPInfoDialog::RandomGPInfoDialog()
 {
     // Defaults - loading selection from last time frrom a file would be better
     m_number_of_tracks = 2;
@@ -40,27 +41,30 @@ randomGPInfoDialog::randomGPInfoDialog()
     doInit();
     m_curr_time = 0.0f;
 
-    int y1 = m_area.getHeight()/7;
+    m_under_title = m_area.getHeight()/7;
+    m_over_body = m_area.getHeight()/7 + SPINNER_HEIGHT + 10; // 10px space
+    m_lower_bound = m_area.getHeight()*6/7;
 
-    m_gp_ident = "random";
     m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
 
-    // ---- GP Name
-    core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
-    IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText(translations->fribidize("Random Grand Prix"),
-                                                               area_top, false, true, // border, word wrap
-                                                               m_irrlicht_window);
-    title->setTabStop(false);
-    title->setTextAlignment(EGUIA_CENTER, EGUIA_CENTER);
+    addTitle();
+    addSpinners();
+    addTracks();
+    addScreenshot();
+    addButtons();
+}
 
-    // ---- Spinners
+// ----------------------------------------------------------------------------
+
+void RandomGPInfoDialog::addSpinners()
+{
     // Trackgroup chooser
-    GUIEngine::SpinnerWidget* spinner = new GUIEngine::SpinnerWidget(false);
-    spinner->m_properties[PROP_ID] = "Trackgroup";
+    Spinner* spinner = new Spinner(false);
+    spinner->m_properties[GUIEngine::PROP_ID] = "Trackgroup";
     spinner->setParent(m_irrlicht_window);
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(10, m_area.getHeight()/7, 300, 40);
+    spinner->move(10, m_under_title, 300, SPINNER_HEIGHT);
     // Fill it with with all the track group names
     spinner->addLabel("all");
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
@@ -68,35 +72,41 @@ randomGPInfoDialog::randomGPInfoDialog()
         spinner->addLabel(stringw(groups[i].c_str()));
 
     // Number of laps chooser
-    spinner = new GUIEngine::SpinnerWidget(false);
+    spinner = new Spinner(false);
     spinner->setValue(m_number_of_tracks);
     spinner->setMin(1);
     spinner->setMax(track_manager->getNumberOfTracks()); // default is "all"
     spinner->setParent(m_irrlicht_window);
-    spinner->m_properties[PROP_ID] = "Number of tracks";
+    spinner->m_properties[GUIEngine::PROP_ID] = "Number of tracks";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(310, m_area.getHeight()/7, 200, 40);
-
-    displayTracks(m_area.getHeight()/7 + 50, m_area.getHeight()*6/7);
-    InitAfterDrawingTheHeader(m_area.getHeight()/7 + 50,
-                              m_area.getHeight()*6/7,
-                              "random");
+    spinner->move(310, m_under_title, 200, SPINNER_HEIGHT);
 }
 
-GUIEngine::EventPropagation randomGPInfoDialog::processEvent(
+// ----------------------------------------------------------------------------
+
+GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
                                                  const std::string& eventSource)
 {
-    if (eventSource == "Number of tracks")
+    if (eventSource == "start")
     {
-        m_number_of_tracks = getWidget<GUIEngine::SpinnerWidget>("Number of tracks")->getValue();
+        // Save the gp since dismiss deletes it otherwise
+        GrandPrixData buff = *m_gp;
+        ModalDialog::dismiss();
+        race_manager->startGP(&buff, false, false);
+        return GUIEngine::EVENT_BLOCK;
+    }
+    else if (eventSource == "Number of tracks")
+    {
+        // The old gp can be reused because there's only track deletion/adding
+        m_number_of_tracks = getWidget<Spinner>("Number of tracks")->getValue();
         m_gp->changeTrackNumber(m_number_of_tracks, m_trackgroup, m_use_reverse);
-        displayTracks(m_area.getHeight()/7, m_area.getHeight()*6/7);
+        addTracks();
     }
     else if (eventSource == "Trackgroup")
     {
-        GUIEngine::SpinnerWidget* t = getWidget<GUIEngine::SpinnerWidget>("Trackgroup");
-        GUIEngine::SpinnerWidget* s = getWidget<GUIEngine::SpinnerWidget>("Number of tracks");
+        Spinner* t = getWidget<Spinner>("Trackgroup");
+        Spinner* s = getWidget<Spinner>("Number of tracks");
 
         m_trackgroup = stringc(t->getStringValue()).c_str();
 
@@ -115,15 +125,17 @@ GUIEngine::EventPropagation randomGPInfoDialog::processEvent(
         updateGP();
     }
 
-    return GPInfoDialog::processEvent(eventSource);
+    return GUIEngine::EVENT_LET;
 }
 
-void randomGPInfoDialog::updateGP()
+// ----------------------------------------------------------------------------
+
+void RandomGPInfoDialog::updateGP()
 {
     if (m_gp != NULL)
         delete m_gp;
 
     m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
-    displayTracks(m_area.getHeight()/7, m_area.getHeight()*6/7);
+    addTracks();
 }
 

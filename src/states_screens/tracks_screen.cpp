@@ -119,10 +119,10 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         }
         else
         {
-            if (selection != "Random")
-                new GPInfoDialog(selection);
+            if (selection == "Random Grand Prix")
+                new RandomGPInfoDialog();
             else
-                new randomGPInfoDialog();
+                new GPInfoDialog(selection);
         }
     }
     else if (name == "trackgroups")
@@ -214,10 +214,11 @@ void TracksScreen::init()
         }
     }
 
-    // Random GP - not finished yet
+    // Random GP
     std::vector<std::string> screenshots;
     screenshots.push_back("gui/main_help.png");
-    gps_widget->addAnimatedItem(translations->fribidize("Random"), "Random",
+    gps_widget->addAnimatedItem(translations->fribidize("Random Grand Prix"),
+                                "Random Grand Prix",
                                 screenshots, 1.5f, 0,
                                 IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
