@@ -3,55 +3,59 @@
 
 <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
-    <header align="center" width="80%" text="Login" text_align="center"/>
+    <header align="center" width="80%" text="Create User" text_align="center"
+            I18N="In the registration dialog" />
     <spacer height="15" width="10"/>
 
-    <tabs id="login_tabs" height="10%" max_height="110" x="2%" width="98%" align="center">
-        <icon-button id="tab_login" width="128" height="128" icon="gui/track_random.png"
-                I18N="Tab in login menu" text="Sign In"/>
-        <icon-button id="tab_guest_login" width="128" height="128" icon="gui/mode_ftl.png"
-                I18N="Tab in login menu" text="Sign In As Guest"/>
-        <icon-button id="tab_register" width="128" height="128" icon="gui/mode_ftl.png"
-                I18N="Tab in login menu" text="Register"/>
-    </tabs>
-
     <box proportion="1" width="100%" layout="vertical-row">
-        <header id="title" width="96%" height="fit" text_align="center" word_wrap="true"
-                I18N="In the login dialog" text="Sign in"/>
-        <spacer height="40" width="20"/>
-
         <div width="80%" align="center" layout="vertical-row" height="fit">
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" I18N="In the registration dialog" text="Username"/>
-                <textbox proportion="2" height="fit" id="username" I18N="In the registration dialog"/>
+                <label   proportion="1" height="100%" text_align="left" 
+                         I18N="In the registration dialog" text="Local Username"/>
+                <textbox id="local_username" proportion="2" height="fit" I18N="In the registration dialog"/>
+            </div>
+            <div width="100%" height="fit" layout="horizontal-row" >
+                 <label    id="label_online" proportion="1" height="100%" text_align="left"
+                           I18N="In the login screen" text="Online"/>
+                 <checkbox id="online" I18N="In the login screen" text_align="left"/>
+            </div>
+
+            <div width="100%" height="fit" layout="horizontal-row" >
+                <label   id="label_username" proportion="1" height="100%" text_align="left" 
+                         I18N="In the registration dialog" text="Online Username"/>
+                <textbox id="username" proportion="2" height="fit" I18N="In the registration dialog"/>
             </div>
 
             <spacer height="20" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" I18N="In the registration dialog" text="Password"/>
-                <textbox proportion="2" height="fit" id="password" I18N="In the registration dialog"/>
+                <label   id="label_password" proportion="1" height="100%" text_align="left"
+                         I18N="In the registration dialog" text="Password"/>
+                <textbox id="password" proportion="2" height="fit" I18N="In the registration dialog"/>
             </div>
 
             <spacer height="20" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" I18N="In the registration dialog" text="Confirm"/>
-                <textbox proportion="2" height="fit" id="password_confirm" I18N="In the registration dialog"/>
+                <label   id="label_password_confirm" proportion="1" height="100%" text_align="left"
+                         I18N="In the registration dialog" text="Confirm"/>
+                <textbox id="password_confirm" proportion="2" height="fit" I18N="In the registration dialog"/>
             </div>
 
             <spacer height="20" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" I18N="In the registration dialog" text="Email"/>
-                <textbox proportion="2" height="fit" id="email" I18N="In the registration dialog"/>
+                <label   id="label_email" proportion="1" height="100%" text_align="left"
+                         I18N="In the registration dialog" text="Email"/>
+                <textbox id="email" proportion="2" height="fit" I18N="In the registration dialog"/>
             </div>
 
             <spacer height="20" width="20"/>
 
             <div width="100%" height="fit" layout="horizontal-row" >
-                <label proportion="1" height="100%" text_align="left" I18N="In the registration dialog" text="Confirm"/>
-                <textbox proportion="2" height="fit" id="email_confirm" I18N="In the registration dialog"/>
+                <label   id="label_email_confirm" proportion="1" height="100%" text_align="left"
+                         I18N="In the registration dialog" text="Confirm"/>
+                <textbox id="email_confirm" proportion="2" height="fit" I18N="In the registration dialog"/>
             </div>
         <spacer height="20" width="50"/>
 
@@ -66,7 +70,7 @@
 
         <buttonbar id="options" width="25%" height="14%" align="center">
             <icon-button id="next" width="64" height="64" icon="gui/green_check.png"
-                I18N="Registration dialog" text="Next" label_location="none"/>
+                I18N="Registration dialog" text="OK" label_location="none"/>
             <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"
                 I18N="Registration dialog"  text="Cancel" label_location="none"/>
         </buttonbar>

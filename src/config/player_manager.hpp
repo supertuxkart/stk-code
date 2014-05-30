@@ -91,11 +91,12 @@ public:
     void initRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
-    void addNewPlayer(const irr::core::stringw& name);
+    PlayerProfile* addNewPlayer(const irr::core::stringw& name);
     void deletePlayer(PlayerProfile *player);
-    void setCurrentPlayer(PlayerProfile *player, bool remember_me);
+    void setCurrentPlayer(PlayerProfile *player);
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
+    unsigned int getNumNonGuestPlayers() const;
     static void setUserDetails(Online::HTTPRequest *request,
                                const std::string &action,
                                const std::string &php_name = "");
@@ -110,9 +111,7 @@ public:
     static void onSTKQuit();
     static void requestSignOut();
     static Online::XMLRequest *requestSignIn(const irr::core::stringw &username,
-                                             const irr::core::stringw &password,
-                                             bool save_session,
-                                              bool request_now = true);
+                                             const irr::core::stringw &password);
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */

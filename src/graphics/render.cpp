@@ -170,7 +170,7 @@ void IrrDriver::renderGLSL(float dt)
                     UtilShader::ColoredLine::setUniforms(it->first);
                     const std::vector<float> &vertex = it->second;
                     const float *tmp = vertex.data();
-                    for (int i = 0; i < vertex.size(); i += 1024 * 6)
+                    for (unsigned int i = 0; i < vertex.size(); i += 1024 * 6)
                     {
                         unsigned count = MIN2(vertex.size() - i, 1024 * 6);
                         glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(float), &tmp[i]);
@@ -195,6 +195,12 @@ void IrrDriver::renderGLSL(float dt)
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
                 irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            else if (irr_driver->getRSM())
+            {
+                glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
+            }
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
 
@@ -314,8 +320,31 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     }
 
     PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-    renderSkybox(camnode);
+    if (!SkyboxTextures.empty())
+        renderSkybox(camnode);
     PROFILER_POP_CPU_MARKER();
+
+    if (getRH())
+    {
+        glEnable(GL_PROGRAM_POINT_SIZE);
+        m_rtts->getFBO(FBO_COLORS).Bind();
+        glUseProgram(FullScreenShader::RHDebug::Program);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[0]);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[1]);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[2]);
+        FullScreenShader::RHDebug::setUniforms(rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
+        glDisable(GL_PROGRAM_POINT_SIZE);
+    }
+
+    if (getGI())
+    {
+        m_rtts->getFBO(FBO_COLORS).Bind();
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+    }
 
     PROFILER_PUSH_CPU_MARKER("- Glow", 0xFF, 0xFF, 0x00);
     // Render anything glowing.
@@ -501,17 +530,44 @@ void IrrDriver::renderSolidFirstPass()
         glUseProgram(MeshShader::ObjectPass1Shader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
         {
-            drawObjectPass1(*GroupedFPSM<FPSM_DEFAULT>::MeshSet[i], GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i]);
+            const GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT>::MeshSet[i];
+            if (mesh.textures[0])
+            {
+                compressTexture(mesh.textures[0], true);
+                setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            }
+            else
+            {
+                setTexture(0, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
+                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
+                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+            }
+            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
+            if (!mesh.textures[0])
+            {
+                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+            }
         }
+
         glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
         {
-            drawObjectRefPass1(*GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
+            const GLMesh &mesh = *GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i];
+            compressTexture(mesh.textures[0], true);
+            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            draw<MeshShader::ObjectRefPass1Shader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
         }
         glUseProgram(MeshShader::NormalMapShader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
         {
-            drawNormalPass(*GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i]);
+            const GLMesh &mesh = *GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i];
+            assert(mesh.textures[1]);
+            compressTexture(mesh.textures[1], false);
+            setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            compressTexture(mesh.textures[0], true);
+            setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            draw<MeshShader::NormalMapShader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
         }
     }
 }
@@ -613,6 +669,8 @@ void IrrDriver::renderParticles()
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
+    static int tick = 0;
+    tick++;
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -701,6 +759,13 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
+    if (!(tick % 100))
+        rsm_matrix = sun_ortho_matrix[3];
+    rh_extend = core::vector3df(128, 64, 128);
+    core::vector3df campos = camnode->getAbsolutePosition();
+    core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
+    rh_matrix.setTranslation(translation);
+
         assert(sun_ortho_matrix.size() == 4);
         camnode->setNearValue(oldnear);
         camnode->setFarValue(oldfar);
@@ -708,10 +773,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         size_t size = irr_driver->getShadowViewProj().size();
         for (unsigned i = 0; i < size; i++)
             memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
-    }
-
-    tmp[128] = width;
-    tmp[129] = height;
+    tmp[128] = float(width);
+    tmp[129] = float(height);
 
     glBindBuffer(GL_UNIFORM_BUFFER, SharedObject::ViewProjectionMatrixesUBO);
     glBufferSubData(GL_UNIFORM_BUFFER, 0, (16 * 8 + 2) * sizeof(float), tmp);
@@ -747,7 +810,22 @@ void IrrDriver::renderShadows()
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    if (!UserConfigParams::m_gi)
+        return;
+
+    m_rtts->getRSM().Bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUseProgram(MeshShader::RSMShader::Program);
+    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
+    {
+        const GLMesh mesh = *GroupedFPSM<FPSM_DEFAULT>::MeshSet[i];
+        if (!mesh.textures[0])
+            continue;
+        compressTexture(mesh.textures[0], true);
+        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        draw<MeshShader::RSMShader>(mesh, mesh.vao_rsm_pass, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -837,6 +915,19 @@ static void renderPointLights(unsigned count)
 
 void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
 {
+    //RH
+    if (UserConfigParams::m_gi)
+    {
+        glDisable(GL_BLEND);
+        m_rtts->getRH().Bind();
+        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
+        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
+        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
+    }
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
@@ -845,10 +936,10 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
-    {
-        //gl_driver->extGlDrawBuffers(1, bufs);
         return;
-    }
+
+    if (UserConfigParams::m_gi)
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
 
     if (SkyboxCubeMap)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
@@ -929,7 +1020,6 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
     renderPointLights(MIN2(lightnum, MAXLIGHT));
     if (SkyboxCubeMap)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-//    gl_driver->extGlDrawBuffers(1, bufs);
 }
 
 void IrrDriver::renderSSAO()
@@ -1395,20 +1485,6 @@ void IrrDriver::generateSkyboxCubemap()
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
-    if (SkyboxTextures.empty() && FakeSkybox)
-    {
-        glGenTextures(1, &FakeSkybox);
-
-        unsigned w = 1, h = 1;
-
-        char *rgba[6];
-        for (unsigned i = 0; i < 6; i++)
-            rgba[i] = new char[w * h * 4];
-        for (unsigned i = 0; i < 6; i++)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
-        return;
-    }
-
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);

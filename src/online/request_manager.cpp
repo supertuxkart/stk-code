@@ -21,6 +21,7 @@
 #include "online/request_manager.hpp"
 
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "states_screens/state_manager.hpp"
 
 #include <iostream>
@@ -130,8 +131,12 @@ namespace Online
         pthread_attr_destroy(&attr);
         // In case that login id was not saved (or first start of stk), 
         // current player would not be defined at this stage.
-        if(PlayerManager::getCurrentPlayer())
+        PlayerProfile *player = PlayerManager::getCurrentPlayer();
+        if(player && player->wasOnlineLastTime() && 
+            !UserConfigParams::m_always_show_login_screen)
+        {
             PlayerManager::resumeSavedSession();
+        }
     }   // startNetworkThread
 
     // ------------------------------------------------------------------------

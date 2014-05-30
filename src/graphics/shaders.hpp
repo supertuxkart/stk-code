@@ -336,6 +336,17 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
+class RSMShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position, attrib_texcoord, attrib_normal;
+    static GLuint uniform_MM, uniform_tex, uniform_RSMMatrix;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix, unsigned TU_tex);
+};
+
 class InstancedShadowShader
 {
 public:
@@ -596,6 +607,38 @@ public:
 
     static void init();
     static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
+};
+
+class RadianceHintsConstructionShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_ctex, uniform_ntex, uniform_dtex, uniform_extents, uniform_RHMatrix, uniform_RSMMatrix;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ctex, unsigned TU_ntex, unsigned TU_dtex);
+};
+
+class RHDebug
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
+};
+
+class GlobalIlluminationReconstructionShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_ntex, uniform_dtex, uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix;
+    static GLuint vao;
+
+    static void init();
+    static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
 };
 
 class Gaussian17TapHShader

@@ -264,6 +264,35 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     glDisable(GL_BLEND);
 }
 
+void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, GLuint shr, GLuint shg, GLuint shb)
+{
+    glDisable(GL_DEPTH_TEST);
+    glUseProgram(FullScreenShader::GlobalIlluminationReconstructionShader::Program);
+    glBindVertexArray(FullScreenShader::GlobalIlluminationReconstructionShader::vao);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_3D, shr);
+    {
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_3D, shg);
+    {
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_3D, shb);
+    {
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    }
+    setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, rh_extend, 3, 4, 0, 1, 2);
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
 void PostProcessing::renderSunlight()
 {
   SunLightProvider * const cb = (SunLightProvider *) irr_driver->getCallback(ES_SUNLIGHT);
@@ -476,7 +505,9 @@ void PostProcessing::renderSSAO()
     glGenerateMipmap(GL_TEXTURE_2D);
     setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(core::vector2df(UserConfigParams::m_width, UserConfigParams::m_height), 0, 1);
+    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width), 
+                                                              float(UserConfigParams::m_height)),
+                                              0, 1);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

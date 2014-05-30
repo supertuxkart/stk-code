@@ -714,7 +714,13 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
             center.Y + (int)(((int)rect.LowerRightCorner.Y
                             - (int)center.Y)*texture_size);
 
-        if (focused)
+        if (w->m_deactivated)
+        {
+            drawBoxFromStretchableTexture(w, sized_rect,
+                                SkinConfig::m_render_params["button::deactivated"],
+                                w->m_deactivated);
+        }
+        else if (focused)
         {
             drawBoxFromStretchableTexture(w, sized_rect,
                                 SkinConfig::m_render_params["button::focused"],
@@ -725,11 +731,17 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
             drawBoxFromStretchableTexture(w, sized_rect,
                                 SkinConfig::m_render_params["button::neutral"],
                                 w->m_deactivated);
-        }
+        }   // if not deactivated or focused
     }
     else   // not within an appearing dialog
     {
-        if (focused)
+        if (w->m_deactivated)
+        {
+            drawBoxFromStretchableTexture(w, rect,
+                                SkinConfig::m_render_params["button::deactivated"],
+                                w->m_deactivated);
+        }
+        else if (focused)
         {
             drawBoxFromStretchableTexture(w, rect,
                                 SkinConfig::m_render_params["button::focused"],
@@ -740,7 +752,7 @@ void Skin::drawButton(Widget* w, const core::recti &rect,
             drawBoxFromStretchableTexture(w, rect,
                                 SkinConfig::m_render_params["button::neutral"],
                                 w->m_deactivated);
-        }   // if not focused
+        }   // if not deactivated or focused
     }   // not within an appearing dialog
 }   // drawButton
 
@@ -818,7 +830,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
     const int texture_w = texture->getSize().Width / 4;
     const int texture_h = texture->getSize().Height;
     const float aspect_ratio = 1.0f;
-    
+
     const int star_number = ratingBar->getStarNumber();
 
     int star_h = rect.getHeight();
@@ -830,7 +842,7 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_w = (int)(star_w * scale_factor);
         star_h = (int)(star_h * scale_factor);
     }
-    
+
     // center horizontally and vertically
     const int x_from = rect.UpperLeftCorner.X;
     const int y_from = rect.UpperLeftCorner.Y;
@@ -853,9 +865,9 @@ void Skin::drawRatingBar(Widget *w, const core::recti &rect,
         star_rect.UpperLeftCorner.Y  = y_from;
         star_rect.LowerRightCorner.X = x_from + (i + 1) * star_w;
         star_rect.LowerRightCorner.Y = y_from + star_h;
-        
+
         int step = ratingBar->getStepsOfStar(i);
-        
+
         const core::recti source_area(texture_w * step, 0,
                                       texture_w * (step + 1), texture_h);
 
@@ -1236,7 +1248,11 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         else if(player_id==3)
             params=&SkinConfig::m_render_params["spinner4::neutral"];
     }
-    else if (focused|| pressed)
+    else if (widget->m_deactivated)
+    {
+        params=&SkinConfig::m_render_params["spinner::deactivated"];
+    }
+    else if (focused || pressed)
     {
         params=&SkinConfig::m_render_params["spinner::focused"];
     }
@@ -1253,7 +1269,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
         rect2.LowerRightCorner.Y += 5;
         drawBoxFromStretchableTexture(widget, rect2,
                      SkinConfig::m_render_params["squareFocusHalo::neutral"]);
-        
+
 
     }
     else if (widget->isFocusedForPlayer(1))
@@ -1314,7 +1330,7 @@ void Skin::drawSpinnerBody(const core::recti &rect, Widget* widget,
 
     // ---- If this spinner is of "gauge" type, draw filling
     const SpinnerWidget* w = dynamic_cast<const SpinnerWidget*>(widget);
-    
+
     if (w->isGauge() && !w->m_deactivated)
     {
         const int handle_size = (int)( widget->m_h*params->m_left_border
@@ -1361,7 +1377,7 @@ void Skin::drawSpinnerChild(const core::recti &rect, Widget* widget,
 {
     if (!widget->isVisible()) return;
 
-    if (pressed)
+    if (!widget->m_deactivated && pressed)
     {
         Widget* spinner = widget->m_event_handler;
         int areas = 0;
@@ -1516,19 +1532,39 @@ void Skin::drawCheckBox(const core::recti &rect, Widget* widget, bool focused)
 
     if (w->getState() == true)
     {
-        texture = focused
-                ? SkinConfig::m_render_params["checkbox::focused+checked"]
-                             .getImage()
-                : SkinConfig::m_render_params["checkbox::neutral+checked"]
-                             .getImage();
+        if (w->m_deactivated)
+        {
+            texture = SkinConfig::m_render_params["checkbox::deactivated+checked"]
+                .getImage();
+        }
+        else if(focused)
+        {
+            texture = SkinConfig::m_render_params["checkbox::focused+checked"]
+                .getImage();
+        }
+        else
+        {
+            texture = SkinConfig::m_render_params["checkbox::neutral+checked"]
+                .getImage();
+        }
     }
     else
     {
-        texture = focused
-                ? SkinConfig::m_render_params["checkbox::focused+unchecked"]
-                             .getImage()
-                : SkinConfig::m_render_params["checkbox::neutral+unchecked"]
-                             .getImage();
+        if (w->m_deactivated)
+        {
+            texture = SkinConfig::m_render_params["checkbox::deactivated+unchecked"]
+                .getImage();
+        }
+        else if(focused)
+        {
+            texture = SkinConfig::m_render_params["checkbox::focused+unchecked"]
+                .getImage();
+        }
+        else
+        {
+            texture = SkinConfig::m_render_params["checkbox::neutral+unchecked"]
+                .getImage();
+        }
     }
 
     const int texture_w = texture->getSize().Width;
@@ -1651,7 +1687,7 @@ void Skin::renderSections(PtrVector<Widget>* within_vector)
                     drawBoxFromStretchableTexture(&widget, rect,
                               SkinConfig::m_render_params["section::neutral"]);
                 }
-                
+
                 renderSections( &widget.m_children );
             }
             else if (widget.isBottomBar())

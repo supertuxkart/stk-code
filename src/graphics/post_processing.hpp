@@ -81,6 +81,7 @@ public:
     void renderFog();
     void renderSSAO();
     void renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff);
+    void renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, unsigned shr, unsigned shg, unsigned shb);
 
     /** Blur the in texture */
     void renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxiliary);

@@ -297,33 +297,6 @@ public:
         return true;
     }   // operator<
 
-    // ------------------------------------------------------------------------
-    /** Compares two addons according to the sort order currently defined.
-     *  Comparison is done for sorting in descending order.
-     *  \param a The addon to compare this addon to.
-     */
-    bool operator>(const Addon &a) const
-    {
-        switch(m_sort_order)
-        {
-            case SO_DEFAULT:
-                if(testStatus(AS_FEATURED) &&
-                    !a.testStatus(AS_FEATURED))  return true;
-                if(!testStatus(AS_FEATURED) &&
-                    a.testStatus(AS_FEATURED))  return false;
-            // Otherwise fall through to name comparison!
-            case SO_NAME:
-                // m_id is the lower case name
-                return m_id > a.m_id;
-                break;
-            case SO_DATE:
-                return m_date < a.m_date;
-                break;
-        }   // switch
-        // Fix compiler warning.
-        return true;
-    }   // operator>
-
 };   // Addon
 
 

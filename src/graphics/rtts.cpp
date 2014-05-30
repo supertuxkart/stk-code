@@ -54,7 +54,7 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 RTT::RTT(size_t width, size_t height)
 {
     m_shadow_FBO = NULL;
-    initGL();
+    m_RSM = NULL;
     using namespace video;
     using namespace core;
 
@@ -199,6 +199,38 @@ RTT::RTT(size_t width, size_t height)
         somevector.clear();
         somevector.push_back(shadowColorTex);
         m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+
+        //Todo : use "normal" shadowtex
+        glGenTextures(1, &RSM_Color);
+        glBindTexture(GL_TEXTURE_2D, RSM_Color);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        glGenTextures(1, &RSM_Normal);
+        glBindTexture(GL_TEXTURE_2D, RSM_Normal);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, 0);
+        glGenTextures(1, &RSM_Depth);
+        glBindTexture(GL_TEXTURE_2D, RSM_Depth);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, 1024, 1024, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
+
+        somevector.clear();
+        somevector.push_back(RSM_Color);
+        somevector.push_back(RSM_Normal);
+        m_RSM = new FrameBuffer(somevector, RSM_Depth, 1024, 1024, true);
+
+        glGenTextures(1, &RH_Red);
+        glBindTexture(GL_TEXTURE_3D, RH_Red);
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA16F, 32, 16, 32, 0, GL_RGBA, GL_FLOAT, 0);
+        glGenTextures(1, &RH_Green);
+        glBindTexture(GL_TEXTURE_3D, RH_Green);
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA16F, 32, 16, 32, 0, GL_RGBA, GL_FLOAT, 0);
+        glGenTextures(1, &RH_Blue);
+        glBindTexture(GL_TEXTURE_3D, RH_Blue);
+        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA16F, 32, 16, 32, 0, GL_RGBA, GL_FLOAT, 0);
+
+        somevector.clear();
+        somevector.push_back(RH_Red);
+        somevector.push_back(RH_Green);
+        somevector.push_back(RH_Blue);
+        m_RH_FBO = new FrameBuffer(somevector, 32, 16, true);
     }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -206,11 +238,19 @@ RTT::RTT(size_t width, size_t height)
 RTT::~RTT()
 {
     delete m_shadow_FBO;
+    delete m_RH_FBO;
+    delete m_RSM;
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (irr_driver->getGLSLVersion() >= 150)
     {
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
+        glDeleteTextures(1, &RSM_Color);
+        glDeleteTextures(1, &RSM_Normal);
+        glDeleteTextures(1, &RSM_Depth);
+        glDeleteTextures(1, &RH_Red);
+        glDeleteTextures(1, &RH_Green);
+        glDeleteTextures(1, &RH_Blue);
     }
 }

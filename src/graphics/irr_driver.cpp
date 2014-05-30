@@ -110,7 +110,7 @@ IrrDriver::IrrDriver()
     m_post_processing     = NULL;
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
-        m_lightviz = m_shadowviz = m_distortviz = 0;
+        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = 0;
     SkyboxCubeMap = 0;
 }   // IrrDriver
 
