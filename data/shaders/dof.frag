@@ -82,5 +82,5 @@ void main()
     depth  = (1 - depth);
     vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
 
-    FragColor = vec4(final, 1.);
+    FragColor = vec4(final, colOriginal.a);
 }
