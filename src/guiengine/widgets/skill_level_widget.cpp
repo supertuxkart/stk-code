@@ -83,7 +83,7 @@ void SkillLevelWidget::add()
 // -----------------------------------------------------------------------------
 
 
-void SkillLevelWidget::move(int x, int y, int w, int h)
+void SkillLevelWidget::move(const int x, const int y, const int w, const int h)
 {
     Widget::move(x,y,w,h);
     setSize(m_x, m_y, m_w, m_h);

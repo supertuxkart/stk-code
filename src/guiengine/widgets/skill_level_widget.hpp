@@ -72,7 +72,7 @@ class SkillLevelWidget : public Widget
 
         // -------------------------------------------------------------------------
 
-        virtual void move(int x, int y, int w, int h);
+        virtual void move(const int x, const int y, const int w, const int h);
 
         // -------------------------------------------------------------------------
 

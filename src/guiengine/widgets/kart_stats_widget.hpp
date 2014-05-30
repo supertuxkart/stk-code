@@ -70,7 +70,7 @@ class KartStatsWidget : public Widget
         virtual void add();
 
         /** Move the widget and its children */
-        virtual void move(int x, int y, int w, int h);
+        virtual void move(const int x, const int y, const int w, const int h);
 
         // -------------------------------------------------------------------------
         /** Updates the animation (moving/shrinking/etc.) */
