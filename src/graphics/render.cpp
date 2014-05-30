@@ -144,7 +144,7 @@ void IrrDriver::renderGLSL(float dt)
         const core::recti &viewport = camera->getViewport();
 
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-        renderScene(camnode, glows, dt, track->hasShadows());
+        renderScene(camnode, glows, dt, track->hasShadows(), false);
 
         // Debug physic
         // Note that drawAll must be called before rendering
@@ -260,7 +260,7 @@ void IrrDriver::renderGLSL(float dt)
     getPostProcessing()->update(dt);
 }
 
-void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow)
+void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
@@ -301,7 +301,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!UserConfigParams::m_dynamic_lights && ! forceRTT)
     {
         glEnable(GL_FRAMEBUFFER_SRGB);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -374,7 +374,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
         renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
-    if (!UserConfigParams::m_dynamic_lights)
+    if (!UserConfigParams::m_dynamic_lights && !forceRTT)
         return;
 
     // Render displacement

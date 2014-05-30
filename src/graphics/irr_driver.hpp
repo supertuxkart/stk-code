@@ -695,7 +695,7 @@ public:
     void onLoadWorld();
     void onUnloadWorld();
 
-    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
+    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
 
     // --------------------- RTT --------------------
