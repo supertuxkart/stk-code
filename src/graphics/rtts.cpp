@@ -188,7 +188,7 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
-    if (irr_driver->getGLSLVersion() >= 150)
+    if (UserConfigParams::m_shadows)
     {
         glGenTextures(1, &shadowColorTex);
         glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
@@ -200,7 +200,10 @@ RTT::RTT(size_t width, size_t height)
         somevector.clear();
         somevector.push_back(shadowColorTex);
         m_shadow_FBO = new FrameBuffer(somevector, shadowDepthTex, 1024, 1024, true);
+    }
 
+    if (UserConfigParams::m_gi)
+    {
         //Todo : use "normal" shadowtex
         glGenTextures(1, &RSM_Color);
         glBindTexture(GL_TEXTURE_2D, RSM_Color);
@@ -240,10 +243,13 @@ RTT::~RTT()
 {
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
-    if (irr_driver->getGLSLVersion() >= 150)
+    if (UserConfigParams::m_shadows)
     {
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
+    }
+    if (UserConfigParams::m_gi)
+    {
         glDeleteTextures(1, &RSM_Color);
         glDeleteTextures(1, &RSM_Normal);
         glDeleteTextures(1, &RSM_Depth);
