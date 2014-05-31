@@ -195,10 +195,7 @@ FileManager::FileManager()
     checkAndCreateCachedTexturesDir();
     checkAndCreateGPDir();
 
-#ifdef WIN32
     redirectOutput();
-
-#endif
 
     // We can't use _() here, since translations will only be initalised
     // after the filemanager (to get the path to the tranlsations from it)
@@ -999,12 +996,36 @@ std::string FileManager::checkAndCreateLinuxDir(const char *env_name,
 
 //-----------------------------------------------------------------------------
 /** Redirects output to go into files in the user's config directory
- *  instead of to the console.
+ *  instead of to the console. It keeps backup copies of previous stdout files
+ *  (3 atm), which can help to diagnose problems caused by a previous crash.
  */
 void FileManager::redirectOutput()
 {
-    //Enable logging of stdout and stderr to logfile
+    // Do a simple log rotate: stdout.log.2 becomes stdout.log.3 etc
+    const int NUM_BACKUPS=3;
     std::string logoutfile = getUserConfigFile("stdout.log");
+    for(int i=NUM_BACKUPS; i>1; i--)
+    {
+        std::ostringstream out_old;
+        out_old << logoutfile << "." << i;
+        removeFile(out_old.str());
+        std::ostringstream out_new;
+        out_new << logoutfile << "." << i-1;
+        if(fileExists(out_new.str()))
+        {
+            rename(out_new.str().c_str(), out_old.str().c_str());
+        }
+    }   // for i in NUM_BACKUPS
+
+    if(fileExists(logoutfile))
+    {
+        std::ostringstream out;
+        out << logoutfile<<".1";
+        // No good place to log error messages when log is not yet initialised
+        rename(logoutfile.c_str(), out.str().c_str());
+    }
+
+    //Enable logging of stdout and stderr to logfile
     Log::verbose("main", "Error messages and other text output will "
                          "be logged to %s.", logoutfile.c_str());
     Log::openOutputFiles(logoutfile);
@@ -1213,7 +1234,47 @@ bool FileManager::removeDirectory(const std::string &name) const
 #endif
 }   // remove directory
 
+// ----------------------------------------------------------------------------
+/** Copies the file source to dest.
+ *  \param source The file to read.
+ *  \param dest The new filename.
+ *  \return True if the copy was successful, false otherwise.
+ */
+bool FileManager::copyFile(const std::string &source, const std::string &dest)
+{
+    FILE *f_source = fopen(source.c_str(), "rb");
+    if(!f_source) return false;
 
+    FILE *f_dest = fopen(dest.c_str(), "wb");
+    if(!f_dest) 
+    {
+        fclose(f_source);
+        return false;
+    }
+
+    const int BUFFER_SIZE=32768;
+    char *buffer = new char[BUFFER_SIZE];
+    if(!buffer) return false;
+    size_t n;
+    while((n=fread(buffer, 1, BUFFER_SIZE, f_source))>0)
+    {
+        if(fwrite(buffer, 1, n, f_dest)!=n)
+        {
+            Log::error("FileManager", "Write error copying '%s' to '%s",
+                        source.c_str(), dest.c_str());
+            delete buffer;
+            fclose(f_source);
+            fclose(f_dest);
+            return false;
+
+        }   // if fwrite()!=n
+    }   // while
+
+    delete buffer;
+    fclose(f_source);
+    fclose(f_dest);
+    return true;
+}   // copyFile
 // ----------------------------------------------------------------------------
 /** Returns true if the first file is newer than the second. The comparison is
 *   based on the modification time of the two files.

@@ -54,6 +54,7 @@ const unsigned int VCLAMP = 2;
  */
 Material::Material(const XMLNode *node, int index, bool deprecated)
 {
+    m_shader_type = SHADERTYPE_SOLID;
     m_deprecated = deprecated;
 
     node->get("name", &m_texname);
@@ -73,26 +74,20 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     node->get("clampv", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.4 style
     node->get("clampV", &b);  if (b) m_clamp_tex |= VCLAMP; //blender 2.5 style
 
-    node->get("transparency",     &m_alpha_testing     );
-    node->get("lightmap",         &m_lightmap          );
-    node->get("additive-lightmap",&m_additive_lightmap );
-
+    
     std::string s;
-    node->get("adjust-image",     &s                   );
-    if(s=="premultiply")
-        m_adjust_image = ADJ_PREMUL;
-    else if (s=="divide")
-        m_adjust_image = ADJ_DIV;
-    else if (s=="" || s=="none")
-        m_adjust_image = ADJ_NONE;
-    else
-        Log::warn("material",
-                  "Incorrect adjust-image specification: '%s' - ignored.",
-                  s.c_str());
-    node->get("alpha",            &m_alpha_blending    );
-    node->get("light",            &m_lighting          );
+    //node->get("adjust-image",     &s                   );
+    //if(s=="premultiply")
+    //    m_adjust_image = ADJ_PREMUL;
+    //else if (s=="divide")
+    //    m_adjust_image = ADJ_DIV;
+    //else if (s=="" || s=="none")
+    //    m_adjust_image = ADJ_NONE;
+    //else
+    //    Log::warn("material",
+    //              "Incorrect adjust-image specification: '%s' - ignored.",
+    //              s.c_str());
 
-    node->get("smooth-reflection",&m_smooth_reflection_shader);
     node->get("high-adhesion",    &m_high_tire_adhesion);
     node->get("reset",            &m_drive_reset       );
 
@@ -135,7 +130,6 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     node->get("surface",          &m_surface           );
     node->get("ignore",           &m_ignore            );
 
-    node->get("additive",         &m_add               );
     node->get("max-speed",        &m_max_speed_fraction);
     node->get("slowdown-time",    &m_slowdown_time     );
     node->get("backface-culling", &m_backface_culling  );
@@ -160,150 +154,197 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     }
 
 
-    s="";
-    node->get("graphical-effect", &s);
-
-    if (s == "water")
+    s = "";
+    if (node->get("shader", &s))
     {
-        // For backwards compatibility only, eventually remove
-        m_water_splash = true;
-    }
-    else if (s == "bubble")
-    {
-        m_graphical_effect = GE_BUBBLE;
-    }
-    else if (s == "grass")
-    {
-        m_graphical_effect = GE_GRASS;
-        m_grass_speed = 1.5f;
-        m_grass_amplitude = 0.25f;
-        node->get("grass-speed", &m_grass_speed);
-        node->get("grass-amplitude", &m_grass_amplitude);
-    }
-    else if (s == "water_shader")
-    {
-        m_graphical_effect = GE_WATER_SHADER;
-        node->get("water-shader-speed-1", &m_water_shader_speed_1);
-        node->get("water-shader-speed-2", &m_water_shader_speed_2);
-    }
-    else if (s == "normal_map")
-    {
-        m_graphical_effect = GE_NORMAL_MAP;
-        node->get("normal-map",  &m_normal_map_tex);
-        node->get("normal-light-map", &m_normal_map_shader_lightmap);
-
-        // TODO: add support for parallax and height maps?
-        /*
-        else if (node->get("normal-heightmap",  &m_normal_map_tex))
+        if (s == "solid")
         {
-            m_is_heightmap = true;
-            m_normal_map = true;
+            m_shader_type = SHADERTYPE_SOLID;
         }
-        else if (node->get("parallax-map",  &m_normal_map_tex))
+        else if (s == "unlit")
         {
-            m_parallax_map = true;
-            m_parallax_height = 0.2f;
-            node->get("parallax-height", &m_parallax_height);
+            m_shader_type = SHADERTYPE_SOLID_UNLIT;
         }
-        else if (node->get("parallax-heightmap",  &m_normal_map_tex))
+        else if (s == "additive")
         {
-            m_is_heightmap = true;
-            m_parallax_map = true;
-            m_parallax_height = 0.2f;
-            node->get("parallax-height", &m_parallax_height);
+            m_shader_type = SHADERTYPE_ADDITIVE;
         }
-         */
-    }
-    else if (s == "spheremap")
-    {
-        m_graphical_effect = GE_SPHERE_MAP;
-    }
-    else if (s == "skybox")
-    {
-        m_graphical_effect = GE_SKYBOX;
-    }
-    else if (s == "splatting")
-    {
-        m_graphical_effect = GE_SPLATTING;
-        node->get("splatting-texture-1", &m_splatting_texture_1);
-        node->get("splatting-texture-2", &m_splatting_texture_2);
-        node->get("splatting-texture-3", &m_splatting_texture_3);
-        node->get("splatting-texture-4", &m_splatting_texture_4);
-    }
-    else if (s == "caustics")
-    {
-        m_graphical_effect = GE_CAUSTICS;
-    }
-    else if (s == "none")
-    {
-    }
-    else if (s != "")
-    {
-        Log::warn("material",
-                  "Invalid graphical effect specification: '%s' - ignored.",
-                  s.c_str());
-    }
-    else
-    {
-        m_graphical_effect = GE_NONE;
-    }
-
-
-    // BACKWARDS COMPATIBILITY, remove eventually
-    bool use_normal_map = false;
-    node->get("use-normal-map",  &use_normal_map);
-
-    if (use_normal_map)
-    {
-        if (node->get("normal-map",  &m_normal_map_tex))
+        else if (s == "alphatest")
         {
-            m_graphical_effect = GE_NORMAL_MAP;
+            m_shader_type = SHADERTYPE_ALPHA_TEST;
+        }
+        else if (s == "alphablend")
+        {
+            m_shader_type = SHADERTYPE_ALPHA_BLEND;
+        }
+        else if (s == "spheremap")
+        {
+            m_shader_type = SHADERTYPE_SPHERE_MAP;
+        }
+        else if (s == "water_shader")
+        {
+            m_shader_type = SHADERTYPE_WATER;
+            node->get("water-shader-speed-1", &m_water_shader_speed_1);
+            node->get("water-shader-speed-2", &m_water_shader_speed_2);
+        }
+        else if (s == "grass")
+        {
+            m_shader_type = SHADERTYPE_VEGETATION;
+            m_grass_speed = 1.5f;
+            m_grass_amplitude = 0.25f;
+            node->get("grass-speed", &m_grass_speed);
+            node->get("grass-amplitude", &m_grass_amplitude);
+        }
+        else if (s == "splatting")
+        {
+            m_shader_type = SHADERTYPE_SPLATTING;
+            node->get("splatting-texture-1", &m_splatting_texture_1);
+            node->get("splatting-texture-2", &m_splatting_texture_2);
+            node->get("splatting-texture-3", &m_splatting_texture_3);
+            node->get("splatting-texture-4", &m_splatting_texture_4);
+        }
+        else if (s == "bubble")
+        {
+            m_shader_type = SHADERTYPE_BUBBLE;
         }
         else
         {
-            Log::warn("material",
-                      "Could not find normal map image in materials.xml");
+            Log::warn("Material", "Unknown shader type <%s> for <%s>", s.c_str(), m_texname.c_str());
+        }
+    }
+    else
+    {
+        // BACKWARS COMPATIBILITY, EVENTUALLY REMOVE
+
+        bool b = false;
+        node->get("additive", &b);
+        if (b)
+            m_shader_type = SHADERTYPE_ADDITIVE;
+
+        b = false;
+        node->get("transparency", &b);
+        if (b)
+            m_shader_type = SHADERTYPE_ALPHA_TEST;
+
+        //node->get("lightmap", &m_lightmap);
+
+        b = false;
+        node->get("alpha", &b);
+        if (b)
+            m_shader_type = SHADERTYPE_ALPHA_BLEND;
+
+        b = true;
+        node->get("light", &b);
+        if (!b)
+            m_shader_type = SHADERTYPE_SOLID_UNLIT;
+
+        b = false;
+        node->get("smooth-reflection", &b);
+        if (b)
+            m_shader_type = SHADERTYPE_SPHERE_MAP;
+
+
+        if (node->get("compositing", &s))
+        {
+            if (s == "blend")         m_shader_type = SHADERTYPE_ALPHA_BLEND;
+            else if (s == "test")     m_shader_type = SHADERTYPE_ALPHA_TEST;
+            else if (s == "additive") m_shader_type = SHADERTYPE_ADDITIVE;
+            else if (s == "coverage") m_shader_type = SHADERTYPE_ALPHA_TEST;
+            else if (s != "none")
+                Log::warn("material", "Unknown compositing mode '%s'", s.c_str());
         }
 
-        node->get("normal-light-map", &m_normal_map_shader_lightmap);
+        s = "";
+        node->get("graphical-effect", &s);
+
+        if (s == "water")
+        {
+            m_water_splash = true;
+        }
+        else if (s == "bubble")
+        {
+            m_shader_type = SHADERTYPE_BUBBLE;
+        }
+        else if (s == "grass")
+        {
+            m_shader_type = SHADERTYPE_VEGETATION;
+            m_grass_speed = 1.5f;
+            m_grass_amplitude = 0.25f;
+            node->get("grass-speed", &m_grass_speed);
+            node->get("grass-amplitude", &m_grass_amplitude);
+        }
+        else if (s == "water_shader")
+        {
+            m_shader_type = SHADERTYPE_WATER;
+            node->get("water-shader-speed-1", &m_water_shader_speed_1);
+            node->get("water-shader-speed-2", &m_water_shader_speed_2);
+        }
+        else if (s == "normal_map")
+        {
+            m_shader_type = SHADERTYPE_SOLID;
+            node->get("normal-map", &m_normal_map_tex);
+        }
+        else if (s == "spheremap")
+        {
+            m_shader_type = SHADERTYPE_SPHERE_MAP;
+        }
+        else if (s == "splatting")
+        {
+            m_shader_type = SHADERTYPE_SPLATTING;
+            node->get("splatting-texture-1", &m_splatting_texture_1);
+            node->get("splatting-texture-2", &m_splatting_texture_2);
+            node->get("splatting-texture-3", &m_splatting_texture_3);
+            node->get("splatting-texture-4", &m_splatting_texture_4);
+        }
+        else if (s == "none")
+        {
+        }
+        else if (s != "")
+        {
+            Log::warn("material",
+                "Invalid graphical effect specification: '%s' - ignored.",
+                s.c_str());
+        }
+
+        bool use_normal_map = false;
+        node->get("use-normal-map", &use_normal_map);
+
+        if (use_normal_map)
+        {
+            if (node->get("normal-map", &m_normal_map_tex))
+            {
+                //m_graphical_effect = GE_NORMAL_MAP;
+            }
+            else
+            {
+                Log::warn("material",
+                    "Could not find normal map image in materials.xml");
+            }
+        }
+
+        bool sphere_map = false;
+        node->get("sphere", &sphere_map);
+        if (sphere_map)
+        {
+            m_shader_type = SHADERTYPE_SPHERE_MAP;
+        }
+
+        bool water_shader = false;
+        node->get("water-shader", &water_shader);
+        if (water_shader)
+        {
+            m_shader_type = SHADERTYPE_WATER;
+            node->get("water-shader-speed-1", &m_water_shader_speed_1);
+            node->get("water-shader-speed-2", &m_water_shader_speed_2);
+        }
+
+        // ---- End backwards compatibility
     }
 
-
-    // BACKWARDS COMPATIBILITY, remove eventually
-    bool sphere_map = false;
-    node->get("sphere",           &sphere_map          );
-    if (sphere_map)
+    if (m_disable_z_write && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
     {
-        m_graphical_effect = GE_SPHERE_MAP;
-    }
-
-
-    if (node->get("compositing", &s))
-    {
-        if      (s == "blend")    m_alpha_blending = true;
-        else if (s == "test")     m_alpha_testing = true;
-        else if (s == "additive") m_add = true;
-        // backwards compatibility only, no longer supported
-        else if (s == "coverage") m_alpha_testing = true;
-        else if (s != "none")
-            Log::warn("material", "Unknown compositing mode '%s'",
-                      s.c_str());
-    }
-
-    if (m_disable_z_write && !m_alpha_blending && !m_add)
-    {
-        Log::warn("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive (for %s)", m_texname.c_str());
+        Log::debug("material", "Disabling writes to z buffer only makes sense when compositing is blending or additive (for %s)", m_texname.c_str());
         m_disable_z_write = false;
-    }
-
-    bool water_shader = false;
-    node->get("water-shader", &water_shader);
-    if (water_shader)
-    {
-        // BACKWARDS COMPATIBILITY, eventually remove
-        m_graphical_effect = GE_WATER_SHADER;
-        node->get("water-shader-speed-1", &m_water_shader_speed_1);
-        node->get("water-shader-speed-2", &m_water_shader_speed_2);
     }
 
     // Terrain-specifc sound effect
@@ -376,14 +417,10 @@ void Material::init(unsigned int index)
 {
     m_index                     = index;
     m_clamp_tex                 = 0;
-    m_alpha_testing             = false;
-    m_lightmap                  = false;
-    m_additive_lightmap         = false;
-    m_adjust_image              = ADJ_NONE;
-    m_alpha_blending            = false;
-    m_lighting                  = true;
+    m_shader_type               = SHADERTYPE_SOLID;
+    //m_lightmap                  = false;
+    //m_adjust_image              = ADJ_NONE;
     m_backface_culling          = true;
-    m_smooth_reflection_shader  = false;
     m_high_tire_adhesion        = false;
     m_below_surface             = false;
     m_falling_effect            = false;
@@ -391,7 +428,6 @@ void Material::init(unsigned int index)
     m_ignore                    = false;
     m_drive_reset               = false;
     m_collision_reaction        = NORMAL;
-    m_add                       = false;
     m_disable_z_write           = false;
     m_water_shader_speed_1      = 6.6667f;
     m_water_shader_speed_2      = 4.0f;
@@ -403,7 +439,6 @@ void Material::init(unsigned int index)
     m_sfx_max_speed             = 30;
     m_sfx_min_pitch             = 1.0f;
     m_sfx_max_pitch             = 1.0f;
-    m_graphical_effect          = GE_NONE;
     m_zipper                    = false;
     m_zipper_duration           = -1.0f;
     m_zipper_fade_out_time      = -1.0f;
@@ -411,8 +446,6 @@ void Material::init(unsigned int index)
     m_zipper_speed_gain         = -1.0f;
     m_zipper_engine_force       = -1.0f;
     m_zipper_min_speed          = -1.0f;
-    m_parallax_map              = false;
-    m_is_heightmap              = false;
     m_water_splash              = false;
     m_is_jump_texture           = false;
     m_has_gravity               = false;
@@ -438,8 +471,8 @@ void Material::install(bool is_full_path, bool complain_if_not_found)
     else
     {
         m_texture = irr_driver->getTexture(full_path,
-                                           isPreMul(),
-                                           isPreDiv(),
+                                           false, //isPreMul(),
+                                           false, //isPreDiv(),
                                            complain_if_not_found);
     }
 
@@ -659,36 +692,40 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     }
 
 
-    int modes = 0;
-
-    if (!m_lighting && irr_driver->isGLSL() && !m_alpha_blending && !m_add)
+    if (m_shader_type == SHADERTYPE_SOLID_UNLIT)
     {
-        m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
-        modes++;
+        if (irr_driver->isGLSL())
+        {
+            m->MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
+        }
+        else
+        {
+            m->AmbientColor = video::SColor(255, 255, 255, 255);
+            m->DiffuseColor = video::SColor(255, 255, 255, 255);
+            m->EmissiveColor = video::SColor(255, 255, 255, 255);
+            m->SpecularColor = video::SColor(255, 255, 255, 255);
+        }
     }
 
-    if (m_alpha_testing)
+    if (m_shader_type == SHADERTYPE_ALPHA_TEST)
     {
         m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
-        modes++;
     }
-    if (m_alpha_blending)
-    {
-        //m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
 
-        // EMT_TRANSPARENT_ALPHA_CHANNEL does include vertex color alpha into
+    if (m_shader_type == SHADERTYPE_ALPHA_BLEND)
+    {
+        // EMT_TRANSPARENT_ALPHA_CHANNEL doesn't include vertex color alpha into
         // account, which messes up fading in/out effects. So we use the more
         // customizable EMT_ONETEXTURE_BLEND instead.
-        m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
+        m->MaterialType = video::EMT_ONETEXTURE_BLEND;
         m->MaterialTypeParam =
             pack_textureBlendFunc(video::EBF_SRC_ALPHA,
                                   video::EBF_ONE_MINUS_SRC_ALPHA,
                                   video::EMFN_MODULATE_1X,
                                   video::EAS_TEXTURE | video::EAS_VERTEX_COLOR);
-
-        modes++;
     }
-    if (m_smooth_reflection_shader)
+
+    if (m_shader_type == SHADERTYPE_SPHERE_MAP)
     {
         if (irr_driver->isGLSL())
         {
@@ -697,58 +734,17 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         else
         {
             m->MaterialType = video::EMT_SPHERE_MAP;
-
-            // sphere map + alpha blending is a supported combination so in
-            // this case don't increase mode count
-            if (m_alpha_blending)
-            {
-                m->BlendOperation = video::EBO_ADD;
-            }
-            else
-            {
-                modes++;
-            }
-        }
-    }
-    if (m_graphical_effect == GE_SPHERE_MAP)
-    {
-        if (irr_driver->isGLSL())
-        {
-            m->MaterialType = irr_driver->getShader(ES_SPHERE_MAP);
-        }
-        else
-        {
-            m->MaterialType = video::EMT_SPHERE_MAP;
-
-            // sphere map + alpha blending is a supported combination so in
-            // this case don't increase mode count
-            if (m_alpha_blending)
-            {
-                m->BlendOperation = video::EBO_ADD;
-            }
-            else
-            {
-                modes++;
-            }
         }
     }
 
-    if (m_lightmap)
-    {
-        m->MaterialType = video::EMT_LIGHTMAP;
-        modes++;
-    }
-    if (m_additive_lightmap)
-    {
-        m->MaterialType = video::EMT_LIGHTMAP_ADD;
-        modes++;
-    }
+    //if (m_lightmap)
+    //{
+    //    m->MaterialType = video::EMT_LIGHTMAP;
+    //}
 
-    if (m_add)
+    if (m_shader_type == SHADERTYPE_ADDITIVE)
     {
-        //m->MaterialType = video::EMT_TRANSPARENT_ADD_COLOR;
-
-        // EMT_TRANSPARENT_ADD_COLOR does include vertex color alpha into
+        // EMT_TRANSPARENT_ADD_COLOR doesn't include vertex color alpha into
         // account, which messes up fading in/out effects. So we use the
         // more customizable EMT_ONETEXTURE_BLEND instead
         m->MaterialType = video::EMT_ONETEXTURE_BLEND ;
@@ -757,39 +753,39 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                                                     video::EMFN_MODULATE_1X,
                                                     video::EAS_TEXTURE |
                                                       video::EAS_VERTEX_COLOR);
-        modes++;
     }
-    if (m_graphical_effect == GE_NORMAL_MAP)
+
+    if (m_shader_type == SHADERTYPE_SOLID && m_normal_map_tex.size() > 0)
     {
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (irr_driver->isGLSL())
         {
 
             if (mb->getVertexType() != video::EVT_TANGENTS)
-                Log::error("material", "Requiring normal map without tangent enabled mesh");
-            ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
-            if (m_is_heightmap)
             {
-                video_driver->makeNormalMapTexture( tex );
+                Log::warn("material", "Requiring normal map without tangent enabled mesh for <%s>",
+                    m_texname.c_str());
             }
-            m->setTexture(1, tex);
-
-            bool with_lightmap = false;
-
-            if (m_normal_map_shader_lightmap.size() > 0)
+            else
             {
-                ITexture* lm_tex = irr_driver->getTexture(m_normal_map_shader_lightmap);
-                m->setTexture(2, lm_tex);
-                with_lightmap = true;
+                ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
+                m->setTexture(1, tex);
+
+                bool with_lightmap = false;
+
+                //if (m_normal_map_shader_lightmap.size() > 0)
+                //{
+                //    ITexture* lm_tex = irr_driver->getTexture(m_normal_map_shader_lightmap);
+                //    m->setTexture(2, lm_tex);
+                //    with_lightmap = true;
+                //}
+
+                // Material and shaders
+                m->MaterialType = irr_driver->getShader(
+                    with_lightmap ? ES_NORMAL_MAP_LIGHTMAP : ES_NORMAL_MAP);
+                m->Lighting = false;
+                m->ZWriteEnable = true;
             }
-
-            // Material and shaders
-            m->MaterialType = irr_driver->getShader(
-                                 with_lightmap ? ES_NORMAL_MAP_LIGHTMAP : ES_NORMAL_MAP );
-            m->Lighting = false;
-            m->ZWriteEnable = true;
-
-            modes++;
         }
         else
         {
@@ -797,29 +793,30 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
             m->setTexture(1, NULL);
         }
     }
-    if (m_parallax_map)
-    {
-        video::ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
-        if (m_is_heightmap)
-        {
-            irr_driver->getVideoDriver()->makeNormalMapTexture( tex );
-        }
-        m->setTexture(1, tex);
-        m->MaterialType = video::EMT_PARALLAX_MAP_SOLID;
-        m->MaterialTypeParam = m_parallax_height;
-        m->SpecularColor.set(0,0,0,0);
-        modes++;
-    }
+    //if (m_parallax_map)
+    //{
+    //    video::ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
+    //    if (m_is_heightmap)
+    //    {
+    //        irr_driver->getVideoDriver()->makeNormalMapTexture( tex );
+    //    }
+    //    m->setTexture(1, tex);
+    //    m->MaterialType = video::EMT_PARALLAX_MAP_SOLID;
+    //    m->MaterialTypeParam = m_parallax_height;
+    //    m->SpecularColor.set(0,0,0,0);
+    //    modes++;
+    //}
     
-    if(m_graphical_effect == GE_SKYBOX && irr_driver->isGLSL())
-    {
-        ITexture* tex = irr_driver->getTexture("cloud_mask.png");
-        m->setTexture(1, tex);
+    //if(m_graphical_effect == GE_SKYBOX && irr_driver->isGLSL())
+    //{
+    //    ITexture* tex = irr_driver->getTexture("cloud_mask.png");
+    //    m->setTexture(1, tex);
+    //
+    //    
+    //    m->MaterialType = irr_driver->getShader(ES_SKYBOX);
+    //}
 
-        
-        m->MaterialType = irr_driver->getShader(ES_SKYBOX);
-    }
-    if (m_graphical_effect == GE_SPLATTING)
+    if (m_shader_type == SHADERTYPE_SPLATTING)
     {
         if (irr_driver->supportsSplatting())
         {
@@ -846,19 +843,12 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
             // Material and shaders
             m->MaterialType = irr_driver->getShader(ES_SPLATTING);
-            }
-            else
-            {
-            m->MaterialType = video::EMT_SOLID;
-            }
         }
-    if (m_graphical_effect == GE_CAUSTICS && irr_driver->isGLSL())
+        else
         {
-        m->MaterialType = irr_driver->getShader(ES_CAUSTICS);
-
-        m->setTexture(1, irr_driver->getTexture(FileManager::SHADER,
-                                                "caustics.png"));
+            m->MaterialType = video::EMT_SOLID;
         }
+    }
 
 
     // Modify lightmap materials so that vertex colors are taken into account.
@@ -873,7 +863,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
 
-    if (m_graphical_effect == GE_BUBBLE && mb != NULL)
+    if (m_shader_type == SHADERTYPE_BUBBLE && mb != NULL)
     {
         if (irr_driver->isGLSL())
         {
@@ -883,18 +873,11 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
             m->MaterialType = irr_driver->getShader(ES_BUBBLES);
             m->BlendOperation = video::EBO_ADD;
-
-            // alpha blending and bubble shading can work together so when both are enabled
-            // don't increment the 'modes' counter to not get the 'too many modes' warning
-            if (!m_alpha_blending)
-            {
-                modes++;
-            }
         }
     }
 
 
-    if (m_graphical_effect == GE_WATER_SHADER)
+    if (m_shader_type == SHADERTYPE_WATER)
     {
         if (irr_driver->isGLSL())
         {
@@ -908,10 +891,9 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
             m->MaterialType = irr_driver->getShader(ES_WATER);
         }
-        modes++;
     }
 
-    if (m_graphical_effect == GE_GRASS)
+    if (m_shader_type == SHADERTYPE_VEGETATION)
     {
         if (UserConfigParams::m_weather_effects &&
             irr_driver->isGLSL())
@@ -923,36 +905,25 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
                 setAmplitude(m_grass_amplitude);
 
             // Material and shaders
-            if (m_alpha_testing)
-            {
+            //if (m_alpha_testing)
+            //{
                 m->MaterialType = irr_driver->getShader(ES_GRASS_REF);
-            }
-            else {
-                m->MaterialType = irr_driver->getShader(ES_GRASS);
-                m->BlendOperation = video::EBO_ADD;
-            }
-
+            //}
+            //else
+            //{
+            //    m->MaterialType = irr_driver->getShader(ES_GRASS);
+            //    m->BlendOperation = video::EBO_ADD;
+            //}
         }
-    }
-
-    if (modes > 1)
-    {
-        std::cerr << "[Material::setMaterialProperties] More than one main "
-                     "mode set for " << m_texname.c_str() << "\n";
+        else
+        {
+            m->MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+        }
     }
 
     if (m_disable_z_write)
     {
         m->ZWriteEnable = false;
-    }
-
-    if (!m_lighting)
-    {
-        //m->setFlag( video::EMF_LIGHTING, false );
-        m->AmbientColor  = video::SColor(255, 255, 255, 255);
-        m->DiffuseColor  = video::SColor(255, 255, 255, 255);
-        m->EmissiveColor = video::SColor(255, 255, 255, 255);
-        m->SpecularColor = video::SColor(255, 255, 255, 255);
     }
 
 #ifdef DEBUG
@@ -1031,7 +1002,7 @@ void Material::adjustForFog(scene::ISceneNode* parent, video::SMaterial *m,
         // to disable fog in the new pipeline, we slightly abuse the steps :
         // moving an object into the transparent pass will make it rendered
         // above fog and thus unaffected by it
-        if (use_fog && !m_fog && !m_alpha_blending && !m_add)
+        if (use_fog && !m_fog && m_shader_type != SHADERTYPE_ALPHA_BLEND && m_shader_type != SHADERTYPE_ADDITIVE)
         {
             m->ZWriteEnable = true;
             m->MaterialType = video::EMT_ONETEXTURE_BLEND;

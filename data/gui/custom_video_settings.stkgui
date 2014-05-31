@@ -16,7 +16,7 @@
     <spacer height="4" width="10" />
     -->
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <checkbox id="dynamiclight"/>
         <spacer width="10" height="10"/>
         <label text="Advanced pipeline (lights, etc.)" I18N="Video settings"/>
@@ -24,7 +24,7 @@
     
     <spacer height="4" width="10" />
 
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <spacer width="70" height="10" />
         <label text="Shadows" I18N="Video settings"/>
         <spacer width="10" height="10"/>
@@ -33,7 +33,7 @@
     
     <spacer height="4" width="10" />
 
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <spacer width="70" height="10"/>
         
         <div layout="horizontal-row" proportion="1" height="fit">
@@ -53,16 +53,27 @@
     
     <spacer height="4" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <spacer width="70" height="10"/>
-        <checkbox id="ssao"/>
-        <spacer width="10" height="10"/>
-        <label text="Ambient Occlusion" I18N="Video settings"/>
+        
+        <div layout="horizontal-row" proportion="1" height="fit">
+            <checkbox id="ssao"/>
+            <spacer width="10" height="10"/>
+            <label text="Ambient Occlusion" I18N="Video settings"/>
+        </div>
+        
+        <spacer height="4" width="10" />
+        
+        <div layout="horizontal-row" proportion="1" height="fit">
+            <checkbox id="global_illumination"/>
+            <spacer width="10" height="10"/>
+            <label text="Global illumination" I18N="Video settings"/>
+        </div>
     </div>
     
     <spacer height="20" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <div layout="horizontal-row" proportion="1" height="fit">
             <checkbox id="motionblur"/>
             <spacer width="10" height="10"/>
@@ -80,7 +91,7 @@
     
     <spacer height="4" width="10" />
 
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <div layout="horizontal-row" proportion="1" height="fit">
             <checkbox id="glow"/>
             <spacer width="10" height="10"/>
@@ -98,7 +109,7 @@
     
     <spacer height="4" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <div layout="horizontal-row" proportion="1" height="fit">
             <checkbox id="weather_gfx"/>
             <spacer width="10" height="10"/>
@@ -116,7 +127,7 @@
     
     <spacer height="4" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <div layout="horizontal-row" proportion="1" height="fit">
             <checkbox id="ubo"/>
             <spacer width="10" height="10"/>
@@ -134,7 +145,7 @@
 	
     <spacer height="4" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <div layout="horizontal-row" proportion="1" height="fit">
             <checkbox id="hd-textures"/>
             <spacer width="10" height="10"/>
@@ -153,7 +164,7 @@
     
     <spacer height="20" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <label text="Animated Characters" I18N="Video settings" width="40%"/>
         <spacer width="10" height="10"/>
         <gauge id="steering_animations" min_value="0" max_value="2" width="50%" />
@@ -161,7 +172,7 @@
     
     <spacer height="4" width="10" />
     
-    <div layout="horizontal-row" width="100%" height="fit">
+    <div layout="horizontal-row" width="100%" proportion="1">
         <label text="Texture filtering" I18N="Video settings" width="40%"/>
         <spacer width="10" height="10"/>
         <gauge id="filtering" min_value="0" max_value="5" width="50%" />

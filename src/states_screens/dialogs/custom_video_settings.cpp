@@ -87,6 +87,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
+    getWidget<CheckBoxWidget>("global_illumination")->setState(UserConfigParams::m_gi);
     getWidget<CheckBoxWidget>("motionblur")->setState(UserConfigParams::m_motionblur);
     getWidget<CheckBoxWidget>("mlaa")->setState(UserConfigParams::m_mlaa);
     getWidget<CheckBoxWidget>("glow")->setState(UserConfigParams::m_glow);
@@ -138,6 +139,9 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_light_shaft =
             getWidget<CheckBoxWidget>("lightshaft")->getState();
+
+        UserConfigParams::m_gi =
+            getWidget<CheckBoxWidget>("global_illumination")->getState();
 
         UserConfigParams::m_glow =
             getWidget<CheckBoxWidget>("glow")->getState();

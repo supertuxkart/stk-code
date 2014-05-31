@@ -1,13 +1,13 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
 uniform float spec;
-uniform vec2 screen;
 
 #ifdef UBO_DISABLED
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 InverseViewMatrix;
 uniform mat4 InverseProjectionMatrix;
+uniform vec2 screen;
 #else
 layout (std140) uniform MatrixesData
 {
@@ -16,12 +16,14 @@ layout (std140) uniform MatrixesData
     mat4 InverseViewMatrix;
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
 };
 #endif
 
 flat in vec3 center;
 flat in float energy;
 flat in vec3 col;
+flat in float radius;
 
 out vec4 Diffuse;
 out vec4 Specular;
@@ -46,8 +48,7 @@ void main()
     vec3 light_col = col.xyz;
     float d = distance(light_pos, xpos.xyz);
     float att = energy * 20. / (1. + d * d);
-    float max_d = 5. * energy;
-    att *= (max_d - d) / max_d;
+    att *= (radius - d) / radius;
     if (att <= 0.) discard;
 
     // Light Direction

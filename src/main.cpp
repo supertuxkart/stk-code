@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
@@ -187,9 +188,10 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
-#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -383,6 +385,43 @@ void handleXmasMode()
     if(xmas)
         kart_properties_manager->setHatMeshName("christmas_hat.b3d");
 }   // handleXmasMode
+// ============================================================================
+/** This function sets up all data structure for an immediate race start.
+ *  It is used when the -N or -R command line options are used.
+ */
+void setupRaceStart()
+{
+    // Skip the start screen. This esp. means that no login screen is
+    // displayed (if necessary), so we have to make sure there is
+    // a current player
+    PlayerManager::get()->enforceCurrentPlayer();
+
+    InputDevice *device;
+
+    // Use keyboard 0 by default in --no-start-screen
+    device = input_manager->getDeviceList()->getKeyboard(0);
+
+    // Create player and associate player with keyboard
+    StateManager::get()->createActivePlayer(
+        PlayerManager::get()->getPlayer(0), device, NULL);
+
+    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+    {
+        Log::warn("main", "Kart '%s' is unknown so will use the "
+            "default kart.",
+            UserConfigParams::m_default_kart.c_str());
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
+    }
+    else
+    {
+        // Set up race manager appropriately
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    }
+
+    // ASSIGN should make sure that only input from assigned devices
+    // is read.
+    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+}   // setupRaceMode
 
 // ----------------------------------------------------------------------------
 /** Prints help for command line options to stdout.
@@ -856,7 +895,7 @@ int handleCmdLine()
         }
     }   // --laps
 
-    if(CommandLine::has("--profile-laps=",  &n))
+    if(CommandLine::has("--profile-laps",  &n))
     {
         if (n < 0)
         {
@@ -962,8 +1001,7 @@ int handleCmdLine()
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
-                PlayerManager::requestSignIn(login, password, false, false);
-        request->executeNow();
+                PlayerManager::requestSignIn(login, password);
 
         if (request->isSuccess())
         {
@@ -1145,11 +1183,6 @@ int main(int argc, char *argv[] )
 
         initRest();
 
-        // Windows 32 always redirects output
-#ifndef WIN32
-        file_manager->redirectOutput();
-#endif
-
         input_manager = new InputManager ();
 
 #ifdef ENABLE_WIIUSE
@@ -1250,7 +1283,24 @@ int main(int argc, char *argv[] )
 
         if(!UserConfigParams::m_no_start_screen)
         {
-            StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
+            // If there is a current player, it was saved in the config file,
+            // so we immediately start the main menu (unless it was requested
+            // to always show the login screen). Otherwise show the login
+            // screen first.
+            if(PlayerManager::getCurrentPlayer() && !
+                UserConfigParams::m_always_show_login_screen)
+            {
+                StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            }
+            else
+            {
+                StateManager::get()->pushScreen(UserScreen::getInstance());
+                // If there is no player, push the RegisterScreen on top of
+                // the login screen. This way on first start players are
+                // forced to create a player.
+                if(PlayerManager::get()->getNumPlayers()==0)
+                    StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())
@@ -1262,37 +1312,7 @@ int main(int argc, char *argv[] )
         }
         else
         {
-            // Skip the start screen. This esp. means that no login screen is
-            // displayed (if necessary), so we have to make sure there is
-            // a current player
-            PlayerManager::get()->enforceCurrentPlayer();
-            
-            InputDevice *device;
-
-            // Use keyboard 0 by default in --no-start-screen
-            device = input_manager->getDeviceList()->getKeyboard(0);
-
-            // Create player and associate player with keyboard
-            StateManager::get()->createActivePlayer(
-                         PlayerManager::get()->getPlayer(0), device, NULL);
-
-            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-            {
-                Log::warn("main", "Kart '%s' is unknown so will use the "
-                          "default kart.",
-                          UserConfigParams::m_default_kart.c_str());
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
-            }
-            else
-            {
-                // Set up race manager appropriately
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-            }
-
-            // ASSIGN should make sure that only input from assigned devices
-            // is read.
-            input_manager->getDeviceList()->setAssignMode(ASSIGN);
-
+            setupRaceStart();
             // Go straight to the race
             StateManager::get()->enterGameState();
         }

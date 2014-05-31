@@ -6,8 +6,17 @@ uniform float endH;
 uniform float start;
 uniform float end;
 uniform vec3 col;
-uniform mat4 ipvmat;
-uniform vec2 screen;
+
+
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 
 #if __VERSION__ >= 130
 in vec2 uv;
@@ -26,7 +35,7 @@ void main()
 	tmp = 2. * tmp - 1.;
 
 	vec4 xpos = vec4(tmp, 1.0);
-	xpos = ipvmat * xpos;
+	xpos = InverseProjectionMatrix * xpos;
 	xpos.xyz /= xpos.w;
 
 	float dist = length(xpos.xyz);

@@ -21,13 +21,12 @@
 #include "achievements/achievements_manager.hpp"
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
+#include "karts/kart_properties.hpp"
+#include "karts/kart_properties_manager.hpp"
 #include "online/online_player_profile.hpp"
 #include "io/xml_node.hpp"
 #include "io/utf_writer.hpp"
 #include "utils/string_utils.hpp"
-
-#include <sstream>
-#include <stdlib.h>
 
 //------------------------------------------------------------------------------
 /** Constructor to create a new player that didn't exist before.
@@ -43,13 +42,12 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
     m_is_guest_account    = is_guest;
     m_use_frequency       = is_guest ? -1 : 0;
     m_unique_id           = PlayerManager::get()->getUniqueId();
-    m_is_default          = false;
-    m_is_default          = false;
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
-    m_achievements_status = NULL;
-    m_story_mode_status   = NULL;
+    m_last_online_name    = "";
+    m_last_was_online     = false;
+    initRemainingData();
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -59,11 +57,12 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
  *  that the achievement and story mode data depends on other data to be
  *  read first (challenges and achievement files), which in turn can only be
  *  created later in the startup process (they depend on e.g. all tracks to
- *  be known). On the other hand, automatic login needs to happen asap
- *  (i.e. as soon as the network thread is started), which needs the main
- *  player data (i.e. the default player, and saved session data). So the
- *  constructor only reads this data, the rest of the player data is handled
- *  in loadRemainingData later in the initialisation process.
+ *  be known). On the other hand, automatic login needs to happen asap (i.e.
+ *  as soon as the network thread is started) to avoid the player having to
+ *  wait for the login to finish , which needs the main player data (i.e.
+ *  the default player, and saved session data). So the constructor only
+ *  reads this data, the rest of the player data is handled in 
+ *  loadRemainingData later in the initialisation process.
  *  \param node The XML node representing this player.
 */
 PlayerProfile::PlayerProfile(const XMLNode* node)
@@ -71,21 +70,27 @@ PlayerProfile::PlayerProfile(const XMLNode* node)
     m_saved_session       = false;
     m_saved_token         = "";
     m_saved_user_id       = 0;
+    m_last_online_name    = "";
+    m_last_was_online     = false;
     m_story_mode_status   = NULL;
     m_achievements_status = NULL;
+    m_icon_filename       = "";
 
-    node->get("name",          &m_local_name      );
-    node->get("guest",         &m_is_guest_account);
-    node->get("use-frequency", &m_use_frequency   );
-    node->get("unique-id",     &m_unique_id       );
-    node->get("is-default",    &m_is_default      );
-    node->get("saved-session", &m_saved_session   );
-    node->get("saved-user",    &m_saved_user_id   );
-    node->get("saved-token",   &m_saved_token     );
+    node->get("name",             &m_local_name      );
+    node->get("guest",            &m_is_guest_account);
+    node->get("use-frequency",    &m_use_frequency   );
+    node->get("unique-id",        &m_unique_id       );
+    node->get("saved-session",    &m_saved_session   );
+    node->get("saved-user",       &m_saved_user_id   );
+    node->get("saved-token",      &m_saved_token     );
+    node->get("last-online-name", &m_last_online_name);
+    node->get("last-was-online",  &m_last_was_online );
+    node->get("icon-filename",    &m_icon_filename   );
 
     #ifdef DEBUG
     m_magic_number = 0xABCD1234;
     #endif
+    
 }   // PlayerProfile
 
 //------------------------------------------------------------------------------
@@ -110,6 +115,8 @@ void PlayerProfile::loadRemainingData(const XMLNode *node)
     const XMLNode *xml_achievements = node->getNode("achievements");
     m_achievements_status = AchievementsManager::get()
                           ->createAchievementsStatus(xml_achievements);
+    // Fix up any potentially missing icons.
+    addIcon();
 }   // initRemainingData
 
 //------------------------------------------------------------------------------
@@ -121,8 +128,63 @@ void PlayerProfile::initRemainingData()
     m_story_mode_status = unlock_manager->createStoryModeStatus();
     m_achievements_status =
         AchievementsManager::get()->createAchievementsStatus();
-
+    addIcon();
 }   // initRemainingData
+
+//------------------------------------------------------------------------------
+/** Creates an icon for a player if non exist so far. It takes the unique
+ *  player id modulo the number of karts to pick an icon from the karts. It
+ *  then uses the unique number plus the extentsion of the original icon as the
+ *  file name (it's not possible to use the player name, since the name is in
+ *  utf-16, but typically the file systems are not, resulting in incorrect file
+ *  names). The icon is then copied to the user config directory, so that it
+ *  can be replaced by an icon made by the user.
+ *  If there should be an error copying the file, the icon filename is set
+ *  to "". Every time stk is started, it will try to fix missing icons
+ *  (which allows it to start from old/incompatible config files).
+ *  \pre This function must only be called after all karts are read in.
+ */
+void PlayerProfile::addIcon()
+{
+    if (m_icon_filename.size() > 0)
+        return;
+
+    int n = m_unique_id % kart_properties_manager->getNumberOfKarts();
+    std::string source = kart_properties_manager->getKartById(n)
+                                                ->getAbsoluteIconFile();
+    // Create the filename for the icon of this player: the unique id
+    // followed by .png or .jpg.
+    std::ostringstream out;
+    out << m_unique_id <<"."<<StringUtils::getExtension(source);
+    if(file_manager->copyFile(source, 
+                               file_manager->getUserConfigFile(out.str())) )
+    {
+        m_icon_filename = out.str();
+    }
+    else
+    {
+        m_icon_filename = "";
+    }
+}   // addIcon
+
+//------------------------------------------------------------------------------
+/** Returns the name of the icon file for this player. If the player icon
+ *  file is undefined, it returns a "?" mark texture. Note, getAsset does
+ *  not return a reference, but only a temporary string. So we must return a
+ *  copy of the string (not a reference to).
+ */ 
+const std::string PlayerProfile::getIconFilename() const
+{
+    // If the icon file is undefined or does not exist, return the "?" icon
+    if(m_icon_filename.size()==0 ||
+       !file_manager->fileExists(file_manager->getUserConfigFile(m_icon_filename)))
+    {
+        return file_manager->getAsset(FileManager::GUI, "main_help.png");
+    }
+
+    return file_manager->getUserConfigFile(m_icon_filename);
+}   // getIconFilename
+
 //------------------------------------------------------------------------------
 /** Writes the data for this player to the specified UTFWriter.
  *  \param out The utf writer to write the data to.
@@ -133,13 +195,15 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" guest=\""         << m_is_guest_account
         << L"\" use-frequency=\"" << m_use_frequency << L"\"\n";
 
-    out << L"            is-default=\"" << m_is_default
-        << L"\" unique-id=\""           << m_unique_id
+    out << L"            icon-filename=\"" << m_icon_filename <<L"\"\n";
+
+    out << L"            unique-id=\""  << m_unique_id
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";
 
     out << L"            saved-user=\"" << m_saved_user_id 
-        << L"\" saved-token=\""         << m_saved_token << L"\">\n";
-
+        << L"\" saved-token=\""         << m_saved_token << L"\"\n";
+    out << L"            last-online-name=\"" << m_last_online_name
+        << L"\" last-was-online=\""           << m_last_was_online<< L"\">\n";
     {
         if(m_story_mode_status)
             m_story_mode_status->save(out);
@@ -200,13 +264,6 @@ bool PlayerProfile::operator<(const PlayerProfile &other)
 {
     return m_use_frequency < other.m_use_frequency;
 }   // operator<
-
-// -----------------------------------------------------------------------------
-/** \brief Needed for toggling sort order **/
-bool PlayerProfile::operator>(const PlayerProfile &other)
-{
-    return m_use_frequency > other.m_use_frequency;
-}   // operator>
 
 // -----------------------------------------------------------------------------
 
