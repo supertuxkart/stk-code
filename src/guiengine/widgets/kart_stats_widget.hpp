@@ -38,6 +38,7 @@ namespace GUIEngine
       * \ingroup widgetsgroup
       */
 
+
 class KartStatsWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to
@@ -52,13 +53,20 @@ class KartStatsWidget : public Widget
         int m_skill_bar_x, m_skill_bar_y, m_skill_bar_h, m_skill_bar_w;
         
         int m_player_id;
-        SkillLevelWidget* m_mass_bar;
-        SkillLevelWidget* m_speed_bar;
-        SkillLevelWidget* m_accel_bar;
+
+        std::vector<SkillLevelWidget*> m_skills;
 
 
     public:
         
+        enum Stats
+        {
+            SKILL_MASS,
+            SKILL_SPEED,
+            SKILL_ACCEL,
+            SKILL_COUNT
+        };
+
         LEAK_CHECK()
         
         KartStatsWidget(core::recti area, const int player_id,
@@ -85,14 +93,10 @@ class KartStatsWidget : public Widget
         void setSize(const int x, const int y, const int w, const int h);
 
         /** Change the value of the widget, it must be a percent. */
-        void setMass(int value);
-        void setAcceleration(int value);
-        void setSpeed(int value);
+        void setValue(Stats type, int value);
         
         /** Get the current values of the widget. */
-        int getMass() {return m_mass_bar->getValue(); };
-        int getAcceleration() {return m_accel_bar->getValue(); };
-        int getSpeed() {return m_speed_bar->getValue(); };
+        int getValue(Stats type);
     };
 }
 

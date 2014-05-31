@@ -346,11 +346,6 @@ public:
 
     // -------------------------------------------------------------------------
 
-    /** Set the kart stats for this player */
-    void setKartStats(const std::string& selection);
-
-    // -------------------------------------------------------------------------
-
     /** Sets which kart was selected for this player */
     void setKartInternalName(const std::string& whichKart);
 

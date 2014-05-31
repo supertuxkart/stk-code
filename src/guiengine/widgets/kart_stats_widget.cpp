@@ -80,37 +80,42 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
     irr::core::recti massArea(m_skill_bar_x, m_skill_bar_y,
                               m_skill_bar_x + m_skill_bar_w,
                               m_skill_bar_y + m_skill_bar_h);
-    m_mass_bar = NULL;
+    SkillLevelWidget* skill_bar = NULL;
 
-    m_mass_bar = new SkillLevelWidget(massArea, m_player_id,
+    skill_bar = new SkillLevelWidget(massArea, m_player_id,
                                       (int) props->getMass()/10, "Weight");
-    m_mass_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
+    skill_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
+
+    m_skills.push_back(skill_bar);
+    m_children.push_back(skill_bar);
 
     // ---- Speed skill level widget
     irr::core::recti speedArea(m_skill_bar_x, m_skill_bar_y - m_skill_bar_h - 10,
                                m_skill_bar_x + m_skill_bar_w,
                                m_skill_bar_y + 10);
 
-    m_speed_bar = NULL;
+    skill_bar = NULL;
 
-    m_speed_bar = new SkillLevelWidget(speedArea, m_player_id,
+    skill_bar = new SkillLevelWidget(speedArea, m_player_id,
                                        (int) props->getMaxSpeed()/10, "Speed");
-    m_speed_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
+    skill_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
+
+    m_skills.push_back(skill_bar);
+    m_children.push_back(skill_bar);
 
     // ---- Acceleration skill level widget
     irr::core::recti accelArea(m_skill_bar_x, m_skill_bar_y + m_skill_bar_h + 10,
                                m_skill_bar_x + m_skill_bar_w,
                                m_skill_bar_y + 2*m_skill_bar_y + 10);
 
-    m_accel_bar = NULL;
+    skill_bar = NULL;
 
-    m_accel_bar = new SkillLevelWidget(accelArea, m_player_id,
+    skill_bar = new SkillLevelWidget(accelArea, m_player_id,
                                        (int) props->getTrackConnectionAccel()/10, "Accel");
-    m_accel_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_accel", m_player_id);
+    skill_bar->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_accel", m_player_id);
 
-    m_children.push_back(m_mass_bar);
-    m_children.push_back(m_speed_bar);
-    m_children.push_back(m_accel_bar);
+    m_skills.push_back(skill_bar);
+    m_children.push_back(skill_bar);
 
 }   // KartStatsWidget
 
@@ -118,43 +123,42 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 
 void KartStatsWidget::add()
 {
-    m_mass_bar->add();
-    m_speed_bar->add();
-    m_accel_bar->add();
+    for (int i = 0; i < SKILL_COUNT; ++i) {
+        m_skills[i]->add();
+    }
 }
 
 void KartStatsWidget::move(int x, int y, int w, int h)
 {
     Widget::move(x,y,w,h);
     setSize(m_x, m_y, m_w, m_h);
-
-    if (m_mass_bar != NULL)
+    int offset = (m_h - (SKILL_COUNT*m_skill_bar_h)) / 2;
+    for (int i = 0; i < SKILL_COUNT; ++i)
     {
-        m_mass_bar->move(m_skill_bar_x,
-                         m_skill_bar_y,
-                         m_skill_bar_w,
-                         m_skill_bar_h);
-    }
-
-    if (m_speed_bar != NULL)
-    {
-        m_speed_bar->move(m_skill_bar_x,
-                          m_skill_bar_y - m_skill_bar_h - 10,
+        m_skills[i]->move(m_skill_bar_x,
+                          m_y + offset + m_skill_bar_h*i,
                           m_skill_bar_w,
                           m_skill_bar_h);
     }
-    if (m_accel_bar != NULL)
-    {
-        m_accel_bar->move(m_skill_bar_x,
-                          m_skill_bar_y + m_skill_bar_h + 10,
-                          m_skill_bar_w,
-                          m_skill_bar_h);
-    }
-
-}
+} //move
 
 // -----------------------------------------------------------------------------
 
+// ---- set value for given type
+void KartStatsWidget::setValue(Stats type, int value)
+{
+    m_skills[type]->setValue(value);
+} //setValue
+
+// -----------------------------------------------------------------------------
+
+// ---- get value for given type
+int KartStatsWidget::getValue(Stats type)
+{
+    return m_skills[type]->getValue();
+}   // getVAlue
+
+// ---- set size for widgets inside KartStatsWidget
 void KartStatsWidget::setSize(const int x, const int y, const int w, const int h)
 {
     m_x = x;
@@ -178,24 +182,3 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
 }   // setSize
 
 // -----------------------------------------------------------------------------
-
-void KartStatsWidget::setMass(int value)
-{
-    m_mass_bar->setValue(value);
-}
-
-// -----------------------------------------------------------------------------
-
-void KartStatsWidget::setAcceleration(int value)
-{
-    m_accel_bar->setValue(value);
-}
-
-// -----------------------------------------------------------------------------
-
-void KartStatsWidget::setSpeed(int value)
-{
-    m_speed_bar->setValue(value);
-}
-// -----------------------------------------------------------------------------
-

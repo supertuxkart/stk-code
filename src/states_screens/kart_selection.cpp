@@ -797,20 +797,6 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
 // -------------------------------------------------------------------------
 
-void PlayerKartWidget::setKartStats(const std::string& selection)
-{
-    assert(m_magic_number == 0x33445566);
-    const KartProperties *kp =
-                kart_properties_manager->getKart(selection);
-    if (kp != NULL)
-    {
-        m_kart_stats->setMass((int)kp->getMass()/10);
-        m_kart_stats->setSpeed((int)kp->getMaxSpeed()/10);
-        m_kart_stats->setAcceleration((int)kp->getTrackConnectionAccel()/10);
-        m_kart_stats->update(0);
-    }
-}
-
 /** Sets which kart was selected for this player */
 void PlayerKartWidget::setKartInternalName(const std::string& whichKart)
 {
@@ -1503,9 +1489,9 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
     if (kp != NULL)
     {
         Log::verbose("updateKartStats", StringUtils::toString((int)kp->getMass()/10).c_str());
-        w->setMass((int)kp->getMass()/10);
-        w->setSpeed((int)kp->getMaxSpeed()/10);
-        w->setAcceleration((int)kp->getTrackConnectionAccel()/10);
+        w->setValue(KartStatsWidget::SKILL_MASS, (int)kp->getMass()/10);
+        w->setValue(KartStatsWidget::SKILL_SPEED, (int)kp->getMaxSpeed()/10);
+        w->setValue(KartStatsWidget::SKILL_ACCEL, (int)kp->getTrackConnectionAccel()/10);
         w->update(0);
     }
 }
