@@ -272,10 +272,12 @@ void PlayerManager::save()
                          << m_current_player->getName() << L"\"/>\n";
         }
 
+        // Save all non-guest players
         PlayerProfile *player;
         for_in(player, m_all_players)
         {
-            player->save(players_file);
+            if(!player->isGuestAccount())
+                player->save(players_file);
         }
         players_file << L"</players>\n";
         players_file.close();
