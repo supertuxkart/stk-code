@@ -98,12 +98,20 @@ void GrandPrixData::reload()
     {
          Log::error("GrandPrixData",
                     "Error while trying to read grandprix file '%s': "
-                    "missing 'name' attribute", m_filename.c_str());
+                    "Missing 'name' attribute", m_filename.c_str());
         throw std::runtime_error("Missing name attribute");
     }
 
-    // Every iteration means parsing one track entry
     const int amount = root->getNumNodes();
+    if (amount == 0)
+    {
+         Log::error("GrandPrixData",
+                    "Error while trying to read grandprix file '%s': "
+                    "There is no track defined", m_filename.c_str());
+        throw std::runtime_error("No track defined");
+    }
+
+    // Every iteration means parsing one track entry
     for (int i = 0; i < amount; i++)
     {
         const XMLNode* node = root->getNode(i);
@@ -235,7 +243,7 @@ bool GrandPrixData::checkConsistency(bool log_error) const
  *  is unlocked). It also prevents people from using the grand prix editor as
  *  a way to play tracks that still haven't been unlocked
  */
-bool GrandPrixData::isTrackAvailable(const std::string &id, 
+bool GrandPrixData::isTrackAvailable(const std::string &id,
                                      bool includeLocked     ) const
 {
     if (includeLocked)
