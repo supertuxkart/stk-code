@@ -114,6 +114,7 @@ enum QueryPerf
     Q_TRANSPARENT,
     Q_PARTICLES,
     Q_DISPLACEMENT,
+    Q_DOF,
     Q_GODRAYS,
     Q_BLOOM,
     Q_TONEMAP,
