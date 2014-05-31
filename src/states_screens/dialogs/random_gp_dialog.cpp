@@ -45,7 +45,14 @@ RandomGPInfoDialog::RandomGPInfoDialog()
     m_over_body = m_area.getHeight()/7 + SPINNER_HEIGHT + 10; // 10px space
     m_lower_bound = m_area.getHeight()*6/7;
 
+    // The GP manager is be used to make the GP live longer than this dialog
+    if (grand_prix_manager->m_random_gp)
+    {
+        delete grand_prix_manager->m_random_gp;
+        grand_prix_manager->m_random_gp = NULL;
+    }
     m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+    grand_prix_manager->m_random_gp = m_gp;
 
     addTitle();
     addSpinners();
@@ -91,9 +98,8 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
     if (eventSource == "start")
     {
         // Save the gp since dismiss deletes it otherwise
-        GrandPrixData buff = *m_gp;
         ModalDialog::dismiss();
-        race_manager->startGP(&buff, false, false);
+        race_manager->startGP(m_gp, false, false);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "Number of tracks")
@@ -132,10 +138,10 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
 
 void RandomGPInfoDialog::updateGP()
 {
-    if (m_gp != NULL)
-        delete m_gp;
+    delete m_gp;
 
     m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+    grand_prix_manager->m_random_gp = m_gp;
     addTracks();
 }
 

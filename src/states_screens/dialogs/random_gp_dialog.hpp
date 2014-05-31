@@ -33,7 +33,6 @@ public:
     static const int SPINNER_HEIGHT = 40;
 
     RandomGPInfoDialog();
-    ~RandomGPInfoDialog() { delete m_gp; }
 
     /** Adds a SpinnerWidgets to choose the track groups and one to choose the
      * number of tracks */
