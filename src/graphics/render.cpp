@@ -740,7 +740,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
-    if (!(tick % 100))
+    if (!(tick % 100) != 2)
         rsm_matrix = sun_ortho_matrix[3];
     rh_extend = core::vector3df(128, 64, 128);
     core::vector3df campos = camnode->getAbsolutePosition();
