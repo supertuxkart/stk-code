@@ -154,6 +154,9 @@ void ModelViewWidget::update(float delta)
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
 
+    if (!irr_driver->isGLSL())
+        return;
+
     if (m_rtt_provider == NULL)
     {
         std::string name = "model view ";
@@ -176,7 +179,7 @@ void ModelViewWidget::update(float delta)
 
     std::vector<IrrDriver::GlowData> glows;
     irr_driver->computeCameraMatrix(m_camera, 512, 512);
-    irr_driver->renderScene(m_camera, glows, GUIEngine::getLatestDt(), false);
+    irr_driver->renderScene(m_camera, glows, GUIEngine::getLatestDt(), false, true);
     m_frame_buffer = irr_driver->getPostProcessing()->render(m_camera);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 

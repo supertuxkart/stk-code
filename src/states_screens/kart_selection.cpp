@@ -1509,8 +1509,6 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
         {
             const KartModel &kart_model = kp->getMasterKartModel();
 
-            Log::error("Kart", "Kart <%s> width : %f, length : %f", selection.c_str(), kart_model.getWidth(), kart_model.getLength());
-
             float scale = 35.0f;
             if (kart_model.getLength() > 1.45f)
             {

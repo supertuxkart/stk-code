@@ -56,6 +56,7 @@ RTT::RTT(size_t width, size_t height)
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;
+    m_RH_FBO = NULL;
     using namespace video;
     using namespace core;
 
@@ -238,9 +239,6 @@ RTT::RTT(size_t width, size_t height)
 
 RTT::~RTT()
 {
-    delete m_shadow_FBO;
-    delete m_RH_FBO;
-    delete m_RSM;
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
     if (irr_driver->getGLSLVersion() >= 150)
@@ -253,5 +251,9 @@ RTT::~RTT()
         glDeleteTextures(1, &RH_Red);
         glDeleteTextures(1, &RH_Green);
         glDeleteTextures(1, &RH_Blue);
+
+        delete m_shadow_FBO;
+        delete m_RH_FBO;
+        delete m_RSM;
     }
 }
