@@ -361,7 +361,7 @@ void gamepadVisualisation()
 }   // gamepadVisualisation
 
 // ============================================================================
-/** Sets the hat mesh name depending on the current christmas mode 
+/** Sets the hat mesh name depending on the current christmas mode
  *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
 void handleXmasMode()
@@ -847,14 +847,14 @@ int handleCmdLine()
     if(CommandLine::has("--gp", &s))
     {
         race_manager->setMajorMode(RaceManager::MAJOR_MODE_GRAND_PRIX);
-        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(s);
+        GrandPrixData *gp = grand_prix_manager->getGrandPrix(s);
 
         if (!gp)
         {
             Log::warn("main", "There is no GP named '%s'.", s.c_str());
             return 0;
         }
-        race_manager->setGrandPrix(*gp);
+        race_manager->setGrandPrix(gp);
     }   // --gp
 
     if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
