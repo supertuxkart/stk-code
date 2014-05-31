@@ -1063,11 +1063,11 @@ void KartSelectionScreen::unloaded()
 
 // ----------------------------------------------------------------------------
 // Return true if event was handled successfully
-bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
+bool KartSelectionScreen::playerJoin(InputDevice* device, bool first_player)
 {
     if (UserConfigParams::logGUI())
         Log::info("[KartSelectionScreen]",  "playerJoin() invoked");
-    if (!m_multiplayer && !firstPlayer) return false;
+    if (!m_multiplayer && !first_player) return false;
 
     assert (g_dispatcher != NULL);
 
@@ -1106,7 +1106,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     // ---- Create new active player
     PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
 
-    if (!firstPlayer)
+    if (!first_player)
     {
         const int player_profile_count = PlayerManager::get()->getNumPlayers();
         for (int i=0; i<player_profile_count; i++)
@@ -1132,7 +1132,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
 
     const int new_player_id =
-        StateManager::get()->createActivePlayer( profile_to_use, device, NULL );
+        StateManager::get()->createActivePlayer( profile_to_use, device);
     StateManager::ActivePlayer* aplayer =
         StateManager::get()->getActivePlayer(new_player_id);
 
@@ -1157,7 +1157,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     Widget* fullarea = getWidget("playerskarts");
 
     // in this special case, leave room for a message on the right
-    if (m_multiplayer && firstPlayer)
+    if (m_multiplayer && first_player)
     {
         const int splitWidth = fullarea->m_w / 2;
 
@@ -1189,7 +1189,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
 
 
-    if (!firstPlayer)
+    if (!first_player)
     {
         // select something (anything) in the ribbon; by default, only the
         // game master has something selected. Thus, when a new player joins,
@@ -1197,13 +1197,13 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         w->setSelection(new_player_id, new_player_id, true);
 
         newPlayerWidget->m_player_ident_spinner
-        ->setFocusForPlayer(new_player_id);
+                       ->setFocusForPlayer(new_player_id);
     }
 
     if (!m_multiplayer)
     {
         input_manager->getDeviceList()->setSinglePlayer( StateManager::get()
-                ->getActivePlayer(0));
+                                                         ->getActivePlayer(0));
     }
 
     return true;

@@ -122,7 +122,7 @@ void StartGameProtocol::update()
                 if (StateManager::get()->getActivePlayers().size() >= 1) // more than one player, we're the first
                     new_player_id = 0;
                 else
-                    new_player_id = StateManager::get()->createActivePlayer( profile_to_use, device , players[i]->user_profile);
+                    new_player_id = StateManager::get()->createActivePlayer( profile_to_use, device);
                 device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
                 input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
 
@@ -147,7 +147,7 @@ void StartGameProtocol::update()
 
             if (!is_me)
             {
-                StateManager::get()->createActivePlayer( NULL, NULL , players[i]->user_profile);
+                StateManager::get()->createActivePlayer( NULL, NULL );
 
                 race_manager->setPlayerKart(i, rki);
             }

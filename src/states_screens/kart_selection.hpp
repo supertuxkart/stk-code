@@ -132,7 +132,7 @@ public:
 
     /** \brief Called when a player hits 'fire'/'select' on his device to
      *  join the game */
-    bool playerJoin(InputDevice* device, bool firstPlayer);
+    bool playerJoin(InputDevice* device, bool first_player);
 
     /**
       * \brief Called when a player hits 'rescue'/'cancel' on his device
