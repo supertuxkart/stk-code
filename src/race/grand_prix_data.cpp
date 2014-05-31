@@ -30,7 +30,6 @@
 
 #include <algorithm>
 #include <cstdlib>
-#include <iostream>
 #include <memory>
 #include <stdexcept>
 
@@ -91,7 +90,12 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                          rand() % available_tracks :
                          track_indices[rand() % available_tracks];
 
-            m_tracks.push_back(track_manager->getTrack(index)->getIdent());
+            std::string id = track_manager->getTrack(index)->getIdent();
+            // Avoid duplicate tracks
+            if (std::find(m_tracks.begin(), m_tracks.end(), id) != m_tracks.end())
+                continue;
+
+            m_tracks.push_back(id);
             m_laps.push_back(3); // TODO: Take the default number from the track
             m_reversed.push_back(rand() % 2);
         }
