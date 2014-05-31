@@ -698,7 +698,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
     m_energy = 1.0f;
     xml_node.get("energy", &m_energy);
 
-    m_distance = 20. * m_energy;
+    m_distance = 20.f * m_energy;
     xml_node.get("distance", &m_distance);
 
     if (irr_driver->isGLSL())

@@ -25,6 +25,8 @@ Note that checkboxes are an exception and have the following styles :
     "neutral+checked"
     "focused+unchecked"
     "focused+checked"
+    "deactivated+unchecked"
+    "deactivated+checked"
 
 "Advanced stretching" images are split this way :
 
@@ -66,11 +68,15 @@ when the border that intersect at this corner are enabled.
 <!--  Stateless -->
 <element type="background" image="peach/background.jpg" />
 
+<element type="button" state="neutral" image="peach/glassbutton.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
 <element type="button" state="focused" image="peach/glassbutton_focused.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
-<element type="button" state="neutral" image="peach/glassbutton.png"
+<element type="button" state="deactivated" image="peach/glassbutton_deactivated.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
 
@@ -132,6 +138,10 @@ when the border that intersect at this corner are enabled.
     left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
 
+<element type="spinner" state="deactivated" image="peach/glassspinner_deactivated.png"
+    left_border="110" right_border="110" top_border="0" bottom_border="36"
+    preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
+
 <element type="spinner1" state="neutral" image="peach/glass_square1.png"
       left_border="110" right_border="110" top_border="0" bottom_border="36"
     preserve_h_aspect_ratios="true" hborder_out_portion="0.0" />
@@ -156,6 +166,8 @@ when the border that intersect at this corner are enabled.
 <element type="checkbox" state="neutral+checked" image="peach/glasscheckbox_checked.png"/>
 <element type="checkbox" state="focused+unchecked" image="peach/glasscheckbox_focus.png"/>
 <element type="checkbox" state="focused+checked" image="peach/glasscheckbox_checked_focus.png"/>
+<element type="checkbox" state="deactivated+unchecked" image="peach/glasscheckbox_deactivated.png"/>
+<element type="checkbox" state="deactivated+checked" image="peach/glasscheckbox_checked_deactivated.png"/>
 
 <!-- are always in neutral state for now. No splitting into 9 areas is done; the image is just stretched.
      Note: the body of a guage is the same as for for spinners. -->

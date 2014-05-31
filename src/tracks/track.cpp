@@ -73,6 +73,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <sstream>
+#include <wchar.h>
 
 using namespace irr;
 
@@ -151,6 +152,69 @@ Track::~Track()
     m_magic_number = 0xDEADBEEF;
 #endif
 }   // ~Track
+
+//-----------------------------------------------------------------------------
+/** A < comparison of tracks. This is used to sort the tracks when displaying
+ *  them in the gui.
+ */
+bool Track::operator<(const Track &other) const
+{
+    PlayerProfile *p = PlayerManager::getCurrentPlayer();
+    bool this_is_locked = p->isLocked(getIdent());
+    bool other_is_locked = p->isLocked(other.getIdent());
+    if(this_is_locked == other_is_locked)
+    {
+        return getSortName() < other.getSortName();
+    }
+    else
+        return other_is_locked;
+}   // operator<
+
+//-----------------------------------------------------------------------------
+/** Returns the name of the track, which is e.g. displayed on the screen.
+    \note this is the LTR name, invoke fribidi as needed. */
+core::stringw Track::getName() const
+{
+    core::stringw translated = translations->w_gettext(m_name.c_str());
+    int index = translated.find("|");
+    if(index>-1)
+    {
+        translated = translated.subString(0, index);
+    }
+    return translated;
+}   // getName
+
+//-----------------------------------------------------------------------------
+/** Returns the name of the track used to sort the tracks alphabetically.
+ *  This can be used to e.g. sort 'The Island' as 'Island,The'; or
+ *  to replace certain language-specific characters (e.g. German 'ae' with 'a')
+ *  The sort name can be specified by setting the name of a track to:
+ *  "normal name|sort name"
+ */
+core::stringw Track::getSortName() const
+{
+    core::stringw translated = translations->w_gettext(m_name.c_str());
+    translated.make_lower();
+    int index = translated.find("|");
+    if(index>-1)
+    {
+        translated = translated.subString(index+1, translated.size());
+    }
+    return translated;
+}   // getSortName
+
+//-----------------------------------------------------------------------------
+/** Returns true if this track belongs to the specified track group.
+ *  \param group_name Group name to test for.
+ */
+bool Track::isInGroup(const std::string &group_name)
+{
+    for(unsigned int i=0; i<m_groups.size(); i++)
+    {
+        if(m_groups[i]==group_name) return true;
+    }
+    return false;
+}   // isInGroup
 
 //-----------------------------------------------------------------------------
 /** Returns number of completed challenges */
@@ -362,7 +426,7 @@ void Track::cleanup()
 void Track::loadTrackInfo()
 {
     irr_driver->setLwhite(1.);
-    irr_driver->setExposure(0.09);
+    irr_driver->setExposure(0.09f);
     // Default values
     m_use_fog               = false;
     m_fog_max               = 1.0f;

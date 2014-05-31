@@ -1,11 +1,13 @@
 #ifndef STKMESH_H
 #define STKMESH_H
 
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
-#include "glwrap.hpp"
+
 #include <vector>
 
 enum GeometricMaterial
@@ -45,6 +47,7 @@ struct GLMesh {
     GLuint vao_glow_pass;
     GLuint vao_displace_pass;
     GLuint vao_displace_mask_pass;
+    GLuint vao_rsm_pass;
     GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
@@ -89,9 +92,22 @@ std::vector<core::matrix4> GroupedFPSM<T>::MVPSet;
 template<enum GeometricMaterial T>
 std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
 
-void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
-void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const core::matrix4 &InverseModelMatrix);
-void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
+
+template<typename Shader, typename...uniforms>
+void draw(const GLMesh &mesh, GLuint vao, uniforms... Args)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    Shader::setUniforms(Args...);
+
+    assert(vao);
+    glBindVertexArray(vao);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)

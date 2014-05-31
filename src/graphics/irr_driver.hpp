@@ -114,6 +114,7 @@ enum QueryPerf
     Q_TRANSPARENT,
     Q_PARTICLES,
     Q_DISPLACEMENT,
+    Q_DOF,
     Q_GODRAYS,
     Q_BLOOM,
     Q_TONEMAP,
@@ -203,6 +204,9 @@ private:
     /** RTTs. */
     RTT                *m_rtts;
     std::vector<core::matrix4> sun_ortho_matrix;
+    core::vector3df    rh_extend;
+    core::matrix4      rh_matrix;
+    core::matrix4      rsm_matrix;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -233,7 +237,7 @@ private:
           RES_CHANGE_CANCEL}                m_resolution_changing;
 
 public:
-    GLuint SkyboxCubeMap, FakeSkybox;
+    GLuint SkyboxCubeMap;
     /** A simple class to store video resolutions. */
     class VideoMode
     {
@@ -307,6 +311,9 @@ private:
     bool                 m_mipviz;
     bool                 m_normals;
     bool                 m_ssaoviz;
+    bool                 m_rsm;
+    bool                 m_rh;
+    bool                 m_gi;
     bool                 m_shadowviz;
     bool                 m_lightviz;
     bool                 m_distortviz;
@@ -572,6 +579,9 @@ public:
         m_mipviz = false;
         m_normals = false;
         m_ssaoviz = false;
+        m_rsm = false;
+        m_rh = false;
+        m_gi = false;
         m_shadowviz = false;
         m_lightviz = false;
         m_distortviz = false;
@@ -592,6 +602,18 @@ public:
     bool getLightViz() { return m_lightviz; }
     // ------------------------------------------------------------------------
     bool getSSAOViz() { return m_ssaoviz; }
+    // ------------------------------------------------------------------------
+    void toggleRSM() { m_rsm = !m_rsm; }
+    // ------------------------------------------------------------------------
+    bool getRSM() { return m_rsm; }
+    // ------------------------------------------------------------------------
+    void toggleRH() { m_rh = !m_rh; }
+    // ------------------------------------------------------------------------
+    bool getRH() { return m_rh; }
+    // ------------------------------------------------------------------------
+    void toggleGI() { m_gi = !m_gi; }
+    // ------------------------------------------------------------------------
+    bool getGI() { return m_gi; }
     // ------------------------------------------------------------------------
     void toggleShadowViz() { m_shadowviz = !m_shadowviz; }
     // ------------------------------------------------------------------------

@@ -100,7 +100,7 @@ namespace Online{
                     break;
                 case SO_NAME:
                     // m_id is the lower case name
-                    return m_name < server.getName();
+                    return m_lower_case_name < server.m_lower_case_name;
                     break;
                 case SO_PLAYERS:
                     return m_current_players < server.getCurrentPlayers();
@@ -108,28 +108,6 @@ namespace Online{
             }   // switch
             return true;
         }   // operator<
-
-        // ------------------------------------------------------------------------
-        /** Compares two addons according to the sort order currently defined.
-         *  Comparison is done for sorting in descending order.
-         *  \param a The addon to compare this addon to.
-         */
-        bool operator>(const Server &server) const
-        {
-            switch(m_sort_order)
-            {
-                case SO_SCORE:
-                    return m_satisfaction_score > server.getScore();
-                    break;
-                case SO_NAME:
-                    return m_lower_case_name > server.getLowerCaseName();
-                    break;
-                case SO_PLAYERS:
-                    return m_current_players > server.getCurrentPlayers();
-                    break;
-            }   // switch
-            return true;
-        }   // operator>
 
     };   // Server
 } // namespace Online

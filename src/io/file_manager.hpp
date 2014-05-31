@@ -123,6 +123,7 @@ public:
     void checkAndCreateDirForAddons(const std::string &dir);
     bool removeFile(const std::string &name) const;
     bool removeDirectory(const std::string &name) const;
+    bool copyFile(const std::string &source, const std::string &dest);
     std::vector<std::string>getMusicDirs() const;
     std::string getAssetChecked(AssetType type, const std::string& name,
                                 bool abort_on_error=false) const;

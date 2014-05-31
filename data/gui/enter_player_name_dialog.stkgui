@@ -11,10 +11,10 @@
 
     <spacer height="20" width="20" />
     
-    <!-- TODO: ok button? -->
-    
-    <button id="cancel"    I18N="When configuring input" text="Press ESC to cancel" align="center"/>
-
+    <buttonbar proportion="1" id="options" width="100%" height="100%">
+        <button id="ok"     I18N="When configuring input" text="OK" align="center"/>
+        <button id="cancel" I18N="When configuring input" text="Cancel" align="center"/>
+    </buttonbar>
     <spacer height="15" width="20" />
 
 </div>

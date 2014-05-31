@@ -277,7 +277,7 @@ public:
         {
             for(int j=(int)start; j<(int)m_contents_vector.size()-1; j++)
              {
-                 if(*(m_contents_vector[j])>*(m_contents_vector[j+1])) continue;
+                 if(*(m_contents_vector[j+1])<*(m_contents_vector[j])) continue;
                  // Now search the proper place for m_contents_vector[j+1]
                  // in the sorted section contentsVectot[start:j]
                  TYPE* t=m_contents_vector[j+1];
@@ -286,7 +286,7 @@ public:
                  {
                      m_contents_vector[i] = m_contents_vector[i-1];
                      i--;
-                 } while (i>start && *t>*(m_contents_vector[i-1]));
+                 } while (i>start && *(m_contents_vector[i-1]) <*t);
                  m_contents_vector[i]=t;
              }
          }

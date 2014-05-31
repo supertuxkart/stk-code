@@ -350,6 +350,9 @@ private:
     /** Name of the track to display. */
     std::string         m_name;
 
+    /** The name used in sorting the track. */
+    core::stringw       m_sort_name;
+
     bool                m_use_fog;
     /** True if this track supports using smoothed normals. */
     bool                m_smooth_normals;
@@ -428,6 +431,11 @@ public:
     void               adjustForFog(scene::IMesh* mesh,
                                     scene::ISceneNode* parent_scene_node);
     void               itemCommand(const XMLNode *node);
+    core::stringw      getName() const;
+    core::stringw      getSortName() const;
+    // ------------------------------------------------------------------------
+    bool               isInGroup(const std::string &group_name);
+    // ------------------------------------------------------------------------
     const core::vector3df& getSunRotation();
     /** Sets the current ambient color for a kart with index k. */
     void               setAmbientColor(const video::SColor &color,
@@ -471,11 +479,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this track (the directory name). */
     const std::string& getIdent          () const {return m_ident;            }
-    // ------------------------------------------------------------------------
-    /** Returns the name of the track, which is e.g. displayed on the screen.
-        \note this is the LTR name, invoke fribidi as needed. */
-    const wchar_t* getName               () const
-                             {return translations->w_gettext(m_name.c_str()); }
     // ------------------------------------------------------------------------
     /** Returns all groups this track belongs to. */
     const std::vector<std::string>&
@@ -612,6 +615,7 @@ public:
 
     float getDisplacementSpeed() const { return m_displacement_speed; }
     float getCausticsSpeed() const { return m_caustics_speed; }
+    bool operator<(const Track &other) const;
 };   // class Track
 
 #endif

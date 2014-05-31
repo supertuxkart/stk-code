@@ -32,10 +32,10 @@
 #include "states_screens/dialogs/press_a_key_dialog.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "utils/translation.hpp"
 
 #include <iostream>
@@ -320,7 +320,7 @@ void OptionsScreenInput2::updateInputButtons()
         getWidget<GUIEngine::LabelWidget>("conflict");
     if (conflicts)
         conflict_label->setText(
-           _("* A blue item means a conflict with another configuration") );
+           _("* A red item means a conflict with another configuration") );
     else
         conflict_label->setText("");
 
@@ -442,7 +442,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
         else if (selection == "tab_video")
             sm->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players")
-            sm->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
+            sm->replaceTopMostScreen(UserScreen::getInstance());
         else if (selection == "tab_ui")
             sm->replaceTopMostScreen(OptionsScreenUI::getInstance());
         else if (selection == "tab_controls") {}
@@ -453,7 +453,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
     }
     else if (name == "back")
     {
-        sm->popMenu();
+        sm->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
     else if (name == "actions")
     {
