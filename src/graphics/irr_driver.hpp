@@ -361,12 +361,13 @@ private:
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
-    void renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadows);
+    void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows);
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
-    void renderLights(scene::ICameraSceneNode * const camnode, float dt);
+    unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
+    void renderLights(unsigned pointlightCount);
     void renderDisplacement();
     void doScreenShot();
 public:
