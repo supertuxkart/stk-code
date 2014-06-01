@@ -27,7 +27,10 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
-    glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
+    if (irr_driver->getGLSLVersion() < 420)
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
+    else
+        glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, res.Width, res.Height);
     return result;
 }
 
