@@ -740,7 +740,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
         sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
     }
-    if (!(tick % 100))
+    if ((tick % 100) == 2)
         rsm_matrix = sun_ortho_matrix[3];
     rh_extend = core::vector3df(128, 64, 128);
     core::vector3df campos = camnode->getAbsolutePosition();
@@ -940,7 +940,9 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
         if (!m_lights[i]->isPointLight())
         {
             m_lights[i]->render();
-            if (UserConfigParams::m_shadows && World::getWorld()->getTrack()->hasShadows())
+            if (!World::getWorld()->getTrack()->hasShadows())
+                continue;
+            if (UserConfigParams::m_shadows)
                 m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
             else
                 m_post_processing->renderSunlight();

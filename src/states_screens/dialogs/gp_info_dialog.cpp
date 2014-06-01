@@ -57,13 +57,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     m_gp_ident = gpIdent;
 
     const GrandPrixData* gp = grand_prix_manager->getGrandPrix(gpIdent);
-    if (gp == NULL)
-    {
-        assert(false);
-        std::cerr << "ERROR at " << __FILE__ << " : " << __LINE__ << "; trying to continue\n";
-        ModalDialog::dismiss();
-        return;
-    }
+    assert (gp != NULL);
 
     // ---- GP Name
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), y1);
@@ -183,14 +177,14 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
         continueBtn->add();
         continueBtn->getIrrlichtElement()->setTabStop(true);
         continueBtn->getIrrlichtElement()->setTabGroup(false);
-        
+
         okBtn->m_x = m_area.getWidth()/2 - 310;
     }
     else
     {
         okBtn->m_x = m_area.getWidth()/2 - 200;
     }
-    
+
     okBtn->m_y = y2;
     okBtn->m_w = 400;
     okBtn->m_h = m_area.getHeight() - y2 - 15;
@@ -201,7 +195,7 @@ GPInfoDialog::GPInfoDialog(const std::string& gpIdent, const float w, const floa
     okBtn->getIrrlichtElement()->setTabGroup(false);
 
     okBtn->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    
+
 }
 
 // ------------------------------------------------------------------------------------------------------
