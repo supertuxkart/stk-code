@@ -38,7 +38,8 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 
 SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
-                                   const int value, const stringw& label) : Widget(WTYPE_DIV)
+                                   bool multiplayer, const int value,
+                                   const stringw& label) : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
 
@@ -59,7 +60,7 @@ SkillLevelWidget::SkillLevelWidget(core::recti area, const int player_id,
 
     m_label = NULL;
 
-    m_label = new LabelWidget(true, true);
+    m_label = new LabelWidget(!multiplayer, true);
     m_label->setText(label,false);
 
     m_label->m_x = m_label_x;
@@ -115,9 +116,9 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
     // -- sizes
     m_bar_w = w/2;
-    m_bar_h = GUIEngine::getFontHeight();
+    m_bar_h = h;
     m_label_w = w/2;
-    m_label_h = GUIEngine::getFontHeight();
+    m_label_h = h;
 
     // for shrinking effect
     if (h < 175)

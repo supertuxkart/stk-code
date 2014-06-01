@@ -38,7 +38,8 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 
 KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
-                                 std::string kart_group) : Widget(WTYPE_DIV)
+                                 std::string kart_group,
+                                 bool multiplayer) : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
 
@@ -75,31 +76,31 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
     }
 
 
-    const int offset = (m_h - (SKILL_COUNT*m_skill_bar_h)) / 2;;
+    const int offset = (m_h - (SKILL_COUNT*m_skill_bar_h)) / 2;
     for (int i = 0; i < SKILL_COUNT; ++i)
     {
         irr::core::recti skillArea(m_skill_bar_x, m_skill_bar_y + offset*i,
                                    m_skill_bar_x + m_skill_bar_w,
-                                   m_skill_bar_y + offset*i + m_skill_bar_h);
+                                   m_skill_bar_y + m_skill_bar_h + offset*i);
 
         SkillLevelWidget* skill_bar = NULL;
 
-            skill_bar = new SkillLevelWidget(skillArea, m_player_id);
+            skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer);
 
             m_skills.push_back(skill_bar);
             m_children.push_back(skill_bar);
     }
 
     m_skills[SKILL_MASS]->setValue(props->getMass()/10);
-    m_skills[SKILL_MASS]->setLabel("Weight");
+    m_skills[SKILL_MASS]->setLabel("WEIGHT");
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
 
     m_skills[SKILL_ACCEL]->setValue(props->getTrackConnectionAccel()/10);
-    m_skills[SKILL_ACCEL]->setLabel("Accel");
+    m_skills[SKILL_ACCEL]->setLabel("ACCEL");
     m_skills[SKILL_ACCEL]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_accel", m_player_id);
 
     m_skills[SKILL_SPEED]->setValue(props->getMaxSpeed()/10);
-    m_skills[SKILL_SPEED]->setLabel("Speed");
+    m_skills[SKILL_SPEED]->setLabel("SPEED");
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
 
 }   // KartStatsWidget
@@ -153,7 +154,7 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
 
     // -- sizes
     m_skill_bar_w = w;
-    m_skill_bar_h = 100;
+    m_skill_bar_h = GUIEngine::getTitleFontHeight();
 
     // for shrinking effect
     if (h < 175)

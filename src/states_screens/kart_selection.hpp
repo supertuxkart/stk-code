@@ -274,7 +274,6 @@ public:
 
     /** Sub-widgets created by this widget */
     PlayerNameSpinner* m_player_ident_spinner;
-    GUIEngine::ProgressBarWidget* m_kart_stat_mass;
     GUIEngine::KartStatsWidget* m_kart_stats;
     GUIEngine::ModelViewWidget* m_model_view;
     GUIEngine::LabelWidget* m_kart_name;

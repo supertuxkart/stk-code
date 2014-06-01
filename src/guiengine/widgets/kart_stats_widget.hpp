@@ -70,7 +70,8 @@ class KartStatsWidget : public Widget
         LEAK_CHECK()
         
         KartStatsWidget(core::recti area, const int player_id,
-                        std::string kart_group);
+                        std::string kart_group,
+                        bool multiplayer);
         virtual ~KartStatsWidget() {};
 
         // ------------------------------------------------------------------------

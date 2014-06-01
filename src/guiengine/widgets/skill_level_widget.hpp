@@ -62,8 +62,9 @@ class SkillLevelWidget : public Widget
         LabelWidget* m_label;
         ProgressBarWidget* m_bar;
 
-        SkillLevelWidget(core::recti area, const int player_id,
+        SkillLevelWidget(core::recti area, const int player_id, bool multiplayer,
                          const int value = 0, const irr::core::stringw& label = "default");
+
         virtual ~SkillLevelWidget() {};
 
         // ------------------------------------------------------------------------
@@ -88,6 +89,12 @@ class SkillLevelWidget : public Widget
 
         /** Change the label of the widget */
         void setLabel(const irr::core::stringw& label);
+
+        /** Get the current label of the widget. */
+        const irr::core::stringw& getLabel()
+        {
+            return m_label->getText();
+        }
 
     };
 }
