@@ -63,7 +63,7 @@ class SkillLevelWidget : public Widget
         ProgressBarWidget* m_bar;
 
         SkillLevelWidget(core::recti area, const int player_id,
-                         const int value, const irr::core::stringw& label);
+                         const int value = 0, const irr::core::stringw& label = "default");
         virtual ~SkillLevelWidget() {};
 
         // ------------------------------------------------------------------------
@@ -81,10 +81,14 @@ class SkillLevelWidget : public Widget
         void setSize(const int x, const int y, const int w, const int h);
 
         /** Change the value of the widget, it must be a percent. */
-        void setValue(int value);
+        void setValue(const int value);
         
         /** Get the current values of the widget. */
         int getValue() {return m_bar->getValue(); };
+
+        /** Change the label of the widget */
+        void setLabel(const irr::core::stringw& label);
+
     };
 }
 

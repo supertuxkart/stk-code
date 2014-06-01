@@ -136,11 +136,16 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
 // -----------------------------------------------------------------------------
 
-void SkillLevelWidget::setValue(int value)
+void SkillLevelWidget::setValue(const int value)
 {
     m_bar->setValue(value);
 
 }
 
 // -----------------------------------------------------------------------------
+
+void SkillLevelWidget::setLabel(const irr::core::stringw& label)
+{
+    m_label->setText(label, false);
+}
 
