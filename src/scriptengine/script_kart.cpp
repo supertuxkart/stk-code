@@ -52,11 +52,22 @@ namespace Scripting{
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle));
             World::getWorld()->moveKartTo(kart, s);
         }
+        void setVelocity(asIScriptGeneric *gen)
+        {
+            int id = (int)gen->GetArgDWord(0);
+            float x = gen->GetArgFloat(1);
+            float y = gen->GetArgFloat(2);
+            float z = gen->GetArgFloat(3);
+
+            AbstractKart* kart = World::getWorld()->getKart(id);
+            kart->setVelocity(btVector3(x, y, z));
+        }
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
             r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void teleportKart(int id, float x, float y,float z)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void setVelocity(int id, float x, float y,float z)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);
 
         }
     }
