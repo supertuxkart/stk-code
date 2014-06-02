@@ -90,6 +90,64 @@ GrandPrixLose::GrandPrixLose() : CutsceneScreen("grand_prix_lose.stkgui")
 
 void GrandPrixLose::onCutsceneEnd()
 {
+    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
+    if (m_kart_node[0] != NULL)
+        m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    if (m_kart_node[1] != NULL)
+        m_kart_node[1]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    if (m_kart_node[2] != NULL)
+        m_kart_node[2]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    if (m_kart_node[3] != NULL)
+        m_kart_node[3]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+
+    for (unsigned int i = 0; i<m_all_kart_models.size(); i++)
+        delete m_all_kart_models[i];
+
+    m_all_kart_models.clear();
+
+    m_kart_node[0] = NULL;
+    m_kart_node[1] = NULL;
+    m_kart_node[2] = NULL;
+    m_kart_node[3] = NULL;
+
+    // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+
+    std::vector<const ChallengeData*> unlocked =
+        PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+    if (unlocked.size() > 0)
+    {
+
+        FeatureUnlockedCutScene* scene =
+            FeatureUnlockedCutScene::getInstance();
+
+        scene->addTrophy(race_manager->getDifficulty());
+        scene->findWhatWasUnlocked(race_manager->getDifficulty());
+
+        StateManager::get()->replaceTopMostScreen(scene);
+        PlayerManager::getCurrentPlayer()->clearUnlocked();
+    }
+    else
+    {
+        if (race_manager->raceWasStartedFromOverworld())
+        {
+            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            OverWorld::enterOverWorld();
+        }
+        else
+        {
+            // we assume the main menu was pushed before showing this menu
+            StateManager::get()->popMenu();
+        }
+    }
+}
+
+// -------------------------------------------------------------------------------------
+
+bool GrandPrixLose::onEscapePressed()
+{
+    ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    return false;
 }
 
 // -------------------------------------------------------------------------------------
@@ -124,17 +182,6 @@ void GrandPrixLose::init()
 void GrandPrixLose::tearDown()
 {
     Screen::tearDown();
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
-
-    for (unsigned int i=0; i<m_all_kart_models.size(); i++)
-        delete m_all_kart_models[i];
-
-    m_all_kart_models.clear();
-    
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-    m_kart_node[3] = NULL;
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -184,36 +231,7 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
 {
     if (name == "continue")
     {
-        // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
-        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-
-        std::vector<const ChallengeData*> unlocked =
-            PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
-        if (unlocked.size() > 0)
-        {
-
-            FeatureUnlockedCutScene* scene =
-                FeatureUnlockedCutScene::getInstance();
-
-            scene->addTrophy(race_manager->getDifficulty());
-            scene->findWhatWasUnlocked(race_manager->getDifficulty());
-
-            StateManager::get()->replaceTopMostScreen(scene);
-            PlayerManager::getCurrentPlayer()->clearUnlocked();
-        }
-        else
-        {
-            if (race_manager->raceWasStartedFromOverworld())
-            {
-                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-                OverWorld::enterOverWorld();
-            }
-            else
-            {
-                // we assume the main menu was pushed before showing this menu
-                StateManager::get()->popMenu();
-            }
-        }
+        ((CutsceneWorld*)World::getWorld())->abortCutscene();
     }
 }   // eventCallback
 

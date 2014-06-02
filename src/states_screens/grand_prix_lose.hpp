@@ -55,6 +55,8 @@ public:
 
     virtual void onCutsceneEnd() OVERRIDE;
 
+    virtual bool onEscapePressed() OVERRIDE;
+    
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
