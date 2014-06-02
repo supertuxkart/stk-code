@@ -53,13 +53,14 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
-const float KARTS_X = -0.62f;
-const float KARTS_DELTA_X = 0.815f;
+const float KARTS_X = -0.95f;
+const float KARTS_DELTA_X = 1.9f;
 const float KARTS_DELTA_Y = -0.55f;
-const float KARTS_DEST_Z = 1.2f;
+const float KARTS_INITIAL_Z = -10.0f;
+const float KARTS_DEST_Z = -1.8f;
 const float INITIAL_Y = 0.0f;
-const float INITIAL_PODIUM_Y = -0.89f;
-const float PODIUM_HEIGHT[3] = { 0.325f, 0.5f, 0.15f };
+const float INITIAL_PODIUM_Y = -1.27f;
+const float PODIUM_HEIGHT[3] = { 0.650f, 1.0f, 0.30f };
 
 DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
@@ -221,7 +222,7 @@ void GrandPrixWin::onUpdate(float dt)
 
                 core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                 core::vector3df kart_rot(0, m_kart_rotation[k], 0);
-                core::vector3df kart_scale(0.5f, 0.5f, 0.5f);
+                core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
                 m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
             }
         } // end for
@@ -246,7 +247,7 @@ void GrandPrixWin::onUpdate(float dt)
 
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
-                    core::vector3df kart_scale(0.5f, 0.5f, 0.5f);
+                    core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
                     m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
 
                     core::vector3df podium_pos = m_podium_steps[k]->getInitXYZ();
@@ -274,7 +275,7 @@ void GrandPrixWin::onUpdate(float dt)
                     m_kart_y[k] += dt*(PODIUM_HEIGHT[k]);
                     core::vector3df kart_pos(m_kart_x[k], m_kart_y[k], m_kart_z[k]);
                     core::vector3df kart_rot(0, m_kart_rotation[k], 0);
-                    core::vector3df kart_scale(0.5f, 0.5f, 0.5f);
+                    core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
                     m_kart_node[k]->move(kart_pos, kart_rot, kart_scale, false);
 
 
@@ -359,12 +360,12 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
 
         m_kart_x[i] = KARTS_X + i*KARTS_DELTA_X;
         m_kart_y[i] = INITIAL_Y + KARTS_DELTA_Y;
-        m_kart_z[i] = -4; // to 1.2
+        m_kart_z[i] = KARTS_INITIAL_Z;
         m_kart_rotation[i] = 0.0f;
 
         core::vector3df kart_pos(m_kart_x[i], m_kart_y[i], m_kart_z[i]);
         core::vector3df kart_rot(0, 0, 0);
-        core::vector3df kart_scale(0.5, 0.5, 0.5);
+        core::vector3df kart_scale(1.0f, 1.0f, 1.0f);
 
         //FIXME: it's not ideal that both the track object and the presentation know the initial coordinates of the object
         TrackObjectPresentationSceneNode* presentation = new TrackObjectPresentationSceneNode(
