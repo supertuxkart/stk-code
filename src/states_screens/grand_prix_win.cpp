@@ -66,12 +66,8 @@ DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false /* pause race */)
+GrandPrixWin::GrandPrixWin() : CutsceneScreen("grand_prix_win.stkgui")
 {
-    setNeeds3D(true);
-
-    m_throttle_FPS = false;
-
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;
     m_kart_node[2] = NULL;
@@ -81,6 +77,70 @@ GrandPrixWin::GrandPrixWin() : Screen("grand_prix_win.stkgui", false /* pause ra
     m_podium_steps[2] = NULL;
 
 }   // GrandPrixWin
+
+// -------------------------------------------------------------------------------------
+
+GrandPrixWin::~GrandPrixWin()
+{
+}
+
+// -------------------------------------------------------------------------------------
+
+void GrandPrixWin::onCutsceneEnd()
+{
+    for (unsigned int i = 0; i<m_all_kart_models.size(); i++)
+        delete m_all_kart_models[i];
+    m_all_kart_models.clear();
+
+    if (m_unlocked_label != NULL)
+    {
+        manualRemoveWidget(m_unlocked_label);
+        delete m_unlocked_label;
+        m_unlocked_label = NULL;
+    }
+
+    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
+    if (m_kart_node[0] != NULL)
+        m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    if (m_kart_node[1] != NULL)
+        m_kart_node[1]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    if (m_kart_node[2] != NULL)
+        m_kart_node[2]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+
+    m_kart_node[0] = NULL;
+    m_kart_node[1] = NULL;
+    m_kart_node[2] = NULL;
+
+    m_podium_steps[0] = NULL;
+    m_podium_steps[1] = NULL;
+    m_podium_steps[2] = NULL;
+
+
+
+    // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
+    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+
+    if (PlayerManager::getCurrentPlayer()
+        ->getRecentlyCompletedChallenges().size() > 0)
+    {
+        std::vector<const ChallengeData*> unlocked =
+            PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+        PlayerManager::getCurrentPlayer()->clearUnlocked();
+
+        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+
+        assert(unlocked.size() > 0);
+        scene->addTrophy(race_manager->getDifficulty());
+        scene->findWhatWasUnlocked(race_manager->getDifficulty());
+
+        StateManager::get()->replaceTopMostScreen(scene);
+    }
+    else
+    {
+        // we assume the main menu was pushed before showing this menu
+        StateManager::get()->popMenu();
+    }
+}
 
 // -------------------------------------------------------------------------------------
 
@@ -161,29 +221,17 @@ void GrandPrixWin::init()
 
 // -------------------------------------------------------------------------------------
 
+bool GrandPrixWin::onEscapePressed()
+{
+    ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    return false;
+}
+
+// -------------------------------------------------------------------------------------
+
 void GrandPrixWin::tearDown()
 {
     Screen::tearDown();
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
-
-    for (unsigned int i = 0; i<m_all_kart_models.size(); i++)
-        delete m_all_kart_models[i];
-    m_all_kart_models.clear();
-
-    if (m_unlocked_label != NULL)
-    {
-        manualRemoveWidget(m_unlocked_label);
-        delete m_unlocked_label;
-        m_unlocked_label = NULL;
-    }
-
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-
-    m_podium_steps[0] = NULL;
-    m_podium_steps[1] = NULL;
-    m_podium_steps[2] = NULL;
 }   // tearDown
 
 // -------------------------------------------------------------------------------------
@@ -311,29 +359,7 @@ void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
 {
     if (name == "continue")
     {
-        // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
-        race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
-
-        if (PlayerManager::getCurrentPlayer()
-                         ->getRecentlyCompletedChallenges().size() > 0)
-        {
-            std::vector<const ChallengeData*> unlocked =
-                PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
-            PlayerManager::getCurrentPlayer()->clearUnlocked();
-
-            FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
-
-            assert(unlocked.size() > 0);
-            scene->addTrophy(race_manager->getDifficulty());
-            scene->findWhatWasUnlocked(race_manager->getDifficulty());
-
-            StateManager::get()->replaceTopMostScreen(scene);
-        }
-        else
-        {
-            // we assume the main menu was pushed before showing this menu
-            StateManager::get()->popMenu();
-        }
+        ((CutsceneWorld*)World::getWorld())->abortCutscene();
     }
 }   // eventCallback
 

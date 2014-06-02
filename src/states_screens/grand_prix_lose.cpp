@@ -82,12 +82,15 @@ DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixLose::GrandPrixLose() : Screen("grand_prix_lose.stkgui", false /* pause race */)
+GrandPrixLose::GrandPrixLose() : CutsceneScreen("grand_prix_lose.stkgui")
 {
-    setNeeds3D(true);
-
-    m_throttle_FPS = false;
 }   // GrandPrixLose
+
+// -------------------------------------------------------------------------------------
+
+void GrandPrixLose::onCutsceneEnd()
+{
+}
 
 // -------------------------------------------------------------------------------------
 
