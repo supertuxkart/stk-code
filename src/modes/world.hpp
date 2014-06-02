@@ -71,6 +71,7 @@ class World : public WorldStatus
 {
 public:
     typedef std::vector<AbstractKart*> KartList;
+
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
@@ -166,7 +167,6 @@ protected:
     virtual void  update(float dt);
     virtual void  createRaceGUI();
             void  updateTrack(float dt);
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Used for AI karts that are still racing when all player kart finished.
      *  Generally it should estimate the arrival time for those karts, but as
@@ -216,6 +216,8 @@ public:
     virtual btTransform getRescueTransform(unsigned int index) const = 0;
     // ------------------------------------------------------------------------
     void moveKartAfterRescue(AbstractKart* kart);
+    // ------------------------------------------------------------------------
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */

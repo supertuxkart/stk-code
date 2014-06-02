@@ -35,11 +35,28 @@ namespace Scripting{
             AbstractKart* kart = World::getWorld()->getKart(id);
             kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
         }
+        void teleportKart(asIScriptGeneric *gen)
+        {
+            int id = (int)gen->GetArgDWord(0);
 
+            float x =  gen->GetArgFloat(1);
+            float y =  gen->GetArgFloat(2);
+            float z =  gen->GetArgFloat(3);
+            
+            AbstractKart* kart = World::getWorld()->getKart(id);
+            kart->setXYZ(btVector3(x, y, z));
+            unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
+            btTransform s = World::getWorld()->getRescueTransform(index);
+            const btVector3 &xyz = s.getOrigin();
+            float angle = atan2(0, 0);
+            s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle));
+            World::getWorld()->moveKartTo(kart, s);
+        }
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
             r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void teleportKart(int id, float x, float y,float z)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
 
         }
     }
