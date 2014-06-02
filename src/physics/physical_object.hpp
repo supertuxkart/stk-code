@@ -94,7 +94,7 @@ private:
     btCollisionShape     *m_shape;
 
     /** ID of the object. */
-    std::string               m_id;
+    std::string           m_id;
 
     /** The corresponding bullet rigid body. */
     btRigidBody          *m_body;
@@ -165,7 +165,7 @@ public:
     void         hit            (const Material *m, const Vec3 &normal);
     bool         isSoccerBall   () const;
     // ------------------------------------------------------------------------
-    /** Returns the rigid body of this physical object. */
+    /** Returns the ID of this physical object. */
     std::string getID()          { return m_id; }
     // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------

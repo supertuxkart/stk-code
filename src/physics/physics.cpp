@@ -250,13 +250,14 @@ void Physics::update(float dt)
             Scripting::Physics::setCollisionType("Projectile-PhysObj");
             Scripting::Physics::setCollision
                 (
-                p->getUserPointer(1)->getPointerPhysicalObject()->getID,
+                p->getUserPointer(1)->getPointerPhysicalObject()->getID(),
                 "item"
                 );
             script_engine->runScript("collisions");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());
             PhysicalObject* obj = p->getUserPointer(1)->getPointerPhysicalObject();
+
             if(obj->isSoccerBall())
             {
                 int kartId = p->getUserPointer(0)->getPointerFlyable()->getOwnerId();

@@ -56,14 +56,13 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
 {
     init();
     std::string shape;
-    xml_node.get("id",      &m_id         );
+    xml_node.get("id",      &m_id          );
     xml_node.get("mass",    &m_mass        );
     xml_node.get("radius",  &m_radius      );
     xml_node.get("shape",   &shape         );
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);
-
     m_reset_when_too_low =
         xml_node.get("reset-when-below", &m_reset_height) == 1;
 
@@ -132,6 +131,7 @@ PhysicalObject::PhysicalObject(bool is_dynamic,
     m_init_hpr   = object->getRotation();
     m_init_scale = object->getScale();
 
+    m_id                 = settings.m_id;
     m_mass               = settings.m_mass;
     m_radius             = settings.m_radius;
     m_body_type          = settings.m_body_type;

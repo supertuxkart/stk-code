@@ -53,6 +53,7 @@ namespace Scripting{
             void getCollidingKart1(asIScriptGeneric *gen);
             void getCollidingKart2(asIScriptGeneric *gen);
             void getCollsionType(asIScriptGeneric *gen);
+            void getCollidingID(asIScriptGeneric *gen);
 
     }
     

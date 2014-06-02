@@ -20,7 +20,6 @@
 #include <angelscript.h>
 #include "script_physics.hpp"
 
-
 namespace Scripting{
     
     namespace Physics{
@@ -32,6 +31,11 @@ namespace Scripting{
         void getCollidingKart2(asIScriptGeneric *gen)
         {
             gen->SetReturnDWord(m_collidingkartid2);
+        }
+        void getCollidingID(asIScriptGeneric *gen)
+        {
+            void *pointer = &m_collider1;
+            gen->SetReturnObject(pointer);
         }
         void getCollisionType(asIScriptGeneric *gen)
         {
@@ -65,7 +69,7 @@ namespace Scripting{
             r = engine->RegisterGlobalFunction("uint getCollidingKart1()", asFUNCTION(getCollidingKart1), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("string getCollisionType()", asFUNCTION(getCollisionType), asCALL_GENERIC); assert(r >= 0);
-
+            r = engine->RegisterGlobalFunction("string getCollidingID()", asFUNCTION(getCollidingID), asCALL_GENERIC); assert(r >= 0);
         }
     }
 }
