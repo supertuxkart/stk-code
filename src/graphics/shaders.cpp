@@ -1510,8 +1510,6 @@ namespace MeshShader
         attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     void RSMShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix, unsigned TU_tex)
@@ -2339,8 +2337,6 @@ namespace FullScreenShader
         uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
         uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
         vao = createVAO(Program);
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     void RadianceHintsConstructionShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ctex, unsigned TU_ntex, unsigned TU_dtex)
@@ -2505,29 +2501,6 @@ namespace FullScreenShader
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
         vao = createVAO(Program);
-    }
-
-    GLuint ShadowGenShader::Program;
-    GLuint ShadowGenShader::uniform_halft;
-    GLuint ShadowGenShader::uniform_quarter;
-    GLuint ShadowGenShader::uniform_height;
-    GLuint ShadowGenShader::vao;
-    void ShadowGenShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/shadowgen.frag").c_str());
-        uniform_halft = glGetUniformLocation(Program, "halft");
-        uniform_quarter = glGetUniformLocation(Program, "quarter");
-        uniform_height = glGetUniformLocation(Program, "height");
-        vao = createVAO(Program);
-    }
-
-    void ShadowGenShader::setUniforms(GLuint TU_halft, GLuint TU_quarter, GLuint TU_height)
-    {
-        glUniform1i(uniform_halft, TU_halft);
-        glUniform1i(uniform_quarter, TU_quarter);
-        glUniform1i(uniform_height, TU_height);
     }
 
     GLuint PassThroughShader::Program;

@@ -142,7 +142,7 @@ bool DemoWorld::updateIdleTimeAndStartDemo(float dt)
     // Use keyboard 0 by default in --no-start-screen
     device = input_manager->getDeviceList()->getKeyboard(0);
     StateManager::get()->createActivePlayer(
-                           PlayerManager::get()->getPlayer(0), device , NULL);
+                           PlayerManager::get()->getPlayer(0), device);
     // ASSIGN should make sure that only input from assigned devices
     // is read.
     input_manager->getDeviceList()->setAssignMode(ASSIGN);

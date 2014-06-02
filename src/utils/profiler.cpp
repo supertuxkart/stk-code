@@ -399,6 +399,7 @@ void Profiler::draw()
                 "Transparent",
                 "Particles",
                 "Displacement",
+                "Depth of Field",
                 "Godrays",
                 "Bloom",
                 "Tonemap",

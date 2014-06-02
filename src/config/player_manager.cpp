@@ -272,10 +272,12 @@ void PlayerManager::save()
                          << m_current_player->getName() << L"\"/>\n";
         }
 
+        // Save all non-guest players
         PlayerProfile *player;
         for_in(player, m_all_players)
         {
-            player->save(players_file);
+            if(!player->isGuestAccount())
+                player->save(players_file);
         }
         players_file << L"</players>\n";
         players_file.close();
@@ -373,9 +375,35 @@ void PlayerManager::addDefaultPlayer()
     // screen to be shown.
     m_all_players.push_back(new Online::OnlinePlayerProfile(username.c_str()) );
 
-    // add default guest player
-    m_all_players.push_back(new Online::OnlinePlayerProfile(_LTR("Guest"), /*guest*/true));
 }   // addDefaultPlayer
+
+// ----------------------------------------------------------------------------
+/** Makes sure at least n guest players exist. This is used by the multiplayer
+ *  KartSelection screen to make sure enough guest players can be picked by
+ *  the players.
+ *  \param n Minimum number of guest players that must exist.
+ */
+void PlayerManager::createGuestPlayers(int n)
+{
+    int num_guests = m_all_players.size() - getNumNonGuestPlayers();
+    for(int i=num_guests; i<n; i++)
+    {
+        core::stringw guest_name;
+        if(i==0)
+        {
+            // I18N: Name of first guest player (without number)
+            guest_name = _LTR("Guest");
+        }
+        else
+        {
+            // I18N: Name of further guest players, with a 1, 2, ... attached
+            guest_name = _LTR("Guest %d", i);
+        }
+        PlayerProfile *guest = new Online::OnlinePlayerProfile(guest_name,
+                                                               /*guest*/ true);
+        m_all_players.push_back(guest);
+    }
+}   // createGuestPlayers
 
 // ----------------------------------------------------------------------------
 /** Returns the number of 'real' (non-guest) players.

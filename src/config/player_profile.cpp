@@ -146,7 +146,7 @@ void PlayerProfile::initRemainingData()
  */
 void PlayerProfile::addIcon()
 {
-    if (m_icon_filename.size() > 0)
+    if (m_icon_filename.size() > 0 || isGuestAccount())
         return;
 
     int n = m_unique_id % kart_properties_manager->getNumberOfKarts();

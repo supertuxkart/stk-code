@@ -718,8 +718,11 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
 
     if (UserConfigParams::m_dof)
     {
+        PROFILER_PUSH_CPU_MARKER("- DoF", 0xFF, 0x00, 0x00);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_DOF));
         renderDoF(*out_fbo, in_fbo->getRTT()[0]);
         std::swap(in_fbo, out_fbo);
+        PROFILER_POP_CPU_MARKER();
     }
 
     {

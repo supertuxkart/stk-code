@@ -27,11 +27,12 @@ namespace GUIEngine { class Widget; }
   * \brief screen where the user can select a track
   * \ingroup states_screens
   */
-class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<TracksScreen>
+class TracksScreen : public GUIEngine::Screen,
+                     public GUIEngine::ScreenSingleton<TracksScreen>
 {
     friend class GUIEngine::ScreenSingleton<TracksScreen>;
 
-    TracksScreen();
+    TracksScreen() : Screen("tracks.stkgui") {}
 
     /** adds the tracks from the current track group into the tracks ribbon */
     void buildTrackList();
@@ -41,10 +42,11 @@ class TracksScreen : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
 public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE;
+    virtual void loadedFromFile() OVERRIDE {};
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void eventCallback(GUIEngine::Widget* widget, const std::string& name,
+    virtual void eventCallback(GUIEngine::Widget* widget,
+                               const std::string& name,
                                const int playerID) OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */

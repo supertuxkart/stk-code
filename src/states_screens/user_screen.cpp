@@ -284,6 +284,10 @@ void BaseUserScreen::eventCallback(Widget* widget,
             deletePlayer();
         }
     }   // options
+    else if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
 
     return;
 
