@@ -42,7 +42,7 @@ namespace Scripting{
             float x =  gen->GetArgFloat(1);
             float y =  gen->GetArgFloat(2);
             float z =  gen->GetArgFloat(3);
-            
+
             AbstractKart* kart = World::getWorld()->getKart(id);
             kart->setXYZ(btVector3(x, y, z));
             unsigned int index = World::getWorld()->getRescuePositionIndex(kart);
@@ -51,6 +51,32 @@ namespace Scripting{
             float angle = atan2(0, 0);
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle));
             World::getWorld()->moveKartTo(kart, s);
+        }
+        void jumpKartTo(asIScriptGeneric *gen)
+        {
+            //attempts to project kart to target destination
+            //at present, assumes both initial and target location are
+            //on the same horizontal plane (z=k plane) and projects
+            //at a 45 degree angle.
+            int id = (int)gen->GetArgDWord(0);
+
+            float x = gen->GetArgFloat(1);
+            float y = gen->GetArgFloat(2);
+            //float velocity = gen->GetArgFloat(3);
+            //angle = pi/4 so t = v/(root 2 * g)
+            //d = t * v/root 2 so d = v^2/(2g) => v = root(2dg)
+            //component in x = component in y = root (dg)
+            AbstractKart* kart = World::getWorld()->getKart(id);
+            Vec3 pos = kart->getXYZ();
+            float dx = x - pos[0];
+            float dy = y - pos[2]; //blender uses xyz, bullet xzy
+            float d = (sqrtf(dx*dx + dy*dy));
+            float normalized_dx = dx / d;
+            float normalized_dy = dy / d;
+            float g = 9.81;
+            float velocity = sqrtf(d * g);
+            
+            kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
         }
         void setVelocity(asIScriptGeneric *gen)
         {
@@ -68,6 +94,7 @@ namespace Scripting{
             r = engine->RegisterGlobalFunction("void squashKart(int id, float time)", asFUNCTION(squashKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void teleportKart(int id, float x, float y,float z)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setVelocity(int id, float x, float y,float z)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void jumpKartTo(int id, float x, float y)", asFUNCTION(jumpKartTo), asCALL_GENERIC); assert(r >= 0);
 
         }
     }
