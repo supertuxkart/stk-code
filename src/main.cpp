@@ -403,7 +403,7 @@ void setupRaceStart()
 
     // Create player and associate player with keyboard
     StateManager::get()->createActivePlayer(
-        PlayerManager::get()->getPlayer(0), device, NULL);
+        PlayerManager::get()->getPlayer(0), device);
 
     if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
     {

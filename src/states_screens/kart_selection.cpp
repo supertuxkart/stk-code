@@ -1005,7 +1005,7 @@ void KartSelectionScreen::init()
     else */
     // For now this is what will happen
     {
-        playerJoin( input_manager->getDeviceList()->getLatestUsedDevice(),
+        joinPlayer( input_manager->getDeviceList()->getLatestUsedDevice(),
                     true );
         w->updateItemDisplay();
     }
@@ -1063,24 +1063,24 @@ void KartSelectionScreen::unloaded()
 
 // ----------------------------------------------------------------------------
 // Return true if event was handled successfully
-bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
+bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
 {
     if (UserConfigParams::logGUI())
-        Log::info("[KartSelectionScreen]",  "playerJoin() invoked");
-    if (!m_multiplayer && !firstPlayer) return false;
+        Log::info("[KartSelectionScreen]",  "joinPlayer() invoked");
+    if (!m_multiplayer && !first_player) return false;
 
     assert (g_dispatcher != NULL);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
     {
-        Log::error("[KartSelectionScreen]", "playerJoin(): Called outside of "
+        Log::error("[KartSelectionScreen]", "joinPlayer(): Called outside of "
                   "kart selection screen.");
         return false;
     }
     else if (device == NULL)
     {
-        Log::error("[KartSelectionScreen]", "playerJoin(): Received null "
+        Log::error("[KartSelectionScreen]", "joinPlayer(): Received null "
                   "device pointer");
         return false;
     }
@@ -1093,32 +1093,19 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         return false;
     }
 
-    // ---- Get available area for karts
-    // make a copy of the area, ands move it to be outside the screen
-    Widget* kartsAreaWidget = getWidget("playerskarts");
-    // start at the rightmost of the screen
-    const int shift = irr_driver->getFrameSize().Width;
-    core::recti kartsArea(kartsAreaWidget->m_x + shift,
-                          kartsAreaWidget->m_y,
-                          kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
-                          kartsAreaWidget->m_y + kartsAreaWidget->m_h);
-
     // ---- Create new active player
     PlayerProfile* profile_to_use = PlayerManager::getCurrentPlayer();
 
-    if (!firstPlayer)
+    // Make sure enough guest character exists. At this stage this player has
+    // not been added, so the number of guests requested for the first player
+    // is 0 --> forcing at least one real player.
+    PlayerManager::get()->createGuestPlayers(
+                                     StateManager::get()->activePlayerCount());
+    if (!first_player)
     {
-        const int player_profile_count = PlayerManager::get()->getNumPlayers();
-        for (int i=0; i<player_profile_count; i++)
-        {
-            PlayerProfile *player = PlayerManager::get()->getPlayer(i);
-            if (player->isGuestAccount())
-            {
-                profile_to_use = player;
-                break;
-            }
-        }
-
+        // Give each player a different start profile
+        const int num_active_players = StateManager::get()->activePlayerCount();
+        profile_to_use = PlayerManager::get()->getPlayer(num_active_players);
 
         // Remove multiplayer message
         if (m_multiplayer_message != NULL)
@@ -1132,7 +1119,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
 
     const int new_player_id =
-        StateManager::get()->createActivePlayer( profile_to_use, device, NULL );
+        StateManager::get()->createActivePlayer( profile_to_use, device);
     StateManager::ActivePlayer* aplayer =
         StateManager::get()->getActivePlayer(new_player_id);
 
@@ -1141,6 +1128,16 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
 
     std::string selected_kart_group =
         tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+    // ---- Get available area for karts
+    // make a copy of the area, ands move it to be outside the screen
+    Widget* kartsAreaWidget = getWidget("playerskarts");
+    // start at the rightmost of the screen
+    const int shift = irr_driver->getFrameSize().Width;
+    core::recti kartsArea(kartsAreaWidget->m_x + shift,
+                          kartsAreaWidget->m_y,
+                          kartsAreaWidget->m_x + shift + kartsAreaWidget->m_w,
+                          kartsAreaWidget->m_y + kartsAreaWidget->m_h);
 
     // ---- Create player/kart widget
     PlayerKartWidget* newPlayerWidget =
@@ -1157,7 +1154,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     Widget* fullarea = getWidget("playerskarts");
 
     // in this special case, leave room for a message on the right
-    if (m_multiplayer && firstPlayer)
+    if (m_multiplayer && first_player)
     {
         const int splitWidth = fullarea->m_w / 2;
 
@@ -1189,7 +1186,7 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
     }
 
 
-    if (!firstPlayer)
+    if (!first_player)
     {
         // select something (anything) in the ribbon; by default, only the
         // game master has something selected. Thus, when a new player joins,
@@ -1197,17 +1194,17 @@ bool KartSelectionScreen::playerJoin(InputDevice* device, bool firstPlayer)
         w->setSelection(new_player_id, new_player_id, true);
 
         newPlayerWidget->m_player_ident_spinner
-        ->setFocusForPlayer(new_player_id);
+                       ->setFocusForPlayer(new_player_id);
     }
 
     if (!m_multiplayer)
     {
         input_manager->getDeviceList()->setSinglePlayer( StateManager::get()
-                ->getActivePlayer(0));
+                                                         ->getActivePlayer(0));
     }
 
     return true;
-}   // playerJoin
+}   // joinPlayer
 
 // -----------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ class TrackObject;
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixLose>
+class GrandPrixLose : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<GrandPrixLose>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixLose>;
 
@@ -53,6 +53,10 @@ class GrandPrixLose : public GUIEngine::Screen, public GUIEngine::ScreenSingleto
 
 public:
 
+    virtual void onCutsceneEnd() OVERRIDE;
+
+    virtual bool onEscapePressed() OVERRIDE;
+    
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 

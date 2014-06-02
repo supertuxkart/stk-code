@@ -309,6 +309,17 @@ namespace GUIEngine
         virtual void onDialogClose() {}
     };
 
+    class CutsceneScreen : public Screen
+    {
+    public:
+        CutsceneScreen(const char* name) : Screen(name, false)
+        {
+            setNeeds3D(true);
+            m_throttle_FPS = false;
+        }
+
+        virtual void onCutsceneEnd() = 0;
+    };
 }
 
 #endif
