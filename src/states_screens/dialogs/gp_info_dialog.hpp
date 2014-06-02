@@ -20,7 +20,10 @@
 #define HEADER_GP_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "race/grand_prix_data.hpp"
+// Don't include grand_prix_data.hpp here or the compilation will fail
+
+
+class GrandPrixData;
 
 namespace GUIEngine
 {

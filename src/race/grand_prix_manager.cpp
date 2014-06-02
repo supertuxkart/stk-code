@@ -27,8 +27,6 @@
 #include <set>
 #include <sstream>
 
-#include <iostream> // remove later
-
 GrandPrixManager *grand_prix_manager = NULL;
 
 const char* GrandPrixManager::SUFFIX = ".grandprix";
@@ -159,7 +157,6 @@ GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
 {
-    std::cout << s << std::endl;
     if (s == "random")
         return m_random_gp;
 

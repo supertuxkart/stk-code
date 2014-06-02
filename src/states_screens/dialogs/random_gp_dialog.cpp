@@ -36,7 +36,7 @@ RandomGPInfoDialog::RandomGPInfoDialog()
     // Defaults - loading selection from last time frrom a file would be better
     m_number_of_tracks = 2;
     m_trackgroup = "all";
-    m_use_reverse = true;
+    m_use_reverse = NO_REVERSE;
 
     doInit();
     m_curr_time = 0.0f;
@@ -65,13 +65,16 @@ RandomGPInfoDialog::RandomGPInfoDialog()
 
 void RandomGPInfoDialog::addSpinners()
 {
+    const int left =  (m_area.getWidth() - 250 - 150 - 250)/2;
+
     // Trackgroup chooser
     Spinner* spinner = new Spinner(false);
     spinner->m_properties[GUIEngine::PROP_ID] = "Trackgroup";
+    spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     spinner->setParent(m_irrlicht_window);
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(10, m_under_title, 300, SPINNER_HEIGHT);
+    spinner->move(left + 0, m_under_title, 250, SPINNER_HEIGHT);
     // Fill it with with all the track group names
     spinner->addLabel("all");
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
@@ -85,9 +88,22 @@ void RandomGPInfoDialog::addSpinners()
     spinner->setMax(track_manager->getNumberOfTracks()); // default is "all"
     spinner->setParent(m_irrlicht_window);
     spinner->m_properties[GUIEngine::PROP_ID] = "Number of tracks";
+    spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(310, m_under_title, 200, SPINNER_HEIGHT);
+    spinner->move(left + 260, m_under_title, 150, SPINNER_HEIGHT);
+
+    // reverse choose
+    spinner = new Spinner(false);
+    spinner->setParent(m_irrlicht_window);
+    spinner->m_properties[GUIEngine::PROP_ID] = "reverse";
+    spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
+    m_widgets.push_back(spinner);
+    spinner->add();
+    spinner->move(left + 410, m_under_title, 250, SPINNER_HEIGHT);
+    spinner->addLabel("no reverse");
+    spinner->addLabel("all reverse");
+    spinner->addLabel("mixed");
 }
 
 // ----------------------------------------------------------------------------
@@ -106,7 +122,7 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
     {
         // The old gp can be reused because there's only track deletion/adding
         m_number_of_tracks = getWidget<Spinner>("Number of tracks")->getValue();
-        m_gp->changeTrackNumber(m_number_of_tracks, m_trackgroup, m_use_reverse);
+        m_gp->changeTrackNumber(m_number_of_tracks, m_trackgroup);
         addTracks();
     }
     else if (eventSource == "Trackgroup")
@@ -128,20 +144,18 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
         if (s->getValue() > (signed)max)
             s->setValue(max);
 
-        updateGP();
+        delete m_gp;
+        m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+        grand_prix_manager->m_random_gp = m_gp;
+        addTracks();
+    }
+    else if (eventSource == "reverse")
+    {
+        Spinner* r = getWidget<Spinner>("reverse");
+        m_use_reverse = static_cast<REVERSED>(r->getValue());
+        m_gp->changeReverse(m_use_reverse);
     }
 
     return GUIEngine::EVENT_LET;
-}
-
-// ----------------------------------------------------------------------------
-
-void RandomGPInfoDialog::updateGP()
-{
-    delete m_gp;
-
-    m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
-    grand_prix_manager->m_random_gp = m_gp;
-    addTracks();
 }
 

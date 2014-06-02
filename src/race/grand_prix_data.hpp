@@ -20,13 +20,14 @@
 #ifndef HEADER_GRAND_PRIX_DATA_HPP
 #define HEADER_GRAND_PRIX_DATA_HPP
 
+#include <irrString.h>
 #include <string>
 #include <vector>
-#include <cassert>
-#include <irrString.h>
-#include <stdexcept>
 
+#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "utils/translation.hpp"
+
+using irr::core::stringw;
 
 class Track;
 
@@ -78,11 +79,11 @@ public:
     GrandPrixData() {};
     /** TODO */
     GrandPrixData(const unsigned int number_of_tracks,
-                  const std::string& m_track_group,
-                  const bool use_reverse);
+                  const std::string& track_group,
+                  const RandomGPInfoDialog::REVERSED use_reverse);
     void changeTrackNumber(const unsigned int number_of_tracks,
-                           const std::string& track_group,
-                           const bool         use_reverse);
+                           const std::string& track_group);
+    void changeReverse(const RandomGPInfoDialog::REVERSED use_reverse);
 
     // Methods for the GP editor
     void setId(const std::string& id);

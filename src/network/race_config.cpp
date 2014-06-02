@@ -3,6 +3,8 @@
 #include "race/race_manager.hpp"
 #include "utils/log.hpp"
 
+#include <stdexcept>
+
 /** \brief Gets the element with the highest count in a std::map<S,int>.
  *  \param histogram : A pointer to the histogram.
  *  \return The key of type S that has the highest second value.

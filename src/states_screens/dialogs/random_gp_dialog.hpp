@@ -24,23 +24,31 @@
 
 class RandomGPInfoDialog : public GPInfoDialog
 {
+public:
+    // the enum has to be declared here because you can't forward declare it
+    // without c++11
+    enum REVERSED
+    {
+        NO_REVERSE = 0,
+        ALL_REVERSE = 1,
+        MIXED = 2
+    };
 private:
     unsigned int m_number_of_tracks;
     std::string m_trackgroup;
-    bool m_use_reverse;
+    REVERSED m_use_reverse;
 
 public:
     static const int SPINNER_HEIGHT = 40;
 
     RandomGPInfoDialog();
 
-    /** Adds a SpinnerWidgets to choose the track groups and one to choose the
-     * number of tracks */
+    /** Adds a SpinnerWidgets to choose the track groups, one to choose the
+     * number of tracks and one to choose if  the tracks should be raced in
+     * reverse. The Spinners are centered. */
     void addSpinners();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    /** Constructs a new gp from the members */
-    void updateGP();
 };
 
 #endif
