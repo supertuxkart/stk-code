@@ -92,7 +92,7 @@ void TrackObjectManager::disable(std::string name , std::string type){
      for_in (curr,m_all_objects){
 		 if (type != curr->getType())continue;
 		 
-            if (curr->getName() == (name))
+            if (curr->getName() == (name) || curr->getID() == (name))
             {
 
 				curr->setEnable(false);
@@ -109,7 +109,7 @@ void TrackObjectManager::enable(std::string name , std::string type){
 
 		if (type != curr->getType())continue;
 		
-            if (curr->getName() == (name))
+            if (curr->getName() == (name) || curr->getID() == (name))
             {
 			
 				curr->reset();
@@ -125,7 +125,7 @@ void TrackObjectManager::enable(std::string name , std::string type){
 bool TrackObjectManager::getStatus(std::string name){
      TrackObject* curr;
      for_in (curr,m_all_objects){
-            if (curr->getName() == (name))
+            if (curr->getName() == (name)||curr->getID()==(name))
             {
 
 				return curr->isEnabled();

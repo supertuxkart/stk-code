@@ -43,6 +43,11 @@ namespace Scripting{
             m_collidingkartid1 = collider1;
             m_collidingkartid2 = collider2;
         }
+        void setCollision(std::string collider1, std::string collider2)
+        {
+            m_collider1 = collider1;
+            m_collider2 = collider2;
+        }
         void setCollisionType(std::string collisionType)
         {
             m_collisionType = collisionType;

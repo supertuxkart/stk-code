@@ -248,6 +248,11 @@ void Physics::update(float dt)
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             Scripting::Physics::setCollision(0,0); //TODO : support item types etc
             Scripting::Physics::setCollisionType("Projectile-PhysObj");
+            Scripting::Physics::setCollision
+                (
+                p->getUserPointer(1)->getPointerPhysicalObject()->getID,
+                "item"
+                );
             script_engine->runScript("collisions");
             p->getUserPointer(0)->getPointerFlyable()
                 ->hit(NULL, p->getUserPointer(1)->getPointerPhysicalObject());

@@ -27,8 +27,13 @@ namespace Scripting{
     namespace Physics{
         
         //private:
+            //IDs of kart collisions
             int m_collidingkartid1;
             int m_collidingkartid2;
+
+            //Details of collision
+            std::string m_collider1;
+            std::string m_collider2;
             std::string m_collisionType;
         
         //public:

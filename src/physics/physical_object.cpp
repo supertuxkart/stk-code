@@ -56,9 +56,10 @@ PhysicalObject::Settings::Settings(const XMLNode &xml_node)
 {
     init();
     std::string shape;
+    xml_node.get("id",      &m_id         );
     xml_node.get("mass",    &m_mass        );
     xml_node.get("radius",  &m_radius      );
-    xml_node.get("shape",   &shape        );
+    xml_node.get("shape",   &shape         );
     xml_node.get("reset",   &m_crash_reset );
     xml_node.get("explode", &m_knock_kart  );
     xml_node.get("flatten", &m_flatten_kart);

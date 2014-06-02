@@ -47,6 +47,8 @@ public:
     class Settings
     {
     public:
+        /** ID of the object. */
+        std::string               m_id;
         /** Mass of the object. */
         float                     m_mass;
         /** Radius of the object. */
@@ -90,6 +92,9 @@ private:
 
     /** The bullet collision shape. */
     btCollisionShape     *m_shape;
+
+    /** ID of the object. */
+    std::string               m_id;
 
     /** The corresponding bullet rigid body. */
     btRigidBody          *m_body;
@@ -159,6 +164,10 @@ public:
     void         move           (const Vec3& xyz, const core::vector3df& hpr);
     void         hit            (const Material *m, const Vec3 &normal);
     bool         isSoccerBall   () const;
+    // ------------------------------------------------------------------------
+    /** Returns the rigid body of this physical object. */
+    std::string getID()          { return m_id; }
+    // ------------------------------------------------------------------------
     // ------------------------------------------------------------------------
     /** Returns the rigid body of this physical object. */
     btRigidBody *getBody        ()          { return m_body; }
