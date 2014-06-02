@@ -344,7 +344,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-        NetworkKartSelectionScreen::getInstance()->tearDown(); // be sure to delete the kart selection screen
+        KartSelectionScreen::getRunningInstance()->tearDown();
         Screen* newStack[] = {MainMenuScreen::getInstance(),
                               RaceSetupScreen::getInstance(),
                               NULL};
@@ -358,7 +358,7 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-        NetworkKartSelectionScreen::getInstance()->tearDown(); // be sure to delete the kart selection screen
+        KartSelectionScreen::getRunningInstance()->tearDown();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
         if (race_manager->raceWasStartedFromOverworld())
