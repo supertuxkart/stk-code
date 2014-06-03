@@ -74,7 +74,7 @@ void BaseUserScreen::init()
     assert(m_info_widget);
 
     getWidget<CheckBoxWidget>("remember-user")
-             ->setState(UserConfigParams::m_always_show_login_screen);
+             ->setState(UserConfigParams::m_remember_user);
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
