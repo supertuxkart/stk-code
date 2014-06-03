@@ -37,6 +37,8 @@ namespace Scripting{
         void enableAnimation(asIScriptGeneric *gen);
         void enableTrigger(asIScriptGeneric *gen);
         void disableTrigger(asIScriptGeneric *gen);
+        void createTrigger(asIScriptGeneric *gen);
+
     }
 
 }

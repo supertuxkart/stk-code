@@ -73,6 +73,10 @@ public:
         m_init_hpr = hpr;
         m_init_scale = scale;
     }
+    TrackObjectPresentation(const core::vector3df& xyz)
+    {
+        m_init_xyz = xyz;
+    }
 
     virtual ~TrackObjectPresentation() {}
 
@@ -336,6 +340,8 @@ public:
 
 
     TrackObjectPresentationActionTrigger(const XMLNode& xml_node);
+    TrackObjectPresentationActionTrigger(const core::vector3df& xyz,std::string scriptname, float distance);
+
     virtual ~TrackObjectPresentationActionTrigger() {}
 
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;

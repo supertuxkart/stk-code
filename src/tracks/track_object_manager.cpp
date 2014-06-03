@@ -106,7 +106,6 @@ void TrackObjectManager::disable(std::string name , std::string type){
 void TrackObjectManager::enable(std::string name , std::string type){
      TrackObject* curr;
      for_in (curr,m_all_objects){
-
 		if (type != curr->getType())continue;
 		
             if (curr->getName() == (name) || curr->getID() == (name))

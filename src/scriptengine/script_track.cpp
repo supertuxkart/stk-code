@@ -43,6 +43,8 @@ namespace Scripting{
             r = engine->RegisterGlobalFunction("void enableAnimation(string &in)", asFUNCTION(enableAnimation), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void createTrigger(string &in,float x,float y,float z, float distance)",
+                asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
 
         }
 
@@ -81,7 +83,22 @@ namespace Scripting{
             std::string type = "action-trigger";
             World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str, type);
         }
-
+        void createTrigger(asIScriptGeneric *gen)
+        {
+            std::string *script_name = (std::string*)gen->GetArgAddress(0);
+            float x = gen->GetArgFloat(1);
+            float y = gen->GetArgFloat(2);
+            float z = gen->GetArgFloat(3);
+            float distance = gen->GetArgFloat(4); //triggering distance
+            core::vector3df posi(0, 0, 0);
+            core::vector3df hpr(0, 0, 0);
+            core::vector3df scale(1.0f, 1.0f, 1.0f);
+            TrackObjectPresentationActionTrigger* newtrigger =
+                new TrackObjectPresentationActionTrigger(posi, *script_name, distance);
+            TrackObject* tobj = new TrackObject(posi, hpr, scale,
+                "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
+            World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
+        }
 
 
     }

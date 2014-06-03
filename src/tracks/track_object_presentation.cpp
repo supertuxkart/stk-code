@@ -740,6 +740,21 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }
 
+TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger
+(const core::vector3df& xyz,std::string script_name, float distance)
+:TrackObjectPresentation(xyz)
+{
+    m_init_xyz = core::vector3df(0, 0, 0);
+    m_init_hpr = core::vector3df(0, 0, 0);
+    m_init_scale = core::vector3df(1, 1, 1);
+    float trigger_distance = distance;
+    m_action = script_name;
+    m_action_active = true;
+
+
+    ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
+}
+
 void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
 {
     if (!m_action_active) return;
