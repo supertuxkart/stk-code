@@ -4,15 +4,8 @@ uniform float redLmn[9];
 uniform sampler2D ntex;
 uniform mat4 TransposeViewMatrix;
 
-#if __VERSION__ >= 130
 in vec2 uv;
 out vec4 Diff;
-out vec4 Spec;
-#else
-varying vec2 uv;
-#define Diff gl_FragData[0]
-#define Spec gl_FragData[1]
-#endif
 
 vec3 DecodeNormal(vec2 n);
 
@@ -43,5 +36,4 @@ void main(void)
     float b = dot(extendednormal, bmat * extendednormal);
 
     Diff = max(0.25 * vec4(r, g, b, .1), vec4(0.));
-    Spec = vec4(0.);
 }

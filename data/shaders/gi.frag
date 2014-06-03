@@ -39,8 +39,7 @@ vec3 SH2RGB (in vec4 sh_r, in vec4 sh_g, in vec4 sh_b, in vec3 dir)
 }
 
 in vec2 uv;
-layout (location = 0) out vec4 Diffuse;
-layout (location = 1) out vec4 Specular;
+out vec4 Diffuse;
 
 vec3 DecodeNormal(vec2 n);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
@@ -97,5 +96,4 @@ void main()
     GI /= 4;
 
     Diffuse = max(16. * vec4(GI, 1.), vec4(0.));
-    Specular = vec4(0.);
 }

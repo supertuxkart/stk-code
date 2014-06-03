@@ -995,9 +995,15 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         return;
 
     if (UserConfigParams::m_gi)
+    {
+        m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+        if (SkyboxCubeMap)
+            m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+        m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    }
 
-    if (SkyboxCubeMap)
+    if (SkyboxCubeMap || !UserConfigParams::m_gi)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     // Render sunlight if and only if track supports shadow
@@ -1009,10 +1015,7 @@ void IrrDriver::renderLights(unsigned pointlightcount)
             m_post_processing->renderSunlight();
     }
 
-
     renderPointLights(MIN2(pointlightcount, MAXLIGHT));
-    if (SkyboxCubeMap)
-        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
 }
 
 void IrrDriver::renderSSAO()
