@@ -641,6 +641,15 @@ public:
     static void init();
 };
 
+class ComputeGaussian17TapHShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_source, uniform_dest;
+
+    static void init();
+};
+
 class Gaussian6HBlurShader
 {
 public:
@@ -670,6 +679,16 @@ public:
 
     static void init();
 };
+
+class ComputeGaussian17TapVShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_source, uniform_dest;
+
+    static void init();
+};
+
 
 class Gaussian6VBlurShader
 {

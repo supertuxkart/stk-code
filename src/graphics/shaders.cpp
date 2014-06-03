@@ -277,9 +277,11 @@ void Shaders::loadShaders()
     FullScreenShader::DepthOfFieldShader::init();
     FullScreenShader::FogShader::init();
     FullScreenShader::Gaussian17TapHShader::init();
+    FullScreenShader::ComputeGaussian17TapHShader::init();
     FullScreenShader::Gaussian3HBlurShader::init();
     FullScreenShader::Gaussian3VBlurShader::init();
     FullScreenShader::Gaussian17TapVShader::init();
+    FullScreenShader::ComputeGaussian17TapVShader::init();
     FullScreenShader::Gaussian6HBlurShader::init();
     FullScreenShader::Gaussian6VBlurShader::init();
     FullScreenShader::GlowShader::init();
@@ -2439,6 +2441,17 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
+    GLuint ComputeGaussian17TapHShader::Program;
+    GLuint ComputeGaussian17TapHShader::uniform_source;
+    GLuint ComputeGaussian17TapHShader::uniform_dest;
+    void ComputeGaussian17TapHShader::init()
+    {
+        Program = LoadProgram(
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian.comp").c_str());
+        uniform_source = glGetUniformLocation(Program, "source");
+        uniform_dest = glGetUniformLocation(Program, "dest");
+    }
+
     GLuint Gaussian6HBlurShader::Program;
     GLuint Gaussian6HBlurShader::uniform_tex;
     GLuint Gaussian6HBlurShader::uniform_pixel;
@@ -2479,6 +2492,17 @@ namespace FullScreenShader
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
         vao = createFullScreenVAO(Program);
+    }
+
+    GLuint ComputeGaussian17TapVShader::Program;
+    GLuint ComputeGaussian17TapVShader::uniform_source;
+    GLuint ComputeGaussian17TapVShader::uniform_dest;
+    void ComputeGaussian17TapVShader::init()
+    {
+        Program = LoadProgram(
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussianv.comp").c_str());
+        uniform_source = glGetUniformLocation(Program, "source");
+        uniform_dest = glGetUniformLocation(Program, "dest");
     }
 
     GLuint Gaussian6VBlurShader::Program;

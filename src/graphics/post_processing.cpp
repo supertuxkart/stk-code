@@ -397,32 +397,56 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
-        auxiliary.Bind();
-        glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
-        glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
+        if (irr_driver->getGLSLVersion() < 430)
+        {
+            auxiliary.Bind();
+            glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
+            glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
 
-        glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
+            glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
 
-        setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
+            setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+        else
+        {
+            glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
+            glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
+            glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_source, 0);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 1);
+            glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
+        }
     }
     {
-        in_fbo.Bind();
-        glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
-        glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
+        if (irr_driver->getGLSLVersion() < 430)
+        {
+            in_fbo.Bind();
+            glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
+            glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
 
-        glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
+            glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
 
-        setTexture(0, auxiliary.getRTT()[0], GL_LINEAR, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
+            setTexture(0, auxiliary.getRTT()[0], GL_LINEAR, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+        else
+        {
+            glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
+            glBindImageTexture(0, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
+            glBindImageTexture(1, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_source, 0);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 1);
+            glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
+        }
     }
 }
 
