@@ -526,11 +526,11 @@ class BloomBlendShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_texture;
+    static GLuint uniform_tex_128, uniform_tex_256, uniform_tex_512;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(unsigned TU_tex);
+    static void setUniforms(unsigned TU_tex_128, unsigned TU_tex_256, unsigned TU_tex_512);
 };
 
 class ToneMapShader

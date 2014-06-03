@@ -2089,20 +2089,27 @@ namespace FullScreenShader
     }
 
     GLuint BloomBlendShader::Program;
-    GLuint BloomBlendShader::uniform_texture;
+    GLuint BloomBlendShader::uniform_tex_128;
+    GLuint BloomBlendShader::uniform_tex_256;
+    GLuint BloomBlendShader::uniform_tex_512;
     GLuint BloomBlendShader::vao;
+
     void BloomBlendShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
-        uniform_texture = glGetUniformLocation(Program, "tex");
-        vao = createVAO(Program);
+        uniform_tex_128 = glGetUniformLocation(Program, "tex_128");
+        uniform_tex_256 = glGetUniformLocation(Program, "tex_256");
+        uniform_tex_512 = glGetUniformLocation(Program, "tex_512");
+        vao = createFullScreenVAO(Program);
     }
 
-    void BloomBlendShader::setUniforms(unsigned TU_tex)
+    void BloomBlendShader::setUniforms(unsigned TU_tex_128, unsigned TU_tex_256, unsigned TU_tex_512)
     {
-        glUniform1i(FullScreenShader::BloomShader::uniform_texture, TU_tex);
+        glUniform1i(uniform_tex_128, TU_tex_128);
+        glUniform1i(uniform_tex_256, TU_tex_256);
+        glUniform1i(uniform_tex_512, TU_tex_512);
     }
 
     GLuint ToneMapShader::Program;

@@ -783,14 +783,16 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
             // Additively blend on top of tmp1
             in_fbo->Bind();
             glEnable(GL_BLEND);
-            glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
+            glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            glBlendColor(.125, .125, .125, .125);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
-            glBlendColor(.25, .25, .25, .25);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
-            glBlendColor(.5, .5, .5, .5);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+            setTexture(0, irr_driver->getRenderTargetTexture(RTT_BLOOM_128), GL_LINEAR, GL_LINEAR);
+            setTexture(1, irr_driver->getRenderTargetTexture(RTT_BLOOM_256), GL_LINEAR, GL_LINEAR);
+            setTexture(2, irr_driver->getRenderTargetTexture(RTT_BLOOM_512), GL_LINEAR, GL_LINEAR);
+            glUseProgram(FullScreenShader::BloomBlendShader::Program);
+            FullScreenShader::BloomBlendShader::setUniforms(0, 1, 2);
+            glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
             glDisable(GL_BLEND);
         } // end if bloom
         PROFILER_POP_CPU_MARKER();
