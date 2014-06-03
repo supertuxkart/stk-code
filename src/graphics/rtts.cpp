@@ -22,7 +22,7 @@
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
-static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, GLint format, GLint type)
+static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
     GLuint result;
     glGenTextures(1, &result);
@@ -30,7 +30,7 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     if (irr_driver->getGLSLVersion() < 420)
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     else
-        glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, res.Width, res.Height);
+        glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
     return result;
 }
 
@@ -77,6 +77,8 @@ RTT::RTT(size_t width, size_t height)
     const dimension2du warpvsize(1, 512);
     const dimension2du warphsize(512, 1);
 
+    unsigned linear_depth_mip_levels = ceil(log2(max_(res.Width, res.Height)));
+
     glGenTextures(1, &DepthStencilTexture);
     glBindTexture(GL_TEXTURE_2D, DepthStencilTexture);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, res.Width, res.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
@@ -88,10 +90,10 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT, linear_depth_mip_levels);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8, GL_BGR, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB, GL_BGR, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
 
