@@ -184,12 +184,16 @@ void EditTrackScreen::loadTrackList()
     {
         Track* t = track_manager->getTrack(i);
         const std::vector<std::string>& groups = t->getGroups();
-        belongsToGroup = (m_track_group.empty() || m_track_group == ALL_TRACKS_GROUP_ID ||
-            std::find(groups.begin(), groups.end(), m_track_group) != groups.end());
-        if (!t->isArena() && !t->isSoccer() && !t->isInternal() && belongsToGroup)
+        belongsToGroup = (m_track_group.empty()                ||
+                          m_track_group == ALL_TRACKS_GROUP_ID ||
+                          t->isInGroup(m_track_group)                );
+        if (!t->isArena()    && !t->isSoccer() && 
+            !t->isInternal() && belongsToGroup       )
         {
-            tracks_widget->addItem(translations->fribidize(t->getName()), t->getIdent(),
-                t->getScreenshotFile(), 0, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE );
+            tracks_widget->addItem(translations->fribidize(t->getName()), 
+                                   t->getIdent(),
+                                   t->getScreenshotFile(), 0, 
+                                   IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
         }
     }
 
