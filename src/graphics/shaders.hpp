@@ -555,16 +555,6 @@ public:
     static void setUniforms(unsigned TU_tex, unsigned TU_depth);
 };
 
-class ColorLevelShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_invprojm, uniform_dtex, uniform_inlevel, uniform_outlevel;
-    static GLuint vao;
-
-    static void init();
-};
-
 class SunLightShader
 {
 public:
@@ -786,17 +776,6 @@ public:
 
     static void init();
     static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
-};
-
-class LogLuminanceShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_tex;
-    static GLuint vao;
-
-    static void init();
-    static void setUniforms(unsigned TU_tex);
 };
 
 class MLAAColorEdgeDetectionSHader

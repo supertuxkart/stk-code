@@ -275,7 +275,6 @@ void Shaders::loadShaders()
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
     FullScreenShader::DepthOfFieldShader::init();
-    FullScreenShader::ColorLevelShader::init();
     FullScreenShader::FogShader::init();
     FullScreenShader::Gaussian17TapHShader::init();
     FullScreenShader::Gaussian3HBlurShader::init();
@@ -297,7 +296,6 @@ void Shaders::loadShaders()
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
     FullScreenShader::GodRayShader::init();
-    FullScreenShader::LogLuminanceShader::init();
     FullScreenShader::ToneMapShader::init();
     FullScreenShader::MLAAColorEdgeDetectionSHader::init();
     FullScreenShader::MLAABlendWeightSHader::init();
@@ -2125,7 +2123,7 @@ namespace FullScreenShader
         uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
         uniform_exposure = glGetUniformLocation(Program, "exposure");
         uniform_lwhite = glGetUniformLocation(Program, "Lwhite");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
     }
 
     void ToneMapShader::setUniforms(float exposure, float Lwhite, unsigned TU_tex, unsigned TU_loglum)
@@ -2159,28 +2157,6 @@ namespace FullScreenShader
         glUniform1i(uniform_depth, TU_dtex);
     }
 
-    GLuint ColorLevelShader::Program;
-    GLuint ColorLevelShader::uniform_tex;
-    GLuint ColorLevelShader::uniform_inlevel;
-    GLuint ColorLevelShader::uniform_outlevel;
-    GLuint ColorLevelShader::vao;
-    GLuint ColorLevelShader::uniform_invprojm;
-    GLuint ColorLevelShader::uniform_dtex;
-    void ColorLevelShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/color_levels.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_inlevel = glGetUniformLocation(Program, "inlevel");
-        uniform_outlevel = glGetUniformLocation(Program, "outlevel");
-        uniform_invprojm = glGetUniformLocation(Program, "invprojm");
-        vao = createVAO(Program);
-    }
-
     GLuint SunLightShader::Program;
     GLuint SunLightShader::uniform_ntex;
     GLuint SunLightShader::uniform_dtex;
@@ -2200,7 +2176,7 @@ namespace FullScreenShader
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_col = glGetUniformLocation(Program, "col");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -2237,7 +2213,7 @@ namespace FullScreenShader
         uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
         uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
         uniform_TVM = glGetUniformLocation(Program, "TransposeViewMatrix");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
     }
 
     void DiffuseEnvMapShader::setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
@@ -2270,7 +2246,7 @@ namespace FullScreenShader
         uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_col = glGetUniformLocation(Program, "col");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -2359,7 +2335,7 @@ namespace FullScreenShader
         uniform_extents = glGetUniformLocation(Program, "extents");
         uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
         uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
     }
 
     void RadianceHintsConstructionShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ctex, unsigned TU_ntex, unsigned TU_dtex)
@@ -2426,7 +2402,7 @@ namespace FullScreenShader
         uniform_SHB = glGetUniformLocation(Program, "SHB");
         uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
         uniform_extents = glGetUniformLocation(Program, "extents");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -2746,7 +2722,7 @@ namespace FullScreenShader
         uniform_start = glGetUniformLocation(Program, "start");
         uniform_end = glGetUniformLocation(Program, "end");
         uniform_col = glGetUniformLocation(Program, "col");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -2787,7 +2763,7 @@ namespace FullScreenShader
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
         uniform_max_tex_height = glGetUniformLocation(Program, "max_tex_height");
-        vao = createVAO(Program);
+        vao = createFullScreenVAO(Program);
     }
 
     void MotionBlurShader::setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb)
@@ -2839,24 +2815,6 @@ namespace FullScreenShader
     void GodRayShader::setUniforms(const core::vector2df &sunpos, unsigned TU_tex)
     {
         glUniform2f(uniform_sunpos, sunpos.X, sunpos.Y);
-        glUniform1i(uniform_tex, TU_tex);
-    }
-
-    GLuint LogLuminanceShader::Program;
-    GLuint LogLuminanceShader::uniform_tex;
-    GLuint LogLuminanceShader::vao;
-
-    void LogLuminanceShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/logluminance.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        vao = createVAO(Program);
-    }
-
-    void LogLuminanceShader::setUniforms(unsigned TU_tex)
-    {
         glUniform1i(uniform_tex, TU_tex);
     }
 

@@ -38,7 +38,6 @@ vec3 SH2RGB (in vec4 sh_r, in vec4 sh_g, in vec4 sh_b, in vec3 dir)
     return vec3 (dot(Y,sh_r), dot(Y,sh_g), dot(Y,sh_b));
 }
 
-in vec2 uv;
 out vec4 Diffuse;
 
 vec3 DecodeNormal(vec2 n);
@@ -48,6 +47,7 @@ vec3 resolution = vec3(32, 16, 32);
 
 void main()
 {
+    vec2 uv = gl_FragCoord.xy / screen;
     vec3 GI = vec3(0.);
 
     float depth = texture2D(dtex, uv).x;

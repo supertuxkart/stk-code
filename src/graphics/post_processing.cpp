@@ -217,28 +217,6 @@ void renderBloom(GLuint in)
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
-static
-void renderColorLevel(GLuint in)
-{
-    core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
-    core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
-
-
-    glUseProgram(FullScreenShader::ColorLevelShader::Program);
-    glBindVertexArray(FullScreenShader::ColorLevelShader::vao);
-    glUniform3f(FullScreenShader::ColorLevelShader::uniform_inlevel, m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
-    glUniform2f(FullScreenShader::ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
-
-    setTexture(0, in, GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
-    glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
-    setTexture(2, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
-    glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
 void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff)
 {
     glDisable(GL_DEPTH_TEST);
@@ -253,7 +231,7 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
     FullScreenShader::DiffuseEnvMapShader::setUniforms(TVM, bSHCoeff, gSHCoeff, rSHCoeff, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -287,7 +265,7 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, rh_extend, 3, 4, 0, 1, 2);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void PostProcessing::renderSunlight()
@@ -304,7 +282,7 @@ void PostProcessing::renderSunlight()
   setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
   setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
   FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
   glBindVertexArray(0);
 }
 
@@ -341,7 +319,7 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
         glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
         FullScreenShader::ShadowedSunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
     }
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 }
 
@@ -536,7 +514,7 @@ void PostProcessing::renderFog()
     setTexture(0, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::FogShader::setUniforms(fogmax, startH, endH, start, end, col, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -576,7 +554,7 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
                                   cb->getDirection(cam), 0.15f,
                                   cb->getMaxHeight(cam) * 0.7f, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static void renderGodFade(GLuint tex, const SColor &col)
@@ -608,7 +586,7 @@ static void toneMap(FrameBuffer &fbo, GLuint rtt)
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
     FullScreenShader::ToneMapShader::setUniforms(irr_driver->getExposure(), irr_driver->getLwhite(), 0, 1);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
@@ -628,19 +606,6 @@ static void averageTexture(GLuint tex)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex);
     glGenerateMipmap(GL_TEXTURE_2D);
-}
-
-static void computeLogLuminance(GLuint tex)
-{
-    irr_driver->getFBO(FBO_LOG_LUMINANCE).Bind();
-    glUseProgram(FullScreenShader::LogLuminanceShader::Program);
-    glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
-    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
-    FullScreenShader::LogLuminanceShader::setUniforms(0);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    averageTexture(irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE));
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 void PostProcessing::applyMLAA()
