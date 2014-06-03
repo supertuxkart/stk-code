@@ -214,7 +214,7 @@ void renderBloom(GLuint in)
     setTexture(0, in, GL_NEAREST, GL_NEAREST);
     FullScreenShader::BloomShader::setUniforms(0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static
@@ -362,7 +362,7 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     {
         in_fbo.Bind();
@@ -376,7 +376,7 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 }
 
@@ -396,7 +396,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     {
         in_fbo.Bind();
@@ -410,7 +410,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 }
 
@@ -430,7 +430,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     {
         in_fbo.Bind();
@@ -444,7 +444,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 }
 
@@ -489,7 +489,7 @@ void PostProcessing::renderSSAO()
     glBindVertexArray(FullScreenShader::LinearizeDepthShader::vao);
     setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
     FullScreenShader::LinearizeDepthShader::setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue(), 0);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     irr_driver->getFBO(FBO_SSAO).Bind();
 
     if (!noise_tex)
@@ -498,15 +498,15 @@ void PostProcessing::renderSSAO()
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
     glGenerateMipmap(GL_TEXTURE_2D);
     setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width), 
+    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width),
                                                               float(UserConfigParams::m_height)),
                                               0, 1);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void PostProcessing::renderFog()
@@ -620,7 +620,7 @@ static void renderDoF(FrameBuffer &fbo, GLuint rtt)
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::DepthOfFieldShader::setUniforms(0, 1);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static void averageTexture(GLuint tex)
