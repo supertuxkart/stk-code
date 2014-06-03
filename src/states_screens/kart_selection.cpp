@@ -675,10 +675,9 @@ void PlayerKartWidget::onUpdate(float delta)
 
 // -------------------------------------------------------------------------
 /** Event callback */
-GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(
-    Widget* w,
-    const std::string& originator,
-    const int m_player_id)
+GUIEngine::EventPropagation PlayerKartWidget::transmitEvent(Widget* w,
+                                              const std::string& originator,
+                                              const int m_player_id          )
 {
     assert(m_magic_number == 0x33445566);
     // if it's declared ready, there is really nothing to process
@@ -1050,7 +1049,7 @@ void KartSelectionScreen::tearDown()
     m_kart_widgets.clearAndDeleteAll();
 
     if (m_must_delete_on_back)
-        GUIEngine::removeScreen(this->getName().c_str());
+        GUIEngine::removeScreen(getName().c_str());
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -1542,7 +1541,7 @@ void KartSelectionScreen::eventCallback(Widget* widget,
 
         setKartsFromCurrentGroup();
 
-        const std::string selected_kart_group =
+        const std::string &selected_kart_group =
             tabs->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         UserConfigParams::m_last_used_kart_group = selected_kart_group;
@@ -1992,7 +1991,7 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     // selected kart group is removed. In this case, select the
     // 'standard' group
     if (selected_kart_group != ALL_KART_GROUPS_ID &&
-            !kart_properties_manager->getKartsInGroup(selected_kart_group).size())
+        !kart_properties_manager->getKartsInGroup(selected_kart_group).size())
     {
         selected_kart_group = DEFAULT_GROUP_NAME;
     }
@@ -2000,69 +1999,43 @@ void KartSelectionScreen::setKartsFromCurrentGroup()
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     w->clearItems();
 
-    int usableKartCount = 0;
+    int usable_kart_count = 0;
+    PtrVector<const KartProperties, REF> karts;
 
-    if (selected_kart_group == ALL_KART_GROUPS_ID)
+    for(unsigned int i=0; i<kart_properties_manager->getNumberOfKarts(); i++)
     {
-        const int kart_amount = kart_properties_manager->getNumberOfKarts();
-
-        for (int n=0; n<kart_amount; n++)
-        {
-            const KartProperties* prop =
-                kart_properties_manager->getKartById(n);
-            if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
-            {
-                w->addItem(
-                    _("Locked : solve active challenges to gain access "
-                      "to more!"),
-                    ID_LOCKED+prop->getIdent(),
-                    prop->getAbsoluteIconFile(), LOCKED_BADGE,
-                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                w->addItem(translations->fribidize(prop->getName()),
-                           prop->getIdent(),
-                           prop->getAbsoluteIconFile(), 0,
-                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-                usableKartCount++;
-            }
-        }
+        const KartProperties* prop = kart_properties_manager->getKartById(i);
+        // Ignore karts that are not in the selected group
+        if(selected_kart_group != ALL_KART_GROUPS_ID &&
+            !prop->isInGroup(selected_kart_group))
+            continue;
+        karts.push_back(prop);
     }
-    else if (selected_kart_group != RibbonWidget::NO_ITEM_ID)
+    karts.insertionSort();
+
+    for(unsigned int i=0; i<karts.size(); i++)
     {
-        std::vector<int> group =
-            kart_properties_manager->getKartsInGroup(selected_kart_group);
-        const int kart_amount = group.size();
-
-
-        for (int n=0; n<kart_amount; n++)
+        const KartProperties* prop = karts.get(i);
+        if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
         {
-            const KartProperties* prop =
-                kart_properties_manager->getKartById(group[n]);
-            const std::string &icon_path = prop->getAbsoluteIconFile();
-
-            if (PlayerManager::getCurrentPlayer()->isLocked(prop->getIdent()))
-            {
-                w->addItem(
-                    _("Locked : solve active challenges to gain access "
-                      "to more!"),
-                    ID_LOCKED+prop->getIdent(), icon_path, LOCKED_BADGE,
-                    IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-            }
-            else
-            {
-                w->addItem(translations->fribidize(prop->getName()),
-                           prop->getIdent(),
-                           icon_path, 0,
-                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-                usableKartCount++;
-            }
+            w->addItem(_("Locked : solve active challenges to gain access "
+                         "to more!"),
+                       ID_LOCKED + prop->getIdent(),
+                       prop->getAbsoluteIconFile(), LOCKED_BADGE,
+                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        }
+        else
+        {
+            w->addItem(translations->fribidize(prop->getName()),
+                       prop->getIdent(),
+                       prop->getAbsoluteIconFile(), 0,
+                       IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+            usable_kart_count++;
         }
     }
 
     // add random
-    if (usableKartCount > 1)
+    if (usable_kart_count > 1)
     {
         w->addItem(_("Random Kart"), RANDOM_KART_ID, "/gui/random_kart.png");
     }
