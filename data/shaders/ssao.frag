@@ -59,11 +59,15 @@ void main(void)
     float phi = 30. * (x ^ y) + 10. * x * y;
     float bl = 0.0;
 
+    float theta = 2. * 3.14 * tau * .5 * invSamples + phi;
+    vec2 rotations = vec2(cos(theta), sin(theta)) * screen;
+    vec2 offset = vec2(cos(invSamples), sin(invSamples));
+
     for(int i = 0; i < SAMPLES; ++i) {
         float alpha = (i + .5) * invSamples;
-        float theta = 2. * 3.14 * tau * alpha + phi;
+        rotations = vec2(rotations.x * offset.x - rotations.y * offset.y, rotations.x * offset.y + rotations.y * offset.x);
         float h = r * alpha;
-        vec2 offset = h * vec2(cos(theta), sin(theta)) * screen;
+        vec2 offset = h * rotations;
 
         float m = round(log2(h) + 6);
         ivec2 ioccluder_uv = ivec2(x, y) + ivec2(offset);
