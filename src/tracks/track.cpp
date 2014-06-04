@@ -209,7 +209,7 @@ core::stringw Track::getSortName() const
  */
 bool Track::isInGroup(const std::string &group_name)
 {
-    return std::find(m_groups.begin(), m_groups.end(), group_name) 
+    return std::find(m_groups.begin(), m_groups.end(), group_name)
         != m_groups.end();
 }   // isInGroup
 

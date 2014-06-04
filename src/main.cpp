@@ -361,7 +361,7 @@ void gamepadVisualisation()
 }   // gamepadVisualisation
 
 // ============================================================================
-/** Sets the hat mesh name depending on the current christmas mode 
+/** Sets the hat mesh name depending on the current christmas mode
  *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
 void handleXmasMode()

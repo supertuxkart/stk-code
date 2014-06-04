@@ -102,7 +102,7 @@ void BaseUserScreen::init()
 
     m_players->updateItemDisplay();
 
-    // Select the current player. That can only be done after 
+    // Select the current player. That can only be done after
     // updateItemDisplay is called.
     if(current_player_index.size()>0)
     {
@@ -240,7 +240,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
     }
     else if (name == "remember-user")
     {
-        UserConfigParams::m_remember_user = 
+        UserConfigParams::m_remember_user =
                        getWidget<CheckBoxWidget>("remember-user")->getState();
     }
     else if (name == "online")
@@ -251,7 +251,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
                                        Online::RequestManager::IPERM_NOT_ALLOWED)
         {
             m_info_widget->setText(
-                "Internet access is disabled, please enable it in the options",
+                _("Internet access is disabled, please enable it in the options"),
                 true);
             sfx_manager->quickSound( "anvil" );
             m_online_cb->setState(false);
@@ -260,7 +260,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
     }
     else if (name == "options")
     {
-        const std::string &button = 
+        const std::string &button =
                              m_options_widget->getSelectionIDString(player_id);
         if (button == "ok")
         {
@@ -280,7 +280,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
             PlayerProfile *cp = getSelectedPlayer();
             RegisterScreen::getInstance()->setRename(cp);
             StateManager::get()->pushScreen(RegisterScreen::getInstance());
-            // Init will automatically be called, which 
+            // Init will automatically be called, which
             // refreshes the player list
         }
         else if (button == "delete")
@@ -401,7 +401,7 @@ void BaseUserScreen::onUpdate(float dt)
 {
     if (!m_options_widget->isActivated())
     {
-        core::stringw message = (m_state & STATE_LOGOUT) 
+        core::stringw message = (m_state & STATE_LOGOUT)
                               ? _(L"Signing out '%s'",m_sign_out_name.c_str())
                               : _(L"Signing in '%s'", m_sign_in_name.c_str());
         m_info_widget->setText(Online::Messages::loadingDots(message.c_str()),
@@ -542,7 +542,7 @@ void BaseUserScreen::doDeletePlayer()
         for(unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
         {
             PlayerProfile *player = PlayerManager::get()->getPlayer(i);
-            if(!player->isGuestAccount()) 
+            if(!player->isGuestAccount())
             {
                 PlayerManager::get()->setCurrentPlayer(player);
                 break;
@@ -568,7 +568,7 @@ void BaseUserScreen::onDialogClose()
 {
     return;
     // To allow players to exit the game without creating a player, we count
-    // how often this function was called. The first time is after the 
+    // how often this function was called. The first time is after the
     // internet allowed dialog, the 2nd time
     static int number_of_calls = 0;
     number_of_calls++;
@@ -605,12 +605,12 @@ void TabbedUserScreen::init()
 /** Switch to the correct tab.
  */
 void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
-                                     const std::string& name, 
+                                     const std::string& name,
                                      const int player_id)
 {
     if (name == "options_choice")
     {
-        const std::string &selection = 
+        const std::string &selection =
             ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         Screen *s;
         if      (selection=="tab_audio"   ) s = OptionsScreenAudio::getInstance();

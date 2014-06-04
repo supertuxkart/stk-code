@@ -31,7 +31,7 @@
 
 class AchievementsStatus;
 
-namespace Online 
+namespace Online
 {
     class CurrentUser;
     class HTTPRequest;
@@ -42,10 +42,10 @@ class PlayerProfile;
 
 /** A special class that manages all local player accounts. It reads all player
  *  accounts from the players.xml file in the user config directory. For each
- *  player an instance of PlayerProfile is created, which keeps track of 
+ *  player an instance of PlayerProfile is created, which keeps track of
  *  story mode progress, achievements and other data. It also keeps track of
  *  the currently logged in player.
- *  It includes several handy static functions which avoid long call 
+ *  It includes several handy static functions which avoid long call
  *  sequences, e.g.:
  *    PlayerManager::getCurrentOnlineId()
  *  which is just:
@@ -116,9 +116,9 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */
-    static PlayerProfile* getCurrentPlayer() 
+    static PlayerProfile* getCurrentPlayer()
     {
-        return get()->m_current_player; 
+        return get()->m_current_player;
     }   // getCurrentPlayer
 
     // ------------------------------------------------------------------------

@@ -1261,8 +1261,8 @@ void IrrDriver::unsetTextureErrorMessage()
 
 // ----------------------------------------------------------------------------
 /** Retrieve all textures in the specified directory, generate a smaller
-*   version for each of them and save them in the cache. Smaller textures are 
-*   generated only if they do not already exist or if their original version 
+*   version for each of them and save them in the cache. Smaller textures are
+*   generated only if they do not already exist or if their original version
 *   is newer than the cached one.
 *   \param dir Directory from where textures will be retrieved.
 *              Must end with '/'.
@@ -1914,6 +1914,8 @@ void IrrDriver::update(float dt)
     // =================================
     if (!m_device->run())
     {
+        GUIEngine::cleanUp();
+        GUIEngine::deallocate();
         main_loop->abort();
         return;
     }
@@ -2392,7 +2394,7 @@ GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 
 // ----------------------------------------------------------------------------
 
-FrameBuffer& IrrDriver::getFBO(TypeFBO which) 
+FrameBuffer& IrrDriver::getFBO(TypeFBO which)
 {
     return m_rtts->getFBO(which);
 }
@@ -2403,3 +2405,4 @@ GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_rtts->getDepthStencilTexture();
 }
+
