@@ -168,7 +168,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
                                             core::vector2df(cb->getDirX(), cb->getDirY()),
                                             core::vector2df(cb->getDir2X(), cb->getDir2Y()),
                                             core::vector2df(float(UserConfigParams::m_width),
-                                                            float(UserConfigParams::m_height)), 
+                                                            float(UserConfigParams::m_height)),
                                             0, 1, 2);
 
     assert(mesh.vao_displace_pass);

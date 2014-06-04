@@ -393,7 +393,7 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha)
 
 //-----------------------------------------------------------------------------
 /** Try to load a compressed texture from the given file name.
- *   Data in the specified file need to have a specific format. See the 
+ *   Data in the specified file need to have a specific format. See the
  *   saveCompressedTexture() function for a description of the format.
  *   \return true if the loading succeeded, false otherwise.
  *   \see saveCompressedTexture
