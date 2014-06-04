@@ -211,7 +211,10 @@ Window get_toplevel_parent(Display* display, Window window)
 #endif
 
 // ----------------------------------------------------------------------------
-
+/** If the position of the window should be remembered, store it in the config
+ *  file.
+ *  \post The user config file must still be saved!
+ */
 void IrrDriver::updateConfigIfRelevant()
 {
         if (!UserConfigParams::m_fullscreen &&
@@ -241,7 +244,6 @@ void IrrDriver::updateConfigIfRelevant()
             {
                 UserConfigParams::m_window_x = x;
                 UserConfigParams::m_window_y = y;
-                user_config->saveConfig();
             }
         }
         else
@@ -265,11 +267,10 @@ void IrrDriver::updateConfigIfRelevant()
         {
             UserConfigParams::m_window_x = wx;
             UserConfigParams::m_window_y = wy;
-            user_config->saveConfig();
         }
 #endif
     }
-}
+}   // updateConfigIfRelevant
 
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data

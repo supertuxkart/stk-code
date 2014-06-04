@@ -1375,13 +1375,6 @@ int main(int argc, char *argv[] )
 
     /* Program closing...*/
 
-    if(user_config)
-    {
-        // In case that abort is triggered before user_config exists
-        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
-        user_config->saveConfig();
-    }
-
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
         delete wiimote_manager;
@@ -1433,10 +1426,15 @@ static void cleanSuperTuxKart()
 
     delete main_loop;
 
-    irr_driver->updateConfigIfRelevant();
-
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
+
+    irr_driver->updateConfigIfRelevant();
+    AchievementsManager::destroy();
+    Referee::cleanup();
+    if(ReplayPlay::get()) ReplayPlay::destroy();
+    if(race_manager) delete race_manager;
+
 
     //delete in reverse order of what they were created in.
     //see InitTuxkart()
@@ -1445,12 +1443,6 @@ static void cleanSuperTuxKart()
     Online::ProfileManager::destroy();
     GUIEngine::DialogQueue::deallocate();
 
-    AchievementsManager::destroy();
-    Referee::cleanup();
-
-    if(ReplayPlay::get())       ReplayPlay::destroy();
-    if(race_manager)            delete race_manager;
-    NewsManager::deallocate();
     if(addons_manager)          delete addons_manager;
     NetworkManager::kill();
 
@@ -1471,6 +1463,14 @@ static void cleanSuperTuxKart()
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
 
+    // Wait (up to 2 seconds) for the news manager to be ready to be deleted,
+    // i.e. make sure it does not need the file_manager anymore (which will
+    // get deleted in cleanUserConfig).
+    if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+    {
+        Log::info("NewsManager", "News manager not stopping, exiting anyway.");
+    }
+    NewsManager::deallocate();
     cleanUserConfig();
 
     StateManager::deallocate();
@@ -1485,7 +1485,14 @@ static void cleanUserConfig()
 {
     if(stk_config)              delete stk_config;
     if(translations)            delete translations;
-    if(user_config)             delete user_config;
+    if (user_config)
+    {
+        // In case that abort is triggered before user_config exists
+        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
+        user_config->saveConfig();
+        delete user_config;
+    }
+
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
 }
