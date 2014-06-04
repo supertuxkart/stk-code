@@ -55,9 +55,10 @@ def main():
                 src_file.close()
 
                 # writing back
-                src_file = open(dirpath + "/" + filename, "w")
-                src_file.write("".join(lines))
-                src_file.close()
+                if modified:
+                    src_file = open(dirpath + "/" + filename, "w")
+                    src_file.write("".join(lines))
+                    src_file.close()
 
     if statistics:
         print("Total number of files in " + directory + ": "
