@@ -74,7 +74,7 @@ void BaseUserScreen::init()
     assert(m_info_widget);
 
     getWidget<CheckBoxWidget>("remember-user")
-             ->setState(UserConfigParams::m_always_show_login_screen);
+             ->setState(UserConfigParams::m_remember_user);
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
@@ -111,6 +111,10 @@ void BaseUserScreen::init()
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
         const stringw &online_name = player->getLastOnlineName();
         m_username_tb->setText(online_name);
+        if(online_name.size()>0)
+            m_username_tb->setDeactivated();
+        else
+            m_username_tb->setActivated();
         // Select 'online
         m_online_cb->setState(player->wasOnlineLastTime() ||
                               player->isLoggedIn()          );
@@ -284,6 +288,10 @@ void BaseUserScreen::eventCallback(Widget* widget,
             deletePlayer();
         }
     }   // options
+    else if (name == "back")
+    {
+        StateManager::get()->escapePressed();
+    }
 
     return;
 
@@ -440,6 +448,7 @@ void BaseUserScreen::loginError(const irr::core::stringw & error_message)
     // which allows the player to enter a new password.
     if(player && player->hasSavedSession())
         player->clearSession();
+    player->setLastOnlineName("");
     makeEntryFieldsVisible();
     sfx_manager->quickSound("anvil");
     m_info_widget->setErrorColor();

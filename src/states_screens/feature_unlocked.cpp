@@ -29,6 +29,7 @@
 #include "io/file_manager.hpp"
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
 #include "race/grand_prix_manager.hpp"
@@ -50,6 +51,10 @@ using namespace irr::core;
 using namespace irr::gui;
 using namespace irr::video;
 
+const float ANIM_FROM = 3.0f;
+const float ANIM_TO = 7.0f;
+const int GIFT_EXIT_FROM = (int)ANIM_TO;
+const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
 DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
 
@@ -66,6 +71,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::string model,
     m_unlock_message     = msg;
     m_unlock_model       = model;
     m_curr_image         = -1;
+    m_scale              = 1.0f;
 }
 
 // -------------------------------------------------------------------------------------
@@ -77,6 +83,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(KartProperties* kart,
     m_unlocked_kart      = kart;
     m_unlock_message     = msg;
     m_curr_image         = -1;
+    m_scale              = 1.0f;
 }   // UnlockedThing::UnlockedThing
 
 // -------------------------------------------------------------------------------------
@@ -91,6 +98,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(irr::video::ITexture* pict
     m_h = h;
     m_unlock_message = msg;
     m_curr_image = -1;
+    m_scale = 1.0f;
 }   // UnlockedThing::UnlockedThing
 
 // ----------------------------------------------------------------------------
@@ -105,6 +113,7 @@ FeatureUnlockedCutScene::UnlockedThing::UnlockedThing(std::vector<irr::video::IT
     m_h = h;
     m_unlock_message = msg;
     m_curr_image = 0;
+    m_scale = 1.0f;
 }   // UnlockedThing::UnlockedThing
 
 // ----------------------------------------------------------------------------
@@ -123,12 +132,10 @@ FeatureUnlockedCutScene::UnlockedThing::~UnlockedThing()
 #endif
 
 FeatureUnlockedCutScene::FeatureUnlockedCutScene()
-                       : Screen("feature_unlocked.stkgui")
+            : CutsceneScreen("feature_unlocked.stkgui")
 {
     m_key_angle = 0;
-    setNeeds3D(true);
 
-    m_throttle_FPS = false;
 #ifdef USE_IRRLICHT_BUG_WORKAROUND
     m_avoid_irrlicht_bug = NULL;
 #endif
@@ -139,6 +146,23 @@ FeatureUnlockedCutScene::FeatureUnlockedCutScene()
 void FeatureUnlockedCutScene::loadedFromFile()
 {
 }   // loadedFromFile
+
+// -------------------------------------------------------------------------------------
+
+void FeatureUnlockedCutScene::onCutsceneEnd()
+{
+#ifdef USE_IRRLICHT_BUG_WORKAROUND
+    if (m_avoid_irrlicht_bug)
+        irr_driver->removeNode(m_avoid_irrlicht_bug);
+    m_avoid_irrlicht_bug = NULL;
+#endif
+
+    m_unlocked_stuff.clearAndDeleteAll();
+    m_all_kart_models.clearAndDeleteAll();
+
+    // update point count and the list of locked/unlocked stuff
+    PlayerManager::getCurrentPlayer()->computeActive();
+}
 
 // ----------------------------------------------------------------------------
 
@@ -248,70 +272,9 @@ void FeatureUnlockedCutScene::addUnlockedPictures(std::vector<irr::video::ITextu
 
 // ----------------------------------------------------------------------------
 
-const float CAMERA_INITIAL_X = 0.0f;
-const float CAMERA_INITIAL_Y = 30.0f;
-const float CAMERA_INITIAL_Z = 70.0f;
-
 void FeatureUnlockedCutScene::init()
 {
-    m_sky_angle = 0.0f;
     m_global_time = 0.0f;
-
-    std::vector<std::string> texture_names(6);
-    texture_names[0] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula.jpg");
-    texture_names[1] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula2.png");
-    texture_names[2] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula.jpg");
-    texture_names[3] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula2.png");
-    texture_names[4] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula.jpg");
-    texture_names[5] = file_manager->getAsset(FileManager::TEXTURE, "purplenebula2.png");
-    std::vector<video::ITexture*> textures;
-    for(unsigned int i=0; i<texture_names.size(); i++)
-    {
-        video::ITexture *t = irr_driver->getTexture(texture_names[i]);
-        textures.push_back(t);
-    }
-    std::vector<video::ITexture*> sh_textures;
-    m_sky = irr_driver->addSkyBox(textures, sh_textures);
-#ifdef DEBUG
-    m_sky->setName("skybox");
-#endif
-
-    m_camera = irr_driver->addCameraSceneNode();
-#ifdef DEBUG
-    m_camera->setName("camera");
-#endif
-    m_camera->setPosition( core::vector3df(CAMERA_INITIAL_X, CAMERA_INITIAL_Y, CAMERA_INITIAL_Z) );
-    m_camera->setUpVector( core::vector3df(0.0, 1.0, 0.0) );
-    m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
-    m_camera->setFOV( DEGREE_TO_RAD*50.0f );
-    m_camera->updateAbsolutePosition();
-    irr_driver->getSceneManager()->setActiveCamera(m_camera);
-
-    scene::IAnimatedMesh* model_chest =
-        irr_driver->getAnimatedMesh( file_manager->getAsset(FileManager::MODEL,"chest.b3d") );
-    assert(model_chest != NULL);
-    m_chest = irr_driver->addAnimatedMesh(model_chest);
-#ifdef DEBUG
-    m_chest->setName("chest");
-#endif
-    m_chest->setPosition( core::vector3df(2, -3, 0) );
-    m_chest->setScale( core::vector3df(10.0f, 10.0f, 10.0f) );
-    m_chest->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 120,
-                                                                 120, 120));
-
-    const core::vector3df &sun_pos = core::vector3df( 0, 200, 100.0f );
-    m_light = irr_driver->addLight(sun_pos, 10000.0f, 1., 1, 1, 1, true);
-#ifdef DEBUG
-    m_light->setName("light");
-#endif
-
-    if (!irr_driver->isGLSL())
-    {
-        ((scene::ILightSceneNode *) m_light)->getLightData().DiffuseColor = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-        ((scene::ILightSceneNode *) m_light)->getLightData().SpecularColor = video::SColorf(1.0f, 1.0f, 1.0f, 1.0f);
-    }
 
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
@@ -323,7 +286,8 @@ void FeatureUnlockedCutScene::init()
         if (m_unlocked_stuff[n].m_unlock_model.size() > 0)
         {
             m_unlocked_stuff[n].m_root_gift_node = irr_driver->addMesh( irr_driver->getMesh(m_unlocked_stuff[n].m_unlock_model) );
-            m_unlocked_stuff[n].m_root_gift_node->setScale( core::vector3df(0.5f, 0.5f, 0.5f) );
+            m_unlocked_stuff[n].m_scale = 0.7f;
+            //m_unlocked_stuff[n].m_root_gift_node->setScale(core::vector3df(0.2f, 0.2f, 0.2f));
         }
         else if (m_unlocked_stuff[n].m_unlocked_kart != NULL)
         {
@@ -331,6 +295,7 @@ void FeatureUnlockedCutScene::init()
                 m_unlocked_stuff[n].m_unlocked_kart->getKartModelCopy();
             m_all_kart_models.push_back(kart_model);
             m_unlocked_stuff[n].m_root_gift_node = kart_model->attachModel(true, false);
+            m_unlocked_stuff[n].m_scale = 5.0f;
             kart_model->setAnimation(KartModel::AF_DEFAULT);
             float susp[4]={0,0,0,0};
             kart_model->update(0.0f, 0.0f, 0.0f, susp, 0.0f);
@@ -363,7 +328,6 @@ void FeatureUnlockedCutScene::init()
             m.SpecularColor = video::SColor(255, 255, 255, 255);
             m.GouraudShading = false;
             m.Shininess      = 0;
-            //m.setFlag(video::EMF_TEXTURE_WRAP, false);
 
             m.TextureLayer[0].TextureWrapU = video::ETC_CLAMP_TO_EDGE;
             m.TextureLayer[0].TextureWrapV = video::ETC_CLAMP_TO_EDGE;
@@ -389,29 +353,7 @@ void FeatureUnlockedCutScene::init()
 void FeatureUnlockedCutScene::tearDown()
 {
     Screen::tearDown();
-    irr_driver->removeNode(m_sky);
-    m_sky = NULL;
-
-    irr_driver->removeCameraSceneNode(m_camera);
-    m_camera = NULL;
-
-    irr_driver->removeNode(m_chest);
-    m_chest = NULL;
-
-    irr_driver->removeNode(m_light);
-    m_light = NULL;
-
-#ifdef USE_IRRLICHT_BUG_WORKAROUND
-    if(m_avoid_irrlicht_bug)
-        irr_driver->removeNode(m_avoid_irrlicht_bug);
-    m_avoid_irrlicht_bug = NULL;
-#endif
-
-    m_unlocked_stuff.clearAndDeleteAll();
-    m_all_kart_models.clearAndDeleteAll();
-
-    // update point count and the list of locked/unlocked stuff
-    PlayerManager::getCurrentPlayer()->computeActive();
+    ((CutsceneWorld*)World::getWorld())->abortCutscene();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -427,62 +369,31 @@ T keepInRange(T from, T to, T value)
 
 // ----------------------------------------------------------------------------
 
-const float ANIM_FROM = 1.0f;
-const float ANIM_TO = 3.0f;
-const int GIFT_EXIT_FROM = (int)ANIM_TO;
-const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
-
 void FeatureUnlockedCutScene::onUpdate(float dt)
 {
     m_global_time += dt;
-
-    m_sky_angle += dt*2;
-    if (m_sky_angle > 360) m_sky_angle -= 360;
-    m_sky->setRotation( core::vector3df(0, m_sky_angle, 0) );
-
-    const int last_image = m_chest->getEndFrame() - 1;
-
-    if (m_global_time < ANIM_FROM)
-    {
-        // progression of the chest rotation between 0 and 1
-        const float rotationProgression =
-            keepInRange( 0.0f, 1.0f, (float)sin(M_PI/2.0f*m_global_time/ANIM_FROM) );
-        const float chest_rotation =
-            keepInRange(80.0f, 160.0f, 80 + rotationProgression * 80);
-        m_chest->setRotation( core::vector3df(0.0f, chest_rotation, 0.0f) );
-    }
-    else
-    {
-        m_chest->setRotation( core::vector3df(0.0f, 160.0f, 0.0f) );
-    }
-
-
-    // Make sure it doesn't continue on its own, WE animated it ourselves here
-    m_chest->setAnimationSpeed(0);
-
-    const float current_frame = keepInRange(0.0f, (float)last_image,
-                                            (float)(m_global_time - ANIM_FROM)
-                                           /(ANIM_TO - ANIM_FROM) * last_image);
-    m_chest->setCurrentFrame( current_frame );
-
     const int unlockedStuffCount = m_unlocked_stuff.size();
 
     if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
     {
+        float progress_factor = (m_global_time - GIFT_EXIT_FROM) / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
+        float smoothed_progress_factor = sin((progress_factor - 0.5f)*M_PI)/2.0f + 0.5f;
+
+        Log::info("smoothed_progress_factor", "%f", smoothed_progress_factor);
 
         for (int n=0; n<unlockedStuffCount; n++)
         {
             if (m_unlocked_stuff[n].m_root_gift_node == NULL) continue;
 
             core::vector3df pos = m_unlocked_stuff[n].m_root_gift_node->getPosition();
-            pos.Y = sin( (float)((m_global_time-GIFT_EXIT_FROM)*M_PI*1.2/GIFT_EXIT_TO) )*30.0f;
+            pos.Y = sin(smoothed_progress_factor*2.5f)*10.0f;
 
             // when there are more than 1 unlocked items, make sure they each
             // have their own path when they move
             if (unlockedStuffCount > 1)
             {
-                if (n == 1) pos.X -= 6.2f*dt*float( int((n + 1)/2) );
-                else if (n > 1) pos.X += 6.2f*dt*(n - 1.0f);
+                if (n == 1) pos.X -= 1.0f*dt*float( int((n + 1)/2) );
+                else if (n > 1) pos.X += 1.0f*dt*(n - 0.3f);
 
                 //else            pos.X += 6.2f*dt*float( int((n + 1)/2) );
                 //std::cout << "Object " << n << " moving by " <<
@@ -493,30 +404,15 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                 //pos.X -= 2.0f*dt;
             }
 
-            if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z += 6.0f*dt;
+            //if (m_global_time > GIFT_EXIT_FROM + 2.0f) pos.Z -= 2.0f*dt;
+
+            pos.Z = smoothed_progress_factor * -4.0f;
 
             m_unlocked_stuff[n].m_root_gift_node->setPosition(pos);
-
-            core::vector3df scale =
-                m_unlocked_stuff[n].m_root_gift_node->getScale();
-            scale.X += 0.9f*dt;
-            scale.Y += 0.9f*dt;
-            scale.Z += 0.9f*dt;
-            m_unlocked_stuff[n].m_root_gift_node->setScale(scale);
         }
-
-        core::vector3df campos = m_camera->getPosition();
-        campos.X -= 8.0f*dt;
-        campos.Y += 5.0f*dt;
-        campos.Z += 5.0f*dt;
-
-        m_camera->setPosition(campos);
     }
     else if (m_global_time < GIFT_EXIT_FROM)
     {
-        m_camera->setPosition( core::vector3df(cos((1.0f-m_key_angle)*M_PI/4 + M_PI/4)*70.0f,
-                                               30.0f,
-                                               sin((1.0f-m_key_angle)*M_PI/8 + M_PI/4)*70.0f) );
     }
 
     for (int n=0; n<unlockedStuffCount; n++)
@@ -554,20 +450,16 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                 }   // textureID != previousTextureID
             }   // if pictureCount>1
         }   // if !m_unlocked_stuff[n].m_pictures.empty()
+
+        float scale = m_unlocked_stuff[n].m_scale;
+        if (m_global_time <= GIFT_EXIT_FROM)
+            scale *= 0.1f;
+        else if (m_global_time > GIFT_EXIT_FROM && m_global_time < GIFT_EXIT_TO)
+            scale *= ((m_global_time - GIFT_EXIT_FROM) / (GIFT_EXIT_TO - GIFT_EXIT_FROM));
+        m_unlocked_stuff[n].m_root_gift_node->setScale(core::vector3df(scale, scale, scale));
     }   // for n<unlockedStuffCount
 
     assert(m_unlocked_stuff.size() > 0);
-    if (m_unlocked_stuff[0].m_root_gift_node != NULL)
-    {
-        m_camera->setTarget( m_unlocked_stuff[0].m_root_gift_node->getPosition() +
-                            core::vector3df(0.0f, 10.0f, 0.0f) );
-        m_camera->updateAbsolutePosition();
-    }
-    else
-    {
-        m_camera->setTarget( core::vector3df(0, 10, 0.0f) );
-        m_camera->updateAbsolutePosition();
-    }
 
     static const int w = irr_driver->getFrameSize().Width;
     static const int h = irr_driver->getFrameSize().Height;
@@ -654,6 +546,7 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 
 bool FeatureUnlockedCutScene::onEscapePressed()
 {
+    ((CutsceneWorld*)World::getWorld())->abortCutscene();
     continueButtonPressed();
     return false; // continueButtonPressed already pop'ed the menu
 }   // onEscapePressed

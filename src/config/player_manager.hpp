@@ -92,6 +92,7 @@ public:
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
     PlayerProfile* addNewPlayer(const irr::core::stringw& name);
+    void createGuestPlayers(int n);
     void deletePlayer(PlayerProfile *player);
     void setCurrentPlayer(PlayerProfile *player);
     const PlayerProfile *getPlayerById(unsigned int id);

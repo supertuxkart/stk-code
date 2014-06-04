@@ -143,8 +143,9 @@ void IrrDriver::renderGLSL(float dt)
 
         const core::recti &viewport = camera->getViewport();
 
+        unsigned plc = UpdateLightsInfo(camnode, dt);
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-        renderScene(camnode, glows, dt, track->hasShadows(), false);
+        renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
 
         // Debug physic
         // Note that drawAll must be called before rendering
@@ -260,7 +261,7 @@ void IrrDriver::renderGLSL(float dt)
     getPostProcessing()->update(dt);
 }
 
-void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
+void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
@@ -287,7 +288,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, std::vector
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
         ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
-        renderLights(camnode, dt);
+        renderLights(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
 
@@ -759,13 +760,13 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
-
-        if (!(tick % 100))
+        if ((tick % 100) == 2)
             rsm_matrix = sun_ortho_matrix[3];
         rh_extend = core::vector3df(128, 64, 128);
         core::vector3df campos = camnode->getAbsolutePosition();
         core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
         rh_matrix.setTranslation(translation);
+
 
         assert(sun_ortho_matrix.size() == 4);
         camnode->setNearValue(oldnear);
@@ -916,37 +917,8 @@ static void renderPointLights(unsigned count)
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
 
-void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
+unsigned IrrDriver::UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt)
 {
-    //RH
-    if (UserConfigParams::m_gi)
-    {
-        glDisable(GL_BLEND);
-        m_rtts->getRH().Bind();
-        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
-        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
-        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
-        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
-        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
-        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
-        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
-    }
-
-    for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
-        sun_ortho_matrix[i] *= getInvViewMatrix();
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
-    if (!UserConfigParams::m_dynamic_lights)
-        glClearColor(.5, .5, .5, .5);
-    glClear(GL_COLOR_BUFFER_BIT);
-    if (!UserConfigParams::m_dynamic_lights)
-        return;
-
-    if (UserConfigParams::m_gi)
-        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
-
-    if (SkyboxCubeMap)
-        irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
-
     const u32 lightcount = m_lights.size();
     const core::vector3df &campos = camnode->getAbsolutePosition();
 
@@ -956,15 +928,6 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
         if (!m_lights[i]->isPointLight())
         {
             m_lights[i]->render();
-            if (UserConfigParams::m_shadows && World::getWorld() != NULL &&
-                World::getWorld()->getTrack()->hasShadows())
-            {
-                m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
-            }
-            else
-            {
-                m_post_processing->renderSunlight();
-            }
             continue;
         }
         const core::vector3df &lightpos = (m_lights[i]->getAbsolutePosition() - campos);
@@ -1019,10 +982,56 @@ void IrrDriver::renderLights(scene::ICameraSceneNode * const camnode, float dt)
     }
 
     lightnum++;
+    return lightnum;
+}
 
-    renderPointLights(MIN2(lightnum, MAXLIGHT));
-    if (SkyboxCubeMap)
-        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+void IrrDriver::renderLights(unsigned pointlightcount)
+{
+    //RH
+    if (UserConfigParams::m_gi)
+    {
+        glDisable(GL_BLEND);
+        m_rtts->getRH().Bind();
+        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
+        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
+        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+        glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
+    }
+
+    for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
+        sun_ortho_matrix[i] *= getInvViewMatrix();
+    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    if (!UserConfigParams::m_dynamic_lights)
+        glClearColor(.5, .5, .5, .5);
+    glClear(GL_COLOR_BUFFER_BIT);
+    if (!UserConfigParams::m_dynamic_lights)
+        return;
+
+    if (UserConfigParams::m_gi)
+    {
+        m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
+        m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+        if (SkyboxCubeMap)
+            m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+        m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    }
+
+    if (SkyboxCubeMap && UserConfigParams::m_gi)
+        irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
+
+    // Render sunlight if and only if track supports shadow
+    if (World::getWorld()->getTrack()->hasShadows())
+    {
+        if (UserConfigParams::m_shadows)
+            m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
+        else
+            m_post_processing->renderSunlight();
+    }
+
+    renderPointLights(MIN2(pointlightcount, MAXLIGHT));
 }
 
 void IrrDriver::renderSSAO()

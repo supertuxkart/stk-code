@@ -76,7 +76,6 @@ public:
     {
         friend class StateManager;
 
-        Online::OnlineProfile  *m_online_user;
         PlayerProfile *m_player;
         InputDevice   *m_device;
 
@@ -86,8 +85,7 @@ public:
         /** ID of this player within the list of active players */
         int m_id;
 
-        ActivePlayer(PlayerProfile* player, InputDevice* device,
-                     Online::OnlineProfile* user);
+        ActivePlayer(PlayerProfile* player, InputDevice* device);
 
 #ifdef DEBUG
         unsigned int m_magic_number;
@@ -127,19 +125,6 @@ public:
         /** Call to change the identity of this player (useful when player is
          *  selecting his identity) */
         void setPlayerProfile(PlayerProfile* player);
-
-        // --------------------------------------------------------------------
-        Online::OnlineProfile* getOnlineUser()
-        {
-            return m_online_user;
-        }   // getOnlineUser
-        // --------------------------------------------------------------------
-        /** Call to change the identity of this player (useful when player is
-         *  selecting his identity) */
-        void setOnlineUser(Online::OnlineProfile* user)
-        {
-            m_online_user = user;
-        }
 
         // --------------------------------------------------------------------
         /** ID of this player within the list of active players */
@@ -197,8 +182,7 @@ public:
       */
     const PlayerProfile* getActivePlayerProfile(const int id);
 
-    int createActivePlayer(PlayerProfile *profile, InputDevice *device,
-                           Online::OnlineProfile* use);
+    int createActivePlayer(PlayerProfile *profile, InputDevice *device);
     void removeActivePlayer(int id);
 
     unsigned int activePlayerCount();

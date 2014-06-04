@@ -240,6 +240,7 @@ namespace Online
                 m_player->setUserDetails(this, 
                     UserConfigParams::m_remember_user ? "client-quit" 
                                                       :"disconnect");
+                setAbortable(false);
             }   // SignOutRequest
         };   // SignOutRequest
         // ----------------------------------------------------------------

@@ -668,6 +668,7 @@ namespace GUIEngine
 #include "guiengine/widget.hpp"
 #include "guiengine/dialog_queue.hpp"
 #include "modes/demo_world.hpp"
+#include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui_base.hpp"
 
@@ -1209,6 +1210,12 @@ namespace GUIEngine
             }
         }
 
+
+        if (gamestate == INGAME_MENU && dynamic_cast<CutsceneWorld*>(World::getWorld()) != NULL)
+        {
+            RaceGUIBase* rg = World::getWorld()->getRaceGUI();
+            if (rg != NULL) rg->renderGlobal(elapsed_time);
+        }
 
         if (gamestate == MENU || gamestate == INGAME_MENU)
         {

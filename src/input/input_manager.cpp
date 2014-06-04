@@ -585,7 +585,7 @@ void InputManager::dispatchInput(Input::InputType type, int deviceID,
 
                     if (device != NULL)
                     {
-                        KartSelectionScreen::getRunningInstance()->playerJoin(device,
+                        KartSelectionScreen::getRunningInstance()->joinPlayer(device,
                                                                        false );
                     }
                 }

@@ -38,9 +38,7 @@ vec3 SH2RGB (in vec4 sh_r, in vec4 sh_g, in vec4 sh_b, in vec3 dir)
     return vec3 (dot(Y,sh_r), dot(Y,sh_g), dot(Y,sh_b));
 }
 
-in vec2 uv;
-layout (location = 0) out vec4 Diffuse;
-layout (location = 1) out vec4 Specular;
+out vec4 Diffuse;
 
 vec3 DecodeNormal(vec2 n);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
@@ -49,6 +47,7 @@ vec3 resolution = vec3(32, 16, 32);
 
 void main()
 {
+    vec2 uv = gl_FragCoord.xy / screen;
     vec3 GI = vec3(0.);
 
     float depth = texture2D(dtex, uv).x;
@@ -97,5 +96,4 @@ void main()
     GI /= 4;
 
     Diffuse = max(16. * vec4(GI, 1.), vec4(0.));
-    Specular = vec4(0.);
 }

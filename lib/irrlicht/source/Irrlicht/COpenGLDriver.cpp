@@ -89,6 +89,19 @@ static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribs_ARB;
 static HGLRC getMeAGLContext(HDC HDc)
 {
     HGLRC hrc = 0;
+    int ctx44[] =
+    {
+        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
+        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
+        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_COMPATIBILITY_PROFILE_BIT_ARB,
+        0
+    };
+
+    hrc = wglCreateContextAttribs_ARB(HDc, 0, ctx44);
+    if (hrc)
+        return hrc;
+
     int ctx40[] =
     {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
