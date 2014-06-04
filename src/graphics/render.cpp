@@ -1023,9 +1023,9 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     // Render sunlight if and only if track supports shadow
-    if (World::getWorld() && World::getWorld()->getTrack()->hasShadows())
+    if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
-        if (UserConfigParams::m_shadows)
+        if (World::getWorld() && UserConfigParams::m_shadows)
             m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
         else
             m_post_processing->renderSunlight();

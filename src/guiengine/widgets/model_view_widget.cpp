@@ -179,7 +179,8 @@ void ModelViewWidget::update(float delta)
 
     std::vector<IrrDriver::GlowData> glows;
     irr_driver->computeCameraMatrix(m_camera, 512, 512);
-    irr_driver->renderScene(m_camera, 0, glows, GUIEngine::getLatestDt(), false, true);
+    unsigned plc = irr_driver->UpdateLightsInfo(m_camera, GUIEngine::getLatestDt());
+    irr_driver->renderScene(m_camera, plc, glows, GUIEngine::getLatestDt(), false, true);
     m_frame_buffer = irr_driver->getPostProcessing()->render(m_camera);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 
