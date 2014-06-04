@@ -108,7 +108,11 @@ enum QueryPerf
 {
     Q_SOLID_PASS1,
     Q_SHADOWS,
-    Q_LIGHT,
+    Q_RH,
+    Q_GI,
+    Q_ENVMAP,
+    Q_SUN,
+    Q_POINTLIGHTS,
     Q_SSAO,
     Q_SOLID_PASS2,
     Q_TRANSPARENT,
