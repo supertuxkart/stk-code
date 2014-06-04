@@ -1913,6 +1913,8 @@ void IrrDriver::update(float dt)
     // =================================
     if (!m_device->run())
     {
+        GUIEngine::cleanUp();
+        GUIEngine::deallocate();
         main_loop->abort();
         return;
     }
@@ -2402,3 +2404,4 @@ GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_rtts->getDepthStencilTexture();
 }
+
