@@ -23,6 +23,7 @@
 
 #include "io/xml_node.hpp"
 #include "online/request.hpp"
+#include "utils/can_be_deleted.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 
@@ -42,11 +43,41 @@
 namespace Online
 {
 
-    /**
-      * \brief Class to connect with a server over HTTP(S)
-      * \ingroup online
-      */
-    class RequestManager
+    /** A class to execute requests in a separate thread. Typically the
+     *  requests involve a http(s) requests to be sent to the stk server, and
+     *  receive an answer (e.g. to sign in; or to download an addon). The
+     *  requests are sorted by priority (e.g. sign in and out have higher
+     *  priority than downloading addon icons).
+     *  A request is created and initialised from the main thread. When it
+     *  is moved into the request queue, it must not be handled by the main
+     *  thread anymore, only the RequestManager thread can handle it.
+     *  Once the request is finished, it is put in a separate ready queue.
+     *  The main thread regularly checks the ready queue for any ready
+     *  request, and executes a callback. So there is no need to protect
+     *  any functions or data members in requests, since they will either
+     *  be handled by the main thread, or RequestManager thread, never by
+     *  both.
+     *  On exit, if necessary a high priority sign-out or client-quit request
+     *  is put into the queue, and a flag is set which causes libcurl to
+     *  abort any ongoing download. Then an additional 'quit' event with
+     *  same priority as the sign-out is added to the queue (since it will
+     *  be added later, the sign-out will be executed first, making sure that
+     *  a logged in user is logged out (or its session saved). Once this is
+     *  done, most of stk is deleted (except a few objects like the file
+     *  manager which might be accessed if a download just finished before the
+     *  abort). On executing the quit request, the request manager will set
+     *  a flag that it is ready to be deleted (using the CanBeDeleted class).
+     *  The main thread will wait for a certain amount of time for the 
+     *  RequestManager to be ready to be deleted (i.e. the sign-out and quit
+     *  request have been processes), before deleting the RequestManager.
+     *  Typically the RequestManager will finish while the rest of stk is
+     *  shutting down, so the user will not experience any waiting time. Only
+     *  on first start of stk (which will trigger downloading of all addon
+     *  icons) is it possible that actually a download request is running,
+     *  which might take a bit before it can be deleted.
+     * \ingroup online
+     */
+    class RequestManager : public CanBeDeleted
     {
     public:
         /** If stk has permission to access the internet (for news

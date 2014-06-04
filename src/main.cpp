@@ -1432,20 +1432,9 @@ static void cleanSuperTuxKart()
     irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
-    if(ReplayPlay::get()) ReplayPlay::destroy();
-    if(race_manager) delete race_manager;
-
-
-    //delete in reverse order of what they were created in.
-    //see InitTuxkart()
-    Online::RequestManager::deallocate();
-    Online::ServersManager::deallocate();
-    Online::ProfileManager::destroy();
-    GUIEngine::DialogQueue::deallocate();
-
+    if(ReplayPlay::get())       ReplayPlay::destroy();
+    if(race_manager)            delete race_manager;
     if(addons_manager)          delete addons_manager;
-    NetworkManager::kill();
-
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1462,15 +1451,34 @@ static void cleanSuperTuxKart()
     delete ParticleKindManager::get();
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
+    Online::ProfileManager::destroy();
+    GUIEngine::DialogQueue::deallocate();
 
-    // Wait (up to 2 seconds) for the news manager to be ready to be deleted,
-    // i.e. make sure it does not need the file_manager anymore (which will
-    // get deleted in cleanUserConfig).
+    // Now finish shutting down objects which a separate thread. The
+    // RequestManager has been signaled to shut down as early as possible,
+    // the NewsManager thread should have finished quite early on anyway.
+    // But still give them some additional time to finish. It avoids a
+    // race condition where a thread might access the file manager after it
+    // was deleted (in cleanUserConfig below), but before STK finishes and
+    // the os takes all threads down.
+
     if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
     {
-        Log::info("NewsManager", "News manager not stopping, exiting anyway.");
+        Log::info("Thread", "News manager not stopping, exiting anyway.");
     }
     NewsManager::deallocate();
+
+    if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
+    {
+        Log::info("Thread", "Request Manager not aborting in time, aborting.");
+    }
+    Online::RequestManager::deallocate();
+
+    // FIXME: do we need to wait for threads there, can they be
+    // moved further up?
+    Online::ServersManager::deallocate();
+    NetworkManager::kill();
+
     cleanUserConfig();
 
     StateManager::deallocate();

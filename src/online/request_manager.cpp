@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010-2014 Lucas Baudin
-//                2011-201 Joerg Henrichs
+//                2011-2014 Joerg Henrichs
 //                2013-2014 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
@@ -83,7 +83,7 @@ namespace Online
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
         m_time_since_poll = MENU_POLLING_INTERVAL * 0.9;
-    }
+    }   // RequestManager
 
     // ------------------------------------------------------------------------
     RequestManager::~RequestManager()
@@ -94,8 +94,7 @@ namespace Online
         m_thread_id.unlock();
         pthread_cond_destroy(&m_cond_request);
         curl_global_cleanup();
-    }
-
+    }   // ~RequestManager
 
     // ------------------------------------------------------------------------
     /** Start the actual network thread. This can not be done as part of
@@ -219,6 +218,11 @@ namespace Online
             me->addResult(me->m_current_request);
             me->m_request_queue.lock();
         }   // while
+
+        // Signal that the request manager can now be deleted.
+        // We signal this even before cleaning up memory, since there's no 
+        // need to keep the user waiting for STK to exit.
+        me->setCanBeDeleted();
 
         // At this stage we have the lock for m_request_queue
         while(!me->m_request_queue.getData().empty())

@@ -23,8 +23,16 @@
 #include "utils/synchronised.hpp"
 #include "utils/time.hpp"
 
-/** A simple class that a
-*/
+/** A simple class that a adds a function to wait with a timeout for a
+ *  class to be ready to be deleted. It is used for objects with their
+ *  own threads (e.g. RequestManager) to make sure they can be deleted.
+ *  For example, the RequestManager might be executing a download request.
+ *  So we have to signal libcurl to abort the download request, then
+ *  potentially handle a high priority sign-out request before the thread
+ *  can be deleted. With this object the main thread can wait for a given
+ *  amount of time (in case that of a bad internet hickup) before deleting
+ *  the RequestManager.
+ */
 class CanBeDeleted
 {
 private:
@@ -43,18 +51,21 @@ public:
     {
         if (m_can_be_deleted.getAtomic()) return true;
         double start = StkTime::getRealTime();
+        Log::verbose("Thread", "Start waiting %lf", start);
         while(1)
         {
             if(m_can_be_deleted.getAtomic()) 
             {
                 Log::verbose("Thread", 
-                            "Waited %lf for thread to become deleteable.", 
-                            StkTime::getRealTime()-start);
+                         "Waited %lf seconds for thread to become deleteable.",
+                         StkTime::getRealTime()-start);
+                Log::verbose("Thread", "Stop waiting %lf", StkTime::getRealTime());
                 return true;
             }
             StkTime::sleep(10);
             if(StkTime::getRealTime() - start > waiting_time)
             {
+                Log::verbose("Thread", "Stop waiting %lf", StkTime::getRealTime());
                 Log::verbose("Thread", "Waited for more than %f seconds for "
                                        "thread to become deleteable", 
                                        waiting_time);
