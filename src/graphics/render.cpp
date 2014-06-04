@@ -131,12 +131,10 @@ void IrrDriver::renderGLSL(float dt)
         Camera * const camera = Camera::getCamera(cam);
         scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
 
-#ifdef ENABLE_PROFILER
         std::ostringstream oss;
-        oss << "drawAll() for kart " << cam << std::flush;
+        oss << "drawAll() for kart " << cam;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
-#endif
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
@@ -228,10 +226,10 @@ void IrrDriver::renderGLSL(float dt)
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera *camera = Camera::getCamera(i);
-        char marker_name[100];
-        sprintf(marker_name, "renderPlayerView() for kart %d", i);
+        std::ostringstream oss;
+        oss << "renderPlayerView() for kart " << i;
 
-        PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
+        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), 0x00, 0x00, (i+1)*60);
         rg->renderPlayerView(camera, dt);
 
         PROFILER_POP_CPU_MARKER();
@@ -407,12 +405,10 @@ void IrrDriver::renderFixed(float dt)
     {
         Camera *camera = Camera::getCamera(i);
 
-#ifdef ENABLE_PROFILER
         std::ostringstream oss;
-        oss << "drawAll() for kart " << i << std::flush;
+        oss << "drawAll() for kart " << i;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,
                                  0x00, 0x00);
-#endif
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
 
@@ -437,10 +433,10 @@ void IrrDriver::renderFixed(float dt)
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera *camera = Camera::getCamera(i);
-        char marker_name[100];
-        sprintf(marker_name, "renderPlayerView() for kart %d", i);
+        std::ostringstream oss;
+        oss << "renderPlayerView() for kart " << i;
 
-        PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
+        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), 0x00, 0x00, (i+1)*60);
         rg->renderPlayerView(camera, dt);
         PROFILER_POP_CPU_MARKER();
 

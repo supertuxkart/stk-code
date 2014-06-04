@@ -468,10 +468,10 @@ void ThreeStrikesBattle::getKartsDisplayInfo(
                 break;
         }
 
-        char lives[4];
-        sprintf(lives, "%i", m_kart_info[i].m_lives);
+        std::ostringstream oss;
+        oss << m_kart_info[i].m_lives;
 
-        rank_info.m_text = lives;
+        rank_info.m_text = oss.str().c_str();
     }
 }   // getKartsDisplayInfo
 
