@@ -124,7 +124,7 @@ void IrrDriver::renderGLSL(float dt)
 
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
-    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
     for(unsigned int cam = 0; cam < Camera::getNumCameras(); cam++)
     {
@@ -465,7 +465,7 @@ void IrrDriver::computeSunVisibility()
     // Is the lens flare enabled & visible? Check last frame's query.
     const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
     const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
     if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
     {
         GLuint res = 0;
@@ -829,10 +829,10 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
 
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
 
     for (u32 i = 0; i < glowcount; i++)
     {
@@ -860,11 +860,11 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     FrameBuffer::Blit(irr_driver->getFBO(FBO_HALF1), irr_driver->getFBO(FBO_QUARTER1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 
-	glEnable(GL_BLEND);
-	glBlendEquation(GL_FUNC_ADD);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glStencilFunc(GL_EQUAL, 0, ~0);
-	glEnable(GL_STENCIL_TEST);
+    glEnable(GL_BLEND);
+    glBlendEquation(GL_FUNC_ADD);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glStencilFunc(GL_EQUAL, 0, ~0);
+    glEnable(GL_STENCIL_TEST);
     m_rtts->getFBO(FBO_COLORS).Bind();
     m_post_processing->renderGlow(m_rtts->getRenderTarget(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
@@ -1480,16 +1480,16 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
-	glDisable(GL_CULL_FACE);
-	assert(SkyboxTextures.size() == 6);
+    glDisable(GL_CULL_FACE);
+    assert(SkyboxTextures.size() == 6);
 
-	core::matrix4 translate;
-	translate.setTranslation(camera->getAbsolutePosition());
+    core::matrix4 translate;
+    translate.setTranslation(camera->getAbsolutePosition());
 
-	// Draw the sky box between the near and far clip plane
-	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
-	core::matrix4 scale;
-	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
+    // Draw the sky box between the near and far clip plane
+    const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
+    core::matrix4 scale;
+    scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
     core::matrix4 transform = translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
@@ -1499,7 +1499,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glUseProgram(MeshShader::SkyboxShader::Program);
-    MeshShader::SkyboxShader::setUniforms(transform, 
+    MeshShader::SkyboxShader::setUniforms(transform,
                                           core::vector2df(float(UserConfigParams::m_width),
                                                           float(UserConfigParams::m_height)),
                                           0);
@@ -1516,15 +1516,15 @@ void IrrDriver::renderDisplacement()
     irr_driver->getFBO(FBO_DISPLACE).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-	cb->update();
+    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+    cb->update();
 
     const int displacingcount = m_displacing.size();
-	irr_driver->setPhase(DISPLACEMENT_PASS);
-	glEnable(GL_DEPTH_TEST);
-	glDisable(GL_ALPHA_TEST);
-	glDepthMask(GL_FALSE);
-	glDisable(GL_BLEND);
+    irr_driver->setPhase(DISPLACEMENT_PASS);
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
     glClear(GL_STENCIL_BUFFER_BIT);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);

@@ -39,7 +39,7 @@ using namespace Online;
 
 /** Creates a modal dialog with given percentage of screen width and height
  */
-ChangePasswordDialog::ChangePasswordDialog() 
+ChangePasswordDialog::ChangePasswordDialog()
                     : ModalDialog(0.8f,0.7f)
 {
     m_self_destroy = false;
@@ -157,13 +157,13 @@ void ChangePasswordDialog::submit()
 }   // submit
 
 // ----------------------------------------------------------------------------
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
              ChangePasswordDialog::processEvent(const std::string& eventSource)
 {
 
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = 
+        const std::string& selection =
                  m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {

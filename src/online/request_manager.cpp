@@ -104,7 +104,7 @@ namespace Online
      *  use network_http - a very subtle race condition. So the thread can
      *  only be started after the assignment (in main) has been done.
      *  \pre PlayerManager was created and has read the main data for each
-     *                     player so that all data for automatic login is 
+     *                     player so that all data for automatic login is
      *                     availale.
      */
     void RequestManager::startNetworkThread()
@@ -129,10 +129,10 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        // In case that login id was not saved (or first start of stk), 
+        // In case that login id was not saved (or first start of stk),
         // current player would not be defined at this stage.
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
-        if(player && player->wasOnlineLastTime() && 
+        if(player && player->wasOnlineLastTime() &&
             !UserConfigParams::m_always_show_login_screen)
         {
             PlayerManager::resumeSavedSession();
