@@ -102,7 +102,6 @@ namespace Online
             static bool isRunning();
 
             void addRequest(Online::Request *request);
-            void cancelAllDownloads();
             void startNetworkThread();
             void stopNetworkThread();
 

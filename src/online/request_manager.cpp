@@ -147,28 +147,26 @@ namespace Online
      */
     void RequestManager::stopNetworkThread()
     {
-        // If a download should be active (which means it was cancelled by the
-        // user, in which case it will still be ongoing in the background)
-        // we can't get the mutex, and would have to wait for a timeout,
-        // and we couldn't finish STK. This way we request an abort of
-        // a download, which mean we can get the mutex and ask the service
-        // thread here to cancel properly.
-        //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
+        // This will queue a sign-out or client-quit request
         PlayerManager::onSTKQuit();
-        addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
-    }   // stopNetworkThread
 
-    // ------------------------------------------------------------------------
-    /** Signals to the progress function to request any ongoing download to be
-     *  cancelled. This function can also be called if there is actually no
-     *  download atm. The function progressDownload checks m_abort and will
-     *  return a non-zero value which causes libcurl to abort. */
-    void RequestManager::cancelAllDownloads()
-    {
+        // Put in a high priortity quit request in. It has the same priority
+        // as a sign-out request (so the sign-out will be executed before the
+        // quit request).
+        Request *quit = new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT);
+        quit->setAbortable(false);
+        addRequest(quit);
+
+        // It is possible that downloads are still ongoing (either an addon
+        // download that the user aborted, or the addon icons etc are still
+        // queued). In order to allow a quick exit of stk we set a flag that
+        // will cause libcurl to abort downloading asap, and then allow the
+        // other requests (sign-out and quit) to be executed asap. Note that
+        // the sign-out request is set to be not abortable, so it still will
+        // be executed (before the quit request is executed, which causes this
+        // thread to exit).
         m_abort.setAtomic(true);
-        // FIXME doesn't get called at the moment. When using this again,
-        // be sure that HTTP_MAX_PRIORITY requests still get executed.
-    }   // cancelAllDownloads
+    }   // stopNetworkThread
 
     // ------------------------------------------------------------------------
     /** Inserts a request into the queue of all requests. The request will be
