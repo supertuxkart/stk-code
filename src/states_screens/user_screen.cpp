@@ -247,7 +247,7 @@ void BaseUserScreen::eventCallback(Widget* widget,
                                        Online::RequestManager::IPERM_NOT_ALLOWED)
         {
             m_info_widget->setText(
-                "Internet access is disabled, please enable it in the options",
+                _("Internet access is disabled, please enable it in the options"),
                 true);
             sfx_manager->quickSound( "anvil" );
             m_online_cb->setState(false);
