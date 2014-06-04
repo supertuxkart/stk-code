@@ -111,6 +111,10 @@ void BaseUserScreen::init()
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
         const stringw &online_name = player->getLastOnlineName();
         m_username_tb->setText(online_name);
+        if(online_name.size()>0)
+            m_username_tb->setDeactivated();
+        else
+            m_username_tb->setActivated();
         // Select 'online
         m_online_cb->setState(player->wasOnlineLastTime() ||
                               player->isLoggedIn()          );
@@ -444,6 +448,7 @@ void BaseUserScreen::loginError(const irr::core::stringw & error_message)
     // which allows the player to enter a new password.
     if(player && player->hasSavedSession())
         player->clearSession();
+    player->setLastOnlineName("");
     makeEntryFieldsVisible();
     sfx_manager->quickSound("anvil");
     m_info_widget->setErrorColor();
