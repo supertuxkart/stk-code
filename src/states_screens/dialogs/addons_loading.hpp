@@ -38,7 +38,8 @@ private:
     GUIEngine::ProgressBarWidget *m_progress;
     GUIEngine::IconButtonWidget  *m_back_button;
     GUIEngine::IconButtonWidget  *m_install_button;
-
+    GUIEngine::ButtonWidget      *m_cancel_button;
+    
     GUIEngine::IconButtonWidget  *m_icon;
     
     /** The addon to load. */
