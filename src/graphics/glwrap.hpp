@@ -219,6 +219,11 @@ void saveCompressedTexture(const std::string& compressed_tex);
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);
 
+void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
+    const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    bool useAlphaChannelOfTexture);
+
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
     const irr::video::SColor &color, bool useAlphaChannelOfTexture);

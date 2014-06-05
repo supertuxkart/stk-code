@@ -1915,6 +1915,16 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         if (!widget->m_event_handler->m_deactivated)
             drawSpinnerChild(rect, widget, pressed, focused);
     }
+    else if (type == WTYPE_MODEL_VIEW)
+    {
+        ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
+        FrameBuffer* fb = mvw->getFrameBuffer();
+        if (fb != NULL && fb->getRTT().size() > 0)
+        {
+            draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
+                rect, core::rect<s32>(0, 0, 512, 512), NULL, true);
+        }
+    }
     else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
     {
         drawIconButton(rect, widget, pressed, focused);

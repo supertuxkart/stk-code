@@ -648,14 +648,15 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
     glGetError();
 }
 
-void drawTexQuad(const video::ITexture *texture, float width, float height,
+static
+void drawTexQuad(GLuint texture, float width, float height,
                  float center_pos_x, float center_pos_y, float tex_center_pos_x, float tex_center_pos_y,
                  float tex_width, float tex_height)
 {
     glUseProgram(UIShader::TextureRectShader::Program);
     glBindVertexArray(UIShader::TextureRectShader::vao);
 
-    setTexture(0, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    setTexture(0, texture, GL_LINEAR, GL_LINEAR);
     UIShader::TextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, 0);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -666,7 +667,8 @@ void drawTexQuad(const video::ITexture *texture, float width, float height,
 }
 
 static void
-getSize(const video::ITexture* texture, const core::rect<s32>& destRect,
+getSize(unsigned texture_width, unsigned texture_height, bool textureisRTT,
+        const core::rect<s32>& destRect,
         const core::rect<s32>& sourceRect,
         float &width, float &height,
         float &center_pos_x, float &center_pos_y,
@@ -689,23 +691,20 @@ getSize(const video::ITexture* texture, const core::rect<s32>& destRect,
     height = float(destRect.LowerRightCorner.Y - destRect.UpperLeftCorner.Y);
     height /= screen_h;
 
-    const core::dimension2d<u32>& ss = texture->getOriginalSize();
     tex_center_pos_x = float(sourceRect.UpperLeftCorner.X + sourceRect.LowerRightCorner.X);
-    tex_center_pos_x /= ss.Width * 2.f;
+    tex_center_pos_x /= texture_width * 2.f;
     tex_center_pos_y = float(sourceRect.UpperLeftCorner.Y + sourceRect.LowerRightCorner.Y);
-    tex_center_pos_y /= ss.Height * 2.f;
+    tex_center_pos_y /= texture_height * 2.f;
     tex_width = float(sourceRect.LowerRightCorner.X - sourceRect.UpperLeftCorner.X);
-    tex_width /= ss.Width * 2.f;
+    tex_width /= texture_width * 2.f;
     tex_height = float(sourceRect.LowerRightCorner.Y - sourceRect.UpperLeftCorner.Y);
-    tex_height /= ss.Height * 2.f;
+    tex_height /= texture_height * 2.f;
 
-    if (texture->isRenderTarget())
-    {
+    if (textureisRTT)
         tex_height = -tex_height;
-    }
 
-    const f32 invW = 1.f / static_cast<f32>(ss.Width);
-    const f32 invH = 1.f / static_cast<f32>(ss.Height);
+    const f32 invW = 1.f / static_cast<f32>(texture_width);
+    const f32 invH = 1.f / static_cast<f32>(texture_height);
     const core::rect<f32> tcoords(
         sourceRect.UpperLeftCorner.X * invW,
         sourceRect.UpperLeftCorner.Y * invH,
@@ -730,7 +729,8 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
         tex_width, tex_height,
         tex_center_pos_x, tex_center_pos_y;
 
-    getSize(texture, destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+    getSize(texture->getOriginalSize().Width, texture->getOriginalSize().Height, texture->isRenderTarget(),
+            destRect, sourceRect, width, height, center_pos_x, center_pos_y,
             tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
     if (useAlphaChannelOfTexture)
@@ -769,6 +769,25 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     glGetError();
 }
 
+void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
+    const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    bool useAlphaChannelOfTexture)
+{
+    glEnable(GL_BLEND);
+    float width, height,
+        center_pos_x, center_pos_y,
+        tex_width, tex_height,
+        tex_center_pos_x, tex_center_pos_y;
+
+    getSize(texture_w, texture_h, true,
+        destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+        tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
+    drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
+        tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
+
+}
+
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
                  const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
                  const video::SColor* const colors, bool useAlphaChannelOfTexture)
@@ -784,7 +803,8 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
         tex_width, tex_height,
         tex_center_pos_x, tex_center_pos_y;
 
-    getSize(texture, destRect, sourceRect, width, height, center_pos_x, center_pos_y,
+    getSize(texture->getOriginalSize().Width, texture->getOriginalSize().Height, texture->isRenderTarget(),
+            destRect, sourceRect, width, height, center_pos_x, center_pos_y,
             tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
 
     if (useAlphaChannelOfTexture)
@@ -810,7 +830,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
         drawTexColoredQuad(texture, colors, width, height, center_pos_x, center_pos_y,
                            tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
     else
-        drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
+        drawTexQuad(static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), width, height, center_pos_x, center_pos_y,
                     tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
     if (clipRect)
         glDisable(GL_SCISSOR_TEST);

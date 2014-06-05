@@ -320,9 +320,16 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_kartInternalName = props->getIdent();
 
     const KartModel &kart_model = props->getMasterKartModel();
+    
+    float scale = 35.0f;
+    if (kart_model.getLength() > 1.45f)
+    {
+        // if kart is too long, size it down a bit so that it fits
+        scale = 30.0f;
+    }
 
     m_model_view->addModel( kart_model.getModel(), Vec3(0,0,0),
-                            Vec3(35.0f, 35.0f, 35.0f),
+                            Vec3(scale, scale, scale),
                             kart_model.getBaseFrame() );
     m_model_view->addModel( kart_model.getWheelModel(0),
                             kart_model.getWheelGraphicsPosition(0) );
@@ -1461,6 +1468,7 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
         // Random kart
         scene::IMesh* model =
             ItemManager::getItemModel(Item::ITEM_BONUS_BOX);
+
         w3->clearModels();
         w3->addModel( model, Vec3(0.0f, -12.0f, 0.0f),
                       Vec3(35.0f, 35.0f, 35.0f) );
@@ -1497,9 +1505,16 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
         {
             const KartModel &kart_model = kp->getMasterKartModel();
 
+            float scale = 35.0f;
+            if (kart_model.getLength() > 1.45f)
+            {
+                // if kart is too long, size it down a bit so that it fits
+                scale = 30.0f;
+            }
+
             w3->clearModels();
             w3->addModel( kart_model.getModel(), Vec3(0,0,0),
-                          Vec3(35.0f, 35.0f, 35.0f),
+                Vec3(scale, scale, scale),
                           kart_model.getBaseFrame() );
             w3->addModel( kart_model.getWheelModel(0),
                           kart_model.getWheelGraphicsPosition(0) );
