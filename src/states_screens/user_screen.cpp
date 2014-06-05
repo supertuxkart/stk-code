@@ -111,14 +111,16 @@ void BaseUserScreen::init()
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
         const stringw &online_name = player->getLastOnlineName();
         m_username_tb->setText(online_name);
-        if(online_name.size()>0)
-            m_username_tb->setDeactivated();
-        else
-            m_username_tb->setActivated();
         // Select 'online
         m_online_cb->setState(player->wasOnlineLastTime() ||
                               player->isLoggedIn()          );
         makeEntryFieldsVisible();
+        // We have to deactivate after make visible (since make visible
+        // automatically activates widgets).
+        if(online_name.size()>0)
+            m_username_tb->setDeactivated();
+        else
+            m_username_tb->setActivated();
     }
     else   // no current player found
     {
