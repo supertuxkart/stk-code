@@ -285,7 +285,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Lights
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
-        ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
         renderLights(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
@@ -986,6 +985,7 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     //RH
     if (UserConfigParams::m_gi)
     {
+        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
         glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
@@ -1008,11 +1008,17 @@ void IrrDriver::renderLights(unsigned pointlightcount)
 
     m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
     if (UserConfigParams::m_gi)
+    {
+        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
+    }
 
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
     if (SkyboxCubeMap)
+    {
+        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+    }
+    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
 
     if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && SkyboxCubeMap && UserConfigParams::m_gi)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
@@ -1020,13 +1026,16 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
+        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
         if (World::getWorld() && UserConfigParams::m_shadows)
             m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
         else
             m_post_processing->renderSunlight();
     }
-
-    renderPointLights(MIN2(pointlightcount, MAXLIGHT));
+    {
+        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
+        renderPointLights(MIN2(pointlightcount, MAXLIGHT));
+    }
 }
 
 void IrrDriver::renderSSAO()
