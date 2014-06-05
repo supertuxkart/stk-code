@@ -25,8 +25,6 @@
 class RandomGPInfoDialog : public GPInfoDialog
 {
 public:
-    // the enum has to be declared here because you can't forward declare it
-    // without c++11
     enum REVERSED
     {
         NO_REVERSE = 0,
@@ -47,6 +45,7 @@ public:
      * number of tracks and one to choose if  the tracks should be raced in
      * reverse. The Spinners are centered. */
     void addSpinners();
+    void addRestartButton();
 
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };

@@ -16,6 +16,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/engine.hpp"
+#include "guiengine/widgets/icon_button_widget.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "race/grand_prix_manager.hpp"
 #include "race/race_manager.hpp"
@@ -34,8 +35,8 @@ typedef GUIEngine::SpinnerWidget Spinner;
 RandomGPInfoDialog::RandomGPInfoDialog()
 {
     // Defaults - loading selection from last time frrom a file would be better
-    m_number_of_tracks = 2;
-    m_trackgroup = "all";
+    m_number_of_tracks = 2; // We can assume that there are at least 2 standart tracks
+    m_trackgroup = "standard";
     m_use_reverse = NO_REVERSE;
 
     doInit();
@@ -59,13 +60,15 @@ RandomGPInfoDialog::RandomGPInfoDialog()
     addTracks();
     addScreenshot();
     addButtons();
+    addRestartButton();
 }
 
 // ----------------------------------------------------------------------------
 
 void RandomGPInfoDialog::addSpinners()
 {
-    const int left =  (m_area.getWidth() - 250 - 150 - 250)/2;
+    const int trackgroup_width = 200, laps_with = 150, reverse_width = 200;
+    const int left =  (m_area.getWidth() - trackgroup_width - 150 - 250)/2;
 
     // Trackgroup chooser
     Spinner* spinner = new Spinner(false);
@@ -74,24 +77,33 @@ void RandomGPInfoDialog::addSpinners()
     spinner->setParent(m_irrlicht_window);
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + 0, m_under_title, 250, SPINNER_HEIGHT);
+    spinner->move(left, m_under_title, trackgroup_width, SPINNER_HEIGHT);
     // Fill it with with all the track group names
     spinner->addLabel("all");
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     for (unsigned int i = 1; i < groups.size() + 1; i++)
-        spinner->addLabel(stringw(groups[i].c_str()));
+    {
+        // FIXME: The NULL check is necessary until #1348 on github is fixed
+        if (groups[i].c_str() != NULL)
+        {
+            spinner->addLabel(stringw(groups[i].c_str()));
+            if(groups[i] == "standard")
+                spinner->setValue(i);
+        }
+    }
+    spinner->setValue(1); // Let's just hope it's right ...
 
     // Number of laps chooser
     spinner = new Spinner(false);
     spinner->setValue(m_number_of_tracks);
     spinner->setMin(1);
-    spinner->setMax(track_manager->getNumberOfTracks()); // default is "all"
+    spinner->setMax(track_manager->getTracksInGroup("standard").size());
     spinner->setParent(m_irrlicht_window);
     spinner->m_properties[GUIEngine::PROP_ID] = "Number of tracks";
     spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + 260, m_under_title, 150, SPINNER_HEIGHT);
+    spinner->move(left + trackgroup_width + 10, m_under_title, laps_with, SPINNER_HEIGHT);
 
     // reverse choose
     spinner = new Spinner(false);
@@ -100,10 +112,23 @@ void RandomGPInfoDialog::addSpinners()
     spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + 410, m_under_title, 250, SPINNER_HEIGHT);
+    spinner->move(left + trackgroup_width + laps_with + 10, m_under_title, reverse_width, SPINNER_HEIGHT);
     spinner->addLabel("no reverse");
     spinner->addLabel("all reverse");
     spinner->addLabel("mixed");
+}
+
+// ----------------------------------------------------------------------------
+
+void RandomGPInfoDialog::addRestartButton()
+{
+    GUIEngine::IconButtonWidget* button = new GUIEngine::IconButtonWidget();
+    button->setImage("gui/restart.png");
+    button->setParent(m_irrlicht_window);
+    button->m_properties[GUIEngine::PROP_ID] = "reload";
+    m_widgets.push_back(button);
+    button->add();
+    button->move(m_area.getWidth() - 20 - 32, 20, 32, 32);
 }
 
 // ----------------------------------------------------------------------------
@@ -154,6 +179,13 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
         Spinner* r = getWidget<Spinner>("reverse");
         m_use_reverse = static_cast<REVERSED>(r->getValue());
         m_gp->changeReverse(m_use_reverse);
+    }
+    else if (eventSource == "reload")
+    {
+        delete m_gp;
+        m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+        grand_prix_manager->m_random_gp = m_gp;
+        addTracks();
     }
 
     return GUIEngine::EVENT_LET;
