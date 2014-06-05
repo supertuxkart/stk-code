@@ -23,13 +23,13 @@
 
 #include "guiengine/screen.hpp"
 
-namespace GUIEngine 
+namespace GUIEngine
 {
     class CheckBoxWidget;
     class LabelWidget;
     class RibbonWidget;
     class TextBoxWidget;
-    class Widget; 
+    class Widget;
 }
 
 class PlayerProfile;
@@ -39,7 +39,7 @@ class PlayerProfile;
   * \brief The user management screen. The screen cames in two variations:
   *  either as a stand-alone screen before the main menu (on first time STK
   *  is started, or it the user is not remembered), but also as tab in the
-  *  options menu. To implement this, we use one common base class that 
+  *  options menu. To implement this, we use one common base class that
   *  implements nearly all functionality, and derive to classes - one for
   *  the stand alone version, one for the version with tabs.
   * \ingroup states_screens.

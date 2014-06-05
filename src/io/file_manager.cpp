@@ -860,7 +860,7 @@ void FileManager::checkAndCreateScreenshotDir()
 }   // checkAndCreateScreenshotDir
 
 // ----------------------------------------------------------------------------
-/** Creates the directories for cached textures. This will set 
+/** Creates the directories for cached textures. This will set
 *  m_cached_textures_dir with the appropriate path.
 */
 void FileManager::checkAndCreateCachedTexturesDir()
@@ -1033,12 +1033,12 @@ void FileManager::redirectOutput()
 }   // redirectOutput
 
 //-----------------------------------------------------------------------------
-/** Returns the theoretical location of the cached version of a texture 
+/** Returns the theoretical location of the cached version of a texture
 *   depending of the current config. (This function also works for directories:
 *   in this case the returned directory will be the cache location for all
 *   textures that you will find in the specified directory. The specified
 *   directory must end with '/')
-*   \note The returned location is where the cached data should be read or 
+*   \note The returned location is where the cached data should be read or
 *   written but the file itseft does not necessarity exist. However, the
 *   directory structure is automatically created if it does not exist.
 */
@@ -1247,7 +1247,7 @@ bool FileManager::copyFile(const std::string &source, const std::string &dest)
     if(!f_source) return false;
 
     FILE *f_dest = fopen(dest.c_str(), "wb");
-    if(!f_dest) 
+    if(!f_dest)
     {
         fclose(f_source);
         return false;

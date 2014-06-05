@@ -137,7 +137,7 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    core::stringw m = _("Signed in as: %s.", 
+    core::stringw m = _("Signed in as: %s.",
                         PlayerManager::getCurrentOnlineUserName());
     m_online_status_widget->setText(m, false);
 }   // init
@@ -198,7 +198,7 @@ void OnlineScreen::doQuickPlay()
     {
         delete request2;
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-        ConnectToServer *cts = new ConnectToServer(server->getServerId(), 
+        ConnectToServer *cts = new ConnectToServer(server->getServerId(),
                                                    server->getHostId());
         ProtocolManager::getInstance()->requestStart(cts);
     }
@@ -255,7 +255,7 @@ void OnlineScreen::tearDown()
 }
 
 // ----------------------------------------------------------------------------
-/** Sets which widget has to be focused. Depends on the user state. 
+/** Sets which widget has to be focused. Depends on the user state.
  */
 void OnlineScreen::setInitialFocus()
 {

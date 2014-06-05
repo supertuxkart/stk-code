@@ -526,11 +526,11 @@ class BloomBlendShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_texture;
+    static GLuint uniform_tex_128, uniform_tex_256, uniform_tex_512;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(unsigned TU_tex);
+    static void setUniforms(unsigned TU_tex_128, unsigned TU_tex_256, unsigned TU_tex_512);
 };
 
 class ToneMapShader
@@ -553,16 +553,6 @@ public:
 
     static void init();
     static void setUniforms(unsigned TU_tex, unsigned TU_depth);
-};
-
-class ColorLevelShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_invprojm, uniform_dtex, uniform_inlevel, uniform_outlevel;
-    static GLuint vao;
-
-    static void init();
 };
 
 class SunLightShader
@@ -651,6 +641,15 @@ public:
     static void init();
 };
 
+class ComputeGaussian17TapHShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_source, uniform_dest;
+
+    static void init();
+};
+
 class Gaussian6HBlurShader
 {
 public:
@@ -680,6 +679,16 @@ public:
 
     static void init();
 };
+
+class ComputeGaussian17TapVShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_source, uniform_dest;
+
+    static void init();
+};
+
 
 class Gaussian6VBlurShader
 {
@@ -786,17 +795,6 @@ public:
 
     static void init();
     static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
-};
-
-class LogLuminanceShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_tex;
-    static GLuint vao;
-
-    static void init();
-    static void setUniforms(unsigned TU_tex);
 };
 
 class MLAAColorEdgeDetectionSHader
