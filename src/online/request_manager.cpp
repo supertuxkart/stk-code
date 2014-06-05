@@ -1,7 +1,7 @@
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2010-2014 Lucas Baudin
-//                2011-2014 Joerg Henrichs
+//                2011-201 Joerg Henrichs
 //                2013-2014 Glenn De Jonghe
 //
 //  This program is free software; you can redistribute it and/or
@@ -83,7 +83,7 @@ namespace Online
         pthread_cond_init(&m_cond_request, NULL);
         m_abort.setAtomic(false);
         m_time_since_poll = MENU_POLLING_INTERVAL * 0.9;
-    }   // RequestManager
+    }
 
     // ------------------------------------------------------------------------
     RequestManager::~RequestManager()
@@ -94,7 +94,8 @@ namespace Online
         m_thread_id.unlock();
         pthread_cond_destroy(&m_cond_request);
         curl_global_cleanup();
-    }   // ~RequestManager
+    }
+
 
     // ------------------------------------------------------------------------
     /** Start the actual network thread. This can not be done as part of
@@ -103,7 +104,7 @@ namespace Online
      *  use network_http - a very subtle race condition. So the thread can
      *  only be started after the assignment (in main) has been done.
      *  \pre PlayerManager was created and has read the main data for each
-     *                     player so that all data for automatic login is
+     *                     player so that all data for automatic login is 
      *                     availale.
      */
     void RequestManager::startNetworkThread()
@@ -128,10 +129,10 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
-        // In case that login id was not saved (or first start of stk),
+        // In case that login id was not saved (or first start of stk), 
         // current player would not be defined at this stage.
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
-        if(player && player->wasOnlineLastTime() &&
+        if(player && player->wasOnlineLastTime() && 
             !UserConfigParams::m_always_show_login_screen)
         {
             PlayerManager::resumeSavedSession();
@@ -146,26 +147,28 @@ namespace Online
      */
     void RequestManager::stopNetworkThread()
     {
-        // This will queue a sign-out or client-quit request
+        // If a download should be active (which means it was cancelled by the
+        // user, in which case it will still be ongoing in the background)
+        // we can't get the mutex, and would have to wait for a timeout,
+        // and we couldn't finish STK. This way we request an abort of
+        // a download, which mean we can get the mutex and ask the service
+        // thread here to cancel properly.
+        //cancelAllDownloads(); FIXME if used this way it also cancels the client-quit action
         PlayerManager::onSTKQuit();
-
-        // Put in a high priortity quit request in. It has the same priority
-        // as a sign-out request (so the sign-out will be executed before the
-        // quit request).
-        Request *quit = new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT);
-        quit->setAbortable(false);
-        addRequest(quit);
-
-        // It is possible that downloads are still ongoing (either an addon
-        // download that the user aborted, or the addon icons etc are still
-        // queued). In order to allow a quick exit of stk we set a flag that
-        // will cause libcurl to abort downloading asap, and then allow the
-        // other requests (sign-out and quit) to be executed asap. Note that
-        // the sign-out request is set to be not abortable, so it still will
-        // be executed (before the quit request is executed, which causes this
-        // thread to exit).
-        m_abort.setAtomic(true);
+        addRequest(new Request(true, HTTP_MAX_PRIORITY, Request::RT_QUIT));
     }   // stopNetworkThread
+
+    // ------------------------------------------------------------------------
+    /** Signals to the progress function to request any ongoing download to be
+     *  cancelled. This function can also be called if there is actually no
+     *  download atm. The function progressDownload checks m_abort and will
+     *  return a non-zero value which causes libcurl to abort. */
+    void RequestManager::cancelAllDownloads()
+    {
+        m_abort.setAtomic(true);
+        // FIXME doesn't get called at the moment. When using this again,
+        // be sure that HTTP_MAX_PRIORITY requests still get executed.
+    }   // cancelAllDownloads
 
     // ------------------------------------------------------------------------
     /** Inserts a request into the queue of all requests. The request will be
@@ -218,11 +221,6 @@ namespace Online
             me->addResult(me->m_current_request);
             me->m_request_queue.lock();
         }   // while
-
-        // Signal that the request manager can now be deleted.
-        // We signal this even before cleaning up memory, since there's no 
-        // need to keep the user waiting for STK to exit.
-        me->setCanBeDeleted();
 
         // At this stage we have the lock for m_request_queue
         while(!me->m_request_queue.getData().empty())

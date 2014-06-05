@@ -83,7 +83,6 @@ public:
                                 int world_kart_id,
                                 int position, const btTransform& init_transform);
     virtual       ~AbstractKart();
-    virtual core::stringw getName() const;
     virtual void   reset();
     virtual void   init(RaceManager::KartType type) = 0;
     // ========================================================================
@@ -110,7 +109,8 @@ public:
     // ------------------------------------------------------------------------
     /** Sets the kart properties. */
     void setKartProperties(const KartProperties *kp) { m_kart_properties=kp; }
-
+    // ------------------------------------------------------------------------
+    virtual const wchar_t* getName() const;
     // ------------------------------------------------------------------------
     /** Returns a unique identifier for this kart (name of the directory the
      *  kart was loaded from). */

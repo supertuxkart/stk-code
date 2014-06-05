@@ -346,7 +346,7 @@ void Camera::smoothMoveCamera(float dt)
     
     if ((m_kart->getSpeed() > 5 ) || (m_kart->getSpeed() < 0 ))
     {
-        current_position += ((wanted_position - current_position) * dt
+        current_position += ((wanted_position - current_position) * dt 
                           * (m_kart->getSpeed()>0 ? m_kart->getSpeed()/3 + 1.0f
                                                  : -1.5f * m_kart->getSpeed() + 2.0f));
     }

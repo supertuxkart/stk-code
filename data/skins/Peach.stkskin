@@ -235,10 +235,8 @@ when the border that intersect at this corner are enabled.
 <!-- Text field color -->
 <color type="text_field" state="background" a="255" r="200" g="200" b="200" />
 <color type="text_field" state="background_focused" a="255" r="236" g="226" b="201" />
-<color type="text_field" state="background_deactivated" a="255" r="200" g="200" b="200" />
 <color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
 <color type="text_field" state="focused" a="255" r="243" g="164" b="80" />
-<color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />
 
 <!-- Rating star image -->
 <element type="rating" state="neutral" image="peach/rating_star.png" />

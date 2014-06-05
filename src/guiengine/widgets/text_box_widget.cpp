@@ -94,9 +94,6 @@ void TextBoxWidget::add()
                                   (m_parent ? m_parent : GUIEngine::getGUIEnv()->getRootGUIElement()),
                                   getNewID(), widget_size);
 
-    if (m_deactivated)
-        m_element->setEnabled(false);
-
     //m_element = GUIEngine::getGUIEnv()->addEditBox(text.c_str(), widget_size,
     //                                               true /* border */, m_parent, getNewID());
     m_id = m_element->getID();
@@ -171,33 +168,3 @@ void TextBoxWidget::elementRemoved()
     m_element->drop();
     Widget::elementRemoved();
 }
-
-// -----------------------------------------------------------------------------
-
-void TextBoxWidget::setActivated()
-{
-    Widget::setActivated();
-
-    if (m_element != NULL)
-    {
-        IGUIEditBox* textCtrl = Widget::getIrrlichtElement<IGUIEditBox>();
-        assert(textCtrl != NULL);
-        textCtrl->setEnabled(true);
-    }
-}
-
-// -----------------------------------------------------------------------------
-
-void TextBoxWidget::setDeactivated()
-{
-    Widget::setDeactivated();
-
-    if (m_element != NULL)
-    {
-        IGUIEditBox* textCtrl = Widget::getIrrlichtElement<IGUIEditBox>();
-        assert(textCtrl != NULL);
-        textCtrl->setEnabled(false);
-    }
-}
-
-// -----------------------------------------------------------------------------

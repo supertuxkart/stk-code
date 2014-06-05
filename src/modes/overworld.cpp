@@ -29,7 +29,6 @@
 #include "karts/kart_properties.hpp"
 #include "karts/kart_properties_manager.hpp"
 #include "karts/rescue_animation.hpp"
-#include "physics/btKart.hpp"
 #include "physics/physics.hpp"
 #include "states_screens/dialogs/select_challenge.hpp"
 #include "states_screens/offline_kart_selection.hpp"
@@ -55,6 +54,7 @@ OverWorld::~OverWorld()
 /** Function to simplify the start process */
 void OverWorld::enterOverWorld()
 {
+
     race_manager->setNumLocalPlayers(1);
     race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
     race_manager->setMinorMode (RaceManager::MINOR_MODE_OVERWORLD);
@@ -231,7 +231,6 @@ void OverWorld::onMouseClick(int x, int y)
         // be the location of the challenge bubble.
         AbstractKart* kart = getKart(0);
         kart->setXYZ(challenge->m_position);
-        kart->getVehicle()->capSpeed(0);
 
         unsigned int index   = getRescuePositionIndex(kart);
         btTransform s        = getRescueTransform(index);

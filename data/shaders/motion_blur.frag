@@ -40,24 +40,20 @@ uniform float mask_radius;
 // Maximum height of texture used
 uniform float max_tex_height;
 
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
+#if __VERSION__ >= 130
+in vec2 uv;
 out vec4 FragColor;
+#else
+varying vec2 uv;
+#define FragColor gl_FragColor
+#endif
 
 // Number of samples used for blurring
 #define NB_SAMPLES 8
 
 void main()
 {
-	vec2 texcoords = gl_FragCoord.xy / screen;
+	vec2 texcoords = uv;
 
 	// Sample the color buffer
 	vec3 color = texture(color_buffer, texcoords).rgb;

@@ -717,10 +717,10 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
         font = GUIEngine::getSmallFont();
 
     static video::SColor color = video::SColor(255, 255, 255, 255);
-    std::ostringstream oss;
-    oss << (int)(speed*10);
+    char str[256];
+    sprintf(str, "%d", (int)(speed*10));
 
-    font->draw(oss.str().c_str(), pos, color);
+    font->draw(core::stringw(str).c_str(), pos, color);
 
 }
 

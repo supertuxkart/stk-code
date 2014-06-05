@@ -387,8 +387,6 @@ public:
     void  getAllData        (const XMLNode * root);
     void  checkAllSet       (const std::string &filename);
     float getStartupBoost   () const;
-    bool  isInGroup         (const std::string &group) const;
-    bool operator<(const KartProperties &other) const;
 
     // ------------------------------------------------------------------------
     /** Returns the (maximum) speed for a given turn radius.
@@ -433,9 +431,9 @@ public:
     /** Returns the name of this kart.
         \note Pass it through fridibi as needed, this is the LTR name
       */
-    core::stringw getName() const
+    const wchar_t* getName() const
     {
-        return core::stringw(translations->w_gettext(m_name.c_str()));
+        return translations->w_gettext(m_name.c_str());
     }
 
     // ------------------------------------------------------------------------

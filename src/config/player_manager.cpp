@@ -268,7 +268,7 @@ void PlayerManager::save()
 
         if(m_current_player && UserConfigParams::m_remember_user)
         {
-            players_file << L"    <current player=\""
+            players_file << L"    <current player=\"" 
                          << m_current_player->getName() << L"\"/>\n";
         }
 
@@ -468,7 +468,7 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 }   // getPlayer
 // ----------------------------------------------------------------------------
 /** Sets the current player. This is the player that is used for story mode
- *  and achievements.
+ *  and achievements. 
  *  \param Player profile to be the current player.
  */
 void PlayerManager::setCurrentPlayer(PlayerProfile *player)

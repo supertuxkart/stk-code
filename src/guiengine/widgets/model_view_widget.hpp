@@ -52,20 +52,12 @@ namespace GUIEngine
         
         video::ITexture* m_texture;
         
-        RTT* m_rtt_provider;
+        IrrDriver::RTTProvider* m_rtt_provider;
         
         float angle;
         
         bool m_rtt_unsupported;
         
-        scene::ISceneNode          *m_rtt_main_node;
-
-        scene::ICameraSceneNode    *m_camera;
-
-        scene::ISceneNode          *m_light;
-
-        FrameBuffer                *m_frame_buffer;
-
     public:
         
         LEAK_CHECK()
@@ -97,13 +89,6 @@ namespace GUIEngine
         bool isRotating();
         
         void clearRttProvider();
-
-        void setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
-            AlignedArray<Vec3>& mesh_location,
-            AlignedArray<Vec3>& mesh_scale,
-            const std::vector<int>& model_frames);
-
-        FrameBuffer* getFrameBuffer() { return m_frame_buffer; }
     };
     
 }

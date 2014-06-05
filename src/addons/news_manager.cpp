@@ -49,10 +49,9 @@ NewsManager::~NewsManager()
 
 // ---------------------------------------------------------------------------
 /** This function initialises the data for the news manager. It starts a
- *  separate thread to execute downloadNews() - which (if necessary) downaloads
- *  the news.xml file and updates the list of news messages. It also
- *  initialises the addons manager (which can trigger another download of
- *  news.xml).
+ *  separate thread to execute downloadNews() - which (if necessary) the
+ *  news.xml file and updating the list of news messages. It also initialises
+ *  the addons manager (which can trigger another download of news.xml).
  *  \param force_refresh Re-download news.xml, even if
  */
 void NewsManager::init(bool force_refresh)
@@ -184,7 +183,7 @@ void* NewsManager::downloadNews(void *obj)
 
     if(xml) delete xml;
     xml = NULL;
-
+    
     // Process new.xml now.
     if(file_manager->fileExists(xml_file))
     {
@@ -195,10 +194,6 @@ void* NewsManager::downloadNews(void *obj)
         delete xml;
     }
 
-    // We can't finish stk (esp. delete the file manager) before
-    // this part of the code is reached (since otherwise the file
-    // manager might be access after it was deleted).
-    me->setCanBeDeleted();
     pthread_exit(NULL);
     return 0;  // prevent warning
 }   // downloadNews

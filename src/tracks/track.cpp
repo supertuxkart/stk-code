@@ -209,8 +209,11 @@ core::stringw Track::getSortName() const
  */
 bool Track::isInGroup(const std::string &group_name)
 {
-    return std::find(m_groups.begin(), m_groups.end(), group_name)
-        != m_groups.end();
+    for(unsigned int i=0; i<m_groups.size(); i++)
+    {
+        if(m_groups[i]==group_name) return true;
+    }
+    return false;
 }   // isInGroup
 
 //-----------------------------------------------------------------------------

@@ -433,7 +433,9 @@ public:
     void               itemCommand(const XMLNode *node);
     core::stringw      getName() const;
     core::stringw      getSortName() const;
+    // ------------------------------------------------------------------------
     bool               isInGroup(const std::string &group_name);
+    // ------------------------------------------------------------------------
     const core::vector3df& getSunRotation();
     /** Sets the current ambient color for a kart with index k. */
     void               setAmbientColor(const video::SColor &color,

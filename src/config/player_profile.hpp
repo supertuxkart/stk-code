@@ -32,7 +32,7 @@ using namespace irr;
 class AchievementsStatus;
 namespace Online
 {
-    class CurrentUser;
+    class CurrentUser; 
     class HTTPRequest;
     class OnlineProfile;
     class XMLRequest;
@@ -167,9 +167,9 @@ public:
     }   // isGuestAccount
     // ------------------------------------------------------------------------
     /** Returns the last used online name. */
-    const core::stringw& getLastOnlineName() const
+    const core::stringw& getLastOnlineName() const 
     {
-        return m_last_online_name;
+        return m_last_online_name; 
     }   // getLastOnlineName
     // ------------------------------------------------------------------------
     /** Sets the last used online name. */
@@ -250,7 +250,7 @@ public:
     // ------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const
-    {
+    { 
         assert(m_saved_session);
         return m_saved_user_id;
     }   // getSavedUserId

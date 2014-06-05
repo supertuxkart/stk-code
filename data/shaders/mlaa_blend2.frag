@@ -1,15 +1,7 @@
 uniform sampler2D edgesMap;
 uniform sampler2D areaMap;
 
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
+uniform vec2 PIXEL_SIZE;
 
 #define MAX_SEARCH_STEPS 8.0
 #define MAX_DISTANCE 33.0
@@ -24,7 +16,7 @@ out vec4 FragColor;
  * bit.
  */
 vec4 tex2Doffset(sampler2D map, vec2 texcoord, vec2 offset) {
-	return textureLod(map, texcoord + offset / screen, 0.0);
+	return textureLod(map, texcoord + PIXEL_SIZE * offset, 0.0);
 }
 
 float SearchXLeft(vec2 texcoord) {
@@ -95,7 +87,7 @@ void main() {
 
 		// Now fetch the crossing edges. Instead of sampling between edgels, we
 		// sample at 0.25, to be able to discern what value has each edgel:
-		vec4 coords = vec4(d.x, 0.25, d.y + 1.0, 0.25) / screen.xyxy + uv.xyxy;
+		vec4 coords = vec4(d.x, 0.25, d.y + 1.0, 0.25) * PIXEL_SIZE.xyxy + uv.xyxy;
 		float e1 = textureLod(edgesMap, coords.xy, 0.0).r;
 		float e2 = textureLod(edgesMap, coords.zw, 0.0).r;
 
@@ -110,7 +102,7 @@ void main() {
 		vec2 d = vec2(SearchYUp(uv), SearchYDown(uv));
 
 		// Now fetch the crossing edges (yet again):
-		vec4 coords = vec4(-0.25, d.x, -0.25, d.y - 1.0) / screen.xyxy + uv.xyxy;
+		vec4 coords = vec4(-0.25, d.x, -0.25, d.y - 1.0) * PIXEL_SIZE.xyxy + uv.xyxy;
 		float e1 = textureLod(edgesMap, coords.xy, 0.0).g;
 		float e2 = textureLod(edgesMap, coords.zw, 0.0).g;
 

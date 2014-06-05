@@ -6,7 +6,7 @@ cd data/gui
 l=""
 for i in $(find . -iname "*.stkgui"); do 
     s=$(basename $i)
-    x=$(find ../../src/states_screens -type f -exec grep -H $s \{} \; | wc -l)
+    x=$(find ../../src/states_screens -exec grep -H $s \{} \; | wc -l)
     echo -n "."
     if [ $x == "0" ]; then
         l="$l $i"

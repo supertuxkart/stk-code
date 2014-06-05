@@ -237,10 +237,8 @@ when the border that intersect at this corner are enabled.
 <!-- Text field color -->
 <color type="text_field" state="background" a="255" r="200" g="200" b="200" />
 <color type="text_field" state="background_focused" a="255" r="223" g="238" b="248" />
-<color type="text_field" state="background_deactivated" a="255" r="200" g="200" b="200" />
 <color type="text_field" state="neutral" a="255" r="138" g="138" b="138" />
 <color type="text_field" state="focused" a="255" r="42" g="169" b="211" />
-<color type="text_field" state="deactivated" a="255" r="138" g="138" b="138" />
 
 <!-- Rating star image -->
 <element type="rating" state="neutral" image="ocean/rating_star.png" />

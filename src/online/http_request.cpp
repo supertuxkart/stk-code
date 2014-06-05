@@ -322,8 +322,7 @@ namespace Online
 
         // Check if we are asked to abort the download. If so, signal this
         // back to libcurl by returning a non-zero status.
-        if( (request_manager->getAbort() || request->isCancelled()) && 
-             request->isAbortable()                                     )
+        if(request_manager->getAbort() || request->isCancelled() )
         {
             // Indicates to abort the current download, which means that this
             // thread will go back to the mainloop and handle the next request.

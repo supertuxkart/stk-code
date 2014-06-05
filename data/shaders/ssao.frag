@@ -22,6 +22,7 @@ layout (std140) uniform MatrixesData
 };
 #endif
 
+in vec2 uv;
 out float AO;
 
 const float sigma = 1.;
@@ -45,7 +46,6 @@ vec3 getXcYcZc(int x, int y, float zC)
 
 void main(void)
 {
-    vec2 uv = gl_FragCoord.xy / screen;
     float lineardepth = textureLod(dtex, uv, 0.).x;
     int x = int(gl_FragCoord.x), y = int(gl_FragCoord.y);
     vec3 FragPos = getXcYcZc(x, y, lineardepth);

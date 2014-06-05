@@ -33,7 +33,7 @@
 Synchronised<int> m_lock_stacktrace;
 
 
-#ifdef GET_STACK_TRACE
+#ifdef GET_STACK_TRACE 
 #  ifdef __APPLE__
 #    include <Availability.h>
 #    include <execinfo.h>

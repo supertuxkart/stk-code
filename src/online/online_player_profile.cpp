@@ -116,7 +116,7 @@ namespace Online
     {
         // If the player changes the online account, there can be a
         // logout stil happening.
-        assert(m_online_state == OS_SIGNED_OUT ||
+        assert(m_online_state == OS_SIGNED_OUT || 
                m_online_state == OS_SIGNING_OUT   );
         SignInRequest * request = new SignInRequest(false);
         // We can't use setUserDetail here, since there is no token yet
@@ -125,7 +125,7 @@ namespace Online
         request->addParameter("username",username);
         request->addParameter("password",password);
         request->addParameter("save-session",
-                              UserConfigParams::m_remember_user ? "true"
+                              UserConfigParams::m_remember_user ? "true" 
                                                                 : "false");
         request->queue();
         m_online_state = OS_SIGNING_IN;
@@ -150,7 +150,7 @@ namespace Online
             {
                 PlayerProfile *player = PlayerManager::get()->getPlayer(i);
                 if(player!=current &&
-                    player->hasSavedSession() &&
+                    player->hasSavedSession() && 
                     player->getLastOnlineName() == current->getLastOnlineName())
                 {
                     player->clearSession();
@@ -209,7 +209,7 @@ namespace Online
 
     // ------------------------------------------------------------------------
     /** Requests a sign out from the server. If the user should be remembered,
-     *  a 'client-quit' request is sent (which will log the user out, but
+     *  a 'client-quit' request is sent (which will log the user out, but 
      *  remember the token), otherwise a 'disconnect' is sent.
      */
     void OnlinePlayerProfile::requestSignOut()
@@ -237,10 +237,9 @@ namespace Online
                         : XMLRequest(true,/*priority*/RequestManager::HTTP_MAX_PRIORITY)
             {
                 m_player = player;
-                m_player->setUserDetails(this,
-                    UserConfigParams::m_remember_user ? "client-quit"
+                m_player->setUserDetails(this, 
+                    UserConfigParams::m_remember_user ? "client-quit" 
                                                       :"disconnect");
-                setAbortable(false);
             }   // SignOutRequest
         };   // SignOutRequest
         // ----------------------------------------------------------------
@@ -251,7 +250,7 @@ namespace Online
     }   // requestSignOut
 
     // ------------------------------------------------------------------------
-    /** Callback once the logout event has been processed.
+    /** Callback once the logout event has been processed. 
      *  \param success If the request was successful.
      *  \param input
      */
@@ -437,7 +436,7 @@ namespace Online
     // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
      */
-    uint32_t OnlinePlayerProfile::getOnlineId() const
+    uint32_t OnlinePlayerProfile::getOnlineId() const 
     {
         if((m_online_state == OS_SIGNED_IN ))
         {

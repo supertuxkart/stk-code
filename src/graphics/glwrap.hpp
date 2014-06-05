@@ -97,8 +97,6 @@ extern PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage;
 extern PFNGLTEXSTORAGE1DPROC glTexStorage1D;
 extern PFNGLTEXSTORAGE2DPROC glTexStorage2D;
 extern PFNGLTEXSTORAGE3DPROC glTexStorage3D;
-extern PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
-extern PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
@@ -221,19 +219,14 @@ void saveCompressedTexture(const std::string& compressed_tex);
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);
 
-void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
-    const core::rect<s32>& destRect,
-    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-    bool useAlphaChannelOfTexture);
-
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
     const irr::video::SColor &color, bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
-    const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
-    const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
+	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
+	const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
 
 void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
-    const irr::core::rect<s32>* clip = 0);
+	const irr::core::rect<s32>* clip = 0);
 #endif

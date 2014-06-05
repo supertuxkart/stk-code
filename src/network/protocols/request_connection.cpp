@@ -28,7 +28,7 @@ using namespace Online;
 /** Constructor. Stores the server id.
  *  \param server_id Id of the server.
  */
-RequestConnection::RequestConnection(uint32_t server_id)
+RequestConnection::RequestConnection(uint32_t server_id) 
                  : Protocol(NULL, PROTOCOL_SILENT)
 {
     m_server_id = server_id;
@@ -72,7 +72,7 @@ void RequestConnection::asynchronousUpdate()
         case NONE:
         {
             m_request = new ServerJoinRequest();
-            PlayerManager::setUserDetails(m_request, "request-connection",
+            PlayerManager::setUserDetails(m_request, "request-connection", 
                                           "address-management.php");
             m_request->addParameter("server_id",m_server_id);
             m_request->queue();
@@ -95,7 +95,7 @@ void RequestConnection::asynchronousUpdate()
                 }
                 else
                 {
-                    Log::error("RequestConnection",
+                    Log::error("RequestConnection", 
                              "Fail to make a request to connecto to server %d",
                                m_server_id);
                 }

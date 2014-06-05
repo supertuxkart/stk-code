@@ -235,9 +235,9 @@ void ProfileWorld::enterRaceOverState()
         min_t = std::min(min_t, kart->getFinishTime());
         av_t += kart->getFinishTime();
         std::ostringstream ss;
-        ss << kart->getIdent() << " "
+        ss << kart->getIdent() << " " 
            << kart->getController()->getControllerName() << " ";
-        ss << 1+(int)i << " " << kart->getPosition() << " "
+        ss << 1+(int)i << " " << kart->getPosition() << " " 
            << kart->getFinishTime() << " ";
 
         all_groups.insert(kart->getController()->getControllerName());
@@ -269,7 +269,7 @@ void ProfileWorld::enterRaceOverState()
 
     std::ostringstream ss;
     Log::verbose("profile", "");
-    ss << "name" << std::setw(max_len-4) << " "
+    ss << "name" << std::setw(max_len-4) << " " 
        << "Strt End  Time    AvSp  Top   Skid  Resc Rsc Brake Expl Exp Itm Ban SNitLNit Bub  Off";
     Log::verbose("profile", ss.str().c_str());
     for(std::set<std::string>::iterator it = all_groups.begin();
@@ -301,7 +301,7 @@ void ProfileWorld::enterRaceOverState()
                                      ? race_manager->getNumLaps() : 1);
             distance *= m_track->getTrackLength();
 
-            Log::verbose("profile",
+            Log::verbose("profile", 
                    "%s %4.2f %3.2f %6.2f %4.2f %3d %5d %4.2f %3d %3d %3d %3d %3d %3d %5d",
                    ss.str().c_str(), distance/kart->getFinishTime(),
                    kart->getTopSpeed(),

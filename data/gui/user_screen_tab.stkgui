@@ -18,7 +18,7 @@
             <spacer height="15" width="10"/>
 
             <scrollable_ribbon id="players" height="120" y="10" x="10" width="98%" align="center" label_location="each"
-                               square_items="true" child_width="128" child_height="128" />
+                               square_items="true" child_width="160" child_height="120" />
 
             <spacer height="15" width="10"/>
             <div width="80%" align="center" layout="vertical-row" height="fit">

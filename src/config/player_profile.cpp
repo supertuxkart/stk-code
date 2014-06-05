@@ -61,7 +61,7 @@ PlayerProfile::PlayerProfile(const core::stringw& name, bool is_guest)
  *  as soon as the network thread is started) to avoid the player having to
  *  wait for the login to finish , which needs the main player data (i.e.
  *  the default player, and saved session data). So the constructor only
- *  reads this data, the rest of the player data is handled in
+ *  reads this data, the rest of the player data is handled in 
  *  loadRemainingData later in the initialisation process.
  *  \param node The XML node representing this player.
 */
@@ -156,7 +156,7 @@ void PlayerProfile::addIcon()
     // followed by .png or .jpg.
     std::ostringstream out;
     out << m_unique_id <<"."<<StringUtils::getExtension(source);
-    if(file_manager->copyFile(source,
+    if(file_manager->copyFile(source, 
                                file_manager->getUserConfigFile(out.str())) )
     {
         m_icon_filename = out.str();
@@ -172,7 +172,7 @@ void PlayerProfile::addIcon()
  *  file is undefined, it returns a "?" mark texture. Note, getAsset does
  *  not return a reference, but only a temporary string. So we must return a
  *  copy of the string (not a reference to).
- */
+ */ 
 const std::string PlayerProfile::getIconFilename() const
 {
     // If the icon file is undefined or does not exist, return the "?" icon
@@ -200,7 +200,7 @@ void PlayerProfile::save(UTFWriter &out)
     out << L"            unique-id=\""  << m_unique_id
         << L"\" saved-session=\""       << m_saved_session << L"\"\n";
 
-    out << L"            saved-user=\"" << m_saved_user_id
+    out << L"            saved-user=\"" << m_saved_user_id 
         << L"\" saved-token=\""         << m_saved_token << L"\"\n";
     out << L"            last-online-name=\"" << m_last_online_name
         << L"\" last-was-online=\""           << m_last_was_online<< L"\">\n";

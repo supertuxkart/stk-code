@@ -21,19 +21,25 @@ layout (std140) uniform MatrixesData
     mat4 InverseViewMatrix;
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
 };
 #endif
 
+#if __VERSION__ >= 130
+in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;
+#else
+varying vec2 uv;
+#define Diff gl_FragData[0]
+#define Spec gl_FragData[1]
+#endif
+
 
 vec3 DecodeNormal(vec2 n);
 vec3 getSpecular(vec3 normal, vec3 eyedir, vec3 lightdir, vec3 color, float roughness);
 vec4 getPosFromUVDepth(vec3 uvDepth, mat4 InverseProjectionMatrix);
 
 void main() {
-    vec2 uv = gl_FragCoord.xy / screen;
 	float z = texture(dtex, uv).x;
 	vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 

@@ -302,7 +302,7 @@ void UserInfoDialog::removeExistingFriend()
             else
                 info_text = getInfo();
 
-            UserInfoDialog *info = new UserInfoDialog(m_id, info_text,
+            UserInfoDialog *info = new UserInfoDialog(m_id, info_text, 
                                                       !isSuccess(), true);
             GUIEngine::DialogQueue::get()->pushDialog(info, true);
 

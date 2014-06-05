@@ -262,8 +262,6 @@ void DisplaceProvider::OnSetConstants(IMaterialRendererServices *srv, int)
 
 void DisplaceProvider::update()
 {
-    if (World::getWorld() == NULL) return;
-
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
     const float speed = World::getWorld()->getTrack()->getDisplacementSpeed();
 

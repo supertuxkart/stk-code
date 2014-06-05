@@ -361,7 +361,7 @@ void gamepadVisualisation()
 }   // gamepadVisualisation
 
 // ============================================================================
-/** Sets the hat mesh name depending on the current christmas mode
+/** Sets the hat mesh name depending on the current christmas mode 
  *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
 void handleXmasMode()
@@ -1375,6 +1375,13 @@ int main(int argc, char *argv[] )
 
     /* Program closing...*/
 
+    if(user_config)
+    {
+        // In case that abort is triggered before user_config exists
+        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
+        user_config->saveConfig();
+    }
+
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
         delete wiimote_manager;
@@ -1426,15 +1433,27 @@ static void cleanSuperTuxKart()
 
     delete main_loop;
 
+    irr_driver->updateConfigIfRelevant();
+
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
 
-    irr_driver->updateConfigIfRelevant();
+    //delete in reverse order of what they were created in.
+    //see InitTuxkart()
+    Online::RequestManager::deallocate();
+    Online::ServersManager::deallocate();
+    Online::ProfileManager::destroy();
+    GUIEngine::DialogQueue::deallocate();
+
     AchievementsManager::destroy();
     Referee::cleanup();
+
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
+    NewsManager::deallocate();
     if(addons_manager)          delete addons_manager;
+    NetworkManager::kill();
+
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1451,33 +1470,6 @@ static void cleanSuperTuxKart()
     delete ParticleKindManager::get();
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
-    Online::ProfileManager::destroy();
-    GUIEngine::DialogQueue::deallocate();
-
-    // Now finish shutting down objects which a separate thread. The
-    // RequestManager has been signaled to shut down as early as possible,
-    // the NewsManager thread should have finished quite early on anyway.
-    // But still give them some additional time to finish. It avoids a
-    // race condition where a thread might access the file manager after it
-    // was deleted (in cleanUserConfig below), but before STK finishes and
-    // the os takes all threads down.
-
-    if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
-    {
-        Log::info("Thread", "News manager not stopping, exiting anyway.");
-    }
-    NewsManager::deallocate();
-
-    if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
-    {
-        Log::info("Thread", "Request Manager not aborting in time, aborting.");
-    }
-    Online::RequestManager::deallocate();
-
-    // FIXME: do we need to wait for threads there, can they be
-    // moved further up?
-    Online::ServersManager::deallocate();
-    NetworkManager::kill();
 
     cleanUserConfig();
 
@@ -1493,14 +1485,7 @@ static void cleanUserConfig()
 {
     if(stk_config)              delete stk_config;
     if(translations)            delete translations;
-    if (user_config)
-    {
-        // In case that abort is triggered before user_config exists
-        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
-        user_config->saveConfig();
-        delete user_config;
-    }
-
+    if(user_config)             delete user_config;
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
 }

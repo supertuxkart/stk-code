@@ -18,7 +18,7 @@
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
-StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
+StartGameProtocol::StartGameProtocol(GameSetup* game_setup) 
                  : Protocol(NULL, PROTOCOL_START_GAME)
 {
     m_game_setup = game_setup;
@@ -105,7 +105,7 @@ void StartGameProtocol::update()
         // have to add self first
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile ==
+            bool is_me = (players[i]->user_profile == 
                           PlayerManager::getCurrentOnlineProfile());
             if (is_me)
             {
@@ -134,7 +134,7 @@ void StartGameProtocol::update()
         }
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile ==
+            bool is_me = (players[i]->user_profile == 
                           PlayerManager::getCurrentOnlineProfile());
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->race_id, profile->kart_name,

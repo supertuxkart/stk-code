@@ -105,12 +105,6 @@ namespace Online
 
         /** Cancel this request if it is active. */
         Synchronised<bool>              m_cancel;
-
-        /** If this request can be aborted (at the end of STK). Most requests
-         *  can, except the (final) logout and client-quit/signout-request,
-         *  which must be finished even when STK is quitting. */
-        Synchronised<bool>              m_is_abortable;
-
         /** Set to though if the reply of the request is in and callbacks are
          *  executed */
         Synchronised<State>             m_state;
@@ -161,12 +155,6 @@ namespace Online
         // --------------------------------------------------------------------
         /** Returns if this request is to be canceled. */
         bool isCancelled() const   { return m_cancel.getAtomic(); }
-        // --------------------------------------------------------------------
-        /** Returns if this request can be aborted. */
-        bool isAbortable() const { return m_is_abortable.getAtomic(); }
-        // --------------------------------------------------------------------
-        /** Sets if this request is abortable or not. */
-        void setAbortable(bool b) { m_is_abortable.setAtomic(b); }
         // --------------------------------------------------------------------
         /** Sets the request state to busy. */
         void setBusy()

@@ -975,11 +975,8 @@ void btKart::capSpeed(float max_speed)
 {
     const btVector3 &velocity = m_chassisBody->getLinearVelocity();
     float speed = velocity.length();
-    if(speed!=0)
-    {
-        const float velocity_ratio = max_speed / speed;
-        m_chassisBody->setLinearVelocity(velocity * velocity_ratio);
-    }
+    const float velocity_ratio = max_speed/speed;
+    m_chassisBody->setLinearVelocity( velocity * velocity_ratio);
 }   // capSpeed
 
 // ----------------------------------------------------------------------------

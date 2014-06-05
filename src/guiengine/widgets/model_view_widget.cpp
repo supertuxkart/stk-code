@@ -15,19 +15,9 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#include "config/user_config.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/post_processing.hpp"
-#include "graphics/rtts.hpp"
 #include <algorithm>
-#include <IAnimatedMesh.h>
-#include <IAnimatedMeshSceneNode.h>
-#include <ICameraSceneNode.h>
-#include <ILightSceneNode.h>
-#include <ISceneManager.h>
-
 using namespace GUIEngine;
 using namespace irr::core;
 using namespace irr::gui;
@@ -35,10 +25,7 @@ using namespace irr::gui;
 ModelViewWidget::ModelViewWidget() :
     IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_TEXTURE_ASPECT_RATIO, false, false)
 {
-    m_frame_buffer = NULL;
-    m_rtt_main_node = NULL;
-    m_camera = NULL;
-    m_light = NULL;
+    //FIXME: find nicer way than overriding what IconButtonWidget's constructor already set...
     m_type = WTYPE_MODEL_VIEW;
     m_rtt_provider = NULL;
     m_rotation_mode = ROTATE_OFF;
@@ -83,17 +70,10 @@ void ModelViewWidget::clearModels()
     m_model_scale.clear();
     m_model_frames.clear();
 
-    if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
-    if (m_light != NULL) m_light->remove();
-    if (m_camera != NULL) m_camera->remove();
-
-    m_rtt_main_node = NULL;
-    m_camera = NULL;
-    m_light = NULL;
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
 }
-
 // -----------------------------------------------------------------------------
-
 void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
                                const Vec3& scale, const int frame)
 {
@@ -103,8 +83,20 @@ void ModelViewWidget::addModel(irr::scene::IMesh* mesh, const Vec3& location,
     m_model_location.push_back(location);
     m_model_scale.push_back(scale);
     m_model_frames.push_back(frame);
-}
 
+    /*
+     ((IGUIMeshViewer*)m_element)->setMesh( mesh );
+
+     video::SMaterial mat = mesh->getMeshBuffer(0)->getMaterial(); //mesh_view->getMaterial();
+     mat.setFlag(EMF_LIGHTING , false);
+     //mat.setFlag(EMF_GOURAUD_SHADING, false);
+     //mat.setFlag(EMF_NORMALIZE_NORMALS, true);
+     ((IGUIMeshViewer*)m_element)->setMaterial(mat);
+     */
+
+    delete m_rtt_provider;
+    m_rtt_provider = NULL;
+}
 // -----------------------------------------------------------------------------
 void ModelViewWidget::update(float delta)
 {
@@ -154,144 +146,27 @@ void ModelViewWidget::update(float delta)
         if (fabsf(angle - m_rotation_target) < 2.0f) m_rotation_mode = ROTATE_OFF;
     }
 
-    if (!irr_driver->isGLSL())
-        return;
-
     if (m_rtt_provider == NULL)
     {
         std::string name = "model view ";
         name += m_properties[PROP_ID].c_str();
-
-        m_rtt_provider = new RTT(512, 512);
+        m_rtt_provider = new IrrDriver::RTTProvider(core::dimension2d< u32 >(512, 512), name, false);
+        m_rtt_provider->setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
     }
 
-    if (m_rtt_main_node == NULL)
+    m_texture = m_rtt_provider->renderToTexture(angle);
+    if (m_texture != NULL)
     {
-        setupRTTScene(m_models, m_model_location, m_model_scale, m_model_frames);
-    }
-
-    m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
-    
-    m_rtt_main_node->setVisible(true);
-    irr_driver->setRTT(m_rtt_provider);
-
-    irr_driver->getSceneManager()->setActiveCamera(m_camera);
-
-    std::vector<IrrDriver::GlowData> glows;
-    irr_driver->computeCameraMatrix(m_camera, 512, 512);
-    unsigned plc = irr_driver->UpdateLightsInfo(m_camera, GUIEngine::getLatestDt());
-    irr_driver->renderScene(m_camera, plc, glows, GUIEngine::getLatestDt(), false, true);
-    m_frame_buffer = irr_driver->getPostProcessing()->render(m_camera);
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
-
-    irr_driver->setRTT(NULL);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
-    m_rtt_main_node->setVisible(false);
-}
-
-void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
-    AlignedArray<Vec3>& mesh_location,
-    AlignedArray<Vec3>& mesh_scale,
-    const std::vector<int>& model_frames)
-{
-    irr_driver->suppressSkyBox();
-
-    if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
-    if (m_light != NULL) m_light->remove();
-    if (m_camera != NULL) m_camera->remove();
-
-    m_rtt_main_node = NULL;
-    m_camera = NULL;
-    m_light = NULL;
-
-    irr_driver->clearLights();
-
-    if (model_frames[0] == -1)
-    {
-        scene::ISceneNode* node = irr_driver->addMesh(mesh.get(0), NULL);
-        node->setPosition(mesh_location[0].toIrrVector());
-        node->setScale(mesh_scale[0].toIrrVector());
-        node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-        m_rtt_main_node = node;
+        setImage(m_texture);
     }
     else
     {
-        scene::IAnimatedMeshSceneNode* node =
-            irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(0), NULL);
-        node->setPosition(mesh_location[0].toIrrVector());
-        node->setFrameLoop(model_frames[0], model_frames[0]);
-        node->setAnimationSpeed(0);
-        node->setScale(mesh_scale[0].toIrrVector());
-        node->setMaterialFlag(video::EMF_FOG_ENABLE, false);
-
-        m_rtt_main_node = node;
+        m_rtt_unsupported = true;
     }
-
-    assert(m_rtt_main_node != NULL);
-    assert(mesh.size() == mesh_location.size());
-    assert(mesh.size() == model_frames.size());
-
-    const int mesh_amount = mesh.size();
-    for (int n = 1; n<mesh_amount; n++)
-    {
-        if (model_frames[n] == -1)
-        {
-            scene::ISceneNode* node =
-                irr_driver->addMesh(mesh.get(n), m_rtt_main_node);
-            node->setPosition(mesh_location[n].toIrrVector());
-            node->updateAbsolutePosition();
-            node->setScale(mesh_scale[n].toIrrVector());
-        }
-        else
-        {
-            scene::IAnimatedMeshSceneNode* node =
-                irr_driver->addAnimatedMesh((scene::IAnimatedMesh*)mesh.get(n),
-                m_rtt_main_node);
-            node->setPosition(mesh_location[n].toIrrVector());
-            node->setFrameLoop(model_frames[n], model_frames[n]);
-            node->setAnimationSpeed(0);
-            node->updateAbsolutePosition();
-            node->setScale(mesh_scale[n].toIrrVector());
-            //std::cout << "(((( set frame " << model_frames[n] << " ))))\n";
-        }
-    }
-
-    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 35, 35, 35));
-
-    const core::vector3df &spot_pos = core::vector3df(0, 30, 40);
-    m_light = irr_driver->addLight(spot_pos, 0.3f /* energy */, 10 /* distance */, 1.0f /* r */, 1.0f /* g */, 1.0f /* g*/, true, NULL);
-
-    m_rtt_main_node->setMaterialFlag(video::EMF_GOURAUD_SHADING, true);
-    m_rtt_main_node->setMaterialFlag(video::EMF_LIGHTING, true);
-
-    const int materials = m_rtt_main_node->getMaterialCount();
-    for (int n = 0; n<materials; n++)
-    {
-        m_rtt_main_node->getMaterial(n).setFlag(video::EMF_LIGHTING, true);
-
-        // set size of specular highlights
-        m_rtt_main_node->getMaterial(n).Shininess = 100.0f;
-        m_rtt_main_node->getMaterial(n).SpecularColor.set(255, 50, 50, 50);
-        m_rtt_main_node->getMaterial(n).DiffuseColor.set(255, 150, 150, 150);
-
-        m_rtt_main_node->getMaterial(n).setFlag(video::EMF_GOURAUD_SHADING,
-            true);
-    }
-
-    m_camera = irr_driver->getSceneManager()->addCameraSceneNode();
-    m_camera->setAspectRatio(1.0f);
-
-    m_camera->setPosition(core::vector3df(0.0, 20.0f, 70.0f));
-    if (irr_driver->isGLSL())
-        m_camera->setUpVector(core::vector3df(0.0, 1.0, 0.0));
-    else
-        m_camera->setUpVector(core::vector3df(0.0, 1.0, 0.0));
-    m_camera->setTarget(core::vector3df(0, 10, 0.0f));
-    m_camera->setFOV(DEGREE_TO_RAD*50.0f);
-    m_camera->updateAbsolutePosition();
+    //getIrrlichtElement<IGUIButton>()->setImage(m_texture);
+    //getIrrlichtElement<IGUIButton>()->setPressedImage(m_texture);
 }
+
 
 void ModelViewWidget::setRotateOff()
 {

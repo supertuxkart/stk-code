@@ -4,13 +4,14 @@ uniform sampler2D tex;
 uniform vec2 pixel;
 uniform float sigma = 5.;
 
+in vec2 uv;
 out vec4 FragColor;
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy * pixel;
     float X = uv.x;
     float Y = uv.y;
+
 
     float g0, g1, g2;
     g0 = 1.0 / (sqrt(2.0 * 3.14) * sigma);

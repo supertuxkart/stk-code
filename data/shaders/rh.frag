@@ -34,6 +34,7 @@ vec4 DirToSh(vec3 dir, float flux)
 
 void main(void)
 {
+
     vec3 normalizedRHCenter = 2. * vec3(gl_FragCoord.xy, slice) / resolution - 1.;
     vec3 RHcenter = (RHMatrix * vec4(normalizedRHCenter * extents, 1.)).xyz;
 

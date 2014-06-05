@@ -108,11 +108,7 @@ enum QueryPerf
 {
     Q_SOLID_PASS1,
     Q_SHADOWS,
-    Q_RH,
-    Q_GI,
-    Q_ENVMAP,
-    Q_SUN,
-    Q_POINTLIGHTS,
+    Q_LIGHT,
     Q_SSAO,
     Q_SOLID_PASS2,
     Q_TRANSPARENT,
@@ -294,11 +290,6 @@ public:
         m_lwhite = v;
     }
 
-    struct GlowData {
-        scene::ISceneNode * node;
-        float r, g, b;
-    };
-
 private:
     std::vector<VideoMode> m_modes;
 
@@ -336,6 +327,11 @@ private:
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
 
+    struct GlowData {
+        scene::ISceneNode * node;
+        float r, g, b;
+    };
+
     std::vector<GlowData> m_glowing;
 
     std::vector<LightNode *> m_lights;
@@ -365,9 +361,12 @@ private:
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
+    void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows);
+    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
     void renderShadows();
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
+    unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
     void renderLights(unsigned pointlightCount);
     void renderDisplacement();
     void doScreenShot();
@@ -526,10 +525,7 @@ public:
     {
         return m_texture_error_message;
     }   // getTextureErrorMessage
-    // ------------------------------------------------------------------------
-    void setRTT(RTT* rtt);
-    // ------------------------------------------------------------------------
-    RTT* getRTT() { return m_rtts; }
+
     // ------------------------------------------------------------------------
     /** Returns a list of all video modes supports by the graphics card. */
     const std::vector<VideoMode>& getVideoModes() const { return m_modes; }
@@ -699,10 +695,6 @@ public:
 
     void onLoadWorld();
     void onUnloadWorld();
-
-    void renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadows, bool forceRTT);
-    unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
-    void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
 
     // --------------------- RTT --------------------
     /**

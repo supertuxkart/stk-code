@@ -393,11 +393,7 @@ void Profiler::draw()
             {
                 "Solid Pass 1",
                 "Shadows",
-                "RH",
-                "GI",
-                "Env Map",
-                "SunLight",
-                "PointLights",
+                "Lights",
                 "SSAO",
                 "Solid Pass 2",
                 "Transparent",

@@ -11,6 +11,7 @@ layout (std140) uniform MatrixesData
     vec2 screen;
 };
 
+in vec2 uv;
 out vec4 FragColor;
 
 float focalDepth = 10.;
@@ -19,7 +20,6 @@ float range = 100.;
 
 void main()
 {
-    vec2 uv = gl_FragCoord.xy / screen;
     float curdepth = texture(dtex, uv).x;
     vec4 FragPos = InverseProjectionMatrix * (2.0f * vec4(uv, curdepth, 1.0f) - 1.0f);
     FragPos /= FragPos.w;
@@ -82,5 +82,5 @@ void main()
     depth  = (1 - depth);
     vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
 
-    FragColor = vec4(final, colOriginal.a);
+    FragColor = vec4(final, 1.);
 }

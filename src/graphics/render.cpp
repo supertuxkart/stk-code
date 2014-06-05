@@ -124,17 +124,19 @@ void IrrDriver::renderGLSL(float dt)
 
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
-    irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
     for(unsigned int cam = 0; cam < Camera::getNumCameras(); cam++)
     {
         Camera * const camera = Camera::getCamera(cam);
         scene::ICameraSceneNode * const camnode = camera->getCameraSceneNode();
 
+#ifdef ENABLE_PROFILER
         std::ostringstream oss;
-        oss << "drawAll() for kart " << cam;
+        oss << "drawAll() for kart " << cam << std::flush;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (cam+1)*60,
                                  0x00, 0x00);
+#endif
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
         m_scene_manager->setActiveCamera(camnode);
@@ -143,7 +145,7 @@ void IrrDriver::renderGLSL(float dt)
 
         unsigned plc = UpdateLightsInfo(camnode, dt);
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
-        renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
+        renderScene(camnode, plc, glows, dt, track->hasShadows());
 
         // Debug physic
         // Note that drawAll must be called before rendering
@@ -226,10 +228,10 @@ void IrrDriver::renderGLSL(float dt)
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera *camera = Camera::getCamera(i);
-        std::ostringstream oss;
-        oss << "renderPlayerView() for kart " << i;
+        char marker_name[100];
+        sprintf(marker_name, "renderPlayerView() for kart %d", i);
 
-        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), 0x00, 0x00, (i+1)*60);
+        PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
         rg->renderPlayerView(camera, dt);
 
         PROFILER_POP_CPU_MARKER();
@@ -259,7 +261,7 @@ void IrrDriver::renderGLSL(float dt)
     getPostProcessing()->update(dt);
 }
 
-void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
+void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
@@ -285,6 +287,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     // Lights
     {
         PROFILER_PUSH_CPU_MARKER("- Light", 0x00, 0xFF, 0x00);
+        ScopedGPUTimer Timer(getGPUTimer(Q_LIGHT));
         renderLights(pointlightcount);
         PROFILER_POP_CPU_MARKER();
     }
@@ -299,7 +302,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
 
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 2", 0x00, 0x00, 0xFF);
-    if (!UserConfigParams::m_dynamic_lights && ! forceRTT)
+    if (!UserConfigParams::m_dynamic_lights)
     {
         glEnable(GL_FRAMEBUFFER_SRGB);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -309,8 +312,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
-    if (UserConfigParams::m_dynamic_lights && World::getWorld() != NULL &&
-        World::getWorld()->isFogEnabled())
+    if (UserConfigParams::m_dynamic_lights && World::getWorld()->isFogEnabled())
     {
         PROFILER_PUSH_CPU_MARKER("- Fog", 0xFF, 0x00, 0x00);
         m_post_processing->renderFog();
@@ -372,7 +374,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         renderParticles();
         PROFILER_POP_CPU_MARKER();
     }
-    if (!UserConfigParams::m_dynamic_lights && !forceRTT)
+    if (!UserConfigParams::m_dynamic_lights)
         return;
 
     // Render displacement
@@ -405,10 +407,12 @@ void IrrDriver::renderFixed(float dt)
     {
         Camera *camera = Camera::getCamera(i);
 
+#ifdef ENABLE_PROFILER
         std::ostringstream oss;
-        oss << "drawAll() for kart " << i;
+        oss << "drawAll() for kart " << i << std::flush;
         PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), (i+1)*60,
                                  0x00, 0x00);
+#endif
         camera->activate();
         rg->preRenderCallback(camera);   // adjusts start referee
 
@@ -433,10 +437,10 @@ void IrrDriver::renderFixed(float dt)
     for(unsigned int i=0; i<Camera::getNumCameras(); i++)
     {
         Camera *camera = Camera::getCamera(i);
-        std::ostringstream oss;
-        oss << "renderPlayerView() for kart " << i;
+        char marker_name[100];
+        sprintf(marker_name, "renderPlayerView() for kart %d", i);
 
-        PROFILER_PUSH_CPU_MARKER(oss.str().c_str(), 0x00, 0x00, (i+1)*60);
+        PROFILER_PUSH_CPU_MARKER(marker_name, 0x00, 0x00, (i+1)*60);
         rg->renderPlayerView(camera, dt);
         PROFILER_POP_CPU_MARKER();
 
@@ -463,16 +467,9 @@ void IrrDriver::renderFixed(float dt)
 void IrrDriver::computeSunVisibility()
 {
     // Is the lens flare enabled & visible? Check last frame's query.
-    bool hasflare = false;
-    bool hasgodrays = false;
-
-    if (World::getWorld() != NULL)
-    {
-        hasflare = World::getWorld()->getTrack()->hasLensFlare();
-        hasgodrays = World::getWorld()->getTrack()->hasGodRays();
-    }
-
-    irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
+    const bool hasflare = World::getWorld()->getTrack()->hasLensFlare();
+    const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+    irr::video::COpenGLDriver*	gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
     if (UserConfigParams::m_light_shaft && hasgodrays)//hasflare || hasgodrays)
     {
         GLuint res = 0;
@@ -570,10 +567,7 @@ void IrrDriver::renderSolidFirstPass()
 
 void IrrDriver::renderSolidSecondPass()
 {
-    SColor clearColor(0., 150, 150, 150);
-    if (World::getWorld() != NULL)
-        clearColor = World::getWorld()->getClearColor();
-
+    SColor clearColor = World::getWorld()->getClearColor();
     glClearColor(clearColor.getRed()  / 255.f, clearColor.getGreen() / 255.f,
                  clearColor.getBlue() / 255.f, clearColor.getAlpha() / 255.f);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -672,6 +666,9 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
 
+    const Vec3 *vmin, *vmax;
+    World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
+
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
@@ -689,89 +686,81 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         50.,
     };
 
+    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
+    sun_ortho_matrix.clear();
+
+    // Build the 3 ortho projection (for the 3 shadow resolution levels)
+    for (unsigned i = 0; i < 4; i++)
+    {
+        camnode->setFarValue(FarValues[i]);
+        camnode->setNearValue(NearValues[i]);
+        camnode->render();
+        const core::aabbox3df smallcambox = camnode->
+            getViewFrustum()->getBoundingBox();
+        core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+            core::vector3df(0, 30, 0));
+
+
+        // Set up a nice ortho projection that contains our camera frustum
+        core::aabbox3df box = smallcambox;
+        box = box.intersect(trackbox);
+
+
+        SunCamViewMatrix.transformBoxEx(trackbox);
+        SunCamViewMatrix.transformBoxEx(box);
+
+        core::vector3df extent = trackbox.getExtent();
+        const float w = fabsf(extent.X);
+        const float h = fabsf(extent.Y);
+        float z = box.MaxEdge.Z;
+
+        // Snap to texels
+        const float units_per_w = w / 1024;
+        const float units_per_h = h / 1024;
+
+        float left = box.MinEdge.X;
+        float right = box.MaxEdge.X;
+        float up = box.MaxEdge.Y;
+        float down = box.MinEdge.Y;
+
+        core::matrix4 tmp_matrix;
+
+        // Prevent Matrix without extend
+        if (left == right || up == down)
+        {
+            Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
+            sun_ortho_matrix.push_back(tmp_matrix);
+            continue;
+        }
+
+        tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
+            up, down,
+            30, z);
+        m_suncam->setProjectionMatrix(tmp_matrix, true);
+        m_suncam->render();
+
+        sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
+    }
+    if ((tick % 100) == 2)
+        rsm_matrix = sun_ortho_matrix[3];
+    rh_extend = core::vector3df(128, 64, 128);
+    core::vector3df campos = camnode->getAbsolutePosition();
+    core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
+    rh_matrix.setTranslation(translation);
+
+    assert(sun_ortho_matrix.size() == 4);
+    camnode->setNearValue(oldnear);
+    camnode->setFarValue(oldfar);
+
     float *tmp = new float[18 * 8];
 
     memcpy(tmp, irr_driver->getViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[16], irr_driver->getProjMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[32], irr_driver->getInvViewMatrix().pointer(), 16 * sizeof(float));
     memcpy(&tmp[48], irr_driver->getInvProjMatrix().pointer(), 16 * sizeof(float));
-
-    const core::matrix4 &SunCamViewMatrix = m_suncam->getViewMatrix();
-    sun_ortho_matrix.clear();
-
-    if (World::getWorld() && World::getWorld()->getTrack())
-    {
-        const Vec3 *vmin, *vmax;
-        World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
-
-        // Build the 3 ortho projection (for the 3 shadow resolution levels)
-        for (unsigned i = 0; i < 4; i++)
-        {
-            camnode->setFarValue(FarValues[i]);
-            camnode->setNearValue(NearValues[i]);
-            camnode->render();
-            const core::aabbox3df smallcambox = camnode->
-                getViewFrustum()->getBoundingBox();
-            core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
-                core::vector3df(0, 30, 0));
-
-            // Set up a nice ortho projection that contains our camera frustum
-            core::aabbox3df box = smallcambox;
-            box = box.intersect(trackbox);
-
-
-            SunCamViewMatrix.transformBoxEx(trackbox);
-            SunCamViewMatrix.transformBoxEx(box);
-
-            core::vector3df extent = box.getExtent();
-            const float w = fabsf(extent.X);
-            const float h = fabsf(extent.Y);
-            float z = box.MaxEdge.Z;
-
-            // Snap to texels
-            const float units_per_w = w / 1024;
-            const float units_per_h = h / 1024;
-
-            float left = box.MinEdge.X;
-            float right = box.MaxEdge.X;
-            float up = box.MaxEdge.Y;
-            float down = box.MinEdge.Y;
-
-            core::matrix4 tmp_matrix;
-
-            // Prevent Matrix without extend
-            if (left == right || up == down)
-            {
-                Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
-                sun_ortho_matrix.push_back(tmp_matrix);
-                continue;
-            }
-
-            tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-                up, down,
-                30, z);
-            m_suncam->setProjectionMatrix(tmp_matrix, true);
-            m_suncam->render();
-
-            sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
-        }
-        if ((tick % 100) == 2)
-            rsm_matrix = sun_ortho_matrix[3];
-        rh_extend = core::vector3df(128, 64, 128);
-        core::vector3df campos = camnode->getAbsolutePosition();
-        core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
-        rh_matrix.setTranslation(translation);
-
-
-        assert(sun_ortho_matrix.size() == 4);
-        camnode->setNearValue(oldnear);
-        camnode->setFarValue(oldfar);
-
-        size_t size = irr_driver->getShadowViewProj().size();
-        for (unsigned i = 0; i < size; i++)
-            memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
-    }
-
+    size_t size = irr_driver->getShadowViewProj().size();
+    for (unsigned i = 0; i < size; i++)
+        memcpy(&tmp[16 * i + 64], irr_driver->getShadowViewProj()[i].pointer(), 16 * sizeof(float));
     tmp[128] = float(width);
     tmp[129] = float(height);
 
@@ -844,10 +833,10 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glStencilFunc(GL_ALWAYS, 1, ~0);
     glEnable(GL_STENCIL_TEST);
 
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_BLEND);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
 
     for (u32 i = 0; i < glowcount; i++)
     {
@@ -875,11 +864,11 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     FrameBuffer::Blit(irr_driver->getFBO(FBO_HALF1), irr_driver->getFBO(FBO_QUARTER1), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
 
-    glEnable(GL_BLEND);
-    glBlendEquation(GL_FUNC_ADD);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glStencilFunc(GL_EQUAL, 0, ~0);
-    glEnable(GL_STENCIL_TEST);
+	glEnable(GL_BLEND);
+	glBlendEquation(GL_FUNC_ADD);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glStencilFunc(GL_EQUAL, 0, ~0);
+	glEnable(GL_STENCIL_TEST);
     m_rtts->getFBO(FBO_COLORS).Bind();
     m_post_processing->renderGlow(m_rtts->getRenderTarget(RTT_QUARTER1));
     glDisable(GL_STENCIL_TEST);
@@ -985,7 +974,6 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     //RH
     if (UserConfigParams::m_gi)
     {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
         glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
@@ -1006,36 +994,25 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     if (!UserConfigParams::m_dynamic_lights)
         return;
 
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
     if (UserConfigParams::m_gi)
-    {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
-    }
 
     if (SkyboxCubeMap)
-    {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-    }
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
-
-    if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && SkyboxCubeMap && UserConfigParams::m_gi)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     // Render sunlight if and only if track supports shadow
-    if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
+    if (World::getWorld()->getTrack()->hasShadows())
     {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && UserConfigParams::m_shadows)
+        if (UserConfigParams::m_shadows)
             m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
         else
             m_post_processing->renderSunlight();
     }
-    {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_POINTLIGHTS));
-        renderPointLights(MIN2(pointlightcount, MAXLIGHT));
-    }
+
+
+    renderPointLights(MIN2(pointlightcount, MAXLIGHT));
+    if (SkyboxCubeMap)
+        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
 }
 
 void IrrDriver::renderSSAO()
@@ -1504,16 +1481,16 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
-    glDisable(GL_CULL_FACE);
-    assert(SkyboxTextures.size() == 6);
+	glDisable(GL_CULL_FACE);
+	assert(SkyboxTextures.size() == 6);
 
-    core::matrix4 translate;
-    translate.setTranslation(camera->getAbsolutePosition());
+	core::matrix4 translate;
+	translate.setTranslation(camera->getAbsolutePosition());
 
-    // Draw the sky box between the near and far clip plane
-    const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
-    core::matrix4 scale;
-    scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
+	// Draw the sky box between the near and far clip plane
+	const f32 viewDistance = (camera->getNearValue() + camera->getFarValue()) * 0.5f;
+	core::matrix4 scale;
+	scale.setScale(core::vector3df(viewDistance, viewDistance, viewDistance));
     core::matrix4 transform = translate * scale;
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
@@ -1523,7 +1500,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glUseProgram(MeshShader::SkyboxShader::Program);
-    MeshShader::SkyboxShader::setUniforms(transform,
+    MeshShader::SkyboxShader::setUniforms(transform, 
                                           core::vector2df(float(UserConfigParams::m_width),
                                                           float(UserConfigParams::m_height)),
                                           0);
@@ -1540,15 +1517,15 @@ void IrrDriver::renderDisplacement()
     irr_driver->getFBO(FBO_DISPLACE).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-    cb->update();
+	DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+	cb->update();
 
     const int displacingcount = m_displacing.size();
-    irr_driver->setPhase(DISPLACEMENT_PASS);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_BLEND);
+	irr_driver->setPhase(DISPLACEMENT_PASS);
+	glEnable(GL_DEPTH_TEST);
+	glDisable(GL_ALPHA_TEST);
+	glDepthMask(GL_FALSE);
+	glDisable(GL_BLEND);
     glClear(GL_STENCIL_BUFFER_BIT);
     glEnable(GL_STENCIL_TEST);
     glStencilFunc(GL_ALWAYS, 1, 0xFF);

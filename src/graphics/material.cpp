@@ -811,7 +811,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     //    ITexture* tex = irr_driver->getTexture("cloud_mask.png");
     //    m->setTexture(1, tex);
     //
-    //
+    //    
     //    m->MaterialType = irr_driver->getShader(ES_SKYBOX);
     //}
 
