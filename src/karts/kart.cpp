@@ -1109,9 +1109,9 @@ void Kart::update(float dt)
         // allow nice jumps without scripting the fly
         // Also disable he upright constraint when gravity is changed by
         // the terrain
-        if( (!isNearGround() &&
-              m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f ) ||
-              (getMaterial() && getMaterial()->hasGravity())                                  )
+        if ((!isNearGround() &&
+            m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER) <= 0.0f) ||
+            (getMaterial() && getMaterial()->hasGravity()))
             m_uprightConstraint->setLimit(M_PI);
         else
             m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());

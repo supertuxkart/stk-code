@@ -28,7 +28,10 @@
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
            bool invisible, bool ai_ignore)
  {
-     if(p1.sideOfLine2D(p0, p2)>0 ||
+     
+    /*This check must be skipped because inverted quads may appear to have 
+     incorrect oritentation. 
+    if(p1.sideOfLine2D(p0, p2)>0 ||
          p3.sideOfLine2D(p0, p2)<0)
      {
          printf("Warning: quad has wrong orientation: p0=%f %f %f p1=%f %f %f\n",
@@ -38,9 +41,9 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
          m_p[0]=p1; m_p[1]=p0; m_p[2]=p3; m_p[3]=p2;
      }
      else
-     {
+     {*/
         m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
-     }
+     //}
      m_center = 0.25f*(p0+p1+p2+p3);
      m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
                                std::min(p2.getY(), p3.getY())  );
@@ -112,6 +115,42 @@ bool Quad::pointInQuad(const Vec3& p) const
                p.sideOfLine2D(m_p[3], m_p[0]) >= 0.0;
     }
 }   // pointInQuad
+
+bool Quad::pointInQuad3D(const Vec3& p) const
+{
+    // All this code for computing the quad bounding box should be later be
+    // moved to somewhere in the constructor and computed only once per quad.
+    Vec3 boxCorners[8];
+    Vec3 normal = (m_p[1] - m_p[0]).cross(m_p[2] - m_p[1]);
+    normal.normalize();
+    float boxHigh = 5.0f;
+    float boxLow = 1.0f;
+    boxCorners[0] = m_p[0] + boxHigh*normal;
+    boxCorners[1] = m_p[1] + boxHigh*normal;
+    boxCorners[2] = m_p[2] + boxHigh*normal;
+    boxCorners[3] = m_p[3] + boxHigh*normal;
+    boxCorners[4] = m_p[0] + -boxLow*m_p[1];
+    boxCorners[5] = m_p[1] + -boxLow*m_p[1];
+    boxCorners[6] = m_p[2] + -boxLow*m_p[1];
+    boxCorners[7] = m_p[3] + -boxLow*m_p[1];
+
+    const Vec3 boxFaces[6][4] = {
+        { boxCorners[0], boxCorners[1], boxCorners[2], boxCorners[3] },
+        { boxCorners[3], boxCorners[2], boxCorners[6], boxCorners[7] },
+        { boxCorners[7], boxCorners[6], boxCorners[5], boxCorners[4] },
+        { boxCorners[1], boxCorners[0], boxCorners[4], boxCorners[5] },
+        { boxCorners[4], boxCorners[0], boxCorners[3], boxCorners[7] },
+        { boxCorners[1], boxCorners[5], boxCorners[6], boxCorners[2] } };
+
+    float side = p.sideofPlane(boxFaces[0][0], boxFaces[0][1], boxFaces[0][2]);
+    for (int i = 1; i < 6; i++)
+    {
+        if (side*p.sideofPlane(boxFaces[i][0], boxFaces[i][1], boxFaces[i][2]) < 0) return false;
+    }
+    return true;
+
+}
+    
 
 // ----------------------------------------------------------------------------
 /** Transforms a quad by a given transform (i.e. translation+rotation). This

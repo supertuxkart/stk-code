@@ -62,6 +62,7 @@ public:
               bool invis=false, bool ai_ignore=false);
     void getVertices(video::S3DVertex *v, const video::SColor &color) const;
     bool pointInQuad(const Vec3& p) const;
+    bool pointInQuad3D(const Vec3& p) const;
     void transform(const btTransform &t, Quad *result) const;
     // ------------------------------------------------------------------------
     /** Returns the i-th. point of a quad. */
