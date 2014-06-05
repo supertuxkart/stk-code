@@ -631,7 +631,7 @@ void EventHandler::sendEventToUser(GUIEngine::Widget* widget, std::string& name,
 
 EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int playerID)
 {
-    if (w->m_deactivated) return EVENT_BLOCK;
+    if (!w->isActivated()) return EVENT_BLOCK;
 
     Widget* parent = w->m_event_handler;
     
@@ -658,7 +658,7 @@ EventPropagation EventHandler::onWidgetActivated(GUIEngine::Widget* w, const int
             parent = parent->m_event_handler;
         }
 
-        if (parent->m_deactivated) return EVENT_BLOCK;
+        if (!parent->isActivated()) return EVENT_BLOCK;
 
         /* notify the found event event handler, and also notify the main callback if the
          parent event handler says so */
@@ -699,7 +699,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
             {
                 Widget* w = GUIEngine::getWidget(id);
                 if (w == NULL) break;
-                if (w->m_deactivated)
+                if (!w->isActivated())
                 {
                     GUIEngine::getCurrentScreen()->onDisabledItemClicked(w->m_properties[PROP_ID].c_str());
                     return EVENT_BLOCK;
