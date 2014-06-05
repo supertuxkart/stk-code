@@ -35,9 +35,9 @@
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "utils/log.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
@@ -131,6 +131,10 @@ void OptionsScreenUI::init()
     news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
 
+    CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
+    assert( show_login!= NULL );
+    show_login->setState( UserConfigParams::m_always_show_login_screen);
+
     // --- select the right skin in the spinner
     bool currSkinFound = false;
     const int skinCount = m_skins.size();
@@ -206,7 +210,7 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 
         if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
         else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
-        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(OptionsScreenPlayers::getInstance());
+        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(TabbedUserScreen::getInstance());
         else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
     }
     else if(name == "back")
@@ -240,6 +244,12 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // downloaded if necessary.
         if(internet->getState())
             NewsManager::get()->init(false);
+    }
+    else if (name=="show-login")
+    {
+        CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
+        assert( show_login != NULL );
+        UserConfigParams::m_always_show_login_screen = show_login->getState();
     }
     else if (name == "language")
     {

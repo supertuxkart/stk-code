@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+
+<!-- For sky particles, the size of the box is ignored -->
+<particles emitter="box" box_x="10.0" box_y="0.5" box_z="10.0">
+
+    <spreading angle="3"           />
+    
+    <velocity  x="-0.00"
+               y="-0.002"
+               z="-0.00"             />
+    
+    <material  file="gfx_leaf_a.png" clampu="Y" clampv="Y" />
+    
+    <!-- Amount of particles emitted per second -->
+    <rate      min="2"
+               max="5"           />
+    
+    <!-- Minimal and maximal lifetime of a particle, in milliseconds. -->
+    <lifetime  min="30000"
+               max="30000"          />
+    
+    <!-- Size of the particles -->
+    <size      min="0.40"
+               max="0.60"          />
+    
+    <color     min="40 40 255"
+               max="255 255 255"   />
+    
+    <!-- How much time in milliseconds before the particle is fully faded out  -->
+    <fadeout   time="100"          />
+
+    <wind      speed="0.16"
+               flips="Y"           />
+
+</particles>

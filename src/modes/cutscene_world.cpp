@@ -43,6 +43,7 @@
 #include <IMeshSceneNode.h>
 #include <ISceneManager.h>
 
+#include <algorithm>
 #include <string>
 
 bool CutsceneWorld::s_use_duration = false;
@@ -187,12 +188,12 @@ void CutsceneWorld::update(float dt)
 {
     /*
     {
-        PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
-        TrackObject* curr;
-        for_in(curr, objects)
-        {
-            printf("* %s\n", curr->getType().c_str());
-        }
+    PtrVector<TrackObject>& objects = m_track->getTrackObjectManager()->getObjects();
+    TrackObject* curr;
+    for_in(curr, objects)
+    {
+    printf("* %s\n", curr->getType().c_str());
+    }
     }
     **/
 
@@ -235,18 +236,29 @@ void CutsceneWorld::update(float dt)
         dt = (float)(m_time - prev_time);
     }
 
-    float fade;
+    float fade = 0.0f;
+    float fadeIn = -1.0f;
+    float fadeOut = -1.0f;
     if (m_time < 2.0f)
     {
-        fade = 1.0f - (float)m_time / 2.0f;
+        fadeIn = 1.0f - (float)m_time / 2.0f;
     }
-    else if (m_time > m_duration - 2.0f)
+    if (m_time > m_duration - 2.0f)
     {
-        fade = (float)(m_time - (m_duration - 2.0f)) / 2.0f;
+        fadeOut = (float)(m_time - (m_duration - 2.0f)) / 2.0f;
     }
-    else
+
+    if (fadeIn >= 0.0f && fadeOut >= 0.0f)
     {
-        fade = 0.0f;
+        fade = std::max(fadeIn, fadeOut);
+    }
+    else if (fadeIn >= 0.0f)
+    {
+        fade = fadeIn;
+    }
+    else if (fadeOut >= 0.0f)
+    {
+        fade = fadeOut;
     }
     dynamic_cast<CutsceneGUI*>(m_race_gui)->setFadeLevel(fade);
 
@@ -354,6 +366,15 @@ void CutsceneWorld::update(float dt)
             it++;
         }
     }
+
+    bool isOver = (m_time > m_duration);
+    if (isOver && (s_use_duration || m_aborted))
+    {
+        GUIEngine::CutsceneScreen* cs = dynamic_cast<GUIEngine::CutsceneScreen*>(
+            GUIEngine::getCurrentScreen());
+        if (cs != NULL)
+            cs->onCutsceneEnd();
+    }
 }   // update
 
 //-----------------------------------------------------------------------------
@@ -440,10 +461,12 @@ void CutsceneWorld::enterRaceOverState()
  */
 bool CutsceneWorld::isRaceOver()
 {
+    bool isOver = (m_time > m_duration);
+
     if (!s_use_duration && !m_aborted)
         return false;
 
-    return m_time > m_duration;
+    return isOver;
 }   // isRaceOver
 
 //-----------------------------------------------------------------------------

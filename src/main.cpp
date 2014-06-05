@@ -1,3 +1,4 @@
+
 //
 //  SuperTuxKart - a fun racing game with go-kart
 //  Copyright (C) 2004-2013 Steve Baker <sjbaker1@airmail.net>
@@ -187,9 +188,10 @@
 #include "race/race_manager.hpp"
 #include "replay/replay_play.hpp"
 #include "replay/replay_recorder.hpp"
-#include "states_screens/story_mode_lobby.hpp"
 #include "states_screens/main_menu_screen.hpp"
+#include "states_screens/register_screen.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -359,7 +361,7 @@ void gamepadVisualisation()
 }   // gamepadVisualisation
 
 // ============================================================================
-/** Sets the hat mesh name depending on the current christmas mode 
+/** Sets the hat mesh name depending on the current christmas mode
  *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
 void handleXmasMode()
@@ -383,6 +385,43 @@ void handleXmasMode()
     if(xmas)
         kart_properties_manager->setHatMeshName("christmas_hat.b3d");
 }   // handleXmasMode
+// ============================================================================
+/** This function sets up all data structure for an immediate race start.
+ *  It is used when the -N or -R command line options are used.
+ */
+void setupRaceStart()
+{
+    // Skip the start screen. This esp. means that no login screen is
+    // displayed (if necessary), so we have to make sure there is
+    // a current player
+    PlayerManager::get()->enforceCurrentPlayer();
+
+    InputDevice *device;
+
+    // Use keyboard 0 by default in --no-start-screen
+    device = input_manager->getDeviceList()->getKeyboard(0);
+
+    // Create player and associate player with keyboard
+    StateManager::get()->createActivePlayer(
+        PlayerManager::get()->getPlayer(0), device);
+
+    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+    {
+        Log::warn("main", "Kart '%s' is unknown so will use the "
+            "default kart.",
+            UserConfigParams::m_default_kart.c_str());
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
+    }
+    else
+    {
+        // Set up race manager appropriately
+        race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
+    }
+
+    // ASSIGN should make sure that only input from assigned devices
+    // is read.
+    input_manager->getDeviceList()->setAssignMode(ASSIGN);
+}   // setupRaceMode
 
 // ----------------------------------------------------------------------------
 /** Prints help for command line options to stdout.
@@ -856,7 +895,7 @@ int handleCmdLine()
         }
     }   // --laps
 
-    if(CommandLine::has("--profile-laps=",  &n))
+    if(CommandLine::has("--profile-laps",  &n))
     {
         if (n < 0)
         {
@@ -962,8 +1001,7 @@ int handleCmdLine()
     {
         irr::core::stringw s;
         Online::XMLRequest* request =
-                PlayerManager::requestSignIn(login, password, false, false);
-        request->executeNow();
+                PlayerManager::requestSignIn(login, password);
 
         if (request->isSuccess())
         {
@@ -1145,11 +1183,6 @@ int main(int argc, char *argv[] )
 
         initRest();
 
-        // Windows 32 always redirects output
-#ifndef WIN32
-        file_manager->redirectOutput();
-#endif
-
         input_manager = new InputManager ();
 
 #ifdef ENABLE_WIIUSE
@@ -1250,7 +1283,24 @@ int main(int argc, char *argv[] )
 
         if(!UserConfigParams::m_no_start_screen)
         {
-            StateManager::get()->pushScreen(StoryModeLobbyScreen::getInstance());
+            // If there is a current player, it was saved in the config file,
+            // so we immediately start the main menu (unless it was requested
+            // to always show the login screen). Otherwise show the login
+            // screen first.
+            if(PlayerManager::getCurrentPlayer() && !
+                UserConfigParams::m_always_show_login_screen)
+            {
+                StateManager::get()->pushScreen(MainMenuScreen::getInstance());
+            }
+            else
+            {
+                StateManager::get()->pushScreen(UserScreen::getInstance());
+                // If there is no player, push the RegisterScreen on top of
+                // the login screen. This way on first start players are
+                // forced to create a player.
+                if(PlayerManager::get()->getNumPlayers()==0)
+                    StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            }
 #ifdef ENABLE_WIIUSE
             // Show a dialog to allow connection of wiimotes. */
             if(WiimoteManager::isEnabled())
@@ -1262,37 +1312,7 @@ int main(int argc, char *argv[] )
         }
         else
         {
-            // Skip the start screen. This esp. means that no login screen is
-            // displayed (if necessary), so we have to make sure there is
-            // a current player
-            PlayerManager::get()->enforceCurrentPlayer();
-            
-            InputDevice *device;
-
-            // Use keyboard 0 by default in --no-start-screen
-            device = input_manager->getDeviceList()->getKeyboard(0);
-
-            // Create player and associate player with keyboard
-            StateManager::get()->createActivePlayer(
-                         PlayerManager::get()->getPlayer(0), device, NULL);
-
-            if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
-            {
-                Log::warn("main", "Kart '%s' is unknown so will use the "
-                          "default kart.",
-                          UserConfigParams::m_default_kart.c_str());
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart.getDefaultValue());
-            }
-            else
-            {
-                // Set up race manager appropriately
-                race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
-            }
-
-            // ASSIGN should make sure that only input from assigned devices
-            // is read.
-            input_manager->getDeviceList()->setAssignMode(ASSIGN);
-
+            setupRaceStart();
             // Go straight to the race
             StateManager::get()->enterGameState();
         }
@@ -1355,13 +1375,6 @@ int main(int argc, char *argv[] )
 
     /* Program closing...*/
 
-    if(user_config)
-    {
-        // In case that abort is triggered before user_config exists
-        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
-        user_config->saveConfig();
-    }
-
 #ifdef ENABLE_WIIUSE
     if(wiimote_manager)
         delete wiimote_manager;
@@ -1413,27 +1426,15 @@ static void cleanSuperTuxKart()
 
     delete main_loop;
 
-    irr_driver->updateConfigIfRelevant();
-
     if(Online::RequestManager::isRunning())
         Online::RequestManager::get()->stopNetworkThread();
 
-    //delete in reverse order of what they were created in.
-    //see InitTuxkart()
-    Online::RequestManager::deallocate();
-    Online::ServersManager::deallocate();
-    Online::ProfileManager::destroy();
-    GUIEngine::DialogQueue::deallocate();
-
+    irr_driver->updateConfigIfRelevant();
     AchievementsManager::destroy();
     Referee::cleanup();
-
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
-    NewsManager::deallocate();
     if(addons_manager)          delete addons_manager;
-    NetworkManager::kill();
-
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1450,6 +1451,33 @@ static void cleanSuperTuxKart()
     delete ParticleKindManager::get();
     PlayerManager::destroy();
     if(unlock_manager)          delete unlock_manager;
+    Online::ProfileManager::destroy();
+    GUIEngine::DialogQueue::deallocate();
+
+    // Now finish shutting down objects which a separate thread. The
+    // RequestManager has been signaled to shut down as early as possible,
+    // the NewsManager thread should have finished quite early on anyway.
+    // But still give them some additional time to finish. It avoids a
+    // race condition where a thread might access the file manager after it
+    // was deleted (in cleanUserConfig below), but before STK finishes and
+    // the os takes all threads down.
+
+    if(!NewsManager::get()->waitForReadyToDeleted(2.0f))
+    {
+        Log::info("Thread", "News manager not stopping, exiting anyway.");
+    }
+    NewsManager::deallocate();
+
+    if(!Online::RequestManager::get()->waitForReadyToDeleted(5.0f))
+    {
+        Log::info("Thread", "Request Manager not aborting in time, aborting.");
+    }
+    Online::RequestManager::deallocate();
+
+    // FIXME: do we need to wait for threads there, can they be
+    // moved further up?
+    Online::ServersManager::deallocate();
+    NetworkManager::kill();
 
     cleanUserConfig();
 
@@ -1465,7 +1493,14 @@ static void cleanUserConfig()
 {
     if(stk_config)              delete stk_config;
     if(translations)            delete translations;
-    if(user_config)             delete user_config;
+    if (user_config)
+    {
+        // In case that abort is triggered before user_config exists
+        if (UserConfigParams::m_crashed) UserConfigParams::m_crashed = false;
+        user_config->saveConfig();
+        delete user_config;
+    }
+
     if(file_manager)            delete file_manager;
     if(irr_driver)              delete irr_driver;
 }

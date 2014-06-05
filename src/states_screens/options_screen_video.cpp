@@ -32,9 +32,9 @@
 #include "states_screens/dialogs/custom_video_settings.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
-#include "states_screens/options_screen_players.hpp"
 #include "states_screens/options_screen_ui.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 
@@ -61,6 +61,7 @@ struct GFXPreset
     int anisotropy;
     /** Depth of field */
     bool dof;
+    bool global_illumination;
 };
 
 static GFXPreset GFX_PRESETS[] =
@@ -68,31 +69,36 @@ static GFXPreset GFX_PRESETS[] =
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */, false /* depth of field */
+        false /* animatedScenery */, 0 /* animatedCharacters */, 0 /* anisotropy */,
+        false /* depth of field */, false /* global illumination */
     },
 
     {
         false /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, false /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */, false /* depth of field */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
+        false /* depth of field */, false /* global illumination */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, false /* motionblur */,
         false /* lightshaft */, false /* glow */, false /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */, false /* depth of field */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 4 /* anisotropy */,
+        false /* depth of field */, false /* global illumination */
     },
 
     {
         true /* light */, 0 /* shadow */, false /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, false /* ssao */, true /* weather */,
-        true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */, false /* depth of field */
+        true /* animatedScenery */, 1 /* animatedCharacters */, 8 /* anisotropy */,
+        false /* depth of field */, false /* global illumination */
     },
 
     {
         true /* light */, 2 /* shadow */, true /* bloom */, true /* motionblur */,
         true /* lightshaft */, true /* glow */, true /* mlaa */, true /* ssao */, true /* weather */,
-        true /* animatedScenery */, 2 /* animatedCharacters */, 8 /* anisotropy */, true /* depth of field */
+        true /* animatedScenery */, 2 /* animatedCharacters */, 8 /* anisotropy */,
+        true /* depth of field */, true /* global illumination */
     }
 };
 
@@ -362,7 +368,8 @@ void OptionsScreenVideo::updateGfxSlider()
             GFX_PRESETS[l].shadows == UserConfigParams::m_shadows &&
             GFX_PRESETS[l].ssao == UserConfigParams::m_ssao &&
             GFX_PRESETS[l].weather == UserConfigParams::m_weather_effects &&
-            GFX_PRESETS[l].dof == UserConfigParams::m_dof)
+            GFX_PRESETS[l].dof == UserConfigParams::m_dof &&
+            GFX_PRESETS[l].global_illumination == UserConfigParams::m_gi)
         {
             gfx->setValue(l + 1);
             found = true;
@@ -427,8 +434,7 @@ void OptionsScreenVideo::updateTooltip()
         UserConfigParams::m_mlaa ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Ambient occlusion : %s",
-        UserConfigParams::m_ssao == 1 ? "low" : UserConfigParams::m_ssao == 2 ?
-                                    "high" : disabled);
+        UserConfigParams::m_ssao ? enabled : disabled);
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Shadows: %s",
         UserConfigParams::m_shadows == 1 ? "low" : UserConfigParams::m_shadows == 2 ?
@@ -444,6 +450,14 @@ void OptionsScreenVideo::updateTooltip()
     //I18N: in graphical options
     tooltip = tooltip + L"\n" + _("Light shaft (God rays) : %s",
         UserConfigParams::m_light_shaft ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Depth of field : %s",
+        UserConfigParams::m_dof ? enabled : disabled);
+
+    //I18N: in graphical options
+    tooltip = tooltip + L"\n" + _("Global illumination : %s",
+        UserConfigParams::m_gi ? enabled : disabled);
 
     gfx->setTooltip(tooltip);
 }   // updateTooltip
@@ -465,7 +479,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         else if (selection == "tab_video")
             screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
-            screen = OptionsScreenPlayers::getInstance();
+            screen = TabbedUserScreen::getInstance();
         else if (selection == "tab_controls")
             screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
@@ -527,6 +541,7 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
         UserConfigParams::m_ssao = GFX_PRESETS[level].ssao;
         UserConfigParams::m_weather_effects = GFX_PRESETS[level].weather;
         UserConfigParams::m_dof = GFX_PRESETS[level].dof;
+        UserConfigParams::m_gi = GFX_PRESETS[level].global_illumination;
 
         updateGfxSlider();
     }

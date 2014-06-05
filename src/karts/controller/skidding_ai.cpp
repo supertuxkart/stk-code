@@ -1261,8 +1261,8 @@ void SkiddingAI::handleItems(const float dt)
             // slower. Also, if the kart behind is closer and not slower than
             // this kart.
             bool fire_backwards = !m_kart_ahead ||
-                                  (m_kart_behind                             && 
-                                    (m_distance_behind < m_distance_ahead || 
+                                  (m_kart_behind                             &&
+                                    (m_distance_behind < m_distance_ahead ||
                                      kart_ahead_is_slow                    ) &&
                                     !kart_behind_is_slow
                                   );
@@ -1272,7 +1272,7 @@ void SkiddingAI::handleItems(const float dt)
             // the kart anyway, or that this might force the kart ahead to
             // use its nitro/zipper (and then we will shoot since then the
             // kart is faster).
-            if ((fire_backwards && kart_behind_is_slow) || 
+            if ((fire_backwards && kart_behind_is_slow) ||
                 (!fire_backwards && kart_ahead_is_slow)    )
                 break;
 
@@ -1751,7 +1751,7 @@ void SkiddingAI::checkCrashes(const Vec3& pos )
                 // Ignore karts ahead that are faster than this kart.
                 if(m_kart->getVelocityLC().getZ() < other_kart->getVelocityLC().getZ())
                     continue;
-                Vec3 other_kart_xyz = other_kart->getXYZ() 
+                Vec3 other_kart_xyz = other_kart->getXYZ()
                                     + other_kart->getVelocity()*(i*dt);
                 float kart_distance = (step_coord - other_kart_xyz).length_2d();
 

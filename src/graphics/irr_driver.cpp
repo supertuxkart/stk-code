@@ -31,7 +31,6 @@
 #include "graphics/post_processing.hpp"
 #include "graphics/referee.hpp"
 #include "graphics/shaders.hpp"
-#include "graphics/shadow_importance.hpp"
 #include "graphics/stkanimatedmesh.hpp"
 #include "graphics/stkbillboard.hpp"
 #include "graphics/stkmeshscenenode.hpp"
@@ -111,7 +110,7 @@ IrrDriver::IrrDriver()
     m_post_processing     = NULL;
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
-        m_lightviz = m_shadowviz = m_distortviz = 0;
+        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = 0;
     SkyboxCubeMap = 0;
 }   // IrrDriver
 
@@ -212,7 +211,10 @@ Window get_toplevel_parent(Display* display, Window window)
 #endif
 
 // ----------------------------------------------------------------------------
-
+/** If the position of the window should be remembered, store it in the config
+ *  file.
+ *  \post The user config file must still be saved!
+ */
 void IrrDriver::updateConfigIfRelevant()
 {
         if (!UserConfigParams::m_fullscreen &&
@@ -242,7 +244,6 @@ void IrrDriver::updateConfigIfRelevant()
             {
                 UserConfigParams::m_window_x = x;
                 UserConfigParams::m_window_y = y;
-                user_config->saveConfig();
             }
         }
         else
@@ -266,11 +267,10 @@ void IrrDriver::updateConfigIfRelevant()
         {
             UserConfigParams::m_window_x = wx;
             UserConfigParams::m_window_y = wy;
-            user_config->saveConfig();
         }
 #endif
     }
-}
+}   // updateConfigIfRelevant
 
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
@@ -472,15 +472,11 @@ void IrrDriver::initDevice()
     if (m_glsl)
     {
         Log::info("irr_driver", "GLSL supported.");
-
-        // Order matters, create RTTs as soon as possible, as they are the largest blocks.
-        m_rtts = new RTT();
     }
     // m_glsl might be reset in rtt if an error occurs.
     if(m_glsl)
     {
         m_shaders = new Shaders();
-        m_shadow_importance = new ShadowImportance();
 
         m_mrt.clear();
         m_mrt.reallocate(2);
@@ -1265,8 +1261,8 @@ void IrrDriver::unsetTextureErrorMessage()
 
 // ----------------------------------------------------------------------------
 /** Retrieve all textures in the specified directory, generate a smaller
-*   version for each of them and save them in the cache. Smaller textures are 
-*   generated only if they do not already exist or if their original version 
+*   version for each of them and save them in the cache. Smaller textures are
+*   generated only if they do not already exist or if their original version
 *   is newer than the cached one.
 *   \param dir Directory from where textures will be retrieved.
 *              Must end with '/'.
@@ -1560,7 +1556,29 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
     mask->drop();
     return t;
 }   // applyMask
+// ----------------------------------------------------------------------------
+void IrrDriver::setRTT(RTT* rtt)
+{
+    m_rtts = rtt;
+}
+// ----------------------------------------------------------------------------
+void IrrDriver::onLoadWorld()
+{
+    if (m_glsl)
+    {
+        const core::recti &viewport = Camera::getCamera(0)->getViewport();
+        size_t width = viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, height = viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y;
+        m_rtts = new RTT(width, height);
+    }
+}
+// ----------------------------------------------------------------------------
+void IrrDriver::onUnloadWorld()
+{
+    delete m_rtts;
+    m_rtts = NULL;
 
+    suppressSkyBox();
+}
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
  *  \param light The colour of the light to set.
@@ -1903,6 +1921,8 @@ void IrrDriver::update(float dt)
     // =================================
     if (!m_device->run())
     {
+        GUIEngine::cleanUp();
+        GUIEngine::deallocate();
         main_loop->abort();
         return;
     }
@@ -2371,3 +2391,25 @@ void IrrDriver::clearLights()
 
     m_lights.clear();
 }
+
+// ----------------------------------------------------------------------------
+
+GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
+{
+    return m_rtts->getRenderTarget(which);
+}
+
+// ----------------------------------------------------------------------------
+
+FrameBuffer& IrrDriver::getFBO(TypeFBO which)
+{
+    return m_rtts->getFBO(which);
+}
+
+// ----------------------------------------------------------------------------
+
+GLuint IrrDriver::getDepthStencilTexture()
+{
+    return m_rtts->getDepthStencilTexture();
+}
+

@@ -31,7 +31,7 @@
 
 class AchievementsStatus;
 
-namespace Online 
+namespace Online
 {
     class CurrentUser;
     class HTTPRequest;
@@ -42,10 +42,10 @@ class PlayerProfile;
 
 /** A special class that manages all local player accounts. It reads all player
  *  accounts from the players.xml file in the user config directory. For each
- *  player an instance of PlayerProfile is created, which keeps track of 
+ *  player an instance of PlayerProfile is created, which keeps track of
  *  story mode progress, achievements and other data. It also keeps track of
  *  the currently logged in player.
- *  It includes several handy static functions which avoid long call 
+ *  It includes several handy static functions which avoid long call
  *  sequences, e.g.:
  *    PlayerManager::getCurrentOnlineId()
  *  which is just:
@@ -91,11 +91,13 @@ public:
     void initRemainingData();
     unsigned int getUniqueId() const;
     void addDefaultPlayer();
-    void addNewPlayer(const irr::core::stringw& name);
+    PlayerProfile* addNewPlayer(const irr::core::stringw& name);
+    void createGuestPlayers(int n);
     void deletePlayer(PlayerProfile *player);
-    void setCurrentPlayer(PlayerProfile *player, bool remember_me);
+    void setCurrentPlayer(PlayerProfile *player);
     const PlayerProfile *getPlayerById(unsigned int id);
     void enforceCurrentPlayer();
+    unsigned int getNumNonGuestPlayers() const;
     static void setUserDetails(Online::HTTPRequest *request,
                                const std::string &action,
                                const std::string &php_name = "");
@@ -110,15 +112,13 @@ public:
     static void onSTKQuit();
     static void requestSignOut();
     static Online::XMLRequest *requestSignIn(const irr::core::stringw &username,
-                                             const irr::core::stringw &password,
-                                             bool save_session,
-                                              bool request_now = true);
+                                             const irr::core::stringw &password);
 
     // ------------------------------------------------------------------------
     /** Returns the current player. */
-    static PlayerProfile* getCurrentPlayer() 
+    static PlayerProfile* getCurrentPlayer()
     {
-        return get()->m_current_player; 
+        return get()->m_current_player;
     }   // getCurrentPlayer
 
     // ------------------------------------------------------------------------

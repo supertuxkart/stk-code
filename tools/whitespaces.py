@@ -39,7 +39,9 @@ def main():
                 if statistics:
                     lines_total += len(lines)
 
+                modified = False
                 for i in range(len(lines)):
+                    oldLine = lines[i]
                     # replacing tabs with four spaces
                     lines[i] = lines[i].replace("\t", "    ")
                     
@@ -48,12 +50,15 @@ def main():
                         if statistics:
                             if lines[i].lstrip().startswith("//"):
                                 lines_code += 1
+                    if not modified and oldLine != lines[i]:
+                        modified = True
                 src_file.close()
 
                 # writing back
-                src_file = open(dirpath + "/" + filename, "w")
-                src_file.write("".join(lines))
-                src_file.close()
+                if modified:
+                    src_file = open(dirpath + "/" + filename, "w")
+                    src_file.write("".join(lines))
+                    src_file.close()
 
     if statistics:
         print("Total number of files in " + directory + ": "

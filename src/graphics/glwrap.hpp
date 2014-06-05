@@ -24,6 +24,7 @@
 #    include <GL/gl.h>
 #endif
 
+#include <vector>
 #include "utils/log.hpp"
 
 // already includes glext.h, which defines useful GL constants.
@@ -93,6 +94,11 @@ extern PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
 extern PFNGLBLENDCOLORPROC glBlendColor;
 extern PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D;
 extern PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage;
+extern PFNGLTEXSTORAGE1DPROC glTexStorage1D;
+extern PFNGLTEXSTORAGE2DPROC glTexStorage2D;
+extern PFNGLTEXSTORAGE3DPROC glTexStorage3D;
+extern PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
+extern PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 #ifdef DEBUG
 extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
@@ -180,6 +186,27 @@ public:
     unsigned elapsedTimeus();
 };
 
+class FrameBuffer
+{
+private:
+    GLuint fbo;
+    std::vector<GLuint> RenderTargets;
+    GLuint DepthTexture;
+    size_t width, height;
+public:
+    FrameBuffer();
+    FrameBuffer(const std::vector <GLuint> &RTTs, size_t w, size_t h, bool layered = false);
+    FrameBuffer(const std::vector <GLuint> &RTTs, GLuint DS, size_t w, size_t h, bool layered = false);
+    ~FrameBuffer();
+    void Bind();
+    std::vector<GLuint> &getRTT() { return RenderTargets; }
+    GLuint &getDepthTexture() { assert(DepthTexture); return DepthTexture; }
+    size_t getWidth() const { return width; }
+    size_t getHeight() const { return height; }
+    static void Blit(const FrameBuffer &Src, FrameBuffer &Dst, GLbitfield mask = GL_COLOR_BUFFER_BIT, GLenum filter = GL_NEAREST);
+    void BlitToDefault(size_t, size_t, size_t, size_t);
+};
+
 // core::rect<s32> needs these includes
 #include <rect.h>
 #include "utils/vec3.hpp"
@@ -190,19 +217,23 @@ void resetTextureTable();
 void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = false);
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
-void blitFBO(GLuint Src, GLuint Dst, size_t width, size_t height);
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);
+
+void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
+    const core::rect<s32>& destRect,
+    const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
+    bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
     const irr::video::SColor &color, bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
-	const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
-	const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
+    const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,
+    const irr::video::SColor* const colors, bool useAlphaChannelOfTexture);
 
 void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
-	const irr::core::rect<s32>* clip = 0);
+    const irr::core::rect<s32>* clip = 0);
 #endif

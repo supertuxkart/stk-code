@@ -102,12 +102,11 @@ void StateManager::updateActivePlayerIDs()
 // ----------------------------------------------------------------------------
 
 int StateManager::createActivePlayer(PlayerProfile *profile,
-                                     InputDevice *device,
-                                     Online::OnlineProfile* user)
+                                     InputDevice *device)
 {
     ActivePlayer *p;
     int i;
-    p = new ActivePlayer(profile, device, user);
+    p = new ActivePlayer(profile, device);
     i = m_active_players.size();
     m_active_players.push_back(p);
 
@@ -254,8 +253,7 @@ void StateManager::onStackEmptied()
 #endif
 
 StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
-                                         InputDevice *device,
-                                         Online::OnlineProfile* user)
+                                         InputDevice *device)
 {
 #ifdef DEBUG
     m_magic_number = 0xAC1EF1AE;
@@ -264,7 +262,6 @@ StateManager::ActivePlayer::ActivePlayer(PlayerProfile* player,
     m_player = player;
     m_device = NULL;
     m_kart = NULL;
-    m_online_user = user;
     setDevice(device);
 }  // ActivePlayer
 

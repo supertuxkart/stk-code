@@ -32,11 +32,13 @@ class TrackObject;
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton<GrandPrixWin>
+class GrandPrixWin : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<GrandPrixWin>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixWin>;
 
     GrandPrixWin();
+
+    virtual ~GrandPrixWin();
 
     /** Global evolution of time */
     double m_global_time;
@@ -60,6 +62,10 @@ class GrandPrixWin : public GUIEngine::Screen, public GUIEngine::ScreenSingleton
     float m_kart_rotation[3];
 
 public:
+
+    virtual void onCutsceneEnd() OVERRIDE;
+
+    virtual bool onEscapePressed() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;

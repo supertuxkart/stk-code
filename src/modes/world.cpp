@@ -345,6 +345,8 @@ Controller* World::loadAIController(AbstractKart *kart)
 //-----------------------------------------------------------------------------
 World::~World()
 {
+    irr_driver->onUnloadWorld();
+
     if(ReplayPlay::get())
     {
         // Destroy the old replay object, which also stored the ghost
@@ -822,7 +824,7 @@ void World::updateWorld(float dt)
 
                 // Create player and associate player with keyboard
                 StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
-                                                        device, NULL);
+                                                        device);
 
                 if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
                 {

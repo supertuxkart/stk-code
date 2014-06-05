@@ -17,6 +17,11 @@
 #ifndef HEADER_RTTS_HPP
 #define HEADER_RTTS_HPP
 
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
+#include "utils/ptr_vector.hpp"
+#include "utils/leak_check.hpp"
+
 namespace irr {
     namespace video {
         class ITexture;
@@ -25,104 +30,32 @@ namespace irr {
 
 using irr::video::ITexture;
 
-enum TypeRTT
-{
-    RTT_TMP1 = 0,
-    RTT_TMP2,
-    RTT_TMP3,
-    RTT_TMP4,
-    RTT_LINEAR_DEPTH,
-    RTT_NORMAL_AND_DEPTH,
-    RTT_COLOR,
-    RTT_LOG_LUMINANCE,
-
-    RTT_HALF1,
-    RTT_HALF2,
-
-    RTT_QUARTER1,
-    RTT_QUARTER2,
-//    RTT_QUARTER3,
-//    RTT_QUARTER4,
-
-    RTT_EIGHTH1,
-    RTT_EIGHTH2,
-
-//    RTT_SIXTEENTH1,
-//    RTT_SIXTEENTH2,
-
-    RTT_SSAO,
-
-//    RTT_COLLAPSE,
-//    RTT_COLLAPSEH,
-//    RTT_COLLAPSEV,
-//    RTT_COLLAPSEH2,
-//    RTT_COLLAPSEV2,
-//    RTT_WARPH,
-//    RTT_WARPV,
-
-//    RTT_HALF_SOFT,
-
-    RTT_DISPLACE,
-    RTT_MLAA_COLORS,
-
-    RTT_BLOOM_1024,
-    RTT_BLOOM_512,
-    RTT_TMP_512,
-    RTT_BLOOM_256,
-    RTT_TMP_256,
-    RTT_BLOOM_128,
-    RTT_TMP_128,
-
-    RTT_COUNT
-};
-
-
-enum TypeFBO
-{
-    FBO_SSAO,
-    FBO_NORMAL_AND_DEPTHS,
-    FBO_COMBINED_TMP1_TMP2,
-    FBO_COLORS,
-    FBO_LOG_LUMINANCE,
-    FBO_MLAA_COLORS,
-    FBO_TMP1_WITH_DS,
-    FBO_TMP2_WITH_DS,
-    FBO_TMP4,
-    FBO_LINEAR_DEPTH,
-    FBO_HALF1,
-    FBO_HALF2,
-    FBO_QUARTER1,
-    FBO_QUARTER2,
-    FBO_EIGHTH1,
-    FBO_EIGHTH2,
-    FBO_DISPLACE,
-    FBO_BLOOM_1024,
-    FBO_BLOOM_512,
-    FBO_TMP_512,
-    FBO_BLOOM_256,
-    FBO_TMP_256,
-    FBO_BLOOM_128,
-    FBO_TMP_128,
-    FBO_COUNT
-};
 
 class RTT
 {
 public:
-    RTT();
+    RTT(size_t width, size_t height);
     ~RTT();
 
-    unsigned getShadowFBO() const { return shadowFBO; }
+    FrameBuffer &getShadowFBO() { return *m_shadow_FBO; }
+    FrameBuffer &getRH() { return *m_RH_FBO; }
+    FrameBuffer &getRSM() { return *m_RSM; }
     unsigned getShadowDepthTex() const { return shadowDepthTex; }
 
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
-    unsigned getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+    FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
 private:
-    unsigned RenderTargetTextures[RTT_COUNT], FrameBuffers[FBO_COUNT];
+    unsigned RenderTargetTextures[RTT_COUNT];
+    PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
-    unsigned shadowFBO, shadowColorTex, shadowDepthTex;
+    unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
+    unsigned RSM_Color, RSM_Normal, RSM_Depth;
+    unsigned RH_Red, RH_Green, RH_Blue;
+    FrameBuffer* m_shadow_FBO, *m_RSM, *m_RH_FBO;
+
+    LEAK_CHECK();
 };
 
 #endif

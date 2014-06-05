@@ -1752,7 +1752,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         btVector3 gravity = m_body->getGravity();
         gravity.normalize();
         // Cast necessary since otherwise to operator- (vec3/btvector) exists
-        Vec3 impulse =  (btVector3)normal - gravity* btDot(normal, gravity);
+        Vec3 impulse =  normal - gravity* btDot(normal, gravity);
         if(impulse.getX() || impulse.getZ())
             impulse.normalize();
         else
@@ -2291,7 +2291,7 @@ void Kart::updateFlying()
         {
             float orientation = getHeading();
             m_body->applyCentralImpulse(btVector3(-100.0f*sin(orientation), 0.0,
-                -100.0*cos(orientation)));
+                -100.0f*cos(orientation)));
         }
     }
 
@@ -2316,8 +2316,8 @@ void Kart::updateFlying()
  */
 void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
 {
-
-    m_node = m_kart_model->attachModel(is_animated_model);
+    bool always_animated = (type == RaceManager::KT_PLAYER && race_manager->getNumPlayers() == 1);
+    m_node = m_kart_model->attachModel(is_animated_model, always_animated);
 
 #ifdef DEBUG
     m_node->setName( (getIdent()+"(lod-node)").c_str() );

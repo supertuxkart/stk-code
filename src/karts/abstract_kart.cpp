@@ -78,7 +78,7 @@ void AbstractKart::reset()
 
 // ----------------------------------------------------------------------------
 /** Returns a name to be displayed for this kart. */
-const wchar_t* AbstractKart::getName() const
+core::stringw AbstractKart::getName() const
 {
     return m_kart_properties->getName();
 }   // getName;

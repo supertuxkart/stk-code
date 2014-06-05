@@ -162,6 +162,7 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
 {
     m_instancing_group = NULL;
+    m_fallback_scene_node = NULL;
 
     std::string instancing_model;
     xml_node.get("instancing_model", &instancing_model);
@@ -179,13 +180,32 @@ TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNo
     }
     else
     {
-        m_instancing_group = new STKInstancedSceneNode(model_def_loader.getFirstMeshFor(instancing_model),
-            m_node, irr_driver->getSceneManager(), -1);
+        scene::IMesh* mesh = model_def_loader.getFirstMeshFor(instancing_model);
+        scene::IMeshSceneNode* node = irr_driver->addMesh(mesh, m_node);
+        node->grab();
+        irr_driver->grabAllTextures(mesh);
+        mesh->grab();
+        World::getWorld()->getTrack()->addNode(node);
+
+        m_fallback_scene_node = node;
     }
 }
 
 TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
 {
+    if (m_instancing_group != NULL)
+        m_instancing_group->instanceDrop();
+
+    if (m_fallback_scene_node != NULL)
+    {
+        scene::IMesh* mesh = m_fallback_scene_node->getMesh();
+        irr_driver->dropAllTextures(mesh);
+        mesh->drop();
+        if (mesh->getReferenceCount() == 1)
+            irr_driver->removeMeshFromCache(mesh);
+
+        m_fallback_scene_node->drop();
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -678,7 +698,7 @@ TrackObjectPresentationLight::TrackObjectPresentationLight(const XMLNode& xml_no
     m_energy = 1.0f;
     xml_node.get("energy", &m_energy);
 
-    m_distance = 20. * m_energy;
+    m_distance = 20.f * m_energy;
     xml_node.get("distance", &m_distance);
 
     if (irr_driver->isGLSL())

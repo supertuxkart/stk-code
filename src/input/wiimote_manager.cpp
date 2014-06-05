@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #ifdef ENABLE_WIIUSE
+#define WCONST
 
 #include "input/wiimote_manager.hpp"
 
@@ -61,24 +62,99 @@ WiimoteManager::~WiimoteManager()
  */
 void WiimoteManager::launchDetection(int timeout)
 {
+  // It's only needed on systems with bluez, because wiiuse_find does not find alredy connected wiimotes
+#ifdef WIIUSE_BLUEZ
+    //Cleans up the config and the disconnected wiimotes
+    int number_previous_wiimotes = 0;
+    wiimote_t** previous_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * MAX_WIIMOTES);
+    memset(previous_wiimotes,0,sizeof(struct wiimote_t*) * MAX_WIIMOTES);
+    for (unsigned int i = 0; i < m_wiimotes.size(); i++)
+    {
+      if (WIIMOTE_IS_CONNECTED(m_all_wiimote_handles[i]))
+      {
+        previous_wiimotes[i]=m_all_wiimote_handles[i];
+        m_all_wiimote_handles[i] = NULL;
+        number_previous_wiimotes++;
+      }
+    }
+
+    //To prevent segmentation fault, have to delete NULLs
+    wiimote_t** deletable_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * (m_wiimotes.size()-number_previous_wiimotes));
+    memset(deletable_wiimotes,0,sizeof(struct wiimote_t*) * (m_wiimotes.size()-number_previous_wiimotes));
+    int number_deletables = 0;
+    for (unsigned int i = 0; i < m_wiimotes.size(); i++)
+    {
+      if (m_all_wiimote_handles[i] != NULL)
+      {
+        deletable_wiimotes[number_deletables++] = m_all_wiimote_handles[i];
+      }
+    }
+    m_all_wiimote_handles = wiiuse_init(MAX_WIIMOTES);
+    wiiuse_cleanup(deletable_wiimotes, number_deletables);
+
+#endif
+
     // Stop WiiUse, remove wiimotes, gamepads, gamepad configs.
     cleanup();
 
-    m_all_wiimote_handles =  wiiuse_init(MAX_WIIMOTES);
+    m_all_wiimote_handles = wiiuse_init(MAX_WIIMOTES);
 
     // Detect wiimotes
     int nb_found_wiimotes = wiiuse_find(m_all_wiimote_handles, MAX_WIIMOTES, timeout);
 
+#ifndef WIIUSE_BLUEZ
     // Couldn't find any wiimote?
     if(nb_found_wiimotes == 0)
         return;
+#endif
+
+#ifdef WIIUSE_BLUEZ
+    // Couldn't find any wiimote?
+    if(nb_found_wiimotes + number_previous_wiimotes == 0)
+        return;
+#endif
 
     // Try to connect to all found wiimotes
     int nb_wiimotes = wiiuse_connect(m_all_wiimote_handles, nb_found_wiimotes);
 
+#ifndef WIIUSE_BLUEZ
     // Couldn't connect to any wiimote?
     if(nb_wiimotes == 0)
         return;
+#endif
+
+#ifdef WIIUSE_BLUEZ
+    // Couldn't connect to any wiimote?
+    if(nb_wiimotes + number_previous_wiimotes == 0)
+        return;
+
+    //Merges previous and new wiimote's list
+    int number_merged_wiimotes = 0;
+    for (int i = 0; i < number_previous_wiimotes && i + nb_wiimotes < MAX_WIIMOTES; i++)
+    {
+      m_all_wiimote_handles[i+nb_wiimotes] = previous_wiimotes[i];
+      previous_wiimotes[i] = NULL;
+      m_all_wiimote_handles[i]->unid = nb_wiimotes+i+1;
+      number_merged_wiimotes++;
+    }
+    nb_wiimotes += number_merged_wiimotes;
+
+    //To prevent segmentation fault, have to delete NULLs
+    number_deletables = 0;
+    number_deletables = 0;
+    deletable_wiimotes = (wiimote_t**) malloc(sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
+    memset(deletable_wiimotes,0,sizeof(struct wiimote_t*) * (number_previous_wiimotes-number_merged_wiimotes));
+    for (int i = 0; i < number_previous_wiimotes; i++)
+    {
+      if (previous_wiimotes[i] != NULL)
+      {
+        deletable_wiimotes[number_deletables++] = previous_wiimotes[i];
+      }
+    }
+    // Cleans up wiimotes which ones didn't fit in limit
+    wiiuse_cleanup(deletable_wiimotes, number_deletables);
+
+#endif
 
     // ---------------------------------------------------
     // Create or find a GamepadConfig for all wiimotes

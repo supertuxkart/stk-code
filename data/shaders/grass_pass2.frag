@@ -29,6 +29,6 @@ void main(void)
 
     vec4 color = texture(Albedo, uv);
     if (color.a < 0.5) discard;
-    vec3 LightFactor = scattering + getLightFactor(1.);
+    vec3 LightFactor = (scattering * 0.3) + getLightFactor(1.);
     FragColor = vec4(color.xyz * LightFactor, 1.);
 }

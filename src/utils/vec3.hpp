@@ -169,6 +169,14 @@ public:
     Vec3  operator-(const Vec3& v1) const {return (Vec3)(*(btVector3*)this
                                                          -(btVector3)v1); }
     // ------------------------------------------------------------------------
+    /** Computes this = this - v1. On VS this special version is needed,
+     *  since otherwise Vec3-btVector3 is ont unique (could be cast to
+     *  btVector3-btVector3, or convert btVector3 to Vec3()). */
+    Vec3 operator-(const btVector3 v1) const
+    {
+        return *(btVector3*)this - v1;
+    }
+    // ------------------------------------------------------------------------
     /** Helper functions to treat this vec3 as a 2d vector. This returns the
      *  square of the length of the first 2 dimensions. */
     float length2_2d() const     { return m_floats[0]*m_floats[0]
