@@ -1010,15 +1010,13 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     if (!UserConfigParams::m_dynamic_lights)
         return;
 
+    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
     if (UserConfigParams::m_gi)
-    {
-        m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
-        if (SkyboxCubeMap)
-            m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-        m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
-    }
 
+    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    if (SkyboxCubeMap)
+        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
 
     if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && SkyboxCubeMap && UserConfigParams::m_gi)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
