@@ -166,15 +166,12 @@ PlayerManager::PlayerManager()
  */
 PlayerManager::~PlayerManager()
 {
-    // If the passwords should not be remembered, clear all saved sessions.
-    if(!UserConfigParams::m_remember_user)
+    // If the passwords should not be remembered, clear the saved session.
+    PlayerProfile *player;
+    for_in(player, m_all_players)
     {
-        PlayerProfile *player;
-        for_in(player, m_all_players)
-        {
+        if(player->rememberPassword())
             player->clearSession();
-        }
-
     }
     save();
 
@@ -266,7 +263,7 @@ void PlayerManager::save()
         players_file << L"<?xml version=\"1.0\"?>\n";
         players_file << L"<players version=\"1\" >\n";
 
-        if(m_current_player && UserConfigParams::m_remember_user)
+        if(m_current_player)
         {
             players_file << L"    <current player=\""
                          << m_current_player->getName() << L"\"/>\n";

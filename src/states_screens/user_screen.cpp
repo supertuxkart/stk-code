@@ -74,7 +74,7 @@ void BaseUserScreen::init()
     assert(m_info_widget);
 
     getWidget<CheckBoxWidget>("remember-user")
-             ->setState(UserConfigParams::m_remember_user);
+             ->setState(false);
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
@@ -114,6 +114,8 @@ void BaseUserScreen::init()
         // Select 'online
         m_online_cb->setState(player->wasOnlineLastTime() ||
                               player->isLoggedIn()          );
+        getWidget<CheckBoxWidget>("remember-user")->setState(
+                                  player->rememberPassword());
         makeEntryFieldsVisible();
         // We have to deactivate after make visible (since make visible
         // automatically activates widgets).
@@ -157,8 +159,6 @@ void BaseUserScreen::selectUser(int index)
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
 
-    getWidget<TextBoxWidget >("username")->setText(profile
-                                                   ->getLastOnlineName());
     m_players->setSelection(StringUtils::toString(index), 0, /*focusIt*/true);
 
     // Last game was not online, so make the offline settings the default
@@ -175,6 +175,8 @@ void BaseUserScreen::selectUser(int index)
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
     m_username_tb->setText(profile->getLastOnlineName());
+    getWidget<CheckBoxWidget>("remember-user")->setState(
+        profile->rememberPassword());
 
     // And make the password invisible if the session is saved (i.e
     // the user does not need to enter a password).
@@ -242,8 +244,8 @@ void BaseUserScreen::eventCallback(Widget* widget,
     }
     else if (name == "remember-user")
     {
-        UserConfigParams::m_remember_user =
-                       getWidget<CheckBoxWidget>("remember-user")->getState();
+        getSelectedPlayer()->setRememberPassword(
+            getWidget<CheckBoxWidget>("remember-user")->getState());
     }
     else if (name == "online")
     {
@@ -257,8 +259,13 @@ void BaseUserScreen::eventCallback(Widget* widget,
                 true);
             sfx_manager->quickSound( "anvil" );
             m_online_cb->setState(false);
+        } else
+        {
+            m_username_tb->setText("");
+            m_password_tb->setText("");
+            getWidget<CheckBoxWidget>("remember-user")->setState(false);
+            makeEntryFieldsVisible();
         }
-        makeEntryFieldsVisible();
     }
     else if (name == "options")
     {

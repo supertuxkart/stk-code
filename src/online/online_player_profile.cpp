@@ -125,8 +125,8 @@ namespace Online
         request->addParameter("username",username);
         request->addParameter("password",password);
         request->addParameter("save-session",
-                              UserConfigParams::m_remember_user ? "true"
-                                                                : "false");
+                              rememberPassword() ? "true"
+                                                 : "false");
         request->queue();
         m_online_state = OS_SIGNING_IN;
         return request;
@@ -187,7 +187,7 @@ namespace Online
             m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
-            if(UserConfigParams::m_remember_user)
+            if(rememberPassword())
             {
                 saveSession(getOnlineId(), getToken() );
             }
@@ -238,8 +238,8 @@ namespace Online
             {
                 m_player = player;
                 m_player->setUserDetails(this,
-                    UserConfigParams::m_remember_user ? "client-quit"
-                                                      :"disconnect");
+                    m_player->rememberPassword() ? "client-quit"
+                                       : "disconnect");
                 setAbortable(false);
             }   // SignOutRequest
         };   // SignOutRequest
@@ -282,7 +282,7 @@ namespace Online
         m_profile = NULL;
         m_online_state = OS_SIGNED_OUT;
         // Discard token if session should not be saved.
-        if(!UserConfigParams::m_remember_user)
+        if(!rememberPassword())
             clearSession();
     }   // signOut
 
