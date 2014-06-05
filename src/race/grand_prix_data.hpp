@@ -77,7 +77,7 @@ public:
     GrandPrixData(const std::string& filename);
     /** Needed for simple creation of an instance of GrandPrixData */
     GrandPrixData() {};
-    /** TODO */
+    /** Creates a new random GP */
     GrandPrixData(const unsigned int number_of_tracks,
                   const std::string& track_group,
                   const RandomGPInfoDialog::REVERSED use_reverse);
