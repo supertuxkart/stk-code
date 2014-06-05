@@ -175,6 +175,10 @@ void BaseUserScreen::selectUser(int index)
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
     m_username_tb->setText(profile->getLastOnlineName());
+    if(profile->getLastOnlineName().size()>0)
+        m_username_tb->setDeactivated();
+    else
+        m_username_tb->setActivated();
 
     // And make the password invisible if the session is saved (i.e
     // the user does not need to enter a password).
@@ -332,10 +336,11 @@ void BaseUserScreen::login()
         m_sign_out_name = current->getLastOnlineName();
         current->requestSignOut();
         m_state = (UserScreenState)(m_state | STATE_LOGOUT);
+
         // If the online user name was changed, reset the save data
         // for this user (otherwise later the saved session will be
         // resumed, not logging the user with the new account).
-        if(current->getLastOnlineName()!=new_username)
+        if(player==current && current->getLastOnlineName()!=new_username)
             current->clearSession();
     }
     PlayerManager::get()->setCurrentPlayer(player);
