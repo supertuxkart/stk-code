@@ -89,17 +89,11 @@ void RegisterScreen::init()
 
     getWidget<CheckBoxWidget>("online")->setVisible(true);
     getWidget<LabelWidget>("label_online")->setVisible(true);
-    // Check if online is allowed
-    if (UserConfigParams::m_internet_status != Online::RequestManager::IPERM_NOT_ALLOWED)
-    {
-        getWidget<CheckBoxWidget>("online")->setState(true);
-        makeEntryFieldsVisible(true);
-    }
-    else
-    {
-        getWidget<CheckBoxWidget>("online")->setState(false);
-        makeEntryFieldsVisible(false);
-    }
+    onDialogClose();
+    bool online =    UserConfigParams::m_internet_status 
+                  != Online::RequestManager::IPERM_NOT_ALLOWED;
+    getWidget<CheckBoxWidget>("online")->setState(online);
+    makeEntryFieldsVisible(online);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -107,6 +101,19 @@ void RegisterScreen::setRename(PlayerProfile *player)
 {
     m_existing_player = player;
 }   // setRename
+
+// -----------------------------------------------------------------------------
+/** Will be called first time STK is started, when the 'internet yes/no' dialog
+ *  is closed. Adjust the state of the online checkbox depending on that
+ *  answer.
+ */
+void RegisterScreen::onDialogClose()
+{
+    bool online =    UserConfigParams::m_internet_status 
+                  != Online::RequestManager::IPERM_NOT_ALLOWED;
+    getWidget<CheckBoxWidget>("online")->setState(online);
+    makeEntryFieldsVisible(online);
+}   // onDialogClose
 
 // -----------------------------------------------------------------------------
 /** Shows or hides the entry fields for online registration, depending on
