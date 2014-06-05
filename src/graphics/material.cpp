@@ -760,32 +760,31 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
         IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (irr_driver->isGLSL())
         {
+            // FIXME; cannot perform this check atm, because setMaterialProperties
+            // is sometimes called before calculating tangents
+            //if (mb->getVertexType() != video::EVT_TANGENTS)
+            //{
+            //    Log::warn("material", "Requiring normal map without tangent enabled mesh for <%s>",
+            //        m_texname.c_str());
+            //}
+            
+            ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
+            m->setTexture(1, tex);
 
-            if (mb->getVertexType() != video::EVT_TANGENTS)
-            {
-                Log::warn("material", "Requiring normal map without tangent enabled mesh for <%s>",
-                    m_texname.c_str());
-            }
-            else
-            {
-                ITexture* tex = irr_driver->getTexture(m_normal_map_tex);
-                m->setTexture(1, tex);
+            bool with_lightmap = false;
 
-                bool with_lightmap = false;
+            //if (m_normal_map_shader_lightmap.size() > 0)
+            //{
+            //    ITexture* lm_tex = irr_driver->getTexture(m_normal_map_shader_lightmap);
+            //    m->setTexture(2, lm_tex);
+            //    with_lightmap = true;
+            //}
 
-                //if (m_normal_map_shader_lightmap.size() > 0)
-                //{
-                //    ITexture* lm_tex = irr_driver->getTexture(m_normal_map_shader_lightmap);
-                //    m->setTexture(2, lm_tex);
-                //    with_lightmap = true;
-                //}
-
-                // Material and shaders
-                m->MaterialType = irr_driver->getShader(
-                    with_lightmap ? ES_NORMAL_MAP_LIGHTMAP : ES_NORMAL_MAP);
-                m->Lighting = false;
-                m->ZWriteEnable = true;
-            }
+            // Material and shaders
+            m->MaterialType = irr_driver->getShader(
+                with_lightmap ? ES_NORMAL_MAP_LIGHTMAP : ES_NORMAL_MAP);
+            m->Lighting = false;
+            m->ZWriteEnable = true;
         }
         else
         {
@@ -812,7 +811,7 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
     //    ITexture* tex = irr_driver->getTexture("cloud_mask.png");
     //    m->setTexture(1, tex);
     //
-    //    
+    //
     //    m->MaterialType = irr_driver->getShader(ES_SKYBOX);
     //}
 

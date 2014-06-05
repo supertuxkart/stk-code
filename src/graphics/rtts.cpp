@@ -22,7 +22,19 @@
 #include "graphics/irr_driver.hpp"
 #include "utils/log.hpp"
 
-static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, GLint format, GLint type)
+static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type)
+{
+    GLuint result;
+    glGenTextures(1, &result);
+    glBindTexture(target, result);
+    if (irr_driver->getGLSLVersion() < 420)
+        glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
+    else
+        glTexStorage3D(target, 1, internalFormat, w, h, d);
+    return result;
+}
+
+static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, GLint format, GLint type, unsigned mipmaplevel = 1)
 {
     GLuint result;
     glGenTextures(1, &result);
@@ -30,7 +42,7 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     if (irr_driver->getGLSLVersion() < 420)
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     else
-        glTexStorage2D(GL_TEXTURE_2D, 1, internalFormat, res.Width, res.Height);
+        glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
     return result;
 }
 
@@ -57,6 +69,7 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 RTT::RTT(size_t width, size_t height)
 {
     m_shadow_FBO = NULL;
+    m_RH_FBO = NULL;
     m_RSM = NULL;
     m_RH_FBO = NULL;
     using namespace video;
@@ -77,9 +90,9 @@ RTT::RTT(size_t width, size_t height)
     const dimension2du warpvsize(1, 512);
     const dimension2du warphsize(512, 1);
 
-    glGenTextures(1, &DepthStencilTexture);
-    glBindTexture(GL_TEXTURE_2D, DepthStencilTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, res.Width, res.Height, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
+    unsigned linear_depth_mip_levels = int(ceilf(log2f( float(max_(res.Width, res.Height)) )));
+
+    DepthStencilTexture = generateRTT(res, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
     // All RTTs are currently RGBA16F mostly with stencil. The four tmp RTTs are the same size
     // as the screen, for use in post-processing.
@@ -88,10 +101,10 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_TMP2] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP3] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_TMP4] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
-    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT);
+    RenderTargetTextures[RTT_LINEAR_DEPTH] = generateRTT(res, GL_R32F, GL_RED, GL_FLOAT, linear_depth_mip_levels);
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
-    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8, GL_BGR, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
 
@@ -193,12 +206,8 @@ RTT::RTT(size_t width, size_t height)
 
     if (UserConfigParams::m_shadows)
     {
-        glGenTextures(1, &shadowColorTex);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, shadowColorTex);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_R8, 1024, 1024, 4, 0, GL_RED, GL_UNSIGNED_BYTE, 0);
-        glGenTextures(1, &shadowDepthTex);
-        glBindTexture(GL_TEXTURE_2D_ARRAY, shadowDepthTex);
-        glTexImage3D(GL_TEXTURE_2D_ARRAY, 0, GL_DEPTH_STENCIL, 1024, 1024, 4, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
+        shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R8, GL_RED, GL_UNSIGNED_BYTE);
+        shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
         somevector.clear();
         somevector.push_back(shadowColorTex);
@@ -208,30 +217,18 @@ RTT::RTT(size_t width, size_t height)
     if (UserConfigParams::m_gi)
     {
         //Todo : use "normal" shadowtex
-        glGenTextures(1, &RSM_Color);
-        glBindTexture(GL_TEXTURE_2D, RSM_Color);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, 1024, 1024, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-        glGenTextures(1, &RSM_Normal);
-        glBindTexture(GL_TEXTURE_2D, RSM_Normal);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, 1024, 1024, 0, GL_RGB, GL_FLOAT, 0);
-        glGenTextures(1, &RSM_Depth);
-        glBindTexture(GL_TEXTURE_2D, RSM_Depth);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_STENCIL, 1024, 1024, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, 0);
+        RSM_Color = generateRTT(shadowsize0, GL_RGB8, GL_RGB, GL_UNSIGNED_BYTE);
+        RSM_Normal = generateRTT(shadowsize0, GL_RGB16F, GL_RGB, GL_FLOAT);
+        RSM_Depth = generateRTT(shadowsize0, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
         somevector.clear();
         somevector.push_back(RSM_Color);
         somevector.push_back(RSM_Normal);
         m_RSM = new FrameBuffer(somevector, RSM_Depth, 1024, 1024, true);
 
-        glGenTextures(1, &RH_Red);
-        glBindTexture(GL_TEXTURE_3D, RH_Red);
-        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA16F, 32, 16, 32, 0, GL_RGBA, GL_FLOAT, 0);
-        glGenTextures(1, &RH_Green);
-        glBindTexture(GL_TEXTURE_3D, RH_Green);
-        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA16F, 32, 16, 32, 0, GL_RGBA, GL_FLOAT, 0);
-        glGenTextures(1, &RH_Blue);
-        glBindTexture(GL_TEXTURE_3D, RH_Blue);
-        glTexImage3D(GL_TEXTURE_3D, 0, GL_RGBA16F, 32, 16, 32, 0, GL_RGBA, GL_FLOAT, 0);
+        RH_Red = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+        RH_Green = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
+        RH_Blue = generateRTT3D(GL_TEXTURE_3D, 32, 16, 32, GL_RGBA16F, GL_RGBA, GL_FLOAT);
 
         somevector.clear();
         somevector.push_back(RH_Red);

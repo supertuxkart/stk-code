@@ -691,7 +691,6 @@ X##_yflip.LowerRightCorner.Y = w->m_skin_dest_y + \
 void Skin::drawButton(Widget* w, const core::recti &rect,
                       const bool pressed, const bool focused)
 {
-
     // if within an appearing dialog, grow
     if (m_dialog && m_dialog_size < 1.0f && w->m_parent != NULL &&
         w->m_parent->getType() == gui::EGUIET_WINDOW)
@@ -1916,6 +1915,16 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         if (!widget->m_event_handler->m_deactivated)
             drawSpinnerChild(rect, widget, pressed, focused);
     }
+    else if (type == WTYPE_MODEL_VIEW)
+    {
+        ModelViewWidget* mvw = dynamic_cast<ModelViewWidget*>(widget);
+        FrameBuffer* fb = mvw->getFrameBuffer();
+        if (fb != NULL && fb->getRTT().size() > 0)
+        {
+            draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
+                rect, core::rect<s32>(0, 0, 512, 512), NULL, true);
+        }
+    }
     else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)
     {
         drawIconButton(rect, widget, pressed, focused);
@@ -2101,8 +2110,10 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
     {
         SColor& bg_color = SkinConfig::m_colors["text_field::background"];
         SColor& bg_color_focused = SkinConfig::m_colors["text_field::background_focused"];
+        SColor& bg_color_deactivated = SkinConfig::m_colors["text_field::background_deactivated"];
         SColor& border_color = SkinConfig::m_colors["text_field::neutral"];
         SColor& border_color_focus = SkinConfig::m_colors["text_field::focused"];
+        SColor& border_color_deactivated = SkinConfig::m_colors["text_field::deactivated"];
 
         core::recti borderArea = rect;
         //borderArea.UpperLeftCorner -= position2d< s32 >( 2, 2 );
@@ -2128,12 +2139,22 @@ void Skin::draw3DSunkenPane (IGUIElement *element, video::SColor bgcolor,
                 center.Y + (int)(((int)rect.LowerRightCorner.Y
                                 - (int)center.Y)*texture_size);
         }
-        GL32_draw2DRectangle(focused ? border_color_focus : border_color, borderArea);
+        if(widget->m_deactivated)
+            GL32_draw2DRectangle(border_color_deactivated, borderArea);
+        else if(focused)
+            GL32_draw2DRectangle(border_color_focus, borderArea);
+        else
+            GL32_draw2DRectangle(border_color, borderArea);
 
         core::recti innerArea = borderArea;
         innerArea.UpperLeftCorner += position2d< s32 >( 3, 3 );
         innerArea.LowerRightCorner -= position2d< s32 >( 3, 3 );
-        GL32_draw2DRectangle(focused ? bg_color_focused : bg_color, innerArea);
+        if(widget->m_deactivated)
+            GL32_draw2DRectangle(bg_color_deactivated, innerArea);
+        else if(focused)
+            GL32_draw2DRectangle(bg_color_focused, innerArea);
+        else
+            GL32_draw2DRectangle(bg_color, innerArea);
         return;
     }
     else if (type == WTYPE_LIST)

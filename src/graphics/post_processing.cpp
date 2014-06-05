@@ -207,36 +207,17 @@ void PostProcessing::update(float dt)
 static
 void renderBloom(GLuint in)
 {
-    const float threshold = World::getWorld()->getTrack()->getBloomThreshold();
+    float threshold = 1.0f;
+    if (World::getWorld() != NULL)
+        threshold = World::getWorld()->getTrack()->getBloomThreshold();
+
     glUseProgram(FullScreenShader::BloomShader::Program);
     glBindVertexArray(FullScreenShader::BloomShader::vao);
 
     setTexture(0, in, GL_NEAREST, GL_NEAREST);
     FullScreenShader::BloomShader::setUniforms(0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-}
-
-static
-void renderColorLevel(GLuint in)
-{
-    core::vector3df m_inlevel = World::getWorld()->getTrack()->getColorLevelIn();
-    core::vector2df m_outlevel = World::getWorld()->getTrack()->getColorLevelOut();
-
-
-    glUseProgram(FullScreenShader::ColorLevelShader::Program);
-    glBindVertexArray(FullScreenShader::ColorLevelShader::vao);
-    glUniform3f(FullScreenShader::ColorLevelShader::uniform_inlevel, m_inlevel.X, m_inlevel.Y, m_inlevel.Z);
-    glUniform2f(FullScreenShader::ColorLevelShader::uniform_outlevel, m_outlevel.X, m_outlevel.Y);
-
-    setTexture(0, in, GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    glUniform1i(FullScreenShader::ColorLevelShader::uniform_tex, 0);
-    glUniform1i(FullScreenShader::ColorLevelShader::uniform_dtex, 1);
-    setTexture(2, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
-    glUniformMatrix4fv(FullScreenShader::ColorLevelShader::uniform_invprojm, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSHCoeff, const float *rSHCoeff)
@@ -253,7 +234,7 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
     FullScreenShader::DiffuseEnvMapShader::setUniforms(TVM, bSHCoeff, gSHCoeff, rSHCoeff, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -287,7 +268,7 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, rh_extend, 3, 4, 0, 1, 2);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void PostProcessing::renderSunlight()
@@ -304,7 +285,7 @@ void PostProcessing::renderSunlight()
   setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
   setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
   FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+  glDrawArrays(GL_TRIANGLES, 0, 3);
   glBindVertexArray(0);
 }
 
@@ -341,7 +322,7 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
         glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
         FullScreenShader::ShadowedSunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
     }
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 }
 
@@ -362,7 +343,7 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3VBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     {
         in_fbo.Bind();
@@ -376,7 +357,7 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian3HBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 }
 
@@ -396,7 +377,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6VBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
     {
         in_fbo.Bind();
@@ -410,7 +391,7 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
         glUniform1i(FullScreenShader::Gaussian6HBlurShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+        glDrawArrays(GL_TRIANGLES, 0, 3);
     }
 }
 
@@ -419,32 +400,56 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
-        auxiliary.Bind();
-        glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
-        glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
+        if (irr_driver->getGLSLVersion() < 430)
+        {
+            auxiliary.Bind();
+            glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
+            glBindVertexArray(FullScreenShader::Gaussian17TapHShader::vao);
 
-        glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
+            glUniform2f(FullScreenShader::Gaussian17TapHShader::uniform_pixel, inv_width, inv_height);
 
-        setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
+            setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+        else
+        {
+            glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
+            glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
+            glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_source, 0);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 1);
+            glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
+        }
     }
     {
-        in_fbo.Bind();
-        glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
-        glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
+        if (irr_driver->getGLSLVersion() < 430)
+        {
+            in_fbo.Bind();
+            glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
+            glBindVertexArray(FullScreenShader::Gaussian17TapVShader::vao);
 
-        glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
+            glUniform2f(FullScreenShader::Gaussian17TapVShader::uniform_pixel, inv_width, inv_height);
 
-        setTexture(0, auxiliary.getRTT()[0], GL_LINEAR, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
+            setTexture(0, auxiliary.getRTT()[0], GL_LINEAR, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
 
-        glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+        }
+        else
+        {
+            glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
+            glBindImageTexture(0, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
+            glBindImageTexture(1, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_source, 0);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 1);
+            glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
+        }
     }
 }
 
@@ -489,7 +494,7 @@ void PostProcessing::renderSSAO()
     glBindVertexArray(FullScreenShader::LinearizeDepthShader::vao);
     setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
     FullScreenShader::LinearizeDepthShader::setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue(), 0);
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     irr_driver->getFBO(FBO_SSAO).Bind();
 
     if (!noise_tex)
@@ -498,15 +503,15 @@ void PostProcessing::renderSSAO()
     glUseProgram(FullScreenShader::SSAOShader::Program);
     glBindVertexArray(FullScreenShader::SSAOShader::vao);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
     glGenerateMipmap(GL_TEXTURE_2D);
     setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width), 
+    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width),
                                                               float(UserConfigParams::m_height)),
                                               0, 1);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 void PostProcessing::renderFog()
@@ -536,7 +541,7 @@ void PostProcessing::renderFog()
     setTexture(0, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::FogShader::setUniforms(fogmax, startH, endH, start, end, col, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -576,7 +581,7 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
                                   cb->getDirection(cam), 0.15f,
                                   cb->getMaxHeight(cam) * 0.7f, 0);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static void renderGodFade(GLuint tex, const SColor &col)
@@ -608,7 +613,7 @@ static void toneMap(FrameBuffer &fbo, GLuint rtt)
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
     FullScreenShader::ToneMapShader::setUniforms(irr_driver->getExposure(), irr_driver->getLwhite(), 0, 1);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
@@ -620,7 +625,7 @@ static void renderDoF(FrameBuffer &fbo, GLuint rtt)
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::DepthOfFieldShader::setUniforms(0, 1);
 
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
 static void averageTexture(GLuint tex)
@@ -628,19 +633,6 @@ static void averageTexture(GLuint tex)
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, tex);
     glGenerateMipmap(GL_TEXTURE_2D);
-}
-
-static void computeLogLuminance(GLuint tex)
-{
-    irr_driver->getFBO(FBO_LOG_LUMINANCE).Bind();
-    glUseProgram(FullScreenShader::LogLuminanceShader::Program);
-    glBindVertexArray(FullScreenShader::LogLuminanceShader::vao);
-    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
-    FullScreenShader::LogLuminanceShader::setUniforms(0);
-
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-    averageTexture(irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE));
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 void PostProcessing::applyMLAA()
@@ -728,7 +720,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     {
         PROFILER_PUSH_CPU_MARKER("- Godrays", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_GODRAYS));
-        const bool hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+        bool hasgodrays = false;
+        if (World::getWorld() != NULL)
+            hasgodrays = World::getWorld()->getTrack()->hasGodRays();
+
         if (UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
             glEnable(GL_DEPTH_TEST);
@@ -798,6 +793,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
         if (UserConfigParams::m_bloom)
         {
             glClear(GL_STENCIL_BUFFER_BIT);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
 
             FrameBuffer::Blit(*in_fbo, irr_driver->getFBO(FBO_BLOOM_1024), GL_COLOR_BUFFER_BIT, GL_LINEAR);
 
@@ -818,15 +814,18 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
             // Additively blend on top of tmp1
             in_fbo->Bind();
             glEnable(GL_BLEND);
-            glBlendFunc(GL_CONSTANT_COLOR, GL_ONE);
+            glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            glBlendColor(.125, .125, .125, .125);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_128));
-            glBlendColor(.25, .25, .25, .25);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_256));
-            glBlendColor(.5, .5, .5, .5);
-            renderPassThrough(irr_driver->getRenderTargetTexture(RTT_BLOOM_512));
+            setTexture(0, irr_driver->getRenderTargetTexture(RTT_BLOOM_128), GL_LINEAR, GL_LINEAR);
+            setTexture(1, irr_driver->getRenderTargetTexture(RTT_BLOOM_256), GL_LINEAR, GL_LINEAR);
+            setTexture(2, irr_driver->getRenderTargetTexture(RTT_BLOOM_512), GL_LINEAR, GL_LINEAR);
+            glUseProgram(FullScreenShader::BloomBlendShader::Program);
+            FullScreenShader::BloomBlendShader::setUniforms(0, 1, 2);
+            glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
+            glDrawArrays(GL_TRIANGLES, 0, 3);
+
             glDisable(GL_BLEND);
+            glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
         } // end if bloom
         PROFILER_POP_CPU_MARKER();
     }
@@ -843,7 +842,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        if (UserConfigParams::m_motionblur && m_any_boost) // motion blur
+        if (UserConfigParams::m_motionblur && m_any_boost && World::getWorld() != NULL) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);

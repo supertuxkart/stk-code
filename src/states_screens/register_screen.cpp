@@ -18,6 +18,7 @@
 #include "states_screens/register_screen.hpp"
 
 #include "config/player_manager.hpp"
+#include "config/user_config.hpp"
 #include "audio/sfx_manager.hpp"
 #include "guiengine/widgets/check_box_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
@@ -78,12 +79,21 @@ void RegisterScreen::init()
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
+    m_info_widget->setDefaultColor();
+    m_info_widget->setText("", false);
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget);
 
     m_signup_request = NULL;
     m_info_message_shown = false;
-    makeEntryFieldsVisible(true);
+
+    getWidget<CheckBoxWidget>("online")->setVisible(true);
+    getWidget<LabelWidget>("label_online")->setVisible(true);
+    onDialogClose();
+    bool online =    UserConfigParams::m_internet_status 
+                  != Online::RequestManager::IPERM_NOT_ALLOWED;
+    getWidget<CheckBoxWidget>("online")->setState(online);
+    makeEntryFieldsVisible(online);
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -91,6 +101,19 @@ void RegisterScreen::setRename(PlayerProfile *player)
 {
     m_existing_player = player;
 }   // setRename
+
+// -----------------------------------------------------------------------------
+/** Will be called first time STK is started, when the 'internet yes/no' dialog
+ *  is closed. Adjust the state of the online checkbox depending on that
+ *  answer.
+ */
+void RegisterScreen::onDialogClose()
+{
+    bool online =    UserConfigParams::m_internet_status 
+                  != Online::RequestManager::IPERM_NOT_ALLOWED;
+    getWidget<CheckBoxWidget>("online")->setState(online);
+    makeEntryFieldsVisible(online);
+}   // onDialogClose
 
 // -----------------------------------------------------------------------------
 /** Shows or hides the entry fields for online registration, depending on
@@ -172,7 +195,7 @@ void RegisterScreen::doRegister()
                        ->getText().trim();
 
     handleLocalName(local_name);
-    
+
     // If no online account is requested, don't register
     if(!getWidget<CheckBoxWidget>("online")->getState() || m_existing_player)
     {
@@ -303,7 +326,14 @@ void RegisterScreen::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == "online")
     {
-        makeEntryFieldsVisible(getWidget<CheckBoxWidget>("online")->getState());
+        if (UserConfigParams::m_internet_status == Online::RequestManager::IPERM_NOT_ALLOWED)
+        {
+            m_info_widget->setErrorColor();
+            m_info_widget->setText(_("Internet access is disabled, please enable it in the options"), false);
+            getWidget<CheckBoxWidget>("online")->setState(false);
+        }
+        else
+            makeEntryFieldsVisible(getWidget<CheckBoxWidget>("online")->getState());
     }
     else if (name=="options")
     {
