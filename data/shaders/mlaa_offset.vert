@@ -20,6 +20,6 @@ void main() {
 //	invy.y = 1.0 - invy.y;
 	uv = invy.st;
 
-	offset[0] = invy.xyxy + screen.xyxy * vec4(-1.0, 0.0, 0.0,  1.0);
-	offset[1] = invy.xyxy + screen.xyxy * vec4( 1.0, 0.0, 0.0, -1.0);
+	offset[0] = invy.xyxy + vec4(-1.0, 0.0, 0.0, 1.0) / screen.xyxy;
+	offset[1] = invy.xyxy + vec4( 1.0, 0.0, 0.0, -1.0) / screen.xyxy;
 }
