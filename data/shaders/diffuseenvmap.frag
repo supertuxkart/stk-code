@@ -3,16 +3,17 @@ uniform float greenLmn[9];
 uniform float redLmn[9];
 uniform sampler2D ntex;
 uniform mat4 TransposeViewMatrix;
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
 
-#if __VERSION__ >= 130
-in vec2 uv;
 out vec4 Diff;
-out vec4 Spec;
-#else
-varying vec2 uv;
-#define Diff gl_FragData[0]
-#define Spec gl_FragData[1]
-#endif
 
 vec3 DecodeNormal(vec2 n);
 
@@ -30,6 +31,7 @@ mat4 getMatrix(float L[9])
 
 void main(void)
 {
+    vec2 uv = gl_FragCoord.xy / screen;
     vec3 normal = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
     // Convert normal in world space (where SH coordinates were computed)
     vec4 extendednormal = TransposeViewMatrix * vec4(normal, 1.);
@@ -43,5 +45,4 @@ void main(void)
     float b = dot(extendednormal, bmat * extendednormal);
 
     Diff = max(0.25 * vec4(r, g, b, .1), vec4(0.));
-    Spec = vec4(0.);
 }

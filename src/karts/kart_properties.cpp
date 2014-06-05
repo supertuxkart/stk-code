@@ -20,6 +20,7 @@
 
 #include "addons/addon.hpp"
 #include "config/stk_config.hpp"
+#include "config/player_manager.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
@@ -731,6 +732,28 @@ void KartProperties::checkAllSet(const std::string &filename)
     for(unsigned int i=0; i<RaceManager::DIFFICULTY_COUNT; i++)
         m_ai_properties[i]->checkAllSet(filename);
 }   // checkAllSet
+
+// ----------------------------------------------------------------------------
+bool KartProperties::operator<(const KartProperties &other) const
+{
+    PlayerProfile *p = PlayerManager::getCurrentPlayer();
+    bool this_is_locked = p->isLocked(getIdent());
+    bool other_is_locked = p->isLocked(other.getIdent());
+    if (this_is_locked == other_is_locked)
+    {
+        return getName() < other.getName();
+    }
+    else
+        return other_is_locked;
+
+    return true;
+}  // operator<
+
+// ----------------------------------------------------------------------------
+bool KartProperties::isInGroup(const std::string &group) const
+{
+    return std::find(m_groups.begin(), m_groups.end(), group) != m_groups.end();
+}   // isInGroups
 
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches

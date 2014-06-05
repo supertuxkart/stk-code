@@ -73,7 +73,7 @@ namespace Online
             PlayerProfile::OnlineState  m_online_state;
 
             virtual void signIn(bool success, const XMLNode * input);
-            virtual void signOut(bool success, const XMLNode * input, 
+            virtual void signOut(bool success, const XMLNode * input,
                                 const irr::core::stringw &info);
             virtual uint32_t getOnlineId() const;
             virtual void setUserDetails(Online::HTTPRequest *request,
@@ -83,7 +83,7 @@ namespace Online
             virtual void requestPoll() const;
             // ----------------------------------------------------------------
             /** Returns if this user is logged in. */
-            virtual bool isLoggedIn() const 
+            virtual bool isLoggedIn() const
             {
                 return m_online_state == PlayerProfile::OS_SIGNED_IN;
             }   // isLoggedIn

@@ -211,7 +211,10 @@ Window get_toplevel_parent(Display* display, Window window)
 #endif
 
 // ----------------------------------------------------------------------------
-
+/** If the position of the window should be remembered, store it in the config
+ *  file.
+ *  \post The user config file must still be saved!
+ */
 void IrrDriver::updateConfigIfRelevant()
 {
         if (!UserConfigParams::m_fullscreen &&
@@ -241,7 +244,6 @@ void IrrDriver::updateConfigIfRelevant()
             {
                 UserConfigParams::m_window_x = x;
                 UserConfigParams::m_window_y = y;
-                user_config->saveConfig();
             }
         }
         else
@@ -265,11 +267,10 @@ void IrrDriver::updateConfigIfRelevant()
         {
             UserConfigParams::m_window_x = wx;
             UserConfigParams::m_window_y = wy;
-            user_config->saveConfig();
         }
 #endif
     }
-}
+}   // updateConfigIfRelevant
 
 // ----------------------------------------------------------------------------
 /** Gets a list of supported video modes from the irrlicht device. This data
@@ -1260,8 +1261,8 @@ void IrrDriver::unsetTextureErrorMessage()
 
 // ----------------------------------------------------------------------------
 /** Retrieve all textures in the specified directory, generate a smaller
-*   version for each of them and save them in the cache. Smaller textures are 
-*   generated only if they do not already exist or if their original version 
+*   version for each of them and save them in the cache. Smaller textures are
+*   generated only if they do not already exist or if their original version
 *   is newer than the cached one.
 *   \param dir Directory from where textures will be retrieved.
 *              Must end with '/'.
@@ -1556,6 +1557,11 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
     return t;
 }   // applyMask
 // ----------------------------------------------------------------------------
+void IrrDriver::setRTT(RTT* rtt)
+{
+    m_rtts = rtt;
+}
+// ----------------------------------------------------------------------------
 void IrrDriver::onLoadWorld()
 {
     if (m_glsl)
@@ -1570,6 +1576,8 @@ void IrrDriver::onUnloadWorld()
 {
     delete m_rtts;
     m_rtts = NULL;
+
+    suppressSkyBox();
 }
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
@@ -1913,6 +1921,8 @@ void IrrDriver::update(float dt)
     // =================================
     if (!m_device->run())
     {
+        GUIEngine::cleanUp();
+        GUIEngine::deallocate();
         main_loop->abort();
         return;
     }
@@ -2391,7 +2401,7 @@ GLuint IrrDriver::getRenderTargetTexture(TypeRTT which)
 
 // ----------------------------------------------------------------------------
 
-FrameBuffer& IrrDriver::getFBO(TypeFBO which) 
+FrameBuffer& IrrDriver::getFBO(TypeFBO which)
 {
     return m_rtts->getFBO(which);
 }
@@ -2402,3 +2412,4 @@ GLuint IrrDriver::getDepthStencilTexture()
 {
     return m_rtts->getDepthStencilTexture();
 }
+

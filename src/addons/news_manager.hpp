@@ -25,6 +25,7 @@
 #include <irrString.h>
 using namespace irr;
 
+#include "utils/can_be_deleted.hpp"
 #include "utils/synchronised.hpp"
 
 class XMLNode;
@@ -32,7 +33,7 @@ class XMLNode;
 /**
   * \ingroup addonsgroup
   */
-class NewsManager
+class NewsManager : public CanBeDeleted
 {
 private:
     static NewsManager *m_news_manager;

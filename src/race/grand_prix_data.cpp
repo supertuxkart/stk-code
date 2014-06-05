@@ -365,7 +365,7 @@ void GrandPrixData::addTrack(Track* track, unsigned int laps, bool reverse,
     int n = getNumberOfTracks(true);
     assert (track != NULL);
     assert (laps > 0);
-    assert (-1 < position && position < n);
+    assert (-1 <= position && position < n);
 
     if (position < 0 || position == (n - 1) || m_tracks.empty())
     {
