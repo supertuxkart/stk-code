@@ -570,7 +570,7 @@ void IrrDriver::renderSolidFirstPass()
 
 void IrrDriver::renderSolidSecondPass()
 {
-    SColor clearColor(0., 150, 150, 150);
+    SColor clearColor(0, 150, 150, 150);
     if (World::getWorld() != NULL)
         clearColor = World::getWorld()->getClearColor();
 
