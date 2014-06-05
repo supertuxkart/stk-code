@@ -94,7 +94,7 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
     PtrVector<KartModel> m_all_kart_models;
 
     /** Global evolution of time */
-    double m_global_time;
+    float m_global_time;
 
     /** Key position from origin (where the chest is) */
     float m_key_pos;

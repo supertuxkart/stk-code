@@ -90,7 +90,7 @@ RTT::RTT(size_t width, size_t height)
     const dimension2du warpvsize(1, 512);
     const dimension2du warphsize(512, 1);
 
-    unsigned linear_depth_mip_levels = ceil(log2(max_(res.Width, res.Height)));
+    unsigned linear_depth_mip_levels = int(ceilf(log2f( float(max_(res.Width, res.Height)) )));
 
     DepthStencilTexture = generateRTT(res, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
 
