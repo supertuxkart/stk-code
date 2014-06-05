@@ -196,6 +196,8 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     AlignedArray<Vec3>& mesh_scale,
     const std::vector<int>& model_frames)
 {
+    irr_driver->suppressSkyBox();
+
     if (m_rtt_main_node != NULL) m_rtt_main_node->remove();
     if (m_light != NULL) m_light->remove();
     if (m_camera != NULL) m_camera->remove();

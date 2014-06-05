@@ -1576,6 +1576,8 @@ void IrrDriver::onUnloadWorld()
 {
     delete m_rtts;
     m_rtts = NULL;
+
+    suppressSkyBox();
 }
 // ----------------------------------------------------------------------------
 /** Sets the ambient light.
