@@ -413,7 +413,7 @@ void CutsceneWorld::enterRaceOverState()
                 OverWorld::enterOverWorld();
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
-        else  if (m_parts.size() == 1 && m_parts[0] == "gplose")
+        else if (m_parts.size() == 1 && m_parts[0] == "gplose")
         {
             race_manager->exitRace();
             StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
@@ -436,6 +436,28 @@ void CutsceneWorld::enterRaceOverState()
                 s->setMultiplayer(false);
                 s->setGoToOverworldNext();
                 StateManager::get()->pushScreen( s );
+            }
+        }
+        // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
+        else if (m_parts.size() == 1 && m_parts[0] == "featunlocked")
+        {
+            if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
+            {
+                // in GP mode, continue GP after viewing this screen
+                StateManager::get()->popMenu();
+                race_manager->next();
+            }
+            else
+            {
+                // back to menu or overworld
+                race_manager->exitRace();
+                StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                //StateManager::get()->popMenu();
+
+                if (race_manager->raceWasStartedFromOverworld())
+                {
+                    OverWorld::enterOverWorld();
+                }
             }
         }
         else

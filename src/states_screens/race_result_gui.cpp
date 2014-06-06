@@ -275,6 +275,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             {
                 FeatureUnlockedCutScene* scene =
                     FeatureUnlockedCutScene::getInstance();
+                std::vector<std::string> parts;
+                parts.push_back("featunlocked");
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+
                 scene->addTrophy(race_manager->getDifficulty());
                 scene->findWhatWasUnlocked(race_manager->getDifficulty());
                 StateManager::get()->popMenu();
