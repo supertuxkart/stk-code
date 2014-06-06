@@ -207,7 +207,7 @@ void PlayerProfile::save(UTFWriter &out)
         << L"\" saved-token=\""         << m_saved_token << L"\"\n";
     out << L"            last-online-name=\"" << m_last_online_name
         << L"\" last-was-online=\""           << m_last_was_online << L"\"\n";
-    out << L"   remember-password=\""         << m_remember_password << L"\">\n";
+    out << L"            remember-password=\""         << m_remember_password << L"\">\n";
     {
         if(m_story_mode_status)
             m_story_mode_status->save(out);

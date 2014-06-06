@@ -189,7 +189,7 @@ namespace Online
             m_online_state = OS_SIGNED_IN;
             if(rememberPassword())
             {
-                saveSession(getOnlineId(), getToken() );
+                saveSession(getOnlineId(), getToken());
             }
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");

@@ -170,7 +170,7 @@ PlayerManager::~PlayerManager()
     PlayerProfile *player;
     for_in(player, m_all_players)
     {
-        if(player->rememberPassword())
+        if(!player->rememberPassword())
             player->clearSession();
     }
     save();
