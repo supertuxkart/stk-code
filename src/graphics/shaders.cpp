@@ -277,11 +277,15 @@ void Shaders::loadShaders()
     FullScreenShader::DepthOfFieldShader::init();
     FullScreenShader::FogShader::init();
     FullScreenShader::Gaussian17TapHShader::init();
+#if !defined(__linux__) || defined(GL_VERSION_4_3)
     FullScreenShader::ComputeGaussian17TapHShader::init();
+#endif
     FullScreenShader::Gaussian3HBlurShader::init();
     FullScreenShader::Gaussian3VBlurShader::init();
     FullScreenShader::Gaussian17TapVShader::init();
+#if !defined(__linux__) || defined(GL_VERSION_4_3)
     FullScreenShader::ComputeGaussian17TapVShader::init();
+#endif
     FullScreenShader::Gaussian6HBlurShader::init();
     FullScreenShader::Gaussian6VBlurShader::init();
     FullScreenShader::GlowShader::init();
@@ -2441,6 +2445,7 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
+#if !defined(__linux__) || defined(GL_VERSION_4_3)
     GLuint ComputeGaussian17TapHShader::Program;
     GLuint ComputeGaussian17TapHShader::uniform_source;
     GLuint ComputeGaussian17TapHShader::uniform_dest;
@@ -2451,7 +2456,7 @@ namespace FullScreenShader
         uniform_source = glGetUniformLocation(Program, "source");
         uniform_dest = glGetUniformLocation(Program, "dest");
     }
-
+#endif
     GLuint Gaussian6HBlurShader::Program;
     GLuint Gaussian6HBlurShader::uniform_tex;
     GLuint Gaussian6HBlurShader::uniform_pixel;
@@ -2497,6 +2502,7 @@ namespace FullScreenShader
     GLuint ComputeGaussian17TapVShader::Program;
     GLuint ComputeGaussian17TapVShader::uniform_source;
     GLuint ComputeGaussian17TapVShader::uniform_dest;
+#if !defined(__linux__) || defined(GL_VERSION_4_3)
     void ComputeGaussian17TapVShader::init()
     {
         Program = LoadProgram(
@@ -2504,7 +2510,7 @@ namespace FullScreenShader
         uniform_source = glGetUniformLocation(Program, "source");
         uniform_dest = glGetUniformLocation(Program, "dest");
     }
-
+#endif
     GLuint Gaussian6VBlurShader::Program;
     GLuint Gaussian6VBlurShader::uniform_tex;
     GLuint Gaussian6VBlurShader::uniform_pixel;

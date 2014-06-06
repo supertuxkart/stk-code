@@ -89,7 +89,6 @@ private:
     void deletePlayer();
     void doDeletePlayer();
     PlayerProfile* getSelectedPlayer();
-    virtual void onDialogClose();
     virtual void onUpdate(float dt) OVERRIDE;
 
 public:

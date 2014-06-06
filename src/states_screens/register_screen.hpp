@@ -64,6 +64,7 @@ public:
     virtual void loadedFromFile() OVERRIDE {};
     virtual void onUpdate(float dt) OVERRIDE;
     virtual bool onEscapePressed() OVERRIDE;
+    virtual void onDialogClose() OVERRIDE;
     void setRename(PlayerProfile *player);
 
     void acceptTerms();

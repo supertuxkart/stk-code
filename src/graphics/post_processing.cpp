@@ -417,12 +417,16 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
         else
         {
+#if !defined(__linux__) || defined(GL_VERSION_4_2)
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
             glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_source, 0);
             glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 1);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
+#else
+            assert(false);
+#endif
         }
     }
     {
@@ -443,12 +447,16 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
         else
         {
+#if !defined(__linux__) || defined(GL_VERSION_4_3)
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
             glBindImageTexture(0, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_source, 0);
             glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 1);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
+#else
+            assert(false);
+#endif
         }
     }
 }
