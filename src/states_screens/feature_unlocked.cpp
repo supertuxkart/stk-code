@@ -156,7 +156,7 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
         irr_driver->removeNode(m_avoid_irrlicht_bug);
     m_avoid_irrlicht_bug = NULL;
 #endif
-
+    
     m_unlocked_stuff.clearAndDeleteAll();
     m_all_kart_models.clearAndDeleteAll();
 
@@ -353,7 +353,6 @@ void FeatureUnlockedCutScene::init()
 void FeatureUnlockedCutScene::tearDown()
 {
     Screen::tearDown();
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -378,8 +377,6 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
     {
         float progress_factor = (m_global_time - GIFT_EXIT_FROM) / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
         float smoothed_progress_factor = sin((progress_factor - 0.5f)*M_PI)/2.0f + 0.5f;
-
-        Log::info("smoothed_progress_factor", "%f", smoothed_progress_factor);
 
         for (int n=0; n<unlockedStuffCount; n++)
         {
@@ -546,7 +543,6 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 
 bool FeatureUnlockedCutScene::onEscapePressed()
 {
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
     continueButtonPressed();
     return false; // continueButtonPressed already pop'ed the menu
 }   // onEscapePressed
@@ -555,35 +551,20 @@ bool FeatureUnlockedCutScene::onEscapePressed()
 
 void FeatureUnlockedCutScene::continueButtonPressed()
 {
-    if (m_global_time < GIFT_EXIT_TO)
-    {
-        // If animation was not over yet, the button is used to skip the animation
-        while (m_global_time < GIFT_EXIT_TO)
-        {
-            // simulate all the steps of the animation until we reach the end
-            onUpdate(0.4f);
-        }
-    }
-    else
-    {
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            // in GP mode, continue GP after viewing this screen
-            StateManager::get()->popMenu();
-            race_manager->next();
-        }
-        else
-        {
-            // back to menu or overworld
-            race_manager->exitRace();
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-
-            if (race_manager->raceWasStartedFromOverworld())
-            {
-                OverWorld::enterOverWorld();
-            }
-        }
-    }
+    //if (m_global_time < GIFT_EXIT_TO)
+    //{
+    //    // If animation was not over yet, the button is used to skip the animation
+    //    while (m_global_time < GIFT_EXIT_TO)
+    //    {
+    //        // simulate all the steps of the animation until we reach the end
+    //        onUpdate(0.4f);
+    //        World::getWorld()->updateWorld(0.4f);
+    //    }
+    //}
+    //else
+    //{
+        ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    //}
 
 }   // continueButtonPressed
 

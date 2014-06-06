@@ -127,7 +127,18 @@ void GrandPrixWin::onCutsceneEnd()
             PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
         PlayerManager::getCurrentPlayer()->clearUnlocked();
 
-        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("featunlocked", 999, false);
+
+        FeatureUnlockedCutScene* scene =
+            FeatureUnlockedCutScene::getInstance();
+        std::vector<std::string> parts;
+        parts.push_back("featunlocked");
+        ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
         assert(unlocked.size() > 0);
         scene->addTrophy(race_manager->getDifficulty());
