@@ -129,10 +129,10 @@ bool Quad::pointInQuad3D(const Vec3& p) const
     boxCorners[1] = m_p[1] + boxHigh*normal;
     boxCorners[2] = m_p[2] + boxHigh*normal;
     boxCorners[3] = m_p[3] + boxHigh*normal;
-    boxCorners[4] = m_p[0] + -boxLow*m_p[1];
-    boxCorners[5] = m_p[1] + -boxLow*m_p[1];
-    boxCorners[6] = m_p[2] + -boxLow*m_p[1];
-    boxCorners[7] = m_p[3] + -boxLow*m_p[1];
+    boxCorners[4] = m_p[0] - boxLow*m_p[1];
+    boxCorners[5] = m_p[1] - boxLow*m_p[1];
+    boxCorners[6] = m_p[2] - boxLow*m_p[1];
+    boxCorners[7] = m_p[3] - boxLow*m_p[1];
 
     const Vec3 boxFaces[6][4] = {
         { boxCorners[0], boxCorners[1], boxCorners[2], boxCorners[3] },

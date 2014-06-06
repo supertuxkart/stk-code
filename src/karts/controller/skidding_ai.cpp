@@ -238,7 +238,7 @@ void SkiddingAI::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
-    Log::info("Sector", "%d", m_track_node);
+    //Log::info("Sector", "%d", m_track_node);
     
     // Don't do anything if there is currently a kart animations shown.
     if(m_kart->getKartAnimation())
