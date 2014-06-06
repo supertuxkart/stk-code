@@ -193,7 +193,7 @@ void IrrDriver::renderGLSL(float dt)
             if (irr_driver->getNormals())
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
-                irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                irr_driver->getFBO(FBO_HALF1_R).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getRSM())
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -600,7 +600,7 @@ void IrrDriver::renderSolidSecondPass()
     GroupedSM<SM_UNTEXTURED>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
-    setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
+    setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
 
     {
 
@@ -1045,7 +1045,9 @@ void IrrDriver::renderSSAO()
     glClear(GL_COLOR_BUFFER_BIT);
     m_post_processing->renderSSAO();
     // Blur it to reduce noise.
-    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_SSAO), irr_driver->getFBO(FBO_TMP4));
+    FrameBuffer::Blit(m_rtts->getFBO(FBO_SSAO), m_rtts->getFBO(FBO_HALF1_R), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_HALF1_R), irr_driver->getFBO(FBO_HALF2_R));
+
 }
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)

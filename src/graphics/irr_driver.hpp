@@ -88,7 +88,9 @@ enum TypeFBO
     FBO_TMP4,
     FBO_LINEAR_DEPTH,
     FBO_HALF1,
+    FBO_HALF1_R,
     FBO_HALF2,
+    FBO_HALF2_R,
     FBO_QUARTER1,
     FBO_QUARTER2,
     FBO_EIGHTH1,
@@ -139,6 +141,8 @@ enum TypeRTT
 
     RTT_HALF1,
     RTT_HALF2,
+    RTT_HALF1_R,
+    RTT_HALF2_R,
 
     RTT_QUARTER1,
     RTT_QUARTER2,
