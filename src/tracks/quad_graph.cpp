@@ -818,7 +818,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
 {
     // Most likely the kart will still be on the sector it was before,
     // so this simple case is tested first.
-    if(*sector!=UNKNOWN_SECTOR && getQuadOfNode(*sector).pointInQuad(xyz) )
+    if(*sector!=UNKNOWN_SECTOR && getQuadOfNode(*sector).pointInQuad3D(xyz) )
     {
         return;
     }   // if still on same quad
@@ -851,7 +851,7 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
         float dist    = xyz.getY() - q.getMinHeight();
         // While negative distances are unlikely, we allow some small negative
         // numbers in case that the kart is partly in the track.
-        if(q.pointInQuad(xyz) && dist < min_dist && dist>-1.0f)
+        if(q.pointInQuad3D(xyz) && dist < min_dist && dist>-1.0f)
         {
             min_dist = dist;
             *sector  = indx;
