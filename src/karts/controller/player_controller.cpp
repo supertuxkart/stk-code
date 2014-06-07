@@ -38,6 +38,8 @@
 #include "network/network_world.hpp"
 #include "race/history.hpp"
 #include "states_screens/race_gui_base.hpp"
+#include "tracks/quad_set.hpp"
+#include "tracks/quad_graph.hpp"
 #include "utils/constants.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
@@ -94,6 +96,20 @@ void PlayerController::reset()
     m_prev_accel   = 0;
     m_prev_nitro   = false;
     m_penalty_time = 0;
+
+    m_track_node = QuadGraph::UNKNOWN_SECTOR;
+    if (QuadGraph::get())
+    {
+        QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
+        if (m_track_node == QuadGraph::UNKNOWN_SECTOR)
+        {
+            Log::error("SkiddingAI",
+                "Invalid starting position for '%s' - not on track"
+                " - can be ignored.",
+                m_kart->getIdent().c_str());
+            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
+        }
+    }
 }   // reset
 
 // ----------------------------------------------------------------------------
@@ -307,6 +323,27 @@ void PlayerController::skidBonusTriggered()
  */
 void PlayerController::update(float dt)
 {
+
+    if (QuadGraph::get())
+    {
+        // Update the current node:
+        int old_node = m_track_node;
+        if (m_track_node != QuadGraph::UNKNOWN_SECTOR)
+        {
+            QuadGraph::get()->findRoadSector(m_kart->getXYZ(), &m_track_node);
+        }
+        // If we can't find a proper place on the track, to a broader search
+        // on off-track locations.
+        if (m_track_node == QuadGraph::UNKNOWN_SECTOR)
+        {
+            m_track_node = QuadGraph::get()->findOutOfRoadSector(m_kart->getXYZ());
+        }
+        // IF the Player is off track (or on a branch of the track it did not
+        // select to be on), keep the old position.
+        if (m_track_node == QuadGraph::UNKNOWN_SECTOR)
+            m_track_node = old_node;
+    }
+
     if (UserConfigParams::m_gamepad_debug)
     {
         // Print a dividing line so that it's easier to see which events
@@ -489,3 +526,8 @@ void PlayerController::collectedItem(const Item &item, int add_info, float old_e
         }
     }
 }   // collectedItem
+
+const Vec3& PlayerController::getTrackNodeNormal()
+{
+    return QuadSet::get()->getQuad(m_track_node).getNormal();
+}
