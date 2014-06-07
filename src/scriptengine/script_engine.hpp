@@ -24,9 +24,11 @@
 
 class TrackObjectPresentation;
 
-namespace Scripting{
+namespace Scripting
+{
 
-    namespace Physics{ 
+    namespace Physics
+    {
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine);
@@ -35,11 +37,13 @@ namespace Scripting{
         void setCollision(std::string collider1, std::string collider2);
     }
 
-    namespace Kart{
+    namespace Kart
+    {
         void registerScriptFunctions(asIScriptEngine *engine);
     }
 
-    namespace Track{
+    namespace Track
+    {
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine);
@@ -47,21 +51,21 @@ namespace Scripting{
         
 class ScriptEngine
 {
-public:
+    public:
 
-         ScriptEngine();
-         ~ScriptEngine();
+             ScriptEngine();
+             ~ScriptEngine();
          
-         void runScript(std::string scriptName);
+             void runScript(std::string scriptName);
          
-private:
-    asIScriptEngine *m_engine;
+    private:
+        asIScriptEngine *m_engine;
     
     
-    void configureEngine(asIScriptEngine *engine);
-    int  compileScript(asIScriptEngine *engine,std::string scriptName);
+        void configureEngine(asIScriptEngine *engine);
+        int  compileScript(asIScriptEngine *engine,std::string scriptName);
 
-};   // class ScriptEngine
+    };   // class ScriptEngine
 
 }
 #endif

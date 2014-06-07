@@ -24,9 +24,11 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
 
-namespace Scripting{
+namespace Scripting
+{
 
-    namespace Track{
+    namespace Track
+    {
 
         asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine)
         {

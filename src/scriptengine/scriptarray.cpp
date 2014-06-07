@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <stdio.h> // sprintf
 
-#include "scriptarray.h"
+#include "scriptarray.hpp"
 
 using namespace std;
 

@@ -22,9 +22,11 @@
 #include <angelscript.h>
 #include <string>
 
-namespace Scripting{
+namespace Scripting
+{
     
-    namespace Physics{
+    namespace Physics
+    {
         
         //private:
             //IDs of kart collisions

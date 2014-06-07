@@ -20,9 +20,11 @@
 #include <angelscript.h>
 #include "script_physics.hpp"
 
-namespace Scripting{
+namespace Scripting
+{
     
-    namespace Physics{
+    namespace Physics
+    {
         
         void getCollidingKart1(asIScriptGeneric *gen)
         {

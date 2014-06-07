@@ -21,9 +21,11 @@
 
 #include <angelscript.h>
 
-namespace Scripting{
+namespace Scripting
+{
 
-    namespace Kart{
+    namespace Kart
+    {
 
         void registerScriptFunctions(asIScriptEngine *engine);
         

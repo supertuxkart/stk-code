@@ -1,4 +1,4 @@
-#include "scriptstdstring.h"
+#include "scriptstdstring.hpp"
 #include <assert.h> // assert()
 #include <sstream>  // std::stringstream
 #include <string.h> // strstr()

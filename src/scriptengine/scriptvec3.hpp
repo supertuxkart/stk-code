@@ -16,32 +16,15 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_SCRIPT_TRACK_HPP
-#define HEADER_SCRIPT_TRACK_HPP
+#ifndef HEADER_SCRIPTVEC3_HPP
+#define HEADER_SCRIPTVEC3_HPP
 
 #include <angelscript.h>
 
 namespace Scripting
 {
 
-    namespace Track
-    {
-
-        //script engine functions
-        void registerScriptFunctions(asIScriptEngine *engine);
-        asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine);
-
-
-        //script-bound functions
-        void displayMessage(asIScriptGeneric *gen);
-        void disableAnimation(asIScriptGeneric *gen);
-        void enableAnimation(asIScriptGeneric *gen);
-        void enableTrigger(asIScriptGeneric *gen);
-        void disableTrigger(asIScriptGeneric *gen);
-        void createTrigger(asIScriptGeneric *gen);
-
-    }
+    void RegisterVec3(asIScriptEngine *engine);
 
 }
 #endif

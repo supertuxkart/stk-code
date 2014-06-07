@@ -22,11 +22,15 @@
 #include "modes/world.hpp"
 #include "script_kart.hpp"
 
+//debug
+#include <iostream>
 
 
-namespace Scripting{
+namespace Scripting
+{
 
-    namespace Kart{
+    namespace Kart
+    {
 
         void squashKart(asIScriptGeneric *gen)
         {
@@ -95,7 +99,6 @@ namespace Scripting{
             r = engine->RegisterGlobalFunction("void teleportKart(int id, float x, float y,float z)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setVelocity(int id, float x, float y,float z)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void jumpKartTo(int id, float x, float y)", asFUNCTION(jumpKartTo), asCALL_GENERIC); assert(r >= 0);
-
         }
     }
 }

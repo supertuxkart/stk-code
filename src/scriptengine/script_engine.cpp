@@ -23,7 +23,8 @@
 #include "karts/kart.hpp"
 #include "modes/world.hpp"
 #include "script_engine.hpp"
-#include "scriptstdstring.h"
+#include "scriptstdstring.hpp"
+#include "scriptvec3.hpp"
 #include <string.h>  // strstr()
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
@@ -33,7 +34,8 @@
 
 using namespace Scripting;
 
-namespace Scripting{
+namespace Scripting
+{
 
 ScriptEngine::ScriptEngine()
 {
@@ -189,7 +191,8 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
     int r;
 
     // Register the script string type
-    RegisterStdString(engine);
+    RegisterStdString(engine); //register std::string
+    RegisterVec3(engine);      //register Vec3
 
     Scripting::Track::registerScriptFunctions(m_engine);
 
