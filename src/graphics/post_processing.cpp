@@ -400,7 +400,9 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
+#if WIN32
         if (irr_driver->getGLSLVersion() < 430)
+#endif
         {
             auxiliary.Bind();
             glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
@@ -415,22 +417,23 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+#if WIN32
         else
         {
-#if WIN32
+
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
             glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_source, 0);
             glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 1);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
-#else
-            assert(false);
-#endif
         }
+#endif
     }
     {
+#if WIN32
         if (irr_driver->getGLSLVersion() < 430)
+#endif
         {
             in_fbo.Bind();
             glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
@@ -445,19 +448,17 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+#if WIN32
         else
         {
-#if WIN32
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
             glBindImageTexture(0, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_source, 0);
             glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 1);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
-#else
-            assert(false);
-#endif
         }
+#endif
     }
 }
 
