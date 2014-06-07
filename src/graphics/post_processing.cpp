@@ -417,7 +417,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
         else
         {
-#if !defined(__linux__) || defined(GL_VERSION_4_3)
+#if WIN32
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
             glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
@@ -447,7 +447,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         }
         else
         {
-#if !defined(__linux__) || defined(GL_VERSION_4_3)
+#if WIN32
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
             glBindImageTexture(0, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
