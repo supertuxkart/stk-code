@@ -408,6 +408,7 @@ void Profiler::draw()
                 "Bloom",
                 "Tonemap",
                 "Motion Blur",
+                "MLAA",
                 "GUI",
             };
             std::ostringstream oss;
