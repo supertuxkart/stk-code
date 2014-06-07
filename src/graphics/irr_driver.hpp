@@ -125,6 +125,7 @@ enum QueryPerf
     Q_BLOOM,
     Q_TONEMAP,
     Q_MOTIONBLUR,
+    Q_GUI,
     Q_LAST
 };
 
