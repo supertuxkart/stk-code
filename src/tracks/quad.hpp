@@ -57,6 +57,8 @@ private:
     /** Set if this quad should not be used by the AI. */
     bool  m_ai_ignore;
 
+    Vec3 m_normal;
+
 public:
          Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
               bool invis=false, bool ai_ignore=false);
@@ -81,5 +83,6 @@ public:
     /** True if this quad should be ignored by the AI. */
     bool        letAIIgnore() const { return m_ai_ignore; }
 
+    const Vec3& getNormal() const   { return m_normal;  }
 };   // class Quad
 #endif

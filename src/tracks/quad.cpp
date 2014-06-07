@@ -52,6 +52,9 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      m_invisible = invisible;
      m_ai_ignore = ai_ignore;
 
+     m_normal = (p1 - p0).cross(p2 - p1);
+     m_normal = m_normal.normalize();
+
 }   // Quad
 
 // ----------------------------------------------------------------------------
