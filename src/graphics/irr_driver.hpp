@@ -380,6 +380,7 @@ private:
     void renderSSAO();
     void renderLights(unsigned pointlightCount);
     void renderDisplacement();
+    void renderShadowsDebug();
     void doScreenShot();
 public:
          IrrDriver();

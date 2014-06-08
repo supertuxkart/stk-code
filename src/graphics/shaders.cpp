@@ -290,6 +290,7 @@ void Shaders::loadShaders()
     FullScreenShader::Gaussian6VBlurShader::init();
     FullScreenShader::GlowShader::init();
     FullScreenShader::PassThroughShader::init();
+    FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::LinearizeDepthShader::init();
     FullScreenShader::SSAOShader::init();
     FullScreenShader::SunLightShader::init();
@@ -2551,6 +2552,20 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
         uniform_texture = glGetUniformLocation(Program, "texture");
+        vao = createVAO(Program);
+    }
+
+    GLuint LayerPassThroughShader::Program;
+    GLuint LayerPassThroughShader::uniform_texture;
+    GLuint LayerPassThroughShader::uniform_layer;
+    GLuint LayerPassThroughShader::vao;
+    void LayerPassThroughShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/layertexturequad.frag").c_str());
+        uniform_texture = glGetUniformLocation(Program, "tex");
+        uniform_layer = glGetUniformLocation(Program, "layer");
         vao = createVAO(Program);
     }
 

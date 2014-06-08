@@ -197,6 +197,10 @@ void IrrDriver::renderGLSL(float dt)
                 glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
                 m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
             }
+            else if (irr_driver->getShadowViz())
+            {
+                renderShadowsDebug();
+            }
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
         }
@@ -822,6 +826,20 @@ void IrrDriver::renderShadows()
         setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         draw<MeshShader::RSMShader>(mesh, mesh.vao_rsm_pass, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
     }
+}
+
+
+void IrrDriver::renderShadowsDebug()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 0);
+    glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 1);
+    glViewport(0, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 2);
+    glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 3);
 }
 
 // ----------------------------------------------------------------------------

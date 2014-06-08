@@ -720,6 +720,16 @@ public:
     static void init();
 };
 
+class LayerPassThroughShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_layer, uniform_texture;
+    static GLuint vao;
+
+    static void init();
+};
+
 class LinearizeDepthShader
 {
 public:
