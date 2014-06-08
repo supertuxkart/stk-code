@@ -3,7 +3,7 @@ uniform sampler2D colorMapG;
 in vec4 offset[2];
 in vec2 uv;
 
-const float threshold = 0.1;
+const float threshold = 0.006;
 
 out vec4 FragColor;
 
