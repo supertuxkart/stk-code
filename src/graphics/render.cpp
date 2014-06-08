@@ -187,13 +187,10 @@ void IrrDriver::renderGLSL(float dt)
         {
             FrameBuffer *fbo = m_post_processing->render(camnode);
 
-            if (!UserConfigParams::m_mlaa) // MLAA_COLORS already in srgb space
-                glEnable(GL_FRAMEBUFFER_SRGB);
-
             if (irr_driver->getNormals())
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
-                irr_driver->getFBO(FBO_SSAO).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                irr_driver->getFBO(FBO_HALF1_R).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getRSM())
             {
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -202,9 +199,6 @@ void IrrDriver::renderGLSL(float dt)
             }
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-
-            if (!UserConfigParams::m_mlaa)
-                glDisable(GL_FRAMEBUFFER_SRGB);
         }
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
@@ -235,10 +229,13 @@ void IrrDriver::renderGLSL(float dt)
         PROFILER_POP_CPU_MARKER();
     }  // for i<getNumKarts
 
-    PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
-    // Either render the gui, or the global elements of the race gui.
-    GUIEngine::render(dt);
-    PROFILER_POP_CPU_MARKER();
+    {
+        ScopedGPUTimer Timer(getGPUTimer(Q_GUI));
+        PROFILER_PUSH_CPU_MARKER("GUIEngine", 0x75, 0x75, 0x75);
+        // Either render the gui, or the global elements of the race gui.
+        GUIEngine::render(dt);
+        PROFILER_POP_CPU_MARKER();
+    }
 
     // Render the profiler
     if(UserConfigParams::m_profiler_enabled)
@@ -600,7 +597,7 @@ void IrrDriver::renderSolidSecondPass()
     GroupedSM<SM_UNTEXTURED>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
-    setTexture(2, m_rtts->getRenderTarget(RTT_SSAO), GL_NEAREST, GL_NEAREST);
+    setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
 
     {
 
@@ -1020,7 +1017,7 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     }
     m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
 
-    if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && SkyboxCubeMap && UserConfigParams::m_gi)
+    if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && SkyboxCubeMap)
         irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
     // Render sunlight if and only if track supports shadow
@@ -1045,7 +1042,9 @@ void IrrDriver::renderSSAO()
     glClear(GL_COLOR_BUFFER_BIT);
     m_post_processing->renderSSAO();
     // Blur it to reduce noise.
-    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_SSAO), irr_driver->getFBO(FBO_TMP4));
+    FrameBuffer::Blit(m_rtts->getFBO(FBO_SSAO), m_rtts->getFBO(FBO_HALF1_R), GL_COLOR_BUFFER_BIT, GL_LINEAR);
+    m_post_processing->renderGaussian17TapBlur(irr_driver->getFBO(FBO_HALF1_R), irr_driver->getFBO(FBO_HALF2_R));
+
 }
 
 static void getXYZ(GLenum face, float i, float j, float &x, float &y, float &z)
