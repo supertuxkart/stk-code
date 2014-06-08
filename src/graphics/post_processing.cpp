@@ -648,7 +648,7 @@ void PostProcessing::applyMLAA()
 {
     const core::vector2df &PIXEL_SIZE = core::vector2df(1.0f / UserConfigParams::m_width, 1.0f / UserConfigParams::m_height);
     IVideoDriver *const drv = irr_driver->getVideoDriver();
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
+    irr_driver->getFBO(FBO_MLAA_TMP).Bind();
     glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -667,11 +667,11 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // Pass 2: blend weights
-    irr_driver->getFBO(FBO_TMP2_WITH_DS).Bind();
+    irr_driver->getFBO(FBO_MLAA_BLEND).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(FullScreenShader::MLAABlendWeightSHader::Program);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_LINEAR, GL_LINEAR);
     setTexture(1, getTextureGLuint(m_areamap), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MLAABlendWeightSHader::setUniforms(PIXEL_SIZE, 0, 1);
 
@@ -679,14 +679,14 @@ void PostProcessing::applyMLAA()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Blit in to tmp1
-    FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_TMP1_WITH_DS));
+    FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_MLAA_TMP));
 
     // Pass 3: gather
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
 
     glUseProgram(FullScreenShader::MLAAGatherSHader::Program);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP2), GL_NEAREST, GL_NEAREST);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MLAAGatherSHader::setUniforms(PIXEL_SIZE, 0, 1);
 
     glBindVertexArray(FullScreenShader::MLAAGatherSHader::vao);
@@ -694,7 +694,6 @@ void PostProcessing::applyMLAA()
 
     // Done.
     glDisable(GL_STENCIL_TEST);
-
 }
 
 // ----------------------------------------------------------------------------
@@ -862,7 +861,6 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     glEnable(GL_FRAMEBUFFER_SRGB);
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
     renderPassThrough(in_fbo->getRTT()[0]);
-    glDisable(GL_FRAMEBUFFER_SRGB);
     out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
 
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
@@ -872,6 +870,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
         applyMLAA();
         PROFILER_POP_CPU_MARKER();
     }
+    glDisable(GL_FRAMEBUFFER_SRGB);
 
     return out_fbo;
 }   // render
