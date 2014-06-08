@@ -859,16 +859,17 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
         PROFILER_POP_CPU_MARKER();
     }
 
+    glEnable(GL_FRAMEBUFFER_SRGB);
+    irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
+    renderPassThrough(in_fbo->getRTT()[0]);
+    glDisable(GL_FRAMEBUFFER_SRGB);
+    out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
+
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
-        renderPassThrough(in_fbo->getRTT()[0]);
-        glDisable(GL_FRAMEBUFFER_SRGB);
         applyMLAA();
-        out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
         PROFILER_POP_CPU_MARKER();
     }
 

@@ -198,18 +198,7 @@ void IrrDriver::renderGLSL(float dt)
                 m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
             }
             else
-            {
-                if (UserConfigParams::m_mlaa) // MLAA_COLORS already in srgb space
-                    fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
-                else
-                {
-                    glEnable(GL_FRAMEBUFFER_SRGB);
-                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                    m_post_processing->renderPassThrough(fbo->getRTT()[0]);
-                    glDisable(GL_FRAMEBUFFER_SRGB);
-                }
-            }
-
+                fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
         }
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
