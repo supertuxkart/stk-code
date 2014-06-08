@@ -1201,6 +1201,7 @@ namespace MeshShader
     GLuint SphereMapShader::attrib_normal;
     GLuint SphereMapShader::uniform_MM;
     GLuint SphereMapShader::uniform_IMM;
+    GLuint SphereMapShader::uniform_ambient;
     GLuint SphereMapShader::TU_tex;
 
     void SphereMapShader::init()
@@ -1214,6 +1215,7 @@ namespace MeshShader
         attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
@@ -1234,12 +1236,13 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const SColorf &ambient)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
+        glUniform3f(uniform_ambient, ambient.r, ambient.g, ambient.b);
     }
 
     GLuint SplattingShader::Program;
