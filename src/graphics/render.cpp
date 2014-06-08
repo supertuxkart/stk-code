@@ -187,9 +187,6 @@ void IrrDriver::renderGLSL(float dt)
         {
             FrameBuffer *fbo = m_post_processing->render(camnode);
 
-            if (!UserConfigParams::m_mlaa) // MLAA_COLORS already in srgb space
-                glEnable(GL_FRAMEBUFFER_SRGB);
-
             if (irr_driver->getNormals())
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
             else if (irr_driver->getSSAOViz())
@@ -201,10 +198,18 @@ void IrrDriver::renderGLSL(float dt)
                 m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
             }
             else
-                fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+            {
+                if (UserConfigParams::m_mlaa) // MLAA_COLORS already in srgb space
+                    fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
+                else
+                {
+                    glEnable(GL_FRAMEBUFFER_SRGB);
+                    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                    m_post_processing->renderPassThrough(fbo->getRTT()[0]);
+                    glDisable(GL_FRAMEBUFFER_SRGB);
+                }
+            }
 
-            if (!UserConfigParams::m_mlaa)
-                glDisable(GL_FRAMEBUFFER_SRGB);
         }
         else
             glDisable(GL_FRAMEBUFFER_SRGB);
