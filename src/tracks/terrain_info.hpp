@@ -49,6 +49,7 @@ public:
                             const Material **m);
     virtual void update(const btTransform &trans, const Vec3 &offset);
     virtual void update(const Vec3 &from);
+    virtual void update(const Vec3& from, const Vec3& towards = Vec3(0,-1,0));
 
     // ------------------------------------------------------------------------
     /** Simple wrapper with no offset. */

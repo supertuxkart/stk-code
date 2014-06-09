@@ -73,6 +73,19 @@ void TerrainInfo::update(const btTransform &trans, const Vec3 &offset)
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
     tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
 }   // update
+//-----------------------------------------------------------------------------
+/** Update the terrain information based on the latest position.
+*  \param Position from which to start the rayast from.
+*/
+void TerrainInfo::update(const Vec3& from, const Vec3& towards)
+{
+    m_last_material = m_material;
+    Vec3 direction = towards.normalized();
+    btVector3 to = from + 10000.0f*direction;
+
+    const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
+}   // update
 
 // -----------------------------------------------------------------------------
 /** Does a raycast upwards from the given position
