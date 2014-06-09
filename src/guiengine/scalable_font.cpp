@@ -21,9 +21,9 @@ namespace gui
 {
 
 //! constructor
-ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
-: Driver(0), SpriteBank(0), Environment(env), WrongCharacter(0),
-    MaxHeight(0), GlobalKerningWidth(0), GlobalKerningHeight(0)
+ScalableFont::ScalableFont(IGUIEnvironment *env, const std::string &filename)
+            : Driver(0), SpriteBank(0), Environment(env), WrongCharacter(0),
+              MaxHeight(0), GlobalKerningWidth(0), GlobalKerningHeight(0)
 {
 #ifdef _DEBUG
     setDebugName("ScalableFont");
@@ -44,7 +44,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const io::path& filename)
         // don't grab environment, to avoid circular references
         Driver = Environment->getVideoDriver();
 
-        SpriteBank = Environment->addEmptySpriteBank(filename);
+        SpriteBank = Environment->addEmptySpriteBank(io::path(filename.c_str()));
         if (SpriteBank)
             SpriteBank->grab();
     }
@@ -676,7 +676,6 @@ void ScalableFont::draw(const core::stringw& text,
                         source,
                         clip,
                         color, true);
-
 #ifdef FONT_DEBUG
             driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
                                core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),

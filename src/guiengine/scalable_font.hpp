@@ -72,7 +72,7 @@ public:
     int           m_fallback_kerning_width;
 
     //! constructor
-    ScalableFont(IGUIEnvironment* env, const io::path& filename);
+    ScalableFont(IGUIEnvironment* env, const std::string &filename);
 
     /** Creates a hollow copy of this font; i.e. the underlying font data is the *same* for
       * both fonts. The advantage of doing this is that you can change "view" parameters
