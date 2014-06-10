@@ -137,7 +137,7 @@ Material::Material(const XMLNode *node, int index, bool deprecated)
     node->get("fog",              &m_fog               );
 
     node->get("mask",             &m_mask              );
-
+    node->get("gloss-map",        &m_gloss_map         );
     node->get("water-splash",     &m_water_splash      );
     node->get("jump",             &m_is_jump_texture   );
     node->get("has-gravity",      &m_has_gravity       );

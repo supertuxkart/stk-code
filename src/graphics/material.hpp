@@ -224,6 +224,8 @@ private:
     /** If m_splatting is true, indicates the fourth splatting texture */
     std::string      m_splatting_texture_4;
 
+    std::string      m_gloss_map;
+
     bool  m_deprecated;
 
     void  init    (unsigned int index);
