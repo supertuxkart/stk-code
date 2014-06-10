@@ -248,6 +248,8 @@ public:
     /** Returns true if a session was saved for this player. */
     bool hasSavedSession() const { return m_saved_session;  }
     // ------------------------------------------------------------------------
+    StoryModeStatus* getStoryModeStatus() { return m_story_mode_status; }
+    // ------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const
     {
