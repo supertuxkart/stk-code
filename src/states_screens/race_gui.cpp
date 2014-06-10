@@ -123,12 +123,32 @@ RaceGUI::RaceGUI()
     w = font->getDimension(m_string_rank.c_str()).Width;
     if(m_rank_lap_width < w) m_rank_lap_width = w;
 
+    // Technically we only need getNumLocalPlayers, but using the
+    // global kart id to find the data for a specific kart.
+    int n = race_manager->getNumberOfKarts();
+
+    m_animation_states.resize(n);
+    m_rank_animation_start_times.resize(n);
+    m_last_ranks.resize(n);
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
 }   // ~Racegui
+
+//-----------------------------------------------------------------------------
+/** Reset the gui before a race. It initialised all rank animation related
+ *  values back to the default.
+ */
+void RaceGUI::reset()
+{
+    for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    {
+        m_animation_states[i] = AS_NONE;
+        m_last_ranks[i]       = i+1;
+    }
+}  // reset
 
 //-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only
@@ -201,7 +221,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     core::vector2df scaling = camera->getScaling();
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-
+    
     drawPlungerInFace(camera, dt);
 
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
@@ -407,14 +427,13 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
 
     // Background
-    draw2DImage(m_gauge_empty,
-                                core::rect<s32>((int)offset.X,
-                                                (int) offset.Y-gauge_height,
-                                                (int) offset.X + gauge_width,
-                                                (int)offset.Y) /* dest rect */,
-                             core::rect<s32>(0, 0, 256, 256) /* source rect */,
-                             NULL /* clip rect */, NULL /* colors */,
-                                              true /* alpha */);
+    draw2DImage(m_gauge_empty, core::rect<s32>((int)offset.X,
+                                               (int)offset.Y-gauge_height,
+                                               (int)offset.X + gauge_width,
+                                               (int)offset.Y) /* dest rect */,
+                core::rect<s32>(0, 0, 256, 256) /* source rect */,
+                NULL /* clip rect */, NULL /* colors */,
+                true /* alpha */);
 
     // Target
 
@@ -605,8 +624,6 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
 
     // First draw the meter (i.e. the background )
     // -------------------------------------------------------------------------
-
-
     core::vector2df offset;
     offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
     offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
@@ -711,19 +728,63 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
         pos.LowerRightCorner.X = (int)(offset.X + 0.8f*meter_width);
         pos.LowerRightCorner.Y = (int)(offset.X - 0.5f*meter_height);
 
-        gui::ScalableFont* font;
+        gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
 
-        font = GUIEngine::getHighresDigitFont();
-        font->setScale(min_ratio * 0.7f);
+        int id = kart->getWorldKartId();
+
+        if(m_animation_states[id] == AS_NONE)
+        {
+            if(m_last_ranks[id]!=kart->getPosition())
+            {
+                m_rank_animation_start_times[id] = world->getTime();
+                m_animation_states[id] = AS_SMALLER;
+            }
+        }
+
+        float scale          = 1.0f;
+        int rank             = kart->getPosition();
+        const float DURATION = 0.8f;
+        if(m_animation_states[id] == AS_SMALLER)
+        {
+            scale = 1.0f - (world->getTime()-m_rank_animation_start_times[id])
+                         /  DURATION;
+            rank = m_last_ranks[id];
+            if(scale<0)
+            {
+                m_animation_states[id] = AS_BIGGER;
+                m_rank_animation_start_times[id] = world->getTime();
+                // Store the new rank
+                m_last_ranks[id] = kart->getPosition();
+                scale = 0.0f;
+            }
+        }
+        else if(m_animation_states[id] == AS_BIGGER)
+        {
+            scale = (world->getTime() - m_rank_animation_start_times[id])
+                  / DURATION;
+            rank = m_last_ranks[id];
+            if(scale>1.0f)
+            {
+                m_animation_states[id] = AS_NONE;
+                scale = 1.0f;
+            }
+
+        }
+        else
+        {
+            m_last_ranks[id] = kart->getPosition();
+        }
+
+        font->setScale(min_ratio * scale * 0.7f);
         font->setShadow(video::SColor(255, 128, 0, 0));
         static video::SColor color = video::SColor(255, 255, 255, 255);
         std::ostringstream oss;
-        oss << kart->getPosition(); // the current font has no . :(   << ".";
+        oss << rank; // the current font has no . :(   << ".";
 
         pos.LowerRightCorner = core::vector2di(offset.X+int(0.6f*meter_width),
-                                              offset.Y-0.5f*meter_height);
+                                               int(offset.Y-0.5f*meter_height));
         pos.UpperLeftCorner  = core::vector2di(offset.X+int(0.6f*meter_width),
-                                               offset.Y-0.5f*meter_height);
+                                               int(offset.Y-0.5f*meter_height));
 
         font->draw(oss.str().c_str(), pos, color, true, true);
     }
