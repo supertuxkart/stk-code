@@ -88,8 +88,18 @@ private:
     /** Maximum string length for the timer */
     int              m_timer_width;
 
+    /** Animation state: none, getting smaller (old value), 
+     *  getting bigger (new number). */
+    enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};
+    std::vector<AnimationState> m_animation_states;
 
-    bool             m_is_tutorial;
+    /** When the animation state was changed. */
+    std::vector<float> m_rank_animation_start_times;
+
+    /** Stores the previous rank for each kart. Used for the rank animation. */
+    std::vector<int> m_last_ranks;
+
+    bool m_is_tutorial;
 
     /* Display informat for one player on the screen. */
     void drawEnergyMeter       (int x, int y, const AbstractKart *kart,
@@ -111,6 +121,7 @@ public:
 
          RaceGUI();
         ~RaceGUI();
+    virtual void reset();
     virtual void renderGlobal(float dt);
     virtual void renderPlayerView(const Camera *camera, float dt);
 
