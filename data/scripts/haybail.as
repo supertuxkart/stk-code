@@ -10,6 +10,6 @@ void onTrigger()
     //track_obj_manager.disable("hayBail.b3d","mesh");
      //track_obj_manager.disable("hayBail.b3d");
 	TrackObject @t_obj = getTrackObject("hayBail.b3d");
-
+     t_obj.setEnable(false);
     squashKart(0,35.0); //id of kart,time to squash
 }
