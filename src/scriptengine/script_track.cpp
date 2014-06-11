@@ -22,6 +22,7 @@
 #include "script_track.hpp"
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
+#include "tracks/track_object.hpp"
 #include "tracks/track.hpp"
 #include <iostream> //debug
 namespace Scripting
@@ -81,6 +82,9 @@ namespace Scripting
             r = engine->RegisterObjectType("TrackObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject @getTrackObject(string &in)", asFUNCTION(getTrackObject), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "void setEnable(bool status)", asMETHOD(TrackObject, setEnable), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectType("PhysicalObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject @getPhysicalObject()", asMETHOD(TrackObject, getPhysicalObjectForScript), asCALL_THISCALL); assert(r >= 0);
+            //r = engine->RegisterObjectMethod("TrackObject", "const PhysicalObject @getPhysicalObject()", asMETHOD(TrackObject, getPhysicalObject), asCALL_THISCALL); assert(r >= 0);
 
         }
 

@@ -126,6 +126,8 @@ public:
     
     const PhysicalObject* getPhysicalObject() const { return m_physical_object; }
     PhysicalObject* getPhysicalObject() { return m_physical_object; }
+    //Due to above overload AngelScript cannot decide which function to bind
+    PhysicalObject* getPhysicalObjectForScript() { return m_physical_object; }
 
     const core::vector3df getInitXYZ() const { return m_init_xyz; }
     const core::vector3df getInitRotation() const { return m_init_hpr; }
