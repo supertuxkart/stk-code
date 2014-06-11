@@ -32,6 +32,7 @@
 #include "physics/physics.hpp"
 #include "states_screens/credits.hpp"
 #include "states_screens/cutscene_gui.hpp"
+#include "states_screens/feature_unlocked.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "tracks/track.hpp"
@@ -367,20 +368,26 @@ void CutsceneWorld::update(float dt)
         }
     }
 
-    bool isOver = (m_time > m_duration);
-    if (isOver && (s_use_duration || m_aborted))
-    {
-        GUIEngine::CutsceneScreen* cs = dynamic_cast<GUIEngine::CutsceneScreen*>(
-            GUIEngine::getCurrentScreen());
-        if (cs != NULL)
-            cs->onCutsceneEnd();
-    }
+    //bool isOver = (m_time > m_duration);
+    //if (isOver && (s_use_duration || m_aborted))
+    //{
+    //    GUIEngine::CutsceneScreen* cs = dynamic_cast<GUIEngine::CutsceneScreen*>(
+    //        GUIEngine::getCurrentScreen());
+    //    if (cs != NULL)
+    //        cs->onCutsceneEnd();
+    //}
 }   // update
 
 //-----------------------------------------------------------------------------
 
 void CutsceneWorld::enterRaceOverState()
 {
+    GUIEngine::CutsceneScreen* cs = dynamic_cast<GUIEngine::CutsceneScreen*>(
+        GUIEngine::getCurrentScreen());
+    if (cs != NULL)
+        cs->onCutsceneEnd();
+
+
     int partId = -1;
     for (int i=0; i<(int)m_parts.size(); i++)
     {
@@ -408,9 +415,49 @@ void CutsceneWorld::enterRaceOverState()
         else  if (m_parts.size() == 1 && m_parts[0] == "gpwin")
         {
             race_manager->exitRace();
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            if (race_manager->raceWasStartedFromOverworld())
-                OverWorld::enterOverWorld();
+
+            // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
+            race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+
+            if (PlayerManager::getCurrentPlayer()
+                ->getRecentlyCompletedChallenges().size() > 0)
+            {
+                std::vector<const ChallengeData*> unlocked =
+                    PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+                PlayerManager::getCurrentPlayer()->clearUnlocked();
+
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts(0);
+                race_manager->setNumPlayers(0);
+                race_manager->setNumLocalPlayers(0);
+                race_manager->startSingleRace("featunlocked", 999, false);
+
+                FeatureUnlockedCutScene* scene =
+                    FeatureUnlockedCutScene::getInstance();
+                std::vector<std::string> parts;
+                parts.push_back("featunlocked");
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+
+                assert(unlocked.size() > 0);
+                scene->addTrophy(race_manager->getDifficulty());
+                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+
+                StateManager::get()->replaceTopMostScreen(scene);
+            }
+            else
+            {
+                if (race_manager->raceWasStartedFromOverworld())
+                {
+                    OverWorld::enterOverWorld();
+                }
+                else
+                {
+                    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                    // we assume the main menu was pushed before showing this menu
+                    //StateManager::get()->popMenu();
+                }
+            }
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (m_parts.size() == 1 && m_parts[0] == "gplose")
