@@ -62,6 +62,17 @@ bool LoadPoFiles(const char* sListFileName){
 	return true;
 }
 
+// ----------------------------------------------------------------------------
+/** Set all characters in the given character string to be used. */
+bool setUsedCharacters(const char* characters)
+{
+    int n = strlen(characters);
+    for(int i=0; i<n; i++)
+        bUsed[characters[i]] = true;
+    return true;
+}   // setUsedCharacters
+
+// ----------------------------------------------------------------------------
 // windows specific
 #ifdef _IRR_WINDOWS_
 
