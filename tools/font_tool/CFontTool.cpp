@@ -68,7 +68,7 @@ bool setUsedCharacters(const char* characters)
 {
     int n = strlen(characters);
     for(int i=0; i<n; i++)
-        bUsed[characters[i]] = true;
+        bUsed[short(characters[i])] = true;
     return true;
 }   // setUsedCharacters
 
