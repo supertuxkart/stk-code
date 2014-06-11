@@ -12,6 +12,7 @@ uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 uniform mat4 InverseViewMatrix;
 uniform mat4 InverseProjectionMatrix;
+uniform vec2 screen;
 #else
 layout (std140) uniform MatrixesData
 {
