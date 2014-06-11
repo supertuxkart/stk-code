@@ -66,6 +66,8 @@ public:
 
     void removeObject(TrackObject* who);
 
+    TrackObject* getTrackObject(std::string name);
+
           PtrVector<TrackObject>& getObjects()       { return m_all_objects; }
     const PtrVector<TrackObject>& getObjects() const { return m_all_objects; }
 

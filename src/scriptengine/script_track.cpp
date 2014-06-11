@@ -23,7 +23,7 @@
 #include "states_screens/dialogs/tutorial_message_dialog.hpp"
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track.hpp"
-
+#include <iostream> //debug
 namespace Scripting
 {
 
@@ -36,6 +36,24 @@ namespace Scripting
             func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
             return func;
         }
+        /*
+        void disableAnimation(std::string *name, void *memory)
+        {
+            std::string *str = name;
+            std::string type = "mesh";
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str, type);
+        }*/
+        void getTrackObject(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            TrackObject* t_obj = World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*str);
+            gen->SetReturnObject(t_obj);
+        }
+        /*TrackObject* getTrackObject(std::string *name)
+        {
+            TrackObject* t_obj = World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*name);
+            return t_obj;
+        }*/
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
@@ -47,6 +65,21 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(string &in,float x,float y,float z, float distance)",
                 asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
+            /*
+            //Test singleton, and various calling conventions
+            // Register the track object manager as a singleton. The script will access it through the global property
+       //     r = engine->RegisterObjectType("TrackObjectManager", 0, asOBJ_REF | asOBJ_NOHANDLE); assert(r >= 0);
+            r = engine->RegisterObjectType("TrackObjectManager", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+
+            // Register the track object manager's methods
+            TrackObjectManager* track_obj_manager = World::getWorld()->getTrack()->getTrackObjectManager();
+            r = engine->RegisterGlobalProperty("TrackObjectManager track_obj_manager", track_obj_manager); assert(r >= 0);
+            //r = engine->RegisterObjectMethod("TrackObjectManager", "void disable(string name , string type)", asMETHOD(TrackObjectManager, disable), asCALL_THISCALL); assert(r >= 0);
+            //r = engine->RegisterObjectMethod("TrackObjectManager", "void disable(string &in name)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObjectManager", "void disable(string &in)", asFUNCTION(disableAnimation), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            */
+            r = engine->RegisterObjectType("TrackObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("TrackObject @getTrackObject(string &in)", asFUNCTION(getTrackObject), asCALL_GENERIC); assert(r >= 0);
 
         }
 

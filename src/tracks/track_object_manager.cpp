@@ -87,7 +87,8 @@ void TrackObjectManager::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-void TrackObjectManager::disable(std::string name , std::string type){
+void TrackObjectManager::disable(std::string name , std::string type)
+{
      TrackObject* curr;
      for_in (curr,m_all_objects){
 		 if (type != curr->getType())continue;
@@ -103,7 +104,8 @@ void TrackObjectManager::disable(std::string name , std::string type){
             }
      }
 }
-void TrackObjectManager::enable(std::string name , std::string type){
+void TrackObjectManager::enable(std::string name , std::string type)
+{
      TrackObject* curr;
      for_in (curr,m_all_objects){
 		if (type != curr->getType())continue;
@@ -121,7 +123,8 @@ void TrackObjectManager::enable(std::string name , std::string type){
             }
      }
 }
-bool TrackObjectManager::getStatus(std::string name){
+bool TrackObjectManager::getStatus(std::string name)
+{
      TrackObject* curr;
      for_in (curr,m_all_objects){
             if (curr->getName() == (name)||curr->getID()==(name))
@@ -133,6 +136,21 @@ bool TrackObjectManager::getStatus(std::string name){
      }
      //object not found
      return false;
+}
+
+TrackObject* TrackObjectManager::getTrackObject(std::string name)
+{
+    TrackObject* curr;
+    for_in(curr, m_all_objects){
+        if (curr->getName() == (name) || curr->getID() == (name))
+        {
+
+            return curr;
+
+        }
+    }
+    //object not found
+    return NULL;
 }
 /** Handles an explosion, i.e. it makes sure that all physical objects are
  *  affected accordingly.
