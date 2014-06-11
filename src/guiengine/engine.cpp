@@ -1072,6 +1072,7 @@ namespace GUIEngine
                              file_manager->getAssetChecked(FileManager::FONT,
                                                            "BigDigitFont.xml",true));
         digit_font->lazyLoadTexture(0); // make sure the texture is loaded for this one
+        digit_font->setMonospaceDigits(true);
         g_digit_font = digit_font;
 
         Private::font_height = g_font->getDimension( L"X" ).Height;
