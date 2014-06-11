@@ -7,10 +7,8 @@ void onTrigger()
 */
     displayMessage("Haybail deactivated");
     //disableAnimation("hayBail.b3d");
-    //track_obj_manager.disable("hayBail.b3d","mesh");
-     //track_obj_manager.disable("hayBail.b3d");
 	TrackObject @t_obj = getTrackObject("hayBail.b3d");
-     t_obj.setEnable(false);
-     PhysicalObject @hay = t_obj.getPhysicalObject();
-    squashKart(0,35.0); //id of kart,time to squash
+     //t_obj.setEnable(false);
+     PhysicalObject @haybail = t_obj.getPhysicalObject();
+     if (haybail.isFlattener())squashKart(0,35.0);
 }
