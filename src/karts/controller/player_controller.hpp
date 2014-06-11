@@ -43,8 +43,6 @@ private:
 
     float          m_penalty_time;
 
-    int            m_track_node;
-
     /** The camera attached to the kart for this controller. The camera
      *  object is managed in the Camera class, so no need to free it. */
     Camera        *m_camera;
@@ -82,8 +80,6 @@ public:
     // ------------------------------------------------------------------------
     /** Player will always be able to get a slipstream bonus. */
     virtual bool  disableSlipstreamBonus() const { return false; }
-
-    const Vec3& getTrackNodeNormal();
 
 };   // PlayerController
 
