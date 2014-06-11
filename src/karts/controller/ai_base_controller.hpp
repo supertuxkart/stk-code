@@ -115,7 +115,6 @@ public:
     virtual void action(PlayerAction action, int value) {};
     virtual void  skidBonusTriggered() {};
     virtual bool  disableSlipstreamBonus() const;
-    const Vec3&  getTrackNodeNormal();
 };   // AIBaseController
 
 #endif

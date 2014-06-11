@@ -517,8 +517,3 @@ bool AIBaseController::disableSlipstreamBonus() const
 {
     return m_ai_properties->disableSlipstreamUsage();
 }   // disableSlipstreamBonus
-
-const Vec3& AIBaseController::getTrackNodeNormal()
-{
-    return QuadSet::get()->getQuad(m_track_node).getNormal();
-}
