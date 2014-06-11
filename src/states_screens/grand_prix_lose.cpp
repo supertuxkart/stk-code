@@ -117,6 +117,8 @@ void GrandPrixLose::onCutsceneEnd()
         PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
     if (unlocked.size() > 0)
     {
+        race_manager->exitRace();
+
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
