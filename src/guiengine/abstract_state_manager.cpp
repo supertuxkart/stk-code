@@ -138,7 +138,7 @@ void AbstractStateManager::pushScreen(Screen* screen)
 
 // ----------------------------------------------------------------------------
 
-void AbstractStateManager::replaceTopMostScreen(Screen* screen)
+void AbstractStateManager::replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState)
 {
     //assert(m_game_mode != GAME);
     // you need to close any dialog before calling this
@@ -160,7 +160,7 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
         getCurrentScreen()->tearDown();
 
     m_menu_stack[m_menu_stack.size()-1] = name;
-    setGameState(MENU);
+    setGameState(gameState);
     switchToScreen(name.c_str());
 
     // Send init event to new menu
