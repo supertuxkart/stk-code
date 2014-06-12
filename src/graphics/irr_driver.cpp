@@ -444,8 +444,8 @@ void IrrDriver::initDevice()
         glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
     }
     Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
-    m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
-
+    //m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
+    m_glsl = false;
     // Parse extensions
     hasVSLayer = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
