@@ -43,6 +43,8 @@ private:
      *  This saves some computations at runtime. */
     Vec3 m_center;
 
+    Vec3 m_normal;
+
     /** The minimum height of the quad, used in case that several quads
      *  are on top of each other when determining the sector a kart is on. */
     float m_min_height;
@@ -80,6 +82,8 @@ public:
     // ------------------------------------------------------------------------
     /** True if this quad should be ignored by the AI. */
     bool        letAIIgnore() const { return m_ai_ignore; }
+
+    const Vec3& getNormal() const   { return m_normal; }
 
 };   // class Quad
 #endif

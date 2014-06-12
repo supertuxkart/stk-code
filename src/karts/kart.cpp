@@ -410,8 +410,8 @@ void Kart::reset()
         m_skidmarks->adjustFog(track->isFogEnabled() );
     }
 
-
-    m_terrain_info->update(getTrans());
+    m_terrain_info->update(getXYZ(), Vec3(0,-1,0));
+    
 
     // Reset is also called when the kart is created, at which time
     // m_controller is not yet defined, so this has to be tested here.
@@ -1214,7 +1214,11 @@ void Kart::update(float dt)
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
 
-    m_terrain_info->update(getTrans(), epsilon);
+    unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+    const Vec3 quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+    m_terrain_info->update(getXYZ() + epsilon*(-quadNormal), -quadNormal);
+
+
     if(m_body->getBroadphaseHandle())
     {
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = old_group;
@@ -1245,10 +1249,12 @@ void Kart::update(float dt)
             Vec3 gravity(0.0f, -g, 0.0f);
             btRigidBody *body = getVehicle()->getRigidBody();
             // If the material should overwrite the gravity,
-            if (material->hasGravity())
+            if (material->hasGravity() || 1)
             {
-                Vec3 normal = m_terrain_info->getNormal();
-                gravity = normal * -g;
+                //Vec3 normal = m_terrain_info->getNormal();
+                
+                gravity = quadNormal * -g;
+                std::cout << gravity.x() << " "<< gravity.y() <<" " << gravity.z() <<  std::endl; 
             }
             body->setGravity(gravity);
         }   // if !flying
