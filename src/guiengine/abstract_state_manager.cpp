@@ -160,6 +160,7 @@ void AbstractStateManager::replaceTopMostScreen(Screen* screen)
         getCurrentScreen()->tearDown();
 
     m_menu_stack[m_menu_stack.size()-1] = name;
+    setGameState(MENU);
     switchToScreen(name.c_str());
 
     // Send init event to new menu
