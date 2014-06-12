@@ -1216,7 +1216,7 @@ void Kart::update(float dt)
 
     unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
     const Vec3 quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
-    m_terrain_info->update(getXYZ() + epsilon*(-quadNormal), -quadNormal);
+    m_terrain_info->update(getXYZ() + epsilon*(quadNormal), -quadNormal);
 
 
     if(m_body->getBroadphaseHandle())
@@ -1251,9 +1251,9 @@ void Kart::update(float dt)
             // If the material should overwrite the gravity,
             if (material->hasGravity() || 1)
             {
-                //Vec3 normal = m_terrain_info->getNormal();
+                Vec3 normal = m_terrain_info->getNormal();
                 
-                gravity = quadNormal * -g;
+                gravity = normal*-g;
                 std::cout << gravity.x() << " "<< gravity.y() <<" " << gravity.z() <<  std::endl; 
             }
             body->setGravity(gravity);
