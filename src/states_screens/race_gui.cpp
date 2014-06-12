@@ -123,6 +123,7 @@ RaceGUI::~RaceGUI()
  */
 void RaceGUI::reset()
 {
+    RaceGUIBase::reset();
     for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
     {
         m_animation_states[i] = AS_NONE;
