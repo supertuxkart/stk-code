@@ -215,7 +215,10 @@ public:
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
     // ------------------------------------------------------------------------
-    void clearUnlocked() { m_story_mode_status->clearUnlocked(); }
+    void clearUnlocked()
+    {
+        m_story_mode_status->clearUnlocked();
+    }
     // ------------------------------------------------------------------------
     /** Returns the current challenge for this player. */
     const ChallengeStatus* getCurrentChallengeStatus() const
