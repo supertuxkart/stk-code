@@ -687,11 +687,11 @@ namespace GUIEngine
     {
         IGUIEnvironment* g_env;
         Skin* g_skin = NULL;
-        ScalableFont* g_font;
-        ScalableFont* g_large_font;
-        ScalableFont* g_title_font;
-        ScalableFont* g_small_font;
-        ScalableFont* g_digit_font;
+        ScalableFont *g_font;
+        ScalableFont *g_large_font;
+        ScalableFont *g_title_font;
+        ScalableFont *g_small_font;
+        ScalableFont *g_digit_font;
 
         IrrlichtDevice* g_device;
         IVideoDriver* g_driver;
@@ -1062,7 +1062,7 @@ namespace GUIEngine
         ScalableFont* sfont =
             new ScalableFont(g_env,
                             file_manager->getAssetChecked(FileManager::FONT,
-                                                          "StkFont.xml",true).c_str() );
+                                                          "StkFont.xml",true) );
         sfont->setScale(normal_text_scale);
         sfont->setKerningHeight(-5);
         g_font = sfont;
@@ -1070,12 +1070,12 @@ namespace GUIEngine
         ScalableFont* digit_font =
             new ScalableFont(g_env,
                              file_manager->getAssetChecked(FileManager::FONT,
-                                                           "BigDigitFont.xml",true).c_str());
+                                                           "BigDigitFont.xml",true));
         digit_font->lazyLoadTexture(0); // make sure the texture is loaded for this one
+        digit_font->setMonospaceDigits(true);
         g_digit_font = digit_font;
 
         Private::font_height = g_font->getDimension( L"X" ).Height;
-
 
         ScalableFont* sfont_larger = sfont->getHollowCopy();
         sfont_larger->setScale(normal_text_scale*1.4f);
@@ -1097,7 +1097,7 @@ namespace GUIEngine
             new ScalableFont(g_env,
                              file_manager->getAssetChecked(FileManager::FONT,
                                                            "title_font.xml",
-                                                           true).c_str()     );
+                                                           true)             );
         sfont2->m_fallback_font = sfont;
         // Because the fallback font is much smaller than the title font:
         sfont2->m_fallback_font_scale = 4.0f;

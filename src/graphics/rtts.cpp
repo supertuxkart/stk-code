@@ -30,7 +30,13 @@ static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint i
     if (irr_driver->getGLSLVersion() < 420)
         glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
     else
+    {
+#if !defined(__linux__) || defined(GL_VERSION_4_2)
         glTexStorage3D(target, 1, internalFormat, w, h, d);
+#else
+        assert(false);
+#endif
+    }
     return result;
 }
 
@@ -42,7 +48,13 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     if (irr_driver->getGLSLVersion() < 420)
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     else
+    {
+#if !defined(__linux__) || defined(GL_VERSION_4_2)
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
+#else
+        assert(false);
+#endif
+    }
     return result;
 }
 
@@ -105,16 +117,20 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_NORMAL_AND_DEPTH] = generateRTT(res, GL_RGBA16F, GL_RGBA, GL_FLOAT);
     RenderTargetTextures[RTT_COLOR] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_MLAA_COLORS] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_TMP] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
+    RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
 
     RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_EIGHTH1] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_HALF1_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
 
     RenderTargetTextures[RTT_HALF2] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_QUARTER2] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_EIGHTH2] = generateRTT(eighth, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_HALF2_R] = generateRTT(half, GL_R16F, GL_RED, GL_FLOAT);
 
     RenderTargetTextures[RTT_BLOOM_1024] = generateRTT(shadowsize0, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_BLOOM_512] = generateRTT(shadowsize1, GL_RGBA16F, GL_BGR, GL_FLOAT);
@@ -150,6 +166,12 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_MLAA_COLORS]);
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_MLAA_BLEND]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_MLAA_TMP]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_TMP1]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
@@ -165,7 +187,13 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_HALF1]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
     somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_HALF1_R]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+    somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF2]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_HALF2_R]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_QUARTER1]);
