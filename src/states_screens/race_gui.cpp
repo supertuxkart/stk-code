@@ -723,27 +723,28 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
             }
         }
 
-        float scale          = 1.0f;
-        int rank             = kart->getPosition();
-        const float DURATION = 0.8f;
+        float scale            = 1.0f;
+        int rank               = kart->getPosition();
+        const float DURATION   = 0.4f;
+        const float MIN_SHRINK = 0.3f;
         if(m_animation_states[id] == AS_SMALLER)
         {
             scale = 1.0f - (world->getTime()-m_rank_animation_start_times[id])
                          /  DURATION;
             rank = m_last_ranks[id];
-            if(scale<0)
+            if(scale<MIN_SHRINK)
             {
                 m_animation_states[id] = AS_BIGGER;
                 m_rank_animation_start_times[id] = world->getTime();
                 // Store the new rank
                 m_last_ranks[id] = kart->getPosition();
-                scale = 0.0f;
+                scale = MIN_SHRINK;
             }
         }
         else if(m_animation_states[id] == AS_BIGGER)
         {
             scale = (world->getTime() - m_rank_animation_start_times[id])
-                  / DURATION;
+                  / DURATION + MIN_SHRINK;
             rank = m_last_ranks[id];
             if(scale>1.0f)
             {
