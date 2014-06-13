@@ -6,6 +6,6 @@ void onTrigger()
 
 */
     displayMessage("Haybail reactivated");
-    enableAnimation("hayBail.b3d");
+    //enableAnimation("hayBail.b3d");
     squashKart(0,35.0); //id of kart,time to squash
 }

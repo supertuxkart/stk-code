@@ -44,6 +44,10 @@ namespace Scripting
             std::string type = "mesh";
             World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str, type);
         }*/
+        void disable(void *memory)
+        {
+            ((PhysicalObject*)(memory))->removeBody();
+        }
         void getTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
@@ -85,7 +89,7 @@ namespace Scripting
             r = engine->RegisterObjectType("PhysicalObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject @getPhysicalObject()", asMETHOD(TrackObject, getPhysicalObjectForScript), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattener()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
-
+            r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asFUNCTION(disable), asCALL_CDECL_OBJLAST); assert(r >= 0);
         }
 
 

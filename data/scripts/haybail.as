@@ -10,5 +10,6 @@ void onTrigger()
 	TrackObject @t_obj = getTrackObject("hayBail.b3d");
      //t_obj.setEnable(false);
      PhysicalObject @haybail = t_obj.getPhysicalObject();
-     if (haybail.isFlattener())squashKart(0,35.0);
+     haybail.disable();
+     //if (haybail.isFlattener())squashKart(0,35.0);
 }
