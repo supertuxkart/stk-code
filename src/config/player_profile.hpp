@@ -101,6 +101,9 @@ private:
     /** True if the last time this player was used as online. */
     bool m_last_was_online;
 
+    /** True if the login data are saved. */
+    bool m_remember_password;
+
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
 
@@ -212,7 +215,10 @@ public:
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
     // ------------------------------------------------------------------------
-    void clearUnlocked() { m_story_mode_status->clearUnlocked(); }
+    void clearUnlocked()
+    {
+        m_story_mode_status->clearUnlocked();
+    }
     // ------------------------------------------------------------------------
     /** Returns the current challenge for this player. */
     const ChallengeStatus* getCurrentChallengeStatus() const
@@ -270,6 +276,13 @@ public:
     // ------------------------------------------------------------------------
     /** Sets if this player was logged in last time it was used. */
     void setWasOnlineLastTime(bool b) { m_last_was_online = b; }
+    // ------------------------------------------------------------------------
+    /** Returns if the last time this player was used it was used online or
+     *  offline. */
+    bool rememberPassword() const { return m_remember_password; }
+    // ------------------------------------------------------------------------
+    /** Sets if this player was logged in last time it was used. */
+    void setRememberPassword(bool b) { m_remember_password = b; }
     // ------------------------------------------------------------------------
 };   // class PlayerProfile
 

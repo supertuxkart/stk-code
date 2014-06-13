@@ -796,6 +796,11 @@ void World::updateWorld(float dt)
         return;
 
     update(dt);
+
+#ifdef DEBUG
+    assert(m_magic_number == 0xB01D6543);
+#endif
+    
     if( (!isFinishPhase()) && isRaceOver())
     {
         enterRaceOverState();

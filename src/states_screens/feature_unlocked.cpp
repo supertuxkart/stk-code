@@ -346,6 +346,8 @@ void FeatureUnlockedCutScene::init()
             std::cerr << "Malformed unlocked goody!!!\n";
         }
     }
+
+    PlayerManager::getCurrentPlayer()->clearUnlocked();
 }   // init
 
 // ----------------------------------------------------------------------------
