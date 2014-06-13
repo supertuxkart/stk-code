@@ -16,7 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, B
 
-#include "tracks/quad_graph.hpp"
+#include "tracks/graph_node.hpp"
 
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"

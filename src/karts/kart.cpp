@@ -1232,7 +1232,7 @@ void Kart::update(float dt)
             float g = World::getWorld()->getTrack()->getGravity();
             Vec3 gravity(0, -g, 0);
             btRigidBody *body = getVehicle()->getRigidBody();
-            body->setGravity(gravity);
+            //body->setGravity(gravity);
         }
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
