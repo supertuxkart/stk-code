@@ -19,6 +19,7 @@
 #include "tracks/quad.hpp"
 
 #include <algorithm>
+#include <matrix4.h>
 #include <S3DVertex.h>
 #include <triangle3d.h>
 
@@ -52,9 +53,8 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      m_invisible = invisible;
      m_ai_ignore = ai_ignore;
 
-     m_normal = (p2 - p1).cross(p1 - p0);
-     m_normal = m_normal.normalize();
-
+     findNormal();
+   
 }   // Quad
 
 // ----------------------------------------------------------------------------
@@ -176,3 +176,28 @@ void Quad::transform(const btTransform &t, Quad *result) const
                                                result->m_p[3].getY())  );
 }   // transform
 
+void Quad::findNormal()
+{
+    core::triangle3df tri1(m_p[0].toIrrVector(), m_p[1].toIrrVector(), m_p[2].toIrrVector());
+    core::triangle3df tri2(m_p[0].toIrrVector(), m_p[2].toIrrVector(), m_p[3].toIrrVector());
+    Vec3 normal1 = tri1.getNormal();
+    Vec3 normal2 = tri2.getNormal();
+    m_normal = -0.5f*(normal1 + normal2);
+    m_normal.normalize();
+}
+
+void Quad::findFlattenedQuads()
+{
+    core::CMatrix4<float> m;
+    m.buildRotateFromTo(m_normal.toIrrVector(), core::vector3df(0, 1, 0));
+    
+    for (unsigned int i = 0; i < 4; i++)
+    {
+        // Translate to origin
+        m_p_flat[i] = m_p[i] - m_center;
+
+        // rotateVect(out,in)
+        m.rotateVect(m_p_flat[i] , m_p_flat[i].toIrrVector());
+    }
+          
+}

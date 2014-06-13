@@ -39,6 +39,8 @@ private:
     /** The four points of a quad. */
     Vec3 m_p[4];
 
+    Vec3 m_p_flat[4];
+
     /** The center of all four points, which is used by the AI.
      *  This saves some computations at runtime. */
     Vec3 m_center;
@@ -58,6 +60,10 @@ private:
 
     /** Set if this quad should not be used by the AI. */
     bool  m_ai_ignore;
+
+    void findNormal();
+
+    void findFlattenedQuads();
 
 public:
          Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
