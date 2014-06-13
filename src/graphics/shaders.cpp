@@ -415,6 +415,8 @@ namespace UtilShader
 
     void ColoredLine::setUniforms(const irr::video::SColor &col)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
         glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
     }
