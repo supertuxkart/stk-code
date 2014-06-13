@@ -193,12 +193,12 @@ namespace Online
             }
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
-            if(input->get("achieved", &achieved_string) == 1)
-            {
-                std::vector<uint32_t> achieved_ids =
-                    StringUtils::splitToUInt(achieved_string, ' ');
-                PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
-            }
+            // Even if no achievements were sent, we have to call sync
+            // in order to upload local achievements to the server
+            input->get("achieved", &achieved_string);
+            std::vector<uint32_t> achieved_ids = 
+                            StringUtils::splitToUInt(achieved_string, ' ');
+            PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
             m_profile->fetchFriends();
         }   // if success
         else
