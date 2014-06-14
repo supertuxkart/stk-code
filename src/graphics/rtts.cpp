@@ -145,10 +145,6 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
 
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
-    // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
-    glClearColor(1., 1., 1., 1.);
-    glClear(GL_COLOR_BUFFER_BIT);
-
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
@@ -189,6 +185,10 @@ RTT::RTT(size_t width, size_t height)
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF1_R]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
+    // Clear this FBO to 1s so that if no SSAO is computed we can still use it.
+    glClearColor(1., 1., 1., 1.);
+    glClear(GL_COLOR_BUFFER_BIT);
+
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_HALF2]);
     FrameBuffers.push_back(new FrameBuffer(somevector, half.Width, half.Height));
