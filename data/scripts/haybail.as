@@ -11,5 +11,6 @@ void onTrigger()
      //t_obj.setEnable(false);
      PhysicalObject @haybail = t_obj.getPhysicalObject();
      haybail.disable();
+     Mesh @haybailMesh = t_obj.getMesh();
      //if (haybail.isFlattener())squashKart(0,35.0);
 }
