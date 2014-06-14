@@ -90,6 +90,10 @@ namespace Scripting
             r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject @getPhysicalObject()", asMETHOD(TrackObject, getPhysicalObjectForScript), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattener()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asFUNCTION(disable), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectType("Mesh", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "getMesh @getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
+
+
         }
 
 

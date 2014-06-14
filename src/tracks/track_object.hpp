@@ -142,6 +142,8 @@ public:
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
 
+    TrackObjectPresentationMesh* getMesh(){ return getPresentation<TrackObjectPresentationMesh>(); }
+
     ThreeDAnimation* getAnimator() { return m_animator; }
     const ThreeDAnimation* getAnimator() const { return m_animator; }
 
