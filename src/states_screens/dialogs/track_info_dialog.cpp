@@ -20,6 +20,10 @@
 #include "challenges/unlock_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
+
+#include "online/http_request.hpp"
+#include "online/request_manager.hpp"
+
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/screen.hpp"
