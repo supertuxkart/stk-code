@@ -129,7 +129,6 @@ private:
     void markAllSuccessorsToUse(unsigned int n,
                                 PathToNodeVector *m_path_to_node);
 
-    void buildUnrolledQuads();
     void GraphNode::addUnrolledQuad(const GraphNode& next_node,int k);
 
 public:
@@ -141,6 +140,7 @@ public:
     void         setChecklineRequirements(int latest_checkline);
     void         setDirectionData(unsigned int successor, DirectionType dir,
                                   unsigned int last_node_index);
+    void         buildUnrolledQuads();
     // ------------------------------------------------------------------------
     /** Returns the number of successors. */
     unsigned int getNumberOfSuccessors() const
@@ -239,6 +239,8 @@ public:
     const Vec3 &getRightUnitVector() const { return m_right_unit_vector; }
 
     const Vec3 getPointTransformedToFlatQuad(Vec3 xyz);
+
+    const Quad& getUnrolledQuad(int i) const { return m_unrolled_quads[i]; }
 };   // GraphNode
 
 #endif

@@ -573,7 +573,7 @@ void QuadGraph::createMesh2()
             c.setGreen((3 * i) % 256);
         }
 
-        Quad flatquad = QuadGraph::get()->getNode(0).getUnrolledQuad(count);
+        Quad flatquad = QuadGraph::get()->getNode(50).getUnrolledQuad(count);
 
         //std::vector<int> vInd = poly.getVerticesIndex();
         // Four vertices for each of the n-1 remaining quads
@@ -622,6 +622,7 @@ void QuadGraph::createDebugMesh()
     //createMesh(/*show_invisible*/true,
     //           /*enable_transparency*/true);
     createMesh2();
+    
     // Now colour the quads red/blue/red ...
     video::SColor     c( 128, 255, 0, 0);
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();

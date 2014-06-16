@@ -67,7 +67,7 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
     // Only this 2d point is needed later
     m_lower_center_2d = core::vector2df(m_lower_center.getX(),
                                         m_lower_center.getZ() );
-
+   
 }   // GraphNode
 
 // ----------------------------------------------------------------------------
@@ -218,19 +218,6 @@ void GraphNode::setChecklineRequirements(int latest_checkline)
     m_checkline_requirements.push_back(latest_checkline);
 }
 
-void GraphNode::buildUnrolledQuads()
-{
-    m_unrolled_quads.clear();
-
-    Quad thisQuad = getQuad();
-
-    m_unrolled_quads.push_back(thisQuad.findFlattenedQuads());
-    
-    int k = 15;
-    //unsigned int successorCount = getNumberOfSuccessors();
-    addUnrolledQuad(QuadGraph::get()->getNode(getSuccessor(0)), k);
-
-}
 
 const Vec3 GraphNode::getPointTransformedToFlatQuad(Vec3 xyz)
 {
@@ -244,6 +231,22 @@ const Vec3 GraphNode::getPointTransformedToFlatQuad(Vec3 xyz)
 
     return (Vec3)result;
 }
+
+
+void GraphNode::buildUnrolledQuads()
+{
+    m_unrolled_quads.clear();
+
+    Quad thisQuad = getQuad();
+
+    m_unrolled_quads.push_back(thisQuad);
+
+    int k = 10;
+    //unsigned int successorCount = getNumberOfSuccessors();
+    addUnrolledQuad(QuadGraph::get()->getNode(getSuccessor(0)), k);
+
+}
+
 
 void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
 {
@@ -267,15 +270,15 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
 
     // Next translate the new quad to be pushed to the correct position infront
     // of the last quad in the vector of unrolled quads
-    Vec3 lower_center = 0.5f*(last_pushed_quad[0] + last_pushed_quad[1]);
-    Vec3 upper_center = 0.5f*(next_quad_to_push[0] + next_quad_to_push[1]);
-    m.setTranslation((lower_center - upper_center).toIrrVector());
+    Vec3 upper_center = 0.5f*(last_pushed_quad[2] + last_pushed_quad[3]);
+    Vec3 lower_center = 0.5f*(next_quad_to_push[0] + next_quad_to_push[1]);
+    m.setTranslation((upper_center-lower_center).toIrrVector());
     for (int i = 0; i < 4; i++)
-        m.translateVect((core::vector3df)new_points[i]);
+        m.translateVect(new_points[i]);
 
     // Push the quad into the vector of unrolled quads
     m_unrolled_quads.push_back(Quad(new_points[0], new_points[1], new_points[2], new_points[3]));
-
+    k = k - 1;
     // Recurisvely build the vector of unrolled quads till k reduces to 0
-    addUnrolledQuad(QuadGraph::get()->getNode(next_node.getSuccessor(0)), k--);
+    addUnrolledQuad(QuadGraph::get()->getNode(next_node.getSuccessor(0)), k);
 }
