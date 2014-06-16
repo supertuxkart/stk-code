@@ -133,18 +133,27 @@ void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
 
     std::map<uint32_t, Achievement*>::iterator i;
 
+    // String to collect all local ids that are not synched
+    // to the online account
+    std::string ids;
     for(i=m_achievements.begin(); i!=m_achievements.end(); i++)
     {
-        int id = i->second->getID();
+        unsigned int id = i->second->getID();
         if(i->second->isAchieved() && (id>=done.size() || !done[id]) )
         {
-            Log::info("Achievements", "Synching achievement %d to server.",
-                     i->first);
-            Online::HTTPRequest * request = new Online::HTTPRequest(true,2);
-            PlayerManager::setUserDetails(request, "achieving");
-            request->addParameter("achievementid", i->second->getID());
-            request->queue();
+            ids=ids+StringUtils::toString(id)+",";
         }
+    }
+
+    if(ids.size()>0)
+    {
+        ids.pop_back();   // delete the last "," in the string
+        Log::info("Achievements", "Synching achievement %d to server.",
+                  ids.c_str());
+        Online::HTTPRequest * request = new Online::HTTPRequest(true, 2);
+        PlayerManager::setUserDetails(request, "achieving");
+        request->addParameter("achievementid", ids);
+        request->queue();
     }
 }   // sync
 

@@ -21,7 +21,6 @@
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
@@ -227,7 +226,8 @@ void ChangePasswordDialog::error(const irr::core::stringw & error)
 void ChangePasswordDialog::onUpdate(float dt)
 {
     if(!m_options_widget->isActivated())
-        m_info_widget->setText(Online::Messages::validatingInfo(), false);
+        m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
+                              false                                          );
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)

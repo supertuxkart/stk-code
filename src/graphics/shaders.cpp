@@ -1094,7 +1094,7 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");

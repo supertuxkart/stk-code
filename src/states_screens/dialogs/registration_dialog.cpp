@@ -24,7 +24,6 @@
 #include "states_screens/register_screen.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/messages.hpp"
 
 #include <IGUIEnvironment.h>
 
