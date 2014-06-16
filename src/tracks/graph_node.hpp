@@ -124,8 +124,13 @@ private:
       */
     std::vector< int > m_checkline_requirements;
 
+    std::vector<Quad> m_unrolled_quads;
+
     void markAllSuccessorsToUse(unsigned int n,
                                 PathToNodeVector *m_path_to_node);
+
+    void buildUnrolledQuads();
+    void GraphNode::addUnrolledQuad(const GraphNode& next_node,int k);
 
 public:
                  GraphNode(unsigned int quad_index, unsigned int node_index);

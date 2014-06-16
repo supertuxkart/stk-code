@@ -186,11 +186,11 @@ void Quad::findNormal()
     m_normal.normalize();
 }
 
-void Quad::findFlattenedQuads()
+Quad Quad::findFlattenedQuads()
 {
     core::CMatrix4<float> m;
     m.buildRotateFromTo(m_normal.toIrrVector(), core::vector3df(0, 1, 0));
-    
+    Vec3 m_p_flat[4];
     for (unsigned int i = 0; i < 4; i++)
     {
         // Translate to origin
@@ -198,6 +198,9 @@ void Quad::findFlattenedQuads()
 
         // rotateVect(out,in)
         m.rotateVect(m_p_flat[i] , m_p_flat[i].toIrrVector());
+
+
     }
-          
+     
+    return Quad(m_p_flat[0], m_p_flat[1], m_p_flat[2], m_p_flat[3]);
 }
