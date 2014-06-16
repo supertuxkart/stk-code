@@ -348,7 +348,7 @@ private:
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
-    #define STAT_URL "http://127.0.0.1/statcollector.php"
+    #define STAT_URL "statcollector.php"
     void sendStatisticsToServer();
 
 public:

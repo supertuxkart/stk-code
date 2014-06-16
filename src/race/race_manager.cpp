@@ -805,7 +805,8 @@ void RaceManager::startSingleRace(const std::string &track_ident,
         race_manager->setupPlayerKartInfo(); // do this setup player kart
 
     //Stat Collection - Send data now we have confirmed everything.
-    if(UserConfigParams::m_stats_status){
+    //Don't send if the user disabled, the player is playing single player or its a cutscene.
+    if(UserConfigParams::m_stats_status && !from_overworld && m_minor_mode != MINOR_MODE_CUTSCENE){
         sendStatisticsToServer();
     }
     startNew(from_overworld);
@@ -847,7 +848,7 @@ void RaceManager::setupPlayerKartInfo()
 void RaceManager::sendStatisticsToServer(){
     //The request will not be send if the user has disabled Internet since HTTPRequest fails automatically.
     Online::HTTPRequest *statRequest = new Online::HTTPRequest(true);
-    statRequest->setURL(STAT_URL);
+    statRequest->setServerURL(STAT_URL);
     statRequest->addParameter("kart",m_player_karts[0].getKartName());
     statRequest->addParameter("track",m_tracks[m_track_number]);
     statRequest->addParameter("difficulty",m_difficulty);
