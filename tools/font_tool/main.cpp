@@ -412,7 +412,7 @@ void createGUI(IrrlichtDevice* device, CFontTool* fc)
 
 	//new
 
-	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+150,yp+h),win, 201, L"Export used characters only")->setEnabled(false);
+	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+150,yp+h),win, 201, L"Export used characters only")->setChecked(false);
 	yp += (s32)(h*1.5f);
 
 	env->addCheckBox(false, core::rect<s32>(xp,yp,xp+150,yp+h),win, 202, L"Exclude basic latin characters");
@@ -512,10 +512,34 @@ int main(int argc,char **argv)
 
 	createGUI(device, fc);
 
-	//new
-	if(argc>1 && LoadPoFiles(argv[1])){
-		device->getGUIEnvironment()->getRootGUIElement()->getElementFromId(201,true)->setEnabled(true);
-	}
+    for(int i=1; i<argc; i++)
+    {
+        if(!strcmp(argv[i],"-c") && i<argc-1)
+        {
+            i++;
+            if(setUsedCharacters(argv[i]))
+            {
+                IGUICheckBox *box =
+                    dynamic_cast<IGUICheckBox*>(device->getGUIEnvironment()
+                                                     ->getRootGUIElement()
+                                                     ->getElementFromId(201, true));
+                box->setChecked(true);
+            }
+
+        }
+        else
+        {  
+            // Old style: just a single parameter, assume it's a file name with pot files in it
+            if(LoadPoFiles(argv[i]))
+            {
+                IGUICheckBox *box =
+                    dynamic_cast<IGUICheckBox*>(device->getGUIEnvironment()
+                    ->getRootGUIElement()
+                    ->getElementFromId(201, true));
+                box->setChecked(true);
+            }
+        }
+    }   // for i <argc
 
 	while(device->run())
 	{

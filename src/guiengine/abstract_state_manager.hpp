@@ -82,7 +82,7 @@ namespace GUIEngine
           * without displaying the second-topmost menu of the stack
           * in-between)
           */
-        void replaceTopMostScreen(Screen* screen);
+        void replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState = GUIEngine::MENU);
 
         /**
           * \brief removes the menu at the top of the screens stack

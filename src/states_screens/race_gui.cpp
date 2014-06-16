@@ -89,46 +89,47 @@ RaceGUI::RaceGUI()
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
     createMarkerTexture();
 
-    // Translate strings only one in constructor to avoid calling
-    // gettext in each frame.
-    //I18N: Shown at the end of a race
-    m_string_lap      = _("Lap");
-    m_string_rank     = _("Rank");
-
-
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
-    gui::ScalableFont* font = GUIEngine::getFont();
-    m_rank_lap_width = font->getDimension(m_string_lap.c_str()).Width;
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    core::dimension2du area = font->getDimension(L"99:99:99");
+    m_timer_width = area.Width;
+    m_font_height = area.Height;
 
-    m_timer_width = font->getDimension(L"99:99:99").Width;
-
-    font = (race_manager->getNumLocalPlayers() > 2 ? GUIEngine::getSmallFont()
-                                                   : GUIEngine::getFont());
-
-    int w;
     if (race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER ||
         race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES     ||
         race_manager->getNumLaps() > 9)
-        w = font->getDimension(L"99/99").Width;
+        m_lap_width = font->getDimension(L"99/99").Width;
     else
-        w = font->getDimension(L"9/9").Width;
+        m_lap_width = font->getDimension(L"9/9").Width;
 
-    // In some split screen configuration the energy bar might be next
-    // to the lap display - so make the lap X/Y display large enough to
-    // leave space for the energy bar (16 pixels) and 10 pixels of space
-    // to the right (see drawEnergyMeter for details).
-    w += 16 + 10;
-    if(m_rank_lap_width < w) m_rank_lap_width = w;
-    w = font->getDimension(m_string_rank.c_str()).Width;
-    if(m_rank_lap_width < w) m_rank_lap_width = w;
+    // Technically we only need getNumLocalPlayers, but using the
+    // global kart id to find the data for a specific kart.
+    int n = race_manager->getNumberOfKarts();
 
+    m_animation_states.resize(n);
+    m_rank_animation_start_times.resize(n);
+    m_last_ranks.resize(n);
 }   // RaceGUI
 
 //-----------------------------------------------------------------------------
 RaceGUI::~RaceGUI()
 {
 }   // ~Racegui
+
+//-----------------------------------------------------------------------------
+/** Reset the gui before a race. It initialised all rank animation related
+ *  values back to the default.
+ */
+void RaceGUI::reset()
+{
+    RaceGUIBase::reset();
+    for(unsigned int i=0; i<race_manager->getNumberOfKarts(); i++)
+    {
+        m_animation_states[i] = AS_NONE;
+        m_last_ranks[i]       = i+1;
+    }
+}  // reset
 
 //-----------------------------------------------------------------------------
 /** Render all global parts of the race gui, i.e. things that are only
@@ -201,24 +202,26 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     core::vector2df scaling = camera->getScaling();
     const AbstractKart *kart = camera->getKart();
     if(!kart) return;
-
+    
     drawPlungerInFace(camera, dt);
 
     scaling *= viewport.getWidth()/800.0f; // scale race GUI along screen size
-    drawAllMessages     (kart, viewport, scaling);
+    drawAllMessages(kart, viewport, scaling);
 
     if(!World::getWorld()->isRacePhase()) return;
 
-    drawPowerupIcons    (kart, viewport, scaling);
-    drawSpeedAndEnergy  (kart, viewport, scaling);
+    drawPowerupIcons   (kart, viewport, scaling);
+    drawSpeedEnergyRank(kart, viewport, scaling);
 
     if (!m_is_tutorial)
-        drawRankLap     (kart, viewport);
+        drawLap(kart, viewport, scaling);
 
     RaceGUIBase::renderPlayerView(camera, dt);
 }   // renderPlayerView
 
 //-----------------------------------------------------------------------------
+/** Shows the current soccer result.
+ */
 void RaceGUI::drawScores()
 {
     SoccerWorld* soccerWorld = (SoccerWorld*)World::getWorld();
@@ -271,7 +274,8 @@ void RaceGUI::drawScores()
         numLeader++;
         offsetX += position.LowerRightCorner.X;
     }
-}
+}   // drawScores
+
 //-----------------------------------------------------------------------------
 /** Displays the racing time on the screen.s
  */
@@ -321,7 +325,9 @@ void RaceGUI::drawGlobalTimer()
         pos += core::vector2d<s32>(0, UserConfigParams::m_height/2);
     }
 
-    gui::ScalableFont* font = GUIEngine::getFont();
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    font->setShadow(video::SColor(255, 128, 0, 0));
+    font->setScale(1.0f);
     font->draw(sw.c_str(), pos, time_color, false, false, NULL,
                true /* ignore RTL */);
 
@@ -388,10 +394,10 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
                               const core::recti &viewport,
                               const core::vector2df &scaling)
 {
-    float minRatio         = std::min(scaling.X, scaling.Y);
+    float min_ratio        = std::min(scaling.X, scaling.Y);
     const int GAUGEWIDTH   = 78;
-    int gauge_width        = (int)(GAUGEWIDTH*minRatio);
-    int gauge_height       = (int)(GAUGEWIDTH*minRatio);
+    int gauge_width        = (int)(GAUGEWIDTH*min_ratio);
+    int gauge_height       = (int)(GAUGEWIDTH*min_ratio);
 
     float state = (float)(kart->getEnergy())
                 / kart->getKartProperties()->getNitroMax();
@@ -404,14 +410,13 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 
 
     // Background
-    draw2DImage(m_gauge_empty,
-                                core::rect<s32>((int)offset.X,
-                                                (int) offset.Y-gauge_height,
-                                                (int) offset.X + gauge_width,
-                                                (int)offset.Y) /* dest rect */,
-                             core::rect<s32>(0, 0, 256, 256) /* source rect */,
-                             NULL /* clip rect */, NULL /* colors */,
-                                              true /* alpha */);
+    draw2DImage(m_gauge_empty, core::rect<s32>((int)offset.X,
+                                               (int)offset.Y-gauge_height,
+                                               (int)offset.X + gauge_width,
+                                               (int)offset.Y) /* dest rect */,
+                core::rect<s32>(0, 0, 256, 256) /* source rect */,
+                NULL /* clip rect */, NULL /* colors */,
+                true /* alpha */);
 
     // Target
 
@@ -581,22 +586,99 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
         irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
-
     }
-
 
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
+void RaceGUI::drawRank(const AbstractKart *kart,
+                      const core::vector2df &offset,
+                      float min_ratio, int meter_width,
+                      int meter_height)
+{
+    // Draw rank
+    WorldWithRank *world = dynamic_cast<WorldWithRank*>(World::getWorld());
+    if (!world || !world->displayRank())
+        return;
 
-void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
+    int id = kart->getWorldKartId();
+
+    if (m_animation_states[id] == AS_NONE)
+    {
+        if (m_last_ranks[id] != kart->getPosition())
+        {
+            m_rank_animation_start_times[id] = world->getTime();
+            m_animation_states[id] = AS_SMALLER;
+        }
+    }
+
+    float scale = 1.0f;
+    int rank = kart->getPosition();
+    const float DURATION = 0.4f;
+    const float MIN_SHRINK = 0.3f;
+    if (m_animation_states[id] == AS_SMALLER)
+    {
+        scale = 1.0f - (world->getTime() - m_rank_animation_start_times[id])
+            / DURATION;
+        rank = m_last_ranks[id];
+        if (scale < MIN_SHRINK)
+        {
+            m_animation_states[id] = AS_BIGGER;
+            m_rank_animation_start_times[id] = world->getTime();
+            // Store the new rank
+            m_last_ranks[id] = kart->getPosition();
+            scale = MIN_SHRINK;
+        }
+    }
+    else if (m_animation_states[id] == AS_BIGGER)
+    {
+        scale = (world->getTime() - m_rank_animation_start_times[id])
+            / DURATION + MIN_SHRINK;
+        rank = m_last_ranks[id];
+        if (scale > 1.0f)
+        {
+            m_animation_states[id] = AS_NONE;
+            scale = 1.0f;
+        }
+
+    }
+    else
+    {
+        m_last_ranks[id] = kart->getPosition();
+    }
+
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+    font->setScale(min_ratio * scale);
+    font->setShadow(video::SColor(255, 128, 0, 0));
+    std::ostringstream oss;
+    oss << rank; // the current font has no . :(   << ".";
+
+    core::recti pos;
+    pos.LowerRightCorner = core::vector2di(int(offset.X + 0.65f*meter_width),
+                                           int(offset.Y - 0.55f*meter_height));
+    pos.UpperLeftCorner = core::vector2di(int(offset.X + 0.65f*meter_width),
+                                          int(offset.Y - 0.55f*meter_height));
+
+    static video::SColor color = video::SColor(255, 255, 255, 255);
+    font->draw(oss.str().c_str(), pos, color, true, true);
+    font->setScale(1.0f);
+}   // drawRank
+
+//-----------------------------------------------------------------------------
+/** Draws the speedometer, the display of available nitro, and
+ *  the rank of the kart (inside the speedometer).
+ *  \param kart The kart for which to show the data.
+ *  \param viewport The viewport to use.
+ *  \param scaling Which scaling to apply to the speedometer.
+ */
+void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  const core::recti &viewport,
                                  const core::vector2df &scaling)
 {
-    float minRatio         = std::min(scaling.X, scaling.Y);
+    float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
-    int meter_width        = (int)(SPEEDWIDTH*minRatio);
-    int meter_height       = (int)(SPEEDWIDTH*minRatio);
+    int meter_width        = (int)(SPEEDWIDTH*min_ratio);
+    int meter_height       = (int)(SPEEDWIDTH*min_ratio);
 
     drawEnergyMeter(viewport.LowerRightCorner.X ,
                     (int)(viewport.LowerRightCorner.Y),
@@ -604,8 +686,6 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
 
     // First draw the meter (i.e. the background )
     // -------------------------------------------------------------------------
-
-
     core::vector2df offset;
     offset.X = (float)(viewport.LowerRightCorner.X-meter_width) - 24.0f*scaling.X;
     offset.Y = viewport.LowerRightCorner.Y-10.0f*scaling.Y;
@@ -621,6 +701,10 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
                        NULL, true);
 
     const float speed =  kart->getSpeed();
+
+    drawRank(kart, offset, min_ratio, meter_width, meter_height);
+
+
     if(speed <=0) return;  // Nothing to do if speed is negative.
 
     // Draw the actual speed bar (if the speed is >0)
@@ -698,41 +782,25 @@ void RaceGUI::drawSpeedAndEnergy(const AbstractKart* kart,
     irr_driver->getVideoDriver()->draw2DVertexPrimitiveList(vertices, count,
         index, count-2, video::EVT_STANDARD, scene::EPT_TRIANGLE_FAN);
 
-
-    // Draw Speed in Numbers
-
-    core::recti pos;
-    pos.UpperLeftCorner.X=(int)(offset.X + 0.5f*meter_width);
-    pos.UpperLeftCorner.Y=(int)(offset.Y - 0.62f*meter_height);
-    pos.LowerRightCorner.X=(int)(offset.X + 0.8f*meter_width);
-    pos.LowerRightCorner.Y=(int)(offset.X - 0.5f*meter_height);
-
-    gui::ScalableFont* font;
-
-    if (pos.getWidth() > 55)
-        font = GUIEngine::getLargeFont();
-    else if (pos.getWidth() > 40)
-        font = GUIEngine::getFont();
-    else
-        font = GUIEngine::getSmallFont();
-
-    static video::SColor color = video::SColor(255, 255, 255, 255);
-    std::ostringstream oss;
-    oss << (int)(speed*10);
-
-    font->draw(oss.str().c_str(), pos, color);
-
-}
+}   // drawSpeedEnergyRank
 
 //-----------------------------------------------------------------------------
 /** Displays the rank and the lap of the kart.
  *  \param info Info object c
 */
-void RaceGUI::drawRankLap(const AbstractKart* kart,
-                          const core::recti &viewport)
+void RaceGUI::drawLap(const AbstractKart* kart,
+                      const core::recti &viewport,
+                      const core::vector2df &scaling)
 {
     // Don't display laps or ranks if the kart has already finished the race.
     if (kart->hasFinishedRace()) return;
+        
+    World *world = World::getWorld();
+    if (!world->raceHasLaps()) return;
+    const int lap = world->getKartLaps(kart->getWorldKartId());
+
+    // don't display 'lap 0/..' at the start of a race
+    if (lap < 0 ) return;
 
     core::recti pos;
     pos.UpperLeftCorner.Y   = viewport.UpperLeftCorner.Y;
@@ -742,52 +810,20 @@ void RaceGUI::drawRankLap(const AbstractKart* kart,
     if(viewport.UpperLeftCorner.Y==0 &&
         viewport.LowerRightCorner.X==UserConfigParams::m_width &&
         race_manager->getNumPlayers()!=3)
-        pos.UpperLeftCorner.Y   += 40;
-    pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y;
+        pos.UpperLeftCorner.Y   += m_font_height;
+    pos.LowerRightCorner.Y  = viewport.LowerRightCorner.Y+20;
     pos.UpperLeftCorner.X   = viewport.LowerRightCorner.X
-                            - m_rank_lap_width - 10;
+                            - m_lap_width - 10;
     pos.LowerRightCorner.X  = viewport.LowerRightCorner.X;
 
-    gui::ScalableFont* font = (race_manager->getNumLocalPlayers() > 2
-                            ? GUIEngine::getSmallFont()
-                            : GUIEngine::getFont());
-    int font_height         = (int)(font->getDimension(L"X").Height);
+    gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
     static video::SColor color = video::SColor(255, 255, 255, 255);
-    WorldWithRank *world    = (WorldWithRank*)(World::getWorld());
+    std::ostringstream out;
+    out << lap + 1 << "/" << race_manager->getNumLaps();
 
-    if (world->displayRank())
-    {
-        const int rank = kart->getPosition();
+    font = GUIEngine::getHighresDigitFont();
+    font->setScale(scaling.Y < 1.0f ? 0.5f: 1.0f);
+    font->draw(out.str().c_str(), pos, color);
+    font->setScale(1.0f);
 
-        font->draw(m_string_rank.c_str(), pos, color);
-        pos.UpperLeftCorner.Y  += font_height;
-        pos.LowerRightCorner.Y += font_height;
-
-        char str[256];
-        const unsigned int kart_amount = world->getCurrentNumKarts();
-        sprintf(str, "%d/%d", rank, kart_amount);
-        font->draw(core::stringw(str).c_str(), pos, color);
-        pos.UpperLeftCorner.Y  += font_height;
-        pos.LowerRightCorner.Y += font_height;
-    }
-
-    // Don't display laps in follow the leader mode
-    if(world->raceHasLaps())
-    {
-        const int lap = world->getKartLaps(kart->getWorldKartId());
-
-        // don't display 'lap 0/...'
-        if(lap>=0)
-        {
-            font->draw(m_string_lap.c_str(), pos, color);
-            char str[256];
-            sprintf(str, "%d/%d", lap+1, race_manager->getNumLaps());
-            pos.UpperLeftCorner.Y  += font_height;
-            pos.LowerRightCorner.Y += font_height;
-            font->draw(core::stringw(str).c_str(), pos, color);
-            pos.UpperLeftCorner.Y  += font_height;
-            pos.LowerRightCorner.Y += font_height;
-        }
-    }
-
-} // drawRankLap
+} // drawLap
