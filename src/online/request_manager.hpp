@@ -136,7 +136,7 @@ namespace Online
             void startNetworkThread();
             void stopNetworkThread();
 
-            bool getAbort(){ return m_abort.getAtomic(); };
+            bool getAbort(){ return m_abort.getAtomic(); }
             void update(float dt);
 
     }; //class RequestManager

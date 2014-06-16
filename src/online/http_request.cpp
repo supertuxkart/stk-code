@@ -163,7 +163,7 @@ namespace Online
      */
     void HTTPRequest::operation()
     {
-        if(!m_curl_session)
+                if(!m_curl_session)
             return;
 
         FILE *fout = NULL;

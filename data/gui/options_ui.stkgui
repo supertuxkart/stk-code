@@ -40,6 +40,12 @@
         </div>
 
         <div width="75%" height="fit" layout="horizontal-row" >
+            <checkbox id="enable-stats"/>
+            <spacer width="20" height="100%" />
+            <label height="100%" I18N="In the ui settings" text="Allow STK to report anonymous stats"/>
+        </div>
+        
+        <div width="75%" height="fit" layout="horizontal-row" >
             <checkbox id="show-login"/>
             <spacer width="20" height="100%" />
             <label height="100%" I18N="In the ui settings" text="Always show login screen"/>

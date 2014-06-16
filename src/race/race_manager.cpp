@@ -804,11 +804,15 @@ void RaceManager::startSingleRace(const std::string &track_ident,
     if (!NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // if not in a network world
         race_manager->setupPlayerKartInfo(); // do this setup player kart
 
+    //Stat Collection - Send data now we have confirmed everything.
+    if(UserConfigParams::m_stats_status){
+        sendStatisticsToServer();
+    }
     startNew(from_overworld);
 }
 
 //-----------------------------------------------------------------------------
-/** Receive and store the information from sendKartsInformation()
+/** Receive and store the information from sendKartsInformaion()
 */
 void RaceManager::setupPlayerKartInfo()
 {
@@ -834,5 +838,26 @@ void RaceManager::setupPlayerKartInfo()
 
     computeRandomKartList();
 }   // setupPlayerKartInfo
+
+/**
+ * Will send statistics to a set server if the player allows it.
+ * Right now we don't allow the player to choose what gets send, this might need to be changed.
+ * @brief RaceManager::sendStatisticsToServer
+ */
+void RaceManager::sendStatisticsToServer(){
+    //The request will not be send if the user has disabled Internet since HTTPRequest fails automatically.
+    Online::HTTPRequest *statRequest = new Online::HTTPRequest(true);
+    statRequest->setURL(STAT_URL);
+    statRequest->addParameter("kart",m_player_karts[0].getKartName());
+    statRequest->addParameter("track",m_tracks[m_track_number]);
+    statRequest->addParameter("difficulty",m_difficulty);
+    statRequest->addParameter("majormode",m_major_mode);
+    statRequest->addParameter("minormode",getIdentOf(m_minor_mode));
+    statRequest->addParameter("nplayers",m_player_karts.size());
+    statRequest->addParameter("nlocalplayers",m_local_player_karts.size());
+    statRequest->addParameter("nlaps",m_num_laps[m_track_number]);
+    statRequest->addParameter("trackreversed",m_reverse_track[m_track_number]);
+    statRequest->queue(); //This is not high priority and can be sent at any time.
+}
 
 /* EOF */

@@ -66,7 +66,7 @@ namespace Online
         operation();
         setExecuted();
         afterOperation();
-    }   // execute
+    }
     // ------------------------------------------------------------------------
     /** Executes the request now, i.e. in the main thread and without involving
      *  the manager thread.. This calles prepareOperation, operation, and
