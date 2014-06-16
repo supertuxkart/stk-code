@@ -251,6 +251,7 @@ void TrackInfoDialog::onEnterPressedInternal()
                                                   : m_checkbox->getState();
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
+
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
 

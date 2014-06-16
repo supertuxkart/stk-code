@@ -679,6 +679,9 @@ namespace UserConfigParams
                                                "Status of internet: 0 user "
                                                "wasn't asked, 1: allowed, 2: "
                                                "not allowed") );
+    // Stats - Track/character choices send anonymously to some STK server.
+    PARAM_PREFIX IntUserConfigParam        m_stats_status
+    PARAM_DEFAULT(  IntUserConfigParam(0, "enable_stats","Should STK send anonymous stats to a server?") );
 
     // ---- User managerment
 
