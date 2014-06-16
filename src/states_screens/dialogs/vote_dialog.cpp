@@ -21,7 +21,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
@@ -164,8 +163,8 @@ void VoteDialog::updateFetchVote()
     if (!m_fetch_vote_request->isDone())
     {
         // request still pending
-        m_info_widget->setText(irr::core::stringw(_("Fetching last vote"))
-                               + Messages::loadingDots(),               false);
+        m_info_widget->setText(StringUtils::loadingDots(_("Fetching last vote")),
+                               false                                          );
         return;
     }   // !isDone
 
@@ -236,8 +235,8 @@ void VoteDialog::onUpdate(float dt)
         }   // isDone
         else
         {
-            m_info_widget->setText(irr::core::stringw(_("Performing vote"))
-                                   + Messages::loadingDots(), false);
+            m_info_widget->setText(StringUtils::loadingDots(_("Performing vote")),
+                                   false);
         }   // !isDone
     }
 
