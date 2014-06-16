@@ -237,6 +237,8 @@ public:
     // ------------------------------------------------------------------------
     /** Returns a unit vector pointing to the right side of the quad. */
     const Vec3 &getRightUnitVector() const { return m_right_unit_vector; }
+
+    const Vec3 getPointTransformedToFlatQuad(Vec3 xyz);
 };   // GraphNode
 
 #endif

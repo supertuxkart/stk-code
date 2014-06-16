@@ -232,6 +232,19 @@ void GraphNode::buildUnrolledQuads()
 
 }
 
+const Vec3 GraphNode::getPointTransformedToFlatQuad(Vec3 xyz)
+{
+    Quad thisQuad = getQuad();
+    core::CMatrix4<float> m;
+    m.buildRotateFromTo(thisQuad.getNormal().toIrrVector(), core::vector3df(0, 1, 0));
+
+    core::vector3df result;
+    // Translate the input point into the Quads frame of reference, then rotate
+    m.rotateVect(result, (xyz - thisQuad.getCenter()).toIrrVector());
+
+    return (Vec3)result;
+}
+
 void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
 {
     if (k == 0) return;
