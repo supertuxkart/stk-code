@@ -201,6 +201,11 @@ void QuadGraph::load(const std::string &filename)
         if(l > m_lap_length)
             m_lap_length = l;
     }
+
+    for (unsigned int i = 0; i < m_all_nodes.size(); i++)
+    {
+        m_all_nodes[i]->buildUnrolledQuads();
+    }
 }   // load
 
 // ----------------------------------------------------------------------------
@@ -526,6 +531,87 @@ void QuadGraph::createMesh(bool show_invisible,
 }   // createMesh
 
 // -----------------------------------------------------------------------------
+/** Creates the actual mesh that is used by createDebugMesh() */
+void QuadGraph::createMesh2()
+{
+    // The debug track will not be lighted or culled.
+    video::SMaterial m;
+    m.BackfaceCulling = false;
+    m.Lighting = false;
+   
+        m.MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+    m_mesh = irr_driver->createQuadMesh(&m);
+    m_mesh_buffer = m_mesh->getMeshBuffer(0);
+    assert(m_mesh_buffer->getVertexType() == video::EVT_STANDARD);
+
+
+    // Eps is used to raise the track debug quads a little bit higher than
+    // the ground, so that they are actually visible. 
+    core::vector3df eps(0, 0.4f, 0);
+    video::SColor     defaultColor(255, 255, 0, 0), c;
+
+    // Declare vector to hold new converted vertices, vertices are copied over 
+    // for each polygon, although it results in redundant vertex copies in the 
+    // final vector, this is the only way I know to make each poly have different color.
+    
+
+    int n_unrolled_quads = 9;
+    // Declare vector to hold indices
+    irr::u16  *ind = new irr::u16[6 * n_unrolled_quads];
+    video::S3DVertex *new_v = new video::S3DVertex[4 * n_unrolled_quads];
+    int i = 0;
+    for (unsigned int count = 0; count< n_unrolled_quads; count++)
+    {
+        ///compute colors
+        
+        {
+            c.setAlpha(178);
+            //c.setRed ((i%2) ? 255 : 0);
+            //c.setBlue((i%3) ? 0 : 255);
+            c.setRed(7 * i % 256);
+            c.setBlue((2 * i) % 256);
+            c.setGreen((3 * i) % 256);
+        }
+
+        Quad flatquad = QuadGraph::get()->getNode(0).getUnrolledQuad(count);
+
+        //std::vector<int> vInd = poly.getVerticesIndex();
+        // Four vertices for each of the n-1 remaining quads
+       
+        flatquad.getVertices(new_v + 4*count,c);
+
+        // Number of triangles in the triangle fan
+        unsigned int numberOfTriangles = 2;
+
+        // Set up the indices for the triangles
+
+           
+            
+
+            ind[6 * i] = 4 * i;  // First triangle: vertex 0, 1, 2
+            ind[6 * i + 1] = 4 * i + 1;
+            ind[6 * i + 2] = 4 * i + 2;
+            ind[6 * i + 3] = 4 * i;  // second triangle: vertex 0, 1, 3
+            ind[6 * i + 4] = 4 * i + 2;
+            ind[6 * i + 5] = 4 * i + 3;
+            i++;
+
+
+    }
+
+    m_mesh_buffer->append(new_v, n_unrolled_quads*4, ind, n_unrolled_quads*6);
+
+    // Instead of setting the bounding boxes, we could just disable culling,
+    // since the debug track should always be drawn.
+    //m_node->setAutomaticCulling(scene::EAC_OFF);
+    m_mesh_buffer->recalculateBoundingBox();
+    m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
+
+}   // createMesh
+
+
+
+// -----------------------------------------------------------------------------
 
 /** Creates the debug mesh to display the quad graph on top of the track
  *  model. */
@@ -533,9 +619,9 @@ void QuadGraph::createDebugMesh()
 {
     if(m_all_nodes.size()<=0) return;  // no debug output if not graph
 
-    createMesh(/*show_invisible*/true,
-               /*enable_transparency*/true);
-
+    //createMesh(/*show_invisible*/true,
+    //           /*enable_transparency*/true);
+    createMesh2();
     // Now colour the quads red/blue/red ...
     video::SColor     c( 128, 255, 0, 0);
     video::S3DVertex *v = (video::S3DVertex*)m_mesh_buffer->getVertices();

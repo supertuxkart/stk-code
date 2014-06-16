@@ -91,6 +91,7 @@ private:
                     bool enable_transparency=false,
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
+    void createMesh2();
     unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name,
                         const std::string graph_file_name,
