@@ -40,6 +40,7 @@ ThreeDAnimation::ThreeDAnimation(const XMLNode &node, TrackObject* object) : Ani
 {
     m_object = object;
 
+    m_is_paused = false;
     m_crash_reset  = false;
     m_explode_kart = false;
     m_flatten_kart = false;
@@ -76,6 +77,9 @@ void ThreeDAnimation::update(float dt)
     {
         Vec3 xyz   = m_object->getPosition();
         Vec3 scale = m_object->getScale();
+
+        //make the object think no time has passed to pause it's animation
+        if (m_is_paused)dt = 0;
 
         AnimationBase::update(dt, &xyz, &m_hpr, &scale);     //updates all IPOs
         //m_node->setPosition(xyz.toIrrVector());

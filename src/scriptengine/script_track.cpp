@@ -24,7 +24,8 @@
 #include "tracks/track_object_manager.hpp"
 #include "tracks/track_object.hpp"
 #include "tracks/track.hpp"
-#include <iostream> //debug
+#include "animations/three_d_animation.hpp"
+
 namespace Scripting
 {
 
@@ -47,6 +48,10 @@ namespace Scripting
         void disable(void *memory)
         {
             ((PhysicalObject*)(memory))->removeBody();
+        }
+        void setPaused(bool mode, void *memory)
+        {
+            ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
         void getTrackObject(asIScriptGeneric *gen)
         {
@@ -92,6 +97,11 @@ namespace Scripting
             r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asFUNCTION(disable), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectType("Mesh", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Mesh @getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "Animator @getAnimator()", asMETHOD(TrackObject, getAnimatorForScript), asCALL_THISCALL); assert(r >= 0);
+            //fails due to insufficient visibility to scripts TODO : Decide whether to fix visibility or introduce wrappers
+            //r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", asMETHOD(ThreeDAnimation, setPaused), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", asFUNCTION( setPaused ), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
 
         }

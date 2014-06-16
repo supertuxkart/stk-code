@@ -28,6 +28,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 #include <string>
+#include "animations/three_d_animation.hpp"
 
 class XMLNode;
 class ThreeDAnimation;
@@ -146,6 +147,10 @@ public:
 
     ThreeDAnimation* getAnimator() { return m_animator; }
     const ThreeDAnimation* getAnimator() const { return m_animator; }
+    //Due to above overload AngelScript cannot decide which function to bind
+    ThreeDAnimation* getAnimatorForScript() { return m_animator; }
+
+    void setPaused(bool mode){ m_animator->setPaused(mode); }
 
     const core::vector3df& getPosition() const;
     const core::vector3df  getAbsolutePosition() const;
