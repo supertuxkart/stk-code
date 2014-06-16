@@ -199,7 +199,7 @@ Quad Quad::findFlattenedQuads()
         // rotateVect(out,in)
         m.rotateVect(m_p_flat[i] , m_p_flat[i].toIrrVector());
 
-
+        m_p_flat[i].setY(0);
     }
      
     return Quad(m_p_flat[0], m_p_flat[1], m_p_flat[2], m_p_flat[3]);
