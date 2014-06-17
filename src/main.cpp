@@ -405,7 +405,7 @@ void setupRaceStart()
     StateManager::get()->createActivePlayer(
         PlayerManager::get()->getPlayer(0), device);
 
-    if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
+    if (!kart_properties_manager->getKart(UserConfigParams::m_default_kart))
     {
         Log::warn("main", "Kart '%s' is unknown so will use the "
             "default kart.",
@@ -417,6 +417,13 @@ void setupRaceStart()
         // Set up race manager appropriately
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
     }
+
+    if(!track_manager->getTrack(UserConfigParams::m_last_track))
+    {
+        race_manager->setTrack("jungle");
+    }
+    else
+        race_manager->setTrack(UserConfigParams::m_last_track);
 
     // ASSIGN should make sure that only input from assigned devices
     // is read.

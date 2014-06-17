@@ -553,8 +553,11 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
         tmpcol.getGreen() / 255.0f,
         tmpcol.getBlue() / 255.0f);
 
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (mesh.textures[0] != NULL)
+    {
+        compressTexture(mesh.textures[0], true);
+        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    }
 
     glUseProgram(MeshShader::TransparentFogShader::Program);
     MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);

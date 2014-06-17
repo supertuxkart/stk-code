@@ -24,7 +24,6 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/ribbon_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "online/messages.hpp"
 #include "online/xml_request.hpp"
 #include "states_screens/dialogs/registration_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -286,7 +285,8 @@ void RegisterScreen::onUpdate(float dt)
     if(m_signup_request)
     {
         if(!m_options_widget->isActivated())
-            m_info_widget->setText(Messages::validatingInfo(), false);
+            m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
+                                   false);
 
         if(m_signup_request->isDone())
         {

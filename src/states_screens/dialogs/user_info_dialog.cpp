@@ -22,7 +22,6 @@
 #include "guiengine/dialog_queue.hpp"
 #include "guiengine/engine.hpp"
 #include "online/online_profile.hpp"
-#include "online/messages.hpp"
 #include "states_screens/online_profile_friends.hpp"
 #include "states_screens/online_profile_overview.hpp"
 #include "states_screens/state_manager.hpp"
@@ -453,7 +452,8 @@ bool UserInfoDialog::onEscapePressed()
 
 void UserInfoDialog::onUpdate(float dt)
 {
-    if(m_processing) m_info_widget->setText(Messages::processing(), false);
+    if(m_processing) 
+        m_info_widget->setText(StringUtils::loadingDots(_("Processing")), false);
 
     //If we want to open the registration dialog, we need to close this one first
     if (m_enter_profile) m_self_destroy = true;
