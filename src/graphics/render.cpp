@@ -861,7 +861,7 @@ static void renderWireFrameFrustrum(const scene::SViewFrustum *frustrum, unsigne
         frustrum->getNearRightUp().Z,
     };
     glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), tmp);
-    MeshShader::ViewFrustrumShader::setUniforms(video::SColor(255, 0, 255, 0));
+    MeshShader::ViewFrustrumShader::setUniforms(video::SColor(255, 0, 255, 0), i);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
 
