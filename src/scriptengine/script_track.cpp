@@ -38,6 +38,12 @@ namespace Scripting
             func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
             return func;
         }
+        asIScriptFunction* registerUpdateScriptCallbacks(asIScriptEngine *engine)
+        {
+            asIScriptFunction *func;
+            func = engine->GetModule(0)->GetFunctionByDecl("void onUpdate()");
+            return func;
+        }
         /*
         void disableAnimation(std::string *name, void *memory)
         {

@@ -41,7 +41,8 @@ class Controller;
 class PhysicalObject;
 class Physics;
 class Track;
-namespace Scripting{
+namespace Scripting
+{
 	class ScriptEngine;
 }
 namespace irr

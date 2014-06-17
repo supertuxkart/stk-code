@@ -41,6 +41,7 @@ class ModelDefinitionLoader;
 
 #include "graphics/material.hpp"
 #include "items/item.hpp"
+#include "scriptengine/script_engine.hpp"
 #include "tracks/quad_graph.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/translation.hpp"
@@ -59,6 +60,10 @@ class TrackObjectManager;
 class TriangleMesh;
 class World;
 class XMLNode;
+namespace Scripting
+{
+    class ScriptEngine;
+}
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 

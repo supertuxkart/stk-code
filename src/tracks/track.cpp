@@ -1400,7 +1400,8 @@ void Track::update(float dt)
     }
     CheckManager::get()->update(dt);
     ItemManager::get()->update(dt);
-
+    Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+    script_engine->runScript("update");
 }   // update
 
 // ----------------------------------------------------------------------------

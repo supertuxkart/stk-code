@@ -115,9 +115,13 @@ void ScriptEngine::runScript(std::string scriptName)
     //This is how you call a normal function with arguments
     //asIScriptFunction *func = engine->GetModule(0)->GetFunctionByDecl("void func(arg1Type, arg2Type)");
     asIScriptFunction *func;
-    if (scriptName=="collisions")
+    if (scriptName =="collisions")
     {
         func = Scripting::Physics::registerScriptCallbacks(m_engine);
+    }
+    if (scriptName == "update")
+    {
+        func = Scripting::Track::registerUpdateScriptCallbacks(m_engine);
     }
     else
     {

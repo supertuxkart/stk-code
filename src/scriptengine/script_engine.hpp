@@ -45,8 +45,12 @@ namespace Scripting
     namespace Track
     {
         void registerScriptFunctions(asIScriptEngine *engine);
+
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine);
+
+        asIScriptFunction*
+            registerUpdateScriptCallbacks(asIScriptEngine *engine);
     }
         
 class ScriptEngine
