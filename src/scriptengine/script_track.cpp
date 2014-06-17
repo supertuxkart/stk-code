@@ -65,6 +65,10 @@ namespace Scripting
         {
             ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
+        void setLoop(int start, int end, void *memory)
+        {
+            ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
+        }
         void getTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
@@ -109,6 +113,7 @@ namespace Scripting
             r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asFUNCTION(disable), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectType("Mesh", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Mesh @getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void setLoop(int start, int end)", asFUNCTION(setLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Animator @getAnimator()", asMETHOD(TrackObject, getAnimatorForScript), asCALL_THISCALL); assert(r >= 0);
             //fails due to insufficient visibility to scripts TODO : Decide whether to fix visibility or introduce wrappers

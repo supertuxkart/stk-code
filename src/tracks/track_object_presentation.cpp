@@ -421,6 +421,22 @@ void TrackObjectPresentationMesh::reset()
 }
 
 
+void TrackObjectPresentationMesh::setLoop(int start, int end)
+{
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode *a_node =
+            (scene::IAnimatedMeshSceneNode*)m_node;
+
+        // trick to reset the animation AND also the timer inside it
+        //a_node->OnAnimate(0);
+        //a_node->OnAnimate(0);
+
+        // irrlicht's "setFrameLoop" is a misnomer, it just sets the first and
+        // last frame, even if looping is disabled
+        a_node->setFrameLoop(start, end);
+    }
+}
 // ----------------------------------------------------------------------------
 
 
