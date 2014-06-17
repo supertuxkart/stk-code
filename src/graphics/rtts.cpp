@@ -31,7 +31,7 @@ static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint i
         glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
     else
     {
-#if !defined(__linux__) || defined(GL_VERSION_4_2)
+#if WIN32
         glTexStorage3D(target, 1, internalFormat, w, h, d);
 #else
         assert(false);
@@ -49,7 +49,7 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     else
     {
-#if !defined(__linux__) || defined(GL_VERSION_4_2)
+#if WIN32
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
 #else
         assert(false);
