@@ -29,7 +29,7 @@ class SharedObject
 {
 public:
     static GLuint billboardvbo;
-    static GLuint cubevbo, cubeindexes;
+    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes;
     static GLuint ViewProjectionMatrixesUBO;
 };
 
@@ -422,6 +422,18 @@ public:
 
     static void init();
     static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &screen, unsigned TU_tex);
+};
+
+class ViewFrustrumShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position;
+    static GLuint uniform_color, uniform_idx;
+    static GLuint frustrumvao;
+
+    static void init();
+    static void setUniforms(const video::SColor &color, unsigned idx);
 };
 
 }
