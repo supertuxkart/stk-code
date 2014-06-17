@@ -321,17 +321,25 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     }
 
 
-    const video::ITexture *mini_map = world->getTrack()->getMiniMap();
+    const video::ITexture *old_rtt_mini_map = world->getTrack()->getOldRttMiniMap();
+    const FrameBuffer* new_rtt_mini_map = world->getTrack()->getNewRttMiniMap();
 
     int upper_y = m_map_bottom - m_map_height;
     int lower_y = m_map_bottom;
 
-    if (mini_map != NULL)
+    core::rect<s32> dest(m_map_left, upper_y,
+                         m_map_left + m_map_width, lower_y);
+
+    if (old_rtt_mini_map != NULL)
     {
-        core::rect<s32> dest(m_map_left,               upper_y,
-                             m_map_left + m_map_width, lower_y);
-        core::rect<s32> source(core::position2di(0, 0), mini_map->getOriginalSize());
-        draw2DImage(mini_map, dest, source, 0, 0, true);
+        core::rect<s32> source(core::position2di(0, 0), old_rtt_mini_map->getOriginalSize());
+        draw2DImage(old_rtt_mini_map, dest, source, 0, 0, true);
+    }
+    else if (new_rtt_mini_map != NULL)
+    {
+        core::rect<s32> source(0, 0, new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight());
+        draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0], 512, 512,
+            dest, source, NULL, true);
     }
 
     Vec3 kart_xyz;

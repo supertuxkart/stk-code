@@ -37,6 +37,7 @@ namespace irr
 using namespace irr;
 
 class CheckLine;
+class FrameBuffer;
 
 /**
  *  \brief This class stores a graph of quads. It uses a 'simplified singleton'
@@ -118,10 +119,11 @@ public:
                                          float forwards_distance=1.5f,
                                          float sidewards_distance=1.5f,
                                          float upwards_distance=0.0f) const;
-    video::ITexture *makeMiniMap(const core::dimension2du &where,
-                                 const std::string &name,
-                                 const video::SColor &fill_color
-                                        =video::SColor(127, 255, 255, 255) );
+    void        makeMiniMap(const core::dimension2du &where,
+                            const std::string &name,
+                            const video::SColor &fill_color,
+                            video::ITexture** oldRttMinimap,
+                            FrameBuffer** newRttMinimap);
     void         mapPoint2MiniMap(const Vec3 &xyz, Vec3 *out) const;
     void         updateDistancesForAllSuccessors(unsigned int indx,
                                                  float delta,

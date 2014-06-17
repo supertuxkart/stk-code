@@ -2052,7 +2052,10 @@ bool IrrDriver::supportsSplatting()
 #endif
 
 // ----------------------------------------------------------------------------
-/** Begins a rendering to a texture.
+/**
+ * THIS IS THE OLD OPENGL 1 RTT PROVIDER, USE THE SHADER-BASED
+ * RTT FOR NEW DEVELOPMENT
+ * Begins a rendering to a texture.
  *  \param dimension The size of the texture.
  *  \param name Name of the texture.
  *  \param persistent_texture Whether the created RTT texture should persist in

@@ -173,21 +173,9 @@ void ModelViewWidget::update(float delta)
     m_rtt_main_node->setRotation(core::vector3df(0.0f, angle, 0.0f));
     
     m_rtt_main_node->setVisible(true);
-    irr_driver->setRTT(m_rtt_provider);
 
-    irr_driver->getSceneManager()->setActiveCamera(m_camera);
+    m_frame_buffer = m_rtt_provider->render(m_camera, GUIEngine::getLatestDt());
 
-    std::vector<IrrDriver::GlowData> glows;
-    irr_driver->computeCameraMatrix(m_camera, 512, 512);
-    unsigned plc = irr_driver->UpdateLightsInfo(m_camera, GUIEngine::getLatestDt());
-    irr_driver->renderScene(m_camera, plc, glows, GUIEngine::getLatestDt(), false, true);
-    m_frame_buffer = irr_driver->getPostProcessing()->render(m_camera);
-    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
-
-    irr_driver->setRTT(NULL);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    irr_driver->getSceneManager()->setActiveCamera(NULL);
     m_rtt_main_node->setVisible(false);
 }
 
@@ -284,10 +272,7 @@ void ModelViewWidget::setupRTTScene(PtrVector<scene::IMesh, REF>& mesh,
     m_camera->setAspectRatio(1.0f);
 
     m_camera->setPosition(core::vector3df(0.0, 20.0f, 70.0f));
-    if (irr_driver->isGLSL())
-        m_camera->setUpVector(core::vector3df(0.0, 1.0, 0.0));
-    else
-        m_camera->setUpVector(core::vector3df(0.0, 1.0, 0.0));
+    m_camera->setUpVector(core::vector3df(0.0, 1.0, 0.0));
     m_camera->setTarget(core::vector3df(0, 10, 0.0f));
     m_camera->setFOV(DEGREE_TO_RAD*50.0f);
     m_camera->updateAbsolutePosition();

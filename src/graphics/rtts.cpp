@@ -20,7 +20,9 @@
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/post_processing.hpp"
 #include "utils/log.hpp"
+#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type)
 {
@@ -289,4 +291,24 @@ RTT::~RTT()
         delete m_RH_FBO;
         delete m_RSM;
     }
+}
+
+FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
+{
+    irr_driver->setRTT(this);
+
+    irr_driver->getSceneManager()->setActiveCamera(camera);
+
+    std::vector<IrrDriver::GlowData> glows;
+    irr_driver->computeCameraMatrix(camera, 512, 512);
+    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    irr_driver->renderScene(camera, plc, glows, dt, false, true);
+    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+
+    irr_driver->setRTT(NULL);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    irr_driver->getSceneManager()->setActiveCamera(NULL);
+    return frame_buffer;
 }
