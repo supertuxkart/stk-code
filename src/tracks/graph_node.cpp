@@ -233,7 +233,7 @@ const Vec3 GraphNode::getPointTransformedToFlatQuad(Vec3 xyz)
 }
 
 
-void GraphNode::buildUnrolledQuads()
+void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
 {
     m_unrolled_quads.clear();
 
@@ -241,9 +241,8 @@ void GraphNode::buildUnrolledQuads()
 
     m_unrolled_quads.push_back(thisQuad);
 
-    int k = 10;
     //unsigned int successorCount = getNumberOfSuccessors();
-    addUnrolledQuad(QuadGraph::get()->getNode(getSuccessor(0)), k);
+    addUnrolledQuad(QuadGraph::get()->getNode(getSuccessor(0)), unroll_quad_count);
 
 }
 
@@ -266,7 +265,6 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
                         last_pushed_quad.getNormal().toIrrVector());
 
   
-
     //m.setRotationCenter(next_quad_to_push.getCenter().toIrrVector(),
     //    ((next_quad_to_push.getCenter() - 0.5f*(next_quad_to_push[0] + next_quad_to_push[1])) + 0.5f*(last_pushed_quad[2] + last_pushed_quad[3)));
     for (unsigned int i = 0; i < 4; i++)

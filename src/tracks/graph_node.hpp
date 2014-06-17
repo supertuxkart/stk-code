@@ -140,7 +140,7 @@ public:
     void         setChecklineRequirements(int latest_checkline);
     void         setDirectionData(unsigned int successor, DirectionType dir,
                                   unsigned int last_node_index);
-    void         buildUnrolledQuads();
+    void         buildUnrolledQuads(unsigned int unroll_quad_count);
     // ------------------------------------------------------------------------
     /** Returns the number of successors. */
     unsigned int getNumberOfSuccessors() const

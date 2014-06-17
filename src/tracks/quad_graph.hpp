@@ -78,6 +78,8 @@ private:
     /** Wether the graph should be reverted or not */
     bool                     m_reverse;
 
+    unsigned int             m_unroll_quad_count;
+
     void setDefaultSuccessors();
     void computeChecklineRequirements(GraphNode* node, int latest_checkline);
     void computeDirectionData();
@@ -91,6 +93,7 @@ private:
                     bool enable_transparency=false,
                     const video::SColor *track_color=NULL,
                     const video::SColor *lap_color=NULL);
+    // Temporary function for debugging unrolled quads
     void createMesh2();
     unsigned int getStartNode() const;
          QuadGraph     (const std::string &quad_file_name,
@@ -191,6 +194,13 @@ public:
     // ----------------------------------------------------------------------
     /** Returns true if the graph is to be reversed. */
     bool         isReverse() const {return m_reverse; }
+
+    const Quad&  getUnrolledQuadOfNode(unsigned int node, unsigned int quad_number)
+                       { return getNode(node).getUnrolledQuad(quad_number); }
+    
+    /** Returns the number of forward quads that are unrolled for each quad **/
+    int          getNumberOfUnrolledQuads() const { return m_unroll_count; }
+
 
 };   // QuadGraph
 

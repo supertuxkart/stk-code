@@ -54,6 +54,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
+    m_unroll_quad_count    = 10;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
@@ -202,9 +203,10 @@ void QuadGraph::load(const std::string &filename)
             m_lap_length = l;
     }
 
+    // Build unrolled quads
     for (unsigned int i = 0; i < m_all_nodes.size(); i++)
     {
-        m_all_nodes[i]->buildUnrolledQuads();
+        m_all_nodes[i]->buildUnrolledQuads(m_unroll_quad_count);
     }
 }   // load
 
@@ -427,7 +429,7 @@ void QuadGraph::createMesh(bool show_invisible,
         if(show_invisible || !m_all_nodes[i]->getQuad().isInvisible())
             n++;
     }
-
+    
     // Four vertices for each of the n-1 remaining quads
     video::S3DVertex *new_v = new video::S3DVertex[4*n];
     // Each quad consists of 2 triangles with 3 elements, so
@@ -443,6 +445,7 @@ void QuadGraph::createMesh(bool show_invisible,
     for(unsigned int count=0; count<m_all_nodes.size(); count++)
     {
         // Ignore invisible quads
+        
         if(!show_invisible && m_all_nodes[count]->getQuad().isInvisible())
             continue;
         // Swap the colours from red to blue and back
@@ -555,7 +558,7 @@ void QuadGraph::createMesh2()
     // final vector, this is the only way I know to make each poly have different color.
     
 
-    int n_unrolled_quads = 9;
+    int n_unrolled_quads = getNumberOfUnrolledQuads();
     // Declare vector to hold indices
     irr::u16  *ind = new irr::u16[6 * n_unrolled_quads];
     video::S3DVertex *new_v = new video::S3DVertex[4 * n_unrolled_quads];
@@ -573,7 +576,7 @@ void QuadGraph::createMesh2()
             c.setGreen((3 * i) % 256);
         }
 
-        Quad flatquad = QuadGraph::get()->getNode(50).getUnrolledQuad(count);
+        Quad flatquad = QuadGraph::get()->getNode(60).getUnrolledQuad(count);
 
         //std::vector<int> vInd = poly.getVerticesIndex();
         // Four vertices for each of the n-1 remaining quads
@@ -619,9 +622,9 @@ void QuadGraph::createDebugMesh()
 {
     if(m_all_nodes.size()<=0) return;  // no debug output if not graph
 
-    //createMesh(/*show_invisible*/true,
-    //           /*enable_transparency*/true);
-    createMesh2();
+    createMesh(/*show_invisible*/true,
+              /*enable_transparency*/true);
+    
     
     // Now colour the quads red/blue/red ...
     video::SColor     c( 128, 255, 0, 0);
@@ -637,6 +640,17 @@ void QuadGraph::createDebugMesh()
 #ifdef DEBUG
     m_node->setName("track-debug-mesh");
 #endif
+    createMesh2();
+    // Now colour the quads red/blue/red ...
+    v = (video::S3DVertex*)m_mesh_buffer->getVertices();
+    for (unsigned int i = 0; i<m_mesh_buffer->getVertexCount(); i++)
+    {
+        // Swap the colours from red to blue and back
+        c.setRed((i % 2) ? 255 : 0);
+        c.setBlue((i % 2) ? 0 : 255);
+        v[i].Color = c;
+    }
+    m_node = irr_driver->addMesh(m_mesh);
 
 }   // createDebugMesh
 
