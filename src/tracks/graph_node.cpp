@@ -253,29 +253,41 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
     if (k == 0) return;
 
     Quad next_quad = next_node.getQuad();
-    Quad next_quad_to_push = next_quad.findFlattenedQuads();
+    Quad next_quad_to_push = next_quad;
     Quad last_pushed_quad = m_unrolled_quads.back();
     
-    Vec3 endEdge = last_pushed_quad[2] - last_pushed_quad[3];
-    Vec3 beginEdge = next_quad_to_push[1] - next_quad_to_push[0];
     
     core::CMatrix4<float> m;
     core::vector3df new_points[4];
 
     // First rotate the next_quad_to_push so that it aligns with last quad
     // in the vector of unrolled quads
-    m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
-    for (int i = 0; i < 4; i++) 
-        m.rotateVect(new_points[i], next_quad_to_push[i].toIrrVector());
+    m.buildRotateFromTo(next_quad_to_push.getNormal().toIrrVector(),
+                        last_pushed_quad.getNormal().toIrrVector());
 
+  
+
+    //m.setRotationCenter(next_quad_to_push.getCenter().toIrrVector(),
+    //    ((next_quad_to_push.getCenter() - 0.5f*(next_quad_to_push[0] + next_quad_to_push[1])) + 0.5f*(last_pushed_quad[2] + last_pushed_quad[3)));
+    for (unsigned int i = 0; i < 4; i++)
+        m.rotateVect(new_points[i], next_quad_to_push[i].toIrrVector());
+    
+    Vec3 endEdge = 0.5f*(last_pushed_quad[2] + last_pushed_quad[1]) - 0.5f*(last_pushed_quad[3] + last_pushed_quad[0]);
+    Vec3 beginEdge = 0.5f*(new_points[1] + new_points[2]) - 0.5f*(new_points[0] + new_points[3]);
+    /*
+    m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
+    for (unsigned int i = 0; i < 4; i++) 
+        m.rotateVect(new_points[i]);
+    */
     // Next translate the new quad to be pushed to the correct position infront
     // of the last quad in the vector of unrolled quads
+    Vec3 lower_center = 0.5f*(new_points[0] + new_points[1]);
     Vec3 upper_center = 0.5f*(last_pushed_quad[2] + last_pushed_quad[3]);
-    Vec3 lower_center = 0.5f*(next_quad_to_push[0] + next_quad_to_push[1]);
     m.setTranslation((upper_center-lower_center).toIrrVector());
-    for (int i = 0; i < 4; i++)
+    //m.setTranslation((last_pushed_quad[3] - next_quad_to_push[0]).toIrrVector());
+    for (unsigned int i = 0; i < 4; i++)
         m.translateVect(new_points[i]);
-
+    
     // Push the quad into the vector of unrolled quads
     m_unrolled_quads.push_back(Quad(new_points[0], new_points[1], new_points[2], new_points[3]));
     k = k - 1;
