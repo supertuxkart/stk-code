@@ -1,6 +1,6 @@
 void onUpdate()
 {
 
-    displayMessage("Haybail deactivated");
+    //displayMessage("Haybail deactivated");
 
 }

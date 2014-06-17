@@ -176,6 +176,8 @@ private:
     std::string              m_description;
     core::stringw            m_designer;
 
+    /* For running the startup script */
+    bool m_startup_run;
     /** The full filename of the config (xml) file. */
     std::string              m_filename;
 

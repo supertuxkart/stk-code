@@ -51,6 +51,9 @@ namespace Scripting
 
         asIScriptFunction*
             registerUpdateScriptCallbacks(asIScriptEngine *engine);
+
+        asIScriptFunction*
+            registerStartScriptCallbacks(asIScriptEngine *engine);
     }
         
 class ScriptEngine

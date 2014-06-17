@@ -119,9 +119,13 @@ void ScriptEngine::runScript(std::string scriptName)
     {
         func = Scripting::Physics::registerScriptCallbacks(m_engine);
     }
-    if (scriptName == "update")
+    else if (scriptName == "update")
     {
         func = Scripting::Track::registerUpdateScriptCallbacks(m_engine);
+    }
+    else if (scriptName == "start")
+    {
+        func = Scripting::Track::registerStartScriptCallbacks(m_engine);
     }
     else
     {
