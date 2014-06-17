@@ -711,7 +711,34 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             camnode->setFarValue(FarValues[i]);
             camnode->setNearValue(NearValues[i]);
             camnode->render();
-            m_shadows_cam[i] = camnode;
+            const scene::SViewFrustum *frustrum = camnode->getViewFrustum();
+            float tmp[24] = {
+                frustrum->getFarLeftDown().X,
+                frustrum->getFarLeftDown().Y,
+                frustrum->getFarLeftDown().Z,
+                frustrum->getFarLeftUp().X,
+                frustrum->getFarLeftUp().Y,
+                frustrum->getFarLeftUp().Z,
+                frustrum->getFarRightDown().X,
+                frustrum->getFarRightDown().Y,
+                frustrum->getFarRightDown().Z,
+                frustrum->getFarRightUp().X,
+                frustrum->getFarRightUp().Y,
+                frustrum->getFarRightUp().Z,
+                frustrum->getNearLeftDown().X,
+                frustrum->getNearLeftDown().Y,
+                frustrum->getNearLeftDown().Z,
+                frustrum->getNearLeftUp().X,
+                frustrum->getNearLeftUp().Y,
+                frustrum->getNearLeftUp().Z,
+                frustrum->getNearRightDown().X,
+                frustrum->getNearRightDown().Y,
+                frustrum->getNearRightDown().Z,
+                frustrum->getNearRightUp().X,
+                frustrum->getNearRightUp().Y,
+                frustrum->getNearRightUp().Z,
+            };
+            memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
             const core::aabbox3df smallcambox = camnode->
                 getViewFrustum()->getBoundingBox();
             core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
@@ -829,38 +856,13 @@ void IrrDriver::renderShadows()
     }
 }
 
-static void renderWireFrameFrustrum(const scene::SViewFrustum *frustrum, unsigned i)
+static void renderWireFrameFrustrum(float *tmp, unsigned i)
 {
     glUseProgram(MeshShader::ViewFrustrumShader::Program);
     glBindVertexArray(MeshShader::ViewFrustrumShader::frustrumvao);
     glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
-    float tmp[24] = {
-        frustrum->getFarLeftDown().X,
-        frustrum->getFarLeftDown().Y,
-        frustrum->getFarLeftDown().Z,
-        frustrum->getFarLeftUp().X,
-        frustrum->getFarLeftUp().Y,
-        frustrum->getFarLeftUp().Z,
-        frustrum->getFarRightDown().X,
-        frustrum->getFarRightDown().Y,
-        frustrum->getFarRightDown().Z,
-        frustrum->getFarRightUp().X,
-        frustrum->getFarRightUp().Y,
-        frustrum->getFarRightUp().Z,
-        frustrum->getNearLeftDown().X,
-        frustrum->getNearLeftDown().Y,
-        frustrum->getNearLeftDown().Z,
-        frustrum->getNearLeftUp().X,
-        frustrum->getNearLeftUp().Y,
-        frustrum->getNearLeftUp().Z,
-        frustrum->getNearRightDown().X,
-        frustrum->getNearRightDown().Y,
-        frustrum->getNearRightDown().Z,
-        frustrum->getNearRightUp().X,
-        frustrum->getNearRightUp().Y,
-        frustrum->getNearRightUp().Z,
-    };
-    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), tmp);
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
     MeshShader::ViewFrustrumShader::setUniforms(video::SColor(255, 0, 255, 0), i);
     glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
 }
@@ -871,16 +873,16 @@ void IrrDriver::renderShadowsDebug()
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
     glViewport(0, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 0);
-    renderWireFrameFrustrum(m_shadows_cam[0]->getViewFrustum(), 0);
+    renderWireFrameFrustrum(m_shadows_cam[0], 0);
     glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 1);
-    renderWireFrameFrustrum(m_shadows_cam[1]->getViewFrustum(), 1);
+    renderWireFrameFrustrum(m_shadows_cam[1], 1);
     glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 2);
-    renderWireFrameFrustrum(m_shadows_cam[2]->getViewFrustum(), 2);
+    renderWireFrameFrustrum(m_shadows_cam[2], 2);
     glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
     m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 3);
-    renderWireFrameFrustrum(m_shadows_cam[3]->getViewFrustum(), 3);
+    renderWireFrameFrustrum(m_shadows_cam[3], 3);
     glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 

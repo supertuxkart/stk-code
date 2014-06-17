@@ -345,7 +345,7 @@ private:
     class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
-    scene::ICameraSceneNode *m_shadows_cam[3];
+    float m_shadows_cam[4][24];
 
     std::vector<GlowData> m_glowing;
 
