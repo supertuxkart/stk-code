@@ -224,6 +224,8 @@ public:
 
     void setLoop(int start, int end); //set custom loops, as well as pause by scripts
 
+    void setCurrentFrame(int frame);
+
     int getCurrentFrame();
 
     virtual ~TrackObjectPresentationMesh();

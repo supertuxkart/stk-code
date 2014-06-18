@@ -69,6 +69,10 @@ namespace Scripting
         {
             ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
         }
+        void setCurrentFrame(int frame,void *memory)
+        {
+            ((TrackObjectPresentationMesh*)(memory))->setCurrentFrame(frame);
+        }
         void getCurrentFrame(void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->getCurrentFrame();
@@ -119,17 +123,21 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("TrackObject @getTrackObject(string &in)", asFUNCTION(getTrackObject), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "void setEnable(bool status)", asMETHOD(TrackObject, setEnable), asCALL_THISCALL); assert(r >= 0);
 
+
             //PhysicalObject
             r = engine->RegisterObjectType("PhysicalObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject @getPhysicalObject()", asMETHOD(TrackObject, getPhysicalObjectForScript), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattener()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asFUNCTION(disable), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
+
             //Mesh or Skeletal Animation
             r = engine->RegisterObjectType("Mesh", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Mesh @getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "void setLoop(int start, int end)", asFUNCTION(setLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "int getCurrentFrame()", asFUNCTION(getCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)", asFUNCTION(setCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
+
 
             //Curve based Animation
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);

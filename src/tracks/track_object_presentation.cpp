@@ -432,6 +432,16 @@ int TrackObjectPresentationMesh::getCurrentFrame()
     return -1; //Not a skeletal animation
 }
 
+void TrackObjectPresentationMesh::setCurrentFrame(int frame)
+{
+    if (m_node->getType() == scene::ESNT_ANIMATED_MESH)
+    {
+        scene::IAnimatedMeshSceneNode *a_node =
+            (scene::IAnimatedMeshSceneNode*)m_node;
+
+        a_node->setCurrentFrame((f32)frame);
+    }
+}
 
 void TrackObjectPresentationMesh::setLoop(int start, int end)
 {
