@@ -87,7 +87,7 @@ public:
 
     const Vec3& getNormal() const   { return m_normal; }
 
-    Quad  findFlattenedQuads();
+    Quad  getFlattenedQuad();
 
 };   // class Quad
 #endif
