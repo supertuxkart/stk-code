@@ -87,35 +87,33 @@ void TrackObjectManager::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
-void TrackObjectManager::disable(std::string name , std::string type)
+void TrackObjectManager::disable(std::string name)
 {
      TrackObject* curr;
      for_in (curr,m_all_objects){
-		 if (type != curr->getType())continue;
 		 
             if (curr->getName() == (name) || curr->getID() == (name))
             {
 
 				curr->setEnable(false);
-                if (type == "mesh")
+                if (curr->getType() == "mesh")
                 {
                     curr->getPhysicalObject()->removeBody();
                 }
             }
      }
 }
-void TrackObjectManager::enable(std::string name , std::string type)
+void TrackObjectManager::enable(std::string name)
 {
      TrackObject* curr;
      for_in (curr,m_all_objects){
-		if (type != curr->getType())continue;
 		
             if (curr->getName() == (name) || curr->getID() == (name))
             {
 			
 				curr->reset();
 				curr->setEnable(true);
-                if (type == "mesh")
+                if (curr->getType() == "mesh")
                 {
                     curr->getPhysicalObject()->addBody();
                 }
@@ -141,7 +139,8 @@ bool TrackObjectManager::getStatus(std::string name)
 TrackObject* TrackObjectManager::getTrackObject(std::string name)
 {
     TrackObject* curr;
-    for_in(curr, m_all_objects){
+    for_in(curr, m_all_objects)
+    {
         if (curr->getName() == (name) || curr->getID() == (name))
         {
 

@@ -69,11 +69,21 @@ namespace Scripting
         {
             ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
         }
+        void getCurrentFrame(void *memory)
+        {
+            ((TrackObjectPresentationMesh*)(memory))->getCurrentFrame();
+        }
         void getTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             TrackObject* t_obj = World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*str);
             gen->SetReturnObject(t_obj);
+        }
+        void runScript(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            script_engine->runScript(*str);
         }
         /*TrackObject* getTrackObject(std::string *name)
         {
@@ -104,22 +114,31 @@ namespace Scripting
             //r = engine->RegisterObjectMethod("TrackObjectManager", "void disable(string &in name)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObjectManager", "void disable(string &in)", asFUNCTION(disableAnimation), asCALL_CDECL_OBJLAST); assert(r >= 0);
             */
+            //TrackObject
             r = engine->RegisterObjectType("TrackObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterGlobalFunction("TrackObject @getTrackObject(string &in)", asFUNCTION(getTrackObject), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "void setEnable(bool status)", asMETHOD(TrackObject, setEnable), asCALL_THISCALL); assert(r >= 0);
+
+            //PhysicalObject
             r = engine->RegisterObjectType("PhysicalObject", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "PhysicalObject @getPhysicalObject()", asMETHOD(TrackObject, getPhysicalObjectForScript), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "bool isFlattener()", asMETHOD(PhysicalObject, isFlattenKartObject), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("PhysicalObject", "void disable()", asFUNCTION(disable), asCALL_CDECL_OBJLAST); assert(r >= 0);
+
+            //Mesh or Skeletal Animation
             r = engine->RegisterObjectType("Mesh", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Mesh @getMesh()", asMETHOD(TrackObject, getMesh), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "void setLoop(int start, int end)", asFUNCTION(setLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "int getCurrentFrame()", asFUNCTION(getCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
+
+            //Curve based Animation
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "Animator @getAnimator()", asMETHOD(TrackObject, getAnimatorForScript), asCALL_THISCALL); assert(r >= 0);
             //fails due to insufficient visibility to scripts TODO : Decide whether to fix visibility or introduce wrappers
             //r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", asMETHOD(ThreeDAnimation, setPaused), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("Animator", "void setPaused(bool mode)", asFUNCTION( setPaused ), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
+            r = engine->RegisterGlobalFunction("void runScript(string &in)", asFUNCTION(runScript), asCALL_GENERIC); assert(r >= 0);
 
         }
 
@@ -137,26 +156,22 @@ namespace Scripting
         void disableAnimation(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
-            std::string type = "mesh";
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str, type);
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
         }
         void enableAnimation(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
-            std::string type = "mesh";
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str, type);
+            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
         }
         void disableTrigger(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
-            std::string type = "action-trigger";
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str, type);
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
         }
         void enableTrigger(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
-            std::string type = "action-trigger";
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str, type);
+            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
         }
         void createTrigger(asIScriptGeneric *gen)
         {
