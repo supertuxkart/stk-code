@@ -110,6 +110,11 @@ public:
                                bool for_ai=false) const;
     void         spatialToTrack(Vec3 *dst, const Vec3& xyz,
                                 const int sector)               const;
+    void         spatialToTrackUnrolled(Vec3 *dst, 
+                                        const Vec3& xyz,
+                                        const int parent_sector, 
+                                        const int unroll_qd_idx)   const;
+
     void         findRoadSector(const Vec3& XYZ, int *sector,
                             std::vector<int> *all_sectors=NULL) const;
     int          findOutOfRoadSector(const Vec3& xyz,
@@ -199,7 +204,7 @@ public:
                        { return getNode(node).getUnrolledQuad(quad_number); }
     
     /** Returns the number of forward quads that are unrolled for each quad **/
-    int          getNumberOfUnrolledQuads() const { return m_unroll_count; }
+    int          getNumberOfUnrolledQuads() const { return m_unroll_quad_count; }
 
 
 };   // QuadGraph

@@ -576,7 +576,7 @@ void QuadGraph::createMesh2()
             c.setGreen((3 * i) % 256);
         }
 
-        Quad flatquad = QuadGraph::get()->getNode(60).getUnrolledQuad(count);
+        Quad flatquad = QuadGraph::get()->getNode(28).getUnrolledQuad(count);
 
         //std::vector<int> vInd = poly.getVerticesIndex();
         // Four vertices for each of the n-1 remaining quads
@@ -901,6 +901,17 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 
     getNode(sector).getDistances(xyz, dst);
 }   // spatialToTrack
+
+void QuadGraph::spatialToTrackUnrolled(Vec3 *dst, const Vec3& xyz,
+    const int parent_sector, const int unroll_qd_idx) const
+{
+    if (parent_sector == UNKNOWN_SECTOR)
+    {
+        Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrack().");
+        return;
+    }
+    getNode(parent_sector).getDistancesUnrolled(xyz, unroll_qd_idx, dst);
+}
 
 //-----------------------------------------------------------------------------
 /** findRoadSector returns in which sector on the road the position

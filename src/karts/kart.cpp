@@ -1254,7 +1254,7 @@ void Kart::update(float dt)
                 Vec3 normal = m_terrain_info->getNormal();
                 
                 gravity = normal*-g;
-                std::cout << gravity.x() << " "<< gravity.y() <<" " << gravity.z() <<  std::endl; 
+                //std::cout << gravity.x() << " "<< gravity.y() <<" " << gravity.z() <<  std::endl; 
             }
             body->setGravity(gravity);
         }   // if !flying
