@@ -60,6 +60,9 @@ class FeatureUnlockedCutScene : public GUIEngine::CutsceneScreen, public GUIEngi
         /** Contains whatever is in the chest */
         scene::ISceneNode* m_root_gift_node;
 
+        scene::IMeshSceneNode* m_side_1;
+        scene::IMeshSceneNode* m_side_2;
+
         float m_scale;
 
         irr::core::stringw m_unlock_message;
