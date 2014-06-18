@@ -197,6 +197,20 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
                   (closest-m_lower_center_2d).getLength());
 }   // getDistances
 
+void GraphNode::getDistancesUnrolled(const Vec3 &xyz, unsigned int quad_idx, Vec3 *result)
+{
+    
+    const Quad& unrolled = getUnrolledQuad(quad_idx);
+    Vec3 upper_center = 0.5f*(unrolled[2] + unrolled[3]),
+         lower_center = 0.5f*(unrolled[0] + unrolled[1]);
+    // center_line is from A to B, or lower_center to upper_center
+    core::vector3df A = lower_center.toIrrVector(), B = upper_center.toIrrVector();
+    result->setX(((B - A).crossProduct(xyz.toIrrVector() - A)).getLength() / (B - A).getLength());
+
+    result->setZ(QuadGraph::get()->getNode(m_node_index + quad_idx).getDistanceFromStart()
+                    + (xyz - lower_center).length());
+}
+
 // ----------------------------------------------------------------------------
 /** Returns the square of the distance between the given point and any point
  *  on the 'centre' line, i.e. the finite line from the middle point of the

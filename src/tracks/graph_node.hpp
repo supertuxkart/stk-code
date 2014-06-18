@@ -135,6 +135,7 @@ public:
                  GraphNode(unsigned int quad_index, unsigned int node_index);
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
+    void         getDistancesUnrolled(const Vec3 &xyz, unsigned int quad_idx, Vec3 *result);
     float        getDistance2FromPoint(const Vec3 &xyz);
     void         setupPathsToNode();
     void         setChecklineRequirements(int latest_checkline);
