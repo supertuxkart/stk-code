@@ -58,7 +58,8 @@ ScriptEngine::~ScriptEngine()
 std::string getScript(std::string scriptName)
 {
     std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
-    
+    script_dir += World::getWorld()->getTrack()->getIdent() + "/";
+    if (scriptName != "update" && scriptName != "collisions" && scriptName!="start") scriptName = "triggers";
     script_dir += scriptName + ".as";
     FILE *f = fopen(script_dir.c_str(), "rb");
     if( f == 0 )
@@ -129,7 +130,8 @@ void ScriptEngine::runScript(std::string scriptName)
     }
     else
     {
-        func = Scripting::Track::registerScriptCallbacks(m_engine);
+        //trigger type can have different names
+        func = Scripting::Track::registerScriptCallbacks(m_engine , scriptName);
     }
     if( func == 0 )
     {

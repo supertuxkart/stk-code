@@ -30,7 +30,7 @@ namespace Scripting
         //script engine functions
         void registerScriptFunctions(asIScriptEngine *engine);
         asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine);
+            registerScriptCallbacks(asIScriptEngine *engine , std::string scriptName);
 
 
         //script-bound functions

@@ -47,7 +47,7 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine);
 
         asIScriptFunction*
-            registerScriptCallbacks(asIScriptEngine *engine);
+            registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
 
         asIScriptFunction*
             registerUpdateScriptCallbacks(asIScriptEngine *engine);

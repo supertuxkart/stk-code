@@ -25,6 +25,7 @@
 #include "tracks/track_object.hpp"
 #include "tracks/track.hpp"
 #include "animations/three_d_animation.hpp"
+#include <iostream> //debug
 
 namespace Scripting
 {
@@ -32,16 +33,17 @@ namespace Scripting
     namespace Track
     {
 
-        asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine)
+        asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName)
         {
             asIScriptFunction *func;
-            func = engine->GetModule(0)->GetFunctionByDecl("void onTrigger()");
+            std::string function_name = "void " + scriptName + "()";
+            func = engine->GetModule(0)->GetFunctionByDecl(function_name.c_str());
             return func;
         }
         asIScriptFunction* registerStartScriptCallbacks(asIScriptEngine *engine)
         {
             asIScriptFunction *func;
-            func = engine->GetModule(0)->GetFunctionByDecl("void onUpdate()");
+            func = engine->GetModule(0)->GetFunctionByDecl("void onStart()");
             return func;
         }
         asIScriptFunction* registerUpdateScriptCallbacks(asIScriptEngine *engine)
@@ -188,7 +190,7 @@ namespace Scripting
             float y = gen->GetArgFloat(2);
             float z = gen->GetArgFloat(3);
             float distance = gen->GetArgFloat(4); //triggering distance
-            core::vector3df posi(0, 0, 0);
+            core::vector3df posi(x, y, z);
             core::vector3df hpr(0, 0, 0);
             core::vector3df scale(1.0f, 1.0f, 1.0f);
             TrackObjectPresentationActionTrigger* newtrigger =

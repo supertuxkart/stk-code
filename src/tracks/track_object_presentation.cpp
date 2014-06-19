@@ -778,7 +778,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger
 (const core::vector3df& xyz,std::string script_name, float distance)
 :TrackObjectPresentation(xyz)
 {
-    m_init_xyz = core::vector3df(0, 0, 0);
+    m_init_xyz = xyz;
     m_init_hpr = core::vector3df(0, 0, 0);
     m_init_scale = core::vector3df(1, 1, 1);
     float trigger_distance = distance;

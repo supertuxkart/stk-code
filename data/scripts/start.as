@@ -1,4 +1,4 @@
-void onUpdate()
+void onStart()
 {
 
     displayMessage("Track Loaded");
