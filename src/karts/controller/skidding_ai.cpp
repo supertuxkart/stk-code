@@ -35,7 +35,7 @@
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
-
+#define AI_DEBUG
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
 #endif
@@ -2009,7 +2009,8 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     float angle = QuadGraph::get()->getAngleToNext(m_track_node,
                                               m_successor_index[m_track_node]);
     int target_sector;
-
+    Vec3 transfrmd_kart_coord = QuadGraph::get()->getNode(m_track_node).
+                                    getPointTransformedToFlatQuad(m_kart->getXYZ());
     Vec3 direction;
     Vec3 step_track_coord;
 
@@ -2017,11 +2018,15 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     // The original while(1) loop is replaced with a for loop to avoid
     // infinite loops (which we had once or twice). Usually the number
     // of iterations in the while loop is less than 7.
-    for(unsigned int j=0; j<100; j++)
+    for(unsigned int j=0; j<QuadGraph::get()->getNumberOfUnrolledQuads(); j++)
     {
         // target_sector is the sector at the longest distance that we can
         // drive to without crashing with the track.
         target_sector = m_next_node_index[*last_node];
+
+
+        /** Skip angle checking for now
+
         angle1 = QuadGraph::get()->getAngleToNext(target_sector,
                                                 m_successor_index[target_sector]);
         // In very sharp turns this algorithm tends to aim at off track points,
@@ -2034,12 +2039,18 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
                                                  .getCenter();
             return;
         }
+        */
 
         //direction is a vector from our kart to the sectors we are testing
-        direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
-                  - m_kart->getXYZ();
+        //direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
+        //          - m_kart->getXYZ();
 
-        float len=direction.length_2d();
+        Quad target_quad_unrolled = QuadGraph::get()->getNode(m_track_node).
+            getUnrolledQuad(j + 1);
+        direction = target_quad_unrolled.getCenter() - m_kart->getXYZ();
+
+        //float len=direction.length_2d();
+        float len = direction.length();
         unsigned int steps = (unsigned int)( len / m_kart_length );
         if( steps < 3 ) steps = 3;
 
@@ -2058,25 +2069,34 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         for(unsigned int i = 2; i < steps; ++i )
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
+            //step_coord = transfrmd_kart_coord+direction*m_kart_length * float(i);
+            
+            //QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
+            //                                 *last_node );
+            QuadGraph::get()->spatialToTrackUnrolled(&step_track_coord, step_coord,
+                                             *last_node, j);
 
-            QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
-                                             *last_node );
 
-            float distance = fabsf(step_track_coord[0]);
+            //float distance = fabsf(step_track_coord[0]);
+            float distance = step_track_coord[0];
 
             //If we are outside, the previous node is what we are looking for
             if ( distance + m_kart_width * 0.5f
-                 > QuadGraph::get()->getNode(*last_node).getPathWidth() )
+                 > QuadGraph::get()->getNode((*last_node+j)%QuadGraph::get()->getNumNodes() ).getPathWidth() )
             {
-                *aim_position = QuadGraph::get()->getQuadOfNode(*last_node)
+                *aim_position = QuadGraph::get()->getUnrolledQuadOfNode(*last_node,j)
                                                  .getCenter();
                 return;
             }
+            
+          
         }
-        angle = angle1;
-        *last_node = target_sector;
+       // angle = angle1;
+        //*last_node = target_sector;
     }   // for i<100
-    *aim_position = QuadGraph::get()->getQuadOfNode(*last_node).getCenter();
+    *aim_position = QuadGraph::get()->getNode(m_track_node).
+        getUnrolledQuad(QuadGraph::get()->getNumberOfUnrolledQuads()).getCenter();
+    //*aim_position = QuadGraph::get()->getQuadOfNode(*last_node).getCenter();
 }   // findNonCrashingPoint
 
 //-----------------------------------------------------------------------------
