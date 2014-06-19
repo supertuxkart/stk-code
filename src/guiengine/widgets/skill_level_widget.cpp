@@ -115,7 +115,7 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
     m_h = h;
 
     // -- sizes
-    m_bar_w = w/2;
+    m_bar_w = 3*(w/2)/4;
     m_bar_h = h;
     m_label_w = w/2;
     m_label_h = h;
