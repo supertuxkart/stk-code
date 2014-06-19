@@ -359,6 +359,9 @@ float AIBaseController::steerToPoint(const Vec3 &point)
     btQuaternion q(btVector3(0,1,0), -m_kart->getHeading());
     Vec3 p  = point - m_kart->getXYZ();
     Vec3 lc = quatRotate(q, p);
+    
+    btTransform trans = m_kart->getTrans().inverse();
+    lc = trans(point);
 
     // The point the kart is aiming at can be reached 'incorrectly' if the
     // point is below the y=x line: Instead of aiming at that point directly
