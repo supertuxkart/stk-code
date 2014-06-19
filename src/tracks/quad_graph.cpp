@@ -54,7 +54,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_unroll_quad_count    = 10;
+    m_unroll_quad_count    = 7;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
@@ -576,7 +576,7 @@ void QuadGraph::createMesh2()
             c.setGreen((3 * i) % 256);
         }
 
-        Quad flatquad = QuadGraph::get()->getNode(28).getUnrolledQuad(count);
+        Quad flatquad = QuadGraph::get()->getNode(57).getUnrolledQuad(count);
 
         //std::vector<int> vInd = poly.getVerticesIndex();
         // Four vertices for each of the n-1 remaining quads

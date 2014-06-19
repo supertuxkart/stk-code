@@ -207,7 +207,7 @@ void GraphNode::getDistancesUnrolled(const Vec3 &xyz, unsigned int quad_idx, Vec
     core::vector3df A = lower_center.toIrrVector(), B = upper_center.toIrrVector();
     result->setX(((B - A).crossProduct(xyz.toIrrVector() - A)).getLength() / (B - A).getLength());
 
-    result->setZ(QuadGraph::get()->getNode(m_node_index + quad_idx).getDistanceFromStart()
+    result->setZ(QuadGraph::get()->getNode((m_node_index + quad_idx)%QuadGraph::get()->getNumNodes()).getDistanceFromStart()
                     + (xyz - lower_center).length());
 }
 
@@ -284,13 +284,13 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
     for (unsigned int i = 0; i < 4; i++)
         m.rotateVect(new_points[i], next_quad_to_push[i].toIrrVector());
     
-    Vec3 endEdge = 0.5f*(last_pushed_quad[2] + last_pushed_quad[1]) - 0.5f*(last_pushed_quad[3] + last_pushed_quad[0]);
-    Vec3 beginEdge = 0.5f*(new_points[1] + new_points[2]) - 0.5f*(new_points[0] + new_points[3]);
-    /*
-    m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
-    for (unsigned int i = 0; i < 4; i++) 
-        m.rotateVect(new_points[i]);
-    */
+    Vec3 endEdge = (last_pushed_quad[2] - last_pushed_quad[3]);
+    Vec3 beginEdge = (new_points[1] - new_points[0]);
+    
+    //m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
+    //for (unsigned int i = 0; i < 4; i++) 
+    //    m.rotateVect(new_points[i]);
+    
     // Next translate the new quad to be pushed to the correct position infront
     // of the last quad in the vector of unrolled quads
     Vec3 lower_center = 0.5f*(new_points[0] + new_points[1]);
