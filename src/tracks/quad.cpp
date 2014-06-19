@@ -194,10 +194,10 @@ Quad Quad::getFlattenedQuad()
     for (unsigned int i = 0; i < 4; i++)
     {
         // Translate to origin
-        m_p_flat[i] = m_p[i] - m_center;
+        //m_p_flat[i] = m_p[i] - m_center;
 
         // rotateVect(out,in)
-        m.rotateVect(m_p_flat[i] , m_p_flat[i].toIrrVector());
+        m.rotateVect(m_p_flat[i], (m_p[i] - m_center).toIrrVector());
 
         m_p_flat[i].setY(0);
     }
