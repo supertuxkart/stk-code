@@ -27,16 +27,12 @@ static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint i
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(target, result);
-    if (irr_driver->getGLSLVersion() < 420)
-        glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
-    else
-    {
-#if !defined(__linux__) || defined(GL_VERSION_4_2)
+#if WIN32
+    if (irr_driver->getGLSLVersion() >= 420)
         glTexStorage3D(target, 1, internalFormat, w, h, d);
-#else
-        assert(false);
+    else
 #endif
-    }
+        glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
     return result;
 }
 
@@ -45,16 +41,12 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
+#if WIN32
     if (irr_driver->getGLSLVersion() < 420)
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
-    else
-    {
-#if !defined(__linux__) || defined(GL_VERSION_4_2)
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
-#else
-        assert(false);
+    else
 #endif
-    }
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     return result;
 }
 
