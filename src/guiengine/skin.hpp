@@ -270,9 +270,7 @@ namespace GUIEngine
         video::ITexture* bg_image;
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
-#ifdef USE_PER_LINE_BACKGROUND
-    public:
-#endif
+
         LEAK_CHECK()
 
         void drawBoxFromStretchableTexture(SkinWidgetContainer* w,
