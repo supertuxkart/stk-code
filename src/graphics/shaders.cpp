@@ -2400,6 +2400,7 @@ namespace FullScreenShader
     GLuint GlobalIlluminationReconstructionShader::uniform_SHB;
     GLuint GlobalIlluminationReconstructionShader::uniform_extents;
     GLuint GlobalIlluminationReconstructionShader::uniform_RHMatrix;
+    GLuint GlobalIlluminationReconstructionShader::uniform_InvRHMatrix;
     GLuint GlobalIlluminationReconstructionShader::vao;
 
     void GlobalIlluminationReconstructionShader::init()
@@ -2415,15 +2416,17 @@ namespace FullScreenShader
         uniform_SHG = glGetUniformLocation(Program, "SHG");
         uniform_SHB = glGetUniformLocation(Program, "SHB");
         uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        uniform_InvRHMatrix = glGetUniformLocation(Program, "InvRHMatrix");
         uniform_extents = glGetUniformLocation(Program, "extents");
         vao = createFullScreenVAO(Program);
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void GlobalIlluminationReconstructionShader::setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
+    void GlobalIlluminationReconstructionShader::setUniforms(const core::matrix4 &RHMatrix, const core::matrix4 &InvRHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
     {
         glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
+        glUniformMatrix4fv(uniform_InvRHMatrix, 1, GL_FALSE, InvRHMatrix.pointer());
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
         glUniform1i(uniform_SHR, TU_SHR);
