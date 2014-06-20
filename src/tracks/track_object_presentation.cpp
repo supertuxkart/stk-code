@@ -885,22 +885,6 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         new TutorialMessageDialog(_("Accelerate and press the <%s> key while turning to skid. Skidding for a short while can help you turn faster to take sharp turns.", skid),
                                  true);
     }
-    else if (m_action == "tutorial_skidding2")
-    {
-        m_action_active = false;
-        World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        new TutorialMessageDialog(_("Note that if you manage to skid for several seconds, you will receive a bonus speedup as a reward!"),
-                                true);
-    }
-    else if (m_action == "tutorial_endmessage")
-    {
-        m_action_active = false;
-        World::getWorld()->getRaceGUI()->clearAllMessages();
-
-        new TutorialMessageDialog(_("You are now ready to race. Good luck!"),
-                                  true);
-    }
     else if (m_action == "tutorial_exit")
     {
         World::getWorld()->scheduleExitRace();

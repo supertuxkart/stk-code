@@ -27,3 +27,13 @@ void tutorial_nitro_collect()
     displayMessage("Collect nitro bottles (we will use them after the curve)");
 }
 
+void tutorial_skidding2()
+{
+    displayMessage("Note that if you manage to skid for several seconds, you will receive a bonus speedup as a reward!");
+}
+
+void tutorial_endmessage()
+{
+    displayMessage("You are now ready to race. Good luck!");
+}
+
