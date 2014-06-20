@@ -2509,13 +2509,15 @@ namespace FullScreenShader
 
     GLuint ComputeGaussian17TapHShader::Program;
     GLuint ComputeGaussian17TapHShader::uniform_source;
+    GLuint ComputeGaussian17TapHShader::uniform_depth;
     GLuint ComputeGaussian17TapHShader::uniform_dest;
     void ComputeGaussian17TapHShader::init()
     {
 #if WIN32
         Program = LoadProgram(
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian.comp").c_str());
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         uniform_dest = glGetUniformLocation(Program, "dest");
 #endif
     }
@@ -2564,13 +2566,15 @@ namespace FullScreenShader
 
     GLuint ComputeGaussian17TapVShader::Program;
     GLuint ComputeGaussian17TapVShader::uniform_source;
+    GLuint ComputeGaussian17TapVShader::uniform_depth;
     GLuint ComputeGaussian17TapVShader::uniform_dest;
     void ComputeGaussian17TapVShader::init()
     {
 #if WIN32
         Program = LoadProgram(
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussianv.comp").c_str());
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         uniform_dest = glGetUniformLocation(Program, "dest");
 #endif
     }
