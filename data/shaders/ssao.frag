@@ -24,12 +24,12 @@ layout (std140) uniform MatrixesData
 
 out float AO;
 
-const float sigma = 1.;
+const float sigma = 2.;
 const float tau = 7.;
 const float beta = 0.001;
 const float epsilon = .00001;
 const float radius = 1.;
-const float k = 1.5;
+const float k = 5.;
 
 #define SAMPLES 16
 
