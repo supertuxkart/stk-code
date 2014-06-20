@@ -1,12 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
+    <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+        <label id="title" width="100%" text_align="left" word_wrap="true" proportion="1" />
 
-<div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
+        <spacer height="10" width="10" />
 
-    <label id="title" width="100%" text_align="left" word_wrap="true" proportion="1" />
-
-    <spacer height="10" width="10" />
-    
-    <button id="continue" I18N="Button in tutorial" text="Continue" align="right"/>
-</div>
-
+        <button id="continue" I18N="Button in tutorial" text="Continue" align="right"/>
+    </div>
 </stkgui>

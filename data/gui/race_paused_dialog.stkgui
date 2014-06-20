@@ -1,7 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-
     <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
-
         <header id="title" width="100%" text_align="center" text="Paused" proportion="3" />
 
         <!-- FIXME: some play in proportions occur below because the text of an icon
@@ -35,5 +34,4 @@
 
         <spacer width="20" height="35" />
     </div>
-
 </stkgui>
