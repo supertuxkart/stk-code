@@ -22,3 +22,8 @@ void tutorial_bananas()
 
 }
 
+void tutorial_nitro_collect()
+{
+    displayMessage("Collect nitro bottles (we will use them after the curve)");
+}
+
