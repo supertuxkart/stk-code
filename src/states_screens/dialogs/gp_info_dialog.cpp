@@ -246,6 +246,7 @@ void GPInfoDialog::addButtons()
 
 void GPInfoDialog::onEnterPressedInternal()
 {
+    // Save the GP id because dismiss() will destroy this instance
     std::string gp_id = m_gp->getId();
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
