@@ -35,7 +35,7 @@ typedef GUIEngine::SpinnerWidget Spinner;
 RandomGPInfoDialog::RandomGPInfoDialog()
 {
     // Defaults - loading selection from last time frrom a file would be better
-    m_number_of_tracks = 2; // We can assume that there are at least 2 standart tracks
+    m_number_of_tracks = 2; // We can assume that there are at least 2 standard tracks
     m_trackgroup = "standard";
     m_use_reverse = NO_REVERSE;
 
@@ -78,20 +78,23 @@ void RandomGPInfoDialog::addSpinners()
     m_widgets.push_back(spinner);
     spinner->add();
     spinner->move(left, m_under_title, trackgroup_width, SPINNER_HEIGHT);
-    // Fill it with with all the track group names
+    // Fill it with all the track group names
     spinner->addLabel("all");
+    int index_standard;
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-    for (unsigned int i = 1; i < groups.size() + 1; i++)
+    for (unsigned int i = 0; i < groups.size() + 1; i++)
     {
         // FIXME: The NULL check is necessary until #1348 on github is fixed
         if (groups[i].c_str() != NULL)
         {
             spinner->addLabel(stringw(groups[i].c_str()));
             if(groups[i] == "standard")
-                spinner->setValue(i);
+                index_standard  = i+1;
         }
     }
-    spinner->setValue(1); // Let's just hope it's right ...
+    // The value can only be set here because SpinnerWidget resets the value
+    // every time a label is added
+    spinner->setValue(index_standard);
 
     // Number of laps chooser
     spinner = new Spinner(false);

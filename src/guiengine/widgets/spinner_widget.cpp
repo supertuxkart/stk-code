@@ -160,7 +160,7 @@ void SpinnerWidget::add()
         {
             label->setText(m_labels[m_value].c_str() );
         }
-    
+
     }
 
 
@@ -174,7 +174,7 @@ void SpinnerWidget::add()
     m_children[2].m_id = m_children[2].m_element->getID();
 
     // refresh display
-    
+
 
     setValue(m_value);
 }
@@ -333,7 +333,7 @@ void SpinnerWidget::setValue(const int new_value)
         assert(new_value >= 0);
         assert(new_value < (int)m_labels.size());
 
-        m_children[1].m_element->setText(m_labels[new_value].c_str() );
+        m_children[1].m_element->setText(m_labels[new_value].c_str());
     }
     else if (m_text.size() > 0 && m_children.size() > 0)
     {
