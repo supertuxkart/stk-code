@@ -244,6 +244,8 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
 
 void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, GLuint shr, GLuint shg, GLuint shb)
 {
+    core::matrix4 InvRHMatrix;
+    RHMatrix.getInverse(InvRHMatrix);
     glDisable(GL_DEPTH_TEST);
     glUseProgram(FullScreenShader::GlobalIlluminationReconstructionShader::Program);
     glBindVertexArray(FullScreenShader::GlobalIlluminationReconstructionShader::vao);
@@ -267,7 +269,7 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     }
     setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, rh_extend, 3, 4, 0, 1, 2);
+    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, InvRHMatrix, rh_extend, 3, 4, 0, 1, 2);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -400,7 +402,9 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
     assert(in_fbo.getWidth() == auxiliary.getWidth() && in_fbo.getHeight() == auxiliary.getHeight());
     float inv_width = 1.0f / in_fbo.getWidth(), inv_height = 1.0f / in_fbo.getHeight();
     {
+#if WIN32
         if (irr_driver->getGLSLVersion() < 430)
+#endif
         {
             auxiliary.Bind();
             glUseProgram(FullScreenShader::Gaussian17TapHShader::Program);
@@ -415,8 +419,10 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+#if WIN32
         else
         {
+
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
             glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
@@ -424,9 +430,12 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 1);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
+#endif
     }
     {
+#if WIN32
         if (irr_driver->getGLSLVersion() < 430)
+#endif
         {
             in_fbo.Bind();
             glUseProgram(FullScreenShader::Gaussian17TapVShader::Program);
@@ -441,6 +450,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
+#if WIN32
         else
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
@@ -450,6 +460,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 1);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
+#endif
     }
 }
 
@@ -639,7 +650,7 @@ void PostProcessing::applyMLAA()
 {
     const core::vector2df &PIXEL_SIZE = core::vector2df(1.0f / UserConfigParams::m_width, 1.0f / UserConfigParams::m_height);
     IVideoDriver *const drv = irr_driver->getVideoDriver();
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
+    irr_driver->getFBO(FBO_MLAA_TMP).Bind();
     glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -658,11 +669,11 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
     // Pass 2: blend weights
-    irr_driver->getFBO(FBO_TMP2_WITH_DS).Bind();
+    irr_driver->getFBO(FBO_MLAA_BLEND).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(FullScreenShader::MLAABlendWeightSHader::Program);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_LINEAR, GL_LINEAR);
     setTexture(1, getTextureGLuint(m_areamap), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MLAABlendWeightSHader::setUniforms(PIXEL_SIZE, 0, 1);
 
@@ -670,14 +681,14 @@ void PostProcessing::applyMLAA()
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Blit in to tmp1
-    FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_TMP1_WITH_DS));
+    FrameBuffer::Blit(irr_driver->getFBO(FBO_MLAA_COLORS), irr_driver->getFBO(FBO_MLAA_TMP));
 
     // Pass 3: gather
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
 
     glUseProgram(FullScreenShader::MLAAGatherSHader::Program);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP2), GL_NEAREST, GL_NEAREST);
+    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_NEAREST, GL_NEAREST);
+    setTexture(1, irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MLAAGatherSHader::setUniforms(PIXEL_SIZE, 0, 1);
 
     glBindVertexArray(FullScreenShader::MLAAGatherSHader::vao);
@@ -685,7 +696,6 @@ void PostProcessing::applyMLAA()
 
     // Done.
     glDisable(GL_STENCIL_TEST);
-
 }
 
 // ----------------------------------------------------------------------------
@@ -850,17 +860,19 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
         PROFILER_POP_CPU_MARKER();
     }
 
+    glEnable(GL_FRAMEBUFFER_SRGB);
+    irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
+    renderPassThrough(in_fbo->getRTT()[0]);
+    out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
+
     if (UserConfigParams::m_mlaa) // MLAA. Must be the last pp filter.
     {
         PROFILER_PUSH_CPU_MARKER("- MLAA", 0xFF, 0x00, 0x00);
-        glEnable(GL_FRAMEBUFFER_SRGB);
-        irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
-        renderPassThrough(in_fbo->getRTT()[0]);
-        glDisable(GL_FRAMEBUFFER_SRGB);
+        ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MLAA));
         applyMLAA();
-        out_fbo = &irr_driver->getFBO(FBO_MLAA_COLORS);
         PROFILER_POP_CPU_MARKER();
     }
+    glDisable(GL_FRAMEBUFFER_SRGB);
 
     return out_fbo;
 }   // render

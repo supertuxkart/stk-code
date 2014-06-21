@@ -114,32 +114,6 @@ void GrandPrixWin::onCutsceneEnd()
     m_podium_steps[0] = NULL;
     m_podium_steps[1] = NULL;
     m_podium_steps[2] = NULL;
-
-
-
-    // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
-
-    if (PlayerManager::getCurrentPlayer()
-        ->getRecentlyCompletedChallenges().size() > 0)
-    {
-        std::vector<const ChallengeData*> unlocked =
-            PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
-        PlayerManager::getCurrentPlayer()->clearUnlocked();
-
-        FeatureUnlockedCutScene* scene = FeatureUnlockedCutScene::getInstance();
-
-        assert(unlocked.size() > 0);
-        scene->addTrophy(race_manager->getDifficulty());
-        scene->findWhatWasUnlocked(race_manager->getDifficulty());
-
-        StateManager::get()->replaceTopMostScreen(scene);
-    }
-    else
-    {
-        // we assume the main menu was pushed before showing this menu
-        StateManager::get()->popMenu();
-    }
 }
 
 // -------------------------------------------------------------------------------------

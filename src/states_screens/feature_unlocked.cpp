@@ -156,7 +156,7 @@ void FeatureUnlockedCutScene::onCutsceneEnd()
         irr_driver->removeNode(m_avoid_irrlicht_bug);
     m_avoid_irrlicht_bug = NULL;
 #endif
-
+    
     m_unlocked_stuff.clearAndDeleteAll();
     m_all_kart_models.clearAndDeleteAll();
 
@@ -319,7 +319,7 @@ void FeatureUnlockedCutScene::init()
         else if (!m_unlocked_stuff[n].m_pictures.empty())
         {
             video::SMaterial m;
-            m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
+            //m.MaterialType    = video::EMT_TRANSPARENT_ALPHA_CHANNEL;
             m.BackfaceCulling = false;
             m.setTexture(0, m_unlocked_stuff[n].m_pictures[0]);
             m.AmbientColor  = video::SColor(255, 255, 255, 255);
@@ -335,8 +335,16 @@ void FeatureUnlockedCutScene::init()
                 irr_driver->createTexturedQuadMesh(&m,
                                                    m_unlocked_stuff[n].m_w,
                                                    m_unlocked_stuff[n].m_h);
-            m_unlocked_stuff[n].m_root_gift_node   = irr_driver->addMesh(mesh);
-            mesh->drop();
+            m_unlocked_stuff[n].m_root_gift_node = irr_driver->getSceneManager()->addEmptySceneNode();
+            m_unlocked_stuff[n].m_side_1 = irr_driver->addMesh(mesh, m_unlocked_stuff[n].m_root_gift_node);
+            //mesh->drop();
+
+            mesh = irr_driver->createTexturedQuadMesh(&m,
+                m_unlocked_stuff[n].m_w,
+                m_unlocked_stuff[n].m_h);
+            m_unlocked_stuff[n].m_side_2 = irr_driver->addMesh(mesh, m_unlocked_stuff[n].m_root_gift_node);
+            m_unlocked_stuff[n].m_side_2->setRotation(core::vector3df(0.0f, 180.0f, 0.0f));
+            //mesh->drop();
 #ifdef DEBUG
             m_unlocked_stuff[n].m_root_gift_node->setName("unlocked track picture");
 #endif
@@ -346,6 +354,8 @@ void FeatureUnlockedCutScene::init()
             std::cerr << "Malformed unlocked goody!!!\n";
         }
     }
+
+    PlayerManager::getCurrentPlayer()->clearUnlocked();
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -353,7 +363,6 @@ void FeatureUnlockedCutScene::init()
 void FeatureUnlockedCutScene::tearDown()
 {
     Screen::tearDown();
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
 }   // tearDown
 
 // ----------------------------------------------------------------------------
@@ -378,8 +387,6 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
     {
         float progress_factor = (m_global_time - GIFT_EXIT_FROM) / (GIFT_EXIT_TO - GIFT_EXIT_FROM);
         float smoothed_progress_factor = sin((progress_factor - 0.5f)*M_PI)/2.0f + 0.5f;
-
-        Log::info("smoothed_progress_factor", "%f", smoothed_progress_factor);
 
         for (int n=0; n<unlockedStuffCount; n++)
         {
@@ -433,7 +440,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
                 if (textureID != previousTextureID)
                 {
                     scene::IMeshSceneNode* node = (scene::IMeshSceneNode*)m_unlocked_stuff[n].m_root_gift_node;
-                    scene::IMesh* mesh = node->getMesh();
+                    scene::IMesh* mesh = m_unlocked_stuff[n].m_side_1->getMesh();
 
                     assert(mesh->getMeshBufferCount() == 1);
 
@@ -444,7 +451,21 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
                     // FIXME: this mesh is already associated with this node. I'm calling this
                     // to force irrLicht to refresh the display, now that Material has changed.
-                    node->setMesh(mesh);
+                    m_unlocked_stuff[n].m_side_1->setMesh(mesh);
+
+                    m_unlocked_stuff[n].m_curr_image = textureID;
+
+
+                    mesh = m_unlocked_stuff[n].m_side_2->getMesh();
+                    assert(mesh->getMeshBufferCount() == 1);
+                    mb = mesh->getMeshBuffer(0);
+
+                    SMaterial& m2 = mb->getMaterial();
+                    m2.setTexture(0, m_unlocked_stuff[n].m_pictures[textureID]);
+
+                    // FIXME: this mesh is already associated with this node. I'm calling this
+                    // to force irrLicht to refresh the display, now that Material has changed.
+                    m_unlocked_stuff[n].m_side_2->setMesh(mesh);
 
                     m_unlocked_stuff[n].m_curr_image = textureID;
                 }   // textureID != previousTextureID
@@ -546,7 +567,6 @@ void FeatureUnlockedCutScene::addUnlockedGP(const GrandPrixData* gp)
 
 bool FeatureUnlockedCutScene::onEscapePressed()
 {
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
     continueButtonPressed();
     return false; // continueButtonPressed already pop'ed the menu
 }   // onEscapePressed
@@ -555,35 +575,20 @@ bool FeatureUnlockedCutScene::onEscapePressed()
 
 void FeatureUnlockedCutScene::continueButtonPressed()
 {
-    if (m_global_time < GIFT_EXIT_TO)
-    {
-        // If animation was not over yet, the button is used to skip the animation
-        while (m_global_time < GIFT_EXIT_TO)
-        {
-            // simulate all the steps of the animation until we reach the end
-            onUpdate(0.4f);
-        }
-    }
-    else
-    {
-        if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX)
-        {
-            // in GP mode, continue GP after viewing this screen
-            StateManager::get()->popMenu();
-            race_manager->next();
-        }
-        else
-        {
-            // back to menu or overworld
-            race_manager->exitRace();
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-
-            if (race_manager->raceWasStartedFromOverworld())
-            {
-                OverWorld::enterOverWorld();
-            }
-        }
-    }
+    //if (m_global_time < GIFT_EXIT_TO)
+    //{
+    //    // If animation was not over yet, the button is used to skip the animation
+    //    while (m_global_time < GIFT_EXIT_TO)
+    //    {
+    //        // simulate all the steps of the animation until we reach the end
+    //        onUpdate(0.4f);
+    //        World::getWorld()->updateWorld(0.4f);
+    //    }
+    //}
+    //else
+    //{
+        ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    //}
 
 }   // continueButtonPressed
 

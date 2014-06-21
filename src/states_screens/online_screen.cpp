@@ -32,7 +32,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/request_connection.hpp"
-#include "online/messages.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request.hpp"
 #include "online/servers_manager.hpp"
@@ -153,11 +152,13 @@ void OnlineScreen::onUpdate(float delta)
 
     if (m_recorded_state == PlayerProfile::OS_SIGNING_IN)
     {
-        m_online_status_widget->setText(Messages::signingIn(), false);
+        m_online_status_widget->setText(StringUtils::loadingDots(_("Signing in")),
+                                        false                                   );
     }
     else if (m_recorded_state == PlayerProfile::OS_SIGNING_OUT)
     {
-        m_online_status_widget->setText(Messages::signingOut(), false);
+        m_online_status_widget->setText(StringUtils::loadingDots(_("Signing out")),
+                                        false                                    );
     }
 }   // onUpdate
 

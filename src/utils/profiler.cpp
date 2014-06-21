@@ -407,7 +407,9 @@ void Profiler::draw()
                 "Godrays",
                 "Bloom",
                 "Tonemap",
-                "Motion Blur"
+                "Motion Blur",
+                "MLAA",
+                "GUI",
             };
             std::ostringstream oss;
             oss << Phase[hovered_gpu_marker] << " : " << hovered_gpu_marker_elapsed << " us";

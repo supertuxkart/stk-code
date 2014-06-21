@@ -21,6 +21,7 @@
 #endif
 
 bool LoadPoFiles(const char* sListFileName);
+bool setUsedCharacters(const char* characters);
 
 namespace irr {
 	class CFontTool : public irr::IReferenceCounted

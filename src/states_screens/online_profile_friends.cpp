@@ -21,7 +21,6 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
-#include "online/messages.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/online_user_search.hpp"
 #include "states_screens/state_manager.hpp"
@@ -85,7 +84,8 @@ void OnlineProfileFriends::init()
     m_visiting_profile->fetchFriends();
     m_waiting_for_friends = true;
     m_friends_list_widget->clear();
-    m_friends_list_widget->addItem("loading", Messages::fetchingFriends());
+    m_friends_list_widget->addItem("loading", 
+                              StringUtils::loadingDots(_("Fetching friends")));
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -171,7 +171,7 @@ void OnlineProfileFriends::onUpdate(float delta)
         else
         {
             m_friends_list_widget->renameItem("loading",
-                                              Messages::fetchingFriends());
+                              StringUtils::loadingDots(_("Fetching friends")));
         }
     }
 }   // onUpdate

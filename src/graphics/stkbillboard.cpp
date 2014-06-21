@@ -22,7 +22,7 @@ static void createbillboardvao()
 STKBillboard::STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position, const irr::core::dimension2d<irr::f32>& size,
     irr::video::SColor colorTop,    irr::video::SColor colorBottom) :
-    CBillboardSceneNode(parent, mgr, id, position, size, colorTop, colorBottom), IBillboardSceneNode(parent, mgr, id, position)
+    IBillboardSceneNode(parent, mgr, id, position), CBillboardSceneNode(parent, mgr, id, position, size, colorTop, colorBottom)
 {
     if (!billboardvao)
         createbillboardvao();

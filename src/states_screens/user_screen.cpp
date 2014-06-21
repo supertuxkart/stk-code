@@ -26,7 +26,6 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "online/messages.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
@@ -73,8 +72,6 @@ void BaseUserScreen::init()
     m_info_widget = getWidget<LabelWidget>("message");
     assert(m_info_widget);
 
-    getWidget<CheckBoxWidget>("remember-user")
-             ->setState(UserConfigParams::m_remember_user);
     m_sign_out_name = "";
     m_sign_in_name  = "";
 
@@ -87,7 +84,7 @@ void BaseUserScreen::init()
     Screen::init();
 
     m_players->clearItems();
-    std::string current_player_index="";
+    int current_player_index = -1;
 
     for (unsigned int n=0; n<PlayerManager::get()->getNumPlayers(); n++)
     {
@@ -96,38 +93,20 @@ void BaseUserScreen::init()
         std::string s = StringUtils::toString(n);
         m_players->addItem(player->getName(), s, player->getIconFilename(), 0,
                            IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
-        if(player==PlayerManager::getCurrentPlayer())
-            current_player_index = s;
+        if(player == PlayerManager::getCurrentPlayer())
+            current_player_index = n;
     }
 
     m_players->updateItemDisplay();
 
     // Select the current player. That can only be done after
     // updateItemDisplay is called.
-    if(current_player_index.size()>0)
-    {
-        m_players->setSelection(current_player_index, PLAYER_ID_GAME_MASTER,
-                                /*focus*/ true);
-        PlayerProfile *player = PlayerManager::getCurrentPlayer();
-        const stringw &online_name = player->getLastOnlineName();
-        m_username_tb->setText(online_name);
-        // Select 'online
-        m_online_cb->setState(player->wasOnlineLastTime() ||
-                              player->isLoggedIn()          );
-        makeEntryFieldsVisible();
-        // We have to deactivate after make visible (since make visible
-        // automatically activates widgets).
-        if(online_name.size()>0)
-            m_username_tb->setDeactivated();
-        else
-            m_username_tb->setActivated();
-    }
-    else   // no current player found
-    {
-        // The first player is the most frequently used, so select it
-        if (PlayerManager::get()->getNumPlayers() > 0)
-            selectUser(0);
-    }
+    if(current_player_index != -1)
+        selectUser(current_player_index);
+    // no current player found
+    // The first player is the most frequently used, so select it
+    else if (PlayerManager::get()->getNumPlayers() > 0)
+        selectUser(0);
 
 }   // init
 
@@ -157,9 +136,8 @@ void BaseUserScreen::selectUser(int index)
     PlayerProfile *profile = PlayerManager::get()->getPlayer(index);
     assert(profile);
 
-    getWidget<TextBoxWidget >("username")->setText(profile
-                                                   ->getLastOnlineName());
-    m_players->setSelection(StringUtils::toString(index), 0, /*focusIt*/true);
+    m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
+                            /*focusIt*/ true);
 
     // Last game was not online, so make the offline settings the default
     // (i.e. unckeck online checkbox, and make entry fields invisible).
@@ -175,6 +153,12 @@ void BaseUserScreen::selectUser(int index)
     m_online_cb->setState(true);
     makeEntryFieldsVisible();
     m_username_tb->setText(profile->getLastOnlineName());
+    getWidget<CheckBoxWidget>("remember-user")->setState(
+        profile->rememberPassword());
+    if(profile->getLastOnlineName().size()>0)
+        m_username_tb->setDeactivated();
+    else
+        m_username_tb->setActivated();
 
     // And make the password invisible if the session is saved (i.e
     // the user does not need to enter a password).
@@ -242,21 +226,24 @@ void BaseUserScreen::eventCallback(Widget* widget,
     }
     else if (name == "remember-user")
     {
-        UserConfigParams::m_remember_user =
-                       getWidget<CheckBoxWidget>("remember-user")->getState();
+        getSelectedPlayer()->setRememberPassword(
+            getWidget<CheckBoxWidget>("remember-user")->getState());
     }
     else if (name == "online")
     {
         // If online access is not allowed, do not accept an online account
         // but advice the user where to enable this option.
-        if (m_online_cb->getState() && UserConfigParams::m_internet_status ==
-                                       Online::RequestManager::IPERM_NOT_ALLOWED)
+        if (m_online_cb->getState())
         {
-            m_info_widget->setText(
-                _("Internet access is disabled, please enable it in the options"),
-                true);
-            sfx_manager->quickSound( "anvil" );
-            m_online_cb->setState(false);
+            if (UserConfigParams::m_internet_status ==
+                                       Online::RequestManager::IPERM_NOT_ALLOWED)
+            {
+                m_info_widget->setText(
+                    _("Internet access is disabled, please enable it in the options"),
+                    true);
+                sfx_manager->quickSound( "anvil" );
+                m_online_cb->setState(false);
+            }
         }
         makeEntryFieldsVisible();
     }
@@ -332,10 +319,11 @@ void BaseUserScreen::login()
         m_sign_out_name = current->getLastOnlineName();
         current->requestSignOut();
         m_state = (UserScreenState)(m_state | STATE_LOGOUT);
+
         // If the online user name was changed, reset the save data
         // for this user (otherwise later the saved session will be
         // resumed, not logging the user with the new account).
-        if(current->getLastOnlineName()!=new_username)
+        if(player==current && current->getLastOnlineName()!=new_username)
             current->clearSession();
     }
     PlayerManager::get()->setCurrentPlayer(player);
@@ -406,8 +394,8 @@ void BaseUserScreen::onUpdate(float dt)
         core::stringw message = (m_state & STATE_LOGOUT)
                               ? _(L"Signing out '%s'",m_sign_out_name.c_str())
                               : _(L"Signing in '%s'", m_sign_in_name.c_str());
-        m_info_widget->setText(Online::Messages::loadingDots(message.c_str()),
-                               false                                           );
+        m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
+                               false                                      );
     }
     PlayerProfile *player = getSelectedPlayer();
     if(player)

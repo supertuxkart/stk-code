@@ -1752,7 +1752,7 @@ void Kart::crashed(const Material *m, const Vec3 &normal)
         btVector3 gravity = m_body->getGravity();
         gravity.normalize();
         // Cast necessary since otherwise to operator- (vec3/btvector) exists
-        Vec3 impulse =  (btVector3)normal - gravity* btDot(normal, gravity);
+        Vec3 impulse =  normal - gravity* btDot(normal, gravity);
         if(impulse.getX() || impulse.getZ())
             impulse.normalize();
         else

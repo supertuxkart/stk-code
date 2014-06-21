@@ -415,6 +415,8 @@ namespace UtilShader
 
     void ColoredLine::setUniforms(const irr::video::SColor &col)
     {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
         glUniform4i(uniform_color, col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
         glUniformMatrix4fv(glGetUniformLocation(Program, "ModelMatrix"), 1, GL_FALSE, core::IdentityMatrix.pointer());
     }
@@ -1092,7 +1094,7 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
@@ -1197,6 +1199,7 @@ namespace MeshShader
     GLuint SphereMapShader::attrib_normal;
     GLuint SphereMapShader::uniform_MM;
     GLuint SphereMapShader::uniform_IMM;
+    GLuint SphereMapShader::uniform_ambient;
     GLuint SphereMapShader::TU_tex;
 
     void SphereMapShader::init()
@@ -1210,6 +1213,7 @@ namespace MeshShader
         attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
+        uniform_ambient = glGetUniformLocation(Program, "ambient");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
@@ -1230,12 +1234,13 @@ namespace MeshShader
         glUseProgram(0);
     }
 
-    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
+    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const SColorf &ambient)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
+        glUniform3f(uniform_ambient, ambient.r, ambient.g, ambient.b);
     }
 
     GLuint SplattingShader::Program;
@@ -2395,6 +2400,7 @@ namespace FullScreenShader
     GLuint GlobalIlluminationReconstructionShader::uniform_SHB;
     GLuint GlobalIlluminationReconstructionShader::uniform_extents;
     GLuint GlobalIlluminationReconstructionShader::uniform_RHMatrix;
+    GLuint GlobalIlluminationReconstructionShader::uniform_InvRHMatrix;
     GLuint GlobalIlluminationReconstructionShader::vao;
 
     void GlobalIlluminationReconstructionShader::init()
@@ -2410,15 +2416,17 @@ namespace FullScreenShader
         uniform_SHG = glGetUniformLocation(Program, "SHG");
         uniform_SHB = glGetUniformLocation(Program, "SHB");
         uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        uniform_InvRHMatrix = glGetUniformLocation(Program, "InvRHMatrix");
         uniform_extents = glGetUniformLocation(Program, "extents");
         vao = createFullScreenVAO(Program);
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void GlobalIlluminationReconstructionShader::setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
+    void GlobalIlluminationReconstructionShader::setUniforms(const core::matrix4 &RHMatrix, const core::matrix4 &InvRHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
     {
         glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
+        glUniformMatrix4fv(uniform_InvRHMatrix, 1, GL_FALSE, InvRHMatrix.pointer());
         glUniform1i(uniform_ntex, TU_ntex);
         glUniform1i(uniform_dtex, TU_dtex);
         glUniform1i(uniform_SHR, TU_SHR);
@@ -2446,10 +2454,12 @@ namespace FullScreenShader
     GLuint ComputeGaussian17TapHShader::uniform_dest;
     void ComputeGaussian17TapHShader::init()
     {
+#if WIN32
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
         uniform_dest = glGetUniformLocation(Program, "dest");
+#endif
     }
 
     GLuint Gaussian6HBlurShader::Program;
@@ -2499,10 +2509,12 @@ namespace FullScreenShader
     GLuint ComputeGaussian17TapVShader::uniform_dest;
     void ComputeGaussian17TapVShader::init()
     {
+#if WIN32
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussianv.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
         uniform_dest = glGetUniformLocation(Program, "dest");
+#endif
     }
 
     GLuint Gaussian6VBlurShader::Program;

@@ -77,6 +77,6 @@ public:
 
 
 
-    };   // WorldWithRank
+};   // WorldWithRank
 
 #endif
