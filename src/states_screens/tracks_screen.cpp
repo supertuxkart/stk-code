@@ -224,7 +224,7 @@ void TracksScreen::init()
 
     // Random GP
     std::vector<std::string> screenshots;
-    screenshots.push_back("gui/main_help.png");
+    screenshots.push_back(file_manager->getAsset(FileManager::GUI, "main_help.png"));
     gps_widget->addAnimatedItem(translations->fribidize("Random Grand Prix"),
                                 "Random Grand Prix",
                                 screenshots, 1.5f, 0,
