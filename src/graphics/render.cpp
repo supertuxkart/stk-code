@@ -748,8 +748,32 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             core::aabbox3df box = smallcambox;
             box = box.intersect(trackbox);
 
-
-            SunCamViewMatrix.transformBoxEx(trackbox);
+            float xmin = INFINITY, xmax = -INFINITY;
+            float ymin = INFINITY, ymax = -INFINITY;
+            float zmin = INFINITY, zmax = -INFINITY;
+            const vector3df vectors[] =
+            {
+                frustrum->getFarLeftDown(),
+                frustrum->getFarLeftUp(),
+                frustrum->getFarRightDown(),
+                frustrum->getFarRightUp(),
+                frustrum->getNearLeftDown(),
+                frustrum->getNearLeftUp(),
+                frustrum->getNearRightDown(),
+                frustrum->getNearRightUp()
+            };
+            for (unsigned j = 0; j < 8; j++)
+            {
+                vector3df vector;
+                SunCamViewMatrix.transformVect(vector, vectors[j]);
+                xmin = MIN2(xmin, vector.X);
+                xmax = MAX2(xmax, vector.X);
+                ymin = MIN2(ymin, vector.Y);
+                ymax = MAX2(ymax, vector.Y);
+                zmin = MIN2(zmin, vector.Z);
+                zmax = MAX2(zmax, vector.Z);
+            }
+/*            SunCamViewMatrix.transformBoxEx(trackbox);
             SunCamViewMatrix.transformBoxEx(box);
 
             core::vector3df extent = box.getExtent();
@@ -759,12 +783,12 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
             // Snap to texels
             const float units_per_w = w / 1024;
-            const float units_per_h = h / 1024;
+            const float units_per_h = h / 1024;*/
 
-            float left = box.MinEdge.X;
-            float right = box.MaxEdge.X;
-            float up = box.MaxEdge.Y;
-            float down = box.MinEdge.Y;
+            float left = xmin;
+            float right = xmax;
+            float up = ymin;
+            float down = ymax;
 
             core::matrix4 tmp_matrix;
 
@@ -777,8 +801,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             }
 
             tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-                up, down,
-                30, z);
+                down, up,
+                30, zmax);
             m_suncam->setProjectionMatrix(tmp_matrix, true);
             m_suncam->render();
 
