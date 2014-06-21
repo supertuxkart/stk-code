@@ -809,7 +809,18 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
         if ((tick % 100) == 2)
-            rsm_matrix = sun_ortho_matrix[3];
+        {
+            core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+                core::vector3df(0, 30, 0));
+            SunCamViewMatrix.transformBoxEx(trackbox);
+            core::matrix4 tmp_matrix;
+            tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X, trackbox.MaxEdge.X,
+                trackbox.MaxEdge.Y, trackbox.MinEdge.Y,
+                30, trackbox.MaxEdge.Z);
+            m_suncam->setProjectionMatrix(tmp_matrix, true);
+            m_suncam->render();
+            rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW);
+        }
         rh_extend = core::vector3df(128, 64, 128);
         core::vector3df campos = camnode->getAbsolutePosition();
         core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
