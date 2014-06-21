@@ -244,6 +244,8 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
 
 void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, GLuint shr, GLuint shg, GLuint shb)
 {
+    core::matrix4 InvRHMatrix;
+    RHMatrix.getInverse(InvRHMatrix);
     glDisable(GL_DEPTH_TEST);
     glUseProgram(FullScreenShader::GlobalIlluminationReconstructionShader::Program);
     glBindVertexArray(FullScreenShader::GlobalIlluminationReconstructionShader::vao);
@@ -267,7 +269,7 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     }
     setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, rh_extend, 3, 4, 0, 1, 2);
+    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, InvRHMatrix, rh_extend, 3, 4, 0, 1, 2);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 

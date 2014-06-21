@@ -233,7 +233,8 @@ void OptionsScreenInput2::updateInputButtons()
 
 
 
-    bool conflicts = false;
+    bool conflicts_between = false;
+    bool conflicts_inside  = false;
     // ---- make sure there are no binding conflicts
     // (same key used for two actions)
     std::set<irr::core::stringw> currentlyUsedKeys;
@@ -249,7 +250,7 @@ void OptionsScreenInput2::updateInputButtons()
                 && conflictsBetweenKbdConfig(action, PA_FIRST_GAME_ACTION,
                                              PA_LAST_GAME_ACTION))
             {
-                conflicts = true;
+                conflicts_between = true;
                 actions->markItemBlue (KartActionStrings[action]);
             }
         }
@@ -266,6 +267,7 @@ void OptionsScreenInput2::updateInputButtons()
                     m_config->getMappingIdString(others);
                 if (others_item == item)
                 {
+                    conflicts_inside = true;
                     actions->markItemRed( KartActionStrings[others] );
                 }
             }
@@ -290,7 +292,7 @@ void OptionsScreenInput2::updateInputButtons()
                 && conflictsBetweenKbdConfig(action, PA_FIRST_MENU_ACTION,
                                              PA_LAST_MENU_ACTION))
             {
-                conflicts = true;
+                conflicts_between = true;
                 actions->markItemBlue (KartActionStrings[action]);
             }
         }
@@ -307,6 +309,7 @@ void OptionsScreenInput2::updateInputButtons()
                     m_config->getBindingAsString(others);
                 if (others_item == item)
                 {
+                    conflicts_inside = true;
                     actions->markItemRed( KartActionStrings[others] );
                 }
             }
@@ -318,11 +321,17 @@ void OptionsScreenInput2::updateInputButtons()
 
     GUIEngine::Widget* conflict_label =
         getWidget<GUIEngine::LabelWidget>("conflict");
-    if (conflicts)
-        conflict_label->setText(
-           _("* A red item means a conflict with another configuration") );
-    else
-        conflict_label->setText("");
+
+    std::wostringstream oss;
+    if (conflicts_between)
+    {
+        oss << _("* A blue item means a conflict with another configuration");
+        if (conflicts_inside)
+            oss << "\n";
+    }
+    if (conflicts_inside)
+        oss << _("* A red item means a conflict in the current configuration");
+    conflict_label->setText(oss.str().c_str());
 
 }   // updateInputButtons
 
@@ -442,7 +451,7 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
         else if (selection == "tab_video")
             sm->replaceTopMostScreen(OptionsScreenVideo::getInstance());
         else if (selection == "tab_players")
-            sm->replaceTopMostScreen(UserScreen::getInstance());
+            sm->replaceTopMostScreen(TabbedUserScreen::getInstance());
         else if (selection == "tab_ui")
             sm->replaceTopMostScreen(OptionsScreenUI::getInstance());
         else if (selection == "tab_controls") {}

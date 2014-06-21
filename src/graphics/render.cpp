@@ -648,7 +648,30 @@ void IrrDriver::renderTransparent()
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glDisable(GL_CULL_FACE);
+    TransparentMeshes<TM_DEFAULT>::reset();
+    TransparentMeshes<TM_ADDITIVE>::reset();
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
+
+    if (World::getWorld() && World::getWorld()->isFogEnabled())
+    {
+        glUseProgram(MeshShader::TransparentFogShader::Program);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
+            drawTransparentFogObject(*TransparentMeshes<TM_DEFAULT>::MeshSet[i], TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix);
+        glBlendFunc(GL_ONE, GL_ONE);
+        for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
+            drawTransparentFogObject(*TransparentMeshes<TM_ADDITIVE>::MeshSet[i], TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix);
+    }
+    else
+    {
+        glUseProgram(MeshShader::TransparentShader::Program);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
+            drawTransparentObject(*TransparentMeshes<TM_DEFAULT>::MeshSet[i], TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix);
+        glBlendFunc(GL_ONE, GL_ONE);
+        for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
+            drawTransparentObject(*TransparentMeshes<TM_ADDITIVE>::MeshSet[i], TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix);
+    }
 }
 
 void IrrDriver::renderParticles()

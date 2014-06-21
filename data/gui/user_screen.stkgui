@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
@@ -61,6 +62,6 @@
         </box>
         <spacer width="20" height="15"/>
     </div>
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 </stkgui>
