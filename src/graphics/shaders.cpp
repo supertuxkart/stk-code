@@ -169,6 +169,26 @@ static void initCubeVBO()
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * 6 * sizeof(int), indices, GL_STATIC_DRAW);
 }
 
+GLuint SharedObject::frustrumvbo = 0;
+GLuint SharedObject::frustrumindexes = 0;
+
+static void initFrustrumVBO()
+{
+    glGenBuffers(1, &SharedObject::frustrumvbo);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
+    glBufferData(GL_ARRAY_BUFFER, 8 * 3 * sizeof(float), 0, GL_DYNAMIC_DRAW);
+
+    int indices[24] = {
+        0, 1, 1, 3, 3, 2, 2, 0,
+        4, 5, 5, 7, 7, 6, 6, 4,
+        0, 4, 1, 5, 2, 6, 3, 7,
+    };
+
+    glGenBuffers(1, &SharedObject::frustrumindexes);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::frustrumindexes);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 12 * 2 * sizeof(int), indices, GL_STATIC_DRAW);
+}
+
 GLuint SharedObject::ViewProjectionMatrixesUBO;
 
 static void initShadowVPMUBO()
@@ -271,6 +291,7 @@ void Shaders::loadShaders()
     initQuadBuffer();
     initBillboardVBO();
     initCubeVBO();
+    initFrustrumVBO();
     initShadowVPMUBO();
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
@@ -286,6 +307,7 @@ void Shaders::loadShaders()
     FullScreenShader::Gaussian6VBlurShader::init();
     FullScreenShader::GlowShader::init();
     FullScreenShader::PassThroughShader::init();
+    FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::LinearizeDepthShader::init();
     FullScreenShader::SSAOShader::init();
     FullScreenShader::SunLightShader::init();
@@ -336,6 +358,7 @@ void Shaders::loadShaders()
     MeshShader::InstancedRefShadowShader::init();
     MeshShader::GrassShadowShader::init();
     MeshShader::SkyboxShader::init();
+    MeshShader::ViewFrustrumShader::init();
     ParticleShader::FlipParticleRender::init();
     ParticleShader::HeightmapSimulationShader::init();
     ParticleShader::SimpleParticleRender::init();
@@ -1791,6 +1814,41 @@ namespace MeshShader
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
+
+    GLuint ViewFrustrumShader::Program;
+    GLuint ViewFrustrumShader::attrib_position;
+    GLuint ViewFrustrumShader::uniform_color;
+    GLuint ViewFrustrumShader::uniform_idx;
+    GLuint ViewFrustrumShader::frustrumvao;
+
+    void ViewFrustrumShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/frustrum.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+        attrib_position = glGetAttribLocation(Program, "Position");
+        if (!UserConfigParams::m_ubo_disabled)
+        {
+            GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+            glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        }
+        uniform_color = glGetUniformLocation(Program, "color");
+        uniform_idx = glGetUniformLocation(Program, "idx");
+
+        glGenVertexArrays(1, &frustrumvao);
+        glBindVertexArray(frustrumvao);
+        glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
+        glEnableVertexAttribArray(attrib_position);
+        glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, SharedObject::frustrumindexes);
+        glBindVertexArray(0);
+    }
+
+    void ViewFrustrumShader::setUniforms(const video::SColor &color, unsigned idx)
+    {
+        glUniform4i(uniform_color, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+        glUniform1i(uniform_idx, idx);
+    }
 }
 
 namespace LightShader
@@ -2554,6 +2612,20 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
         uniform_texture = glGetUniformLocation(Program, "texture");
+        vao = createVAO(Program);
+    }
+
+    GLuint LayerPassThroughShader::Program;
+    GLuint LayerPassThroughShader::uniform_texture;
+    GLuint LayerPassThroughShader::uniform_layer;
+    GLuint LayerPassThroughShader::vao;
+    void LayerPassThroughShader::init()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/layertexturequad.frag").c_str());
+        uniform_texture = glGetUniformLocation(Program, "tex");
+        uniform_layer = glGetUniformLocation(Program, "layer");
         vao = createVAO(Program);
     }
 
