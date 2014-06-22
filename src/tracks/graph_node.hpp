@@ -129,7 +129,7 @@ private:
     void markAllSuccessorsToUse(unsigned int n,
                                 PathToNodeVector *m_path_to_node);
 
-    void GraphNode::addUnrolledQuad(const GraphNode& next_node,int k);
+    void addUnrolledQuad(const GraphNode& next_node,int k);
 
 public:
                  GraphNode(unsigned int quad_index, unsigned int node_index);
