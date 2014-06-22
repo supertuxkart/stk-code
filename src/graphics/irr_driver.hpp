@@ -345,6 +345,7 @@ private:
     class STKMeshSceneNode *m_sun_interposer;
     scene::CLensFlareSceneNode *m_lensflare;
     scene::ICameraSceneNode *m_suncam;
+    float m_shadows_cam[4][24];
 
     std::vector<GlowData> m_glowing;
 
@@ -380,6 +381,7 @@ private:
     void renderSSAO();
     void renderLights(unsigned pointlightCount);
     void renderDisplacement();
+    void renderShadowsDebug();
     void doScreenShot();
 public:
          IrrDriver();
