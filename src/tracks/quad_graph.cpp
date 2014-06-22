@@ -54,7 +54,7 @@ QuadGraph::QuadGraph(const std::string &quad_file_name,
     m_mesh                 = NULL;
     m_mesh_buffer          = NULL;
     m_lap_length           = 0;
-    m_unroll_quad_count    = 7;
+    m_unroll_quad_count    = 6;
     QuadSet::create();
     QuadSet::get()->init(quad_file_name);
     m_quad_filename        = quad_file_name;
@@ -576,7 +576,7 @@ void QuadGraph::createMesh2()
             c.setGreen((3 * i) % 256);
         }
 
-        Quad flatquad = QuadGraph::get()->getNode(57).getUnrolledQuad(count);
+        Quad flatquad = QuadGraph::get()->getNode(59).getUnrolledQuad(count);
 
         //std::vector<int> vInd = poly.getVerticesIndex();
         // Four vertices for each of the n-1 remaining quads
@@ -938,7 +938,9 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
     // Now we search through all graph nodes, starting with
     // the current one
     int indx       = *sector;
-    float min_dist = 999999.9f;
+    // This was used to check the vertical distance of kart from sector
+    // but because now karts are checked in a 3D space, this is not required
+    //float min_dist = 999999.9f;
 
     // If a current sector is given, and max_lookahead is specify, only test
     // the next max_lookahead graph nodes instead of testing the whole graph.
@@ -963,9 +965,9 @@ void QuadGraph::findRoadSector(const Vec3& xyz, int *sector,
         float dist    = xyz.getY() - q.getMinHeight();
         // While negative distances are unlikely, we allow some small negative
         // numbers in case that the kart is partly in the track.
-        if(q.pointInQuad3D(xyz) && dist < min_dist && dist>-1.0f)
+        if(q.pointInQuad3D(xyz))// && dist < min_dist && dist>-1.0f)
         {
-            min_dist = dist;
+            //min_dist = dist;
             *sector  = indx;
         }
     }   // for i<m_all_nodes.size()
