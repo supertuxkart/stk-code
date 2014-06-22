@@ -2025,7 +2025,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         target_sector = m_next_node_index[*last_node];
 
 
-        /** Skip angle checking for now
+        
 
         angle1 = QuadGraph::get()->getAngleToNext(target_sector,
                                                 m_successor_index[target_sector]);
@@ -2039,7 +2039,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
                                                  .getCenter();
             return;
         }
-        */
+        
 
         //direction is a vector from our kart to the sectors we are testing
         //direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
@@ -2107,8 +2107,18 @@ void SkiddingAI::determineTrackDirection()
 {
     const QuadGraph *qg = QuadGraph::get();
     unsigned int succ   = m_successor_index[m_track_node];
-    float angle_to_track = qg->getNode(m_track_node).getAngleToSuccessor(succ)
-                         - m_kart->getHeading();
+    unsigned int next = qg->getNode(m_track_node).getSuccessor(succ);
+
+    //float angle_to_track = qg->getNode(m_track_node).getAngleToSuccessor(succ)
+    //                     - m_kart->getHeading();
+    Vec3 track_direction = -qg->getQuadOfNode(m_track_node).getCenter()
+        + qg->getQuadOfNode(next).getCenter();
+    //Vec3 kart_direction = qg->getQuadOfNode(m_track_node).getCenter() + m_kart->getVelocity();
+
+    float angle_to_track = 0;
+    if (m_kart->getVelocity().length() > 0.0f)
+        angle_to_track = track_direction.angle(m_kart->getVelocity().normalized());
+
     angle_to_track = normalizeAngle(angle_to_track);
 
     // In certain circumstances (esp. S curves) it is possible that the
@@ -2128,7 +2138,7 @@ void SkiddingAI::determineTrackDirection()
         return;
     }
 
-    unsigned int next   = qg->getNode(m_track_node).getSuccessor(succ);
+    
 
     qg->getNode(next).getDirectionData(m_successor_index[next],
                                        &m_current_track_direction,
