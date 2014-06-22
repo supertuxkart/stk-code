@@ -662,6 +662,7 @@ namespace GUIEngine
 #include "io/file_manager.hpp"
 #include "guiengine/event_handler.hpp"
 #include "guiengine/modaldialog.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/skin.hpp"
@@ -1188,6 +1189,8 @@ namespace GUIEngine
         // let irrLicht do the rest (the Skin object will be called for
         // further render)
         g_env->drawAll();
+
+        MessageQueue::update(elapsed_time);
 
         // ---- some menus may need updating
         if (gamestate != GAME)

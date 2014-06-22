@@ -68,6 +68,14 @@ when the border that intersect at this corner are enabled.
 <!--  Stateless -->
 <element type="background" image="peach/background.jpg" />
 
+<element type="achievement-message" image="peach/glassbutton.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
+<element type="friend-message" image="peach/glassbutton.png"
+      left_border="13" right_border="13" top_border="13" bottom_border="13"
+      preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>
+
 <element type="button" state="neutral" image="peach/glassbutton.png"
       left_border="13" right_border="13" top_border="13" bottom_border="13"
       preserve_h_aspect_ratios="true" hborder_out_portion="0" vborder_out_portion="0"/>

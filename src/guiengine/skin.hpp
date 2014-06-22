@@ -394,7 +394,7 @@ namespace GUIEngine
         virtual const wchar_t*
                              getDefaultText(gui::EGUI_DEFAULT_TEXT text) const;
         virtual gui::IGUIFont* getFont(gui::EGUI_DEFAULT_FONT which=
-                                                     gui::EGDF_DEFAULT) const ;
+                                                     gui::EGDF_DEFAULT) const;
         virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const ;
         virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const ;
         virtual gui::IGUISpriteBank *  getSpriteBank () const ;
@@ -409,6 +409,8 @@ namespace GUIEngine
         virtual void setSpriteBank (gui::IGUISpriteBank *bank);
 
         void drawTooltips();
+        void drawMessage(SkinWidgetContainer* w, const core::recti &dest,
+                         const std::string &type);
 
         video::ITexture* getImage(const char* name);
 

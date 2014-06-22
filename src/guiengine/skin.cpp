@@ -374,6 +374,20 @@ void Skin::drawBgImage()
 }   // drawBgImage
 
 // ----------------------------------------------------------------------------
+/** Draws a background box for an in-game notification message. Example would
+ *  be an achievement, or friends comming online.
+ *  \param w The SkinWidgetContainer for the outline.
+ *  \param dest The destination rectangle to use.
+ *  \param type The type of the message (achievement or friend).
+ */
+void Skin::drawMessage(SkinWidgetContainer* w, const core::recti &dest,
+                       const std::string &type)
+{
+    drawBoxFromStretchableTexture(w, dest,
+                             SkinConfig::m_render_params[type+"::neutral"]);
+}   // drawMessage
+
+// ----------------------------------------------------------------------------
 void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
                                          const core::recti &dest,
                                          BoxRenderParams& params,
