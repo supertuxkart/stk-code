@@ -265,20 +265,19 @@ RTT::~RTT()
     glDeleteTextures(1, &DepthStencilTexture);
     if (UserConfigParams::m_shadows)
     {
+        delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }
     if (UserConfigParams::m_gi)
     {
+        delete m_RH_FBO;
+        delete m_RSM;
         glDeleteTextures(1, &RSM_Color);
         glDeleteTextures(1, &RSM_Normal);
         glDeleteTextures(1, &RSM_Depth);
         glDeleteTextures(1, &RH_Red);
         glDeleteTextures(1, &RH_Green);
         glDeleteTextures(1, &RH_Blue);
-
-        delete m_shadow_FBO;
-        delete m_RH_FBO;
-        delete m_RSM;
     }
 }
