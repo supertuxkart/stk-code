@@ -2495,15 +2495,17 @@ namespace FullScreenShader
 
     GLuint Gaussian17TapHShader::Program;
     GLuint Gaussian17TapHShader::uniform_tex;
+    GLuint Gaussian17TapHShader::uniform_depth;
     GLuint Gaussian17TapHShader::uniform_pixel;
     GLuint Gaussian17TapHShader::vao;
     void Gaussian17TapHShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian17taph.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         vao = createFullScreenVAO(Program);
     }
 
@@ -2552,15 +2554,17 @@ namespace FullScreenShader
 
     GLuint Gaussian17TapVShader::Program;
     GLuint Gaussian17TapVShader::uniform_tex;
+    GLuint Gaussian17TapVShader::uniform_depth;
     GLuint Gaussian17TapVShader::uniform_pixel;
     GLuint Gaussian17TapVShader::vao;
     void Gaussian17TapVShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian17tapv.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralV.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         vao = createFullScreenVAO(Program);
     }
 
