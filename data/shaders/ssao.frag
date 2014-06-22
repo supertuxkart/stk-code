@@ -24,12 +24,12 @@ layout (std140) uniform MatrixesData
 
 out float AO;
 
-const float sigma = 2.;
+const float sigma = 1.;
 const float tau = 7.;
 const float beta = 0.001;
 const float epsilon = .00001;
 const float radius = 1.;
-const float k = 5.;
+const float k = 1.5;
 
 #define SAMPLES 16
 
@@ -56,7 +56,7 @@ void main(void)
     vec3 norm = -normalize(cross(ddy, ddx));
 
     float r = radius / FragPos.z;
-    float phi = 30. * (x ^ y) + 10. * x * y;
+    float phi = 3. * (x ^ y) + x * y;
     float bl = 0.0;
     float m = log2(r) + 6 + log2(invSamples);
 

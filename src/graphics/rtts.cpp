@@ -42,7 +42,7 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
 #if WIN32
-    if (irr_driver->getGLSLVersion() < 420)
+    if (irr_driver->getGLSLVersion() >= 420)
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
     else
 #endif
