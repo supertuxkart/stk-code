@@ -124,7 +124,7 @@ bool Quad::pointInQuad3D(const Vec3& p) const
     // All this code for computing the quad bounding box should be later be
     // moved to somewhere in the constructor and computed only once per quad.
     Vec3 boxCorners[8];
-    Vec3 normal = (m_p[1] - m_p[0]).cross(m_p[2] - m_p[1]);
+    Vec3 normal = -(m_p[1] - m_p[0]).cross(m_p[2] - m_p[1]);
     normal.normalize();
     float boxHigh = 5.0f;
     float boxLow = 1.0f;
@@ -132,10 +132,10 @@ bool Quad::pointInQuad3D(const Vec3& p) const
     boxCorners[1] = m_p[1] + boxHigh*normal;
     boxCorners[2] = m_p[2] + boxHigh*normal;
     boxCorners[3] = m_p[3] + boxHigh*normal;
-    boxCorners[4] = m_p[0] - boxLow*m_p[1];
-    boxCorners[5] = m_p[1] - boxLow*m_p[1];
-    boxCorners[6] = m_p[2] - boxLow*m_p[1];
-    boxCorners[7] = m_p[3] - boxLow*m_p[1];
+    boxCorners[4] = m_p[0] - boxLow*normal;
+    boxCorners[5] = m_p[1] - boxLow*normal;
+    boxCorners[6] = m_p[2] - boxLow*normal;
+    boxCorners[7] = m_p[3] - boxLow*normal;
 
     const Vec3 boxFaces[6][4] = {
         { boxCorners[0], boxCorners[1], boxCorners[2], boxCorners[3] },
