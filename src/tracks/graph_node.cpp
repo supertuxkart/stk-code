@@ -273,7 +273,7 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
     if (k == 0) return;
 
     Quad next_quad = next_node.getQuad();
-    Quad next_quad_to_push = next_quad;
+    Quad next_quad_to_push = next_quad.getFlattenedQuad();
     Quad last_pushed_quad = m_unrolled_quads.back();
     
     
