@@ -109,7 +109,7 @@ void createLabel(const Message *message)
  *  \param mt The MessageType of the message.
  *  \param message The actual message.
  */
-void MessageQueue::add(MessageType mt, const core::stringw &message)
+void add(MessageType mt, const irr::core::stringw &message)
 {
     Message *m = new Message(mt, message);
     if(g_all_messages.size()==0)
@@ -126,7 +126,7 @@ void MessageQueue::add(MessageType mt, const core::stringw &message)
  *  is displayed.
  *  \param dt Time step size.
  */
-void MessageQueue::update(float dt)
+void update(float dt)
 {
     if(g_all_messages.size()==0) return;
 
