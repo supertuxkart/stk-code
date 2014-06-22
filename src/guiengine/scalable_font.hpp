@@ -5,17 +5,19 @@
 #ifndef __C_GUI_FONT_H_INCLUDED__
 #define __C_GUI_FONT_H_INCLUDED__
 
-#include "IrrCompileConfig.h"
+#include "utils/leak_check.hpp"
 
+#include "IrrCompileConfig.h"
 #include "IGUIFontBitmap.h"
 #include "irrString.h"
 #include "irrMap.h"
 #include "IXMLReader.h"
 #include "IReadFile.h"
 #include "irrArray.h"
-#include <map>
 
-#include "utils/leak_check.hpp"
+
+#include <map>
+#include <string>
 
 namespace irr
 {

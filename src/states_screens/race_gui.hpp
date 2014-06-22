@@ -107,6 +107,10 @@ private:
     void drawLap               (const AbstractKart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
+    void drawRank              (const AbstractKart *kart,
+                                const core::vector2df &offset,
+                                float min_ratio, int meter_width,
+                                int meter_height);
 
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();

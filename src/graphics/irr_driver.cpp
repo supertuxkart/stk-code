@@ -443,9 +443,10 @@ void IrrDriver::initDevice()
         glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
         glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
     }
-    Log::info("IrrDriver", "OPENGL VERSION IS %d.%d", GLMajorVersion, GLMinorVersion);
-    //m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
-    m_glsl = false;
+    Log::info("IrrDriver", "OpenGL version: %d.%d", GLMajorVersion, GLMinorVersion);
+    Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
+    Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
+    Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     // Parse extensions
     hasVSLayer = false;
     // Default false value for hasVSLayer if --no-graphics argument is used

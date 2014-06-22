@@ -147,6 +147,25 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
 void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
 
+template<enum TransparentMaterial T>
+class TransparentMeshes
+{
+public:
+    static std::vector<GLMesh *> MeshSet;
+    static std::vector<core::matrix4> MVPSet;
+
+    static void reset()
+    {
+        MeshSet.clear();
+        MVPSet.clear();
+    }
+};
+
+template<enum TransparentMaterial T>
+std::vector<GLMesh *> TransparentMeshes<T>::MeshSet;
+template<enum TransparentMaterial T>
+std::vector<core::matrix4> TransparentMeshes<T>::MVPSet;
+
 // Forward pass (for transparents meshes)
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);

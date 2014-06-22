@@ -227,30 +227,16 @@ void STKAnimatedMesh::render()
             glUseProgram(MeshShader::BubbleShader::Program);
 
         GLMesh* mesh;
-        for_in(mesh, TransparentMesh[TM_BUBBLE])
-            drawBubble(*mesh, ModelViewProjectionMatrix);
-
-        if (World::getWorld() != NULL && World::getWorld()->isFogEnabled())
+        for_in(mesh, TransparentMesh[TM_DEFAULT])
         {
-            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
-                glUseProgram(MeshShader::TransparentFogShader::Program);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
-            glBlendFunc(GL_ONE, GL_ONE);
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
+            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
         }
-        else
+
+        for_in(mesh, TransparentMesh[TM_ADDITIVE])
         {
-            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
-                glUseProgram(MeshShader::TransparentShader::Program);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
-            glBlendFunc(GL_ONE, GL_ONE);
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
+            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(ModelViewProjectionMatrix);
         }
         return;
     }

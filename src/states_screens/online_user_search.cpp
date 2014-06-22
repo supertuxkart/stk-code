@@ -20,7 +20,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/modaldialog.hpp"
-#include "online/messages.hpp"
 #include "online/profile_manager.hpp"
 #include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -199,7 +198,7 @@ void OnlineUserSearch::search()
 
         m_user_list_widget->clear();
         m_user_list_widget->addItem("spacer", L"");
-        m_user_list_widget->addItem("loading", Messages::searching());
+        m_user_list_widget->addItem("loading", StringUtils::loadingDots(_("Searching")));
         m_back_widget->setDeactivated();
         m_search_box_widget->setDeactivated();
         m_search_button_widget->setDeactivated();
@@ -276,7 +275,8 @@ void OnlineUserSearch::onUpdate(float dt)
         }
         else
         {
-            m_user_list_widget->renameItem("loading", Messages::searching());
+            m_user_list_widget->renameItem("loading", 
+                                    StringUtils::loadingDots(_("Searching")) );
         }
     }
 }   // onUpdate

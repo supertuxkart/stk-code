@@ -12,6 +12,7 @@ uniform sampler3D SHB;
 uniform float R_wcs = 10.;
 uniform vec3 extents;
 uniform mat4 RHMatrix;
+uniform mat4 InvRHMatrix;
 
 layout (std140) uniform MatrixesData
 {
@@ -55,7 +56,7 @@ void main()
     if (depth==1.0) discard;
 
     vec4 pos_screen_space = getPosFromUVDepth(vec3(uv, depth), InverseProjectionMatrix);
-    vec4 tmp = (inverse(RHMatrix) * InverseViewMatrix * pos_screen_space);
+    vec4 tmp = (InvRHMatrix * InverseViewMatrix * pos_screen_space);
     vec3 pos = tmp.xyz / tmp.w;
     vec3 normal_screen_space = normalize(DecodeNormal(2. * texture(ntex, uv).xy - 1.));
     vec3 normal = (transpose(ViewMatrix) * vec4(normal_screen_space, 0.)).xyz;

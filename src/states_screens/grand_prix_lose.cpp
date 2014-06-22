@@ -109,48 +109,6 @@ void GrandPrixLose::onCutsceneEnd()
     m_kart_node[1] = NULL;
     m_kart_node[2] = NULL;
     m_kart_node[3] = NULL;
-
-    // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
-    race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
-
-    std::vector<const ChallengeData*> unlocked =
-        PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
-    if (unlocked.size() > 0)
-    {
-        race_manager->exitRace();
-
-        StateManager::get()->enterGameState();
-        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
-        race_manager->setNumKarts(0);
-        race_manager->setNumPlayers(0);
-        race_manager->setNumLocalPlayers(0);
-        race_manager->startSingleRace("featunlocked", 999, false);
-
-        FeatureUnlockedCutScene* scene =
-            FeatureUnlockedCutScene::getInstance();
-        std::vector<std::string> parts;
-        parts.push_back("featunlocked");
-        ((CutsceneWorld*)World::getWorld())->setParts(parts);
-
-        scene->addTrophy(race_manager->getDifficulty());
-        scene->findWhatWasUnlocked(race_manager->getDifficulty());
-
-        StateManager::get()->replaceTopMostScreen(scene);
-        PlayerManager::getCurrentPlayer()->clearUnlocked();
-    }
-    else
-    {
-        if (race_manager->raceWasStartedFromOverworld())
-        {
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            OverWorld::enterOverWorld();
-        }
-        else
-        {
-            // we assume the main menu was pushed before showing this menu
-            StateManager::get()->popMenu();
-        }
-    }
 }
 
 // -------------------------------------------------------------------------------------

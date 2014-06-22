@@ -209,32 +209,8 @@ void STKMeshSceneNode::drawSolidPass2(const GLMesh &mesh, ShadedMaterial type)
 {
     switch (type)
     {
-    case SM_SPHEREMAP:
-        drawSphereMap(mesh, ModelViewProjectionMatrix, TransposeInverseModelView);
-        break;
-    case SM_SPLATTING:
-        drawSplatting(mesh, ModelViewProjectionMatrix);
-        break;
-    case SM_ALPHA_REF_TEXTURE:
-        drawObjectRefPass2(mesh, ModelViewProjectionMatrix, mesh.TextureMatrix);
-        break;
     case SM_GRASS:
         drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
-        break;
-    case SM_RIMLIT:
-        drawObjectRimLimit(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, core::matrix4::EM4CONST_IDENTITY);
-        break;
-    case SM_UNLIT:
-        drawObjectUnlit(mesh, ModelViewProjectionMatrix);
-        break;
-    case SM_DETAILS:
-        drawDetailledObjectPass2(mesh, ModelViewProjectionMatrix);
-        break;
-    case SM_UNTEXTURED:
-        drawUntexturedObject(mesh, ModelViewProjectionMatrix);
-        break;
-    case SM_DEFAULT:
-        drawObjectPass2(mesh, ModelViewProjectionMatrix, mesh.TextureMatrix);
         break;
     default:
         assert(0 && "Wrong shaded material");
@@ -440,33 +416,23 @@ void STKMeshSceneNode::render()
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
 
         GLMesh* mesh;
+
+        for_in(mesh, TransparentMesh[TM_DEFAULT])
+        {
+            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
+            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
+        }
+
+        for_in(mesh, TransparentMesh[TM_ADDITIVE])
+        {
+            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
+            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(ModelViewProjectionMatrix);
+        }
+
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
         for_in(mesh, TransparentMesh[TM_BUBBLE])
             drawBubble(*mesh, ModelViewProjectionMatrix);
-
-        if (World::getWorld() ->isFogEnabled())
-        {
-            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
-                glUseProgram(MeshShader::TransparentFogShader::Program);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
-            glBlendFunc(GL_ONE, GL_ONE);
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
-        }
-        else
-        {
-            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
-                glUseProgram(MeshShader::TransparentShader::Program);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                drawTransparentObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
-            glBlendFunc(GL_ONE, GL_ONE);
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                drawTransparentObject(*mesh, ModelViewProjectionMatrix, (*mesh).TextureMatrix);
-        }
         return;
     }
 

@@ -62,8 +62,7 @@ namespace GUIEngine
         
         EventPropagation onGUIEvent(const irr::SEvent& event);
         EventPropagation onWidgetActivated(Widget* w, const int playerID);
-        void navigateUp(const int playerID, Input::InputType type, const bool pressedDown);
-        void navigateDown(const int playerID, Input::InputType type, const bool pressedDown);
+        void navigate(const int playerID, Input::InputType type, const bool pressedDown, const bool reverse);
 
         /** \brief          send an event to the GUI module user's event callback
           * \param widget   the widget that triggerred this event

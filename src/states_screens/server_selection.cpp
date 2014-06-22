@@ -26,7 +26,6 @@
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
-#include "online/messages.hpp"
 #include "audio/sfx_manager.hpp"
 
 using namespace Online;
@@ -64,7 +63,8 @@ void ServerSelection::refresh()
     m_fake_refresh = (m_refresh_request == NULL ? true : false);
     m_server_list_widget->clear();
     m_server_list_widget->addItem("spacer", L"");
-    m_server_list_widget->addItem("loading", Messages::fetchingServers());
+    m_server_list_widget->addItem("loading",
+                              StringUtils::loadingDots(_("Fetching servers")));
     m_reload_widget->setDeactivated();
 }
 
@@ -206,7 +206,8 @@ void ServerSelection::onUpdate(float dt)
         }
         else
         {
-            m_server_list_widget->renameItem("loading", Messages::fetchingServers());
+            m_server_list_widget->renameItem("loading",
+                              StringUtils::loadingDots(_("Fetching servers")));
         }
     }
     else if(m_fake_refresh)

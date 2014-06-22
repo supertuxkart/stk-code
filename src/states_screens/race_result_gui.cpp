@@ -377,7 +377,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         // FIXME: why is this call necessary here? tearDown should be
         // automatically called when the screen is left. Note that the
         // NetworkKartSelectionScreen::getInstance()->tearDown(); caused #1347
-            KartSelectionScreen::getRunningInstance()->tearDown();
+        //if (KartSelectionScreen::getRunningInstance() != NULL)
+        //    KartSelectionScreen::getRunningInstance()->tearDown();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
         if (race_manager->raceWasStartedFromOverworld())

@@ -419,12 +419,11 @@ void CutsceneWorld::enterRaceOverState()
             // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
             race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
 
-            if (PlayerManager::getCurrentPlayer()
-                ->getRecentlyCompletedChallenges().size() > 0)
+            std::vector<const ChallengeData*> unlocked =
+                PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+            if (unlocked.size() > 0)
             {
-                std::vector<const ChallengeData*> unlocked =
-                    PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
-                PlayerManager::getCurrentPlayer()->clearUnlocked();
+                //PlayerManager::getCurrentPlayer()->clearUnlocked();
 
                 StateManager::get()->enterGameState();
                 race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
@@ -443,12 +442,13 @@ void CutsceneWorld::enterRaceOverState()
                 scene->addTrophy(race_manager->getDifficulty());
                 scene->findWhatWasUnlocked(race_manager->getDifficulty());
 
-                StateManager::get()->replaceTopMostScreen(scene);
+                StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
             }
             else
             {
                 if (race_manager->raceWasStartedFromOverworld())
                 {
+                    //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
                     OverWorld::enterOverWorld();
                 }
                 else
@@ -462,10 +462,54 @@ void CutsceneWorld::enterRaceOverState()
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (m_parts.size() == 1 && m_parts[0] == "gplose")
         {
+            //race_manager->exitRace();
+            //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+            //if (race_manager->raceWasStartedFromOverworld())
+            //    OverWorld::enterOverWorld();
+
             race_manager->exitRace();
-            StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
-            if (race_manager->raceWasStartedFromOverworld())
-                OverWorld::enterOverWorld();
+
+            // un-set the GP mode so that after unlocking, it doesn't try to continue the GP
+            race_manager->setMajorMode(RaceManager::MAJOR_MODE_SINGLE);
+
+            std::vector<const ChallengeData*> unlocked =
+                PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges();
+            if (unlocked.size() > 0)
+            {
+                //PlayerManager::getCurrentPlayer()->clearUnlocked();
+
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts(0);
+                race_manager->setNumPlayers(0);
+                race_manager->setNumLocalPlayers(0);
+                race_manager->startSingleRace("featunlocked", 999, false);
+
+                FeatureUnlockedCutScene* scene =
+                    FeatureUnlockedCutScene::getInstance();
+                std::vector<std::string> parts;
+                parts.push_back("featunlocked");
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
+
+                scene->addTrophy(race_manager->getDifficulty());
+                scene->findWhatWasUnlocked(race_manager->getDifficulty());
+
+                StateManager::get()->replaceTopMostScreen(scene, GUIEngine::INGAME_MENU);
+            }
+            else
+            {
+                if (race_manager->raceWasStartedFromOverworld())
+                {
+                    //StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                    OverWorld::enterOverWorld();
+                }
+                else
+                {
+                    StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
+                    // we assume the main menu was pushed before showing this menu
+                    //StateManager::get()->popMenu();
+                }
+            }
         }
         // TODO: remove hardcoded knowledge of cutscenes, replace with scripting probably
         else if (race_manager->getTrackName() == "introcutscene" ||
