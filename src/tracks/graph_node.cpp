@@ -92,9 +92,16 @@ void GraphNode::addSuccessor(unsigned int to)
 
     Vec3 d = m_lower_center - QuadGraph::get()->getNode(to).m_lower_center;
     m_distance_to_next.push_back(d.length());
-
+    
     Vec3 diff = next_quad.getCenter() - this_quad.getCenter();
-    m_angle_to_next.push_back(atan2(diff.getX(), diff.getZ()));
+    
+    core::CMatrix4<float> m;
+    m.buildRotateFromTo(this_quad.getNormal().toIrrVector(), 
+                        Vec3(0, 1, 0).toIrrVector());
+    core::vector3df diffRotated;
+    m.rotateVect(diffRotated, diff.toIrrVector());
+   
+    m_angle_to_next.push_back(atan2(diffRotated.X, diffRotated.Z));
 
 }   // addSuccessor
 
@@ -287,9 +294,9 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
     Vec3 endEdge = (last_pushed_quad[2] - last_pushed_quad[3]);
     Vec3 beginEdge = (new_points[1] - new_points[0]);
     
-    //m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
-    //for (unsigned int i = 0; i < 4; i++) 
-    //    m.rotateVect(new_points[i]);
+    m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
+    for (unsigned int i = 0; i < 4; i++) 
+        m.rotateVect(new_points[i]);
     
     // Next translate the new quad to be pushed to the correct position infront
     // of the last quad in the vector of unrolled quads
