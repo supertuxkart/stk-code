@@ -48,6 +48,7 @@
 #include "utils/profiler.hpp"
 
 #include <algorithm>
+#include <limits>
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
@@ -769,9 +770,12 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             core::aabbox3df box = smallcambox;
             box = box.intersect(trackbox);
 
-            float xmin = INFINITY, xmax = -INFINITY;
-            float ymin = INFINITY, ymax = -INFINITY;
-            float zmin = INFINITY, zmax = -INFINITY;
+            float xmin =  std::numeric_limits<float>::infinity();
+            float xmax = -std::numeric_limits<float>::infinity();
+            float ymin =  std::numeric_limits<float>::infinity();
+            float ymax = -std::numeric_limits<float>::infinity();
+            float zmin =  std::numeric_limits<float>::infinity();
+            float zmax = -std::numeric_limits<float>::infinity();
             const vector3df vectors[] =
             {
                 frustrum->getFarLeftDown(),
