@@ -452,12 +452,12 @@ void QuadGraph::createMesh(bool show_invisible,
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code
         // would not be portable to directx anymore).
-        ind[6*i  ] = 4*i;  // First triangle: vertex 0, 1, 2
+        ind[6*i  ] = 4*i+2;  // First triangle: vertex 0, 1, 2
         ind[6*i+1] = 4*i+1;
-        ind[6*i+2] = 4*i+2;
-        ind[6*i+3] = 4*i;  // second triangle: vertex 0, 1, 3
+        ind[6*i+2] = 4*i;
+        ind[6*i+3] = 4*i+3;  // second triangle: vertex 0, 1, 3
         ind[6*i+4] = 4*i+2;
-        ind[6*i+5] = 4*i+3;
+        ind[6*i+5] = 4*i;
         i++;
     }   // for i=1; i<QuadSet::get()
 
@@ -970,7 +970,7 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 //-----------------------------------------------------------------------------
 /** Takes a snapshot of the driveline quads so they can be used as minimap.
  */
-void QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
+void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                             const std::string &name,
                             const video::SColor &fill_color,
                             video::ITexture** oldRttMinimap,
@@ -978,8 +978,6 @@ void QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
 {
     *oldRttMinimap = NULL;
     *newRttMinimap = NULL;
-
-    const core::dimension2du dimension = origdimension * 2;
 
     RTT* newRttProvider = NULL;
     IrrDriver::RTTProvider* oldRttProvider = NULL;
@@ -1057,15 +1055,16 @@ void QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
     // Adjust Y position by +1 for max, -1 for min - this helps in case that
     // the maximum Y coordinate is negative (otherwise the minimap is mirrored)
     // and avoids problems for tracks which have a flat (max Y = min Y) minimap.
-    camera->setPosition(core::vector3df(center.getX(), bb_min.getY() - 300.0f, center.getZ()));
+    camera->setPosition(core::vector3df(center.getX(), bb_min.getY() + 1.0f, center.getZ()));
     //camera->setPosition(core::vector3df(center.getX() - 5.0f, bb_min.getY() - 1 - 5.0f, center.getZ() - 15.0f));
     camera->setUpVector(core::vector3df(0, 0, 1));
     camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
-    camera->setAspectRatio(1.0f);
+    //camera->setAspectRatio(1.0f);
     camera->updateAbsolutePosition();
 
     video::ITexture* texture = NULL;
     FrameBuffer* frame_buffer = NULL;
+
     if (irr_driver->isGLSL())
     {
         frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
