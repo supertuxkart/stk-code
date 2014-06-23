@@ -374,6 +374,15 @@ void Skin::drawBgImage()
 }   // drawBgImage
 
 // ----------------------------------------------------------------------------
+/** Returns the BoxRenderParams data structure for a given type.
+ *  \param type The type name of the box render param to get.
+ */
+const BoxRenderParams& Skin::getBoxRenderParams(const std::string &type)
+{
+    return SkinConfig::m_render_params[type];
+}   // getBoxRenderParams
+
+// ----------------------------------------------------------------------------
 /** Draws a background box for an in-game notification message. Example would
  *  be an achievement, or friends comming online.
  *  \param w The SkinWidgetContainer for the outline.
@@ -383,8 +392,7 @@ void Skin::drawBgImage()
 void Skin::drawMessage(SkinWidgetContainer* w, const core::recti &dest,
                        const std::string &type)
 {
-    drawBoxFromStretchableTexture(w, dest,
-                             SkinConfig::m_render_params[type+"::neutral"]);
+    drawBoxFromStretchableTexture(w, dest, SkinConfig::m_render_params[type]);
 }   // drawMessage
 
 // ----------------------------------------------------------------------------

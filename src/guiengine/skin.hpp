@@ -395,9 +395,10 @@ namespace GUIEngine
                              getDefaultText(gui::EGUI_DEFAULT_TEXT text) const;
         virtual gui::IGUIFont* getFont(gui::EGUI_DEFAULT_FONT which=
                                                      gui::EGDF_DEFAULT) const;
-        virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const ;
-        virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const ;
-        virtual gui::IGUISpriteBank *  getSpriteBank () const ;
+        virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const;
+        virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const;
+        const BoxRenderParams& getBoxRenderParams(const std::string &type);
+        virtual gui::IGUISpriteBank *  getSpriteBank () const;
         virtual void setColor (gui::EGUI_DEFAULT_COLOR which,
                                   video::SColor newColor);
         virtual void setDefaultText (gui::EGUI_DEFAULT_TEXT which,

@@ -31,8 +31,10 @@ using namespace irr;
 namespace MessageQueue
 {
     /** The various message type which can be shown (which might use a
-     *  different look. */
-    enum MessageType {MT_ACHIEVEMENT, MT_FRIEND};
+     *  different look. This type is used to sort the messages, so it is
+     *  important that messages that need to be shown as early as possible
+     *  will be listed last (i.e. have highest priority). */
+    enum MessageType {MT_FRIEND, MT_ACHIEVEMENT};
 
     void add(MessageType mt, const core::stringw &message);
     void update(float dt);
