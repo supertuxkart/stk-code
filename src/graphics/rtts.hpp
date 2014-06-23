@@ -53,6 +53,9 @@ private:
     PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
 
+    int m_width;
+    int m_height;
+
     unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;
     unsigned RH_Red, RH_Green, RH_Blue;
