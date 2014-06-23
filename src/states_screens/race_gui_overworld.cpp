@@ -338,7 +338,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
     else if (new_rtt_mini_map != NULL)
     {
         core::rect<s32> source(0, 0, new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight());
-        draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0], 512, 512,
+        draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0],
+            new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight(),
             dest, source, NULL, true);
     }
 

@@ -985,7 +985,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     IrrDriver::RTTProvider* oldRttProvider = NULL;
     if (irr_driver->isGLSL())
     {
-        newRttProvider = new RTT(512, 512);
+        newRttProvider = new RTT(dimension.Width, dimension.Height);
     }
     else
     {
