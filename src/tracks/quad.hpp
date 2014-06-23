@@ -22,6 +22,8 @@
 #include <SColor.h>
 #include "utils/vec3.hpp"
 
+#include <array>
+
 namespace irr
 {
     namespace video { struct S3DVertex; }
@@ -58,6 +60,8 @@ private:
 
     /** Set if this quad should not be used by the AI. */
     bool  m_ai_ignore;
+
+    std::array<std::array<Vec3,4> , 6 > boxFaces;
 
     void findNormal();
         
