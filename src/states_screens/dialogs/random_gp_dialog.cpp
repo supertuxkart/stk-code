@@ -82,7 +82,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->addLabel("all");
     int index_standard;
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-    for (unsigned int i = 0; i < groups.size() + 1; i++)
+    for (unsigned int i = 0; i < groups.size(); i++)
     {
         // FIXME: The NULL check is necessary until #1348 on github is fixed
         if (groups[i].c_str() != NULL)
