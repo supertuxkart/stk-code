@@ -66,7 +66,7 @@ class CompareMessages
 public:
     bool operator() (const Message *a, const Message *b) const
     {
-        return a->getMessageType() < b->getMessageType();
+        return a->getMessageType() > b->getMessageType();
     }   // operator ()
 };   // operator()
 
