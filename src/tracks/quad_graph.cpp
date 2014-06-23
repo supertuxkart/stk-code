@@ -1046,8 +1046,8 @@ void QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
     float range = (dx>dz) ? dx : dz;
 
     core::matrix4 projection;
-    projection.buildProjectionMatrixOrthoLH(range,
-                                            range,
+    projection.buildProjectionMatrixOrthoLH(range /* width */,
+                                            range /* height */,
                                             -1, bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
 
@@ -1057,7 +1057,8 @@ void QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
     // Adjust Y position by +1 for max, -1 for min - this helps in case that
     // the maximum Y coordinate is negative (otherwise the minimap is mirrored)
     // and avoids problems for tracks which have a flat (max Y = min Y) minimap.
-    camera->setPosition(core::vector3df(center.getX(), bb_max.getY()+1, center.getZ()));
+    camera->setPosition(core::vector3df(center.getX(), bb_min.getY() - 300.0f, center.getZ()));
+    //camera->setPosition(core::vector3df(center.getX() - 5.0f, bb_min.getY() - 1 - 5.0f, center.getZ() - 15.0f));
     camera->setUpVector(core::vector3df(0, 0, 1));
     camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
     camera->setAspectRatio(1.0f);
