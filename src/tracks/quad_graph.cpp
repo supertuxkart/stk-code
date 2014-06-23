@@ -976,6 +976,8 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
                             video::ITexture** oldRttMinimap,
                             FrameBuffer** newRttMinimap)
 {
+    const SColor oldClearColor = World::getWorld()->getClearColor();
+    World::getWorld()->setClearbackBufferColor(SColor(0, 255, 255, 255));
     *oldRttMinimap = NULL;
     *newRttMinimap = NULL;
 
@@ -1091,6 +1093,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
 
     *oldRttMinimap = texture;
     *newRttMinimap = frame_buffer;
+    World::getWorld()->setClearbackBufferColor(oldClearColor);
 }   // makeMiniMap
 
 //-----------------------------------------------------------------------------
