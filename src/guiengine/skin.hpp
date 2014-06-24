@@ -270,9 +270,7 @@ namespace GUIEngine
         video::ITexture* bg_image;
         std::vector<Widget*> m_tooltips;
         std::vector<bool> m_tooltip_at_mouse;
-#ifdef USE_PER_LINE_BACKGROUND
-    public:
-#endif
+
         LEAK_CHECK()
 
         void drawBoxFromStretchableTexture(SkinWidgetContainer* w,
@@ -396,10 +394,11 @@ namespace GUIEngine
         virtual const wchar_t*
                              getDefaultText(gui::EGUI_DEFAULT_TEXT text) const;
         virtual gui::IGUIFont* getFont(gui::EGUI_DEFAULT_FONT which=
-                                                     gui::EGDF_DEFAULT) const ;
-        virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const ;
-        virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const ;
-        virtual gui::IGUISpriteBank *  getSpriteBank () const ;
+                                                     gui::EGDF_DEFAULT) const;
+        virtual u32  getIcon (gui::EGUI_DEFAULT_ICON icon) const;
+        virtual s32  getSize (gui::EGUI_DEFAULT_SIZE size) const;
+        const BoxRenderParams& getBoxRenderParams(const std::string &type);
+        virtual gui::IGUISpriteBank *  getSpriteBank () const;
         virtual void setColor (gui::EGUI_DEFAULT_COLOR which,
                                   video::SColor newColor);
         virtual void setDefaultText (gui::EGUI_DEFAULT_TEXT which,
@@ -411,6 +410,8 @@ namespace GUIEngine
         virtual void setSpriteBank (gui::IGUISpriteBank *bank);
 
         void drawTooltips();
+        void drawMessage(SkinWidgetContainer* w, const core::recti &dest,
+                         const std::string &type);
 
         video::ITexture* getImage(const char* name);
 

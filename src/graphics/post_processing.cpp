@@ -244,6 +244,8 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
 
 void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, GLuint shr, GLuint shg, GLuint shb)
 {
+    core::matrix4 InvRHMatrix;
+    RHMatrix.getInverse(InvRHMatrix);
     glDisable(GL_DEPTH_TEST);
     glUseProgram(FullScreenShader::GlobalIlluminationReconstructionShader::Program);
     glBindVertexArray(FullScreenShader::GlobalIlluminationReconstructionShader::vao);
@@ -267,7 +269,7 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     }
     setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
     setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, rh_extend, 3, 4, 0, 1, 2);
+    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, InvRHMatrix, rh_extend, 3, 4, 0, 1, 2);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -413,7 +415,11 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_tex, 0);
+            glUniform1i(FullScreenShader::Gaussian17TapHShader::uniform_depth, 1);
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
@@ -423,9 +429,11 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
 
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::Program);
             glBindImageTexture(0, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
-            glBindImageTexture(1, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            glBindImageTexture(1, irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0], 1, false, 0, GL_READ_ONLY, GL_R32F);
+            glBindImageTexture(2, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_source, 0);
-            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 1);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_depth, 1);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapHShader::uniform_dest, 2);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
 #endif
@@ -444,7 +452,11 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
             setTexture(0, auxiliary.getRTT()[0], GL_LINEAR, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+            setTexture(1, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_tex, 0);
+            glUniform1i(FullScreenShader::Gaussian17TapVShader::uniform_depth, 1);
 
             glDrawArrays(GL_TRIANGLES, 0, 3);
         }
@@ -453,9 +465,11 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::Program);
             glBindImageTexture(0, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
-            glBindImageTexture(1, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
+            glBindImageTexture(1, irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0], 1, false, 0, GL_READ_ONLY, GL_R32F);
+            glBindImageTexture(2, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_source, 0);
-            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 1);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_depth, 1);
+            glUniform1i(FullScreenShader::ComputeGaussian17TapVShader::uniform_dest, 2);
             glDispatchCompute(in_fbo.getWidth() / 8, in_fbo.getHeight() / 8, 1);
         }
 #endif
@@ -473,6 +487,21 @@ void PostProcessing::renderPassThrough(GLuint tex)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+}
+
+void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
+{
+    glUseProgram(FullScreenShader::LayerPassThroughShader::Program);
+    glBindVertexArray(FullScreenShader::LayerPassThroughShader::vao);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glUniform1i(FullScreenShader::LayerPassThroughShader::uniform_texture, 0);
+    glUniform1i(FullScreenShader::LayerPassThroughShader::uniform_layer, layer);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

@@ -29,7 +29,7 @@ class SharedObject
 {
 public:
     static GLuint billboardvbo;
-    static GLuint cubevbo, cubeindexes;
+    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes;
     static GLuint ViewProjectionMatrixesUBO;
 };
 
@@ -424,6 +424,18 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &screen, unsigned TU_tex);
 };
 
+class ViewFrustrumShader
+{
+public:
+    static GLuint Program;
+    static GLuint attrib_position;
+    static GLuint uniform_color, uniform_idx;
+    static GLuint frustrumvao;
+
+    static void init();
+    static void setUniforms(const video::SColor &color, unsigned idx);
+};
+
 }
 
 #define MAXLIGHT 32
@@ -624,18 +636,18 @@ class GlobalIlluminationReconstructionShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix;
+    static GLuint uniform_ntex, uniform_dtex, uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix, uniform_InvRHMatrix;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
+    static void setUniforms(const core::matrix4 &RHMatrix, const core::matrix4 &InvRHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
 };
 
 class Gaussian17TapHShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
+    static GLuint uniform_tex, uniform_depth, uniform_pixel;
     static GLuint vao;
 
     static void init();
@@ -645,7 +657,7 @@ class ComputeGaussian17TapHShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_source, uniform_dest;
+    static GLuint uniform_source, uniform_depth, uniform_dest;
 
     static void init();
 };
@@ -674,7 +686,7 @@ class Gaussian17TapVShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
+    static GLuint uniform_tex, uniform_depth, uniform_pixel;
     static GLuint vao;
 
     static void init();
@@ -684,7 +696,7 @@ class ComputeGaussian17TapVShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_source, uniform_dest;
+    static GLuint uniform_source, uniform_depth, uniform_dest;
 
     static void init();
 };
@@ -715,6 +727,16 @@ class PassThroughShader
 public:
     static GLuint Program;
     static GLuint uniform_texture;
+    static GLuint vao;
+
+    static void init();
+};
+
+class LayerPassThroughShader
+{
+public:
+    static GLuint Program;
+    static GLuint uniform_layer, uniform_texture;
     static GLuint vao;
 
     static void init();
