@@ -21,7 +21,7 @@
 #include "achievements/achievement.hpp"
 
 #include "achievements/achievement_info.hpp"
-#include "guiengine/dialog_queue.hpp"
+#include "guiengine/message_queue.hpp"
 #include "io/utf_writer.hpp"
 #include "config/player_manager.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
@@ -202,8 +202,7 @@ void Achievement::check()
         //show achievement
         core::stringw s = StringUtils::insertValues(_("Completed achievement \"%s\"."),
                                                     m_achievement_info->getTitle());
-        GUIEngine::DialogQueue::get()->pushDialog(
-            new NotificationDialog(NotificationDialog::T_Achievements, s));
+        MessageQueue::add(MessageQueue::MT_ACHIEVEMENT, s);
 
         // Sends a confirmation to the server that an achievement has been
         // completed, if a user is signed in.
