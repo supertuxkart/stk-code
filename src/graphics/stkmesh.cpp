@@ -56,54 +56,78 @@ TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE typ
     return TM_DEFAULT;
 }
 
-GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride)
+video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride)
 {
-    if (attrib_position == -1)
-        return 0;
+    if (stride == sizeof(video::S3DVertex))
+        return video::EVT_STANDARD;
+    else if (stride == sizeof(video::S3DVertex2TCoords))
+        return video::EVT_2TCOORDS;
+    assert(stride == sizeof(video::S3DVertexTangents));
+    return video::EVT_TANGENTS;
+}
+
+GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
+{
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glEnableVertexAttribArray(attrib_position);
-    if ((GLint)attrib_texcoord != -1)
-        glEnableVertexAttribArray(attrib_texcoord);
-    if ((GLint)attrib_second_texcoord != -1)
-        glEnableVertexAttribArray(attrib_second_texcoord);
-    if ((GLint)attrib_normal != -1)
-        glEnableVertexAttribArray(attrib_normal);
-    if ((GLint)attrib_tangent != -1)
-        glEnableVertexAttribArray(attrib_tangent);
-    if ((GLint)attrib_bitangent != -1)
-        glEnableVertexAttribArray(attrib_bitangent);
-    if ((GLint)attrib_color != -1)
-        glEnableVertexAttribArray(attrib_color);
-    glVertexAttribPointer(attrib_position, 3, GL_FLOAT, GL_FALSE, stride, 0);
-    if ((GLint)attrib_texcoord != -1)
-        glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 28);
-    if ((GLint)attrib_second_texcoord != -1)
+    switch (type)
     {
-        if (stride < 44)
-            Log::error("material", "Second texcoords not present in VBO");
-        glVertexAttribPointer(attrib_second_texcoord, 2, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 36);
+    case video::EVT_STANDARD:
+        // Position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        // Normal
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        // Color
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        // Texcoord
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        break;
+    case video::EVT_2TCOORDS:
+        break;
+        // Position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        // Normal
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        // Color
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        // Texcoord
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        // SecondTexcoord
+        glEnableVertexAttribArray(4);
+        glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)36);
+        break;
+    case video::EVT_TANGENTS:
+        // Position
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
+        // Normal
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)12);
+        // Color
+        glEnableVertexAttribArray(2);
+        glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, getVertexPitchFromType(type), (GLvoid*)24);
+        // Texcoord
+        glEnableVertexAttribArray(3);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
+        // Tangent
+        glEnableVertexAttribArray(5);
+        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)36);
+        // Bitangent
+        glEnableVertexAttribArray(6);
+        glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)48);
+        break;
     }
-    if ((GLint)attrib_normal != -1)
-        glVertexAttribPointer(attrib_normal, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*) 12);
-    if ((GLint)attrib_tangent != -1)
-    {
-        if (stride < 48)
-            Log::error("material", "Tangents not present in VBO");
-        glVertexAttribPointer(attrib_tangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)36);
-    }
-        
-    if ((GLint)attrib_bitangent != -1)
-    {
-        if (stride < 60)
-            Log::error("material", "Bitangents not present in VBO");
-        glVertexAttribPointer(attrib_bitangent, 3, GL_FLOAT, GL_FALSE, stride, (GLvoid*)48);
-    }
-    if ((GLint)attrib_color != -1)
-        glVertexAttribPointer(attrib_color, 4, GL_UNSIGNED_BYTE, GL_TRUE, stride, (GLvoid*)24);
-        
+
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
     return vao;
 }
@@ -659,25 +683,21 @@ void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedM
     switch (GeoMat)
     {
     case FPSM_DEFAULT:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectPass1Shader::attrib_position, MeshShader::ObjectPass1Shader::attrib_texcoord, -1, MeshShader::ObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
-        mesh.vao_rsm_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::RSMShader::attrib_position, MeshShader::RSMShader::attrib_texcoord, -1, MeshShader::RSMShader::attrib_normal, -1, -1, -1, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+        mesh.vao_rsm_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case FPSM_ALPHA_REF_TEXTURE:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectRefPass1Shader::attrib_position, MeshShader::ObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::ObjectRefPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::RefShadowShader::attrib_position, MeshShader::RefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case FPSM_NORMAL_MAP:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::NormalMapShader::attrib_position, MeshShader::NormalMapShader::attrib_texcoord, -1, -1, MeshShader::NormalMapShader::attrib_tangent, MeshShader::NormalMapShader::attrib_bitangent, -1, mesh.Stride);
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case FPSM_GRASS:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::GrassPass1Shader::attrib_position, MeshShader::GrassPass1Shader::attrib_texcoord, -1, MeshShader::GrassPass1Shader::attrib_normal, -1, -1, MeshShader::GrassPass1Shader::attrib_color, mesh.Stride);
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::GrassShadowShader::attrib_position, MeshShader::GrassShadowShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassShadowShader::attrib_color, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     default:
         assert(0 && "Unknow material");
@@ -687,50 +707,41 @@ void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedM
     switch (ShadedMat)
     {
     case SM_SPHEREMAP:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::SphereMapShader::attrib_position, -1, -1, MeshShader::SphereMapShader::attrib_normal, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_SPLATTING:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::SplattingShader::attrib_position, MeshShader::SplattingShader::attrib_texcoord, MeshShader::SplattingShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_ALPHA_REF_TEXTURE:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectRefPass2Shader::attrib_position, MeshShader::ObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_RIMLIT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectRimLimitShader::attrib_position, MeshShader::ObjectRimLimitShader::attrib_texcoord, -1, MeshShader::ObjectRimLimitShader::attrib_normal, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_GRASS:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::GrassPass2Shader::attrib_position, MeshShader::GrassPass2Shader::attrib_texcoord, -1, -1, -1, -1, MeshShader::GrassPass2Shader::attrib_color, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_UNLIT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectUnlitShader::attrib_position, MeshShader::ObjectUnlitShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_DETAILS:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::DetailledObjectPass2Shader::attrib_position, MeshShader::DetailledObjectPass2Shader::attrib_texcoord, MeshShader::DetailledObjectPass2Shader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_UNTEXTURED:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::UntexturedObjectShader::attrib_position, -1, -1, -1, -1, -1, MeshShader::UntexturedObjectShader::attrib_color, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case SM_DEFAULT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::ObjectPass2Shader::attrib_position, MeshShader::ObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     default:
         assert(0 && "unknow shaded material");
         break;
     }
 
-    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
-    mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+    mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
     if (mesh.Stride >= 44)
-        mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
 }
 
 void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
@@ -738,22 +749,19 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
     switch (TranspMat)
     {
     case TM_BUBBLE:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::BubbleShader::attrib_position, MeshShader::BubbleShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     case TM_DEFAULT:
     case TM_ADDITIVE:
         if (World::getWorld() != NULL && World::getWorld()->isFogEnabled())
-            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-                MeshShader::TransparentFogShader::attrib_position, MeshShader::TransparentFogShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentFogShader::attrib_color, mesh.Stride);
+            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         else
-            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-                MeshShader::TransparentShader::attrib_position, MeshShader::TransparentShader::attrib_texcoord, -1, -1, -1, -1, MeshShader::TransparentShader::attrib_color, mesh.Stride);
+            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         break;
     }
-    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::ColorizeShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
-    mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+    mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
     if (mesh.Stride >= 44)
-        mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::DisplaceShader::attrib_position, MeshShader::DisplaceShader::attrib_texcoord, MeshShader::DisplaceShader::attrib_second_texcoord, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
 }
 

@@ -24,25 +24,17 @@ uniform mat4 TextureMatrix =
          0., 0., 1., 0.,
          0., 0., 0., 1.);
 
-#if __VERSION__ >= 130
-in vec3 Position;
-in vec2 Texcoord;
+
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
 in vec2 SecondTexcoord;
-in vec3 Normal;
-in vec4 Color;
+
 out vec3 nor;
 out vec2 uv;
 out vec2 uv_bis;
 out vec4 color;
-#else
-attribute vec3 Position;
-attribute vec3 Normal;
-attribute vec2 Texcoord;
-attribute vec2 SecondTexcoord;
-varying vec3 nor;
-varying vec2 uv;
-varying vec2 uv_bis;
-#endif
 
 
 void main(void)

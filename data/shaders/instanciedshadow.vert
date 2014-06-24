@@ -11,8 +11,8 @@ in vec3 Origin;
 in vec3 Orientation;
 in vec3 Scale;
 
-in vec3 Position;
-in vec2 Texcoord;
+layout(location = 0) in vec3 Position;
+layout(location = 3) in vec2 Texcoord;
 
 #ifdef VSLayer
 out vec2 uv;
