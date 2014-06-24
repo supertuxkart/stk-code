@@ -82,18 +82,8 @@ void STKMeshSceneNode::cleanGLMeshes()
         GLMesh mesh = GLmeshes[i];
         if (!mesh.vertex_buffer)
             continue;
-        if (mesh.vao_first_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_first_pass));
-        if (mesh.vao_second_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_second_pass));
-        if (mesh.vao_glow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
-        if (mesh.vao_displace_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
-        if (mesh.vao_displace_mask_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
-        if (mesh.vao_shadow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
+        if (mesh.vao)
+            glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
     }
@@ -126,8 +116,8 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
 
     MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
 
-    assert(mesh.vao_glow_pass);
-    glBindVertexArray(mesh.vao_glow_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -152,8 +142,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
     MeshShader::DisplaceMaskShader::setUniforms(ModelViewProjectionMatrix);
 
-    assert(mesh.vao_displace_mask_pass);
-    glBindVertexArray(mesh.vao_displace_mask_pass);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 
     // Render the effect
@@ -171,8 +160,6 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
                                                             float(UserConfigParams::m_height)),
                                             0, 1, 2);
 
-    assert(mesh.vao_displace_pass);
-    glBindVertexArray(mesh.vao_displace_pass);
     glDrawElements(ptype, count, itype, 0);
 }
 

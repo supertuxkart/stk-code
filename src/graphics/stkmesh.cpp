@@ -71,6 +71,7 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
     GLuint vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
+    assert(vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     switch (type)
     {
@@ -129,7 +130,7 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
     default:
         assert(0 && "Wrong vertex type");
     }
-
+    assert(idx);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
     return vao;
 }
@@ -250,8 +251,8 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 
     MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, windDir, 0);
 
-    assert(mesh.vao_first_pass);
-    glBindVertexArray(mesh.vao_first_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -276,8 +277,8 @@ void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const c
   setTexture(MeshShader::SphereMapShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
   MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix, irr_driver->getSceneManager()->getAmbientLight());
-  assert(mesh.vao_second_pass);
-  glBindVertexArray(mesh.vao_second_pass);
+  assert(mesh.vao);
+  glBindVertexArray(mesh.vao);
   glDrawElements(ptype, count, itype, 0);
 }
 
@@ -356,8 +357,8 @@ void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionM
 
   MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix);
 
-  assert(mesh.vao_second_pass);
-  glBindVertexArray(mesh.vao_second_pass);
+  assert(mesh.vao);
+  glBindVertexArray(mesh.vao);
   glDrawElements(ptype, count, itype, 0);
 }
 
@@ -383,8 +384,8 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 
   MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix);
 
-  assert(mesh.vao_second_pass);
-  glBindVertexArray(mesh.vao_second_pass);
+  assert(mesh.vao);
+  glBindVertexArray(mesh.vao);
   glDrawElements(ptype, count, itype, 0);
 }
 
@@ -412,8 +413,8 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 
     MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir);
 
-    assert(mesh.vao_second_pass);
-    glBindVertexArray(mesh.vao_second_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -426,8 +427,8 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 
   MeshShader::UntexturedObjectShader::setUniforms(ModelMatrix);
 
-  assert(mesh.vao_second_pass);
-  glBindVertexArray(mesh.vao_second_pass);
+  assert(mesh.vao);
+  glBindVertexArray(mesh.vao);
   glDrawElements(ptype, count, itype, 0);
 }
 
@@ -453,8 +454,8 @@ void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
 
     MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
 
-    assert(mesh.vao_second_pass);
-    glBindVertexArray(mesh.vao_second_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -480,8 +481,8 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 
     MeshShader::ObjectUnlitShader::setUniforms(ModelViewProjectionMatrix);
 
-    assert(mesh.vao_second_pass);
-    glBindVertexArray(mesh.vao_second_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -509,8 +510,8 @@ void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelView
 
   MeshShader::DetailledObjectPass2Shader::setUniforms(ModelViewProjectionMatrix);
 
-  assert(mesh.vao_second_pass);
-  glBindVertexArray(mesh.vao_second_pass);
+  assert(mesh.vao);
+  glBindVertexArray(mesh.vao);
   glDrawElements(ptype, count, itype, 0);
 }
 
@@ -536,8 +537,8 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 
     MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix);
 
-    assert(mesh.vao_second_pass);
-    glBindVertexArray(mesh.vao_second_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -553,8 +554,8 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 
     MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
 
-    assert(mesh.vao_first_pass);
-    glBindVertexArray(mesh.vao_first_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -588,8 +589,8 @@ void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelView
     glUseProgram(MeshShader::TransparentFogShader::Program);
     MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
 
-    assert(mesh.vao_first_pass);
-    glBindVertexArray(mesh.vao_first_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -608,8 +609,8 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 
     MeshShader::BubbleShader::setUniforms(ModelViewProjectionMatrix, 0, time, transparency);
 
-    assert(mesh.vao_first_pass);
-    glBindVertexArray(mesh.vao_first_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -624,8 +625,8 @@ void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
 
-    assert(mesh.vao_shadow_pass);
-    glBindVertexArray(mesh.vao_shadow_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, 4);
 }
 
@@ -638,8 +639,8 @@ void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
 
     MeshShader::ShadowShader::setUniforms(ModelMatrix);
 
-    assert(mesh.vao_shadow_pass);
-    glBindVertexArray(mesh.vao_shadow_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, 4);
 }
 
@@ -682,88 +683,11 @@ bool isObject(video::E_MATERIAL_TYPE type)
 
 void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat)
 {
-    switch (GeoMat)
-    {
-    case FPSM_DEFAULT:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        mesh.vao_rsm_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case FPSM_ALPHA_REF_TEXTURE:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case FPSM_NORMAL_MAP:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case FPSM_GRASS:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    default:
-        assert(0 && "Unknow material");
-        break;
-    }
-
-    switch (ShadedMat)
-    {
-    case SM_SPHEREMAP:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_SPLATTING:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_ALPHA_REF_TEXTURE:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_RIMLIT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_GRASS:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_UNLIT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_DETAILS:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_UNTEXTURED:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case SM_DEFAULT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    default:
-        assert(0 && "unknow shaded material");
-        break;
-    }
-
-    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-    mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-    if (mesh.Stride >= 44)
-        mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+    mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
 }
 
 void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
 {
-    switch (TranspMat)
-    {
-    case TM_BUBBLE:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    case TM_DEFAULT:
-    case TM_ADDITIVE:
-        if (World::getWorld() != NULL && World::getWorld()->isFogEnabled())
-            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        else
-            mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        break;
-    }
-    mesh.vao_glow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-    mesh.vao_displace_mask_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-    if (mesh.Stride >= 44)
-        mesh.vao_displace_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
+    mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
 }
 

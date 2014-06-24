@@ -42,6 +42,7 @@ enum TransparentMaterial
 };
 
 struct GLMesh {
+    GLuint vao;
     GLuint vao_first_pass;
     GLuint vao_second_pass;
     GLuint vao_glow_pass;
