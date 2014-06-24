@@ -126,6 +126,8 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
         glEnableVertexAttribArray(6);
         glVertexAttribPointer(6, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)48);
         break;
+    default:
+        assert(0 && "Wrong vertex type");
     }
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx);
