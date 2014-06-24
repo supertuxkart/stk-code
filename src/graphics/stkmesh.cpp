@@ -90,7 +90,6 @@ GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type)
         glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), (GLvoid*)28);
         break;
     case video::EVT_2TCOORDS:
-        break;
         // Position
         glEnableVertexAttribArray(0);
         glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, getVertexPitchFromType(type), 0);
@@ -151,6 +150,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
     result.Stride = getVertexPitchFromType(vType);
     const c8* vbuf = static_cast<const c8*>(vertices);
     glBufferData(GL_ARRAY_BUFFER, vertexCount * result.Stride, vbuf, GL_STATIC_DRAW);
+    assert(vertexCount);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.index_buffer);
     const void* indices = mb->getIndices();
