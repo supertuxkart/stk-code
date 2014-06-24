@@ -992,6 +992,8 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
         oldRttProvider = new IrrDriver::RTTProvider(dimension, name, true);
     }
 
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 255, 255, 255));
+
     video::SColor red(128, 255, 0, 0);
     createMesh(/*show_invisible part of the track*/ false,
                /*enable_transparency*/ false,
