@@ -206,6 +206,8 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
 
     Scripting::Track::registerScriptFunctions(m_engine);
 
+    Scripting::Track::registerScriptEnums(m_engine);
+
     Scripting::Kart::registerScriptFunctions(m_engine);
 
     Scripting::Physics::registerScriptFunctions(m_engine);

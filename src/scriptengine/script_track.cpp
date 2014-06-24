@@ -173,6 +173,28 @@ namespace Scripting
 
         }
 
+        void registerScriptEnums(asIScriptEngine *engine)
+        {
+
+            engine->RegisterEnum("PA");
+            engine->RegisterEnumValue("PA", "STEER_LEFT", PA_STEER_LEFT);
+            engine->RegisterEnumValue("PA", "STEER_RIGHT", PA_STEER_RIGHT);
+            engine->RegisterEnumValue("PA", "ACCEL", PA_ACCEL);
+            engine->RegisterEnumValue("PA", "BRAKE", PA_BRAKE);
+            engine->RegisterEnumValue("PA", "NITRO", PA_NITRO);
+            engine->RegisterEnumValue("PA", "DRIFT", PA_DRIFT);
+            engine->RegisterEnumValue("PA", "RESCUE", PA_RESCUE);
+            engine->RegisterEnumValue("PA", "FIRE", PA_FIRE);
+            engine->RegisterEnumValue("PA", "LOOK_BACK", PA_LOOK_BACK);
+            engine->RegisterEnumValue("PA", "PAUSE_RACE", PA_PAUSE_RACE);
+            engine->RegisterEnumValue("PA", "MENU_UP", PA_MENU_UP);
+            engine->RegisterEnumValue("PA", "MENU_DOWN", PA_MENU_DOWN);
+            engine->RegisterEnumValue("PA", "MENU_LEFT", PA_MENU_LEFT);
+            engine->RegisterEnumValue("PA", "MENU_RIGHT", PA_MENU_RIGHT);
+            engine->RegisterEnumValue("PA", "MENU_SELECT", PA_MENU_SELECT);
+            engine->RegisterEnumValue("PA", "MENU_CANCEL", PA_MENU_CANCEL);
+
+        }
 
 
 

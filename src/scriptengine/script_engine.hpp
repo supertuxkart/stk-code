@@ -46,6 +46,8 @@ namespace Scripting
     {
         void registerScriptFunctions(asIScriptEngine *engine);
 
+        void registerScriptEnums(asIScriptEngine *engine);
+
         asIScriptFunction*
             registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName);
 
