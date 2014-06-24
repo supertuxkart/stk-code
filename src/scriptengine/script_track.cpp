@@ -26,6 +26,8 @@
 #include "tracks/track.hpp"
 #include "animations/three_d_animation.hpp"
 #include <iostream> //debug
+#include "input/input_manager.hpp"
+#include "input/device_manager.hpp"
 
 namespace Scripting
 {
@@ -79,6 +81,16 @@ namespace Scripting
         {
             ((TrackObjectPresentationMesh*)(memory))->getCurrentFrame();
         }
+        void getKeyBinding(asIScriptGeneric *gen)
+        {
+            //currently just test if it works
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
+            DeviceConfig* config = device->getConfiguration();
+            irr::core::stringw skid = config->getBindingAsString(PA_DRIFT);
+            std::string key = std::string(irr::core::stringc(skid).c_str());
+            gen->SetReturnObject(&key);
+        }
         void getTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
@@ -99,6 +111,7 @@ namespace Scripting
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
+                    void getKeyBinding(asIScriptGeneric *gen)
 
             r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r >= 0);
@@ -107,6 +120,9 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(string &in,float x,float y,float z, float distance)",
                 asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void getKeyBinding(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r >= 0);
+
+
             /*
             //Test singleton, and various calling conventions
             // Register the track object manager as a singleton. The script will access it through the global property
