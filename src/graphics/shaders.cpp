@@ -1733,12 +1733,14 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
+    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
     }
 
     GLuint DisplaceShader::Program;
@@ -1746,7 +1748,6 @@ namespace MeshShader
     GLuint DisplaceShader::attrib_texcoord;
     GLuint DisplaceShader::attrib_second_texcoord;
     GLuint DisplaceShader::uniform_MVP;
-    GLuint DisplaceShader::uniform_MV;
     GLuint DisplaceShader::uniform_displacement_tex;
     GLuint DisplaceShader::uniform_mask_tex;
     GLuint DisplaceShader::uniform_color_tex;
@@ -1761,8 +1762,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
+        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_displacement_tex = glGetUniformLocation(Program, "displacement_tex");
         uniform_color_tex = glGetUniformLocation(Program, "color_tex");
         uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
@@ -1772,10 +1772,9 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
+    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform2f(uniform_dir, dir.X, dir.Y);
         glUniform2f(uniform_dir2, dir2.X, dir2.Y);
         glUniform1i(uniform_displacement_tex, TU_displacement_tex);

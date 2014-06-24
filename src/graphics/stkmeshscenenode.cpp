@@ -131,16 +131,12 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-    core::matrix4 ModelViewMatrix = irr_driver->getViewMatrix();
-    ModelViewMatrix *= AbsoluteTransformation;
-
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
 
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
-    MeshShader::DisplaceMaskShader::setUniforms(ModelViewProjectionMatrix);
+    MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
 
     glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
@@ -153,7 +149,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
-    MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix,
+    MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
                                             core::vector2df(cb->getDirX(), cb->getDirY()),
                                             core::vector2df(cb->getDir2X(), cb->getDir2Y()),
                                             core::vector2df(float(UserConfigParams::m_width),
