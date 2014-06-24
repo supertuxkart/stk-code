@@ -1,1 +1,0 @@
-This folder contains Grands Prixs which always have one invalid property to test the reload-function in grand_prix_data.cpp. To run the tests, start stk with '''--add-gp-dir=/path/to/this/folder/'''. You should see many error-messages in the console explaining why the GP is invalid but no invalid GP in the GUI.
