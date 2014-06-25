@@ -15,10 +15,10 @@ in vec3 Origin;
 in vec3 Orientation;
 in vec3 Scale;
 
-in vec3 Position;
-in vec3 Normal;
-in vec2 Texcoord;
-in vec4 Color;
+layout(location = 0) in vec3 Position;
+layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
+layout(location = 3) in vec2 Texcoord;
 
 out vec3 nor;
 out vec2 uv;
