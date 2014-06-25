@@ -224,7 +224,7 @@ void draw3DLine(const core::vector3df& start,
 void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     const core::rect<s32>& destRect,
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-    bool useAlphaChannelOfTexture);
+    const video::SColor &colors, bool useAlphaChannelOfTexture);
 
 void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>& destRect,
     const irr::core::rect<s32>& sourceRect, const irr::core::rect<s32>* clipRect,

@@ -363,7 +363,7 @@ void RaceGUI::drawGlobalMiniMap()
         core::rect<s32> source(0, 0, new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight());
         draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0],
             new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight(),
-            dest, source, NULL, true);
+            dest, source, NULL, video::SColor(127, 255, 255, 255), true);
     }
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)

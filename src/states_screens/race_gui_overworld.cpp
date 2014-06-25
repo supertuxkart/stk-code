@@ -340,7 +340,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         core::rect<s32> source(0, 0, new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight());
         draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0],
             new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight(),
-            dest, source, NULL, true);
+            dest, source, NULL, video::SColor(127, 255, 255, 255), true);
     }
 
     Vec3 kart_xyz;

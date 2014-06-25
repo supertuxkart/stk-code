@@ -779,7 +779,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     const core::rect<s32>& destRect,
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-    bool useAlphaChannelOfTexture)
+    const video::SColor &colors, bool useAlphaChannelOfTexture)
 {
     if (useAlphaChannelOfTexture)
     {
@@ -794,9 +794,16 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     getSize(texture_w, texture_h, true,
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
-    drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
-        tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
 
+    glUseProgram(UIShader::UniformColoredTextureRectShader::Program);
+    glBindVertexArray(UIShader::UniformColoredTextureRectShader::vao);
+
+    setTexture(0, texture, GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, colors, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,
