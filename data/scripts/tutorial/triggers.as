@@ -1,6 +1,6 @@
 void added_script()
 {
-    displayMessage(getKeyBinding("DRIFT") + getKeyBinding("ACCEL") + "This trigger was added by another script");
+    displayMessage(getKeyBinding(PA::FIRE) + getKeyBinding(PA::ACCEL) + "This trigger was added by another script");
     jumpKartTo( 0, 67.90, 99.49 );
     Vec3 a;
     Vec3 b;

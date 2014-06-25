@@ -84,15 +84,12 @@ namespace Scripting
         void getKeyBinding(asIScriptGeneric *gen)
         {
             //currently just test if it works
-            std::string *str = (std::string*)gen->GetArgAddress(0);
+            int Enum_value = (int)gen->GetArgDWord(0);
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
             irr::core::stringw control;
-            //TODO : bind Enumerables?
-            if (*str == "DRIFT")control = config->getBindingAsString(PA_DRIFT);
-            if (*str == "FIRE")control = config->getBindingAsString(PA_FIRE);
-            if (*str == "ACCEL")control = config->getBindingAsString(PA_ACCEL);
-
+            PlayerAction ScriptAction = (PlayerAction)Enum_value;
+            control = config->getBindingAsString(ScriptAction);
             std::string key = std::string(irr::core::stringc(control).c_str());
             void *key_pointer = &key;
             gen->SetReturnObject(key_pointer);
@@ -125,7 +122,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(string &in,float x,float y,float z, float distance)",
                 asFUNCTION(createTrigger), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("string getKeyBinding(string &in)", asFUNCTION(getKeyBinding), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string getKeyBinding(int input)", asFUNCTION(getKeyBinding), asCALL_GENERIC); assert(r >= 0);
 
 
             /*
