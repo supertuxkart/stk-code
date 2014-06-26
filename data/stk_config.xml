@@ -163,49 +163,6 @@
                         shown. -->
    <jump animation-time="0.5" />
 
-    <!-- If a kart starts within the specified time after 'go',
-         it receives the corresponding bonus from 'boost'. Those
-         fields must have the same size, and must be sorted by
-         increasing times. -->
-
-    <!-- Rescue: time: How long it takes the kart to be raised.
-         height: how height the kart will be raised before it is
-         dropped back onto the track. 
-         vert rescue offset: used to raise karts a bit higher before
-         releasing them on the ground after a rescue. Used to avoid
-         resetting karts into the track. Not sure if this is still
-         necessary. -->
-
-    <!-- Nitro: engine-force: additional engine power
-         consumption: nitro consumption - heavier characters can be set
-             to need more nitro than lighter character.
-         small-container: how much energy a small container gives.
-         big-container: how much energy a big container gives. 
-         max-speed-increase: How much the speed of a kart might exceed
-             its maximum speed (in m/s). 
-         duration: How long the increased speed will be valid after
-             the kart stops using nitro (and the fade-out-time starts).
-         fade-out-time: Duration during which the increased maximum
-             speed due to nitro fades out. 
-         max: How much nitro a kart can store.
-     -->
-
-    <!-- Bubble gum data:
-         time: How long the bubblegum lasts.
-         speed-fraction: To what fraction of top-speed the speed is reduced.
-         torque: To rotate the kart somewhat.
-         fade-in-time: How quick the slowdown takes effect.
-      -->
-
-    <!-- time: Time a zipper is active. 
-         force: Additional zipper force. 
-         speed-gain: One time additional speed.
-         max-speed-increase: Additional speed allowed on top of the 
-             kart-specific maximum kart speed. 
-         fade-out-time: determines how long it takes for a zipper 
-             to fade out (after 'time').
-     -->
-
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.
          max: maximum skidding factor = maximum increase of steering angle.
@@ -378,69 +335,7 @@
                 skidding-threshold="2.0"
                 />
     </ai>
-    <!-- Slipstream: length: How far behind a kart slipstream works
-         width: how wide slipstream works furthest away from the kart.
-         collect-time: How many seconds of sstream give  maximum benefit
-         use-time: How long the benefit will last.
-         add-power: Additional power due to sstreaming. 1 = +100%
-         min-speed: Minimum speed necessary for slipstream to take effect. 
-         max-speed-increase: How much the speed of the kart might exceed
-         its normal maximum speed.
-         duration: How long the higher speed lasts after slipstream stopped
-         working.
-         fade-out-time: How long the slip stream speed increase will 
-         gradually be reduced.  -->
-
-    <!-- Kart-specific settings for the swatter:
-         duration: how long can the swatter be active.
-         distance: How close a kart or an item must be before it can be hit.
-         squash-duration: How long a kart will remain squashed.
-         squash-slowdown: percentage of max speed that a kart is
-                 restricted to.  -->
 	
-    <!-- Leaning related parameters, i.e. slightly leaning the karts when
-         driving a fast curve.
-         max: maximum leaning (i.e. when steering as much as possible at highest
-              speed), in degrees.
-         sped: Speed with which the leaning changes (in degree/second). -->
-
-    <!-- turn-radius defines the turn radius of the kart at
-         a given speed. The actual steering angle is dependent on the
-         wheel base of the kart: radius = wheel_base/sin(steering_angle).
-         The values below define that at speed 0 the turn radius is 2, at
-         speed 10 the radius is 7.5 etc.
-         The actual turn radius is piece-wise linearly interpolated. This
-         allows for tighter turning at lower speeds, and also avoids that
-         the kart becomes too hard to control at high speed (speeds of higher
-         than 23 can only be reached with powerups).
-         time-full-steer: This is the amount of change in steering depending
-           on current steering. So if the steering is between 0 and 0.5,
-           the time-for-steering-change is 0.15. If the current steering is
-           between 0.5 and 1.0, the time-for-steering-change is 0.25.
-           The speed is used as dt/time-for-steering-change.
-           In short: steering at less than halfway is somewhat faster,
-           which should avoid oversteering (by pressing the key for too long),
-           but slower when you want to steer more. Overwall with the current
-           settings the expected time-to-full-steer is:
-           0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
-           time we had previously.
-    -->
-
-    <!-- Speed and acceleration related values: power and max-speed (in m/s) 
-         have 3 values, one for low, medium, and hard.
-         brake-factor: Value used when braking. max-speed-reverse-ratio is
-         the percentage of max speed for reverse gear. -->
-
-    <!-- Simulated gears: switch-ratio defines at what ratio of the maximum
-         speed what gear is selected, e.g. 0.25 means that if the speed is
-         bigger or equal to 0.25 x maxSpeed then use gear 1, 0.5 means if 
-         the speed is bigger or equal to 0.5 x maxSpeed then gear 2.
-         gear-power-increase contains the increase in max power (to simulate
-         different gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
-         | first  | second |  third | . -->
-
-    <!-- mass  -->
-
     <!-- Suspension related values. stiffness: kart's suspension stiffness.
          rest: Length of suspension when at rest. 
          travel-cm: maximum movement of suspension - in cm!! 
@@ -521,6 +416,69 @@
     <collision impulse-type="normal" 
                impulse="3000" impulse-time="0.1" terrain-impulse="8000"
                restitution="1.0" bevel-factor="0.5 0.0 0.5" />
+			   
+    <!-- Slipstream: length: How far behind a kart slipstream works
+         width: how wide slipstream works furthest away from the kart.
+         collect-time: How many seconds of sstream give  maximum benefit
+         use-time: How long the benefit will last.
+         add-power: Additional power due to sstreaming. 1 = +100%
+         min-speed: Minimum speed necessary for slipstream to take effect. 
+         max-speed-increase: How much the speed of the kart might exceed
+         its normal maximum speed.
+         duration: How long the higher speed lasts after slipstream stopped
+         working.
+         fade-out-time: How long the slip stream speed increase will 
+         gradually be reduced.  -->
+
+    <!-- Kart-specific settings for the swatter:
+         duration: how long can the swatter be active.
+         distance: How close a kart or an item must be before it can be hit.
+         squash-duration: How long a kart will remain squashed.
+         squash-slowdown: percentage of max speed that a kart is
+                 restricted to.  -->
+	
+    <!-- Leaning related parameters, i.e. slightly leaning the karts when
+         driving a fast curve.
+         max: maximum leaning (i.e. when steering as much as possible at highest
+              speed), in degrees.
+         sped: Speed with which the leaning changes (in degree/second). -->
+
+    <!-- turn-radius defines the turn radius of the kart at
+         a given speed. The actual steering angle is dependent on the
+         wheel base of the kart: radius = wheel_base/sin(steering_angle).
+         The values below define that at speed 0 the turn radius is 2, at
+         speed 10 the radius is 7.5 etc.
+         The actual turn radius is piece-wise linearly interpolated. This
+         allows for tighter turning at lower speeds, and also avoids that
+         the kart becomes too hard to control at high speed (speeds of higher
+         than 23 can only be reached with powerups).
+         time-full-steer: This is the amount of change in steering depending
+           on current steering. So if the steering is between 0 and 0.5,
+           the time-for-steering-change is 0.15. If the current steering is
+           between 0.5 and 1.0, the time-for-steering-change is 0.25.
+           The speed is used as dt/time-for-steering-change.
+           In short: steering at less than halfway is somewhat faster,
+           which should avoid oversteering (by pressing the key for too long),
+           but slower when you want to steer more. Overwall with the current
+           settings the expected time-to-full-steer is:
+           0.5 * 0.25 + 0.5 * 0.15 = 0.2 ... which is overall the same
+           time we had previously.
+    -->
+
+    <!-- Speed and acceleration related values: power and max-speed (in m/s) 
+         have 3 values, one for low, medium, and hard.
+         brake-factor: Value used when braking. max-speed-reverse-ratio is
+         the percentage of max speed for reverse gear. -->
+
+    <!-- Simulated gears: switch-ratio defines at what ratio of the maximum
+         speed what gear is selected, e.g. 0.25 means that if the speed is
+         bigger or equal to 0.25 x maxSpeed then use gear 1, 0.5 means if 
+         the speed is bigger or equal to 0.5 x maxSpeed then gear 2.
+         gear-power-increase contains the increase in max power (to simulate
+         different gears), e.g. 2.5 as first entry means: 2.5*maxPower in gear 1
+         | first  | second |  third | . -->
+
+    <!-- mass  -->
 
     <!-- Kart-specific plunger and rubber band handling: max-length is
          the maximum length of rubber band before it snaps. force is
@@ -536,161 +494,202 @@
                after being hit by an explosion.
          radius: Kart closer to this value will be affected by
                an explosion as well.  -->
+	
+    <!-- If a kart starts within the specified time after 'go',
+         it receives the corresponding bonus from 'boost'. Those
+         fields must have the same size, and must be sorted by
+         increasing times. -->
+
+    <!-- Rescue: time: How long it takes the kart to be raised.
+         height: how height the kart will be raised before it is
+         dropped back onto the track. 
+         vert rescue offset: used to raise karts a bit higher before
+         releasing them on the ground after a rescue. Used to avoid
+         resetting karts into the track. Not sure if this is still
+         necessary. -->
+
+    <!-- Nitro: engine-force: additional engine power
+         consumption: nitro consumption - heavier characters can be set
+             to need more nitro than lighter character.
+         small-container: how much energy a small container gives.
+         big-container: how much energy a big container gives. 
+         max-speed-increase: How much the speed of a kart might exceed
+             its maximum speed (in m/s). 
+         duration: How long the increased speed will be valid after
+             the kart stops using nitro (and the fade-out-time starts).
+         fade-out-time: Duration during which the increased maximum
+             speed due to nitro fades out. 
+         max: How much nitro a kart can store.
+     -->
+
+    <!-- Bubble gum data:
+         time: How long the bubblegum lasts.
+         speed-fraction: To what fraction of top-speed the speed is reduced.
+         torque: To rotate the kart somewhat.
+         fade-in-time: How quick the slowdown takes effect.
+      -->
+
+    <!-- time: Time a zipper is active. 
+         force: Additional zipper force. 
+         speed-gain: One time additional speed.
+         max-speed-increase: Additional speed allowed on top of the 
+             kart-specific maximum kart speed. 
+         fade-out-time: determines how long it takes for a zipper 
+             to fade out (after 'time').
+     -->
 		 
 	 <kart-type>
 		 <light>
-			  <startup time   = "0.3 0.5"
-		          		boost  = "6 3"  />
+	         <startup time   = "0.3 0.5"
+	             boost  = "8.5 4.5"  />
 
-			  <rescue vert-offset="0.0" time="1.2" height="2"/>
+			 <rescue vert-offset="0.0" time="1.2" height="2"/>
 	  
-			  <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-			        max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
+		     <nitro engine-force="350" consumption="1" small-container="1" big-container="3"
+		         max-speed-increase="4.5" duration="1.5" fade-out-time="2.5" max="20"/>
 
-			  <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
+			 <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
 
-			  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-			        fade-out-time="1.0"  />
+			 <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+			     fade-out-time="1.0"  />
 
-			  <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-			        visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-			        min-speed="10"  time-till-bonus="1.0 3.0" 
-			        bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-			        bonus-force="250 350"
-			        physical-jump-time="0" graphical-jump-time="0.4"
-			        post-skid-rotate-factor="1"
-			        reduce-turn-min="0.2" reduce-turn-max="0.8"/>
+			 <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
+			     visual="1.25" visual-time="0.7" revert-visual-time="0.7"
+			     min-speed="10"  time-till-bonus="1.0 3.0" 
+			     bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
+			     bonus-force="250 350"
+			     physical-jump-time="0" graphical-jump-time="0.4"
+			     post-skid-rotate-factor="1"
+			     reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 			
-		         <slipstream length="10" width="2" collect-time="2" use-time="5"
-		            add-power="3" min-speed="10"
-		            max-speed-increase="5" duration="1" fade-out-time="2"/>
+			 <slipstream length="11" width="2" collect-time="1.5" use-time="2.5"
+			     add-power="3.2" min-speed="9"
+			     max-speed-increase="4" duration="1.2" fade-out-time="2.3"/>
 
-		      <swatter duration="10" distance="3" squash-duration="5" 
-				    squash-slowdown="0.5"/>
+		     <swatter duration="10" distance="3" squash-duration="5" 
+			     squash-slowdown="0.5"/>
 		    
-		      <lean    max="8.6"  speed="5.0" />
+		     <lean    max="8.6"  speed="5.0" />
 
-		      <turn turn-radius="0:2.0 10:7.5 25:15 45:30"
-		            time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25" 
-		            time-reset-steer="0.1" />
+		     <turn turn-radius="0:3.0 10:10.0 25:20.0 45:40.0" 
+			     time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
+		         time-reset-steer="0.1"/>
 
-			  <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
-		 	            max-speed-reverse-ratio="0.3"/>
+			 <engine power="250 300 350 400"  max-speed="15 20 23 25" brake-factor="15.0"
+			     max-speed-reverse-ratio="0.3"/>
 
-			  <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3"/>
+			 <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3"/>
 
-			  <mass value="225"/>
+			 <mass value="195"/>
 			  
-		      <plunger band-max-length="50" band-force="1500" band-duration="1"
-		            band-speed-increase="7" band-fade-out-time="3"
-		            in-face-time="3 4 4.5 4.5"/>
+		     <plunger band-max-length="50" band-force="1500" band-duration="1"
+		         band-speed-increase="7" band-fade-out-time="3"
+		         in-face-time="3 4 4.5 4.5"/>
 
-		      <explosion time="2" radius="5" 
-		           invulnerability-time="6" />
-			  
-			  
+			 <explosion time="2.1" radius="5.5" 
+			     invulnerability-time="7" /> 
 		 </light>
 		 
 		 <medium>
-			  <startup time   = "0.3 0.5"
-               		boost  = "6 3"  />
+	         <startup time   = "0.3 0.5"
+	             boost  = "4.2 2.6"  />
 
    			  <rescue vert-offset="0.0" time="1.2" height="2"/>
 			  
-			  <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-			        max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
+		      <nitro engine-force="425" consumption="1.4" small-container="1" big-container="3"
+		            max-speed-increase="5" duration="1.2" fade-out-time="2" max="20"/>
 
     		  <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
 
 			  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-			        fade-out-time="1.0"  />
+			      fade-out-time="1.0"  />
 
 			  <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-			        visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-			        min-speed="10"  time-till-bonus="1.0 3.0" 
-			        bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-			        bonus-force="250 350"
-			        physical-jump-time="0" graphical-jump-time="0.4"
-			        post-skid-rotate-factor="1"
-			        reduce-turn-min="0.2" reduce-turn-max="0.8"/>
+			      visual="1.25" visual-time="0.7" revert-visual-time="0.7"
+			      min-speed="10"  time-till-bonus="1.0 3.0" 
+	              bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
+			      bonus-force="250 350"
+			      physical-jump-time="0" graphical-jump-time="0.4"
+			      post-skid-rotate-factor="1"
+			      reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 					
-              <slipstream length="10" width="2" collect-time="2" use-time="5"
-	                add-power="3" min-speed="10"
-	                max-speed-increase="5" duration="1" fade-out-time="2"/>
+			  <slipstream length="10" width="2" collect-time="2" use-time="3.3"
+                  add-power="2.8" min-speed="10"
+				  max-speed-increase="5" duration="0.9" fade-out-time="1.6"/>
 
 		      <swatter duration="10" distance="3" squash-duration="5" 
-				    squash-slowdown="0.5"/>
+			      squash-slowdown="0.5"/>
 				    
 		      <lean    max="8.6"  speed="5.0" />
   
-		      <turn turn-radius="0:2.0 10:7.5 25:15 45:30"
-		            time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25" 
-		            time-reset-steer="0.1" />
+		      <turn turn-radius="0:4.5 10:16.0 25:30.0 45:60.0"
+		            time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28" 
+					time-reset-steer="0.1"/>
 
-			  <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
-      	            max-speed-reverse-ratio="0.3"/>
+			  <engine power="425 500 575 600"  max-speed="15 20 23.2 27" brake-factor="11.0"
+			      max-speed-reverse-ratio="0.4"/>
 
-			  <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3"/>
+			  <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5"/>
 
-			  <mass value="225"/> 		
+			  <mass value="250"/> 		
 			  
 		      <plunger band-max-length="50" band-force="1500" band-duration="1"
-		            band-speed-increase="7" band-fade-out-time="3"
-		            in-face-time="3 4 4.5 4.5"/>
+		          band-speed-increase="7" band-fade-out-time="3"
+		          in-face-time="3 4 4.5 4.5"/>
 
-		      <explosion time="2" radius="5" 
-		           invulnerability-time="6" />
+		     <explosion time="1.8" radius="5" 
+			      invulnerability-time="6" />
 		 </medium>
 		 
 		 <heavy>
-			  <startup time   = "0.3 0.5"
-	              		boost  = "6 3"  />
+	         <startup time   = "0.3 0.5"
+	               boost  = "3.8 2"  />
 
-	  			  <rescue vert-offset="0.0" time="1.2" height="2"/>
+	  		 <rescue vert-offset="0.0" time="1.2" height="2"/>
 		  
-			  <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
-			        max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
+			 <nitro engine-force="600" consumption="2" small-container="1" big-container="3"
+			       max-speed-increase="8" duration="0.7" fade-out-time="1.3" max="20"/>
 
-	   		  <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
+	   		 <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
 
-			  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-			        fade-out-time="1.0"  />
+			 <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+			       fade-out-time="1.0"  />
 
-			  <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-			        visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-			        min-speed="10"  time-till-bonus="1.0 3.0" 
-			        bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-			        bonus-force="250 350"
-			        physical-jump-time="0" graphical-jump-time="0.4"
-			        post-skid-rotate-factor="1"
-			        reduce-turn-min="0.2" reduce-turn-max="0.8"/>
+			 <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
+			       visual="1.25" visual-time="0.7" revert-visual-time="0.7"
+			       min-speed="10"  time-till-bonus="1.0 3.0" 
+			       bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
+			       bonus-force="250 350"
+			       physical-jump-time="0" graphical-jump-time="0.4"
+			       post-skid-rotate-factor="1"
+			       reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 				
-	             <slipstream length="10" width="2" collect-time="2" use-time="5"
-	                add-power="3" min-speed="10"
-	                max-speed-increase="5" duration="1" fade-out-time="2"/>
+			 <slipstream length="8.5" width="2" collect-time="2" use-time="4"
+			       add-power="2.7" min-speed="10.5"
+			       max-speed-increase="8" duration="0.7" fade-out-time="1"/>
 
-		      <swatter duration="10" distance="3" squash-duration="5" 
-				    squash-slowdown="0.5"/>
+		     <swatter duration="10" distance="3" squash-duration="5" 
+			       squash-slowdown="0.5"/>
 			    
-		      <lean    max="8.6"  speed="5.0" />
+		     <lean    max="8.6"  speed="5.0" />
  
-		      <turn turn-radius="0:2.0 10:7.5 25:15 45:30"
-		            time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25" 
-		            time-reset-steer="0.1" />
+		     <turn turn-radius="0:4.0 10:18.5 25:43.0 45:72.5"
+			   	   time-full-steer ="0:0.23 0.5:0.23 0.5:0.41 1.0:0.41"
+		           time-reset-steer="0.1"/>
 
-			  <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
-	     	            max-speed-reverse-ratio="0.3"/>
+			 <engine power="600 700 800 900"  max-speed="15.8 18.8 23.85 30.0" brake-factor="10"
+			       max-speed-reverse-ratio="0.65"/>
 
-			  <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3"/>
+			 <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5"/>
 
-			  <mass value="225"/> 
+		     <mass value="350"/>
 			  
-		      <plunger band-max-length="50" band-force="1500" band-duration="1"
-		            band-speed-increase="7" band-fade-out-time="3"
-		            in-face-time="3 4 4.5 4.5"/>
+		     <plunger band-max-length="50" band-force="1500" band-duration="1"
+		           band-speed-increase="7" band-fade-out-time="3"
+		           in-face-time="3 4 4.5 4.5"/>
 
-		      <explosion time="2" radius="5" 
-		           invulnerability-time="6" />
+			 <explosion time="1.5" radius="4"
+			       invulnerability-time="6" />
 		 </heavy>
 	 </kart-type>
   </general-kart-defaults>

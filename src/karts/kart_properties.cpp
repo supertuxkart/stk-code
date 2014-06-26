@@ -314,7 +314,7 @@ void KartProperties::getAllData(const XMLNode * root)
     }
     else
     {
-        root->get("kart-type",     &m_kart_type        );
+        root->get("type",     &m_kart_type        );
     }
 
     if(const XMLNode *kart_type = root->getNode("kart-type"))
