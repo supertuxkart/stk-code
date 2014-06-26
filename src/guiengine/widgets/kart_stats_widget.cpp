@@ -91,16 +91,16 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
             m_children.push_back(skill_bar);
     }
 
-    m_skills[SKILL_MASS]->setValue(props->getMass()/10);
+    m_skills[SKILL_MASS]->setValue((int)(props->getMass()/5));
     m_skills[SKILL_MASS]->setLabel("WEIGHT");
     m_skills[SKILL_MASS]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_mass", m_player_id);
 
-    m_skills[SKILL_ACCEL]->setValue(props->getTrackConnectionAccel()/10);
+    m_skills[SKILL_ACCEL]->setValue((int)((props->getMaxSpeed()-20)*20));
     m_skills[SKILL_ACCEL]->setLabel("ACCEL");
     m_skills[SKILL_ACCEL]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_accel", m_player_id);
 
-    m_skills[SKILL_SPEED]->setValue(props->getMaxSpeed()/10);
-    m_skills[SKILL_SPEED]->setLabel("SPEED");
+    m_skills[SKILL_SPEED]->setValue((int)(props->getMaxPower()/10));
+    m_skills[SKILL_SPEED]->setLabel("POWER");
     m_skills[SKILL_SPEED]->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_speed", m_player_id);
 
 }   // KartStatsWidget
