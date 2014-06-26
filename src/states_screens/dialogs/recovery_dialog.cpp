@@ -20,7 +20,6 @@
 #include "audio/sfx_manager.hpp"
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
-#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
@@ -200,7 +199,8 @@ void RecoveryDialog::onUpdate(float dt)
         }
         else
         {
-            m_info_widget->setText(Messages::validatingInfo(), false);
+            m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
+                                   false);
         }
     }
     // It's unsafe to delete from inside the event handler so we do it here

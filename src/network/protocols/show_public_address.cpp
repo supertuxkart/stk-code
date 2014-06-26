@@ -43,7 +43,7 @@ void ShowPublicAddress::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "set", 
+        PlayerManager::setUserDetails(m_request, "set",
                                      "address-management.php");
         m_request->addParameter("address",addr.ip);
         m_request->addParameter("port",addr.port);

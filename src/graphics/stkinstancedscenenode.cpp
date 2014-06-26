@@ -8,6 +8,9 @@ STKInstancedSceneNode::STKInstancedSceneNode(irr::scene::IMesh* mesh, ISceneNode
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
+    m_ref_count = 0;
+    irr_driver->grabAllTextures(mesh);
+
     if (irr_driver->isGLSL())
     {
         createGLMeshes();
@@ -22,16 +25,10 @@ void STKInstancedSceneNode::cleanGL()
         GLMesh mesh = GLmeshes[i];
         if (!mesh.vertex_buffer)
             continue;
-        if (mesh.vao_first_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_first_pass));
+        if (mesh.vao)
+            glDeleteVertexArrays(1, &(mesh.vao));
         if (mesh.vao_second_pass)
             glDeleteVertexArrays(1, &(mesh.vao_second_pass));
-        if (mesh.vao_glow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
-        if (mesh.vao_displace_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
-        if (mesh.vao_displace_mask_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
         if (mesh.vao_shadow_pass)
             glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
@@ -42,6 +39,9 @@ void STKInstancedSceneNode::cleanGL()
 
 STKInstancedSceneNode::~STKInstancedSceneNode()
 {
+    irr_driver->dropAllTextures(getMesh());
+    irr_driver->removeMeshFromCache(getMesh());
+
     if (irr_driver->isGLSL())
         cleanGL();
 }
@@ -75,36 +75,33 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
     switch (GeoMat)
     {
     case FPSM_DEFAULT:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedObjectPass1Shader::attrib_position, MeshShader::InstancedObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::InstancedObjectPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glGenBuffers(1, &instances_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectPass1Shader, 1>();
         if (irr_driver->getGLSLVersion() >= 150)
         {
-            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedShadowShader::attrib_position, -1, -1, -1, -1, -1, -1, mesh.Stride);
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
             glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
             setInstanceAttribPointer<MeshShader::InstancedShadowShader, 4>();
         }
         break;
     case FPSM_ALPHA_REF_TEXTURE:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedObjectRefPass1Shader::attrib_position, MeshShader::InstancedObjectRefPass1Shader::attrib_texcoord, -1, MeshShader::InstancedObjectRefPass1Shader::attrib_normal, -1, -1, -1, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glGenBuffers(1, &instances_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
         setInstanceAttribPointer<MeshShader::InstancedObjectRefPass1Shader, 1>();
         if (irr_driver->getGLSLVersion() >= 150)
         {
-            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, MeshShader::InstancedRefShadowShader::attrib_position, MeshShader::InstancedRefShadowShader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+            mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
             glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
             setInstanceAttribPointer<MeshShader::InstancedRefShadowShader, 4>();
         }
         break;
     case FPSM_GRASS:
-        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedGrassPass1Shader::attrib_position, MeshShader::InstancedGrassPass1Shader::attrib_texcoord, -1, MeshShader::InstancedGrassPass1Shader::attrib_normal, -1, -1, MeshShader::InstancedGrassPass1Shader::attrib_color, mesh.Stride);
+        mesh.vao_first_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glGenBuffers(1, &instances_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         glBufferData(GL_ARRAY_BUFFER, instance_pos.size() * sizeof(float), instance_pos.data(), GL_STATIC_DRAW);
@@ -119,20 +116,17 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMateria
     switch (ShadedMat)
     {
     case SM_DEFAULT:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedObjectPass2Shader::attrib_position, MeshShader::InstancedObjectPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         setInstanceAttribPointer<MeshShader::InstancedObjectPass2Shader, 1>();
         break;
     case SM_ALPHA_REF_TEXTURE:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedObjectRefPass2Shader::attrib_position, MeshShader::InstancedObjectRefPass2Shader::attrib_texcoord, -1, -1, -1, -1, -1, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         setInstanceAttribPointer<MeshShader::InstancedObjectRefPass2Shader, 1>();
         break;
     case SM_GRASS:
-        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer,
-            MeshShader::InstancedGrassPass2Shader::attrib_position, MeshShader::InstancedGrassPass2Shader::attrib_texcoord, -1, MeshShader::InstancedGrassPass2Shader::attrib_normal, -1, -1, MeshShader::InstancedGrassPass2Shader::attrib_color, mesh.Stride);
+        mesh.vao_second_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
         setInstanceAttribPointer<MeshShader::InstancedGrassPass2Shader, 1>();
         break;
@@ -277,6 +271,16 @@ static void drawSMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjection
   size_t count = mesh.IndexCount;
 
   setTexture(MeshShader::InstancedObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  if (irr_driver->getLightViz())
+  {
+      GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
+  else
+  {
+      GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+  }
 
   MeshShader::InstancedObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
 
@@ -293,6 +297,16 @@ static void drawSMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelViewPr
 
     compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::InstancedObjectRefPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
 
     MeshShader::InstancedObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
 
@@ -309,6 +323,16 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
 
     compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::InstancedGrassPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
     setTexture(MeshShader::InstancedGrassPass2Shader::TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 

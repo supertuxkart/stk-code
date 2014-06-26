@@ -5,7 +5,16 @@ uniform sampler2D logluminancetex;
 uniform float exposure = .09;
 uniform float Lwhite = 1.;
 
-in vec2 uv;
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
+
 out vec4 FragColor;
 
 vec3 getCIEYxy(vec3 rgbColor);
@@ -17,6 +26,7 @@ float saturation = 1.;
 
 void main()
 {
+    vec2 uv = gl_FragCoord.xy / screen;
     vec4 col = texture(tex, uv);
     float avgLw = textureLod(logluminancetex, uv, 10.).x;
     avgLw = max(exp(avgLw) - delta, delta);
@@ -33,6 +43,12 @@ void main()
     // Uncharted2 tonemap with Auria's custom coefficients
     vec4 perChannel = (col * (6.9 * col + .5)) / (col * (5.2 * col + 1.7) + 0.06);
     perChannel = pow(perChannel, vec4(2.2));
-    FragColor = vec4(perChannel.xyz, 1.);
+    
+    vec2 inside = uv - 0.5;
+    float vignette = 1 - dot(inside, inside);    
+    vignette = clamp(pow(vignette, 0.8), 0., 1.);
+    //vignette = clamp(vignette + vignette - 0.5, 0., 1.15);
 
+    
+    FragColor = vec4(perChannel.xyz * vignette, col.a);
 }

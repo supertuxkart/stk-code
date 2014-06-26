@@ -136,6 +136,7 @@ STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vecto
     }
 
     m_instancing_nodes[name]->addInstance(position, rotation, scale);
+    m_instancing_nodes[name]->instanceGrab();
     return m_instancing_nodes[name];
 }
 

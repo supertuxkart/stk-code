@@ -9,6 +9,10 @@ const int fontsizes[] = {4,6,8,9,10,11,12,14,16,18,20,22,24,26,28,36,48,56,68,72
 
 char bUsed[0x10000]={0};
 
+/** True if pot files where given, which indicates that Asian fonts
+ *  are to be created, and an offset needs to be used for the index. */
+bool has_pot_files = false;
+
 inline u32 getTextureSizeFromSurfaceSize(u32 size)
 {
 	u32 ts = 0x01;
@@ -19,6 +23,7 @@ inline u32 getTextureSizeFromSurfaceSize(u32 size)
 }
 
 bool LoadPoFiles(const char* sListFileName){
+	has_pot_files = true;
 	char s[1024];
 	std::ifstream fin(sListFileName);
 	if(!fin){
@@ -57,6 +62,17 @@ bool LoadPoFiles(const char* sListFileName){
 	return true;
 }
 
+// ----------------------------------------------------------------------------
+/** Set all characters in the given character string to be used. */
+bool setUsedCharacters(const char* characters)
+{
+    int n = strlen(characters);
+    for(int i=0; i<n; i++)
+        bUsed[short(characters[i])] = true;
+    return true;
+}   // setUsedCharacters
+
+// ----------------------------------------------------------------------------
 // windows specific
 #ifdef _IRR_WINDOWS_
 
@@ -762,7 +778,8 @@ bool CFontTool::saveBitmapFont(const c8 *filename, const c8* format)
 	writer->writeLineBreak();
 
 	// write images and link to them
-    u32 offset_for_asian_fonts=100;
+    // Only use the offset if Asian fonts are created.
+    u32 offset_for_asian_fonts=has_pot_files ? 100 : 0;
 	for (u32 i=0; i<currentImages.size(); ++i)
 	{
 		imagename = filename;

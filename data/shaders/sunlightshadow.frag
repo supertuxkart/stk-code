@@ -16,6 +16,7 @@ uniform mat4 ProjectionMatrix;
 uniform mat4 InverseViewMatrix;
 uniform mat4 InverseProjectionMatrix;
 uniform mat4 ShadowViewProjMatrixes[4];
+uniform vec2 screen;
 #else
 layout (std140) uniform MatrixesData
 {
@@ -24,6 +25,7 @@ layout (std140) uniform MatrixesData
     mat4 InverseViewMatrix;
     mat4 InverseProjectionMatrix;
     mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
 };
 #endif
 
@@ -68,6 +70,7 @@ float getShadowFactor(vec3 pos, float bias, int index)
 }
 
 void main() {
+    vec2 uv = gl_FragCoord.xy / screen;
 	float z = texture(dtex, uv).x;
 	vec4 xpos = getPosFromUVDepth(vec3(uv, z), InverseProjectionMatrix);
 

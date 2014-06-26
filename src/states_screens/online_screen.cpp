@@ -32,7 +32,6 @@
 #include "network/protocol_manager.hpp"
 #include "network/protocols/connect_to_server.hpp"
 #include "network/protocols/request_connection.hpp"
-#include "online/messages.hpp"
 #include "online/profile_manager.hpp"
 #include "online/request.hpp"
 #include "online/servers_manager.hpp"
@@ -137,7 +136,7 @@ void OnlineScreen::init()
     Screen::init();
     setInitialFocus();
     DemoWorld::resetIdleTime();
-    core::stringw m = _("Signed in as: %s.", 
+    core::stringw m = _("Signed in as: %s.",
                         PlayerManager::getCurrentOnlineUserName());
     m_online_status_widget->setText(m, false);
 }   // init
@@ -153,11 +152,13 @@ void OnlineScreen::onUpdate(float delta)
 
     if (m_recorded_state == PlayerProfile::OS_SIGNING_IN)
     {
-        m_online_status_widget->setText(Messages::signingIn(), false);
+        m_online_status_widget->setText(StringUtils::loadingDots(_("Signing in")),
+                                        false                                   );
     }
     else if (m_recorded_state == PlayerProfile::OS_SIGNING_OUT)
     {
-        m_online_status_widget->setText(Messages::signingOut(), false);
+        m_online_status_widget->setText(StringUtils::loadingDots(_("Signing out")),
+                                        false                                    );
     }
 }   // onUpdate
 
@@ -198,7 +199,7 @@ void OnlineScreen::doQuickPlay()
     {
         delete request2;
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
-        ConnectToServer *cts = new ConnectToServer(server->getServerId(), 
+        ConnectToServer *cts = new ConnectToServer(server->getServerId(),
                                                    server->getHostId());
         ProtocolManager::getInstance()->requestStart(cts);
     }
@@ -255,7 +256,7 @@ void OnlineScreen::tearDown()
 }
 
 // ----------------------------------------------------------------------------
-/** Sets which widget has to be focused. Depends on the user state. 
+/** Sets which widget has to be focused. Depends on the user state.
  */
 void OnlineScreen::setInitialFocus()
 {

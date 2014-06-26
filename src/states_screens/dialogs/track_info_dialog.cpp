@@ -173,7 +173,7 @@ TrackInfoDialog::~TrackInfoDialog()
 {
     // Place focus back on selected track, in case the dialog was cancelled and we're back to
     // the track selection screen after
-    Screen* curr_screen = GUIEngine::getCurrentScreen();
+    GUIEngine::Screen* curr_screen = GUIEngine::getCurrentScreen();
     if (curr_screen->getName() == "tracks.stkgui")
     {
         ((TracksScreen*)curr_screen)->setFocusOnTrack(m_ribbon_item);

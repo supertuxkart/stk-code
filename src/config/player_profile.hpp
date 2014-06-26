@@ -32,7 +32,7 @@ using namespace irr;
 class AchievementsStatus;
 namespace Online
 {
-    class CurrentUser; 
+    class CurrentUser;
     class HTTPRequest;
     class OnlineProfile;
     class XMLRequest;
@@ -83,8 +83,8 @@ private:
     /** A unique number for this player, used to link it to challenges etc. */
     unsigned int m_unique_id;
 
-    /** True if this is the default (last used) player. */
-    bool m_is_default;
+    /** Absolute path of the icon file for this player. */
+    std::string m_icon_filename;
 
     /** True if this user has a saved session. */
     bool m_saved_session;
@@ -94,6 +94,15 @@ private:
 
     /** The token of the saved session. */
     std::string m_saved_token;
+
+    /** The online user name used last (empty if not used online). */
+    core::stringw m_last_online_name;
+
+    /** True if the last time this player was used as online. */
+    bool m_last_was_online;
+
+    /** True if the login data are saved. */
+    bool m_remember_password;
 
     /** The complete challenge state. */
     StoryModeStatus *m_story_mode_status;
@@ -110,29 +119,28 @@ public:
     void initRemainingData();
     void incrementUseFrequency();
     bool operator<(const PlayerProfile &other);
-    bool operator>(const PlayerProfile &other);
     void raceFinished();
     void saveSession(int user_id, const std::string &token);
     void clearSession();
+    void addIcon();
 
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
     virtual void setUserDetails(Online::HTTPRequest *request,
                                 const std::string &action,
-                                const std::string &php_script = "") = 0;
+                                const std::string &php_script = "") const = 0;
     virtual uint32_t getOnlineId() const = 0;
     virtual PlayerProfile::OnlineState getOnlineState() const = 0;
     virtual Online::OnlineProfile* getProfile() const = 0;
     virtual void requestPoll() const = 0;
     virtual void requestSavedSession() = 0;
-    virtual void onSTKQuit() const = 0;
     virtual Online::XMLRequest* requestSignIn(const irr::core::stringw &username,
-                                              const irr::core::stringw &password,
-                                              bool save_session,
-                                              bool request_now = true) = 0;
+                                              const irr::core::stringw &password) = 0;
     virtual void signIn(bool success, const XMLNode * input) = 0;
-    virtual void signOut(bool success, const XMLNode * input) = 0;
+    virtual void signOut(bool success, const XMLNode * input,
+                         const irr::core::stringw &info) = 0;
     virtual void requestSignOut() = 0;
     virtual bool isLoggedIn() const { return false;  }
+    const std::string getIconFilename() const;
     // ------------------------------------------------------------------------
     /** Sets the name of this player. */
     void setName(const core::stringw& name)
@@ -160,16 +168,21 @@ public:
         #endif
         return m_is_guest_account;
     }   // isGuestAccount
-
+    // ------------------------------------------------------------------------
+    /** Returns the last used online name. */
+    const core::stringw& getLastOnlineName() const
+    {
+        return m_last_online_name;
+    }   // getLastOnlineName
+    // ------------------------------------------------------------------------
+    /** Sets the last used online name. */
+    void setLastOnlineName(const core::stringw &name)
+    {
+        m_last_online_name = name;
+    }   // setLastOnlineName
     // ------------------------------------------------------------------------
     /** Returns the unique id of this player. */
     unsigned int getUniqueID() const { return m_unique_id; }
-    // -----------------------------------------------------------------------
-    /** Returns true if this is the default (last used) player. */
-    bool isDefault() const { return m_is_default; }
-    // ------------------------------------------------------------------------
-    /** Sets if this player is the default player or not. */
-    void setDefault(bool is_default) { m_is_default = is_default; }
     // ------------------------------------------------------------------------
     /** Returnes if the feature (kart, track) is locked. */
     bool isLocked(const std::string &feature) const
@@ -202,7 +215,10 @@ public:
     // ------------------------------------------------------------------------
     bool isFirstTime() const { return m_story_mode_status->isFirstTime(); }
     // ------------------------------------------------------------------------
-    void clearUnlocked() { m_story_mode_status->clearUnlocked(); }
+    void clearUnlocked()
+    {
+        m_story_mode_status->clearUnlocked();
+    }
     // ------------------------------------------------------------------------
     /** Returns the current challenge for this player. */
     const ChallengeStatus* getCurrentChallengeStatus() const
@@ -238,9 +254,11 @@ public:
     /** Returns true if a session was saved for this player. */
     bool hasSavedSession() const { return m_saved_session;  }
     // ------------------------------------------------------------------------
+    StoryModeStatus* getStoryModeStatus() { return m_story_mode_status; }
+    // ------------------------------------------------------------------------
     /** If a session was saved, return the id of the saved user. */
     int getSavedUserId() const
-    { 
+    {
         assert(m_saved_session);
         return m_saved_user_id;
     }   // getSavedUserId
@@ -251,6 +269,20 @@ public:
         assert(m_saved_session);
         return m_saved_token;
     }   // getSavedToken
+    // ------------------------------------------------------------------------
+    /** Returns if the last time this player was used it was used online or
+     *  offline. */
+    bool wasOnlineLastTime() const { return m_last_was_online; }
+    // ------------------------------------------------------------------------
+    /** Sets if this player was logged in last time it was used. */
+    void setWasOnlineLastTime(bool b) { m_last_was_online = b; }
+    // ------------------------------------------------------------------------
+    /** Returns if the last time this player was used it was used online or
+     *  offline. */
+    bool rememberPassword() const { return m_remember_password; }
+    // ------------------------------------------------------------------------
+    /** Sets if this player was logged in last time it was used. */
+    void setRememberPassword(bool b) { m_remember_password = b; }
     // ------------------------------------------------------------------------
 };   // class PlayerProfile
 

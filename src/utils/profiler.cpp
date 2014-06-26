@@ -320,7 +320,7 @@ void Profiler::draw()
     long hovered_gpu_marker_elapsed = 0;
     if (hovered_markers.size() == 0)
     {
-        int gpu_y = y_offset + nb_thread_infos*line_height + line_height/2;
+        int gpu_y = int(y_offset + nb_thread_infos*line_height + line_height/2);
         float total = 0;
         for (unsigned i = 0; i < Q_LAST; i++)
         {
@@ -341,7 +341,7 @@ void Profiler::draw()
         {
             //Log::info("GPU Perf", "Phase %d : %d us\n", i, irr_driver->getGPUTimer(i).elapsedTimeus());
 
-            float elapsed = irr_driver->getGPUTimer(i).elapsedTimeus();
+            float elapsed = float(irr_driver->getGPUTimer(i).elapsedTimeus());
             core::rect<s32> pos((s32)(x_offset + (curr_val / total)*profiler_width),
                 (s32)(y_offset + gpu_y),
                 (s32)(x_offset + ((curr_val + elapsed) / total)*profiler_width),
@@ -393,16 +393,23 @@ void Profiler::draw()
             {
                 "Solid Pass 1",
                 "Shadows",
-                "Lights",
+                "RH",
+                "GI",
+                "Env Map",
+                "SunLight",
+                "PointLights",
                 "SSAO",
                 "Solid Pass 2",
                 "Transparent",
                 "Particles",
                 "Displacement",
+                "Depth of Field",
                 "Godrays",
                 "Bloom",
                 "Tonemap",
-                "Motion Blur"
+                "Motion Blur",
+                "MLAA",
+                "GUI",
             };
             std::ostringstream oss;
             oss << Phase[hovered_gpu_marker] << " : " << hovered_gpu_marker_elapsed << " us";

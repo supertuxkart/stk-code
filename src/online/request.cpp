@@ -44,6 +44,7 @@ namespace Online
     {
         m_cancel.setAtomic(false);
         m_state.setAtomic(S_PREPARING);
+        m_is_abortable.setAtomic(true);
     }   // Request
 
     // ------------------------------------------------------------------------

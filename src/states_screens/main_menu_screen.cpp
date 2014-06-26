@@ -41,11 +41,11 @@
 #include "states_screens/credits.hpp"
 #include "states_screens/grand_prix_editor_screen.hpp"
 #include "states_screens/help_screen_1.hpp"
-#include "states_screens/login_screen.hpp"
 #include "states_screens/offline_kart_selection.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/user_screen.hpp"
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/grand_prix_lose.hpp"
@@ -230,12 +230,14 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
     */
 
 #if DEBUG_MENU_ITEM
-    if (selection == "options")
+    if (selection == "gpEditor")
     {
         // The DEBUG item
+        StoryModeStatus* sms = PlayerManager::getCurrentPlayer()->getStoryModeStatus();
+        sms->unlockFeature(const_cast<ChallengeStatus*>(sms->getChallengeStatus("gp1")),
+            RaceManager::DIFFICULTY_HARD);
 
         // GP WIN
-        /*
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
@@ -246,9 +248,9 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         StateManager::get()->pushScreen(scene);
         const std::string winners[] = { "elephpant", "nolok", "pidgin" };
         scene->setKarts(winners);
-        */
 
         // GP Lose
+        /*
         StateManager::get()->enterGameState();
         race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
         race_manager->setNumKarts(0);
@@ -263,15 +265,26 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         //losers.push_back("wilber");
         //losers.push_back("tux");
         scene->setKarts(losers);
-
+        */
 
         /*
         // FEATURE UNLOCKED
+        StateManager::get()->enterGameState();
+        race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+        race_manager->setNumKarts(0);
+        race_manager->setNumPlayers(0);
+        race_manager->setNumLocalPlayers(0);
+        race_manager->startSingleRace("featunlocked", 999, false);
+
         FeatureUnlockedCutScene* scene =
-        FeatureUnlockedCutScene::getInstance();
+            FeatureUnlockedCutScene::getInstance();
+        
+        std::vector<std::string> parts;
+        parts.push_back("featunlocked");
+        ((CutsceneWorld*)World::getWorld())->setParts(parts);
 
         scene->addTrophy(RaceManager::DIFFICULTY_EASY);
-        StateManager::get()->pushScreen(scene);
+        //StateManager::get()->pushScreen(scene);
 
         static int i = 1;
         i++;
@@ -295,7 +308,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 track_manager->getTrack("lighthouse")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
-                track_manager->getTrack("crescentcrossing")
+                track_manager->getTrack("startrack")
                              ->getScreenshotFile().c_str()));
             textures.push_back(irr_driver->getTexture(
                 track_manager->getTrack("sandtrack")
@@ -304,11 +317,11 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 track_manager->getTrack("snowmountain")
                              ->getScreenshotFile().c_str()));
 
-            scene->addUnlockedPictures(textures, 1.0, 0.75, L"You did it");
+            scene->addUnlockedPictures(textures, 4.0, 3.0, L"You did it");
 
             StateManager::get()->pushScreen(scene);
         }
-         */
+        */
     }
     else
 #endif
@@ -358,7 +371,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
         // Create player and associate player with keyboard
         StateManager::get()->createActivePlayer(PlayerManager::getCurrentPlayer(),
-                                                device, NULL);
+                                                device);
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
@@ -424,7 +437,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
         if (PlayerManager::getCurrentOnlineId())
             StateManager::get()->pushScreen(OnlineScreen::getInstance());
         else
-            StateManager::get()->pushScreen(LoginScreen::getInstance());
+        {
+            BaseUserScreen *login = UserScreen::getInstance();
+            StateManager::get()->pushScreen(login);
+        }
     }
     else if (selection == "addons")
     {

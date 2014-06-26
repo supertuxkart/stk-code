@@ -18,7 +18,7 @@
 #include "utils/log.hpp"
 #include "utils/time.hpp"
 
-StartGameProtocol::StartGameProtocol(GameSetup* game_setup) 
+StartGameProtocol::StartGameProtocol(GameSetup* game_setup)
                  : Protocol(NULL, PROTOCOL_START_GAME)
 {
     m_game_setup = game_setup;
@@ -105,7 +105,7 @@ void StartGameProtocol::update()
         // have to add self first
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile == 
+            bool is_me = (players[i]->user_profile ==
                           PlayerManager::getCurrentOnlineProfile());
             if (is_me)
             {
@@ -122,7 +122,7 @@ void StartGameProtocol::update()
                 if (StateManager::get()->getActivePlayers().size() >= 1) // more than one player, we're the first
                     new_player_id = 0;
                 else
-                    new_player_id = StateManager::get()->createActivePlayer( profile_to_use, device , players[i]->user_profile);
+                    new_player_id = StateManager::get()->createActivePlayer( profile_to_use, device);
                 device->setPlayer(StateManager::get()->getActivePlayer(new_player_id));
                 input_manager->getDeviceList()->setSinglePlayer(StateManager::get()->getActivePlayer(new_player_id));
 
@@ -134,7 +134,7 @@ void StartGameProtocol::update()
         }
         for (unsigned int i = 0; i < players.size(); i++)
         {
-            bool is_me = (players[i]->user_profile == 
+            bool is_me = (players[i]->user_profile ==
                           PlayerManager::getCurrentOnlineProfile());
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
@@ -147,7 +147,7 @@ void StartGameProtocol::update()
 
             if (!is_me)
             {
-                StateManager::get()->createActivePlayer( NULL, NULL , players[i]->user_profile);
+                StateManager::get()->createActivePlayer( NULL, NULL );
 
                 race_manager->setPlayerKart(i, rki);
             }

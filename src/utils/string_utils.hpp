@@ -46,6 +46,8 @@ namespace StringUtils
 
     bool notEmpty(const irr::core::stringw& input);
     std::string timeToString(float time);
+    irr::core::stringw loadingDots(float interval = 0.5f, int max_dots = 3);
+    irr::core::stringw loadingDots(const wchar_t *s);
     std::string                     toUpperCase(const std::string&);
     std::string                     toLowerCase(const std::string&);
     std::vector<std::string>        split(const std::string& s, char c,

@@ -1,11 +1,13 @@
 #ifndef STKMESH_H
 #define STKMESH_H
 
+#include "graphics/glwrap.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
-#include "glwrap.hpp"
+
 #include <vector>
 
 enum GeometricMaterial
@@ -26,7 +28,6 @@ enum ShadedMaterial
     SM_SPLATTING,
     SM_GRASS,
     SM_UNLIT,
-    SM_CAUSTICS,
     SM_DETAILS,
     SM_UNTEXTURED,
     SM_COUNT
@@ -41,11 +42,13 @@ enum TransparentMaterial
 };
 
 struct GLMesh {
+    GLuint vao;
     GLuint vao_first_pass;
     GLuint vao_second_pass;
     GLuint vao_glow_pass;
     GLuint vao_displace_pass;
     GLuint vao_displace_mask_pass;
+    GLuint vao_rsm_pass;
     GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
@@ -57,8 +60,9 @@ struct GLMesh {
     core::matrix4 TextureMatrix;
 };
 
-GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride);
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
+video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
+GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
 void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
 void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat);
 core::matrix4 computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
@@ -90,9 +94,22 @@ std::vector<core::matrix4> GroupedFPSM<T>::MVPSet;
 template<enum GeometricMaterial T>
 std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
 
-void drawObjectPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
-void drawNormalPass(const GLMesh &mesh, const core::matrix4 & ModelMatrix, const core::matrix4 &InverseModelMatrix);
-void drawObjectRefPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
+
+template<typename Shader, typename...uniforms>
+void draw(const GLMesh &mesh, GLuint vao, uniforms... Args)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    Shader::setUniforms(Args...);
+
+    assert(vao);
+    glBindVertexArray(vao);
+    glDrawElements(ptype, count, itype, 0);
+}
+
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)
@@ -124,7 +141,6 @@ void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProj
 void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-void drawCaustics(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, core::vector2df dir, core::vector2df dir2);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
 void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
 void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
@@ -132,6 +148,25 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 // Shadow pass
 void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
 void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
+
+template<enum TransparentMaterial T>
+class TransparentMeshes
+{
+public:
+    static std::vector<GLMesh *> MeshSet;
+    static std::vector<core::matrix4> MVPSet;
+
+    static void reset()
+    {
+        MeshSet.clear();
+        MVPSet.clear();
+    }
+};
+
+template<enum TransparentMaterial T>
+std::vector<GLMesh *> TransparentMeshes<T>::MeshSet;
+template<enum TransparentMaterial T>
+std::vector<core::matrix4> TransparentMeshes<T>::MVPSet;
 
 // Forward pass (for transparents meshes)
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);

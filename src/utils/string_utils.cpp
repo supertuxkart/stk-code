@@ -21,6 +21,7 @@
 #include "utils/string_utils.hpp"
 
 #include "utils/log.hpp"
+#include "utils/time.hpp"
 
 #include "coreutil.h"
 
@@ -522,6 +523,29 @@ namespace StringUtils
         sprintf ( s, "%02d:%02d:%02d", min,  sec,  hundredths) ;
         return std::string(s);
     }   // timeToString
+
+    // ------------------------------------------------------------------------
+    /** Shows a increasing number of dots.
+      * \param interval A float representing the time it takes to add a new dot
+      * \param max_dots The number of dots used. Defaults to 3.
+      */
+    irr::core::stringw loadingDots(float interval, int max_dots)
+    {
+        int nr_dots = int(floor(StkTime::getRealTime() / interval)) 
+                    % (max_dots + 1);
+        return irr::core::stringw((std::string(nr_dots, '.') + 
+                                   std::string(max_dots - nr_dots, ' ')).c_str());
+    }   // loadingDots
+
+    // ------------------------------------------------------------------------
+    /** Returns the string given with loadingDots appended. A simple
+     *  convenience function to type less in calls.
+     *  \parameter s The string to which the loading dots are appended.
+     */
+    irr::core::stringw loadingDots(const wchar_t *s)
+    {
+        return irr::core::stringw(s) + loadingDots();
+    }   // loadingDots
 
     // ------------------------------------------------------------------------
     /** Replaces values in a string.

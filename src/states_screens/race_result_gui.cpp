@@ -273,14 +273,27 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             else
             {
-                FeatureUnlockedCutScene* scene =
-                    FeatureUnlockedCutScene::getInstance();
-                scene->addTrophy(race_manager->getDifficulty());
-                scene->findWhatWasUnlocked(race_manager->getDifficulty());
                 StateManager::get()->popMenu();
                 World::deleteWorld();
+
+                StateManager::get()->enterGameState();
+                race_manager->setMinorMode(RaceManager::MINOR_MODE_CUTSCENE);
+                race_manager->setNumKarts(0);
+                race_manager->setNumPlayers(0);
+                race_manager->setNumLocalPlayers(0);
+                race_manager->startSingleRace("featunlocked", 999, false);
+
+                FeatureUnlockedCutScene* scene =
+                    FeatureUnlockedCutScene::getInstance();
+
+                scene->addTrophy(race_manager->getDifficulty());
+                scene->findWhatWasUnlocked(race_manager->getDifficulty());
                 StateManager::get()->pushScreen(scene);
                 race_manager->setAIKartOverride("");
+
+                std::vector<std::string> parts;
+                parts.push_back("featunlocked");
+                ((CutsceneWorld*)World::getWorld())->setParts(parts);
             }
             return;
         }
@@ -344,7 +357,10 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-        NetworkKartSelectionScreen::getInstance()->tearDown(); // be sure to delete the kart selection screen
+        // FIXME: why is this call necessary here? tearDown should be
+        // automatically called when the screen is left. Note that the
+        // NetworkKartSelectionScreen::getInstance()->tearDown(); caused #1347
+        KartSelectionScreen::getRunningInstance()->tearDown();
         Screen* newStack[] = {MainMenuScreen::getInstance(),
                               RaceSetupScreen::getInstance(),
                               NULL};
@@ -358,7 +374,11 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
     {
         race_manager->exitRace();
         race_manager->setAIKartOverride("");
-        NetworkKartSelectionScreen::getInstance()->tearDown(); // be sure to delete the kart selection screen
+        // FIXME: why is this call necessary here? tearDown should be
+        // automatically called when the screen is left. Note that the
+        // NetworkKartSelectionScreen::getInstance()->tearDown(); caused #1347
+        //if (KartSelectionScreen::getRunningInstance() != NULL)
+        //    KartSelectionScreen::getRunningInstance()->tearDown();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
         if (race_manager->raceWasStartedFromOverworld())

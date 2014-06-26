@@ -22,6 +22,7 @@
 
 #include "achievements/achievement_info.hpp"
 #include "achievements/achievements_manager.hpp"
+#include "config/player_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
@@ -112,13 +113,47 @@ Achievement * AchievementsStatus::getAchievement(uint32_t id)
 }   // getAchievement
 
 // ----------------------------------------------------------------------------
+/** Synchronises the achievements between local and online usage. It takes
+ *  the list of online achievements, and marks them all to be achieved 
+ *  locally. Then it issues 'achieved' requests to the server for all local
+ *  achievements that are not set online.
+*/
 void AchievementsStatus::sync(const std::vector<uint32_t> & achieved_ids)
 {
+    std::vector<bool> done;
     for(unsigned int i =0; i < achieved_ids.size(); ++i)
     {
+        if(done.size()< achieved_ids[i]+1)
+            done.resize(achieved_ids[i]+1);
+        done[achieved_ids[i]] = true;
         Achievement * achievement = getAchievement(achieved_ids[i]);
         if(achievement != NULL)
             achievement->setAchieved();
+    }
+
+    std::map<uint32_t, Achievement*>::iterator i;
+
+    // String to collect all local ids that are not synched
+    // to the online account
+    std::string ids;
+    for(i=m_achievements.begin(); i!=m_achievements.end(); i++)
+    {
+        unsigned int id = i->second->getID();
+        if(i->second->isAchieved() && (id>=done.size() || !done[id]) )
+        {
+            ids=ids+StringUtils::toString(id)+",";
+        }
+    }
+
+    if(ids.size()>0)
+    {
+        ids = ids.substr(0, ids.size() - 1); // delete the last "," in the string
+        Log::info("Achievements", "Synching achievement %d to server.",
+                  ids.c_str());
+        Online::HTTPRequest * request = new Online::HTTPRequest(true, 2);
+        PlayerManager::setUserDetails(request, "achieving");
+        request->addParameter("achievementid", ids);
+        request->queue();
     }
 }   // sync
 
@@ -132,6 +167,7 @@ void AchievementsStatus::onRaceEnd()
     }
 }   // onRaceEnd
 
+// ----------------------------------------------------------------------------
 void AchievementsStatus::onLapEnd()
 {
     //reset all values that need to be reset

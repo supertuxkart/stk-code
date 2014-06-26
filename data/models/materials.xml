@@ -2,34 +2,22 @@
 <materials>
   <material name="banana.png"/>
   <material name="gift-box.png"/>
-  <material name="gift-loop.png"  sphere="Y"/>
-  <material name="gold.png"  light="Y" smooth-reflection="Y"/>
-  <material name="silver.png"  light="Y" smooth-reflection="Y"/>
-  <material name="bronze.png"  light="Y" smooth-reflection="Y"/>
+  <material name="gift-loop.png"  shader="spheremap"/>
+  <material name="gold.png"  light="Y" shader="spheremap"/>
+  <material name="silver.png"  light="Y" shader="spheremap"/>
+  <material name="bronze.png"  light="Y" shader="spheremap"/>
 
   <material name="stk_mod_nitroBarrel.png" /> 
   <material name="stk_mod_nitroBottle.png" />
-  <material name="stk_mod_nitroLogo.png" compositing="additive" light="N" disable-z-write="Y" />
+  <material name="stk_mod_nitroLogo.png" shader="additive" disable-z-write="Y" />
 
-  <material name="traffic_light_green.jpg" light="N"/>
-  <material name="traffic_light_yellow.jpg" light="N"/>
-  <material name="traffic_light_red.jpg" light="N"/>
+  <material name="traffic_light_green.jpg" shader="unlit"/>
+  <material name="traffic_light_yellow.jpg" shader="unlit"/>
+  <material name="traffic_light_red.jpg" shader="unlit"/>
   
-  <material name="bubblegum_shield.png" compositing="blend" disable-z-write="Y"/>
-  <material name="bubblegum_shield_nolok.png" compositing="blend" disable-z-write="Y"/>
+  <material name="bubblegum_shield.png" shader="alphablend" disable-z-write="Y"/>
+  <material name="bubblegum_shield_nolok.png" shader="alphablend" disable-z-write="Y"/>
   <material name="parachute.png" backface-culling="n" ignore="Y"/>
-  <material name="zipper.png"  light="N" zipper="Y"/>
-  <material name="zipper_collect.png"  light="N" zipper="Y"/>
-  <material name="bowling-icon.png" transparency="Y"  light="N"/>
-  <material name="bubblegum-icon.png" transparency="Y"  light="N"/>
-  <material name="cake-icon.png" transparency="Y"  light="N" />
-  <material name="anchor-icon.png" clampU="Y" clampV="Y" transparency="Y" light="N" ignore="Y"/>
-  <material name="plunger-icon.png" transparency="Y"  light="N"/>
-  <material name="parachute-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
-  <material name="anchor-attach-icon.png" clampU="Y" clampV="Y" transparency="Y" light="N" ignore="Y"/>
-  <material name="parachute-attach-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
-  <material name="bomb-attach-icon.png" clampU="Y" clampV="Y" ignore="Y"/>
-  
-  <material name="balldimpleddark.jpg"/>
+  <material name="zipper.png" shader="unlit" zipper="Y"/>
 </materials>
 

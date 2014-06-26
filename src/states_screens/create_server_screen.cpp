@@ -24,7 +24,6 @@
 #include "config/player_manager.hpp"
 #include "modes/demo_world.hpp"
 #include "online/servers_manager.hpp"
-#include "online/messages.hpp"
 #include "states_screens/online_screen.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
@@ -115,7 +114,8 @@ void CreateServerScreen::onUpdate(float delta)
         else
         {
             m_info_widget->setDefaultColor();
-            m_info_widget->setText(Online::Messages::creatingServer(), false);
+            m_info_widget->setText(StringUtils::loadingDots(_("Creating server")),
+                                   false);
         }
     }
 }   // onUpdate

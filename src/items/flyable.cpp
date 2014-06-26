@@ -308,6 +308,10 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
 
     float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist))
                   / (dx*dx + dz*dz);
+    if(fire_th>1)
+        fire_th = 1.0f;
+    else if (fire_th<-1.0f)
+        fire_th = -1.0f;
     fire_th = (((dist - dx*fire_th) / dz > 0) ? -acosf(fire_th)
                                               :  acosf(fire_th));
 
@@ -326,8 +330,10 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
         fire_th += M_PI;
 
     //createPhysics offset
+    assert(sqrt(a*a+b*b)!=0);
     time -= forw_offset / sqrt(a*a+b*b);
 
+    assert(time!=0);
     *fire_angle = fire_th;
     *up_velocity = (0.5f * time * gravity) + (dy / time)
                  + (gy * target_kart->getSpeed());

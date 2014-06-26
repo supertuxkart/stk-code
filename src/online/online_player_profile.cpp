@@ -22,16 +22,16 @@
 #include "achievements/achievements_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "guiengine/dialog_queue.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/screen.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
 #include "online/servers_manager.hpp"
-#include "states_screens/login_screen.hpp"
 #include "states_screens/online_profile_friends.hpp"
+#include "states_screens/user_screen.hpp"
 #include "states_screens/dialogs/change_password_dialog.hpp"
-#include "states_screens/dialogs/user_info_dialog.hpp"
 #include "states_screens/dialogs/notification_dialog.hpp"
+#include "states_screens/dialogs/user_info_dialog.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
 
@@ -52,8 +52,8 @@ namespace Online
      *  \param action If not empty, the action to be set.
      */
     void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
-                                     const std::string &action,
-                                     const std::string &php_script)
+                                             const std::string &action,
+                                             const std::string &php_script) const
     {
         if (php_script.size()>0)
             request->setServerURL(php_script);
@@ -74,7 +74,6 @@ namespace Online
     {
         m_online_state = OS_SIGNED_OUT;
         m_token        = "";
-        m_save_session = false;
         m_profile      = NULL;
     }   // OnlinePlayerProfile
 
@@ -84,7 +83,6 @@ namespace Online
     {
         m_online_state = OS_SIGNED_OUT;
         m_token        = "";
-        m_save_session = false;
         m_profile      = NULL;
 
     }   // OnlinePlayerProfile
@@ -94,11 +92,12 @@ namespace Online
     void OnlinePlayerProfile::requestSavedSession()
     {
         SignInRequest * request = NULL;
-        if (m_online_state == OS_SIGNED_OUT  && hasSavedSession() )
+        if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
             request = new SignInRequest(true);
-            request->setServerURL("client-user.php");
-            request->addParameter("action", "saved-session" );
+            setUserDetails(request, "saved-session");
+            // The userid must be taken from the saved data,
+            // setUserDetails takes it from current data.
             request->addParameter("userid", getSavedUserId());
             request->addParameter("token",  getSavedToken() );
             request->queue();
@@ -110,29 +109,26 @@ namespace Online
     /** Create a signin request.
      *  \param username Name of user.
      *  \param password Password.
-     *  \param save_session If true, the login credential will be saved to
-     *         allow a password-less login.
-     *  \param request_now Immediately submit this request to the
-     *         RequestManager.
      */
     OnlinePlayerProfile::SignInRequest*
         OnlinePlayerProfile::requestSignIn(const core::stringw &username,
-                                   const core::stringw &password,
-                                   bool save_session, bool request_now)
+                                           const core::stringw &password)
     {
-        assert(m_online_state == OS_SIGNED_OUT);
-        m_save_session = save_session;
+        // If the player changes the online account, there can be a
+        // logout stil happening.
+        assert(m_online_state == OS_SIGNED_OUT ||
+               m_online_state == OS_SIGNING_OUT   );
         SignInRequest * request = new SignInRequest(false);
+        // We can't use setUserDetail here, since there is no token yet
         request->setServerURL("client-user.php");
         request->addParameter("action","connect");
         request->addParameter("username",username);
         request->addParameter("password",password);
-        request->addParameter("save-session", save_session);
-        if (request_now)
-        {
-            request->queue();
-            m_online_state = OS_SIGNING_IN;
-        }
+        request->addParameter("save-session",
+                              rememberPassword() ? "true"
+                                                 : "false");
+        request->queue();
+        m_online_state = OS_SIGNING_IN;
         return request;
     }   // requestSignIn
 
@@ -143,7 +139,24 @@ namespace Online
     {
         PlayerManager::getCurrentPlayer()->signIn(isSuccess(), getXMLData());
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
-        LoginScreen *login = dynamic_cast<LoginScreen*>(screen);
+        BaseUserScreen *login = dynamic_cast<BaseUserScreen*>(screen);
+
+        // If the login is successful, reset any saved session of other
+        // local players using the same online account (which are now invalid)
+        if(isSuccess())
+        {
+            PlayerProfile *current = PlayerManager::getCurrentPlayer();
+            for(unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
+            {
+                PlayerProfile *player = PlayerManager::get()->getPlayer(i);
+                if(player!=current &&
+                    player->hasSavedSession() &&
+                    player->getLastOnlineName() == current->getLastOnlineName())
+                {
+                    player->clearSession();
+                }
+            }
+        }
         if(login)
         {
             if(isSuccess())
@@ -170,21 +183,22 @@ namespace Online
             int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
             int userid_fetched      = input->get("userid", &userid);
+            setLastOnlineName(username);
             m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
-            if(doSaveSession())
+            if(rememberPassword())
             {
-                saveSession(getOnlineId(), getToken() );
+                saveSession(getOnlineId(), getToken());
             }
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
-            if(input->get("achieved", &achieved_string) == 1)
-            {
-                std::vector<uint32_t> achieved_ids =
-                    StringUtils::splitToUInt(achieved_string, ' ');
-                PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
-            }
+            // Even if no achievements were sent, we have to call sync
+            // in order to upload local achievements to the server
+            input->get("achieved", &achieved_string);
+            std::vector<uint32_t> achieved_ids = 
+                            StringUtils::splitToUInt(achieved_string, ' ');
+            PlayerManager::getCurrentAchievementsStatus()->sync(achieved_ids);
             m_profile->fetchFriends();
         }   // if success
         else
@@ -194,38 +208,82 @@ namespace Online
     }   // signIn
 
     // ------------------------------------------------------------------------
+    /** Requests a sign out from the server. If the user should be remembered,
+     *  a 'client-quit' request is sent (which will log the user out, but
+     *  remember the token), otherwise a 'disconnect' is sent.
+     */
     void OnlinePlayerProfile::requestSignOut()
     {
         assert(m_online_state == OS_SIGNED_IN || m_online_state == OS_GUEST);
-        SignOutRequest * request = new SignOutRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action","disconnect");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getOnlineId());
+        // ----------------------------------------------------------------
+        class SignOutRequest : public XMLRequest
+        {
+        private:
+            PlayerProfile *m_player;
+            virtual void callback()
+            {
+                m_player->signOut(isSuccess(), getXMLData(), getInfo());
+            }
+        public:
+            /** Sign out request, which have the highest priority (same as
+             *  quit-stk request). This allows the final logout request at
+             *  the end of STK to be handled, even if a quit request gets
+             *  added (otherwise if quit has higher priority, the quit can
+             *  be executed before signout, resulting in players not being
+             *  logged out properly). It also guarantees that the logout
+             *  happens before a following logout.
+             */
+            SignOutRequest(PlayerProfile *player)
+                        : XMLRequest(true,/*priority*/RequestManager::HTTP_MAX_PRIORITY)
+            {
+                m_player = player;
+                m_player->setUserDetails(this,
+                    m_player->rememberPassword() ? "client-quit"
+                                       : "disconnect");
+                setAbortable(false);
+            }   // SignOutRequest
+        };   // SignOutRequest
+        // ----------------------------------------------------------------
+
+        HTTPRequest *request = new SignOutRequest(this);
         request->queue();
         m_online_state = OS_SIGNING_OUT;
     }   // requestSignOut
 
-    // --------------------------------------------------------------------
-    void OnlinePlayerProfile::SignOutRequest::callback()
-    {
-        PlayerManager::getCurrentPlayer()->signOut(isSuccess(), getXMLData());
-    }   // SignOutRequest::callback
-
     // ------------------------------------------------------------------------
-    void OnlinePlayerProfile::signOut(bool success, const XMLNode * input)
+    /** Callback once the logout event has been processed.
+     *  \param success If the request was successful.
+     *  \param input
+     */
+    void OnlinePlayerProfile::signOut(bool success, const XMLNode *input,
+                                      const irr::core::stringw &info)
     {
-        if(!success)
+        GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
+        BaseUserScreen *user_screen = dynamic_cast<BaseUserScreen*>(screen);
+        // We can't do much of error handling here, no screen waits for
+        // a logout to finish, so we can only log the message to screen,
+        // and otherwise mark the player logged out internally.
+        if (!success)
         {
-            Log::warn("OnlinePlayerProfile::signOut", "%s",
+            Log::warn("OnlinePlayerProfile::signOut",
                       "There were some connection issues while signing out. "
                       "Report a bug if this caused issues.");
+            Log::warn("OnlinePlayerProfile::signOut", core::stringc(info.c_str()).c_str());
+            if(user_screen)
+                user_screen->logoutError(info);
         }
-        m_token = "";
+        else
+        {
+            if(user_screen)
+                user_screen->logoutSuccessful();
+        }
+
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         m_online_state = OS_SIGNED_OUT;
-        PlayerManager::getCurrentPlayer()->clearSession();
+        // Discard token if session should not be saved.
+        if(!rememberPassword())
+            clearSession();
     }   // signOut
 
     // ------------------------------------------------------------------------
@@ -236,10 +294,7 @@ namespace Online
     {
         assert(m_online_state == OS_SIGNED_IN);
         OnlinePlayerProfile::PollRequest * request = new OnlinePlayerProfile::PollRequest();
-        request->setServerURL("client-user.php");
-        request->addParameter("action", "poll");
-        request->addParameter("token", getToken());
-        request->addParameter("userid", getOnlineId());
+        setUserDetails(request, "poll");
         request->queue();
     }   // requestPoll()
 
@@ -324,11 +379,7 @@ namespace Online
                             message = _("%d friends are now online.",
                                         to_notify.size());
                         }
-                        NotificationDialog *dia =
-                            new NotificationDialog(NotificationDialog::T_Friends,
-                                                   message);
-                        GUIEngine::DialogQueue::get()->pushDialog(dia, false);
-                        OnlineProfileFriends::getInstance()->refreshFriendsList();
+                        MessageQueue::add(MessageQueue::MT_FRIEND, message);
                     }
                     else if(went_offline)
                     {
@@ -367,10 +418,7 @@ namespace Online
                 {
                     message = _("You have a new friend request!");
                 }
-                NotificationDialog *dia =
-                    new NotificationDialog(NotificationDialog::T_Friends,
-                                           message);
-                GUIEngine::DialogQueue::get()->pushDialog(dia, false);
+                MessageQueue::add(MessageQueue::MT_FRIEND, message);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
             }
         }
@@ -380,27 +428,9 @@ namespace Online
     }   // PollRequest::callback
 
     // ------------------------------------------------------------------------
-    /** Sends a message to the server that the client has been closed, if a
-     *  user is signed in.
-     */
-    void OnlinePlayerProfile::onSTKQuit() const
-    {
-        if(isLoggedIn())
-        {
-            HTTPRequest * request =
-                      new HTTPRequest(true, RequestManager::HTTP_MAX_PRIORITY);
-            request->setServerURL("client-user.php");
-            request->addParameter("action", "client-quit");
-            request->addParameter("token", getToken());
-            request->addParameter("userid", getOnlineId());
-            request->queue();
-        }
-    }
-
-    // ------------------------------------------------------------------------
     /** \return the online id, or 0 if the user is not signed in.
      */
-    uint32_t OnlinePlayerProfile::getOnlineId() const 
+    uint32_t OnlinePlayerProfile::getOnlineId() const
     {
         if((m_online_state == OS_SIGNED_IN ))
         {

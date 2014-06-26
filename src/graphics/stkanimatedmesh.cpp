@@ -27,18 +27,8 @@ void STKAnimatedMesh::cleanGLMeshes()
         GLMesh mesh = GLmeshes[i];
         if (!mesh.vertex_buffer)
             continue;
-        if (mesh.vao_first_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_first_pass));
-        if (mesh.vao_second_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_second_pass));
-        if (mesh.vao_glow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
-        if (mesh.vao_displace_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
-        if (mesh.vao_displace_mask_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
-        if (mesh.vao_shadow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
+        if (mesh.vao)
+            glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
     }
@@ -143,14 +133,12 @@ void STKAnimatedMesh::render()
           continue;
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
-
-        PROFILER_PUSH_CPU_MARKER("GATHER SOLID MESHES", 0xFC, 0xFA, 0x68);
 
         GLMesh* mesh;
         for_in(mesh, GeometricMesh[FPSM_DEFAULT])
@@ -167,14 +155,11 @@ void STKAnimatedMesh::render()
             GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
-        PROFILER_POP_CPU_MARKER();
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
-        PROFILER_PUSH_CPU_MARKER("GATHER TRANSPARENT MESHES", 0xFC, 0xFA, 0x68);
-
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
@@ -221,24 +206,6 @@ void STKAnimatedMesh::render()
             GroupedSM<SM_UNTEXTURED>::TIMVSet.push_back(invmodel);
         }
 
-        PROFILER_POP_CPU_MARKER();
-        return;
-    }
-
-    if (irr_driver->getPhase() == SHADOW_PASS)
-    {
-        if (!GeometricMesh[FPSM_DEFAULT].empty())
-            glUseProgram(MeshShader::ShadowShader::Program);
-
-        GLMesh* mesh;
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
-            drawShadow(*mesh, AbsoluteTransformation);
-
-        if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::RefShadowShader::Program);
-
-        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-            drawShadowRef(*mesh, AbsoluteTransformation);
         return;
     }
 
@@ -250,30 +217,16 @@ void STKAnimatedMesh::render()
             glUseProgram(MeshShader::BubbleShader::Program);
 
         GLMesh* mesh;
-        for_in(mesh, TransparentMesh[TM_BUBBLE])
-            drawBubble(*mesh, ModelViewProjectionMatrix);
-
-        if (World::getWorld()->isFogEnabled())
+        for_in(mesh, TransparentMesh[TM_DEFAULT])
         {
-            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
-                glUseProgram(MeshShader::TransparentFogShader::Program);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
-            glBlendFunc(GL_ONE, GL_ONE);
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                drawTransparentFogObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
+            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
         }
-        else
+
+        for_in(mesh, TransparentMesh[TM_ADDITIVE])
         {
-            if (!TransparentMesh[TM_DEFAULT].empty() || !TransparentMesh[TM_ADDITIVE].empty())
-                glUseProgram(MeshShader::TransparentShader::Program);
-            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-            for_in(mesh, TransparentMesh[TM_DEFAULT])
-                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
-            glBlendFunc(GL_ONE, GL_ONE);
-            for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                drawTransparentObject(*mesh, ModelViewProjectionMatrix, mesh->TextureMatrix);
+            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
+            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(AbsoluteTransformation);
         }
         return;
     }

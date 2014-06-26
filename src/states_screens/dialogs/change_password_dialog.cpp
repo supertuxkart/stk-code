@@ -21,7 +21,6 @@
 #include "config/player_manager.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/widgets.hpp"
-#include "online/messages.hpp"
 #include "states_screens/state_manager.hpp"
 #include "utils/translation.hpp"
 #include "utils/string_utils.hpp"
@@ -39,7 +38,7 @@ using namespace Online;
 
 /** Creates a modal dialog with given percentage of screen width and height
  */
-ChangePasswordDialog::ChangePasswordDialog() 
+ChangePasswordDialog::ChangePasswordDialog()
                     : ModalDialog(0.8f,0.7f)
 {
     m_self_destroy = false;
@@ -157,13 +156,13 @@ void ChangePasswordDialog::submit()
 }   // submit
 
 // ----------------------------------------------------------------------------
-GUIEngine::EventPropagation 
+GUIEngine::EventPropagation
              ChangePasswordDialog::processEvent(const std::string& eventSource)
 {
 
     if (eventSource == m_options_widget->m_properties[PROP_ID])
     {
-        const std::string& selection = 
+        const std::string& selection =
                  m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
@@ -227,7 +226,8 @@ void ChangePasswordDialog::error(const irr::core::stringw & error)
 void ChangePasswordDialog::onUpdate(float dt)
 {
     if(!m_options_widget->isActivated())
-        m_info_widget->setText(Online::Messages::validatingInfo(), false);
+        m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
+                              false                                          );
 
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)

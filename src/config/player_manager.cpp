@@ -20,6 +20,7 @@
 
 #include "achievements/achievements_manager.hpp"
 #include "config/player_profile.hpp"
+#include "config/user_config.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
 #include "io/xml_node.hpp"
@@ -38,12 +39,6 @@ void PlayerManager::create()
 {
     assert(!m_player_manager);
     m_player_manager = new PlayerManager();
-    if(m_player_manager->getNumPlayers() == 0)
-    {
-        m_player_manager->addDefaultPlayer();
-        m_player_manager->save();
-    }
-
 }   // create
 
 // ----------------------------------------------------------------------------
@@ -120,7 +115,8 @@ void PlayerManager::resumeSavedSession()
  */
 void PlayerManager::onSTKQuit()
 {
-    getCurrentPlayer()->onSTKQuit();
+    if (getCurrentPlayer() && getCurrentPlayer()->isLoggedIn())
+        getCurrentPlayer()->requestSignOut();
 }   // onSTKQuit
 
 // ----------------------------------------------------------------------------
@@ -134,12 +130,9 @@ void PlayerManager::onSTKQuit()
  */
 
 Online::XMLRequest *PlayerManager::requestSignIn(const irr::core::stringw &username,
-                                                 const irr::core::stringw &password,
-                                                 bool save_session,
-                                                 bool request_now)
+                                                 const irr::core::stringw &password)
 {
-    return getCurrentPlayer()->requestSignIn(username, password, save_session,
-                                             request_now);
+    return getCurrentPlayer()->requestSignIn(username, password);
 }   // requestSignIn
 
 // ----------------------------------------------------------------------------
@@ -173,7 +166,15 @@ PlayerManager::PlayerManager()
  */
 PlayerManager::~PlayerManager()
 {
+    // If the passwords should not be remembered, clear the saved session.
+    PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if(!player->rememberPassword())
+            player->clearSession();
+    }
     save();
+
 }   // ~PlayerManager
 
 // ----------------------------------------------------------------------------
@@ -197,14 +198,21 @@ void PlayerManager::load()
         return;
     }
 
-    m_current_player = NULL;
-    for(unsigned int i=0; i<m_player_data->getNumNodes(); i++)
+    std::vector<XMLNode*> player_list;
+    m_player_data->getNodes("player", player_list);
+    for(unsigned int i=0; i<player_list.size(); i++)
     {
-        const XMLNode *player_xml = m_player_data->getNode(i);
+        const XMLNode *player_xml = player_list[i];
         PlayerProfile *player = new Online::OnlinePlayerProfile(player_xml);
         m_all_players.push_back(player);
-        if(player->isDefault())
-            m_current_player = player;
+    }
+    m_current_player = NULL;
+    const XMLNode *current = m_player_data->getNode("current");
+    if(current)
+    {
+        stringw name;
+        current->get("player", &name);
+        m_current_player = getPlayer(name);
     }
 
 }   // load
@@ -218,6 +226,12 @@ void PlayerManager::load()
  */
 void PlayerManager::initRemainingData()
 {
+    // Filter the player nodes out (there is one additional node 'online-ids'
+    // which makes this necessary), otherwise the index of m_all_players
+    // is not identical with the index in the xml file.
+    std::vector<XMLNode*> player_nodes;
+    if(m_player_data)
+        m_player_data->getNodes("player", player_nodes);
     for (unsigned int i = 0; i<m_all_players.size(); i++)
     {
         // On the first time STK is run, there is no player data,
@@ -226,7 +240,7 @@ void PlayerManager::initRemainingData()
         if (!m_player_data)
             m_all_players[i].initRemainingData();
         else   // not a first time start, load remaining data
-            m_all_players[i].loadRemainingData(m_player_data->getNode(i));
+            m_all_players[i].loadRemainingData(player_nodes[i]);
     }
 
     delete m_player_data;
@@ -249,10 +263,18 @@ void PlayerManager::save()
         players_file << L"<?xml version=\"1.0\"?>\n";
         players_file << L"<players version=\"1\" >\n";
 
+        if(m_current_player)
+        {
+            players_file << L"    <current player=\""
+                         << m_current_player->getName() << L"\"/>\n";
+        }
+
+        // Save all non-guest players
         PlayerProfile *player;
         for_in(player, m_all_players)
         {
-            player->save(players_file);
+            if(!player->isGuestAccount())
+                player->save(players_file);
         }
         players_file << L"</players>\n";
         players_file.close();
@@ -270,9 +292,11 @@ void PlayerManager::save()
 /** Adds a new player to the list of all players.
  *  \param name Name of the new player.
  */
-void PlayerManager::addNewPlayer(const core::stringw& name)
+PlayerProfile* PlayerManager::addNewPlayer(const core::stringw& name)
 {
-    m_all_players.push_back( new Online::OnlinePlayerProfile(name) );
+    PlayerProfile *profile = new Online::OnlinePlayerProfile(name);
+    m_all_players.push_back(profile);
+    return profile;
 }   // addNewPlayer
 
 // ----------------------------------------------------------------------------
@@ -281,6 +305,8 @@ void PlayerManager::addNewPlayer(const core::stringw& name)
 void PlayerManager::deletePlayer(PlayerProfile *player)
 {
     m_all_players.erase(player);
+    if(player==m_current_player)
+        m_current_player = NULL;
 }   // deletePlayer
 
 // ----------------------------------------------------------------------------
@@ -315,7 +341,7 @@ void PlayerManager::enforceCurrentPlayer()
         if (!player->isGuestAccount())
         {
             Log::info("PlayerManager", "Enfocring current player '%s'.",
-                player->getName().c_str());
+                       player->getName().c_str());
             m_current_player = player;
             return;
         }
@@ -346,9 +372,49 @@ void PlayerManager::addDefaultPlayer()
     // screen to be shown.
     m_all_players.push_back(new Online::OnlinePlayerProfile(username.c_str()) );
 
-    // add default guest player
-    m_all_players.push_back(new Online::OnlinePlayerProfile(_LTR("Guest"), /*guest*/true));
 }   // addDefaultPlayer
+
+// ----------------------------------------------------------------------------
+/** Makes sure at least n guest players exist. This is used by the multiplayer
+ *  KartSelection screen to make sure enough guest players can be picked by
+ *  the players.
+ *  \param n Minimum number of guest players that must exist.
+ */
+void PlayerManager::createGuestPlayers(int n)
+{
+    int num_guests = m_all_players.size() - getNumNonGuestPlayers();
+    for(int i=num_guests; i<n; i++)
+    {
+        core::stringw guest_name;
+        if(i==0)
+        {
+            // I18N: Name of first guest player (without number)
+            guest_name = _LTR("Guest");
+        }
+        else
+        {
+            // I18N: Name of further guest players, with a 1, 2, ... attached
+            guest_name = _LTR("Guest %d", i);
+        }
+        PlayerProfile *guest = new Online::OnlinePlayerProfile(guest_name,
+                                                               /*guest*/ true);
+        m_all_players.push_back(guest);
+    }
+}   // createGuestPlayers
+
+// ----------------------------------------------------------------------------
+/** Returns the number of 'real' (non-guest) players.
+ */
+unsigned int PlayerManager::getNumNonGuestPlayers() const
+{
+    unsigned int count=0;
+    const PlayerProfile *player;
+    for_in(player, m_all_players)
+    {
+        if(!player->isGuestAccount()) count ++;
+    }
+    return count;
+}   // getNumNonGuestPlayers
 
 // ----------------------------------------------------------------------------
 /** This returns a unique id. This is 1 + largest id used so far.
@@ -399,24 +465,15 @@ PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 }   // getPlayer
 // ----------------------------------------------------------------------------
 /** Sets the current player. This is the player that is used for story mode
- *  and achievements. If 'remember_me' is set, this information will be
- *  stored in the players.xml file, and automatically loaded next time
- *  STK is started.
+ *  and achievements.
  *  \param Player profile to be the current player.
- *  \param remember_me If this player should be marked as default
- *         player in players.xml
  */
-void PlayerManager::setCurrentPlayer(PlayerProfile *player, bool remember_me)
+void PlayerManager::setCurrentPlayer(PlayerProfile *player)
 {
-    // Reset current default player
-    if(m_current_player)
-        m_current_player->setDefault(false);
     m_current_player = player;
     if(m_current_player)
     {
-        m_current_player->setDefault(remember_me);
         m_current_player->computeActive();
     }
 }   // setCurrentPlayer
 
-// ----------------------------------------------------------------------------
