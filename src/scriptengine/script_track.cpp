@@ -128,7 +128,7 @@ namespace Scripting
             /*
             //Test singleton, and various calling conventions
             // Register the track object manager as a singleton. The script will access it through the global property
-       //     r = engine->RegisterObjectType("TrackObjectManager", 0, asOBJ_REF | asOBJ_NOHANDLE); assert(r >= 0);
+            //r = engine->RegisterObjectType("TrackObjectManager", 0, asOBJ_REF | asOBJ_NOHANDLE); assert(r >= 0);
             r = engine->RegisterObjectType("TrackObjectManager", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
 
             // Register the track object manager's methods

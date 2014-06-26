@@ -1,13 +1,13 @@
 void added_script()
 {
-    displayMessage(getKeyBinding(PA::FIRE) + getKeyBinding(PA::ACCEL) + "This trigger was added by another script");
+    /*displayMessage(getKeyBinding(PA::FIRE) + getKeyBinding(PA::ACCEL) + "This trigger was added by another script");
     jumpKartTo( 0, 67.90, 99.49 );
     Vec3 a;
     Vec3 b;
     b=a;
     Vec3 c = Vec3();
     Vec3 d = Vec3(2,3,4);
-    printVec3(d);
+    printVec3(d); */
 }
 
 
@@ -22,9 +22,46 @@ void tutorial_bananas()
 
 }
 
+void tutorial_drive(){
+
+	displayMessage("Accelerate with <" +
+				getKeyBinding(PA::ACCEL) +
+				"> and steer with <" +
+				getKeyBinding(PA::STEER_LEFT) +
+				"> and <" +
+				getKeyBinding(PA::STEER_RIGHT) + ">");
+}
+
+void tutorial_giftboxes(){
+
+	displayMessage("Collect gift boxes, and fire the weapon with <" + getKeyBinding(PA::FIRE) + "> to blow away these boxes");
+}
+
+void tutorial_backgiftboxes()
+{
+    displayMessage("Press <" + getKeyBinding(PA::LOOK_BACK) + "> to look behind. Fire the weapon with <" + getKeyBinding(PA::FIRE) + "> while pressing <" + getKeyBinding(PA::LOOK_BACK) + "> to fire behind!");
+}
+
+void tutorial_nitro_use()
+{
+    displayMessage("Use the nitro you collected by pressing <" + getKeyBinding(PA::NITRO) + ">!");
+}
+
 void tutorial_nitro_collect()
 {
     displayMessage("Collect nitro bottles (we will use them after the curve)");
+}
+
+void tutorial_rescue()
+{
+    displayMessage("Oops! When you're in trouble, press <" + getKeyBinding(PA::RESCUE) + "> to be rescued");
+
+}
+
+void tutorial_skidding()
+{
+    displayMessage("Accelerate and press the <" + getKeyBinding(PA::DRIFT) + "> key while turning to skid. Skidding for a short while can help you turn faster to take sharp turns");
+
 }
 
 void tutorial_skidding2()
