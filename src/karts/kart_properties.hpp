@@ -181,6 +181,9 @@ private:
      */
     float m_nitro_min_consumption;
 
+    /** Type of the kart (for the properties) */
+    std::string m_kart_type;
+
     /** Filename of the wheel models. */
     std::string m_wheel_filename[4];
     /**  Radius of the graphical wheels.  */
@@ -389,6 +392,7 @@ public:
     float getStartupBoost   () const;
     bool  isInGroup         (const std::string &group) const;
     bool operator<(const KartProperties &other) const;
+    void getProperties      (const XMLNode * root);
 
     // ------------------------------------------------------------------------
     /** Returns the (maximum) speed for a given turn radius.
