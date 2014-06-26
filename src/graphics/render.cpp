@@ -540,7 +540,7 @@ void IrrDriver::renderSolidFirstPass()
                 GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
                 glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
             }
-            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
+            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
             if (!mesh.textures[0])
             {
                 GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
@@ -554,7 +554,7 @@ void IrrDriver::renderSolidFirstPass()
             const GLMesh &mesh = *GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i];
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::ObjectRefPass1Shader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
+            draw<MeshShader::ObjectRefPass1Shader>(mesh, mesh.vao, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
         }
         glUseProgram(MeshShader::NormalMapShader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
@@ -565,7 +565,7 @@ void IrrDriver::renderSolidFirstPass()
             setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
             compressTexture(mesh.textures[0], true);
             setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::NormalMapShader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
+            draw<MeshShader::NormalMapShader>(mesh, mesh.vao, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
         }
     }
 }
@@ -912,7 +912,7 @@ void IrrDriver::renderShadows()
             continue;
         compressTexture(mesh.textures[0], true);
         setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        draw<MeshShader::RSMShader>(mesh, mesh.vao_rsm_pass, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
+        draw<MeshShader::RSMShader>(mesh, mesh.vao, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
     }
 }
 

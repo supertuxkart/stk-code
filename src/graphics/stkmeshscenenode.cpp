@@ -82,18 +82,8 @@ void STKMeshSceneNode::cleanGLMeshes()
         GLMesh mesh = GLmeshes[i];
         if (!mesh.vertex_buffer)
             continue;
-        if (mesh.vao_first_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_first_pass));
-        if (mesh.vao_second_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_second_pass));
-        if (mesh.vao_glow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_glow_pass));
-        if (mesh.vao_displace_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_pass));
-        if (mesh.vao_displace_mask_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_displace_mask_pass));
-        if (mesh.vao_shadow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
+        if (mesh.vao)
+            glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
     }
@@ -126,8 +116,8 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
 
     MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
 
-    assert(mesh.vao_glow_pass);
-    glBindVertexArray(mesh.vao_glow_pass);
+    assert(mesh.vao);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -141,19 +131,14 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-    core::matrix4 ModelViewMatrix = irr_driver->getViewMatrix();
-    ModelViewMatrix *= AbsoluteTransformation;
-
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
 
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
-    MeshShader::DisplaceMaskShader::setUniforms(ModelViewProjectionMatrix);
+    MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
 
-    assert(mesh.vao_displace_mask_pass);
-    glBindVertexArray(mesh.vao_displace_mask_pass);
+    glBindVertexArray(mesh.vao);
     glDrawElements(ptype, count, itype, 0);
 
     // Render the effect
@@ -164,15 +149,13 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
-    MeshShader::DisplaceShader::setUniforms(ModelViewProjectionMatrix, ModelViewMatrix,
+    MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
                                             core::vector2df(cb->getDirX(), cb->getDirY()),
                                             core::vector2df(cb->getDir2X(), cb->getDir2Y()),
                                             core::vector2df(float(UserConfigParams::m_width),
                                                             float(UserConfigParams::m_height)),
                                             0, 1, 2);
 
-    assert(mesh.vao_displace_pass);
-    glBindVertexArray(mesh.vao_displace_pass);
     glDrawElements(ptype, count, itype, 0);
 }
 
@@ -420,13 +403,13 @@ void STKMeshSceneNode::render()
         for_in(mesh, TransparentMesh[TM_DEFAULT])
         {
             TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(ModelViewProjectionMatrix);
+            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
         }
 
         for_in(mesh, TransparentMesh[TM_ADDITIVE])
         {
             TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(ModelViewProjectionMatrix);
+            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(AbsoluteTransformation);
         }
 
         if (!TransparentMesh[TM_BUBBLE].empty())
