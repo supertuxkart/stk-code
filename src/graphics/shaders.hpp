@@ -288,7 +288,7 @@ public:
     static GLuint uniform_MVP, uniform_TM, uniform_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex);
 };
 
 class TransparentFogShader
@@ -299,7 +299,7 @@ public:
     static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
 };
 
 class BillboardShader
@@ -398,7 +398,7 @@ public:
     static GLuint uniform_MVP;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix);
+    static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
 class DisplaceShader
@@ -406,10 +406,10 @@ class DisplaceShader
 public:
     static GLuint Program;
     static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
-    static GLuint uniform_MVP, uniform_MV, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_dir, uniform_dir2;
+    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_dir, uniform_dir2;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex);
 };
 
 class SkyboxShader
@@ -647,7 +647,7 @@ class Gaussian17TapHShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
+    static GLuint uniform_tex, uniform_depth, uniform_pixel;
     static GLuint vao;
 
     static void init();
@@ -657,7 +657,7 @@ class ComputeGaussian17TapHShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_source, uniform_dest;
+    static GLuint uniform_source, uniform_depth, uniform_dest;
 
     static void init();
 };
@@ -686,7 +686,7 @@ class Gaussian17TapVShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
+    static GLuint uniform_tex, uniform_depth, uniform_pixel;
     static GLuint vao;
 
     static void init();
@@ -696,7 +696,7 @@ class ComputeGaussian17TapVShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_source, uniform_dest;
+    static GLuint uniform_source, uniform_depth, uniform_dest;
 
     static void init();
 };

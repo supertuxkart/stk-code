@@ -1360,19 +1360,24 @@ namespace MeshShader
     void TransparentShader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/transparent.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
+        if (!UserConfigParams::m_ubo_disabled)
+        {
+            GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+            glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        }
     }
 
-    void TransparentShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex)
+    void TransparentShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
     }
@@ -1394,12 +1399,12 @@ namespace MeshShader
     void TransparentFogShader::init()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/transparent.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparentfog.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_color = glGetAttribLocation(Program, "Color");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_fogmax = glGetUniformLocation(Program, "fogmax");
@@ -1415,9 +1420,9 @@ namespace MeshShader
         }
     }
 
-    void TransparentFogShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
+    void TransparentFogShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniform1f(uniform_fogmax, fogmax);
         glUniform1f(uniform_startH, startH);
@@ -1728,12 +1733,14 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
+        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix)
+    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
     }
 
     GLuint DisplaceShader::Program;
@@ -1741,7 +1748,6 @@ namespace MeshShader
     GLuint DisplaceShader::attrib_texcoord;
     GLuint DisplaceShader::attrib_second_texcoord;
     GLuint DisplaceShader::uniform_MVP;
-    GLuint DisplaceShader::uniform_MV;
     GLuint DisplaceShader::uniform_displacement_tex;
     GLuint DisplaceShader::uniform_mask_tex;
     GLuint DisplaceShader::uniform_color_tex;
@@ -1756,8 +1762,7 @@ namespace MeshShader
         attrib_position = glGetAttribLocation(Program, "Position");
         attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
+        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_displacement_tex = glGetUniformLocation(Program, "displacement_tex");
         uniform_color_tex = glGetUniformLocation(Program, "color_tex");
         uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
@@ -1767,10 +1772,9 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &ModelViewMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
+    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
     {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
+        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform2f(uniform_dir, dir.X, dir.Y);
         glUniform2f(uniform_dir2, dir2.X, dir2.Y);
         glUniform1i(uniform_displacement_tex, TU_displacement_tex);
@@ -2495,27 +2499,31 @@ namespace FullScreenShader
 
     GLuint Gaussian17TapHShader::Program;
     GLuint Gaussian17TapHShader::uniform_tex;
+    GLuint Gaussian17TapHShader::uniform_depth;
     GLuint Gaussian17TapHShader::uniform_pixel;
     GLuint Gaussian17TapHShader::vao;
     void Gaussian17TapHShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian17taph.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         vao = createFullScreenVAO(Program);
     }
 
     GLuint ComputeGaussian17TapHShader::Program;
     GLuint ComputeGaussian17TapHShader::uniform_source;
+    GLuint ComputeGaussian17TapHShader::uniform_depth;
     GLuint ComputeGaussian17TapHShader::uniform_dest;
     void ComputeGaussian17TapHShader::init()
     {
 #if WIN32
         Program = LoadProgram(
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussian.comp").c_str());
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         uniform_dest = glGetUniformLocation(Program, "dest");
 #endif
     }
@@ -2550,27 +2558,31 @@ namespace FullScreenShader
 
     GLuint Gaussian17TapVShader::Program;
     GLuint Gaussian17TapVShader::uniform_tex;
+    GLuint Gaussian17TapVShader::uniform_depth;
     GLuint Gaussian17TapVShader::uniform_pixel;
     GLuint Gaussian17TapVShader::vao;
     void Gaussian17TapVShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian17tapv.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralV.frag").c_str());
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_pixel = glGetUniformLocation(Program, "pixel");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         vao = createFullScreenVAO(Program);
     }
 
     GLuint ComputeGaussian17TapVShader::Program;
     GLuint ComputeGaussian17TapVShader::uniform_source;
+    GLuint ComputeGaussian17TapVShader::uniform_depth;
     GLuint ComputeGaussian17TapVShader::uniform_dest;
     void ComputeGaussian17TapVShader::init()
     {
 #if WIN32
         Program = LoadProgram(
-            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/gaussianv.comp").c_str());
+            GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
+        uniform_depth = glGetUniformLocation(Program, "depth");
         uniform_dest = glGetUniformLocation(Program, "dest");
 #endif
     }

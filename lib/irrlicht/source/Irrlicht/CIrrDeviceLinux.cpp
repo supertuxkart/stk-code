@@ -264,7 +264,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		// enumerate video modes
 		s32 modeCount;
 		XF86VidModeModeInfo** modes;
-		float refresh_rate;
+		float refresh_rate, refresh_rate_old;
 
 		XF86VidModeGetAllModeLines(display, screennr, &modeCount, &modes);
 
@@ -273,22 +273,17 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		{
 			if (bestMode==-1 && modes[i]->hdisplay >= Width && modes[i]->vdisplay >= Height)
 			{
-				float pixels_per_second = modes[i]->dotclock * 1000.0;
-				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
-				refresh_rate = pixels_per_second / pixels_per_frame;
 				bestMode = i;
 			}
 			else if (bestMode!=-1 &&
 					modes[i]->hdisplay == modes[bestMode]->hdisplay &&
 					modes[i]->vdisplay == modes[bestMode]->vdisplay)
 			{
-				float pixels_per_second = modes[i]->dotclock * 1000.0;
-				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
-				float refresh_rate_tmp = pixels_per_second / pixels_per_frame;
+				refresh_rate_old = (modes[bestMode]->dotclock * 1000.0) / (modes[bestMode]->htotal * modes[bestMode]->vtotal);
+				refresh_rate = (modes[i]->dotclock * 1000.0) / (modes[i]->htotal * modes[i]->vtotal);
 
-				if (refresh_rate_tmp > refresh_rate)
+				if (refresh_rate > refresh_rate_old)
 				{
-					refresh_rate = refresh_rate_tmp;
 					bestMode = i;
 				}
 			}
@@ -298,9 +293,6 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					modes[i]->hdisplay <= modes[bestMode]->hdisplay &&
 					modes[i]->vdisplay <= modes[bestMode]->vdisplay)
 			{
-				float pixels_per_second = modes[i]->dotclock * 1000.0;
-				float pixels_per_frame = modes[i]->htotal * modes[i]->vtotal;
-				refresh_rate = pixels_per_second / pixels_per_frame;
 				bestMode = i;
 			}
 		}
