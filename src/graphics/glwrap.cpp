@@ -1,5 +1,4 @@
 #include "graphics/glwrap.hpp"
-#include "irr_driver.hpp"
 #include <fstream>
 #include <string>
 #include "config/user_config.hpp"

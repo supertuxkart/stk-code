@@ -25,6 +25,7 @@
 #endif
 
 #include <vector>
+#include "irr_driver.hpp"
 #include "utils/log.hpp"
 
 // already includes glext.h, which defines useful GL constants.
