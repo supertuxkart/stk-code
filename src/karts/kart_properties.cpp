@@ -173,14 +173,18 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     // Get the default values from STKConfig. This will also allocate any
     // pointers used in KartProperties
 
-    copyFrom(&stk_config->getDefaultKartProperties());
+    const XMLNode* root = new XMLNode(filename);
+    std::string kart_type;
+    if (root->get("type", &kart_type))
+        copyFrom(&stk_config->getKartProperties(kart_type));
+    else
+        copyFrom(&stk_config->getDefaultKartProperties());
 
     // m_kart_model must be initialised after assigning the default
     // values from stk_config (otherwise all kart_properties will
     // share the same KartModel
     m_kart_model  = new KartModel(/*is_master*/true);
 
-    const XMLNode * root = 0;
     m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
     // If this is an addon kart, add "addon_" to the identifier - just in
@@ -190,7 +194,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_ident = Addon::createAddonId(m_ident);
     try
     {
-        root = new XMLNode(filename);
         if(!root || root->getName()!="kart")
         {
             std::ostringstream msg;
@@ -201,6 +204,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
             throw std::runtime_error(msg.str());
         }
         getAllData(root);
+        getProperties(root);
     }
     catch(std::exception& err)
     {
@@ -316,21 +320,6 @@ void KartProperties::getAllData(const XMLNode * root)
     {
         root->get("type",     &m_kart_type        );
     }
-
-    if(const XMLNode *kart_type = root->getNode("kart-type"))
-    {
-        getProperties(kart_type->getNode(m_kart_type));
-    }
-    else
-    {
-        //When we load in kart.xml values, we first set the correct type
-        //After we have done that, we can still enter kart-specific values
-        const XMLNode* config_root = new XMLNode(file_manager->getAsset("stk_config.xml"));
-        getProperties(config_root->getNode("general-kart-defaults")->getNode("kart-type")->getNode(m_kart_type));
-        getProperties(root);
-    }
-
-
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);

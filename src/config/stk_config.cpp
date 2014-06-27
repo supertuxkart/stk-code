@@ -380,6 +380,16 @@ void STKConfig::getAllData(const XMLNode * root)
         throw std::runtime_error(msg.str());
     }
     m_default_kart_properties->getAllData(node);
+    const XMLNode *types = node->getNode("kart-type");
+    m_default_kart_properties->getProperties(types->getNode("default"));
+
+    for (int i = 0; i < types->getNumNodes(); ++i)
+    {
+        const XMLNode* type = types->getNode(i);
+        m_kart_properties[type->getName()] = new KartProperties();
+        m_kart_properties[type->getName()]->copyFrom(m_default_kart_properties);
+        m_kart_properties[type->getName()]->getProperties(type);
+    }
 
 }   // getAllData
 

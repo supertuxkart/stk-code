@@ -145,7 +145,7 @@
   <!-- Default values for all karts
        ============================ -->
   <general-kart-defaults>
-	<properties group= "medium" />
+	<properties group= "default" />
   
     <!-- Camera: Distance between kart and camera. 
          forward-up-angle: Angle between camera and plane of kart (pitch) 
@@ -539,7 +539,61 @@
      -->
 		 
 	 <kart-type>
+		 <default>
+			 <properties group = "default"/>	 
+			 <startup time   = "0.3 0.5"
+			     boost  = "6 3"  />
+
+			 <rescue vert-offset="0.0" time="1.2" height="2"/>
+	  
+			 <nitro engine-force="500" consumption="1" small-container="1" big-container="3"
+			     max-speed-increase="5" duration="1" fade-out-time="2" max="20"/>
+
+			 <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
+
+			 <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
+			     fade-out-time="1.0"  />
+
+		     <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
+			     visual="1.25" visual-time="0.7" revert-visual-time="0.7"
+			     min-speed="10"  time-till-bonus="1.0 3.0" 
+			     bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
+			     bonus-force="250 350"
+			     physical-jump-time="0" graphical-jump-time="0.4"
+			     post-skid-rotate-factor="1"
+			     reduce-turn-min="0.2" reduce-turn-max="0.8"/>
+			
+		     <slipstream length="10" width="2" collect-time="2" use-time="5"
+			     add-power="3" min-speed="10"
+			     max-speed-increase="5" duration="1" fade-out-time="2"/>
+
+		     <swatter duration="10" distance="3" squash-duration="5" 
+			     squash-slowdown="0.5"/>
+		    
+		     <lean    max="8.6"  speed="5.0" />
+
+			 <turn turn-radius="0:2.0 10:7.5 25:15 45:30"
+			     time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25" 
+			     time-reset-steer="0.1" />
+				 
+		     <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
+			     max-speed-reverse-ratio="0.3"/>
+
+			 <gear switch-ratio="0.25 0.7 1.0" power-increase="2.2 1.7 1.3"/>
+
+			 <mass value="225"/>
+			  
+			 <plunger band-max-length="50" band-force="1500" band-duration="1"
+	             band-speed-increase="7" band-fade-out-time="3"
+	             in-face-time="3 4 4.5 4.5"/>
+
+			 <explosion time="2" radius="5" 
+			     invulnerability-time="6" /> 
+		 </default>
+		 
 		 <light>
+			 <properties group = "light"/>
+			 
 	         <startup time   = "0.3 0.5"
 	             boost  = "8.5 4.5"  />
 
@@ -591,6 +645,8 @@
 		 </light>
 		 
 		 <medium>
+			 <properties group = "medium"/>
+			 
 	         <startup time   = "0.3 0.5"
 	             boost  = "4.2 2.6"  />
 
@@ -642,6 +698,8 @@
 		 </medium>
 		 
 		 <heavy>
+			 <properties group = "heavy"/>
+			 
 	         <startup time   = "0.3 0.5"
 	               boost  = "3.8 2"  />
 
