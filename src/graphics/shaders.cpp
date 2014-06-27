@@ -450,9 +450,6 @@ namespace MeshShader
 
     // Solid Normal and depth pass shaders
     GLuint ObjectPass1Shader::Program;
-    GLuint ObjectPass1Shader::attrib_position;
-    GLuint ObjectPass1Shader::attrib_normal;
-    GLuint ObjectPass1Shader::attrib_texcoord;
     GLuint ObjectPass1Shader::uniform_MM;
     GLuint ObjectPass1Shader::uniform_IMM;
     GLuint ObjectPass1Shader::uniform_tex;
@@ -463,9 +460,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
@@ -486,9 +480,6 @@ namespace MeshShader
     }
 
     GLuint ObjectRefPass1Shader::Program;
-    GLuint ObjectRefPass1Shader::attrib_position;
-    GLuint ObjectRefPass1Shader::attrib_normal;
-    GLuint ObjectRefPass1Shader::attrib_texcoord;
     GLuint ObjectRefPass1Shader::uniform_MM;
     GLuint ObjectRefPass1Shader::uniform_IMM;
     GLuint ObjectRefPass1Shader::uniform_TM;
@@ -500,9 +491,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
@@ -525,10 +513,6 @@ namespace MeshShader
     }
 
     GLuint GrassPass1Shader::Program;
-    GLuint GrassPass1Shader::attrib_position;
-    GLuint GrassPass1Shader::attrib_texcoord;
-    GLuint GrassPass1Shader::attrib_normal;
-    GLuint GrassPass1Shader::attrib_color;
     GLuint GrassPass1Shader::uniform_MVP;
     GLuint GrassPass1Shader::uniform_TIMV;
     GLuint GrassPass1Shader::uniform_tex;
@@ -540,10 +524,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
-        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
         uniform_tex = glGetUniformLocation(Program, "tex");
@@ -559,10 +539,6 @@ namespace MeshShader
     }
 
     GLuint NormalMapShader::Program;
-    GLuint NormalMapShader::attrib_position;
-    GLuint NormalMapShader::attrib_texcoord;
-    GLuint NormalMapShader::attrib_tangent;
-    GLuint NormalMapShader::attrib_bitangent;
     GLuint NormalMapShader::uniform_MM;
     GLuint NormalMapShader::uniform_IMM;
     GLuint NormalMapShader::uniform_normalMap;
@@ -574,10 +550,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/normalmap.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_tangent = glGetAttribLocation(Program, "Tangent");
-        attrib_bitangent = glGetAttribLocation(Program, "Bitangent");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_normalMap = glGetUniformLocation(Program, "normalMap");
@@ -718,8 +690,6 @@ namespace MeshShader
     // Solid Lit pass shaders
 
     GLuint ObjectPass2Shader::Program;
-    GLuint ObjectPass2Shader::attrib_position;
-    GLuint ObjectPass2Shader::attrib_texcoord;
     GLuint ObjectPass2Shader::uniform_MM;
     GLuint ObjectPass2Shader::uniform_TM;
     GLuint ObjectPass2Shader::uniform_ambient;
@@ -731,8 +701,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
@@ -875,9 +843,6 @@ namespace MeshShader
     }
 
     GLuint DetailledObjectPass2Shader::Program;
-    GLuint DetailledObjectPass2Shader::attrib_position;
-    GLuint DetailledObjectPass2Shader::attrib_texcoord;
-    GLuint DetailledObjectPass2Shader::attrib_second_texcoord;
     GLuint DetailledObjectPass2Shader::uniform_MM;
     GLuint DetailledObjectPass2Shader::uniform_ambient;
     GLuint DetailledObjectPass2Shader::TU_Albedo;
@@ -889,9 +854,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_Detail = glGetUniformLocation(Program, "Detail");
@@ -923,8 +885,6 @@ namespace MeshShader
     }
 
     GLuint ObjectUnlitShader::Program;
-    GLuint ObjectUnlitShader::attrib_position;
-    GLuint ObjectUnlitShader::attrib_texcoord;
     GLuint ObjectUnlitShader::uniform_MM;
     GLuint ObjectUnlitShader::TU_tex;
 
@@ -933,8 +893,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
@@ -957,9 +915,6 @@ namespace MeshShader
     }
 
     GLuint ObjectRimLimitShader::Program;
-    GLuint ObjectRimLimitShader::attrib_position;
-    GLuint ObjectRimLimitShader::attrib_texcoord;
-    GLuint ObjectRimLimitShader::attrib_normal;
     GLuint ObjectRimLimitShader::uniform_MM;
     GLuint ObjectRimLimitShader::uniform_IMM;
     GLuint ObjectRimLimitShader::uniform_TM;
@@ -971,9 +926,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_rimlit.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
@@ -1012,8 +964,6 @@ namespace MeshShader
     }
 
     GLuint UntexturedObjectShader::Program;
-    GLuint UntexturedObjectShader::attrib_position;
-    GLuint UntexturedObjectShader::attrib_color;
     GLuint UntexturedObjectShader::uniform_MM;
     GLuint UntexturedObjectShader::uniform_ambient;
 
@@ -1023,8 +973,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/untextured_object.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
         GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
@@ -1054,8 +1002,6 @@ namespace MeshShader
 
 
     GLuint ObjectRefPass2Shader::Program;
-    GLuint ObjectRefPass2Shader::attrib_position;
-    GLuint ObjectRefPass2Shader::attrib_texcoord;
     GLuint ObjectRefPass2Shader::uniform_MM;
     GLuint ObjectRefPass2Shader::uniform_TM;
     GLuint ObjectRefPass2Shader::uniform_ambient;
@@ -1068,8 +1014,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
@@ -1104,9 +1048,6 @@ namespace MeshShader
     }
 
     GLuint GrassPass2Shader::Program;
-    GLuint GrassPass2Shader::attrib_position;
-    GLuint GrassPass2Shader::attrib_texcoord;
-    GLuint GrassPass2Shader::attrib_color;
     GLuint GrassPass2Shader::uniform_MVP;
     GLuint GrassPass2Shader::uniform_ambient;
     GLuint GrassPass2Shader::uniform_windDir;
@@ -1118,9 +1059,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
@@ -1218,8 +1156,6 @@ namespace MeshShader
     }
 
     GLuint SphereMapShader::Program;
-    GLuint SphereMapShader::attrib_position;
-    GLuint SphereMapShader::attrib_normal;
     GLuint SphereMapShader::uniform_MM;
     GLuint SphereMapShader::uniform_IMM;
     GLuint SphereMapShader::uniform_ambient;
@@ -1232,8 +1168,6 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_ambient = glGetUniformLocation(Program, "ambient");
@@ -1283,9 +1217,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_tex_layout = glGetUniformLocation(Program, "tex_layout");
         GLuint uniform_tex_detail0 = glGetUniformLocation(Program, "tex_detail0");
@@ -1544,6 +1475,8 @@ namespace MeshShader
 
     void RSMShader::init()
     {
+        if (irr_driver->getGLSLVersion() < 150)
+            return;
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
@@ -1734,8 +1667,11 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        if (!UserConfigParams::m_ubo_disabled)
+        {
+            GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+            glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        }
     }
 
     void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelMatrix)
@@ -2391,6 +2327,8 @@ namespace FullScreenShader
 
     void RadianceHintsConstructionShader::init()
     {
+        if (irr_driver->getGLSLVersion() < 150)
+            return;
         if (irr_driver->hasVSLayerExtension())
         {
             Program = LoadProgram(
@@ -2520,6 +2458,8 @@ namespace FullScreenShader
     void ComputeGaussian17TapHShader::init()
     {
 #if WIN32
+        if (irr_driver->getGLSLVersion() < 420)
+            return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");
@@ -2579,6 +2519,8 @@ namespace FullScreenShader
     void ComputeGaussian17TapVShader::init()
     {
 #if WIN32
+        if (irr_driver->getGLSLVersion() < 420)
+            return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
         uniform_source = glGetUniformLocation(Program, "source");

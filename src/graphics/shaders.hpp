@@ -53,7 +53,6 @@ class ObjectPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_normal;
     static GLuint uniform_MM, uniform_IMM, uniform_tex;
 
     static void init();
@@ -64,7 +63,6 @@ class ObjectRefPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_texcoord;
     static GLuint uniform_MM, uniform_TM, uniform_IMM, uniform_tex;
 
     static void init();
@@ -75,7 +73,6 @@ class GrassPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_normal, attrib_color;
     static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_windDir;
 
     static void init();
@@ -86,7 +83,6 @@ class NormalMapShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_tangent, attrib_bitangent;
     static GLuint uniform_MM, uniform_IMM, uniform_normalMap, uniform_DiffuseForAlpha;
 
     static void init();
@@ -130,7 +126,6 @@ class ObjectPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
     static GLuint uniform_MM, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -166,7 +161,6 @@ class DetailledObjectPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
     static GLuint uniform_MM, uniform_ambient;
     static GLuint TU_Albedo, TU_detail;
 
@@ -178,7 +172,6 @@ class ObjectRimLimitShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_texcoord;
     static GLuint uniform_MM, uniform_IMM, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -190,7 +183,6 @@ class UntexturedObjectShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_color;
     static GLuint uniform_MM, uniform_ambient;
 
     static void init();
@@ -201,7 +193,6 @@ class ObjectUnlitShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
     static GLuint uniform_MM;
     static GLuint TU_tex;
 
@@ -213,7 +204,6 @@ class ObjectRefPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
     static GLuint uniform_MM, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -225,7 +215,6 @@ class GrassPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color;
     static GLuint uniform_MVP, uniform_ambient, uniform_windDir;
     static GLuint TU_Albedo;
 
@@ -249,7 +238,6 @@ class SphereMapShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal;
     static GLuint uniform_MM, uniform_IMM, uniform_ambient;
     static GLuint TU_tex;
 
