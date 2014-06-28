@@ -491,12 +491,12 @@ void QuadGraph::createMesh(bool show_invisible,
             lap_v[2].Pos = lap_v[1].Pos+core::vector3df(0, 0, 1);
         else
             lap_v[2].Pos = lap_v[1].Pos+dr*length/sqrt(lr2);
-        lap_ind[0] = 0;
+        lap_ind[0] = 2;
         lap_ind[1] = 1;
-        lap_ind[2] = 2;
-        lap_ind[3] = 0;
+        lap_ind[2] = 0;
+        lap_ind[3] = 3;
         lap_ind[4] = 2;
-        lap_ind[5] = 3;
+        lap_ind[5] = 0;
         // Set it a bit higher to avoid issued with z fighting,
         // i.e. part of the lap line might not be visible.
         for(unsigned int i=0; i<4; i++)
