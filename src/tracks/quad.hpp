@@ -61,7 +61,7 @@ private:
     /** Set if this quad should not be used by the AI. */
     bool  m_ai_ignore;
 
-    std::array<std::array<Vec3,4> , 6 > boxFaces;
+    Vec3 m_box_faces[6][4];
 
     void findNormal();
         

@@ -69,14 +69,18 @@ Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
      boxCorners[6] = m_p[2] - boxLow*normal;
      boxCorners[7] = m_p[3] - boxLow*normal;
 
-     boxFaces = {{
-         {{ boxCorners[0], boxCorners[1], boxCorners[2], boxCorners[3] }},
-         {{ boxCorners[3], boxCorners[2], boxCorners[6], boxCorners[7] }},
-         {{ boxCorners[7], boxCorners[6], boxCorners[5], boxCorners[4] }},
-         {{ boxCorners[1], boxCorners[0], boxCorners[4], boxCorners[5] }},
-         {{ boxCorners[4], boxCorners[0], boxCorners[3], boxCorners[7] }},
-         {{ boxCorners[1], boxCorners[5], boxCorners[6], boxCorners[2] }} 
-     }};
+     Vec3 boxFaces[6][4] = {
+         { boxCorners[0], boxCorners[1], boxCorners[2], boxCorners[3] },
+         { boxCorners[3], boxCorners[2], boxCorners[6], boxCorners[7] },
+         { boxCorners[7], boxCorners[6], boxCorners[5], boxCorners[4] },
+         { boxCorners[1], boxCorners[0], boxCorners[4], boxCorners[5] },
+         { boxCorners[4], boxCorners[0], boxCorners[3], boxCorners[7] },
+         { boxCorners[1], boxCorners[5], boxCorners[6], boxCorners[2] } 
+     };
+
+     for (unsigned int i = 0; i < 6 ; i++)
+        for (unsigned int j = 0; j < 4; j++)
+             m_box_faces[i][j] = boxFaces[i][j];
    
 }   // Quad
 
@@ -144,10 +148,10 @@ bool Quad::pointInQuad(const Vec3& p) const
 
 bool Quad::pointInQuad3D(const Vec3& p) const
 {
-    float side = p.sideofPlane(boxFaces[0][0], boxFaces[0][1], boxFaces[0][2]);
+    float side = p.sideofPlane(m_box_faces[0][0], m_box_faces[0][1], m_box_faces[0][2]);
     for (int i = 1; i < 6; i++)
     {
-        if (side*p.sideofPlane(boxFaces[i][0], boxFaces[i][1], boxFaces[i][2]) < 0) return false;
+        if (side*p.sideofPlane(m_box_faces[i][0], m_box_faces[i][1], m_box_faces[i][2]) < 0) return false;
     }
     return true;
 }
