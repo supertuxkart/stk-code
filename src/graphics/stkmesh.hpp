@@ -29,7 +29,6 @@ enum ShadedMaterial
     SM_GRASS,
     SM_UNLIT,
     SM_DETAILS,
-    SM_UNTEXTURED,
     SM_COUNT
 };
 

@@ -199,13 +199,6 @@ void STKAnimatedMesh::render()
             GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
         }
 
-        for_in(mesh, ShadedMesh[SM_UNTEXTURED])
-        {
-            GroupedSM<SM_UNTEXTURED>::MeshSet.push_back(mesh);
-            GroupedSM<SM_UNTEXTURED>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_UNTEXTURED>::TIMVSet.push_back(invmodel);
-        }
-
         return;
     }
 

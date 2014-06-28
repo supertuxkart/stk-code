@@ -37,8 +37,6 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
         return SM_UNLIT;
     else if (textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))
         return SM_DETAILS;
-    else if (!textures[0])
-        return SM_UNTEXTURED;
     else
         return SM_DEFAULT;
 }

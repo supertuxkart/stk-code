@@ -587,7 +587,6 @@ void IrrDriver::renderSolidSecondPass()
     GroupedSM<SM_SPLATTING>::reset();
     GroupedSM<SM_UNLIT>::reset();
     GroupedSM<SM_DETAILS>::reset();
-    GroupedSM<SM_UNTEXTURED>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
@@ -625,10 +624,6 @@ void IrrDriver::renderSolidSecondPass()
         glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
         for (unsigned i = 0; i < GroupedSM<SM_DETAILS>::MeshSet.size(); i++)
             drawDetailledObjectPass2(*GroupedSM<SM_DETAILS>::MeshSet[i], GroupedSM<SM_DETAILS>::MVPSet[i]);
-
-        glUseProgram(MeshShader::UntexturedObjectShader::Program);
-        for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
-            drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
     }
 }
 
