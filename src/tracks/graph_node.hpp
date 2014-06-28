@@ -124,18 +124,19 @@ private:
       */
     std::vector< int > m_checkline_requirements;
 
-    std::vector<Quad> m_unrolled_quads;
+    std::vector< std::vector<Quad> >m_unrolled_quads;
 
     void markAllSuccessorsToUse(unsigned int n,
                                 PathToNodeVector *m_path_to_node);
 
-    void addUnrolledQuad(const GraphNode& next_node,int k);
+    void addUnrolledQuad(const GraphNode& next_node, int fork_number, int k);
 
 public:
                  GraphNode(unsigned int quad_index, unsigned int node_index);
     void         addSuccessor (unsigned int to);
     void         getDistances(const Vec3 &xyz, Vec3 *result);
-    void         getDistancesUnrolled(const Vec3 &xyz, unsigned int quad_idx, Vec3 *result);
+    void         getDistancesUnrolled(const Vec3 &xyz, const int fork_number,
+                                        unsigned int quad_idx, Vec3 *result);
     float        getDistance2FromPoint(const Vec3 &xyz);
     void         setupPathsToNode();
     void         setChecklineRequirements(int latest_checkline);
@@ -241,7 +242,7 @@ public:
 
     const Vec3 getPointTransformedToFlatQuad(Vec3 xyz);
 
-    const Quad& getUnrolledQuad(int i) const { return m_unrolled_quads[i]; }
+    const Quad& getUnrolledQuad(int succ_idx, int i) const { return m_unrolled_quads[succ_idx][i]; }
 };   // GraphNode
 
 #endif

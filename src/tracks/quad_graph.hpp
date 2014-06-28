@@ -113,7 +113,8 @@ public:
     void         spatialToTrackUnrolled(Vec3 *dst, 
                                         const Vec3& xyz,
                                         const int parent_sector, 
-                                        const int unroll_qd_idx)   const;
+                                        const int unroll_qd_idx,
+                                        const int fork_number)   const;
 
     void         findRoadSector(const Vec3& XYZ, int *sector,
                             std::vector<int> *all_sectors=NULL) const;
@@ -200,8 +201,8 @@ public:
     /** Returns true if the graph is to be reversed. */
     bool         isReverse() const {return m_reverse; }
 
-    const Quad&  getUnrolledQuadOfNode(unsigned int node, unsigned int quad_number)
-                       { return getNode(node).getUnrolledQuad(quad_number); }
+    const Quad&  getUnrolledQuadOfNode(unsigned int node, unsigned int fork_number, unsigned int quad_number)
+                       { return getNode(node).getUnrolledQuad(fork_number,quad_number); }
     
     /** Returns the number of forward quads that are unrolled for each quad **/
     int          getNumberOfUnrolledQuads() const { return m_unroll_quad_count; }

@@ -576,7 +576,7 @@ void QuadGraph::createMesh2()
             c.setGreen((3 * i) % 256);
         }
 
-        Quad flatquad = QuadGraph::get()->getNode(55).getUnrolledQuad(count);
+        Quad flatquad = QuadGraph::get()->getNode(55).getUnrolledQuad(0,count);
 
         //std::vector<int> vInd = poly.getVerticesIndex();
         // Four vertices for each of the n-1 remaining quads
@@ -903,14 +903,14 @@ void QuadGraph::spatialToTrack(Vec3 *dst, const Vec3& xyz,
 }   // spatialToTrack
 
 void QuadGraph::spatialToTrackUnrolled(Vec3 *dst, const Vec3& xyz,
-    const int parent_sector, const int unroll_qd_idx) const
+    const int parent_sector, const int unroll_qd_idx, const int fork_number) const
 {
     if (parent_sector == UNKNOWN_SECTOR)
     {
         Log::warn("Quad Graph", "UNKNOWN_SECTOR in spatialToTrack().");
         return;
     }
-    getNode(parent_sector).getDistancesUnrolled(xyz, unroll_qd_idx, dst);
+    getNode(parent_sector).getDistancesUnrolled(xyz, fork_number, unroll_qd_idx, dst);
 }
 
 //-----------------------------------------------------------------------------

@@ -204,10 +204,10 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
                   (closest-m_lower_center_2d).getLength());
 }   // getDistances
 
-void GraphNode::getDistancesUnrolled(const Vec3 &xyz, unsigned int quad_idx, Vec3 *result)
+void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, unsigned int quad_idx, Vec3 *result)
 {
     
-    const Quad& unrolled = getUnrolledQuad(quad_idx);
+    const Quad& unrolled = getUnrolledQuad(fork_number,quad_idx);
     Vec3 upper_center = 0.5f*(unrolled[2] + unrolled[3]),
          lower_center = 0.5f*(unrolled[0] + unrolled[1]);
     // center_line is from A to B, or lower_center to upper_center
@@ -258,23 +258,43 @@ void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
 {
     m_unrolled_quads.clear();
 
-    Quad thisQuad = getQuad();
+    
+    unsigned int numberOfForks = 1;
+    GraphNode* currentNode = this;
+    for (int i = 0; i < unroll_quad_count+1; i++)
+    {
+        unsigned int successorCount = currentNode->getNumberOfSuccessors();
+        if (successorCount >= 2) 
+        {
+            numberOfForks = successorCount;
+            break;
+        }
+        else
+        {
+            currentNode = &QuadGraph::get()->getNode(currentNode->getSuccessor(0));
+            
+        }
+    }
 
-    m_unrolled_quads.push_back(thisQuad);
+    m_unrolled_quads.resize(numberOfForks);
 
-    //unsigned int successorCount = getNumberOfSuccessors();
-    addUnrolledQuad(QuadGraph::get()->getNode(getSuccessor(0)), unroll_quad_count);
-
+    for (int i = 0; i < numberOfForks; i++)
+    {
+        Quad thisQuad = getQuad();
+        m_unrolled_quads[i].push_back(thisQuad);
+        GraphNode& next = QuadGraph::get()->getNode(getSuccessor(i%getNumberOfSuccessors()));
+        addUnrolledQuad(next , i , unroll_quad_count);
+    }
 }
 
 
-void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
+void GraphNode::addUnrolledQuad(const GraphNode& next_node, int fork_number, int k)
 {
     if (k == 0) return;
 
     Quad next_quad = next_node.getQuad();
     Quad next_quad_to_push = next_quad.getFlattenedQuad();
-    Quad last_pushed_quad = m_unrolled_quads.back();
+    Quad last_pushed_quad = m_unrolled_quads[fork_number].back();
     
     
     core::CMatrix4<float> m;
@@ -308,8 +328,9 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int k)
         m.translateVect(new_points[i]);
     
     // Push the quad into the vector of unrolled quads
-    m_unrolled_quads.push_back(Quad(new_points[0], new_points[1], new_points[2], new_points[3]));
+    m_unrolled_quads[fork_number].push_back(Quad(new_points[0], new_points[1], new_points[2], new_points[3]));
     k = k - 1;
     // Recurisvely build the vector of unrolled quads till k reduces to 0
-    addUnrolledQuad(QuadGraph::get()->getNode(next_node.getSuccessor(0)), k);
+    GraphNode& next = QuadGraph::get()->getNode(next_node.getSuccessor(fork_number%next_node.getNumberOfSuccessors()));
+    addUnrolledQuad(next, fork_number, k);
 }

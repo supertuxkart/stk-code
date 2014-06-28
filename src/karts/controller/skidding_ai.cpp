@@ -238,7 +238,9 @@ void SkiddingAI::update(float dt)
     // This is used to enable firing an item backwards.
     m_controls->m_look_back = false;
     m_controls->m_nitro     = false;
-    //Log::info("Sector", "%d", m_track_node);
+    
+    //Vec3 gravity = m_kart->getBody()->getGravity();
+    //Log::info("Sector", "%f %f %f %d", gravity[0], gravity[1], gravity[2],m_track_node);
     
     // Don't do anything if there is currently a kart animations shown.
     if(m_kart->getKartAnimation())
@@ -2009,12 +2011,22 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     float angle = QuadGraph::get()->getAngleToNext(m_track_node,
                                               m_successor_index[m_track_node]);
     int target_sector;
-    Vec3 transfrmd_kart_coord = QuadGraph::get()->getNode(m_track_node).
-                                    getPointTransformedToFlatQuad(m_kart->getXYZ());
+   
     Vec3 direction;
     Vec3 step_track_coord;
 
     float angle1;
+
+    int future_successor_idx = 0;
+    int current = m_track_node; 
+    for (unsigned int j = 0; j < QuadGraph::get()->getNumberOfUnrolledQuads(); j++)
+    {
+        if (m_successor_index[current] != 0)
+            future_successor_idx = m_successor_index[m_track_node];
+       
+        current = m_next_node_index[current];
+    }
+
     // The original while(1) loop is replaced with a for loop to avoid
     // infinite loops (which we had once or twice). Usually the number
     // of iterations in the while loop is less than 7.
@@ -2023,9 +2035,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         // target_sector is the sector at the longest distance that we can
         // drive to without crashing with the track.
         target_sector = m_next_node_index[*last_node];
-
-
-        
+               
 
         angle1 = QuadGraph::get()->getAngleToNext(target_sector,
                                                 m_successor_index[target_sector]);
@@ -2041,15 +2051,13 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         }
         
 
-        //direction is a vector from our kart to the sectors we are testing
-        //direction = QuadGraph::get()->getQuadOfNode(target_sector).getCenter()
-        //          - m_kart->getXYZ();
-
+        
         Quad target_quad_unrolled = QuadGraph::get()->getNode(m_track_node).
-            getUnrolledQuad(j + 1);
+            getUnrolledQuad(future_successor_idx,j + 1);
+
         direction = target_quad_unrolled.getCenter() - m_kart->getXYZ();
 
-        //float len=direction.length_2d();
+
         float len = direction.length();
         unsigned int steps = (unsigned int)( len / m_kart_length );
         if( steps < 3 ) steps = 3;
@@ -2069,12 +2077,11 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         for(unsigned int i = 2; i < steps; ++i )
         {
             step_coord = m_kart->getXYZ()+direction*m_kart_length * float(i);
-            //step_coord = transfrmd_kart_coord+direction*m_kart_length * float(i);
-            
+                       
             //QuadGraph::get()->spatialToTrack(&step_track_coord, step_coord,
             //                                 *last_node );
             QuadGraph::get()->spatialToTrackUnrolled(&step_track_coord, step_coord,
-                                             *last_node, j);
+                                             m_track_node, j, future_successor_idx);
 
 
             //float distance = fabsf(step_track_coord[0]);
@@ -2084,7 +2091,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
             if ( distance + m_kart_width * 0.5f
                  > QuadGraph::get()->getNode((*last_node+j)%QuadGraph::get()->getNumNodes() ).getPathWidth() )
             {
-                *aim_position = QuadGraph::get()->getUnrolledQuadOfNode(*last_node,j)
+                *aim_position = QuadGraph::get()->getUnrolledQuadOfNode(m_track_node,future_successor_idx,j)
                                                  .getCenter();
                 return;
             }
@@ -2095,7 +2102,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
         //*last_node = target_sector;
     }   // for i<100
     *aim_position = QuadGraph::get()->getNode(m_track_node).
-        getUnrolledQuad(QuadGraph::get()->getNumberOfUnrolledQuads()).getCenter();
+        getUnrolledQuad(future_successor_idx,QuadGraph::get()->getNumberOfUnrolledQuads()).getCenter();
     //*aim_position = QuadGraph::get()->getQuadOfNode(*last_node).getCenter();
 }   // findNonCrashingPoint
 
