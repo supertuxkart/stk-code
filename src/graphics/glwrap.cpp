@@ -474,6 +474,20 @@ void saveCompressedTexture(const std::string& compressed_tex)
     delete[] data;
 }
 
+static unsigned colorcount = 0;
+
+video::ITexture* getUnicolorTexture(video::SColor c)
+{
+    video::SColor tmp[4] = {
+        c, c, c, c
+    };
+    video::IImage *img = irr_driver->getVideoDriver()->createImageFromData(video::ECF_A8R8G8B8, core::dimension2d<u32>(2, 2), tmp);
+    img->grab();
+    std::string name("color");
+    name += colorcount++;
+    return irr_driver->getVideoDriver()->addTexture(name.c_str(), img);
+}
+
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
 {
     glActiveTexture(GL_TEXTURE0 + TextureUnit);
