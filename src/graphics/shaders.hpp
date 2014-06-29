@@ -93,7 +93,7 @@ class InstancedObjectPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();
@@ -104,7 +104,7 @@ class InstancedObjectRefPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();
@@ -115,7 +115,7 @@ class InstancedGrassPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_normal, attrib_origin, attrib_orientation, attrib_scale, attrib_color, attrib_texcoord;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_windDir, uniform_tex;
 
     static void init();
@@ -137,7 +137,7 @@ class InstancedObjectPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_VP, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -149,7 +149,7 @@ class InstancedObjectRefPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_VP, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -226,7 +226,7 @@ class InstancedGrassPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_normal, attrib_color, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_VP, uniform_TM, uniform_IVM, uniform_ambient, uniform_windDir, uniform_invproj, uniform_SunDir;
     static GLuint TU_Albedo, TU_dtex;
 
@@ -249,7 +249,6 @@ class SplattingShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
     static GLuint uniform_MM, uniform_ambient;
     static GLuint TU_tex_layout, TU_tex_detail0, TU_tex_detail1, TU_tex_detail2, TU_tex_detail3;
 
@@ -261,7 +260,6 @@ class BubbleShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
     static GLuint uniform_MVP, uniform_tex, uniform_time, uniform_transparency;
 
     static void init();
@@ -272,7 +270,6 @@ class TransparentShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color;
     static GLuint uniform_MVP, uniform_TM, uniform_tex;
 
     static void init();
@@ -283,7 +280,6 @@ class TransparentFogShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color;
     static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
 
     static void init();
@@ -306,7 +302,6 @@ class ColorizeShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position;
     static GLuint uniform_MM, uniform_col;
 
     static void init();
@@ -317,7 +312,6 @@ class ShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position;
     static GLuint uniform_MM, uniform_ViewProjectionMatrixesUBO;
 
     static void init();
@@ -328,7 +322,6 @@ class RSMShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_normal;
     static GLuint uniform_MM, uniform_tex, uniform_RSMMatrix;
 
     static void init();
@@ -339,7 +332,7 @@ class InstancedShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
 
     static void init();
     static void setUniforms();
@@ -349,7 +342,6 @@ class RefShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
     static GLuint uniform_MM, uniform_tex;
 
     static void init();
@@ -360,7 +352,7 @@ class InstancedRefShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_origin, attrib_orientation, attrib_scale;
+    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();
@@ -382,7 +374,6 @@ class DisplaceMaskShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position;
     static GLuint uniform_MVP;
 
     static void init();
@@ -393,7 +384,6 @@ class DisplaceShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_second_texcoord;
     static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_dir, uniform_dir2;
 
     static void init();

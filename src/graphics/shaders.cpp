@@ -572,9 +572,6 @@ namespace MeshShader
     }
 
     GLuint InstancedObjectPass1Shader::Program;
-    GLuint InstancedObjectPass1Shader::attrib_position;
-    GLuint InstancedObjectPass1Shader::attrib_normal;
-    GLuint InstancedObjectPass1Shader::attrib_texcoord;
     GLuint InstancedObjectPass1Shader::attrib_orientation;
     GLuint InstancedObjectPass1Shader::attrib_origin;
     GLuint InstancedObjectPass1Shader::attrib_scale;
@@ -589,10 +586,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
-        attrib_position = glGetAttribLocation(Program, "Position");
         attrib_scale = glGetAttribLocation(Program, "Scale");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
         {
@@ -609,9 +603,6 @@ namespace MeshShader
     }
 
     GLuint InstancedObjectRefPass1Shader::Program;
-    GLuint InstancedObjectRefPass1Shader::attrib_position;
-    GLuint InstancedObjectRefPass1Shader::attrib_normal;
-    GLuint InstancedObjectRefPass1Shader::attrib_texcoord;
     GLuint InstancedObjectRefPass1Shader::attrib_orientation;
     GLuint InstancedObjectRefPass1Shader::attrib_origin;
     GLuint InstancedObjectRefPass1Shader::attrib_scale;
@@ -626,10 +617,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
-        attrib_position = glGetAttribLocation(Program, "Position");
         attrib_scale = glGetAttribLocation(Program, "Scale");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
         {
@@ -646,13 +634,9 @@ namespace MeshShader
     }
 
     GLuint InstancedGrassPass1Shader::Program;
-    GLuint InstancedGrassPass1Shader::attrib_position;
-    GLuint InstancedGrassPass1Shader::attrib_normal;
     GLuint InstancedGrassPass1Shader::attrib_origin;
     GLuint InstancedGrassPass1Shader::attrib_orientation;
     GLuint InstancedGrassPass1Shader::attrib_scale;
-    GLuint InstancedGrassPass1Shader::attrib_texcoord;
-    GLuint InstancedGrassPass1Shader::attrib_color;
     GLuint InstancedGrassPass1Shader::uniform_windDir;
     GLuint InstancedGrassPass1Shader::uniform_tex;
 
@@ -666,10 +650,6 @@ namespace MeshShader
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
-        attrib_color = glGetAttribLocation(Program, "Color");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_windDir = glGetUniformLocation(Program, "windDir");
         uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
@@ -734,8 +714,6 @@ namespace MeshShader
     }
 
     GLuint InstancedObjectPass2Shader::Program;
-    GLuint InstancedObjectPass2Shader::attrib_position;
-    GLuint InstancedObjectPass2Shader::attrib_texcoord;
     GLuint InstancedObjectPass2Shader::attrib_origin;
     GLuint InstancedObjectPass2Shader::attrib_orientation;
     GLuint InstancedObjectPass2Shader::attrib_scale;
@@ -751,8 +729,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
@@ -790,8 +766,6 @@ namespace MeshShader
     }
 
     GLuint InstancedObjectRefPass2Shader::Program;
-    GLuint InstancedObjectRefPass2Shader::attrib_position;
-    GLuint InstancedObjectRefPass2Shader::attrib_texcoord;
     GLuint InstancedObjectRefPass2Shader::attrib_origin;
     GLuint InstancedObjectRefPass2Shader::attrib_orientation;
     GLuint InstancedObjectRefPass2Shader::attrib_scale;
@@ -807,8 +781,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
@@ -1086,10 +1058,6 @@ namespace MeshShader
     }
 
     GLuint InstancedGrassPass2Shader::Program;
-    GLuint InstancedGrassPass2Shader::attrib_position;
-    GLuint InstancedGrassPass2Shader::attrib_texcoord;
-    GLuint InstancedGrassPass2Shader::attrib_color;
-    GLuint InstancedGrassPass2Shader::attrib_normal;
     GLuint InstancedGrassPass2Shader::attrib_origin;
     GLuint InstancedGrassPass2Shader::attrib_orientation;
     GLuint InstancedGrassPass2Shader::attrib_scale;
@@ -1109,10 +1077,6 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_color = glGetAttribLocation(Program, "Color");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
@@ -1201,9 +1165,6 @@ namespace MeshShader
     }
 
     GLuint SplattingShader::Program;
-    GLuint SplattingShader::attrib_position;
-    GLuint SplattingShader::attrib_texcoord;
-    GLuint SplattingShader::attrib_second_texcoord;
     GLuint SplattingShader::uniform_MM;
     GLuint SplattingShader::uniform_ambient;
     GLuint SplattingShader::TU_tex_layout;
@@ -1253,8 +1214,6 @@ namespace MeshShader
     }
 
     GLuint BubbleShader::Program;
-    GLuint BubbleShader::attrib_position;
-    GLuint BubbleShader::attrib_texcoord;
     GLuint BubbleShader::uniform_MVP;
     GLuint BubbleShader::uniform_tex;
     GLuint BubbleShader::uniform_time;
@@ -1265,8 +1224,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/bubble.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bubble.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_time = glGetUniformLocation(Program, "time");
@@ -1281,9 +1238,6 @@ namespace MeshShader
     }
 
     GLuint TransparentShader::Program;
-    GLuint TransparentShader::attrib_position;
-    GLuint TransparentShader::attrib_texcoord;
-    GLuint TransparentShader::attrib_color;
     GLuint TransparentShader::uniform_MVP;
     GLuint TransparentShader::uniform_TM;
     GLuint TransparentShader::uniform_tex;
@@ -1293,9 +1247,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
@@ -1314,9 +1265,6 @@ namespace MeshShader
     }
 
     GLuint TransparentFogShader::Program;
-    GLuint TransparentFogShader::attrib_position;
-    GLuint TransparentFogShader::attrib_texcoord;
-    GLuint TransparentFogShader::attrib_color;
     GLuint TransparentFogShader::uniform_MVP;
     GLuint TransparentFogShader::uniform_TM;
     GLuint TransparentFogShader::uniform_tex;
@@ -1332,9 +1280,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparentfog.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_color = glGetAttribLocation(Program, "Color");
         uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
         uniform_tex = glGetUniformLocation(Program, "tex");
@@ -1401,7 +1346,6 @@ namespace MeshShader
     }
 
     GLuint ColorizeShader::Program;
-    GLuint ColorizeShader::attrib_position;
     GLuint ColorizeShader::uniform_MM;
     GLuint ColorizeShader::uniform_col;
 
@@ -1410,7 +1354,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_col = glGetUniformLocation(Program, "col");
         if (!UserConfigParams::m_ubo_disabled)
@@ -1429,17 +1372,13 @@ namespace MeshShader
     }
 
     GLuint ShadowShader::Program;
-    GLuint ShadowShader::attrib_position;
     GLuint ShadowShader::uniform_MM;
 
     void ShadowShader::init()
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
-        {
-            attrib_position = -1;
             return;
-        }
         if (irr_driver->hasVSLayerExtension())
         {
             Program = LoadProgram(
@@ -1453,7 +1392,6 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         }
-        attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1466,9 +1404,6 @@ namespace MeshShader
     }
 
     GLuint RSMShader::Program;
-    GLuint RSMShader::attrib_position;
-    GLuint RSMShader::attrib_texcoord;
-    GLuint RSMShader::attrib_normal;
     GLuint RSMShader::uniform_MM;
     GLuint RSMShader::uniform_tex;
     GLuint RSMShader::uniform_RSMMatrix;
@@ -1480,10 +1415,7 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_normal = glGetAttribLocation(Program, "Normal");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
     }
@@ -1496,7 +1428,6 @@ namespace MeshShader
     }
 
     GLuint InstancedShadowShader::Program;
-    GLuint InstancedShadowShader::attrib_position;
     GLuint InstancedShadowShader::attrib_origin;
     GLuint InstancedShadowShader::attrib_orientation;
     GLuint InstancedShadowShader::attrib_scale;
@@ -1505,10 +1436,7 @@ namespace MeshShader
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
-        {
-            attrib_position = -1;
             return;
-        }
         if (irr_driver->hasVSLayerExtension())
         {
             Program = LoadProgram(
@@ -1524,7 +1452,6 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         }
-        attrib_position = glGetAttribLocation(Program, "Position");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
@@ -1537,8 +1464,6 @@ namespace MeshShader
     }
 
     GLuint RefShadowShader::Program;
-    GLuint RefShadowShader::attrib_position;
-    GLuint RefShadowShader::attrib_texcoord;
     GLuint RefShadowShader::uniform_MM;
     GLuint RefShadowShader::uniform_tex;
 
@@ -1546,11 +1471,7 @@ namespace MeshShader
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
-        {
-            attrib_position = -1;
-            attrib_texcoord = -1;
             return;
-        }
         if (irr_driver->hasVSLayerExtension())
         {
             Program = LoadProgram(
@@ -1564,8 +1485,6 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1579,8 +1498,6 @@ namespace MeshShader
     }
 
     GLuint InstancedRefShadowShader::Program;
-    GLuint InstancedRefShadowShader::attrib_position;
-    GLuint InstancedRefShadowShader::attrib_texcoord;
     GLuint InstancedRefShadowShader::attrib_origin;
     GLuint InstancedRefShadowShader::attrib_orientation;
     GLuint InstancedRefShadowShader::attrib_scale;
@@ -1590,11 +1507,7 @@ namespace MeshShader
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
-        {
-            attrib_position = -1;
-            attrib_texcoord = -1;
             return;
-        }
         if (irr_driver->hasVSLayerExtension())
         {
             Program = LoadProgram(
@@ -1610,8 +1523,6 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
         attrib_origin = glGetAttribLocation(Program, "Origin");
         attrib_orientation = glGetAttribLocation(Program, "Orientation");
         attrib_scale = glGetAttribLocation(Program, "Scale");
@@ -1657,7 +1568,6 @@ namespace MeshShader
     }
 
     GLuint DisplaceMaskShader::Program;
-    GLuint DisplaceMaskShader::attrib_position;
     GLuint DisplaceMaskShader::uniform_MVP;
 
     void DisplaceMaskShader::init()
@@ -1665,7 +1575,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
         uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         if (!UserConfigParams::m_ubo_disabled)
         {
@@ -1680,9 +1589,6 @@ namespace MeshShader
     }
 
     GLuint DisplaceShader::Program;
-    GLuint DisplaceShader::attrib_position;
-    GLuint DisplaceShader::attrib_texcoord;
-    GLuint DisplaceShader::attrib_second_texcoord;
     GLuint DisplaceShader::uniform_MVP;
     GLuint DisplaceShader::uniform_displacement_tex;
     GLuint DisplaceShader::uniform_mask_tex;
@@ -1695,9 +1601,6 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/displace.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "Position");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        attrib_second_texcoord = glGetAttribLocation(Program, "SecondTexcoord");
         uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
         uniform_displacement_tex = glGetUniformLocation(Program, "displacement_tex");
         uniform_color_tex = glGetUniformLocation(Program, "color_tex");
