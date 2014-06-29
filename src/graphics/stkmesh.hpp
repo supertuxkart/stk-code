@@ -43,12 +43,6 @@ enum TransparentMaterial
 
 struct GLMesh {
     GLuint vao;
-    GLuint vao_first_pass;
-    GLuint vao_second_pass;
-    GLuint vao_glow_pass;
-    GLuint vao_displace_pass;
-    GLuint vao_displace_mask_pass;
-    GLuint vao_rsm_pass;
     GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
