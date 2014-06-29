@@ -27,6 +27,8 @@ void STKInstancedSceneNode::cleanGL()
             continue;
         if (mesh.vao)
             glDeleteVertexArrays(1, &(mesh.vao));
+        if (mesh.vao_shadow_pass)
+            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
     }
