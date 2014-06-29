@@ -93,7 +93,6 @@ class InstancedObjectPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();
@@ -104,7 +103,6 @@ class InstancedObjectRefPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();
@@ -115,7 +113,6 @@ class InstancedGrassPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_windDir, uniform_tex;
 
     static void init();
@@ -137,7 +134,6 @@ class InstancedObjectPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_VP, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -149,7 +145,6 @@ class InstancedObjectRefPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_VP, uniform_TM, uniform_ambient;
     static GLuint TU_Albedo;
 
@@ -226,7 +221,6 @@ class InstancedGrassPass2Shader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_VP, uniform_TM, uniform_IVM, uniform_ambient, uniform_windDir, uniform_invproj, uniform_SunDir;
     static GLuint TU_Albedo, TU_dtex;
 
@@ -332,7 +326,6 @@ class InstancedShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
 
     static void init();
     static void setUniforms();
@@ -352,7 +345,6 @@ class InstancedRefShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_origin, attrib_orientation, attrib_scale;
     static GLuint uniform_tex;
 
     static void init();
@@ -363,7 +355,6 @@ class GrassShadowShader
 {
 public:
     static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color;
     static GLuint uniform_MVP, uniform_tex, uniform_windDir;
 
     static void init();
