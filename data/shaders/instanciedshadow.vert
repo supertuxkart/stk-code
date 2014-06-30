@@ -7,12 +7,21 @@ layout (std140) uniform MatrixesData
     mat4 ShadowViewProjMatrixes[4];
 };
 
+#if __VERSION__ >= 330
+layout(location = 0) in vec3 Position;
+layout(location = 3) in vec2 Texcoord;
+
+layout(location = 7) in vec3 Origin;
+layout(location = 8) in vec3 Orientation;
+layout(location = 9) in vec3 Scale;
+#else
+in vec3 Position;
+in vec2 Texcoord;
+
 in vec3 Origin;
 in vec3 Orientation;
 in vec3 Scale;
-
-layout(location = 0) in vec3 Position;
-layout(location = 3) in vec2 Texcoord;
+#endif
 
 #ifdef VSLayer
 out vec2 uv;

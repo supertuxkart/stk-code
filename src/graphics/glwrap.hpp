@@ -154,6 +154,9 @@ GLint LoadProgram(Types ... args)
         glBindAttribLocation(ProgramID, 4, "SecondTexcoord");
         glBindAttribLocation(ProgramID, 5, "Tangent");
         glBindAttribLocation(ProgramID, 6, "Bitangent");
+        glBindAttribLocation(ProgramID, 7, "Origin");
+        glBindAttribLocation(ProgramID, 8, "Orientation");
+        glBindAttribLocation(ProgramID, 9, "Scale");
     }
     glLinkProgram(ProgramID);
 
