@@ -1246,30 +1246,17 @@ void Kart::update(float dt)
         if (!m_flying)
         {
             float g = World::getWorld()->getTrack()->getGravity();
-            Vec3 new_gravity(0.0f, -g, 0.0f);
+            Vec3 gravity(0.0f, -g, 0.0f);
             btRigidBody *body = getVehicle()->getRigidBody();
             // If the material should overwrite the gravity,
             if (material->hasGravity() || 1)
             {
                 Vec3 normal = m_terrain_info->getNormal();
                 
-                new_gravity = normal*-g;
+                gravity = normal*-g;
                 //std::cout << gravity.x() << " "<< gravity.y() <<" " << gravity.z() <<  std::endl; 
             }
-
-            Vec3 old_gravity = body->getGravity();
-            if (old_gravity != new_gravity)
-            {
-                float alpha = 0.98f;
-                new_gravity = alpha*old_gravity + (1 - alpha)*new_gravity;
-                body->setGravity(new_gravity);
-            }
-            else
-            {
-                body->setGravity(old_gravity);
-            }
-            
-            //body->setGravity(new_gravity);
+            body->setGravity(gravity);
         }   // if !flying
         handleMaterialSFX(material);
         if     (material->isDriveReset() && isOnGround())
