@@ -22,7 +22,7 @@
 #include "achievements/achievements_manager.hpp"
 #include "config/player_manager.hpp"
 #include "config/user_config.hpp"
-#include "guiengine/dialog_queue.hpp"
+#include "guiengine/message_queue.hpp"
 #include "guiengine/screen.hpp"
 #include "online/online_profile.hpp"
 #include "online/profile_manager.hpp"
@@ -379,11 +379,7 @@ namespace Online
                             message = _("%d friends are now online.",
                                         to_notify.size());
                         }
-                        NotificationDialog *dia =
-                            new NotificationDialog(NotificationDialog::T_Friends,
-                                                   message);
-                        GUIEngine::DialogQueue::get()->pushDialog(dia, false);
-                        OnlineProfileFriends::getInstance()->refreshFriendsList();
+                        MessageQueue::add(MessageQueue::MT_FRIEND, message);
                     }
                     else if(went_offline)
                     {
@@ -422,10 +418,7 @@ namespace Online
                 {
                     message = _("You have a new friend request!");
                 }
-                NotificationDialog *dia =
-                    new NotificationDialog(NotificationDialog::T_Friends,
-                                           message);
-                GUIEngine::DialogQueue::get()->pushDialog(dia, false);
+                MessageQueue::add(MessageQueue::MT_FRIEND, message);
                 OnlineProfileFriends::getInstance()->refreshFriendsList();
             }
         }

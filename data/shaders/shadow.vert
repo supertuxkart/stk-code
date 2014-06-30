@@ -9,8 +9,8 @@ layout (std140) uniform MatrixesData
 
 uniform mat4 ModelMatrix;
 
-in vec3 Position;
-in vec2 Texcoord;
+layout(location = 0) in vec3 Position;
+layout(location = 3) in vec2 Texcoord;
 
 #ifdef VSLayer
 out vec2 uv;

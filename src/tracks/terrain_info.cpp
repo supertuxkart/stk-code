@@ -57,7 +57,8 @@ void TerrainInfo::update(const Vec3 &from)
     to.setY(-10000.0f);
 
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal, 
+               /*interpolate*/false);
 }   // update
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.
@@ -71,7 +72,8 @@ void TerrainInfo::update(const btTransform &trans, const Vec3 &offset)
     to = trans(to);
 
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal);
+    tm.castRay(from, to, &m_hit_point, &m_material, &m_normal,
+               /*interpolate*/true);
 }   // update
 //-----------------------------------------------------------------------------
 /** Update the terrain information based on the latest position.

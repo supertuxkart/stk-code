@@ -1,20 +1,25 @@
 // From http://http.developer.nvidia.com/GPUGems3/gpugems3_ch40.html
 
 uniform layout(size1x16) restrict readonly image2D source;
+uniform layout(size1x32) restrict readonly image2D depth;
 uniform layout(size1x16) volatile restrict writeonly image2D dest;
 uniform float sigma = 5.;
 
 layout (local_size_x = 8, local_size_y = 8) in;
 
 shared float local_src[8 + 2 * 8][8];
+shared float local_depth[8 + 2 * 8][8];
 
 void main()
 {
     int x = int(gl_LocalInvocationID.x), y = int(gl_LocalInvocationID.y);
     ivec2 uv = ivec2(gl_GlobalInvocationID.x, gl_GlobalInvocationID.y);
     local_src[x][y] = imageLoad(source, ivec2(uv) - ivec2(8, 0)).x;
+    local_depth[x][y] = imageLoad(depth, ivec2(uv) - ivec2(8, 0)).x;
     local_src[x + 8][y] = imageLoad(source, ivec2(uv)).x;
+    local_depth[x + 8][y] = imageLoad(depth, ivec2(uv)).x;
     local_src[x + 16][y] = imageLoad(source, ivec2(uv) + ivec2(8, 0)).x;
+    local_depth[x + 16][y] = imageLoad(depth, ivec2(uv) + ivec2(8, 0)).x;
 
     barrier();
 
@@ -23,14 +28,20 @@ void main()
     g1 = exp(-0.5 / (sigma * sigma));
     g2 = g1 * g1;
     float sum = local_src[x + 8][y] * g0;
+    float pixel_depth = local_depth[x + 8][y];
     g0 *= g1;
     g1 *= g2;
+    float tmp_weight, total_weight = g0;
     for (int j = 1; j < 8; j++) {
-        sum += local_src[8 + x - j][y] * g0;
-        sum += local_src[8 + x + j][y] * g0;
+        tmp_weight = max(0.0, 1.0 - .001 * abs(local_depth[8 + x - j][y] - pixel_depth));
+        total_weight += g0 * tmp_weight;
+        sum += local_src[8 + x - j][y] * g0 * tmp_weight;
+        tmp_weight = max(0.0, 1.0 - .001 * abs(local_depth[8 + x + j][y] - pixel_depth));
+        total_weight += g0 * tmp_weight;
+        sum += local_src[8 + x + j][y] * g0 * tmp_weight;
         g0 *= g1;
         g1 *= g2;
     }
-    imageStore(dest, ivec2(uv), vec4(sum));
+    imageStore(dest, ivec2(uv), vec4(sum / total_weight));
 }
 

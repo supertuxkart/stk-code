@@ -1,5 +1,4 @@
 #include "graphics/glwrap.hpp"
-#include "irr_driver.hpp"
 #include <fstream>
 #include <string>
 #include "config/user_config.hpp"
@@ -44,6 +43,7 @@ PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 PFNGLBLENDEQUATIONPROC glBlendEquation;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
@@ -197,6 +197,7 @@ void initGL()
     glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
     glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
     glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
+    glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glBindAttribLocation");
     glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
     glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
     glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");

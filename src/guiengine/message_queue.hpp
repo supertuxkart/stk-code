@@ -1,5 +1,6 @@
+//
 //  SuperTuxKart - a fun racing game with go-kart
-//  Copyright (C) 2013 the SuperTuxKart team
+//  Copyright (C) 2014 Joerg Henrichs
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -15,22 +16,28 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#ifndef HEADER_MESSAGE_QUEUE_HPP
+#define HEADER_MESSAGE_QUEUE_HPP
 
-// Creates a bubble (wave) effect by distorting the texture depending on time
+#include "guiengine/widgets/label_widget.hpp"
 
-uniform mat4 ModelViewProjectionMatrix;
-uniform float time;
+#include "irrString.h"
 
-layout(location = 0) in vec3 Position;
-layout(location = 3) in vec2 Texcoord;
-out vec2 uv;
+#include <queue>
+#include <vector>
 
-void main()
+using namespace irr;
+
+namespace MessageQueue
 {
-    gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
+    /** The various message type which can be shown (which might use a
+     *  different look. This type is used to sort the messages, so it is
+     *  important that messages that need to be shown as early as possible
+     *  will be listed last (i.e. have highest priority). */
+    enum MessageType {MT_FRIEND, MT_ACHIEVEMENT};
 
-    float delta_x = cos(time*3.0) * sin( 4.0 * Texcoord.x * 6.28318531 );
-    float delta_y = cos(time*2.0) * sin( 3.0 * Texcoord.y * 6.28318531 );
+    void add(MessageType mt, const core::stringw &message);
+    void update(float dt);
 
-    uv = Texcoord + vec2(0.02*delta_x, 0.02*delta_y);
-}
+};   // namespace GUIEngine
+#endif

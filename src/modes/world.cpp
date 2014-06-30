@@ -628,7 +628,7 @@ void World::resetAllKarts()
     {
         if (count++ > 100)
         {
-            Log::error("World", "Infitine loop waiting for all_finished?");
+            Log::error("World", "Infinite loop waiting for all_finished?");
             break;
         }
         m_physics->update(1.f/60.f);
