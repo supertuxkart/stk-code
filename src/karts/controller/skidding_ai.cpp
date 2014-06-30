@@ -2022,7 +2022,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     for (unsigned int j = 0; j < QuadGraph::get()->getNumberOfUnrolledQuads(); j++)
     {
         if (m_successor_index[current] != 0)
-            future_successor_idx = m_successor_index[m_track_node];
+            future_successor_idx = m_successor_index[current];
        
         current = m_next_node_index[current];
     }
