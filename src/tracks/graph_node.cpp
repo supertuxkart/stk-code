@@ -208,9 +208,18 @@ void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, uns
 {
     
     const Quad& unrolled = getUnrolledQuad(fork_number,quad_idx);
-    Vec3 upper_center = 0.5f*(unrolled[2] + unrolled[3]),
-         lower_center = 0.5f*(unrolled[0] + unrolled[1]);
-    // center_line is from A to B, or lower_center to upper_center
+    Vec3 upper_center, lower_center;
+    if (!QuadGraph::get()->isReverse())
+    {
+            upper_center = 0.5f*(unrolled[2] + unrolled[3]),
+            lower_center = 0.5f*(unrolled[0] + unrolled[1]);
+    }
+    else
+    {
+            upper_center = 0.5f*(unrolled[0] + unrolled[1]),
+            lower_center = 0.5f*(unrolled[2] + unrolled[3]);
+    }
+        // center_line is from A to B, or lower_center to upper_center
     core::vector3df A = lower_center.toIrrVector(), B = upper_center.toIrrVector();
     result->setX(((B - A).crossProduct(xyz.toIrrVector() - A)).getLength() / (B - A).getLength());
 
@@ -308,22 +317,43 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int fork_number, int
   
     //m.setRotationCenter(next_quad_to_push.getCenter().toIrrVector(),
     //    ((next_quad_to_push.getCenter() - 0.5f*(next_quad_to_push[0] + next_quad_to_push[1])) + 0.5f*(last_pushed_quad[2] + last_pushed_quad[3)));
+    
     for (unsigned int i = 0; i < 4; i++)
         m.rotateVect(new_points[i], next_quad_to_push[i].toIrrVector());
     
-    Vec3 endEdge = (last_pushed_quad[2] - last_pushed_quad[3]);
-    Vec3 beginEdge = (new_points[1] - new_points[0]);
-    
+    Vec3 endEdge, beginEdge;
+    if (!QuadGraph::get()->isReverse())
+    {
+         endEdge = (last_pushed_quad[2] - last_pushed_quad[3]);
+         beginEdge = (new_points[1] - new_points[0]);
+    }
+    else
+    {
+         endEdge = (last_pushed_quad[1] - last_pushed_quad[0]);
+         beginEdge = (new_points[2] - new_points[3]);
+    }
+
     m.buildRotateFromTo(beginEdge.toIrrVector(), endEdge.toIrrVector());
     for (unsigned int i = 0; i < 4; i++) 
         m.rotateVect(new_points[i]);
     
+
+
     // Next translate the new quad to be pushed to the correct position infront
     // of the last quad in the vector of unrolled quads
-    Vec3 lower_center = 0.5f*(new_points[0] + new_points[1]);
-    Vec3 upper_center = 0.5f*(last_pushed_quad[2] + last_pushed_quad[3]);
+    Vec3 lower_center, upper_center;
+    if (!QuadGraph::get()->isReverse())
+    {
+        lower_center = 0.5f*(new_points[0] + new_points[1]);
+        upper_center = 0.5f*(last_pushed_quad[2] + last_pushed_quad[3]);
+    }
+    else
+    {
+        lower_center = 0.5f*(new_points[2] + new_points[3]);
+        upper_center = 0.5f*(last_pushed_quad[0] + last_pushed_quad[1]);
+    }
     m.setTranslation((upper_center-lower_center).toIrrVector());
-    //m.setTranslation((last_pushed_quad[3] - next_quad_to_push[0]).toIrrVector());
+    
     for (unsigned int i = 0; i < 4; i++)
         m.translateVect(new_points[i]);
     
