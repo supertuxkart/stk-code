@@ -356,10 +356,7 @@ float AIBaseController::steerToPoint(const Vec3 &point)
 
     // First translate and rotate the point the AI is aiming
     // at into the kart's local coordinate system.
-    btQuaternion q(btVector3(0,1,0), -m_kart->getHeading());
-    Vec3 p  = point - m_kart->getXYZ();
-    Vec3 lc = quatRotate(q, p);
-    
+    Vec3 lc;
     btTransform trans = m_kart->getTrans().inverse();
     lc = trans(point);
 
