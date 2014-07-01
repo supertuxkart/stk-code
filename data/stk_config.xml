@@ -475,6 +475,38 @@
 	 <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
 	     fade-out-time="1.0"  />
 
+	 <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
+	          decrease: multiplicative decrease of skidding factor in each frame.
+	          max: maximum skidding factor = maximum increase of steering angle.
+	          time-till-max: Time till maximum skidding is reached.
+	          visual: Additional graphical rotation of kart. The graphical rotation
+	            of the kart also determines the direction the kart is driving to
+	            when skidding is stopped.
+	          visual-time: How long it takes for the visual skid to reach maximum.
+	          revert-visual-time: how long it takes when stopping a skid to revert
+	            the visual skid and bring visuals and physics in sync again.
+	          angular-velocity: Angular velocity to be used for the kart when skidding.
+	          min-speed: Minimum speed a kart must have before it can skid. Must be
+	            >0, otherwise the kart can skid at the start of the race.
+	          time-till-bonus: How long a kart needs to skid in order to get a bonus.
+	          bonus-force: A speedup applied to the kart whick skidded for a while.
+	          bonus-time: How long the bonus-force is applied.
+	          bonus-force: Additional engine force (this is used to offset the fact
+	            that turning after skidding (e.g. to correct direction) often uses
+	            up the skid bonus).
+	          post-skid-rotate-factor: a factor to be used to determine how much 
+	            the chassis of a kart should rotate to match the graphical view. 
+	            A factor of 1 is identical, a smaller factor will rotate the kart
+	            less (which might  feel better).   
+	          physical-jump-time: Time for a physical jump at the beginning of a skid.
+	          graphical-jump-time: Time for a graphics-only jump at the beginning
+	            of a skid.
+	          reduce-turn-min/max: The steering done by the controller (which is in
+	            [-1,1]) is mapped to [reduce-turn-min, reduce-turn-max] when skidding
+	            is active (for left turn, right turn will use [-max, -min]). The 
+	            effect is that while you skid (say left) you can adjust the direction
+	            of the turn the kart is doing somewhat by steering to the left and right,
+	            but you will always keep on doing a left turn, just more or less. -->
      <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
 	     visual="1.25" visual-time="0.7" revert-visual-time="0.7"
 	     min-speed="10"  time-till-bonus="1.0 3.0" 
