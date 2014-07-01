@@ -621,32 +621,13 @@
 			 
 	         <startup time   = "0.3 0.5"
 	             boost  = "8.5 4.5"  />
-
-			 <rescue vert-offset="0.0" time="1.2" height="2"/>
 	  
 		     <nitro engine-force="350" consumption="1" small-container="1" big-container="3"
 		         max-speed-increase="4.5" duration="1.5" fade-out-time="2.5" max="20"/>
-
-			 <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
-
-			 <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-			     fade-out-time="1.0"  />
-
-			 <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-			     visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-			     min-speed="10"  time-till-bonus="1.0 3.0" 
-			     bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-			     bonus-force="250 350"
-			     physical-jump-time="0" graphical-jump-time="0.4"
-			     post-skid-rotate-factor="1"
-			     reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 			
 			 <slipstream length="11" width="2" collect-time="1.5" use-time="2.5"
 			     add-power="3.2" min-speed="9"
 			     max-speed-increase="4" duration="1.2" fade-out-time="2.3"/>
-
-		     <swatter duration="10" distance="3" squash-duration="5" 
-			     squash-slowdown="0.5"/>
 		    
 		     <turn turn-radius="0:3.0 10:10.0 25:20.0 45:40.0" 
 			     time-full-steer ="0:0.15 0.5:0.15 0.5:0.25 1.0:0.25"
@@ -658,10 +639,6 @@
 			 <gear switch-ratio="0.20 0.55 1" power-increase="5 4 3"/>
 
 			 <mass value="195"/>
-			  
-		     <plunger band-max-length="50" band-force="1500" band-duration="1"
-		         band-speed-increase="7" band-fade-out-time="3"
-		         in-face-time="3 4 4.5 4.5"/>
 
 			 <explosion time="2.1" radius="5.5" 
 			     invulnerability-time="7" /> 
@@ -672,32 +649,13 @@
 			 
 	         <startup time   = "0.3 0.5"
 	             boost  = "4.2 2.6"  />
-
-   			  <rescue vert-offset="0.0" time="1.2" height="2"/>
 			  
 		      <nitro engine-force="425" consumption="1.4" small-container="1" big-container="3"
 		            max-speed-increase="5" duration="1.2" fade-out-time="2" max="20"/>
-
-    		  <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
-
-			  <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-			      fade-out-time="1.0"  />
-
-			  <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-			      visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-			      min-speed="10"  time-till-bonus="1.0 3.0" 
-	              bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-			      bonus-force="250 350"
-			      physical-jump-time="0" graphical-jump-time="0.4"
-			      post-skid-rotate-factor="1"
-			      reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 					
 			  <slipstream length="10" width="2" collect-time="2" use-time="3.3"
                   add-power="2.8" min-speed="10"
 				  max-speed-increase="5" duration="0.9" fade-out-time="1.6"/>
-
-		      <swatter duration="10" distance="3" squash-duration="5" 
-			      squash-slowdown="0.5"/>
 				      
 		      <turn turn-radius="0:4.5 10:16.0 25:30.0 45:60.0"
 		            time-full-steer ="0:0.17 0.5:0.17 0.5:0.28 1.0:0.28" 
@@ -709,10 +667,6 @@
 			  <gear switch-ratio="0.30 0.7 1.0" power-increase="2.2 2.2 2.5"/>
 
 			  <mass value="250"/> 		
-			  
-		      <plunger band-max-length="50" band-force="1500" band-duration="1"
-		          band-speed-increase="7" band-fade-out-time="3"
-		          in-face-time="3 4 4.5 4.5"/>
 
 		     <explosion time="1.8" radius="5" 
 			      invulnerability-time="6" />
@@ -723,25 +677,9 @@
 			 
 	         <startup time   = "0.3 0.5"
 	               boost  = "3.8 2"  />
-
-	  		 <rescue vert-offset="0.0" time="1.2" height="2"/>
 		  
 			 <nitro engine-force="600" consumption="2" small-container="1" big-container="3"
 			       max-speed-increase="8" duration="0.7" fade-out-time="1.3" max="20"/>
-
-	   		 <bubblegum time="1" speed-fraction="0.3" torque="500" fade-in-time="0.01"/>
-
-			 <zipper time="3.5" force="250.0" speed-gain="4.5" max-speed-increase="15"
-			       fade-out-time="1.0"  />
-
-			 <skid increase="1.05" decrease="0.95" max="2.5" time-till-max="0.5"
-			       visual="1.25" visual-time="0.7" revert-visual-time="0.7"
-			       min-speed="10"  time-till-bonus="1.0 3.0" 
-			       bonus-speed="4.5 6.5" bonus-time="3.0 4.0" 
-			       bonus-force="250 350"
-			       physical-jump-time="0" graphical-jump-time="0.4"
-			       post-skid-rotate-factor="1"
-			       reduce-turn-min="0.2" reduce-turn-max="0.8"/>
 				
 			 <slipstream length="8.5" width="2" collect-time="2" use-time="4"
 			       add-power="2.7" min-speed="10.5"
@@ -760,10 +698,6 @@
 			 <gear switch-ratio="0.45 0.70 1" power-increase="1.5 1.7 2.5"/>
 
 		     <mass value="350"/>
-			  
-		     <plunger band-max-length="50" band-force="1500" band-duration="1"
-		           band-speed-increase="7" band-fade-out-time="3"
-		           in-face-time="3 4 4.5 4.5"/>
 
 			 <explosion time="1.5" radius="4"
 			       invulnerability-time="6" />
