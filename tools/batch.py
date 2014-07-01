@@ -16,11 +16,11 @@ avg_speed = {}
 avg_top = {}
 total_rescued = {}
         
-tests = len(listdir('../batch'))-1    
-for file in listdir('../batch'):
+tests = len(listdir('../../batch'))-1    
+for file in listdir('../../batch'):
     if (file == '.DS_Store'):
         continue
-    f = open('../batch/'+file,'r')
+    f = open('../../batch/'+file,'r')
     
     
     '''
