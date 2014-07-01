@@ -50,6 +50,13 @@ STKConfig::~STKConfig()
 
     if(m_default_kart_properties)
         delete m_default_kart_properties;
+
+    for(std::map<std::string, KartProperties*>::iterator it = m_kart_properties.begin();
+            it != m_kart_properties.end(); ++it)
+    {
+        if (it->second)
+            delete it->second;
+    }
 }   // ~STKConfig
 
 //-----------------------------------------------------------------------------
@@ -380,8 +387,8 @@ void STKConfig::getAllData(const XMLNode * root)
         throw std::runtime_error(msg.str());
     }
     m_default_kart_properties->getAllData(node);
+    m_default_kart_properties->getProperties(node);
     const XMLNode *types = node->getNode("kart-type");
-    m_default_kart_properties->getProperties(types->getNode("default"));
 
     for (int i = 0; i < types->getNumNodes(); ++i)
     {
