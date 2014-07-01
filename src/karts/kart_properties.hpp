@@ -392,7 +392,6 @@ public:
     float getStartupBoost   () const;
     bool  isInGroup         (const std::string &group) const;
     bool operator<(const KartProperties &other) const;
-    void getProperties      (const XMLNode * root);
 
     // ------------------------------------------------------------------------
     /** Returns the (maximum) speed for a given turn radius.
