@@ -312,13 +312,7 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
     root->get("shadow-y-offset",   &m_shadow_y_offset  );
 
-    if(const XMLNode *props_group = root->getNode("properties")) {
-        props_group->get("group",  &m_kart_type        );
-    }
-    else
-    {
-        root->get("type",     &m_kart_type        );
-    }
+    root->get("type",     &m_kart_type        );
 
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);

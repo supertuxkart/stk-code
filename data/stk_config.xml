@@ -145,8 +145,7 @@
   <!-- Default values for all karts
        ============================ -->
   <general-kart-defaults>
-	<properties group= "default" />
-  
+	    
     <!-- Camera: Distance between kart and camera. 
          forward-up-angle: Angle between camera and plane of kart (pitch) 
                  when the camera is pointing forward
@@ -416,12 +415,6 @@
     <collision impulse-type="normal" 
                impulse="3000" impulse-time="0.1" terrain-impulse="8000"
                restitution="1.0" bevel-factor="0.5 0.0 0.5" />
-			   
-	<!-- properties gropu
-	     field that contains the properties group the kart belongs to
-	     (light/medium/heavy). Those groups have specific kart
-	     properties to have different karts -->		   
-  	<properties group = "default"/>
 			 
      <!-- If a kart starts within the specified time after 'go',
           it receives the corresponding bonus from 'boost'. Those
@@ -616,9 +609,7 @@
 	     invulnerability-time="6" /> 
 		 
 	 <kart-type>
-		 <light>
-			 <properties group = "light"/>
-			 
+		 <light>			 
 	         <startup time   = "0.3 0.5"
 	             boost  = "8.5 4.5"  />
 	  
@@ -644,9 +635,7 @@
 			     invulnerability-time="7" /> 
 		 </light>
 		 
-		 <medium>
-			 <properties group = "medium"/>
-			 
+		 <medium>			 
 	         <startup time   = "0.3 0.5"
 	             boost  = "4.2 2.6"  />
 			  
@@ -672,9 +661,7 @@
 			      invulnerability-time="6" />
 		 </medium>
 		 
-		 <heavy>
-			 <properties group = "heavy"/>
-			 
+		 <heavy>			 
 	         <startup time   = "0.3 0.5"
 	               boost  = "3.8 2"  />
 		  
