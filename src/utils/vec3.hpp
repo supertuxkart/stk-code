@@ -51,7 +51,7 @@ public:
     inline Vec3(const btVector3& a)        : btVector3(a)                {}
     // ------------------------------------------------------------------------
     /** Empty constructor. */
-    inline Vec3()                          : btVector3()                 {}
+    inline Vec3()                          : btVector3(0, 0, 0)          {}
     // ------------------------------------------------------------------------
     /** Creates a 3d vector from three scalars. */
     inline Vec3(float x, float y, float z) : btVector3(x,y,z)            {}

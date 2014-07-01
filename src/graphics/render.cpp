@@ -186,7 +186,7 @@ void IrrDriver::renderGLSL(float dt)
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
         {
-            FrameBuffer *fbo = m_post_processing->render(camnode);
+            FrameBuffer *fbo = m_post_processing->render(camnode, true);
 
             if (irr_driver->getNormals())
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
@@ -837,13 +837,17 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         {
             core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
                 core::vector3df(0, 30, 0));
-            SunCamViewMatrix.transformBoxEx(trackbox);
-            core::matrix4 tmp_matrix;
-            tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X, trackbox.MaxEdge.X,
-                trackbox.MaxEdge.Y, trackbox.MinEdge.Y,
-                30, trackbox.MaxEdge.Z);
-            m_suncam->setProjectionMatrix(tmp_matrix, true);
-            m_suncam->render();
+            if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
+                trackbox.MinEdge.Y != trackbox.MaxEdge.Y)
+            {
+                SunCamViewMatrix.transformBoxEx(trackbox);
+                core::matrix4 tmp_matrix;
+                tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X, trackbox.MaxEdge.X,
+                    trackbox.MaxEdge.Y, trackbox.MinEdge.Y,
+                    30, trackbox.MaxEdge.Z);
+                m_suncam->setProjectionMatrix(tmp_matrix, true);
+                m_suncam->render();
+            }
             rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW);
         }
         rh_extend = core::vector3df(128, 64, 128);

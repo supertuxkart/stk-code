@@ -342,19 +342,28 @@ void RaceGUI::drawGlobalMiniMap()
     // arenas currently don't have a map.
     if(world->getTrack()->isArena() || world->getTrack()->isSoccer()) return;
 
-    const video::ITexture *mini_map = world->getTrack()->getMiniMap();
+    const video::ITexture *old_rtt_mini_map = world->getTrack()->getOldRttMiniMap();
+    const FrameBuffer* new_rtt_mini_map = world->getTrack()->getNewRttMiniMap();
 
     int upper_y = UserConfigParams::m_height - m_map_bottom - m_map_height;
     int lower_y = UserConfigParams::m_height - m_map_bottom;
 
-    if (mini_map != NULL)
+    core::rect<s32> dest(m_map_left, upper_y,
+                         m_map_left + m_map_width, lower_y);
+
+    if (old_rtt_mini_map != NULL)
     {
-        core::rect<s32> dest(m_map_left,               upper_y,
-                             m_map_left + m_map_width, lower_y);
         core::rect<s32> source(core::position2di(0, 0),
-                               mini_map->getOriginalSize());
-        draw2DImage(mini_map, dest, source,
-                                                  NULL, NULL, true);
+                               old_rtt_mini_map->getOriginalSize());
+        draw2DImage(old_rtt_mini_map, dest, source,
+                    NULL, NULL, true);
+    }
+    else if (new_rtt_mini_map != NULL)
+    {
+        core::rect<s32> source(0, 0, new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight());
+        draw2DImageFromRTT(new_rtt_mini_map->getRTT()[0],
+            new_rtt_mini_map->getWidth(), new_rtt_mini_map->getHeight(),
+            dest, source, NULL, video::SColor(127, 255, 255, 255), true);
     }
 
     for(unsigned int i=0; i<world->getNumKarts(); i++)

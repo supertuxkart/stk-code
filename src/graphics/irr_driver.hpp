@@ -716,8 +716,11 @@ public:
     unsigned UpdateLightsInfo(scene::ICameraSceneNode * const camnode, float dt);
     void computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height);
 
-    // --------------------- RTT --------------------
+    // --------------------- OLD RTT --------------------
     /**
+      * THIS IS THE OLD OPENGL 1 RTT PROVIDER, USE THE SHADER-BASED
+      * RTT FOR NEW DEVELOPMENT
+      *
       * Class that provides RTT (currently, only when no other 3D rendering
       * in the main scene is required)
       * Provides an optional 'setupRTTScene' method to make it quick and easy

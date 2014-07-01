@@ -727,7 +727,7 @@ void PostProcessing::applyMLAA()
 
 // ----------------------------------------------------------------------------
 /** Render the post-processed scene */
-FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
+FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, bool isRace)
 {
     IVideoDriver * const drv = irr_driver->getVideoDriver();
 
@@ -745,7 +745,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
-    if (UserConfigParams::m_dof)
+    if (isRace && UserConfigParams::m_dof)
     {
         PROFILER_PUSH_CPU_MARKER("- DoF", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_DOF));
@@ -761,7 +761,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
         if (World::getWorld() != NULL)
             hasgodrays = World::getWorld()->getTrack()->hasGodRays();
 
-        if (UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
+        if (isRace && UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
             glEnable(GL_DEPTH_TEST);
             // Grab the sky
@@ -827,7 +827,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     {
         PROFILER_PUSH_CPU_MARKER("- Bloom", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_BLOOM));
-        if (UserConfigParams::m_bloom)
+        if (isRace && UserConfigParams::m_bloom)
         {
             glClear(GL_STENCIL_BUFFER_BIT);
             glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_FALSE);
@@ -879,7 +879,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode)
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        if (UserConfigParams::m_motionblur && m_any_boost && World::getWorld() != NULL) // motion blur
+        if (isRace && UserConfigParams::m_motionblur && m_any_boost && World::getWorld() != NULL) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);
