@@ -520,6 +520,8 @@ void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
+    if (!mesh.textures[0])
+        const_cast<GLMesh &>(mesh).textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     if (irr_driver->getLightViz())
