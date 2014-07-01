@@ -1,18 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
     <div x="2%" y="2%" width="98%" height="96%" layout="vertical-row" >
-    
+
         <icon id="logo" align="center" proportion="4" width="100%" icon="gui/logo_slim.png"/>
-        
+
         <header I18N="Title in credits screen" text="Credits" width="100%" />
-        
+
         <box id="animated_area" width="100%" proportion="10" padding="0">
-        
         </box>
-
     </div>
-
 </stkgui>

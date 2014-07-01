@@ -56,7 +56,7 @@ void main(void)
     vec3 norm = -normalize(cross(ddy, ddx));
 
     float r = radius / FragPos.z;
-    float phi = 30. * (x ^ y) + 10. * x * y;
+    float phi = 3. * (x ^ y) + x * y;
     float bl = 0.0;
     float m = log2(r) + 6 + log2(invSamples);
 

@@ -254,7 +254,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     else
     {
         m_mesh = irr_driver->getMesh(model_name);
-
+        
         if (tangent)
         {
             scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
@@ -368,6 +368,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         m_node = irr_driver->addMesh(m_mesh, parent);
         m_frame_start = 0;
         m_frame_end = 0;
+
+        if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+            World::getWorld()->getTrack()->handleAnimatedTextures(m_node, *xml_node);
     }
 //#ifdef DEBUG
 //    std::string debug_name = model_name+" (track-object)";

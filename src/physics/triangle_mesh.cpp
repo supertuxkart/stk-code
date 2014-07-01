@@ -274,12 +274,16 @@ btVector3 TriangleMesh::getInterpolatedNormal(unsigned int index,
  *  \param xyz The position in world where the ray hit.
  *  \param material The material of the mesh that was hit.
  *  \param normal The intrapolated normal at that position.
+ *  \param interpolate_normal If true, the returned normal is the interpolated
+ *         based on the three normals of the triangle and the location of the
+ *         hit point (which is more compute intensive, but results in much
+ *         smoother results).
  *  \return True if a triangle was hit, false otherwise (and no output
  *          variable will be set.
  */
 bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
                            btVector3 *xyz, const Material **material,
-                           btVector3 *normal) const
+                           btVector3 *normal, bool interpolate_normal) const
 {
     if(!m_collision_shape)
     {
@@ -300,26 +304,25 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
 
     btCollisionWorld::ClosestRayResultCallback result(from, to);
 
-
+    /** A special ray result class that stores the index of the triangle 
+     *  that was hit. */
     class MaterialRayResult : public btCollisionWorld::ClosestRayResultCallback
     {
     public:
-        const Material* m_material;
-        const TriangleMesh *m_this;
+        /** Stores the index of the triangle that was hit. */
+        int m_index;
         // --------------------------------------------------------------------
         MaterialRayResult(const btVector3 &p1, const btVector3 &p2,
                           const TriangleMesh *me)
                         : btCollisionWorld::ClosestRayResultCallback(p1,p2)
         {
-            m_material = NULL;
-            m_this     = me;
+            m_index = -1;;
         }   // MaterialRayResult
         // --------------------------------------------------------------------
         virtual btScalar addSingleResult(btCollisionWorld::LocalRayResult& rayResult,
                                          bool normalInWorldSpace)
         {
-            m_material =
-                m_this->getMaterial(rayResult.m_localShapeInfo->m_triangleIndex);
+            m_index = rayResult.m_localShapeInfo->m_triangleIndex;
             return btCollisionWorld::ClosestRayResultCallback
                     ::addSingleResult(rayResult, normalInWorldSpace);
         }   // AddSingleResult
@@ -335,13 +338,23 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
                                                        : m_body,
                                     m_collision_shape, world_trans,
                                     ray_callback);
+    // Get the index of the triangle hit
+    int index = ray_callback.m_index;
     if(ray_callback.hasHit())
     {
         *xyz      = ray_callback.m_hitPointWorld;
-        *material = ray_callback.m_material;
+        *material = m_triangleIndex2Material[index];
+
         if(normal)
         {
-            *normal   = ray_callback.m_hitNormalWorld;
+            // If requested interpolate the normal. I.e. instead of using
+            // the normal of the triangle interpolate the normal at the
+            // hit position based on the three normals of the triangle.
+            if(interpolate_normal)
+                *normal = getInterpolatedNormal(ray_callback.m_index, 
+                                                ray_callback.m_hitPointWorld);
+            else
+                *normal = ray_callback.m_hitNormalWorld;
             normal->normalize();
         }
     }

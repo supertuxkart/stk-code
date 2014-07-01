@@ -48,6 +48,7 @@
 #include "utils/profiler.hpp"
 
 #include <algorithm>
+#include <limits>
 
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
@@ -196,6 +197,10 @@ void IrrDriver::renderGLSL(float dt)
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
                 glViewport(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
                 m_post_processing->renderPassThrough(m_rtts->getRSM().getRTT()[0]);
+            }
+            else if (irr_driver->getShadowViz())
+            {
+                renderShadowsDebug();
             }
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
@@ -535,7 +540,7 @@ void IrrDriver::renderSolidFirstPass()
                 GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
                 glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
             }
-            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
+            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
             if (!mesh.textures[0])
             {
                 GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
@@ -549,7 +554,7 @@ void IrrDriver::renderSolidFirstPass()
             const GLMesh &mesh = *GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i];
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::ObjectRefPass1Shader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
+            draw<MeshShader::ObjectRefPass1Shader>(mesh, mesh.vao, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
         }
         glUseProgram(MeshShader::NormalMapShader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
@@ -560,7 +565,7 @@ void IrrDriver::renderSolidFirstPass()
             setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
             compressTexture(mesh.textures[0], true);
             setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::NormalMapShader>(mesh, mesh.vao_first_pass, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
+            draw<MeshShader::NormalMapShader>(mesh, mesh.vao, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
         }
     }
 }
@@ -648,7 +653,30 @@ void IrrDriver::renderTransparent()
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glDisable(GL_CULL_FACE);
+    TransparentMeshes<TM_DEFAULT>::reset();
+    TransparentMeshes<TM_ADDITIVE>::reset();
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
+
+    if (World::getWorld() && World::getWorld()->isFogEnabled())
+    {
+        glUseProgram(MeshShader::TransparentFogShader::Program);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
+            drawTransparentFogObject(*TransparentMeshes<TM_DEFAULT>::MeshSet[i], TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix);
+        glBlendFunc(GL_ONE, GL_ONE);
+        for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
+            drawTransparentFogObject(*TransparentMeshes<TM_ADDITIVE>::MeshSet[i], TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix);
+    }
+    else
+    {
+        glUseProgram(MeshShader::TransparentShader::Program);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+        for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
+            drawTransparentObject(*TransparentMeshes<TM_DEFAULT>::MeshSet[i], TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix);
+        glBlendFunc(GL_ONE, GL_ONE);
+        for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
+            drawTransparentObject(*TransparentMeshes<TM_ADDITIVE>::MeshSet[i], TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix);
+    }
 }
 
 void IrrDriver::renderParticles()
@@ -662,8 +690,6 @@ void IrrDriver::renderParticles()
 
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
-    static int tick = 0;
-    tick++;
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
@@ -707,6 +733,34 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             camnode->setFarValue(FarValues[i]);
             camnode->setNearValue(NearValues[i]);
             camnode->render();
+            const scene::SViewFrustum *frustrum = camnode->getViewFrustum();
+            float tmp[24] = {
+                frustrum->getFarLeftDown().X,
+                frustrum->getFarLeftDown().Y,
+                frustrum->getFarLeftDown().Z,
+                frustrum->getFarLeftUp().X,
+                frustrum->getFarLeftUp().Y,
+                frustrum->getFarLeftUp().Z,
+                frustrum->getFarRightDown().X,
+                frustrum->getFarRightDown().Y,
+                frustrum->getFarRightDown().Z,
+                frustrum->getFarRightUp().X,
+                frustrum->getFarRightUp().Y,
+                frustrum->getFarRightUp().Z,
+                frustrum->getNearLeftDown().X,
+                frustrum->getNearLeftDown().Y,
+                frustrum->getNearLeftDown().Z,
+                frustrum->getNearLeftUp().X,
+                frustrum->getNearLeftUp().Y,
+                frustrum->getNearLeftUp().Z,
+                frustrum->getNearRightDown().X,
+                frustrum->getNearRightDown().Y,
+                frustrum->getNearRightDown().Z,
+                frustrum->getNearRightUp().X,
+                frustrum->getNearRightUp().Y,
+                frustrum->getNearRightUp().Z,
+            };
+            memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
             const core::aabbox3df smallcambox = camnode->
                 getViewFrustum()->getBoundingBox();
             core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
@@ -716,8 +770,35 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             core::aabbox3df box = smallcambox;
             box = box.intersect(trackbox);
 
-
-            SunCamViewMatrix.transformBoxEx(trackbox);
+            float xmin =  std::numeric_limits<float>::infinity();
+            float xmax = -std::numeric_limits<float>::infinity();
+            float ymin =  std::numeric_limits<float>::infinity();
+            float ymax = -std::numeric_limits<float>::infinity();
+            float zmin =  std::numeric_limits<float>::infinity();
+            float zmax = -std::numeric_limits<float>::infinity();
+            const vector3df vectors[] =
+            {
+                frustrum->getFarLeftDown(),
+                frustrum->getFarLeftUp(),
+                frustrum->getFarRightDown(),
+                frustrum->getFarRightUp(),
+                frustrum->getNearLeftDown(),
+                frustrum->getNearLeftUp(),
+                frustrum->getNearRightDown(),
+                frustrum->getNearRightUp()
+            };
+            for (unsigned j = 0; j < 8; j++)
+            {
+                vector3df vector;
+                SunCamViewMatrix.transformVect(vector, vectors[j]);
+                xmin = MIN2(xmin, vector.X);
+                xmax = MAX2(xmax, vector.X);
+                ymin = MIN2(ymin, vector.Y);
+                ymax = MAX2(ymax, vector.Y);
+                zmin = MIN2(zmin, vector.Z);
+                zmax = MAX2(zmax, vector.Z);
+            }
+/*            SunCamViewMatrix.transformBoxEx(trackbox);
             SunCamViewMatrix.transformBoxEx(box);
 
             core::vector3df extent = box.getExtent();
@@ -727,12 +808,12 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
             // Snap to texels
             const float units_per_w = w / 1024;
-            const float units_per_h = h / 1024;
+            const float units_per_h = h / 1024;*/
 
-            float left = box.MinEdge.X;
-            float right = box.MaxEdge.X;
-            float up = box.MaxEdge.Y;
-            float down = box.MinEdge.Y;
+            float left = xmin;
+            float right = xmax;
+            float up = ymin;
+            float down = ymax;
 
             core::matrix4 tmp_matrix;
 
@@ -745,15 +826,26 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             }
 
             tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-                up, down,
-                30, z);
+                down, up,
+                30, zmax);
             m_suncam->setProjectionMatrix(tmp_matrix, true);
             m_suncam->render();
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
         }
-        if ((tick % 100) == 2)
-            rsm_matrix = sun_ortho_matrix[3];
+
+        {
+            core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+                core::vector3df(0, 30, 0));
+            SunCamViewMatrix.transformBoxEx(trackbox);
+            core::matrix4 tmp_matrix;
+            tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X, trackbox.MaxEdge.X,
+                trackbox.MaxEdge.Y, trackbox.MinEdge.Y,
+                30, trackbox.MaxEdge.Z);
+            m_suncam->setProjectionMatrix(tmp_matrix, true);
+            m_suncam->render();
+            rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW);
+        }
         rh_extend = core::vector3df(128, 64, 128);
         core::vector3df campos = camnode->getAbsolutePosition();
         core::vector3df translation(8 * floor(campos.X / 8), 8 * floor(campos.Y / 8), 8 * floor(campos.Z / 8));
@@ -820,8 +912,38 @@ void IrrDriver::renderShadows()
             continue;
         compressTexture(mesh.textures[0], true);
         setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        draw<MeshShader::RSMShader>(mesh, mesh.vao_rsm_pass, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
+        draw<MeshShader::RSMShader>(mesh, mesh.vao, rsm_matrix, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], 0);
     }
+}
+
+static void renderWireFrameFrustrum(float *tmp, unsigned i)
+{
+    glUseProgram(MeshShader::ViewFrustrumShader::Program);
+    glBindVertexArray(MeshShader::ViewFrustrumShader::frustrumvao);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::frustrumvbo);
+
+    glBufferSubData(GL_ARRAY_BUFFER, 0, 8 * 3 * sizeof(float), (void *)tmp);
+    MeshShader::ViewFrustrumShader::setUniforms(video::SColor(255, 0, 255, 0), i);
+    glDrawElements(GL_LINES, 24, GL_UNSIGNED_INT, 0);
+}
+
+
+void IrrDriver::renderShadowsDebug()
+{
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glViewport(0, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 0);
+    renderWireFrameFrustrum(m_shadows_cam[0], 0);
+    glViewport(UserConfigParams::m_width / 2, UserConfigParams::m_height / 2, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 1);
+    renderWireFrameFrustrum(m_shadows_cam[1], 1);
+    glViewport(0, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 2);
+    renderWireFrameFrustrum(m_shadows_cam[2], 2);
+    glViewport(UserConfigParams::m_width / 2, 0, UserConfigParams::m_width / 2, UserConfigParams::m_height / 2);
+    m_post_processing->renderTextureLayer(m_rtts->getShadowDepthTex(), 3);
+    renderWireFrameFrustrum(m_shadows_cam[3], 3);
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 // ----------------------------------------------------------------------------
