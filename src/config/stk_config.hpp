@@ -30,6 +30,7 @@
 
 #include <vector>
 #include <string>
+#include <map>
 
 class KartProperties;
 class MusicInformation;
@@ -47,6 +48,7 @@ class STKConfig : public NoCopy
 protected:
     /** Default kart properties. */
     KartProperties  *m_default_kart_properties;
+    std::map<std::string, KartProperties*> m_kart_properties;
 
 public:
     /** What to do if a kart already has a powerup when it hits a bonus box:
@@ -170,6 +172,9 @@ public:
     /** Returns the default kart properties for each kart. */
     const KartProperties &
          getDefaultKartProperties() const {return *m_default_kart_properties; }
+
+    const KartProperties &
+         getKartProperties(std::string type) { return *m_kart_properties[type]; }
 }
 ;   // STKConfig
 
