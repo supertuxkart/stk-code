@@ -338,7 +338,7 @@ private:
     bool                 m_distortviz;
     /** Performance stats */
     unsigned             m_last_light_bucket_distance;
-    unsigned             object_count[PASS_COUNT];
+    unsigned             object_count[PASS_COUNT] = {};
     u32                  m_renderpass;
     u32                  m_lensflare_query;
     bool                 m_query_issued;
