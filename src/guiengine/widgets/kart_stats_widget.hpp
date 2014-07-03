@@ -63,7 +63,7 @@ class KartStatsWidget : public Widget
         {
             SKILL_MASS,
             SKILL_SPEED,
-            SKILL_ACCEL,
+            SKILL_POWER,
             SKILL_COUNT
         };
 
