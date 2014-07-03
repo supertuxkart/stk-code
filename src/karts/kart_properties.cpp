@@ -781,14 +781,15 @@ float KartProperties::getStartupBoost() const
     return 0;
 }   // getStartupBoost
 
+// ----------------------------------------------------------------------------
 const float KartProperties::getAvgPower() const
 {
-    float avg = 0.0;
-    for (int i = 0; i < m_gear_power_increase.size(); ++i)
+    float sum = 0.0;
+    for (unsigned int i = 0; i < m_gear_power_increase.size(); ++i)
     {
-        avg += (m_gear_power_increase[i]*m_max_speed[0])/m_gear_power_increase.size();
+        sum += m_gear_power_increase[i]*m_max_speed[0];
     }
-    return avg;
+    return sum/m_gear_power_increase.size();
 }   // getAvgPower
 
 /* EOF */
