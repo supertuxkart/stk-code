@@ -715,7 +715,7 @@ void World::moveKartTo(AbstractKart* kart, const btTransform &transform)
     btQuaternion rot = pos.getRotation();
     
     // Move the kart
-    Vec3 xyz = pos.getOrigin() + btVector3(0, 0.55f*kart->getKartHeight(),0.0f).
+    Vec3 xyz = pos.getOrigin() + btVector3(0, 0.5f*kart->getKartHeight(),0.0f).
                                           rotate(rot.getAxis(),rot.getAngle());
 
     pos.setOrigin(xyz);

@@ -2431,6 +2431,7 @@ bool Track::findGround(AbstractKart *kart)
 
 
     btTransform t = kart->getBody()->getCenterOfMassTransform();
+    btQuaternion q = t.getRotation();
     // The computer offset is slightly too large, it should take
     // the default suspension rest insteat of suspension rest (i.e. the
     // length of the suspension with the weight of the kart resting on
@@ -2438,7 +2439,7 @@ bool Track::findGround(AbstractKart *kart)
     // - so I'll leave it in for now.
     float offset = kart->getKartProperties()->getSuspensionRest() +
                    kart->getKartProperties()->getWheelRadius();
-    t.setOrigin(hit_point+Vec3(0, offset, 0) );
+    t.setOrigin(hit_point+ (btVector3(0, offset, 0).rotate(q.getAxis(),q.getAngle()) ) );
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);
 
