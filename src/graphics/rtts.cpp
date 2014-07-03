@@ -20,7 +20,9 @@
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/post_processing.hpp"
 #include "utils/log.hpp"
+#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type)
 {
@@ -72,6 +74,8 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 
 RTT::RTT(size_t width, size_t height)
 {
+    m_width = width;
+    m_height = height;
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;
@@ -280,4 +284,25 @@ RTT::~RTT()
         glDeleteTextures(1, &RH_Green);
         glDeleteTextures(1, &RH_Blue);
     }
+}
+
+FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
+{
+    irr_driver->setRTT(this);
+
+    irr_driver->getSceneManager()->setActiveCamera(camera);
+
+    std::vector<IrrDriver::GlowData> glows;
+    irr_driver->computeCameraMatrix(camera, m_width, m_height);
+    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    irr_driver->renderScene(camera, plc, glows, dt, false, true);
+    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
+
+    // reset
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    irr_driver->setRTT(NULL);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    irr_driver->getSceneManager()->setActiveCamera(NULL);
+    return frame_buffer;
 }

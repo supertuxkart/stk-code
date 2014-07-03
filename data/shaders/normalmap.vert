@@ -10,11 +10,17 @@ layout (std140) uniform MatrixesData
 uniform mat4 ModelMatrix;
 uniform mat4 InverseModelMatrix;
 
-
+#if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
 layout(location = 3) in vec2 Texcoord;
 layout(location = 5) in vec3 Tangent;
 layout(location = 6) in vec3 Bitangent;
+#else
+in vec3 Position;
+in vec2 Texcoord;
+in vec3 Tangent;
+in vec3 Bitangent;
+#endif
 
 out vec3 tangent;
 out vec3 bitangent;

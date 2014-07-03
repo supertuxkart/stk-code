@@ -70,7 +70,7 @@ public:
     // ------------------------------------------------------------------------
     bool castRay(const btVector3 &from, const btVector3 &to,
                  btVector3 *xyz, const Material **material,
-                 btVector3 *normal=NULL) const;
+                 btVector3 *normal=NULL, bool interpolate_normal=false) const;
     // ------------------------------------------------------------------------
     /** Returns the points of the 'indx' triangle.
      *  \param indx Index of the triangle to get.

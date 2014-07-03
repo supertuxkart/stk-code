@@ -186,7 +186,7 @@ void IrrDriver::renderGLSL(float dt)
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
         {
-            FrameBuffer *fbo = m_post_processing->render(camnode);
+            FrameBuffer *fbo = m_post_processing->render(camnode, true);
 
             if (irr_driver->getNormals())
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
@@ -528,24 +528,12 @@ void IrrDriver::renderSolidFirstPass()
         glUseProgram(MeshShader::ObjectPass1Shader::Program);
         for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT>::MeshSet.size(); ++i)
         {
-            const GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT>::MeshSet[i];
-            if (mesh.textures[0])
-            {
-                compressTexture(mesh.textures[0], true);
-                setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            }
-            else
-            {
-                setTexture(0, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
+            GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT>::MeshSet[i];
             if (!mesh.textures[0])
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
+                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[0], true);
+            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            draw<MeshShader::ObjectPass1Shader>(mesh, mesh.vao, GroupedFPSM<FPSM_DEFAULT>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT>::TIMVSet[i], 0);
         }
 
         glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
@@ -599,7 +587,6 @@ void IrrDriver::renderSolidSecondPass()
     GroupedSM<SM_SPLATTING>::reset();
     GroupedSM<SM_UNLIT>::reset();
     GroupedSM<SM_DETAILS>::reset();
-    GroupedSM<SM_UNTEXTURED>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
@@ -637,10 +624,6 @@ void IrrDriver::renderSolidSecondPass()
         glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
         for (unsigned i = 0; i < GroupedSM<SM_DETAILS>::MeshSet.size(); i++)
             drawDetailledObjectPass2(*GroupedSM<SM_DETAILS>::MeshSet[i], GroupedSM<SM_DETAILS>::MVPSet[i]);
-
-        glUseProgram(MeshShader::UntexturedObjectShader::Program);
-        for (unsigned i = 0; i < GroupedSM<SM_UNTEXTURED>::MeshSet.size(); i++)
-            drawUntexturedObject(*GroupedSM<SM_UNTEXTURED>::MeshSet[i], GroupedSM<SM_UNTEXTURED>::MVPSet[i]);
     }
 }
 
@@ -837,13 +820,17 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         {
             core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
                 core::vector3df(0, 30, 0));
-            SunCamViewMatrix.transformBoxEx(trackbox);
-            core::matrix4 tmp_matrix;
-            tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X, trackbox.MaxEdge.X,
-                trackbox.MaxEdge.Y, trackbox.MinEdge.Y,
-                30, trackbox.MaxEdge.Z);
-            m_suncam->setProjectionMatrix(tmp_matrix, true);
-            m_suncam->render();
+            if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
+                trackbox.MinEdge.Y != trackbox.MaxEdge.Y)
+            {
+                SunCamViewMatrix.transformBoxEx(trackbox);
+                core::matrix4 tmp_matrix;
+                tmp_matrix.buildProjectionMatrixOrthoLH(trackbox.MinEdge.X, trackbox.MaxEdge.X,
+                    trackbox.MaxEdge.Y, trackbox.MinEdge.Y,
+                    30, trackbox.MaxEdge.Z);
+                m_suncam->setProjectionMatrix(tmp_matrix, true);
+                m_suncam->render();
+            }
             rsm_matrix = getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW);
         }
         rh_extend = core::vector3df(128, 64, 128);

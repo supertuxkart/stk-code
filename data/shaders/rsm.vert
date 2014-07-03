@@ -11,10 +11,12 @@ uniform mat4 TextureMatrix =
 
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
+layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
 
 out vec3 nor;
 out vec2 uv;
+out vec4 color;
 
 
 void main(void)
@@ -24,4 +26,5 @@ void main(void)
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
     nor = (vec4(Normal, 0.)).xyz;
     uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
+    color = Color.zyxw;
 }
