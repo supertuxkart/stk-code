@@ -389,7 +389,7 @@ void STKConfig::getAllData(const XMLNode * root)
     m_default_kart_properties->getAllData(node);
     const XMLNode *types = node->getNode("kart-type");
 
-    for (int i = 0; i < types->getNumNodes(); ++i)
+    for (unsigned int i = 0; i < types->getNumNodes(); ++i)
     {
         const XMLNode* type = types->getNode(i);
         m_kart_properties[type->getName()] = new KartProperties();

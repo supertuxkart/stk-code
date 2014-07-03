@@ -1527,8 +1527,8 @@ void KartSelectionScreen::updateKartStats(uint8_t widget_id,
     if (kp != NULL)
     {
         w->setValue(KartStatsWidget::SKILL_MASS, (int)(kp->getMass()/5));
-        w->setValue(KartStatsWidget::SKILL_SPEED, (int)(kp->getMaxPower()/10));
-        w->setValue(KartStatsWidget::SKILL_ACCEL, (int)((kp->getMaxSpeed()-20)*20));
+        w->setValue(KartStatsWidget::SKILL_SPEED, (int)((kp->getAbsMaxSpeed()-20)*9));
+        w->setValue(KartStatsWidget::SKILL_POWER, (int)(kp->getAvgPower()));
         w->update(0);
     }
 }

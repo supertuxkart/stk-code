@@ -546,7 +546,10 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns parameters for the speed-weighted objects */
-    const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const {return m_speed_weighted_object_properties;}
+    const SpeedWeightedObject::Properties& getSpeedWeightedObjectProperties() const
+    {
+        return m_speed_weighted_object_properties;
+    }
     
     // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */
@@ -571,8 +574,17 @@ public:
 
     // ------------------------------------------------------------------------
     /** Returns the maximum speed dependent on the difficult level. */
-    float getMaxSpeed               () const {return
-                                   m_max_speed[race_manager->getDifficulty()];}
+    float getMaxSpeed               () const
+    {
+        return m_max_speed[race_manager->getDifficulty()];
+    }
+
+    // ------------------------------------------------------------------------
+    /** Return the absolute maximum speed, independent on the difficulty. */
+    float getAbsMaxSpeed            () const
+    {
+        return m_max_speed[m_max_speed.size()-1];
+    }
 
     // ------------------------------------------------------------------------
     /** Returns the nitro consumption. */
@@ -828,6 +840,10 @@ public:
     /** Returns the power increase depending on gear. */
     const std::vector<float>&
           getGearPowerIncrease      () const {return m_gear_power_increase;   }
+
+    // ------------------------------------------------------------------------
+    /** Returns the average power of the kart (in all gears). */
+    const float getAvgPower         () const;
 
     // ------------------------------------------------------------------------
     /** Returns distance between kart and camera. */
