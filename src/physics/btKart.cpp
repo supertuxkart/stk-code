@@ -589,7 +589,7 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar current_length = wheel_info.m_raycastInfo.m_suspensionLength;
         btScalar length_diff    = (susp_length - current_length);
         if(m_kart->getKartProperties()->getExpSpringResponse())
-            length_diff *= length_diff/susp_length;
+            length_diff *= fabsf(length_diff)/susp_length;
 
         force = wheel_info.m_suspensionStiffness * length_diff
               * wheel_info.m_clippedInvContactDotSuspension;
