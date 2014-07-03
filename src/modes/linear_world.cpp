@@ -634,10 +634,21 @@ unsigned int LinearWorld::getRescuePositionIndex(AbstractKart *kart)
 btTransform LinearWorld::getRescueTransform(unsigned int index) const
 {
     const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(index).getCenter();
+    const Vec3 &normal = QuadGraph::get()->getQuadOfNode(index).getNormal();
     btTransform pos;
+
+    // First rotate into the quad's plane (q1), then rotate so that the kart points in the
+    // right direction (q2).
+    btQuaternion q1;
+    if (normal.cross(Vec3(0, 1, 0)).length() > 0)
+    {
+         q1 = btQuaternion(-normal.cross(Vec3(0, 1, 0)), normal.angle(Vec3(0, 1, 0)));
+    }
+    else q1 = btQuaternion(Vec3(0,1,0),0);
+
+    btQuaternion q2(btVector3(normal), m_track->getAngle(index));
     pos.setOrigin(xyz);
-    pos.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f),
-                    m_track->getAngle(index)));
+    pos.setRotation(q2*q1);
     return pos;
 }   // getRescueTransform
 

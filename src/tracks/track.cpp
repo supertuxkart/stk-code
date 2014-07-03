@@ -2388,7 +2388,12 @@ const core::vector3df& Track::getSunRotation()
 bool Track::findGround(AbstractKart *kart)
 {
     btVector3 to(kart->getXYZ());
-    to.setY(-100000.f);
+    unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
+    Vec3 quadNormal;
+    if (sector != QuadGraph::UNKNOWN_SECTOR)
+       quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+    else quadNormal = Vec3(0, 1, 0);
+    to = to + -1000.0f*quadNormal;
 
     // Material and hit point are not needed;
     const Material *m;

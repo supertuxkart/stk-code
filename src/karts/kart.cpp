@@ -1187,10 +1187,16 @@ void Kart::update(float dt)
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
     // gravity (which can
+    
+    unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+    const Vec3 quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+    btQuaternion q = getTrans().getRotation();
+    float roll = quadNormal.angle((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
+
     if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
         (!m_terrain_info->getMaterial() ||
          !m_terrain_info->getMaterial()->hasGravity())          &&
-        !getKartAnimation() && fabs(getRoll())>60*DEGREE_TO_RAD &&
+        !getKartAnimation() && fabs(roll)>60*DEGREE_TO_RAD &&
                               fabs(getSpeed())<3.0f                )
     {
         new RescueAnimation(this, /*is_auto_rescue*/true);
@@ -1214,8 +1220,8 @@ void Kart::update(float dt)
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
 
-    unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-    const Vec3 quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+    
+    
     m_terrain_info->update(getXYZ() + epsilon*(quadNormal), -quadNormal);
 
 

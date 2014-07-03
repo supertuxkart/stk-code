@@ -97,7 +97,9 @@ RescueAnimation::~RescueAnimation()
 void RescueAnimation::update(float dt)
 {
 
-    m_xyz.setY(m_xyz.getY() + dt*m_velocity);
+    //m_xyz.setY(m_xyz.getY() + dt*m_velocity);
+    btQuaternion q1 = m_kart->getTrans().getRotation();
+    m_xyz = m_xyz + dt*m_velocity*(Vec3(0, 1, 0).rotate(q1.getAxis(), q1.getAngle()));
     m_kart->setXYZ(m_xyz);
     m_curr_rotation += dt*m_add_rotation;
     btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),

@@ -65,8 +65,8 @@ void TrackSector::update(const Vec3 &xyz)
     {
         // keep the current quad as the latest valid one IF the player has one
         // of the required checklines
-        const std::vector<int>& checkline_requirements =
-            QuadGraph::get()->getNode(m_current_graph_node).getChecklineRequirements();
+        GraphNode gn = QuadGraph::get()->getNode(m_current_graph_node);
+        const std::vector<int>& checkline_requirements = gn.getChecklineRequirements();
 
         if (checkline_requirements.size() == 0)
         {
