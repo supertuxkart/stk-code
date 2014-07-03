@@ -69,6 +69,13 @@ namespace Scripting
         {
             ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
+        void move(void *memory) //TODO get other params using vec3
+        {
+            core::vector3df xyz = core::vector3df(0, 0, 0);
+            core::vector3df hpr = core::vector3df(0, 0, 0);
+            core::vector3df scale = core::vector3df(1, 1, 1);
+            ((TrackObjectPresentationMesh*)(memory))->move(xyz, hpr, scale);
+        }
         void setLoop(int start, int end, void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
