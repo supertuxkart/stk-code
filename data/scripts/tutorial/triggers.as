@@ -6,7 +6,7 @@ void added_script()
     Vec3 b;
     b=a;
     Vec3 c = Vec3();
-    Vec3 d = Vec3(2,3,4);
+    Vec3 d = Vec3(2,3,0);
     printVec3(d); */
 }
 

@@ -69,9 +69,13 @@ namespace Scripting
         {
             ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
-        void move(void *memory) //TODO get other params using vec3
+        void move(Vec3 *new_pos,void *memory) //TODO get other params using vec3
         {
+
             core::vector3df xyz = core::vector3df(0, 0, 0);
+            xyz.X = new_pos->getX();
+            xyz.Y = new_pos->getY();
+            xyz.Z = new_pos->getZ();
             core::vector3df hpr = core::vector3df(0, 0, 0);
             core::vector3df scale = core::vector3df(1, 1, 1);
             ((TrackObjectPresentationMesh*)(memory))->move(xyz, hpr, scale);
@@ -164,7 +168,7 @@ namespace Scripting
             r = engine->RegisterObjectMethod("Mesh", "void setLoop(int start, int end)", asFUNCTION(setLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "int getCurrentFrame()", asFUNCTION(getCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)", asFUNCTION(setCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
-
+            r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)", asFUNCTION(move), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
             //Curve based Animation
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
