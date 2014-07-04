@@ -28,12 +28,11 @@ namespace Scripting
     
     namespace Physics
     {
-        void createExplosion()
+        void createExplosion(asIScriptGeneric *gen)
         {
-            //currently hardcode for sphere 2
-            //79.53 0.07 97.13" 
-            Vec3 explosion_loc = Vec3(79.53, 0.07, 97.13);
-            HitEffect *he = new Explosion(explosion_loc, "explosion", "explosion_bomb.xml");
+            //TODO: allow different types? sand etc
+            Vec3 *explosion_loc = (Vec3*)gen->GetArgAddress(0);
+            HitEffect *he = new Explosion(*explosion_loc, "explosion", "explosion_bomb.xml");
             projectile_manager->addHitEffect(he);
         }
         void getCollidingKart1(asIScriptGeneric *gen)
@@ -47,7 +46,6 @@ namespace Scripting
         void getCollidingID(asIScriptGeneric *gen)
         {
             void *pointer = &m_collider1;
-            createExplosion();
             gen->SetReturnObject(pointer);
         }
         void getCollisionType(asIScriptGeneric *gen)
@@ -83,6 +81,7 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("uint getCollidingKart2()", asFUNCTION(getCollidingKart2), asCALL_GENERIC); assert( r >= 0 );
             r = engine->RegisterGlobalFunction("string getCollisionType()", asFUNCTION(getCollisionType), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("string getCollidingID()", asFUNCTION(getCollidingID), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("string createExplosion(Vec3 &in)", asFUNCTION(createExplosion), asCALL_GENERIC); assert(r >= 0);
         }
     }
 }

@@ -69,9 +69,8 @@ namespace Scripting
         {
             ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
-        void move(Vec3 *new_pos,void *memory) //TODO get other params using vec3
+        void move(Vec3 *new_pos,void *memory)
         {
-
             core::vector3df xyz = core::vector3df(0, 0, 0);
             xyz.X = new_pos->getX();
             xyz.Y = new_pos->getY();
@@ -94,7 +93,6 @@ namespace Scripting
         }
         void getKeyBinding(asIScriptGeneric *gen)
         {
-            //currently just test if it works
             int Enum_value = (int)gen->GetArgDWord(0);
             InputDevice* device = input_manager->getDeviceList()->getLatestUsedDevice();
             DeviceConfig* config = device->getConfiguration();
