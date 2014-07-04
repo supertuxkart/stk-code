@@ -96,11 +96,19 @@ const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 
 
 void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                                            const core::vector3df& scale)
+    const core::vector3df& scale)
 {
     if (m_node == NULL) return;
 
-    m_node->setPosition(xyz);
+    if (m_node->getParent() != NULL)
+    {
+        scene::ISceneNode* parent = m_node->getParent();
+        m_node->setPosition(xyz - parent->getAbsolutePosition());
+    }
+    else
+    {
+        m_node->setPosition(xyz);
+    }
     m_node->setRotation(hpr);
     m_node->setScale(scale);
     m_node->updateAbsolutePosition();
