@@ -99,7 +99,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
  *  So we create a dummy device here to begin with, which is then later (once
  *  the real device exists) changed in initDevice().
  */
-IrrDriver::IrrDriver() : object_count{}
+IrrDriver::IrrDriver()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
@@ -112,6 +112,10 @@ IrrDriver::IrrDriver() : object_count{}
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
         m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
     SkyboxCubeMap = m_last_light_bucket_distance = 0;
+    for(unsigned int i = 0; i < PASS_COUNT; i++)
+    {
+        object_count[i] = 0;
+    }
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
