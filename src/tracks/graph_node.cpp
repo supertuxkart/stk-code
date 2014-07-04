@@ -194,14 +194,13 @@ void GraphNode::setDirectionData(unsigned int successor, DirectionType dir,
  */
 void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
 {
-    core::vector2df xyz2d(xyz.getX(), xyz.getZ());
-    core::vector2df closest = m_line.getClosestPoint(xyz2d);
-    if(m_line.getPointOrientation(xyz2d)>0)
-        result->setX( (closest-xyz2d).getLength());   // to the right
-    else
-        result->setX(-(closest-xyz2d).getLength());   // to the left
+
+    // center_line is from A to B, or lower_center to upper_center
+    core::vector3df A = m_lower_center.toIrrVector(), B = m_upper_center.toIrrVector();
+    result->setX(((B - A).crossProduct(xyz.toIrrVector() - A)).getLength() / (B - A).getLength());
+
     result->setZ( m_distance_from_start +
-                  (closest-m_lower_center_2d).getLength());
+                  (xyz-m_lower_center).length());
 }   // getDistances
 
 void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, unsigned int quad_idx, Vec3 *result)
@@ -219,7 +218,7 @@ void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, uns
             upper_center = 0.5f*(unrolled[0] + unrolled[1]),
             lower_center = 0.5f*(unrolled[2] + unrolled[3]);
     }
-        // center_line is from A to B, or lower_center to upper_center
+    
     core::vector3df A = lower_center.toIrrVector(), B = upper_center.toIrrVector();
     result->setX(((B - A).crossProduct(xyz.toIrrVector() - A)).getLength() / (B - A).getLength());
 
