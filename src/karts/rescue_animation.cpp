@@ -45,10 +45,26 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 
     m_kart->getAttachment()->clear();
 
+    // We get the final transform of the kart so that it is rotated
+    // accordingly during the rescue animation
+    World * world = World::getWorld();
+    unsigned int index = world->getRescuePositionIndex(m_kart);
+    btTransform t = world->getRescueTransform(index);
+    Vec3 up = t.getBasis().getColumn(1);
+    float target_pitch = atan2(up.getZ(), fabsf(up.getY()));
+    float target_roll = atan2(up.getX(), up.getY());
+
+
     m_curr_rotation.setPitch(m_kart->getPitch());
-    m_curr_rotation.setRoll(m_kart->getRoll()  );
+    m_curr_rotation.setRoll(m_kart->getRoll());
     m_curr_rotation.setHeading(0);
-    m_add_rotation = -m_curr_rotation/m_timer;
+
+    Vec3 required_rotation;
+    required_rotation.setPitch(target_pitch - m_kart->getPitch());
+    required_rotation.setRoll(target_roll - m_kart->getRoll());
+    required_rotation.setHeading(0);
+    m_add_rotation = -required_rotation/m_timer;
+
     m_curr_rotation.setHeading(m_kart->getHeading());
 
     // Add a hit unless it was auto-rescue
