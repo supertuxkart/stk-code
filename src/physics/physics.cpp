@@ -183,6 +183,15 @@ void Physics::update(float dt)
         {
             // Kart hits physical object
             // -------------------------
+            Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
+            Scripting::Physics::setCollision(0, 0); //TODO : support item types etc
+            Scripting::Physics::setCollisionType("Kart-PhysObj");
+            Scripting::Physics::setCollision
+                (
+                p->getUserPointer(0)->getPointerPhysicalObject()->getID(),
+                "kart"
+                );
+            script_engine->runScript("collisions");
             PhysicalObject *obj = p->getUserPointer(0)
                                    ->getPointerPhysicalObject();
             if(obj->isCrashReset())
