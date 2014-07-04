@@ -2301,11 +2301,13 @@ void Track::itemCommand(const XMLNode *node)
 #endif
     }
 
-    // Don't tilt the items, since otherwise the rotation will look odd,
-    // i.e. the items will not rotate around the normal, but 'wobble'
-    // around.
-    //Vec3 normal(0.7071f, 0, 0.7071f);
-    Vec3 normal(0, 1, 0);
+    // Tilt the items according to the track
+    int road_sector = QuadGraph::UNKNOWN_SECTOR;
+    QuadGraph::get()->findRoadSector(xyz, &road_sector);
+    // If a valid road_sector is not found
+    if (road_sector == QuadGraph::UNKNOWN_SECTOR) 
+        road_sector=QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
+    Vec3 normal = QuadGraph::get()->getQuadOfNode(road_sector).getNormal();
     ItemManager::get()->newItem(type, loc, normal);
 }   // itemCommand
 
