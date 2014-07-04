@@ -19,13 +19,23 @@
 #include <assert.h>
 #include <angelscript.h>
 #include "script_physics.hpp"
+#include "graphics/hit_effect.hpp"
+#include "items/projectile_manager.hpp"
+#include "graphics/explosion.hpp"
 
 namespace Scripting
 {
     
     namespace Physics
     {
-        
+        void createExplosion()
+        {
+            //currently hardcode for sphere 2
+            //79.53 0.07 97.13" 
+            Vec3 explosion_loc = Vec3(79.53, 0.07, 97.13);
+            HitEffect *he = new Explosion(explosion_loc, "explosion", "explosion_bomb.xml");
+            projectile_manager->addHitEffect(he);
+        }
         void getCollidingKart1(asIScriptGeneric *gen)
         {
             gen->SetReturnDWord(m_collidingkartid1);
@@ -37,6 +47,7 @@ namespace Scripting
         void getCollidingID(asIScriptGeneric *gen)
         {
             void *pointer = &m_collider1;
+            createExplosion();
             gen->SetReturnObject(pointer);
         }
         void getCollisionType(asIScriptGeneric *gen)
