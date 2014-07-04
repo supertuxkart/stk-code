@@ -103,6 +103,7 @@ void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const co
     m_node->setPosition(xyz);
     m_node->setRotation(hpr);
     m_node->setScale(scale);
+    m_node->updateAbsolutePosition();
 }
 
 void TrackObjectPresentationSceneNode::setEnable(bool enabled)
