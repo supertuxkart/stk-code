@@ -9,6 +9,11 @@ void sheep_dance()
      Vec3 newloc = Vec3(2,3,4);
      sheepMesh.move(newloc);
      //runScript("sheep_approach");
+     TrackObject @t_obj2 = getTrackObject("waterfall");
+     ParticleEmitter @waterfallemitter = t_obj2.getParticleEmitter();
+     Vec3 newlocation = Vec3(0,2,5);
+     waterfallemitter.move(newlocation);
+
 }
 
 

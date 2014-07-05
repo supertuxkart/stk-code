@@ -145,6 +145,8 @@ public:
 
     TrackObjectPresentationMesh* getMesh(){ return getPresentation<TrackObjectPresentationMesh>(); }
 
+    TrackObjectPresentationParticles* getParticles(){ return getPresentation<TrackObjectPresentationParticles>(); }
+
     ThreeDAnimation* getAnimator() { return m_animator; }
     const ThreeDAnimation* getAnimator() const { return m_animator; }
     //Due to above overload AngelScript cannot decide which function to bind

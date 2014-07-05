@@ -69,7 +69,7 @@ namespace Scripting
         {
             ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
-        void move(Vec3 *new_pos,void *memory)
+        void moveMesh(Vec3 *new_pos,void *memory)
         {
             core::vector3df xyz = core::vector3df(0, 0, 0);
             xyz.X = new_pos->getX();
@@ -78,6 +78,16 @@ namespace Scripting
             core::vector3df hpr = core::vector3df(0, 0, 0);
             core::vector3df scale = core::vector3df(1, 1, 1);
             ((TrackObjectPresentationMesh*)(memory))->move(xyz, hpr, scale);
+        }
+        void moveParticles(Vec3 *new_pos, void *memory)
+        {
+            core::vector3df xyz = core::vector3df(0, 0, 0);
+            xyz.X = new_pos->getX();
+            xyz.Y = new_pos->getY();
+            xyz.Z = new_pos->getZ();
+            core::vector3df hpr = core::vector3df(0, 0, 0);
+            core::vector3df scale = core::vector3df(1, 1, 1);
+            ((TrackObjectPresentationParticles*)(memory))->move(xyz, hpr, scale);
         }
         void setLoop(int start, int end, void *memory)
         {
@@ -166,7 +176,15 @@ namespace Scripting
             r = engine->RegisterObjectMethod("Mesh", "void setLoop(int start, int end)", asFUNCTION(setLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "int getCurrentFrame()", asFUNCTION(getCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("Mesh", "void setCurrentFrame(int frame)", asFUNCTION(setCurrentFrame), asCALL_CDECL_OBJLAST); assert(r >= 0);
-            r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)", asFUNCTION(move), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("Mesh", "void move(Vec3 &in)", asFUNCTION(moveMesh), asCALL_CDECL_OBJLAST); assert(r >= 0);
+
+            //Particle Emitter
+            r = engine->RegisterObjectType("ParticleEmitter", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
+            r = engine->RegisterObjectMethod("TrackObject", "ParticleEmitter @getParticleEmitter()", asMETHOD(TrackObject, getParticles), asCALL_THISCALL); assert(r >= 0);
+            r = engine->RegisterObjectMethod("ParticleEmitter", "void move(Vec3 &in)", asFUNCTION(moveParticles), asCALL_CDECL_OBJLAST); assert(r >= 0);
+
+
+
 
             //Curve based Animation
             r = engine->RegisterObjectType("Animator", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
