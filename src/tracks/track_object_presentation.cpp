@@ -103,7 +103,7 @@ void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const co
     if (m_node->getParent() != NULL)
     {
         scene::ISceneNode* parent = m_node->getParent();
-        m_node->setPosition(xyz - parent->getAbsolutePosition());
+        m_node->setPosition((xyz - parent->getAbsolutePosition()) / parent->getScale());
     }
     else
     {
