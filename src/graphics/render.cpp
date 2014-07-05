@@ -821,7 +821,9 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
                 core::vector3df(0, 30, 0));
             if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
-                trackbox.MinEdge.Y != trackbox.MaxEdge.Y)
+                trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&
+                // Cover the case where SunCamViewMatrix is null
+                SunCamViewMatrix.getScale() != core::vector3df(0., 0., 0.))
             {
                 SunCamViewMatrix.transformBoxEx(trackbox);
                 core::matrix4 tmp_matrix;
