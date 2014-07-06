@@ -99,7 +99,7 @@ const int MIN_SUPPORTED_WIDTH  = 800;
  *  So we create a dummy device here to begin with, which is then later (once
  *  the real device exists) changed in initDevice().
  */
-IrrDriver::IrrDriver() : object_count{}
+IrrDriver::IrrDriver() : object_count()
 {
     m_resolution_changing = RES_CHANGE_NONE;
     m_phase               = SOLID_NORMAL_AND_DEPTH_PASS;
