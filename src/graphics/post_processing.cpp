@@ -207,10 +207,6 @@ void PostProcessing::update(float dt)
 static
 void renderBloom(GLuint in)
 {
-    float threshold = 1.0f;
-    if (World::getWorld() != NULL)
-        threshold = World::getWorld()->getTrack()->getBloomThreshold();
-
     glUseProgram(FullScreenShader::BloomShader::Program);
     glBindVertexArray(FullScreenShader::BloomShader::vao);
 
@@ -676,7 +672,7 @@ static void averageTexture(GLuint tex)
 void PostProcessing::applyMLAA()
 {
     const core::vector2df &PIXEL_SIZE = core::vector2df(1.0f / UserConfigParams::m_width, 1.0f / UserConfigParams::m_height);
-    IVideoDriver *const drv = irr_driver->getVideoDriver();
+
     irr_driver->getFBO(FBO_MLAA_TMP).Bind();
     glEnable(GL_STENCIL_TEST);
     glClearColor(0.0, 0.0, 0.0, 1.0);
@@ -729,13 +725,6 @@ void PostProcessing::applyMLAA()
 /** Render the post-processed scene */
 FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, bool isRace)
 {
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
-
-    MotionBlurProvider * const mocb = (MotionBlurProvider *) irr_driver->
-                                                           getCallback(ES_MOTIONBLUR);
-    GaussianBlurProvider * const gacb = (GaussianBlurProvider *) irr_driver->
-                                                                 getCallback(ES_GAUSSIAN3H);
-
     FrameBuffer *in_fbo = &irr_driver->getFBO(FBO_COLORS);
     FrameBuffer *out_fbo = &irr_driver->getFBO(FBO_TMP1_WITH_DS);
     // Each effect uses these as named, and sets them up for the next effect.

@@ -83,12 +83,10 @@ RTT::RTT(size_t width, size_t height)
     using namespace video;
     using namespace core;
 
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
     const dimension2du res(width, height);
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
-    const dimension2du sixteenth = res/16;
 
     const u16 shadowside = 1024;
     const dimension2du shadowsize0(shadowside, shadowside);

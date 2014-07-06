@@ -125,7 +125,6 @@ void IrrDriver::renderGLSL(float dt)
 
     RaceGUIBase *rg = world->getRaceGUI();
     if (rg) rg->update(dt);
-    irr::video::COpenGLDriver*    gl_driver = (irr::video::COpenGLDriver*)m_device->getVideoDriver();
 
     for(unsigned int cam = 0; cam < Camera::getNumCameras(); cam++)
     {
@@ -268,8 +267,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
     renderSolidFirstPass();
     PROFILER_POP_CPU_MARKER();
-
-    const core::aabbox3df cambox = camnode->getViewFrustum()->getBoundingBox();
 
     // Shadows
     {
