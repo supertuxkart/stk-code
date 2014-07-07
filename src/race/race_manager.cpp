@@ -75,6 +75,7 @@ RaceManager::RaceManager()
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumLocalPlayers(0);
+    m_grand_prix = new GrandPrixData();
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
