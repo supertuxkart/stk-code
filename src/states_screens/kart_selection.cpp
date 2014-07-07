@@ -1602,6 +1602,11 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
                           kart_model.getWheelGraphicsPosition(2) );
             w3->addModel( kart_model.getWheelModel(3),
                           kart_model.getWheelGraphicsPosition(3) );
+            for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+            {
+                const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+                w3->addModel(obj.m_model, obj.m_position);
+            }
             w3->update(0);
 
             m_kart_widgets[widget_id].m_kart_name
