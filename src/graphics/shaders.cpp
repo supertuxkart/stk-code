@@ -2665,9 +2665,7 @@ namespace FullScreenShader
     GLuint MotionBlurShader::uniform_color_buffer;
     GLuint MotionBlurShader::uniform_dtex;
     GLuint MotionBlurShader::uniform_previous_viewproj;
-    GLuint MotionBlurShader::uniform_direction;
     GLuint MotionBlurShader::uniform_mask_radius;
-    GLuint MotionBlurShader::uniform_max_tex_height;
     GLuint MotionBlurShader::vao;
 
     void MotionBlurShader::init()
@@ -2679,9 +2677,7 @@ namespace FullScreenShader
         uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
         uniform_center = glGetUniformLocation(Program, "center");
         uniform_color_buffer = glGetUniformLocation(Program, "color_buffer");
-        uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
-        uniform_max_tex_height = glGetUniformLocation(Program, "max_tex_height");
         uniform_dtex = glGetUniformLocation(Program, "dtex");
         uniform_previous_viewproj = glGetUniformLocation(Program, "previous_viewproj");
         vao = createFullScreenVAO(Program);
@@ -2692,9 +2688,7 @@ namespace FullScreenShader
         glUniformMatrix4fv(uniform_previous_viewproj, 1, GL_FALSE, previousVP.pointer());
         glUniform1f(uniform_boost_amount, boost_amount);
         glUniform2f(uniform_center, center.X, center.Y);
-        glUniform2f(uniform_direction, direction.X, direction.Y);
         glUniform1f(uniform_mask_radius, mask_radius);
-        glUniform1f(uniform_max_tex_height, max_tex_height);
         glUniform1i(uniform_color_buffer, TU_cb);
         glUniform1i(uniform_dtex, TU_dtex);
     }
