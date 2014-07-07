@@ -153,7 +153,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.index_buffer);
     const void* indices = mb->getIndices();
     u32 indexCount = mb->getIndexCount();
-    GLenum indexSize;
+    size_t indexSize = 0;
     switch (mb->getIndexType())
     {
         case irr::video::EIT_16BIT:
@@ -232,7 +232,7 @@ core::vector3df getWind()
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
     GrassShaderProvider *gsp = (GrassShaderProvider *)irr_driver->getCallback(ES_GRASS);
-    float m_speed = gsp->getSpeed(), m_amplitude = gsp->getAmplitude();
+    float m_speed = gsp->getSpeed();
 
     return m_speed * vector3df(1., 0., 0.) * cos(time);
 }
@@ -386,8 +386,6 @@ void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjec
   glBindVertexArray(mesh.vao);
   glDrawElements(ptype, count, itype, 0);
 }
-
-static video::ITexture *CausticTex = 0;
 
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
 {

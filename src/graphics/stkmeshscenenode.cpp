@@ -220,7 +220,7 @@ void STKMeshSceneNode::updatevbo()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
         const void* indices = mb->getIndices();
         mesh.IndexCount = mb->getIndexCount();
-        GLenum indexSize;
+        size_t indexSize = 0;
         switch (mb->getIndexType())
         {
         case irr::video::EIT_16BIT:
@@ -245,9 +245,6 @@ void STKMeshSceneNode::render()
 
     if (reload_each_frame)
         updatevbo();
-
-    bool isTransparentPass =
-        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
 
     ++PassCount;
 

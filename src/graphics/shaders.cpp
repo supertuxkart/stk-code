@@ -876,7 +876,6 @@ namespace MeshShader
         GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
         GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
         uniform_ambient = glGetUniformLocation(Program, "ambient");
-        GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1100,7 +1099,6 @@ namespace MeshShader
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_ambient = glGetUniformLocation(Program, "ambient");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
-        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
         GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
         GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");

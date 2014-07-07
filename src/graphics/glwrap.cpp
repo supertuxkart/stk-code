@@ -303,7 +303,7 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
         glGetProgramiv(Program, GL_INFO_LOG_LENGTH, &InfoLogLength);
         char *ErrorMessage = new char[InfoLogLength];
         glGetProgramInfoLog(Program, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
+        Log::error("GLWrap", ErrorMessage);
         delete[] ErrorMessage;
     }
 
