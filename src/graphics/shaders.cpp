@@ -2687,7 +2687,7 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
-    void MotionBlurShader::setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb, unsigned TU_dtex)
+    void MotionBlurShader::setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center, float mask_radius, unsigned TU_cb, unsigned TU_dtex)
     {
         glUniformMatrix4fv(uniform_previous_viewproj, 1, GL_FALSE, previousVP.pointer());
         glUniform1f(uniform_boost_amount, boost_amount);

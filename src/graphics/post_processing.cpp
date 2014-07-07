@@ -607,17 +607,17 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
     glUseProgram(FullScreenShader::MotionBlurShader::Program);
     glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
 
-    setTexture(0, in_fbo.getRTT()[0], GL_NEAREST, GL_NEAREST);
+    setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MotionBlurShader
-                    ::setUniforms(1., // Todo : should be framerate dependent
+                    ::setUniforms(.5, // Todo : should be framerate dependent
                                   // Todo : use a previousPVMatrix per cam, not global
                                   irr_driver->getPreviousPVMatrix(),
                                   cb->getCenter(cam),
-                                  cb->getDirection(cam), 0.15f,
-                                  cb->getMaxHeight(cam) * 0.7f, 0, 1);
+                                  0.15f,
+                                  0, 1);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

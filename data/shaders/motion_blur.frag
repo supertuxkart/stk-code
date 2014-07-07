@@ -80,11 +80,11 @@ void main()
     blur_factor *= boost_amount;
 
     // Scale the blur direction
-    blur_dir *= blur_factor;
+    blur_dir *= boost_amount;
 
     // Compute the blur
     vec2 inc_vec = blur_dir / vec2(NB_SAMPLES);
-    vec2 blur_texcoords = texcoords + inc_vec;
+    vec2 blur_texcoords = texcoords - inc_vec * NB_SAMPLES / 2;
     for(int i=1 ; i < NB_SAMPLES ; i++)
     {
         color += texture(color_buffer, blur_texcoords).rgb;
