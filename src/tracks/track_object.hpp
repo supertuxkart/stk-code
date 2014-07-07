@@ -143,9 +143,12 @@ public:
     template<typename T>
     const T* getPresentation() const { return dynamic_cast<T*>(m_presentation); }
 
+    //specialized getters for scripts
     TrackObjectPresentationMesh* getMesh(){ return getPresentation<TrackObjectPresentationMesh>(); }
 
     TrackObjectPresentationParticles* getParticles(){ return getPresentation<TrackObjectPresentationParticles>(); }
+
+    TrackObjectPresentationSound* getSound(){ return getPresentation<TrackObjectPresentationSound>(); }
 
     ThreeDAnimation* getAnimator() { return m_animator; }
     const ThreeDAnimation* getAnimator() const { return m_animator; }
