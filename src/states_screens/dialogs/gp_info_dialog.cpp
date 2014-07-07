@@ -44,8 +44,11 @@ using GUIEngine::PROP_ID;
 
 typedef GUIEngine::LabelWidget Label;
 
-GPInfoDialog::GPInfoDialog(const std::string& gp_ident) :
-    ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT)
+const float GPInfoDialog::PERCENT_WIDTH  = 0.8f;
+const float GPInfoDialog::PERCENT_HEIGHT = 0.7f;
+
+GPInfoDialog::GPInfoDialog(const std::string& gp_ident)
+            : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT)
 {
     doInit();
     m_curr_time = 0.0f;

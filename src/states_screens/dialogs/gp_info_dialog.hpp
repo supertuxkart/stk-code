@@ -62,10 +62,11 @@ protected: // Necessary for RandomGPInfoDialog
     /** only used for track_screen.cpp */
     GPInfoDialog() : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT) {}
 
-public:
-    static const float PERCENT_WIDTH  = 0.8f;
-    static const float PERCENT_HEIGHT = 0.7f;
+private:
+    static const float PERCENT_WIDTH;
+    static const float PERCENT_HEIGHT;
 
+public:
     GPInfoDialog(const std::string& gpIdent);
     /** Places the focus back on the selected GP, in the case that the dialog
      * was cancelled and we're returning to the track selection screen */
