@@ -24,13 +24,15 @@
 #include "config/player_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
+#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
 
-#include <iostream>
-#include <memory>
 #include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <memory>
 #include <stdexcept>
 
 
@@ -42,6 +44,94 @@ GrandPrixData::GrandPrixData(const std::string& filename)
                                         StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
     reload();
+}
+
+// ----------------------------------------------------------------------------
+GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
+                             const std::string&  track_group,
+                             const RandomGPInfoDialog::REVERSED use_reverse)
+{
+    m_filename = "Random GP - Not loaded from a file!";
+    m_id       = "random";
+    m_name     = "Random Grand Prix";
+    m_editable = false;
+
+    m_tracks.reserve(number_of_tracks);
+    m_laps.reserve(number_of_tracks);
+    m_reversed.reserve(number_of_tracks);
+
+    changeTrackNumber(number_of_tracks, track_group);
+    changeReverse(use_reverse);
+}
+
+// ----------------------------------------------------------------------------
+void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
+                                      const std::string& track_group)
+{
+    // The problem with the track groups is that "all" isn't a track group
+    // TODO: Add "all" to the track groups and rewrite this more elegant
+    std::vector<int> track_indices;
+    size_t available_tracks;
+    if (track_group == "all")
+    {
+        available_tracks = track_manager->getNumberOfTracks();
+    }
+    else
+    {
+        track_indices = track_manager->getTracksInGroup(track_group);
+        available_tracks = track_indices.size();
+    }
+    assert(number_of_tracks <= available_tracks);
+
+    // add or remove the right number of tracks
+    if (m_tracks.size() < number_of_tracks)
+    {
+        while (m_tracks.size() < number_of_tracks)
+        {
+            int index = (track_group == "all") ?
+                         rand() % available_tracks :
+                         track_indices[rand() % available_tracks];
+
+            std::string id = track_manager->getTrack(index)->getIdent();
+            // Avoid duplicate tracks
+            if (std::find(m_tracks.begin(), m_tracks.end(), id) != m_tracks.end())
+                continue;
+
+            m_tracks.push_back(id);
+            m_laps.push_back(3); // TODO: Take the default number from the track
+            m_reversed.push_back(false); // This will be changed later
+        }
+    }
+    else if (m_tracks.size() > number_of_tracks)
+    {
+        while (m_tracks.size() > number_of_tracks)
+        {
+            m_tracks.pop_back();
+            m_laps.pop_back();
+            m_reversed.pop_back();
+        }
+    }
+
+    assert(m_tracks.size() == m_laps.size()    );
+    assert(m_laps.size()   == m_reversed.size());
+}
+
+// ----------------------------------------------------------------------------
+
+void GrandPrixData::changeReverse(const RandomGPInfoDialog::REVERSED use_reverse)
+{
+    for (unsigned int i = 0; i < m_tracks.size(); i++)
+    {
+        if (use_reverse == RandomGPInfoDialog::NO_REVERSE)
+            m_reversed[i] = false;
+        else if (use_reverse == RandomGPInfoDialog::MIXED)
+            if (track_manager->getTrack(m_tracks[i])->reverseAvailable())
+                m_reversed[i] = rand() % 2;
+            else
+                m_reversed[i] = false;
+        else // all reversed
+            m_reversed[i] = true;
+    }
 }
 
 // ----------------------------------------------------------------------------

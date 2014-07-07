@@ -20,6 +20,10 @@
 #define HEADER_GP_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
+// Don't include grand_prix_data.hpp here or the compilation will fail
+
+
+class GrandPrixData;
 
 namespace GUIEngine
 {
@@ -32,23 +36,45 @@ namespace GUIEngine
  */
 class GPInfoDialog : public GUIEngine::ModalDialog
 {
-    std::string m_gp_ident;
+protected: // Necessary for RandomGPInfoDialog
     GUIEngine::IconButtonWidget* m_screenshot_widget;
-    
     float m_curr_time;
-    
+    GrandPrixData* m_gp;
+
+    /** height of the separator over the body */
+    int m_over_body;
+    /** height of the separator under the titlebar, which is equal to
+     * m_over_body in a normal GPInfoDialo and lower in RandomGPInfoDialog. */
+    int m_under_title;
+    /** height of the seperator over the buttons */
+    int m_lower_bound;
+
+    void addTitle();
+    /** \brief display all the tracks according to the current gp
+     * For a normal gp info dialog, it just creates a label for every track.
+     * But with a random gp info dialog, it tries to reuse as many
+     * labels as possible by just changing their text. */
+    void addTracks();
+    void addScreenshot();
+    /** display a ok-button and eventually a continue-button */
+    void addButtons();
+
+    /** only used for track_screen.cpp */
+    GPInfoDialog() : ModalDialog(PERCENT_WIDTH, PERCENT_HEIGHT) {}
+
 public:
-    /**
-     * Creates a modal dialog with given percentage of screen width and height
-     */
-    GPInfoDialog(const std::string& gpIdent, const float percentWidth, const float percentHeight);
+    static const float PERCENT_WIDTH  = 0.8f;
+    static const float PERCENT_HEIGHT = 0.7f;
+
+    GPInfoDialog(const std::string& gpIdent);
+    /** Places the focus back on the selected GP, in the case that the dialog
+     * was cancelled and we're returning to the track selection screen */
     virtual ~GPInfoDialog();
-    
+
     void onEnterPressedInternal();
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
-    
-    virtual void onUpdate(float dt);
 
+    virtual void onUpdate(float dt);
 };
 
 #endif

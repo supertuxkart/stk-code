@@ -29,6 +29,7 @@
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/dialogs/gp_info_dialog.hpp"
+#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "states_screens/dialogs/track_info_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -121,9 +122,16 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
                        gps_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         if (selection == "locked")
+        {
             unlock_manager->playLockSound();
+        }
         else
-            new GPInfoDialog(selection, 0.8f, 0.7f);
+        {
+            if (selection == "Random Grand Prix")
+                new RandomGPInfoDialog();
+            else
+                new GPInfoDialog(selection);
+        }
     }
     else if (name == "trackgroups")
     {
@@ -214,12 +222,13 @@ void TracksScreen::init()
         }
     }
 
-    /*// Random GP - not finished yet
+    // Random GP
     std::vector<std::string> screenshots;
-    screenshots.push_back("gui/main_help.png");
-    gps_widget->addAnimatedItem(translations->fribidize("Random"), "Random",
+    screenshots.push_back(file_manager->getAsset(FileManager::GUI, "main_help.png"));
+    gps_widget->addAnimatedItem(translations->fribidize("Random Grand Prix"),
+                                "Random Grand Prix",
                                 screenshots, 1.5f, 0,
-                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);*/
+                                IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
 
     gps_widget->updateItemDisplay();
 

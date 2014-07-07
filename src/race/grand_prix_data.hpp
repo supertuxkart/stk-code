@@ -20,13 +20,14 @@
 #ifndef HEADER_GRAND_PRIX_DATA_HPP
 #define HEADER_GRAND_PRIX_DATA_HPP
 
+#include <irrString.h>
 #include <string>
 #include <vector>
-#include <cassert>
-#include <irrString.h>
-#include <stdexcept>
 
+#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "utils/translation.hpp"
+
+using irr::core::stringw;
 
 class Track;
 
@@ -76,6 +77,13 @@ public:
     GrandPrixData(const std::string& filename);
     /** Needed for simple creation of an instance of GrandPrixData */
     GrandPrixData() {};
+    /** Creates a new random GP */
+    GrandPrixData(const unsigned int number_of_tracks,
+                  const std::string& track_group,
+                  const RandomGPInfoDialog::REVERSED use_reverse);
+    void changeTrackNumber(const unsigned int number_of_tracks,
+                           const std::string& track_group);
+    void changeReverse(const RandomGPInfoDialog::REVERSED use_reverse);
 
     // Methods for the GP editor
     void setId(const std::string& id);
@@ -117,7 +125,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the filename of the grand prix xml file. */
     const std::string& getFilename() const { return m_filename;           }
-
 };   // GrandPrixData
 
 #endif
