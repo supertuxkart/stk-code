@@ -2663,6 +2663,8 @@ namespace FullScreenShader
     GLuint MotionBlurShader::uniform_boost_amount;
     GLuint MotionBlurShader::uniform_center;
     GLuint MotionBlurShader::uniform_color_buffer;
+    GLuint MotionBlurShader::uniform_dtex;
+    GLuint MotionBlurShader::uniform_previous_viewproj;
     GLuint MotionBlurShader::uniform_direction;
     GLuint MotionBlurShader::uniform_mask_radius;
     GLuint MotionBlurShader::uniform_max_tex_height;
@@ -2672,6 +2674,7 @@ namespace FullScreenShader
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
         uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
         uniform_center = glGetUniformLocation(Program, "center");
@@ -2679,17 +2682,21 @@ namespace FullScreenShader
         uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
         uniform_max_tex_height = glGetUniformLocation(Program, "max_tex_height");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_previous_viewproj = glGetUniformLocation(Program, "previous_viewproj");
         vao = createFullScreenVAO(Program);
     }
 
-    void MotionBlurShader::setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb)
+    void MotionBlurShader::setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb, unsigned TU_dtex)
     {
+        glUniformMatrix4fv(uniform_previous_viewproj, 1, GL_FALSE, previousVP.pointer());
         glUniform1f(uniform_boost_amount, boost_amount);
         glUniform2f(uniform_center, center.X, center.Y);
         glUniform2f(uniform_direction, direction.X, direction.Y);
         glUniform1f(uniform_mask_radius, mask_radius);
         glUniform1f(uniform_max_tex_height, max_tex_height);
         glUniform1i(uniform_color_buffer, TU_cb);
+        glUniform1i(uniform_dtex, TU_dtex);
     }
 
     GLuint GodFadeShader::Program;
