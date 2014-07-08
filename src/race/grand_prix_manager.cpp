@@ -93,7 +93,7 @@ void GrandPrixManager::load(const std::string& filename)
     catch (std::runtime_error& e)
     {
         Log::error("GrandPrixManager",
-                   "Ignoring grand prix %s (%s)\n", filename.c_str(), e.what());
+                   "Ignoring Grand Prix %s (%s)\n", filename.c_str(), e.what());
     }
 }   // load
 
