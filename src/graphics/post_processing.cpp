@@ -612,7 +612,7 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MotionBlurShader
-                    ::setUniforms(.5, // Todo : should be framerate dependent
+                    ::setUniforms(.1, // Todo : should be framerate dependent
                                   // Todo : use a previousPVMatrix per cam, not global
                                   irr_driver->getPreviousPVMatrix(),
                                   cb->getCenter(cam),
