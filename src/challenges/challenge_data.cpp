@@ -376,8 +376,7 @@ void ChallengeData::setRace(RaceManager::Difficulty d) const
     else if(m_mode==CM_GRAND_PRIX)
     {
         race_manager->setMinorMode(m_minor);
-        const GrandPrixData *gp = grand_prix_manager->getGrandPrix(m_gp_id);
-        race_manager->setGrandPrix(*gp);
+        race_manager->setGrandPrix(grand_prix_manager->getGrandPrix(m_gp_id));
         race_manager->setDifficulty(d);
         race_manager->setNumKarts(m_num_karts[d]);
         race_manager->setNumLocalPlayers(1);
@@ -459,7 +458,7 @@ bool ChallengeData::isGPFulfilled() const
     // is no world objects to query at this stage.
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
-        race_manager->getGrandPrix()->getId() != m_gp_id                     ||
+        race_manager->getGrandPrix().getId() != m_gp_id                      ||
         race_manager->getNumberOfKarts() < (unsigned int)m_num_karts[d]      ||
         race_manager->getNumPlayers() > 1) return false;
 

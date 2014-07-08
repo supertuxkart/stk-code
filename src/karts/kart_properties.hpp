@@ -328,9 +328,6 @@ private:
     /** The restitution factor to be used in collsions for this kart. */
     float m_restitution;
 
-    float m_upright_tolerance;
-    float m_upright_max_force;
-
     /** How far behind a kart slipstreaming is effective. */
     float m_slipstream_length;
     /** How wide the slipstream area is at the end. */
@@ -698,15 +695,6 @@ public:
         explosion. */
     float getExplosionInvulnerabilityTime() const
                                    { return m_explosion_invulnerability_time; }
-
-    // ------------------------------------------------------------------------
-    /** Returns how much a kart can roll/pitch before the upright constraint
-     *  counteracts. */
-    float getUprightTolerance       () const {return m_upright_tolerance;     }
-
-    // ------------------------------------------------------------------------
-    /** Returns the maximum value of the upright counteracting force. */
-    float getUprightMaxForce        () const {return m_upright_max_force;     }
 
     // ------------------------------------------------------------------------
     /** Returns the maximum length of a rubber band before it breaks. */

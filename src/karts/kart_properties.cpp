@@ -72,9 +72,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
-        m_upright_tolerance = m_collision_terrain_impulse =
-        m_collision_impulse = m_restitution = m_collision_impulse_time =
-        m_upright_max_force = m_suspension_travel_cm =
+        m_collision_terrain_impulse = m_collision_impulse = m_restitution =
+        m_collision_impulse_time = m_suspension_travel_cm =
         m_track_connection_accel = m_rubber_band_max_length =
         m_rubber_band_force = m_rubber_band_duration =
         m_rubber_band_speed_increase = m_rubber_band_fade_out_time =
@@ -365,12 +364,6 @@ void KartProperties::getAllData(const XMLNode * root)
                                                    &m_downward_impulse_factor);
         stability_node->get("track-connection-accel",
                                                    &m_track_connection_accel );
-    }
-
-    if(const XMLNode *upright_node = root->getNode("upright"))
-    {
-        upright_node->get("tolerance", &m_upright_tolerance);
-        upright_node->get("max-force", &m_upright_max_force);
     }
 
     if(const XMLNode *collision_node = root->getNode("collision"))
@@ -673,8 +666,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_bevel_factor.getX(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getY(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
-    CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
-    CHECK_NEG(m_upright_max_force,          "upright max-force"             );
     CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
     CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
     CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );

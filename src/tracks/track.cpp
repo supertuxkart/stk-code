@@ -523,10 +523,10 @@ void Track::loadTrackInfo()
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);
-    std::string easter_name = dir+"/easter_eggs.xml";
+    std::string easter_name = dir + "/easter_eggs.xml";
 
     XMLNode *easter = file_manager->createXMLTree(easter_name);
-  
+
     if(easter)
     {
         for(unsigned int i=0; i<easter->getNumNodes(); i++)
@@ -934,7 +934,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         mesh = irr_driver->getMesh(full_path);
     }
-    
+
     if(!mesh)
     {
         Log::fatal("track",
@@ -1969,7 +1969,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
                 libroot = library_nodes[name];
                 create_lod_definitions = false; // LOD definitions are already created, don't create them again
             }
-    
+
             scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
             parent->setPosition(xyz);
             parent->setRotation(hpr);

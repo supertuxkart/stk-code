@@ -607,13 +607,17 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
     glUseProgram(FullScreenShader::MotionBlurShader::Program);
     glBindVertexArray(FullScreenShader::MotionBlurShader::vao);
 
-    setTexture(0, in_fbo.getRTT()[0], GL_NEAREST, GL_NEAREST);
+    setTexture(0, in_fbo.getRTT()[0], GL_LINEAR, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     FullScreenShader::MotionBlurShader
-                    ::setUniforms(cb->getBoostTime(cam), cb->getCenter(cam),
-                                  cb->getDirection(cam), 0.15f,
-                                  cb->getMaxHeight(cam) * 0.7f, 0);
+                    ::setUniforms(.1, // Todo : should be framerate dependent
+                                  // Todo : use a previousPVMatrix per cam, not global
+                                  irr_driver->getPreviousPVMatrix(),
+                                  cb->getCenter(cam),
+                                  0.15f,
+                                  0, 1);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -868,7 +872,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
     {
         PROFILER_PUSH_CPU_MARKER("- Motion blur", 0xFF, 0x00, 0x00);
         ScopedGPUTimer Timer(irr_driver->getGPUTimer(Q_MOTIONBLUR));
-        if (isRace && UserConfigParams::m_motionblur && m_any_boost && World::getWorld() != NULL) // motion blur
+        if (isRace && UserConfigParams::m_motionblur && World::getWorld() != NULL) // motion blur
         {
             renderMotionBlur(0, *in_fbo, *out_fbo);
             std::swap(in_fbo, out_fbo);

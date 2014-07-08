@@ -204,9 +204,6 @@ void IrrDriver::renderGLSL(float dt)
             else
                 fbo->BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
         }
-        else
-            glDisable(GL_FRAMEBUFFER_SRGB);
-
 
         PROFILER_POP_CPU_MARKER();
     }   // for i<world->getNumKarts()
@@ -372,7 +369,10 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         PROFILER_POP_CPU_MARKER();
     }
     if (!UserConfigParams::m_dynamic_lights && !forceRTT)
+    {
+        glDisable(GL_FRAMEBUFFER_SRGB);
         return;
+    }
 
     // Render displacement
     {

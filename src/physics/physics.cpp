@@ -33,7 +33,6 @@
 #include "modes/world.hpp"
 #include "karts/explosion_animation.hpp"
 #include "physics/btKart.hpp"
-#include "physics/btUprightConstraint.hpp"
 #include "physics/irr_debug_drawer.hpp"
 #include "physics/physical_object.hpp"
 #include "physics/stk_dynamics_world.hpp"
@@ -86,8 +85,8 @@ Physics::~Physics()
 
 // ----------------------------------------------------------------------------
 /** Adds a kart to the physics engine.
- *  This adds the rigid body, the vehicle, and the upright constraint, but only
- *  if the kart is not already in the physics world.
+ *  This adds the rigid body and the vehicle but only if the kart is not 
+ *  already in the physics world.
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.
  */
@@ -102,7 +101,6 @@ void Physics::addKart(const AbstractKart *kart)
     }
     m_dynamics_world->addRigidBody(kart->getBody());
     m_dynamics_world->addVehicle(kart->getVehicle());
-    m_dynamics_world->addConstraint(kart->getUprightConstraint());
 }   // addKart
 
 //-----------------------------------------------------------------------------
@@ -130,7 +128,6 @@ void Physics::removeKart(const AbstractKart *kart)
     {
         m_dynamics_world->removeRigidBody(kart->getBody());
         m_dynamics_world->removeVehicle(kart->getVehicle());
-        m_dynamics_world->removeConstraint(kart->getUprightConstraint());
     }
 }   // removeKart
 
