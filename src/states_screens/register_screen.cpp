@@ -89,7 +89,7 @@ void RegisterScreen::init()
     getWidget<CheckBoxWidget>("online")->setVisible(true);
     getWidget<LabelWidget>("label_online")->setVisible(true);
     onDialogClose();
-    bool online =    UserConfigParams::m_internet_status 
+    bool online =    UserConfigParams::m_internet_status
                   != Online::RequestManager::IPERM_NOT_ALLOWED;
     getWidget<CheckBoxWidget>("online")->setState(online);
     makeEntryFieldsVisible(online);
@@ -108,7 +108,7 @@ void RegisterScreen::setRename(PlayerProfile *player)
  */
 void RegisterScreen::onDialogClose()
 {
-    bool online =    UserConfigParams::m_internet_status 
+    bool online =    UserConfigParams::m_internet_status
                   != Online::RequestManager::IPERM_NOT_ALLOWED;
     getWidget<CheckBoxWidget>("online")->setState(online);
     makeEntryFieldsVisible(online);

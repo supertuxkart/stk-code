@@ -84,7 +84,7 @@ private:
     /** Height of the digit font. */
     int              m_font_height;
 
-    /** Animation state: none, getting smaller (old value), 
+    /** Animation state: none, getting smaller (old value),
      *  getting bigger (new number). */
     enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};
     std::vector<AnimationState> m_animation_states;

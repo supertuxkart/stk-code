@@ -84,7 +84,7 @@ Physics::~Physics()
 
 // ----------------------------------------------------------------------------
 /** Adds a kart to the physics engine.
- *  This adds the rigid body and the vehicle but only if the kart is not 
+ *  This adds the rigid body and the vehicle but only if the kart is not
  *  already in the physics world.
  *  \param kart The kart to add.
  *  \param vehicle The raycast vehicle object.

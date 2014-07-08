@@ -531,9 +531,9 @@ namespace StringUtils
       */
     irr::core::stringw loadingDots(float interval, int max_dots)
     {
-        int nr_dots = int(floor(StkTime::getRealTime() / interval)) 
+        int nr_dots = int(floor(StkTime::getRealTime() / interval))
                     % (max_dots + 1);
-        return irr::core::stringw((std::string(nr_dots, '.') + 
+        return irr::core::stringw((std::string(nr_dots, '.') +
                                    std::string(max_dots - nr_dots, ' ')).c_str());
     }   // loadingDots
 
