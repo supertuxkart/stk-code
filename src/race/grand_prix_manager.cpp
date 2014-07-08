@@ -36,7 +36,7 @@ GrandPrixManager::GrandPrixManager()
 {
     m_random_gp = NULL; // better do it explicitly and avoid weird stuff
     loadFiles();
-}
+}   // GrandPrixManager
 
 // ----------------------------------------------------------------------------
 GrandPrixManager::~GrandPrixManager()
@@ -45,9 +45,8 @@ GrandPrixManager::~GrandPrixManager()
     {
         delete m_gp_data[i];
     }
-
     delete m_random_gp;
-}
+}   // ~GrandPrixManager
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::loadFiles()
@@ -66,7 +65,7 @@ void GrandPrixManager::loadFiles()
         if (!dir.empty() && dir[dir.size() - 1] == '/')
             loadDir(dir);
     }
-}
+}   // loadFiles
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::loadDir(const std::string& dir)
@@ -82,7 +81,7 @@ void GrandPrixManager::loadDir(const std::string& dir)
                                         i != result.end(); i++)
         if (StringUtils::hasSuffix(*i, SUFFIX))
             load(dir + *i);
-}
+}   // loadDir
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::load(const std::string& filename)
@@ -110,7 +109,7 @@ void GrandPrixManager::reload()
     m_gp_data.clear();
 
     loadFiles();
-}
+}   // reload
 
 // ----------------------------------------------------------------------------
 std::string GrandPrixManager::generateId()
@@ -136,7 +135,7 @@ std::string GrandPrixManager::generateId()
     }
 
     return s.str();
-}
+}   // generateId
 
 // ----------------------------------------------------------------------------
 bool GrandPrixManager::existsName(const irr::core::stringw& name) const
@@ -146,13 +145,13 @@ bool GrandPrixManager::existsName(const irr::core::stringw& name) const
             return true;
 
     return false;
-}
+}   // existsName
 
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 {
     return editGrandPrix(s);
-}
+}   // getGrandPrix
 
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
@@ -167,7 +166,7 @@ GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
     }   // for i in m_gp_data
 
     return NULL;
-}
+}   // editGrandPrix
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::checkConsistency()
@@ -200,7 +199,7 @@ GrandPrixData* GrandPrixManager::createNewGP(const irr::core::stringw& newName)
     m_gp_data.push_back(gp);
 
     return gp;
-}
+}   // createNewGP
 
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::copy(const std::string& id,
@@ -220,7 +219,7 @@ GrandPrixData* GrandPrixManager::copy(const std::string& id,
     m_gp_data.push_back(gp);
 
     return gp;
-}
+}   // copy
 
 // ----------------------------------------------------------------------------
 void GrandPrixManager::remove(const std::string& id)
@@ -238,4 +237,4 @@ void GrandPrixManager::remove(const std::string& id)
         Log::warn("GrandPrixManager",
                   "Grand Prix '%s' can not be removed", gp->getId().c_str());
     }
-}
+}   // remove
