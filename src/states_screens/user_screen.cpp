@@ -26,7 +26,6 @@
 #include "guiengine/widgets/label_widget.hpp"
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
-#include "online/messages.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
@@ -395,8 +394,8 @@ void BaseUserScreen::onUpdate(float dt)
         core::stringw message = (m_state & STATE_LOGOUT)
                               ? _(L"Signing out '%s'",m_sign_out_name.c_str())
                               : _(L"Signing in '%s'", m_sign_in_name.c_str());
-        m_info_widget->setText(Online::Messages::loadingDots(message.c_str()),
-                               false                                           );
+        m_info_widget->setText(StringUtils::loadingDots(message.c_str()),
+                               false                                      );
     }
     PlayerProfile *player = getSelectedPlayer();
     if(player)

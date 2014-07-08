@@ -29,7 +29,6 @@ enum ShadedMaterial
     SM_GRASS,
     SM_UNLIT,
     SM_DETAILS,
-    SM_UNTEXTURED,
     SM_COUNT
 };
 
@@ -42,12 +41,7 @@ enum TransparentMaterial
 };
 
 struct GLMesh {
-    GLuint vao_first_pass;
-    GLuint vao_second_pass;
-    GLuint vao_glow_pass;
-    GLuint vao_displace_pass;
-    GLuint vao_displace_mask_pass;
-    GLuint vao_rsm_pass;
+    GLuint vao;
     GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
@@ -59,8 +53,9 @@ struct GLMesh {
     core::matrix4 TextureMatrix;
 };
 
-GLuint createVAO(GLuint vbo, GLuint idx, GLuint attrib_position, GLuint attrib_texcoord, GLuint attrib_second_texcoord, GLuint attrib_normal, GLuint attrib_tangent, GLuint attrib_bitangent, GLuint attrib_color, size_t stride);
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
+video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
+GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
 void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
 void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat);
 core::matrix4 computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
@@ -146,6 +141,25 @@ void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectio
 // Shadow pass
 void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
 void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
+
+template<enum TransparentMaterial T>
+class TransparentMeshes
+{
+public:
+    static std::vector<GLMesh *> MeshSet;
+    static std::vector<core::matrix4> MVPSet;
+
+    static void reset()
+    {
+        MeshSet.clear();
+        MVPSet.clear();
+    }
+};
+
+template<enum TransparentMaterial T>
+std::vector<GLMesh *> TransparentMeshes<T>::MeshSet;
+template<enum TransparentMaterial T>
+std::vector<core::matrix4> TransparentMeshes<T>::MVPSet;
 
 // Forward pass (for transparents meshes)
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);

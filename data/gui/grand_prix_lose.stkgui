@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
         <spacer width="10" proportion="1"/>

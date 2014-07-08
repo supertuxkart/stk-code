@@ -393,7 +393,6 @@ public:
 
     void setPosition(float x, float y, float z)
     {
-        const video::IVideoDriver * const drv = irr_driver->getVideoDriver();
         // Sun "position" is actually a direction and not a position
         core::matrix4 m_view = irr_driver->getViewMatrix();
         m_view.makeInverse();

@@ -232,6 +232,31 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_player_ident_spinner->m_w = player_name_w;
     m_player_ident_spinner->m_h = player_name_h;
 
+    // ---- KartStatsWidget
+    m_kart_stats = NULL;
+
+        // area for the stats widget
+    core::recti statsArea;
+    if (!parent->m_multiplayer)
+    {
+        statsArea = core::recti(m_kart_stats_x,
+                                m_kart_stats_y,
+                                m_kart_stats_x + m_kart_stats_w,
+                                m_kart_stats_y + m_kart_stats_h);
+    }
+    else
+    {
+        statsArea = core::recti(m_x , m_y + m_h/2,
+                                m_x + m_w, m_y + m_h);
+    }
+
+
+    m_kart_stats = new GUIEngine::KartStatsWidget(statsArea, player_id, kart_group,
+                                                  m_parent_screen->m_multiplayer);
+    m_kart_stats->m_properties[PROP_ID] =
+            StringUtils::insertValues("@p%i_stats", m_player_id);
+    m_children.push_back(m_kart_stats);
+
     if (parent->m_multiplayer && associated_player)
     {
         if (associated_player->getDevice()->getType() == DT_KEYBOARD)
@@ -272,8 +297,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
     //m_player_ident_spinner->m_event_handler = this;
     m_children.push_back(m_player_ident_spinner);
-    
-
 
     // ----- Kart model view
     m_model_view = new ModelViewWidget();
@@ -347,8 +370,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_model_view->setRotateContinuously( 35.0f );
 
     // ---- Kart name label
-    m_kart_name = new LabelWidget();
-    m_kart_name->add(); // add the widget
+    m_kart_name = new LabelWidget(true, true);
     m_kart_name->setText(props->getName(), false);
     m_kart_name->m_properties[PROP_TEXT_ALIGN] = "center";
     m_kart_name->m_properties[PROP_ID] =
@@ -357,7 +379,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_kart_name->m_y = kart_name_y;
     m_kart_name->m_w = kart_name_w;
     m_kart_name->m_h = kart_name_h;
-    //m_kart_name->setParent(this);
     m_children.push_back(m_kart_name);
 }   // PlayerKartWidget
 // ------------------------------------------------------------------------
@@ -473,7 +494,7 @@ void PlayerKartWidget::add()
     m_player_ident_spinner->add();
     m_player_ident_spinner->getIrrlichtElement()->setTabStop(false);
     m_player_ident_spinner->setListener(this);
-
+    m_kart_stats->add();
     m_model_view->add();
     m_kart_name->add();
 
@@ -661,11 +682,25 @@ void PlayerKartWidget::onUpdate(float delta)
             core::recti(core::position2di(player_name_x, player_name_y),
                         core::dimension2di(player_name_w, player_name_h))           );
     }
+    if (!m_parent_screen->m_multiplayer)
+    {
+        m_kart_stats->move(m_kart_stats_x,
+                           m_kart_stats_y,
+                           m_kart_stats_w,
+                           m_kart_stats_h);
+    }
+    else
+    {
+        m_kart_stats->move(m_x, m_y + m_h/2,
+                           m_w, m_h/2);
+    }
+
 
     m_model_view->move(model_x,
                        model_y,
                        model_w,
                        model_h);
+
     m_kart_name->move(kart_name_x,
                       kart_name_y,
                       kart_name_w,
@@ -758,15 +793,41 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     player_name_x = x + w/2 - player_name_w/2;
     player_name_y = y + player_id_h;
 
-    const int modelMaxHeight =  h - kart_name_h - player_name_h
-                                - player_id_h;
-    const int modelMaxWidth =  w;
-    const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
-    const int modelY = y + player_name_h + player_id_h;
-    model_x = x + w/2 - (int)(bestSize/2);
-    model_y = modelY + modelMaxHeight/2 - bestSize/2;
-    model_w = (int)(bestSize);
-    model_h = bestSize;
+    if (m_parent_screen->m_multiplayer)
+    {
+        const int modelMaxHeight =  (h - kart_name_h - player_name_h
+                                    - player_id_h)/2;
+        const int modelMaxWidth =  w;
+        const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
+        model_x = x + w/2 - (int)(bestSize/2);
+        model_y =  y + player_name_h + player_id_h;
+        model_w = (int)(bestSize);
+        model_h = bestSize;
+
+        m_kart_stats_w = model_w;
+        m_kart_stats_h = model_h;
+        m_kart_stats_x = x + w/2 - (int)(bestSize/2);
+        m_kart_stats_y = model_y + model_h;
+
+
+    }
+    else
+    {
+        const int modelMaxHeight =  h - kart_name_h - player_name_h
+                                    - player_id_h;
+        const int modelMaxWidth =  w;
+        const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
+        const int modelY = y + player_name_h + player_id_h;
+        model_x = x + w/4 - (int)(bestSize/2);
+        model_y = modelY + modelMaxHeight/2 - bestSize/2;
+        model_w = (int)(bestSize);
+        model_h = bestSize;
+
+        m_kart_stats_w = w/2;
+        m_kart_stats_h = h;
+        m_kart_stats_x = x + w/2;
+        m_kart_stats_y = y;
+    }
 
     kart_name_x = x;
     kart_name_y = y + h - kart_name_h;
@@ -851,8 +912,8 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
     }
 
     m_parent->updateKartWidgetModel(playerID, selectionID, selectionText);
-
     m_parent->m_kart_widgets[playerID].setKartInternalName(selectionID);
+    m_parent->updateKartStats(playerID, selectionID);
     m_parent->validateKartChoices();
 }   // onSelectionChanged
 
@@ -1455,6 +1516,23 @@ void KartSelectionScreen::playerConfirm(const int playerID)
 
 // ----------------------------------------------------------------------------
 
+void KartSelectionScreen::updateKartStats(uint8_t widget_id,
+                                          const std::string& selection)
+{
+    KartStatsWidget* w = m_kart_widgets[widget_id].m_kart_stats;
+    assert(w != NULL);
+
+    const KartProperties *kp =
+                    kart_properties_manager->getKart(selection);
+    if (kp != NULL)
+    {
+        w->setValue(KartStatsWidget::SKILL_MASS, (int)(kp->getMass()/5));
+        w->setValue(KartStatsWidget::SKILL_SPEED, (int)((kp->getAbsMaxSpeed()-20)*9));
+        w->setValue(KartStatsWidget::SKILL_POWER, (int)(kp->getAvgPower()));
+        w->update(0);
+    }
+}
+
 void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
                 const std::string& selection,
                 const irr::core::stringw& selectionText)
@@ -1524,6 +1602,11 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
                           kart_model.getWheelGraphicsPosition(2) );
             w3->addModel( kart_model.getWheelModel(3),
                           kart_model.getWheelGraphicsPosition(3) );
+            for (size_t i = 0; i < kart_model.getSpeedWeightedObjectsCount(); i++)
+            {
+                const SpeedWeightedObject&  obj = kart_model.getSpeedWeightedObject(i);
+                w3->addModel(obj.m_model, obj.m_position);
+            }
             w3->update(0);
 
             m_kart_widgets[widget_id].m_kart_name

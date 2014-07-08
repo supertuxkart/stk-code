@@ -418,17 +418,10 @@ void setupRaceStart()
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
     }
 
-    if(!track_manager->getTrack(UserConfigParams::m_last_track))
-    {
-        race_manager->setTrack("jungle");
-    }
-    else
-        race_manager->setTrack(UserConfigParams::m_last_track);
-
     // ASSIGN should make sure that only input from assigned devices
     // is read.
     input_manager->getDeviceList()->setAssignMode(ASSIGN);
-}   // setupRaceMode
+}   // setupRaceStart
 
 // ----------------------------------------------------------------------------
 /** Prints help for command line options to stdout.
@@ -861,7 +854,7 @@ int handleCmdLine()
             Log::warn("main", "There is no GP named '%s'.", s.c_str());
             return 0;
         }
-        race_manager->setGrandPrix(*gp);
+        race_manager->setGrandPrix(gp);
     }   // --gp
 
     if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
@@ -1118,6 +1111,8 @@ void initRest()
     race_manager->setMinorMode (RaceManager::MINOR_MODE_NORMAL_RACE);
     race_manager->setDifficulty(
                  (RaceManager::Difficulty)(int)UserConfigParams::m_difficulty);
+    if(track_manager->getTrack(UserConfigParams::m_last_track))
+        race_manager->setTrack(UserConfigParams::m_last_track);
 
 }   // initRest
 

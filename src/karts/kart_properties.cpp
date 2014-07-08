@@ -72,9 +72,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_wheel_radius = m_chassis_linear_damping = m_max_suspension_force =
         m_chassis_angular_damping = m_suspension_rest =
         m_max_speed_reverse_ratio = m_rescue_vert_offset =
-        m_upright_tolerance = m_collision_terrain_impulse =
-        m_collision_impulse = m_restitution = m_collision_impulse_time =
-        m_upright_max_force = m_suspension_travel_cm =
+        m_collision_terrain_impulse = m_collision_impulse = m_restitution =
+        m_collision_impulse_time = m_suspension_travel_cm =
         m_track_connection_accel = m_rubber_band_max_length =
         m_rubber_band_force = m_rubber_band_duration =
         m_rubber_band_speed_increase = m_rubber_band_fade_out_time =
@@ -172,13 +171,19 @@ void KartProperties::load(const std::string &filename, const std::string &node)
 {
     // Get the default values from STKConfig. This will also allocate any
     // pointers used in KartProperties
-    copyFrom(&stk_config->getDefaultKartProperties());
+
+    const XMLNode* root = new XMLNode(filename);
+    std::string kart_type;
+    if (root->get("type", &kart_type))
+        copyFrom(&stk_config->getKartProperties(kart_type));
+    else
+        copyFrom(&stk_config->getDefaultKartProperties());
+
     // m_kart_model must be initialised after assigning the default
     // values from stk_config (otherwise all kart_properties will
     // share the same KartModel
     m_kart_model  = new KartModel(/*is_master*/true);
 
-    const XMLNode * root = 0;
     m_root  = StringUtils::getPath(filename)+"/";
     m_ident = StringUtils::getBasename(StringUtils::getPath(filename));
     // If this is an addon kart, add "addon_" to the identifier - just in
@@ -188,7 +193,6 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_ident = Addon::createAddonId(m_ident);
     try
     {
-        root = new XMLNode(filename);
         if(!root || root->getName()!="kart")
         {
             std::ostringstream msg;
@@ -286,7 +290,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
  */
 void KartProperties::getAllData(const XMLNode * root)
 {
-    root->get("version", &m_version);
+    root->get("version",           &m_version);
 
     root->get("name",              &m_name             );
 
@@ -307,49 +311,10 @@ void KartProperties::getAllData(const XMLNode * root)
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
     root->get("shadow-y-offset",   &m_shadow_y_offset  );
 
+    root->get("type",     &m_kart_type        );
+
     if(const XMLNode *dimensions_node = root->getNode("center"))
         dimensions_node->get("gravity-shift", &m_gravity_center_shift);
-
-    if(const XMLNode *nitro_node = root->getNode("nitro"))
-    {
-        nitro_node->get("consumption",        &m_nitro_consumption       );
-        nitro_node->get("small-container",    &m_nitro_small_container   );
-        nitro_node->get("big-container",      &m_nitro_big_container     );
-        nitro_node->get("max-speed-increase", &m_nitro_max_speed_increase);
-        nitro_node->get("engine-force",       &m_nitro_engine_force      );
-        nitro_node->get("duration",           &m_nitro_duration          );
-        nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
-        nitro_node->get("max",                &m_nitro_max               );
-        nitro_node->get("min-consumption-time", &m_nitro_min_consumption   );
-    }
-
-    if(const XMLNode *bubble_node = root->getNode("bubblegum"))
-    {
-        bubble_node->get("time",           &m_bubblegum_time          );
-        bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
-        bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
-        bubble_node->get("torque",         &m_bubblegum_torque        );
-    }
-
-    if(const XMLNode *rescue_node = root->getNode("rescue"))
-    {
-        rescue_node->get("vert-offset", &m_rescue_vert_offset);
-        rescue_node->get("time",        &m_rescue_time       );
-        rescue_node->get("height",      &m_rescue_height     );
-    }
-
-    if(const XMLNode *explosion_node = root->getNode("explosion"))
-    {
-        explosion_node->get("time",   &m_explosion_time  );
-        explosion_node->get("radius", &m_explosion_radius);
-        explosion_node->get("invulnerability-time",
-                        &m_explosion_invulnerability_time);
-    }
-
-    if(const XMLNode *skid_node = root->getNode("skid"))
-    {
-        m_skidding_properties->load(skid_node);
-    }
 
     if(const XMLNode *ai_node = root->getNode("ai"))
     {
@@ -362,59 +327,6 @@ void KartProperties::getAllData(const XMLNode * root)
         const XMLNode *best = ai_node->getNode("best");
         m_ai_properties[RaceManager::DIFFICULTY_BEST]->load(best);
     }
-
-    if(const XMLNode *slipstream_node = root->getNode("slipstream"))
-    {
-        slipstream_node->get("length",       &m_slipstream_length            );
-        slipstream_node->get("width",        &m_slipstream_width             );
-        slipstream_node->get("collect-time", &m_slipstream_collect_time      );
-        slipstream_node->get("use-time",     &m_slipstream_use_time          );
-        slipstream_node->get("add-power",    &m_slipstream_add_power         );
-        slipstream_node->get("min-speed",    &m_slipstream_min_speed         );
-        slipstream_node->get("max-speed-increase",
-                                             &m_slipstream_max_speed_increase);
-        slipstream_node->get("duration",     &m_slipstream_duration          );
-        slipstream_node->get("fade-out-time",&m_slipstream_fade_out_time     );
-    }
-
-    if(const XMLNode *turn_node = root->getNode("turn"))
-    {
-        turn_node->get("time-full-steer",      &m_time_full_steer     );
-        turn_node->get("time-reset-steer",     &m_time_reset_steer    );
-        turn_node->get("turn-radius",          &m_turn_angle_at_speed );
-        // For now store the turn radius in turn angle, the correct
-        // value can only be determined later in ::load
-    }
-
-    if(const XMLNode *engine_node = root->getNode("engine"))
-    {
-        engine_node->get("brake-factor", &m_brake_factor);
-        engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
-        engine_node->get("power", &m_engine_power);
-        if(m_engine_power.size()!=RaceManager::DIFFICULTY_COUNT)
-        {
-            Log::fatal("[KartProperties]",
-                       "Incorrect engine-power specifications for kart '%s'",
-                       getIdent().c_str());
-        }
-        engine_node->get("max-speed", &m_max_speed);
-        if(m_max_speed.size()!=RaceManager::DIFFICULTY_COUNT)
-        {
-            Log::fatal("[KartProperties]",
-                       "Incorrect max-speed specifications for kart '%s'",
-                       getIdent().c_str());
-        }
-    }   // if getNode("engine")
-
-    if(const XMLNode *gear_node = root->getNode("gear"))
-    {
-        gear_node->get("switch-ratio",   &m_gear_switch_ratio  );
-        gear_node->get("power-increase", &m_gear_power_increase);
-    }
-
-    if(const XMLNode *mass_node = root->getNode("mass"))
-        mass_node->get("value", &m_mass);
-
 
     if(const XMLNode *suspension_node = root->getNode("suspension"))
     {
@@ -454,12 +366,6 @@ void KartProperties::getAllData(const XMLNode * root)
                                                    &m_track_connection_accel );
     }
 
-    if(const XMLNode *upright_node = root->getNode("upright"))
-    {
-        upright_node->get("tolerance", &m_upright_tolerance);
-        upright_node->get("max-force", &m_upright_max_force);
-    }
-
     if(const XMLNode *collision_node = root->getNode("collision"))
     {
         collision_node->get("impulse",         &m_collision_impulse        );
@@ -488,50 +394,6 @@ void KartProperties::getAllData(const XMLNode * root)
     //TODO: listed as an attribute in the xml file after wheel-radius
     //TODO: same goes for their rear equivalents
 
-    if(const XMLNode *plunger_node= root->getNode("plunger"))
-    {
-        plunger_node->get("band-max-length",    &m_rubber_band_max_length    );
-        plunger_node->get("band-force",         &m_rubber_band_force         );
-        plunger_node->get("band-duration",      &m_rubber_band_duration      );
-        plunger_node->get("band-speed-increase",&m_rubber_band_speed_increase);
-        plunger_node->get("band-fade-out-time", &m_rubber_band_fade_out_time );
-        plunger_node->get("in-face-time", &m_plunger_in_face_duration);
-        if(m_plunger_in_face_duration.size()!=RaceManager::DIFFICULTY_COUNT)
-        {
-            Log::fatal("KartProperties",
-                       "Invalid plunger in-face-time specification.");
-        }
-    }
-
-    if(const XMLNode *zipper_node= root->getNode("zipper"))
-    {
-        zipper_node->get("time",               &m_zipper_time              );
-        zipper_node->get("fade-out-time",      &m_zipper_fade_out_time     );
-        zipper_node->get("force",              &m_zipper_force             );
-        zipper_node->get("speed-gain",         &m_zipper_speed_gain        );
-        zipper_node->get("max-speed-increase", &m_zipper_max_speed_increase);
-    }
-
-    if(const XMLNode *swatter_node= root->getNode("swatter"))
-    {
-        swatter_node->get("duration",        &m_swatter_duration      );
-        swatter_node->get("squash-duration", &m_squash_duration       );
-        swatter_node->get("squash-slowdown", &m_squash_slowdown       );
-        if(swatter_node->get("distance",     &m_swatter_distance2) )
-        {
-            // Avoid squaring if distance is not defined, so that
-            // distance2 remains UNDEFINED (which is a negative value)
-            m_swatter_distance2 *= m_swatter_distance2;
-        }
-    }
-
-    if(const XMLNode *lean_node= root->getNode("lean"))
-    {
-        lean_node->get("max",   &m_max_lean  );
-        lean_node->get("speed", &m_lean_speed);
-        m_max_lean   *= DEGREE_TO_RAD;
-        m_lean_speed *= DEGREE_TO_RAD;
-    }
 
     if(const XMLNode *jump_node= root->getNode("jump"))
     {
@@ -545,12 +407,6 @@ void KartProperties::getAllData(const XMLNode * root)
         m_camera_forward_up_angle *= DEGREE_TO_RAD;
         camera_node->get("backward-up-angle", &m_camera_backward_up_angle);
         m_camera_backward_up_angle *= DEGREE_TO_RAD;
-    }
-
-    if(const XMLNode *startup_node= root->getNode("startup"))
-    {
-        startup_node->get("time", &m_startup_times);
-        startup_node->get("boost", &m_startup_boost);
     }
 
     if(const XMLNode *sounds_node= root->getNode("sounds"))
@@ -597,6 +453,151 @@ void KartProperties::getAllData(const XMLNode * root)
         }   // for i<SFXManager::NUM_CUSTOMS
 #endif
     }   // if sounds-node exist
+
+    if(const XMLNode *nitro_node = root->getNode("nitro"))
+        {
+            nitro_node->get("consumption",          &m_nitro_consumption       );
+            nitro_node->get("small-container",      &m_nitro_small_container   );
+            nitro_node->get("big-container",        &m_nitro_big_container     );
+            nitro_node->get("max-speed-increase",   &m_nitro_max_speed_increase);
+            nitro_node->get("engine-force",         &m_nitro_engine_force      );
+            nitro_node->get("duration",             &m_nitro_duration          );
+            nitro_node->get("fade-out-time",        &m_nitro_fade_out_time     );
+            nitro_node->get("max",                  &m_nitro_max               );
+            nitro_node->get("min-consumption-time", &m_nitro_min_consumption   );
+        }
+
+        if(const XMLNode *bubble_node = root->getNode("bubblegum"))
+        {
+            bubble_node->get("time",           &m_bubblegum_time          );
+            bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
+            bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
+            bubble_node->get("torque",         &m_bubblegum_torque        );
+        }
+
+        if(const XMLNode *rescue_node = root->getNode("rescue"))
+        {
+            rescue_node->get("vert-offset", &m_rescue_vert_offset);
+            rescue_node->get("time",        &m_rescue_time       );
+            rescue_node->get("height",      &m_rescue_height     );
+        }
+
+        if(const XMLNode *explosion_node = root->getNode("explosion"))
+        {
+            explosion_node->get("time",   &m_explosion_time  );
+            explosion_node->get("radius", &m_explosion_radius);
+            explosion_node->get("invulnerability-time",
+                            &m_explosion_invulnerability_time);
+        }
+
+        if(const XMLNode *skid_node = root->getNode("skid"))
+        {
+            m_skidding_properties->load(skid_node);
+        }
+
+
+        if(const XMLNode *slipstream_node = root->getNode("slipstream"))
+        {
+            slipstream_node->get("length",       &m_slipstream_length            );
+            slipstream_node->get("width",        &m_slipstream_width             );
+            slipstream_node->get("collect-time", &m_slipstream_collect_time      );
+            slipstream_node->get("use-time",     &m_slipstream_use_time          );
+            slipstream_node->get("add-power",    &m_slipstream_add_power         );
+            slipstream_node->get("min-speed",    &m_slipstream_min_speed         );
+            slipstream_node->get("max-speed-increase",
+                                                 &m_slipstream_max_speed_increase);
+            slipstream_node->get("duration",     &m_slipstream_duration          );
+            slipstream_node->get("fade-out-time",&m_slipstream_fade_out_time     );
+        }
+
+        if(const XMLNode *turn_node = root->getNode("turn"))
+        {
+            turn_node->get("time-full-steer",      &m_time_full_steer     );
+            turn_node->get("time-reset-steer",     &m_time_reset_steer    );
+            turn_node->get("turn-radius",          &m_turn_angle_at_speed );
+            // For now store the turn radius in turn angle, the correct
+            // value can only be determined later in ::load
+        }
+
+        if(const XMLNode *engine_node = root->getNode("engine"))
+        {
+            engine_node->get("brake-factor", &m_brake_factor);
+            engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
+            engine_node->get("power", &m_engine_power);
+            if(m_engine_power.size()!=RaceManager::DIFFICULTY_COUNT)
+            {
+                Log::fatal("[KartProperties]",
+                           "Incorrect engine-power specifications for kart '%s'",
+                           getIdent().c_str());
+            }
+            engine_node->get("max-speed", &m_max_speed);
+            if(m_max_speed.size()!=RaceManager::DIFFICULTY_COUNT)
+            {
+                Log::fatal("[KartProperties]",
+                           "Incorrect max-speed specifications for kart '%s'",
+                           getIdent().c_str());
+            }
+        }   // if getNode("engine")
+
+        if(const XMLNode *gear_node = root->getNode("gear"))
+        {
+            gear_node->get("switch-ratio",   &m_gear_switch_ratio  );
+            gear_node->get("power-increase", &m_gear_power_increase);
+        }
+
+        if(const XMLNode *mass_node = root->getNode("mass"))
+            mass_node->get("value", &m_mass);
+
+        if(const XMLNode *plunger_node= root->getNode("plunger"))
+        {
+            plunger_node->get("band-max-length",    &m_rubber_band_max_length    );
+            plunger_node->get("band-force",         &m_rubber_band_force         );
+            plunger_node->get("band-duration",      &m_rubber_band_duration      );
+            plunger_node->get("band-speed-increase",&m_rubber_band_speed_increase);
+            plunger_node->get("band-fade-out-time", &m_rubber_band_fade_out_time );
+            plunger_node->get("in-face-time", &m_plunger_in_face_duration);
+            if(m_plunger_in_face_duration.size()!=RaceManager::DIFFICULTY_COUNT)
+            {
+                Log::fatal("KartProperties",
+                           "Invalid plunger in-face-time specification.");
+            }
+        }
+
+        if(const XMLNode *zipper_node= root->getNode("zipper"))
+        {
+            zipper_node->get("time",               &m_zipper_time              );
+            zipper_node->get("fade-out-time",      &m_zipper_fade_out_time     );
+            zipper_node->get("force",              &m_zipper_force             );
+            zipper_node->get("speed-gain",         &m_zipper_speed_gain        );
+            zipper_node->get("max-speed-increase", &m_zipper_max_speed_increase);
+        }
+
+        if(const XMLNode *swatter_node= root->getNode("swatter"))
+        {
+            swatter_node->get("duration",        &m_swatter_duration      );
+            swatter_node->get("squash-duration", &m_squash_duration       );
+            swatter_node->get("squash-slowdown", &m_squash_slowdown       );
+            if(swatter_node->get("distance",     &m_swatter_distance2) )
+            {
+                // Avoid squaring if distance is not defined, so that
+                // distance2 remains UNDEFINED (which is a negative value)
+                m_swatter_distance2 *= m_swatter_distance2;
+            }
+        }
+
+        if(const XMLNode *lean_node= root->getNode("lean"))
+        {
+            lean_node->get("max",   &m_max_lean  );
+            lean_node->get("speed", &m_lean_speed);
+            m_max_lean   *= DEGREE_TO_RAD;
+            m_lean_speed *= DEGREE_TO_RAD;
+        }
+
+        if(const XMLNode *startup_node= root->getNode("startup"))
+        {
+            startup_node->get("time", &m_startup_times);
+            startup_node->get("boost", &m_startup_boost);
+        }
 
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
@@ -665,8 +666,6 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_bevel_factor.getX(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getY(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
-    CHECK_NEG(m_upright_tolerance,          "upright tolerance"             );
-    CHECK_NEG(m_upright_max_force,          "upright max-force"             );
     CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
     CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
     CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );
@@ -755,6 +754,7 @@ bool KartProperties::isInGroup(const std::string &group) const
     return std::find(m_groups.begin(), m_groups.end(), group) != m_groups.end();
 }   // isInGroups
 
+
 // ----------------------------------------------------------------------------
 /** Called the first time a kart accelerates after 'ready-set-go'. It searches
  *  through m_startup_times to find the appropriate slot, and returns the
@@ -771,4 +771,16 @@ float KartProperties::getStartupBoost() const
     }
     return 0;
 }   // getStartupBoost
+
+// ----------------------------------------------------------------------------
+const float KartProperties::getAvgPower() const
+{
+    float sum = 0.0;
+    for (unsigned int i = 0; i < m_gear_power_increase.size(); ++i)
+    {
+        sum += m_gear_power_increase[i]*m_max_speed[0];
+    }
+    return sum/m_gear_power_increase.size();
+}   // getAvgPower
+
 /* EOF */

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row" >
 
@@ -13,7 +14,7 @@
             <icon-button id="tab_controls" width="128" height="128" icon="gui/options_input.png"/>
         </tabs>
 
-        <box proportion="1" width="98%" layout="vertical-row">
+        <box proportion="1" width="100%" layout="vertical-row">
 
             <spacer height="15" width="10"/>
 
@@ -55,7 +56,7 @@
                 <label id="message" width="80%" align="center" text_align="left"/>
             </div>
             <spacer width="20" height="25"/>
-            <buttonbar id="options" width="90%" height="13%" align="bottom">
+            <buttonbar id="options" width="90%" height="13%" align="center">
                 <icon-button id="ok" width="64" height="64" icon="gui/green_check.png"
                              I18N="Login dialog" text="OK" label_location="bottom"/>
                 <icon-button id="new_user" width="64" height="64" icon="gui/gp_add_track.png"
@@ -68,8 +69,7 @@
                              I18N="Login dialog" text="Cancel" label_location="bottom"/>
             </buttonbar>
         </box>
-        <spacer width="20" height="15"/>
     </div>
-    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 </stkgui>

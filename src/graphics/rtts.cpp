@@ -20,23 +20,21 @@
 #include "config/user_config.hpp"
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "graphics/post_processing.hpp"
 #include "utils/log.hpp"
+#include <ISceneManager.h>
 
 static GLuint generateRTT3D(GLenum target, size_t w, size_t h, size_t d, GLint internalFormat, GLint format, GLint type)
 {
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(target, result);
-    if (irr_driver->getGLSLVersion() < 420)
-        glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
-    else
-    {
-#if !defined(__linux__) || defined(GL_VERSION_4_2)
+#if WIN32
+    if (irr_driver->getGLSLVersion() >= 420)
         glTexStorage3D(target, 1, internalFormat, w, h, d);
-#else
-        assert(false);
+    else
 #endif
-    }
+        glTexImage3D(target, 0, internalFormat, w, h, d, 0, format, type, 0);
     return result;
 }
 
@@ -45,16 +43,12 @@ static GLuint generateRTT(const core::dimension2du &res, GLint internalFormat, G
     GLuint result;
     glGenTextures(1, &result);
     glBindTexture(GL_TEXTURE_2D, result);
-    if (irr_driver->getGLSLVersion() < 420)
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
-    else
-    {
-#if !defined(__linux__) || defined(GL_VERSION_4_2)
+#if WIN32
+    if (irr_driver->getGLSLVersion() >= 420)
         glTexStorage2D(GL_TEXTURE_2D, mipmaplevel, internalFormat, res.Width, res.Height);
-#else
-        assert(false);
+    else
 #endif
-    }
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, res.Width, res.Height, 0, format, type, 0);
     return result;
 }
 
@@ -80,6 +74,8 @@ static GLuint generateFBO(GLuint ColorAttachement, GLuint DepthAttachement)
 
 RTT::RTT(size_t width, size_t height)
 {
+    m_width = width;
+    m_height = height;
     m_shadow_FBO = NULL;
     m_RH_FBO = NULL;
     m_RSM = NULL;
@@ -87,12 +83,10 @@ RTT::RTT(size_t width, size_t height)
     using namespace video;
     using namespace core;
 
-    IVideoDriver * const drv = irr_driver->getVideoDriver();
     const dimension2du res(width, height);
     const dimension2du half = res/2;
     const dimension2du quarter = res/4;
     const dimension2du eighth = res/8;
-    const dimension2du sixteenth = res/16;
 
     const u16 shadowside = 1024;
     const dimension2du shadowsize0(shadowside, shadowside);
@@ -273,20 +267,40 @@ RTT::~RTT()
     glDeleteTextures(1, &DepthStencilTexture);
     if (UserConfigParams::m_shadows)
     {
+        delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);
         glDeleteTextures(1, &shadowDepthTex);
     }
     if (UserConfigParams::m_gi)
     {
+        delete m_RH_FBO;
+        delete m_RSM;
         glDeleteTextures(1, &RSM_Color);
         glDeleteTextures(1, &RSM_Normal);
         glDeleteTextures(1, &RSM_Depth);
         glDeleteTextures(1, &RH_Red);
         glDeleteTextures(1, &RH_Green);
         glDeleteTextures(1, &RH_Blue);
-
-        delete m_shadow_FBO;
-        delete m_RH_FBO;
-        delete m_RSM;
     }
+}
+
+FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
+{
+    irr_driver->setRTT(this);
+
+    irr_driver->getSceneManager()->setActiveCamera(camera);
+
+    std::vector<IrrDriver::GlowData> glows;
+    irr_driver->computeCameraMatrix(camera, m_width, m_height);
+    unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
+    irr_driver->renderScene(camera, plc, glows, dt, false, true);
+    FrameBuffer* frame_buffer = irr_driver->getPostProcessing()->render(camera, false);
+
+    // reset
+    glViewport(0, 0, UserConfigParams::m_width, UserConfigParams::m_height);
+    irr_driver->setRTT(NULL);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    irr_driver->getSceneManager()->setActiveCamera(NULL);
+    return frame_buffer;
 }

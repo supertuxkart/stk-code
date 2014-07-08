@@ -1,5 +1,4 @@
 #include "graphics/glwrap.hpp"
-#include "irr_driver.hpp"
 #include <fstream>
 #include <string>
 #include "config/user_config.hpp"
@@ -44,6 +43,7 @@ PFNGLUNIFORM4FVPROC glUniform4fv;
 PFNGLGETPROGRAMIVPROC glGetProgramiv;
 PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
 PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
+PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
 PFNGLBLENDEQUATIONPROC glBlendEquation;
 PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
 PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
@@ -197,6 +197,7 @@ void initGL()
     glGetProgramInfoLog = (PFNGLGETPROGRAMINFOLOGPROC)IRR_OGL_LOAD_EXTENSION("glGetProgramInfoLog");
     glTransformFeedbackVaryings = (PFNGLTRANSFORMFEEDBACKVARYINGSPROC)IRR_OGL_LOAD_EXTENSION("glTransformFeedbackVaryings");
     glGetAttribLocation = (PFNGLGETATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetAttribLocation");
+    glBindAttribLocation = (PFNGLBINDATTRIBLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glBindAttribLocation");
     glBlendEquation = (PFNGLBLENDEQUATIONPROC)IRR_OGL_LOAD_EXTENSION("glBlendEquation");
     glVertexAttribDivisor = (PFNGLVERTEXATTRIBDIVISORPROC)IRR_OGL_LOAD_EXTENSION("glVertexAttribDivisor");
     glDrawArraysInstanced = (PFNGLDRAWARRAYSINSTANCEDPROC)IRR_OGL_LOAD_EXTENSION("glDrawArraysInstanced");
@@ -302,7 +303,7 @@ GLuint LoadTFBProgram(const char * vertex_file_path, const char **varyings, unsi
         glGetProgramiv(Program, GL_INFO_LOG_LENGTH, &InfoLogLength);
         char *ErrorMessage = new char[InfoLogLength];
         glGetProgramInfoLog(Program, InfoLogLength, NULL, ErrorMessage);
-        printf(ErrorMessage);
+        Log::error("GLWrap", ErrorMessage);
         delete[] ErrorMessage;
     }
 
@@ -471,6 +472,20 @@ void saveCompressedTexture(const std::string& compressed_tex)
         ofs.close();
     }
     delete[] data;
+}
+
+static unsigned colorcount = 0;
+
+video::ITexture* getUnicolorTexture(video::SColor c)
+{
+    video::SColor tmp[4] = {
+        c, c, c, c
+    };
+    video::IImage *img = irr_driver->getVideoDriver()->createImageFromData(video::ECF_A8R8G8B8, core::dimension2d<u32>(2, 2), tmp);
+    img->grab();
+    std::string name("color");
+    name += colorcount++;
+    return irr_driver->getVideoDriver()->addTexture(name.c_str(), img);
 }
 
 void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum MinFilter, bool allowAF)
@@ -779,9 +794,13 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
 void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     const core::rect<s32>& destRect,
     const core::rect<s32>& sourceRect, const core::rect<s32>* clipRect,
-    bool useAlphaChannelOfTexture)
+    const video::SColor &colors, bool useAlphaChannelOfTexture)
 {
-    glEnable(GL_BLEND);
+    if (useAlphaChannelOfTexture)
+    {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
     float width, height,
         center_pos_x, center_pos_y,
         tex_width, tex_height,
@@ -790,9 +809,16 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     getSize(texture_w, texture_h, true,
         destRect, sourceRect, width, height, center_pos_x, center_pos_y,
         tex_width, tex_height, tex_center_pos_x, tex_center_pos_y);
-    drawTexQuad(texture, width, height, center_pos_x, center_pos_y,
-        tex_center_pos_x, tex_center_pos_y, tex_width, tex_height);
 
+    glUseProgram(UIShader::UniformColoredTextureRectShader::Program);
+    glBindVertexArray(UIShader::UniformColoredTextureRectShader::vao);
+
+    setTexture(0, texture, GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::setUniforms(center_pos_x, center_pos_y, width, height, tex_center_pos_x, tex_center_pos_y, tex_width, tex_height, colors, 0);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect,

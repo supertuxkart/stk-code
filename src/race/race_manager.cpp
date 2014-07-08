@@ -771,9 +771,10 @@ void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
                           bool continue_saved_gp)
 {
     assert(gp != NULL);
+    //std::cout << gp->getId();
 
     StateManager::get()->enterGameState();
-    setGrandPrix(*gp);
+    setGrandPrix(gp);
     setCoinTarget( 0 ); // Might still be set from a previous challenge
     race_manager->setupPlayerKartInfo();
     m_continue_saved_gp = continue_saved_gp;

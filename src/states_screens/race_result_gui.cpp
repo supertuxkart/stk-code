@@ -92,7 +92,7 @@ void RaceResultGUI::init()
 
     // Calculate screenshot scrolling parameters
     const std::vector<std::string> tracks =
-        race_manager->getGrandPrix()->getTrackNames();
+        race_manager->getGrandPrix().getTrackNames();
     int n_tracks = tracks.size();
     int currentTrack = race_manager->getTrackNumber();
     m_start_track = currentTrack;
@@ -208,7 +208,7 @@ void RaceResultGUI::enableAllButtons()
 void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                                   const std::string& name, const int playerID)
 {
-    int n_tracks = race_manager->getGrandPrix()->getNumberOfTracks();
+    int n_tracks = race_manager->getGrandPrix().getNumberOfTracks();
     if (name == "up_button" && n_tracks > m_max_tracks && m_start_track > 0)
     {
         m_start_track--;
@@ -377,7 +377,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         // FIXME: why is this call necessary here? tearDown should be
         // automatically called when the screen is left. Note that the
         // NetworkKartSelectionScreen::getInstance()->tearDown(); caused #1347
-            KartSelectionScreen::getRunningInstance()->tearDown();
+        //if (KartSelectionScreen::getRunningInstance() != NULL)
+        //    KartSelectionScreen::getRunningInstance()->tearDown();
         StateManager::get()->resetAndGoToScreen(MainMenuScreen::getInstance());
 
         if (race_manager->raceWasStartedFromOverworld())
@@ -1120,7 +1121,7 @@ void RaceResultGUI::enableGPProgress()
         status_label->m_h = font_height;
         status_label->add();
         status_label->setText(_("Track %i/%i", currentTrack + 1,
-            race_manager->getGrandPrix()->getNumberOfTracks()), true);
+            race_manager->getGrandPrix().getNumberOfTracks()), true);
         addGPProgressWidget(status_label);
         y = (status_label->m_y + status_label->m_h + 5);
 
@@ -1315,7 +1316,7 @@ void RaceResultGUI::displayHighScores()
 void RaceResultGUI::displayScreenShots()
 {
     const std::vector<std::string> tracks =
-        race_manager->getGrandPrix()->getTrackNames();
+        race_manager->getGrandPrix().getTrackNames();
     int currentTrack = race_manager->getTrackNumber();
 
     int n_sshot = 1;

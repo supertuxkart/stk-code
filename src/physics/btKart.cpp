@@ -323,35 +323,24 @@ btScalar btKart::rayCast(unsigned int index)
 #else
     if(index==2 || index==3)
     {
-        if(m_visual_rotation==0.123123123)
+        btTransform chassisTrans = getChassisWorldTransform();
+        if (getRigidBody()->getMotionState())
         {
-            m_visual_contact_point[index  ] = rayResults.m_hitPointInWorld;
-            m_visual_contact_point[index-2] = source;
-            m_visual_wheels_touch_ground &= (object!=NULL);
+            getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
         }
-        else
-        {
-            btTransform chassisTrans = getChassisWorldTransform();
-            if (getRigidBody()->getMotionState())
-            {
-                getRigidBody()->getMotionState()->getWorldTransform(chassisTrans);
-            }
-            btQuaternion q(m_visual_rotation, 0, 0);
-            btQuaternion rot_new = chassisTrans.getRotation() * q;
-            chassisTrans.setRotation(rot_new);
-            btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
-            pos.setZ(pos.getZ()*0.9f);
-            //pos.setX(pos.getX()*0.1f);
-            //btVector3 pos = wheel.m_chassisConnectionPointCS;
-            btVector3 source = chassisTrans( pos );
-            btVector3 target = source + rayvector;
-            btVehicleRaycaster::btVehicleRaycasterResult rayResults;
+        btQuaternion q(m_visual_rotation, 0, 0);
+        btQuaternion rot_new = chassisTrans.getRotation() * q;
+        chassisTrans.setRotation(rot_new);
+        btVector3 pos = m_kart->getKartModel()->getWheelGraphicsPosition(index);
+        pos.setZ(pos.getZ()*0.9f);
+        btVector3 source = chassisTrans( pos );
+        btVector3 target = source + rayvector;
+        btVehicleRaycaster::btVehicleRaycasterResult rayResults;
 
-            void* object = m_vehicleRaycaster->castRay(source,target,rayResults);
-            m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
-            m_visual_contact_point[index-2] = source;
-            m_visual_wheels_touch_ground &= (object!=NULL);
-        }
+        void* object = m_vehicleRaycaster->castRay(source,target,rayResults);
+        m_visual_contact_point[index] = rayResults.m_hitPointInWorld;
+        m_visual_contact_point[index-2] = source;
+        m_visual_wheels_touch_ground &= (object!=NULL);
     }
 #endif
 
@@ -600,7 +589,7 @@ void btKart::updateSuspension(btScalar deltaTime)
         btScalar current_length = wheel_info.m_raycastInfo.m_suspensionLength;
         btScalar length_diff    = (susp_length - current_length);
         if(m_kart->getKartProperties()->getExpSpringResponse())
-            length_diff *= length_diff/susp_length;
+            length_diff *= fabsf(length_diff)/susp_length;
 
         force = wheel_info.m_suspensionStiffness * length_diff
               * wheel_info.m_clippedInvContactDotSuspension;

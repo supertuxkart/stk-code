@@ -90,13 +90,14 @@ public:
 
     /** Render tex. Used for blit/texture resize */
     void renderPassThrough(unsigned tex);
+    void renderTextureLayer(unsigned tex, unsigned layer);
     void applyMLAA();
 
     void renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBuffer &out_fbo);
     void renderGlow(unsigned tex);
 
     /** Render the post-processed scene */
-    FrameBuffer *render(scene::ICameraSceneNode * const camnode);
+    FrameBuffer *render(scene::ICameraSceneNode * const camnode, bool isRace);
 
     /** Use motion blur for a short time */
     void         giveBoost(unsigned int cam_index);

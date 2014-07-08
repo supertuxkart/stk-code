@@ -21,17 +21,9 @@
 uniform mat4 ModelViewProjectionMatrix;
 uniform float time;
 
-#if __VERSION__ >= 130
-in vec3 Position;
-in vec2 Texcoord;
+layout(location = 0) in vec3 Position;
+layout(location = 3) in vec2 Texcoord;
 out vec2 uv;
-#else
-attribute vec3 Position;
-attribute vec2 Texcoord;
-varying vec2 uv;
-#endif
-
-
 
 void main()
 {

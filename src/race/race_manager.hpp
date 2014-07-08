@@ -331,7 +331,7 @@ private:
     int                              m_coin_target;
     bool                             m_has_time_target;
     float                            m_time_target;
-    int                                 m_goal_target;
+    int                              m_goal_target;
 
     void startNextRace();    // start a next race
 
@@ -344,7 +344,7 @@ private:
 
     bool m_have_kart_last_position_on_overworld;
     Vec3 m_kart_last_position_on_overworld;
-    
+
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
@@ -413,9 +413,9 @@ public:
     void setDifficulty(Difficulty diff);
 
     // ------------------------------------------------------------------------
-    void setGrandPrix(const GrandPrixData &gp)
+    void setGrandPrix(const GrandPrixData *gp)
     {
-        m_grand_prix = gp;
+        m_grand_prix = *gp;
         m_coin_target = 0;
     }
     // ------------------------------------------------------------------------
@@ -528,7 +528,7 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
-    const GrandPrixData *getGrandPrix() const { return &m_grand_prix; }
+    const GrandPrixData& getGrandPrix() const { return m_grand_prix; }
     // ------------------------------------------------------------------------
     unsigned int getFinishedKarts() const { return m_num_finished_karts; }
     // ------------------------------------------------------------------------

@@ -374,6 +374,28 @@ void Skin::drawBgImage()
 }   // drawBgImage
 
 // ----------------------------------------------------------------------------
+/** Returns the BoxRenderParams data structure for a given type.
+ *  \param type The type name of the box render param to get.
+ */
+const BoxRenderParams& Skin::getBoxRenderParams(const std::string &type)
+{
+    return SkinConfig::m_render_params[type];
+}   // getBoxRenderParams
+
+// ----------------------------------------------------------------------------
+/** Draws a background box for an in-game notification message. Example would
+ *  be an achievement, or friends comming online.
+ *  \param w The SkinWidgetContainer for the outline.
+ *  \param dest The destination rectangle to use.
+ *  \param type The type of the message (achievement or friend).
+ */
+void Skin::drawMessage(SkinWidgetContainer* w, const core::recti &dest,
+                       const std::string &type)
+{
+    drawBoxFromStretchableTexture(w, dest, SkinConfig::m_render_params[type]);
+}   // drawMessage
+
+// ----------------------------------------------------------------------------
 void Skin::drawBoxFromStretchableTexture(SkinWidgetContainer* w,
                                          const core::recti &dest,
                                          BoxRenderParams& params,
@@ -1922,7 +1944,7 @@ void Skin::process3DPane(IGUIElement *element, const core::recti &rect,
         if (fb != NULL && fb->getRTT().size() > 0)
         {
             draw2DImageFromRTT(fb->getRTT()[0], 512, 512,
-                rect, core::rect<s32>(0, 0, 512, 512), NULL, true);
+                rect, core::rect<s32>(0, 0, 512, 512), NULL, SColor(255, 255, 255, 255), true);
         }
     }
     else if (type == WTYPE_ICON_BUTTON || type == WTYPE_MODEL_VIEW)

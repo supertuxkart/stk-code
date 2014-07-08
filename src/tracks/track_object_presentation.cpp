@@ -96,13 +96,22 @@ const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 
 
 void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                                            const core::vector3df& scale)
+    const core::vector3df& scale)
 {
     if (m_node == NULL) return;
 
-    m_node->setPosition(xyz);
+    if (m_node->getParent() != NULL)
+    {
+        scene::ISceneNode* parent = m_node->getParent();
+        m_node->setPosition((xyz - parent->getAbsolutePosition()) / parent->getScale());
+    }
+    else
+    {
+        m_node->setPosition(xyz);
+    }
     m_node->setRotation(hpr);
     m_node->setScale(scale);
+    m_node->updateAbsolutePosition();
 }
 
 void TrackObjectPresentationSceneNode::setEnable(bool enabled)
@@ -254,7 +263,7 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
     else
     {
         m_mesh = irr_driver->getMesh(model_name);
-
+        
         if (tangent)
         {
             scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
@@ -368,6 +377,9 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         m_node = irr_driver->addMesh(m_mesh, parent);
         m_frame_start = 0;
         m_frame_end = 0;
+
+        if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+            World::getWorld()->getTrack()->handleAnimatedTextures(m_node, *xml_node);
     }
 //#ifdef DEBUG
 //    std::string debug_name = model_name+" (track-object)";

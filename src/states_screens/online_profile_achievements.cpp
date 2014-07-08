@@ -24,7 +24,6 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/screen.hpp"
 #include "guiengine/widget.hpp"
-#include "online/messages.hpp"
 #include "online/online_profile.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/state_manager.hpp"
@@ -122,7 +121,7 @@ void OnlineProfileAchievements::init()
         m_visiting_profile->fetchAchievements();
         m_achievements_list_widget->clear();
         m_achievements_list_widget->addItem("loading",
-                                             Messages::fetchingAchievements());
+                         StringUtils::loadingDots(_("Fetching achievements")));
     }
 }   // init
 
@@ -161,8 +160,8 @@ void OnlineProfileAchievements::onUpdate(float delta)
     if (!m_visiting_profile->isReady())
     {
         // This will display an increasing number of dots while waiting.
-        m_achievements_list_widget->renameItem("loading",
-                                             Messages::fetchingAchievements());
+        m_achievements_list_widget->renameItem("loading", 
+                       StringUtils::loadingDots(_("Fetching achievements")));  
         return;
     }
 

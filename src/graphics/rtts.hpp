@@ -45,10 +45,16 @@ public:
     unsigned getDepthStencilTexture() const { return DepthStencilTexture; }
     unsigned getRenderTarget(enum TypeRTT target) const { return RenderTargetTextures[target]; }
     FrameBuffer& getFBO(enum TypeFBO fbo) { return FrameBuffers[fbo]; }
+
+    FrameBuffer* render(scene::ICameraSceneNode* camera, float dt);
+
 private:
     unsigned RenderTargetTextures[RTT_COUNT];
     PtrVector<FrameBuffer> FrameBuffers;
     unsigned DepthStencilTexture;
+
+    int m_width;
+    int m_height;
 
     unsigned shadowColorTex, shadowNormalTex, shadowDepthTex;
     unsigned RSM_Color, RSM_Normal, RSM_Depth;

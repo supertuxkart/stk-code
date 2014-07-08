@@ -33,6 +33,8 @@ AnimationBase::AnimationBase(const XMLNode &node)
     node.get("fps", &fps);
     for(unsigned int i=0; i<node.getNumNodes(); i++)
     {
+        if (node.getNode(i)->getName() == "animated-texture")
+            continue;
         Ipo *ipo = new Ipo(*node.getNode(i), fps);
         m_all_ipos.push_back(ipo);
     }
