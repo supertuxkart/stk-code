@@ -47,10 +47,6 @@ private:
     bool existsName(const irr::core::stringw& name) const;
 
 public:
-    /** saved here by a random GP dialog to avoid dangling pinters or
-     * memory leaks */
-    GrandPrixData* m_random_gp;
-
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();
