@@ -624,7 +624,7 @@ void IrrDriver::renderSolidSecondPass()
         glBindVertexArray(getVAO(video::EVT_STANDARD));
         for (unsigned i = 0; i < GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *GroupedSM<SM_DEFAULT_STANDARD>::MeshSet[i];
+            GLMesh &mesh = *GroupedSM<SM_DEFAULT_STANDARD>::MeshSet[i];
             if (mesh.VAOType != video::EVT_STANDARD)
             {
 #ifdef DEBUG
@@ -632,6 +632,8 @@ void IrrDriver::renderSolidSecondPass()
 #endif
                 continue;
             }
+            if (!mesh.textures[0])
+                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
             if (irr_driver->getLightViz())
