@@ -458,7 +458,7 @@ bool ChallengeData::isGPFulfilled() const
     // is no world objects to query at this stage.
     if (race_manager->getMajorMode()  != RaceManager::MAJOR_MODE_GRAND_PRIX  ||
         race_manager->getMinorMode()  != m_minor                             ||
-        race_manager->getGrandPrix()->getId() != m_gp_id                     ||
+        race_manager->getGrandPrix().getId() != m_gp_id                      ||
         race_manager->getNumberOfKarts() < (unsigned int)m_num_karts[d]      ||
         race_manager->getNumPlayers() > 1) return false;
 

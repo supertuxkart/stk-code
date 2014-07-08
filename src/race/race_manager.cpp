@@ -75,7 +75,6 @@ RaceManager::RaceManager()
     setTrack("jungle");
     m_default_ai_list.clear();
     setNumLocalPlayers(0);
-    m_grand_prix = new GrandPrixData();
 }   // RaceManager
 
 //-----------------------------------------------------------------------------
@@ -284,9 +283,9 @@ void RaceManager::startNew(bool from_overworld)
     if(m_major_mode==MAJOR_MODE_GRAND_PRIX)
     {
         // GP: get tracks, laps and reverse info from grand prix
-        m_tracks        = m_grand_prix->getTrackNames();
-        m_num_laps      = m_grand_prix->getLaps();
-        m_reverse_track = m_grand_prix->getReverse();
+        m_tracks        = m_grand_prix.getTrackNames();
+        m_num_laps      = m_grand_prix.getLaps();
+        m_reverse_track = m_grand_prix.getReverse();
     }
     //assert(m_player_karts.size() > 0);
 
@@ -349,7 +348,7 @@ void RaceManager::startNew(bool from_overworld)
         SavedGrandPrix* gp = SavedGrandPrix::getSavedGP( StateManager::get()
                                                          ->getActivePlayerProfile(0)
                                                          ->getUniqueID(),
-                                                         m_grand_prix->getId(),
+                                                         m_grand_prix.getId(),
                                                          m_difficulty,
                                                          m_num_karts,
                                                          m_player_karts.size());
@@ -500,7 +499,7 @@ void RaceManager::next()
                 SavedGrandPrix::getSavedGP(StateManager::get()
                                            ->getActivePlayerProfile(0)
                                            ->getUniqueID(),
-                                           m_grand_prix->getId(),
+                                           m_grand_prix.getId(),
                                            m_difficulty,
                                            m_num_karts,
                                            m_player_karts.size());
@@ -517,7 +516,7 @@ void RaceManager::next()
                     new SavedGrandPrix(
                         StateManager::get()->getActivePlayerProfile(0)
                                            ->getUniqueID(),
-                        m_grand_prix->getId(),
+                        m_grand_prix.getId(),
                         m_difficulty,
                         m_player_karts.size(),
                         m_track_number,
@@ -636,7 +635,7 @@ void RaceManager::exitRace(bool delete_world)
                 SavedGrandPrix::getSavedGP(StateManager::get()
                                            ->getActivePlayerProfile(0)
                                            ->getUniqueID(),
-                                           m_grand_prix->getId(),
+                                           m_grand_prix.getId(),
                                            m_difficulty,
                                            m_num_karts,
                                            m_player_karts.size());
@@ -768,7 +767,7 @@ void RaceManager::rerunRace()
 
 //-----------------------------------------------------------------------------
 
-void RaceManager::startGP(GrandPrixData* gp, bool from_overworld,
+void RaceManager::startGP(const GrandPrixData* gp, bool from_overworld,
                           bool continue_saved_gp)
 {
     assert(gp != NULL);

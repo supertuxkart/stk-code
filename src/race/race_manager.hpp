@@ -324,7 +324,7 @@ private:
      *  same list of AIs is used for all tracks of a GP. */
     std::vector<std::string>         m_ai_kart_list;
     int                              m_track_number;
-    GrandPrixData*                   m_grand_prix;
+    GrandPrixData                    m_grand_prix;
     int                              m_num_karts;
     unsigned int                     m_num_finished_karts;
     unsigned int                     m_num_finished_players;
@@ -410,9 +410,9 @@ public:
     void setDifficulty(Difficulty diff);
 
     // ------------------------------------------------------------------------
-    void setGrandPrix(GrandPrixData* gp)
+    void setGrandPrix(const GrandPrixData *gp)
     {
-        m_grand_prix = gp;
+        m_grand_prix = *gp;
         m_coin_target = 0;
     }
     // ------------------------------------------------------------------------
@@ -525,7 +525,7 @@ public:
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
-    GrandPrixData* getGrandPrix() const { return m_grand_prix; }
+    const GrandPrixData& getGrandPrix() const { return m_grand_prix; }
     // ------------------------------------------------------------------------
     unsigned int getFinishedKarts() const { return m_num_finished_karts; }
     // ------------------------------------------------------------------------
@@ -682,7 +682,7 @@ public:
       * \brief Higher-level method to start a GP without having to care about
       *  the exact startup sequence
       */
-    void  startGP(GrandPrixData* gp, bool from_overworld,
+    void  startGP(const GrandPrixData* gp, bool from_overworld,
                   bool continue_saved_gp);
 
     /**
