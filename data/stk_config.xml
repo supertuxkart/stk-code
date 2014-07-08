@@ -380,9 +380,6 @@
                downward-impulse-factor="0"
                track-connection-accel="2"/>
 
-    <!-- Parameters for the upright constraint, which keeps karts upright. -->
-    <upright tolerance="0.2" max-force="30"/>
-
     <!-- collision
          impulse-type: STK can apply an additional impulse in case of
            kart-track collision:

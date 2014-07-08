@@ -58,7 +58,6 @@
 #include "network/network_manager.hpp"
 #include "physics/btKart.hpp"
 #include "physics/btKartRaycast.hpp"
-#include "physics/btUprightConstraint.hpp"
 #include "physics/physics.hpp"
 #include "race/history.hpp"
 #include "tracks/track.hpp"
@@ -269,7 +268,6 @@ Kart::~Kart()
         World::getWorld()->getPhysics()->removeKart(this);
         delete m_vehicle;
         delete m_vehicle_raycaster;
-        delete m_uprightConstraint;
     }
 
     for(int i=0; i<m_kart_chassis.getNumChildShapes(); i++)
@@ -682,13 +680,6 @@ void Kart::createPhysics()
     // Obviously these allocs have to be properly managed/freed
     btTransform t;
     t.setIdentity();
-    m_uprightConstraint=new btUprightConstraint(this, t);
-    m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
-    m_uprightConstraint->setBounce(0.0f);
-    m_uprightConstraint->setMaxLimitForce(m_kart_properties->getUprightMaxForce());
-    m_uprightConstraint->setErp(1.0f);
-    m_uprightConstraint->setLimitSoftness(1.0f);
-    m_uprightConstraint->setDamping(0.0f);
     World::getWorld()->getPhysics()->addKart(this);
 
 }   // createPhysics
@@ -699,8 +690,9 @@ void Kart::flyUp()
 {
     m_flying = true;
     Moveable::flyUp();
-}
+}   // flyUp
 
+// ----------------------------------------------------------------------------
 void Kart::flyDown()
 {
     if (isNearGround())
@@ -712,7 +704,7 @@ void Kart::flyDown()
     {
         Moveable::flyDown();
     }
-}   // flyUp
+}   // flyDown
 
 // ----------------------------------------------------------------------------
 /** Starts the engine sound effect. Called once the track intro phase is over.
@@ -957,8 +949,7 @@ bool Kart::isOnGround() const
 
 //-----------------------------------------------------------------------------
 /** The kart is near the ground, but not necessarily on it (small jumps). This
- *  is used to determine when to switch off the upright constraint, so that
- *  explosions can be more violent, while still
+ *  is used to determine when to stop flying.
 */
 bool Kart::isNearGround() const
 {
@@ -1101,21 +1092,6 @@ void Kart::update(float dt)
     }
 
     m_slipstream->update(dt);
-
-    if (!m_flying)
-    {
-        // When really on air, free fly, when near ground, try to glide /
-        // adjust for landing. If zipped, be stable, so ramp+zipper can
-        // allow nice jumps without scripting the fly
-        // Also disable he upright constraint when gravity is changed by
-        // the terrain
-        if( (!isNearGround() &&
-              m_max_speed->getSpeedIncreaseTimeLeft(MaxSpeed::MS_INCREASE_ZIPPER)<=0.0f ) ||
-              (getMaterial() && getMaterial()->hasGravity())                                  )
-            m_uprightConstraint->setLimit(M_PI);
-        else
-            m_uprightConstraint->setLimit(m_kart_properties->getUprightTolerance());
-    }
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
@@ -2041,6 +2017,30 @@ void Kart::updatePhysics(float dt)
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
 
+    // If the kart is flying, keep its up-axis aligned to gravity (which in
+    // turn typically means the kart is parallel to the ground). This avoids
+    // that the kart rotates in mid-air and lands on its side.
+    if(m_vehicle->getNumWheelsOnGround()==0)
+    {
+        btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
+        btVector3 terrain_up = m_body->getGravity();
+        float g = World::getWorld()->getTrack()->getGravity();
+        // Normalize the gravity, g is the length of the vector
+        btVector3 new_up = 0.9f * kart_up + 0.1f * terrain_up/-g;
+        // Get the rotation (hpr) based on current heading.
+        Vec3 rotation(getHeading(), new_up);
+        btMatrix3x3 m;
+        m.setEulerZYX(rotation.getX(), rotation.getY(), rotation.getZ());
+        // We can't use getXYZ() for the position here, since the position is
+        // based on interpolation, while the actual center-of-mass-transform
+        // is based on the actual value every 1/60 of a second (using getXYZ()
+        // would result in the kart being pushed ahead a bit, making it jump
+        // much further, depending on fps)
+        btTransform new_trans(m, m_body->getCenterOfMassTransform().getOrigin());
+        //setTrans(new_trans);
+        m_body->setCenterOfMassTransform(new_trans);
+    }
+
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
     // is larger than the maximum suspension travel (per frame), since then
@@ -2048,6 +2048,7 @@ void Kart::updatePhysics(float dt)
     // not sure if this is enough in all cases!). So the speed is limited
     // to suspensionTravel / dt with dt = 1/60 (since this is the dt
     // bullet is using).
+
     // Only apply if near ground instead of purely based on speed avoiding
     // the "parachute on top" look.
     const Vec3 &v = m_body->getLinearVelocity();
@@ -2056,7 +2057,7 @@ void Kart::updatePhysics(float dt)
         Vec3 v_clamped = v;
         // clamp the speed to 99% of the maxium falling speed.
         v_clamped.setY(-m_kart_properties->getSuspensionTravelCM()*0.01f*60 * 0.99f);
-        m_body->setLinearVelocity(v_clamped);
+        //m_body->setLinearVelocity(v_clamped);
     }
 
     //at low velocity, forces on kart push it back and forth so we ignore this

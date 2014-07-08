@@ -28,7 +28,6 @@ class AbstractKartAnimation;
 class Attachment;
 class btKart;
 class btQuaternion;
-class btUprightConstraint;
 class Controller;
 class Item;
 class KartModel;
@@ -341,9 +340,6 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
     virtual btKart* getVehicle() const = 0;
-    // ------------------------------------------------------------------------
-    /** Returns the upright constraint for this kart. */
-    virtual btUprightConstraint* getUprightConstraint() const = 0;
     // ------------------------------------------------------------------------
     virtual btQuaternion getVisualRotation() const = 0;
     // ------------------------------------------------------------------------
