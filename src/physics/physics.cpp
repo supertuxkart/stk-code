@@ -174,7 +174,7 @@ void Physics::update(float dt)
             int kartid1 = p->getUserPointer(0)->getPointerKart()->getWorldKartId();
             int kartid2 = p->getUserPointer(1)->getPointerKart()->getWorldKartId();
             Scripting::Physics::setCollision(kartid1,kartid2);
-            Scripting::Physics::setCollisionType("Kart-Kart");
+            Scripting::Physics::setCollisionType("KartKart");
             script_engine->runScript("collisions");
             continue;
         }  // if kart-kart collision
@@ -184,8 +184,8 @@ void Physics::update(float dt)
             // Kart hits physical object
             // -------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
-            Scripting::Physics::setCollision(0, 0); //TODO : support item types etc
-            Scripting::Physics::setCollisionType("Kart-PhysObj");
+            Scripting::Physics::setCollision(0, 0);
+            Scripting::Physics::setCollisionType("KartObject"); //object as in physical object
             Scripting::Physics::setCollision
                 (
                 p->getUserPointer(0)->getPointerPhysicalObject()->getID(),
@@ -256,7 +256,7 @@ void Physics::update(float dt)
             // -------------------------------
             Scripting::ScriptEngine* script_engine = World::getWorld()->getScriptEngine();
             Scripting::Physics::setCollision(0,0); //TODO : support item types etc
-            Scripting::Physics::setCollisionType("Projectile-PhysObj");
+            Scripting::Physics::setCollisionType("ItemObject");
             Scripting::Physics::setCollision
                 (
                 p->getUserPointer(1)->getPointerPhysicalObject()->getID(),

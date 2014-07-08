@@ -67,11 +67,11 @@ namespace Scripting
         {
             m_collisionType = collisionType;
         }
-        
         asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine)
         {
             asIScriptFunction *func;
-            func = engine->GetModule(0)->GetFunctionByDecl("void onCollision()");
+            std::string function_name = "void on" + m_collisionType + "Collision()";
+            func = engine->GetModule(0)->GetFunctionByDecl(function_name.c_str());
             return func;
         }
         void registerScriptFunctions(asIScriptEngine *engine)
