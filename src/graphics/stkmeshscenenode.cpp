@@ -187,21 +187,6 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
-void STKMeshSceneNode::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-    assert(irr_driver->getPhase() == TRANSPARENT_PASS);
-
-    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-
-    if (type == irr_driver->getShader(ES_BUBBLES))
-        drawBubble(mesh, ModelViewProjectionMatrix);
-//    else if (World::getWorld()->getTrack()->isFogEnabled())
-//        drawTransparentFogObject(mesh, ModelViewProjectionMatrix, TextureMatrix);
-    else
-        drawTransparentObject(mesh, ModelViewProjectionMatrix, mesh.TextureMatrix);
-    return;
-}
-
 void STKMeshSceneNode::updatevbo()
 {
     for (unsigned i = 0; i < Mesh->getMeshBufferCount(); ++i)

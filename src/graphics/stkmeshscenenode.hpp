@@ -14,9 +14,6 @@ protected:
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
     core::vector3df windDir;
     core::vector2df caustic_dir, caustic_dir2;
-    void drawSolidPass1(const GLMesh &mesh, GeometricMaterial type);
-    void drawSolidPass2(const GLMesh &mesh, ShadedMaterial type);
-    void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 
     // Misc passes shaders (glow, displace...)
     void drawGlow(const GLMesh &mesh);
