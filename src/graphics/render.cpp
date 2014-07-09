@@ -833,7 +833,7 @@ void IrrDriver::renderTransparent()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *TransparentMeshes<TM_DEFAULT>::MeshSet[i];
+            GLMesh &mesh = *TransparentMeshes<TM_DEFAULT>::MeshSet[i];
             if (mesh.VAOType != EVT_STANDARD)
             {
 #ifdef DEBUG
@@ -843,11 +843,10 @@ void IrrDriver::renderTransparent()
             }
 
 
-            if (mesh.textures[0] != NULL)
-            {
-                compressTexture(mesh.textures[0], true);
-                setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            }
+            if (!mesh.textures[0])
+                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[0], true);
+            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
             draw<MeshShader::TransparentFogShader>(mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
             if (mesh.VAOType != EVT_STANDARD)
@@ -856,7 +855,7 @@ void IrrDriver::renderTransparent()
         glBlendFunc(GL_ONE, GL_ONE);
         for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *TransparentMeshes<TM_ADDITIVE>::MeshSet[i];
+            GLMesh &mesh = *TransparentMeshes<TM_ADDITIVE>::MeshSet[i];
             if (mesh.VAOType != EVT_STANDARD)
             {
 #ifdef DEBUG
@@ -866,11 +865,10 @@ void IrrDriver::renderTransparent()
             }
             glBindVertexArray(getVAO(mesh.VAOType));
 
-            if (mesh.textures[0] != NULL)
-            {
-                compressTexture(mesh.textures[0], true);
-                setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            }
+            if (!mesh.textures[0])
+                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[0], true);
+            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
             draw<MeshShader::TransparentFogShader>(mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
             if (mesh.VAOType != EVT_STANDARD)
@@ -883,7 +881,7 @@ void IrrDriver::renderTransparent()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *TransparentMeshes<TM_DEFAULT>::MeshSet[i];
+             GLMesh &mesh = *TransparentMeshes<TM_DEFAULT>::MeshSet[i];
              if (mesh.VAOType != EVT_STANDARD)
             {
 #ifdef DEBUG
@@ -892,6 +890,8 @@ void IrrDriver::renderTransparent()
                 glBindVertexArray(getVAO(mesh.VAOType));
             }
             glBindVertexArray(getVAO(mesh.VAOType));
+            if (!mesh.textures[0])
+                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
             draw<MeshShader::TransparentShader>(mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, 0);
