@@ -375,10 +375,10 @@ class DisplaceShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_dir, uniform_dir2;
+    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_tex, uniform_dir, uniform_dir2;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex);
 };
 
 class SkyboxShader

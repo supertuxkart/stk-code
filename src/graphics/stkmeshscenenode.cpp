@@ -141,7 +141,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     size_t count = mesh.IndexCount;
 
     MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, 4, mesh.vaoBaseVertex);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 static video::ITexture *displaceTex = 0;
@@ -166,7 +166,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
 
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
     MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, 4, mesh.vaoBaseVertex);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 
     // Render the effect
     if (!displaceTex)
@@ -175,15 +175,16 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
+    setTexture(3, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
     MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
                                             core::vector2df(cb->getDirX(), cb->getDirY()),
                                             core::vector2df(cb->getDir2X(), cb->getDir2Y()),
                                             core::vector2df(float(UserConfigParams::m_width),
                                                             float(UserConfigParams::m_height)),
-                                            0, 1, 2);
+                                            0, 1, 2, 3);
 
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, 4, mesh.vaoBaseVertex);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 void STKMeshSceneNode::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
