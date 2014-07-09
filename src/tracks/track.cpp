@@ -267,6 +267,7 @@ void Track::cleanup()
 {
     QuadGraph::destroy();
     ItemManager::destroy();
+    resetVAO();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     // Clear reminder of transformed textures
@@ -705,6 +706,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
+
+
 /** Convert the graohics track into its physics equivalents.
  *  \param mesh The mesh to convert.
  *  \param node The scene node.
@@ -952,9 +955,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
 
-    scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-    // TODO: memory leak?
-    scene::IMesh* tangent_mesh = manip->createMeshWithTangents(merged_mesh);
+    scene::IMesh* tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
 
     adjustForFog(tangent_mesh, NULL);
 
@@ -1163,8 +1164,6 @@ bool Track::loadMainTrack(const XMLNode &root)
 
         if (tangent)
         {
-            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-
             scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
 
             if (std::find(m_detached_cached_meshes.begin(),
@@ -1186,7 +1185,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             scene_node->remove();
             irr_driver->grabAllTextures(original_mesh);
 
-            scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
+            scene::IMesh* mesh = MeshTools::createMeshWithTangents(original_mesh, &MeshTools::isNormalMap);
             mesh->grab();
             irr_driver->grabAllTextures(mesh);
 

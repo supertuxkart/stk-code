@@ -47,6 +47,12 @@ namespace irr
     namespace scene { class ISceneNode; }
 }
 
+class AbortWorldUpdateException : public std::runtime_error
+{
+public:
+    AbortWorldUpdateException() : std::runtime_error("race abort") { };
+};
+
 /**
  *  \brief base class for all game modes
  *  This class is responsible for running the actual race. A world is created

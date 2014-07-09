@@ -26,7 +26,8 @@ protected:
     void setFirstTimeMaterial();
     void updatevbo();
     bool isMaterialInitialized;
-    bool reload_each_frame;
+    bool immediate_draw;
+    bool update_each_frame;
 public:
     void setReloadEachFrame(bool);
     STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
