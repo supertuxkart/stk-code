@@ -195,13 +195,6 @@ void STKAnimatedMesh::render()
             GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
         }
 
-        for_in(mesh, ShadedMesh[SM_RIMLIT])
-        {
-            GroupedSM<SM_RIMLIT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_RIMLIT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_RIMLIT>::TIMVSet.push_back(invmodel);
-        }
-
         for_in (mesh, ShadedMesh[SM_UNLIT])
         {
             GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);

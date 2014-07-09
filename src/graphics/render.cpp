@@ -610,7 +610,6 @@ void IrrDriver::renderSolidSecondPass()
     GroupedSM<SM_DEFAULT_STANDARD>::reset();
     GroupedSM<SM_DEFAULT_TANGENT>::reset();
     GroupedSM<SM_ALPHA_REF_TEXTURE>::reset();
-    GroupedSM<SM_RIMLIT>::reset();
     GroupedSM<SM_SPHEREMAP>::reset();
     GroupedSM<SM_SPLATTING>::reset();
     GroupedSM<SM_UNLIT>::reset();
@@ -700,27 +699,6 @@ void IrrDriver::renderSolidSecondPass()
             }
 
             draw<MeshShader::ObjectRefPass2Shader>(mesh, GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
-        }
-
-        glUseProgram(MeshShader::ObjectRimLimitShader::Program);
-        glBindVertexArray(getVAO(EVT_STANDARD));
-        for (unsigned i = 0; i < GroupedSM<SM_RIMLIT>::MeshSet.size(); i++)
-        {
-            const GLMesh &mesh = *GroupedSM<SM_RIMLIT>::MeshSet[i];
-            assert(mesh.VAOType == EVT_STANDARD);
-            compressTexture(mesh.textures[0], true);
-            setTexture(MeshShader::ObjectRimLimitShader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            draw<MeshShader::ObjectRimLimitShader>(mesh, GroupedSM<SM_RIMLIT>::MVPSet[i], GroupedSM<SM_RIMLIT>::TIMVSet[i], GroupedSM<SM_RIMLIT>::MeshSet[i]->TextureMatrix);
         }
 
         glUseProgram(MeshShader::SphereMapShader::Program);

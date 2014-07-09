@@ -31,8 +31,6 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
         return SM_SPLATTING;
     else if (type == irr_driver->getShader(ES_OBJECTPASS_REF) || type == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
         return SM_ALPHA_REF_TEXTURE;
-    else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT) && textures[0])
-        return SM_RIMLIT;
     else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
         return SM_GRASS;
     else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
