@@ -37,7 +37,7 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 {
     assert(type != ITEM_TRIGGER); // use other constructor for that
 
-    m_distance_2        = 0.8f;
+    m_distance_2        = 1.2f;
     initItem(type, xyz);
     // Sets heading to 0, and sets pitch and roll depending on the normal. */
     m_original_hpr      = Vec3(0, normal);
