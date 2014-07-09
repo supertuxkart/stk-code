@@ -210,7 +210,7 @@ private:
     {
         if(m_event_handler==kart && m_deactive_time >0) return false;
         float d2 = (m_xyz.getX()-xyz.X)*(m_xyz.getX()-xyz.X)
-                 + (m_xyz.getZ()-xyz.Y)*(m_xyz.getZ()-xyz.Y);
+                 + (m_xyz.getZ()-xyz.Z)*(m_xyz.getZ()-xyz.Z);
         return d2 < m_distance_2;
     }   // hitKart
 
