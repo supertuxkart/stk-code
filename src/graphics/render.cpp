@@ -1757,17 +1757,26 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
     }
 }
 
-void IrrDriver::generateSkyboxCubemap()
+/** Generate an opengl cubemap texture from 6 2d textures.
+    Out of legacy the sequence of textures maps to :
+    - 1st texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Y
+    - 2nd texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_Y
+    - 3rd texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_X
+    - 4th texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_X
+    - 5th texture maps to GL_TEXTURE_CUBE_MAP_NEGATIVE_Z
+    - 6th texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Z
+*  \param textures sequence of 6 textures.
+*/
+GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &textures)
 {
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
-
-    glGenTextures(1, &SkyboxCubeMap);
+    GLuint result;
+    glGenTextures(1, &result);
 
     unsigned w = 0, h = 0;
     for (unsigned i = 0; i < 6; i++)
     {
-        w = MAX2(w, SkyboxTextures[i]->getOriginalSize().Width);
-        h = MAX2(h, SkyboxTextures[i]->getOriginalSize().Height);
+        w = MAX2(w, textures[i]->getOriginalSize().Width);
+        h = MAX2(h, textures[i]->getOriginalSize().Height);
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
@@ -1778,24 +1787,35 @@ void IrrDriver::generateSkyboxCubemap()
     {
         unsigned idx = texture_permutation[i];
 
-        video::IImage* image = getVideoDriver()->createImageFromData(
-            SkyboxTextures[idx]->getColorFormat(),
-            SkyboxTextures[idx]->getSize(),
-            SkyboxTextures[idx]->lock(),
+        video::IImage* image = irr_driver->getVideoDriver()->createImageFromData(
+            textures[idx]->getColorFormat(),
+            textures[idx]->getSize(),
+            textures[idx]->lock(),
             false
             );
-        SkyboxTextures[idx]->unlock();
+        textures[idx]->unlock();
 
         image->copyToScaling(rgba[i], w, h);
         image->drop();
 
-        glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, result);
         if (UserConfigParams::m_texture_compression)
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         else
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
+    for (unsigned i = 0; i < 6; i++)
+        delete[] rgba[i];
+    return result;
+}
 
+void IrrDriver::generateSkyboxCubemap()
+{
+    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+
+    SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
+    const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
+    
     if (SphericalHarmonicsTextures.size() == 6)
     {
         unsigned sh_w = 0, sh_h = 0;
@@ -1857,9 +1877,6 @@ void IrrDriver::generateSkyboxCubemap()
             delete[] sh_rgba[i];
     }
 
-    for (unsigned i = 0; i < 6; i++)
-        delete[] rgba[i];
-
     /*for (unsigned i = 0; i < 6; i++)
     {
         glBindTexture(GL_TEXTURE_CUBE_MAP, ConvolutedSkyboxCubeMap);
@@ -1868,7 +1885,6 @@ void IrrDriver::generateSkyboxCubemap()
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
 }
-
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
