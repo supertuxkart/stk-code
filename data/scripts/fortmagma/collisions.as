@@ -1,4 +1,15 @@
-void onCollision()
+void onKartObjectCollision()
+{
+
+}
+
+void onItemObjectCollision()
+{
+
+}
+
+
+void onKartKartCollision()
 {
 
 }
