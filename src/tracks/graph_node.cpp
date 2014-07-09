@@ -62,8 +62,8 @@ GraphNode::GraphNode(unsigned int quad_index, unsigned int node_index)
         m_lower_center = (quad[0]+quad[1]) * 0.5f;
         m_upper_center = (quad[2]+quad[3]) * 0.5f;
     }
-    m_line     = core::line2df(m_upper_center.getX(), m_upper_center.getZ(),
-                               m_lower_center.getX(), m_lower_center.getZ() );
+    m_line     = core::line3df(m_lower_center.toIrrVector(), 
+                               m_upper_center.toIrrVector());
     // Only this 2d point is needed later
     m_lower_center_2d = core::vector2df(m_lower_center.getX(),
                                         m_lower_center.getZ() );
@@ -194,14 +194,16 @@ void GraphNode::setDirectionData(unsigned int successor, DirectionType dir,
  */
 void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
 {
-    core::vector2df xyz2d(xyz.getX(), xyz.getZ());
-    core::vector2df closest = m_line.getClosestPoint(xyz2d);
-    if(m_line.getPointOrientation(xyz2d)>0)
-        result->setX( (closest-xyz2d).getLength());   // to the right
+    core::vector3df xyz_irr = xyz.toIrrVector();
+    core::vector3df closest = m_line.getClosestPoint(xyz.toIrrVector());
+    core::vector3df normal = getQuad().getNormal().toIrrVector();
+
+    if(xyz.sideofPlane(closest, closest+normal, m_line.end)<0)
+        result->setX( (closest-xyz_irr).getLength());   // to the right
     else
-        result->setX(-(closest-xyz2d).getLength());   // to the left
+        result->setX(-(closest-xyz_irr).getLength());   // to the left
     result->setZ( m_distance_from_start +
-                  (closest-m_lower_center_2d).getLength());
+                  (closest-m_lower_center.toIrrVector()).getLength());
 }   // getDistances
 
 void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, unsigned int quad_idx, Vec3 *result)
@@ -236,9 +238,8 @@ void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, uns
  */
 float GraphNode::getDistance2FromPoint(const Vec3 &xyz)
 {
-    core::vector2df xyz2d(xyz.getX(), xyz.getZ());
-    core::vector2df closest = m_line.getClosestPoint(xyz2d);
-    return (closest-xyz2d).getLengthSQ();
+    core::vector3df closest = m_line.getClosestPoint(xyz.toIrrVector());
+    return (closest-xyz.toIrrVector()).getLengthSQ();
 }   // getDistance2FromPoint
 
 // ----------------------------------------------------------------------------

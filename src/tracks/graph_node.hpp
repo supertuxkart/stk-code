@@ -95,7 +95,7 @@ private:
       *  taller karts would have a larger distance from the center. It also
       *  saves computation, and it is only needed to determine the distance
       *  from the center of the drivelines anyway. */
-     core::line2df  m_line;
+     core::line3df  m_line;
 
      typedef std::vector<int> PathToNodeVector;
      /** This vector is only used if the graph node has more than one
