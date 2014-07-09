@@ -35,7 +35,7 @@
 #endif
 
 #include "karts/controller/skidding_ai.hpp"
-#define AI_DEBUG
+
 #ifdef AI_DEBUG
 #  include "graphics/irr_driver.hpp"
 #endif
