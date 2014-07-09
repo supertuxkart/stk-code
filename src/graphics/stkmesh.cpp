@@ -52,7 +52,7 @@ TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE typ
     video::E_MODULATE_FUNC mod;
     u32 alpha;
     unpack_textureBlendFunc(srcFact, DstFact, mod, alpha, MaterialTypeParam);
-    if (DstFact == video::EBF_ONE)
+    if (DstFact == video::EBF_ONE || type == video::EMT_TRANSPARENT_ADD_COLOR)
         return TM_ADDITIVE;
     return TM_DEFAULT;
 }
