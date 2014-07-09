@@ -26,6 +26,7 @@
   */
 
 #include <vector>
+#include <stdexcept>
 
 #include "modes/world_status.hpp"
 #include "race/highscores.hpp"
@@ -46,6 +47,12 @@ namespace irr
 {
     namespace scene { class ISceneNode; }
 }
+
+class AbortWorldUpdateException : public std::runtime_error
+{
+public:
+    AbortWorldUpdateException() : std::runtime_error("race abort") { };
+};
 
 /**
  *  \brief base class for all game modes

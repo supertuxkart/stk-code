@@ -50,6 +50,7 @@ void STKInstancedSceneNode::createGLMeshes()
     {
         scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
         GLmeshes.push_back(allocateMeshBuffer(mb));
+        fillLocalBuffer(GLmeshes.back(), mb);
     }
     isMaterialInitialized = false;
 }
@@ -98,8 +99,8 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
         video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
 
         GLMesh &mesh = GLmeshes[i];
-        GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type);
-        ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures);
+        GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
+        ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
         initinstancedvaostate(mesh, GeometricType, ShadedType);
         GeometricMesh[GeometricType].push_back(&mesh);
         ShadedMesh[ShadedType].push_back(&mesh);
@@ -302,10 +303,10 @@ void STKInstancedSceneNode::render()
         ModelViewProjectionMatrix = irr_driver->getProjMatrix();
         ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
 
-        if (!GeometricMesh[FPSM_DEFAULT].empty())
+        if (!GeometricMesh[FPSM_DEFAULT_STANDARD].empty())
             glUseProgram(MeshShader::InstancedObjectPass1Shader::Program);
-        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT][i], instance_pos.size() / 9);
+        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT_STANDARD].size(); i++)
+            drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT_STANDARD][i], instance_pos.size() / 9);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::InstancedObjectRefPass1Shader::Program);
@@ -322,10 +323,10 @@ void STKInstancedSceneNode::render()
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
-        if (!ShadedMesh[SM_DEFAULT].empty())
+        if (!ShadedMesh[SM_DEFAULT_STANDARD].empty())
             glUseProgram(MeshShader::InstancedObjectPass2Shader::Program);
-        for (unsigned i = 0; i < ShadedMesh[FPSM_DEFAULT].size(); i++)
-            drawSMDefault(*ShadedMesh[FPSM_DEFAULT][i], ModelViewProjectionMatrix, instance_pos.size() / 9);
+        for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT_STANDARD].size(); i++)
+            drawSMDefault(*ShadedMesh[SM_DEFAULT_STANDARD][i], ModelViewProjectionMatrix, instance_pos.size() / 9);
 
         if (!ShadedMesh[SM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::InstancedObjectRefPass2Shader::Program);
@@ -341,10 +342,10 @@ void STKInstancedSceneNode::render()
 
     if (irr_driver->getPhase() == SHADOW_PASS)
     {
-        if (!GeometricMesh[FPSM_DEFAULT].empty())
+        if (!GeometricMesh[FPSM_DEFAULT_STANDARD].empty())
             glUseProgram(MeshShader::InstancedShadowShader::Program);
-        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT].size(); i++)
-            drawShadowDefault(*GeometricMesh[FPSM_DEFAULT][i], instance_pos.size() / 9);
+        for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT_STANDARD].size(); i++)
+            drawShadowDefault(*GeometricMesh[FPSM_DEFAULT_STANDARD][i], instance_pos.size() / 9);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
             glUseProgram(MeshShader::InstancedRefShadowShader::Program);

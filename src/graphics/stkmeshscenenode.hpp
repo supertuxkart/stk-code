@@ -14,9 +14,6 @@ protected:
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
     core::vector3df windDir;
     core::vector2df caustic_dir, caustic_dir2;
-    void drawSolidPass1(const GLMesh &mesh, GeometricMaterial type);
-    void drawSolidPass2(const GLMesh &mesh, ShadedMaterial type);
-    void drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type);
 
     // Misc passes shaders (glow, displace...)
     void drawGlow(const GLMesh &mesh);
@@ -26,7 +23,8 @@ protected:
     void setFirstTimeMaterial();
     void updatevbo();
     bool isMaterialInitialized;
-    bool reload_each_frame;
+    bool immediate_draw;
+    bool update_each_frame;
 public:
     void setReloadEachFrame(bool);
     STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,

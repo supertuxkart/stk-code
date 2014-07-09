@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stkinstancedscenenode.hpp"
@@ -266,10 +267,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         
         if (tangent)
         {
-            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-            // TODO: perhaps the original mesh leaks here?
-            m_mesh = manip->createMeshWithTangents(m_mesh);
-       }
+            m_mesh = MeshTools::createMeshWithTangents(m_mesh, &MeshTools::isNormalMap);
+        }
     }
 
     if (!m_mesh)
