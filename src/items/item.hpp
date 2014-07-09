@@ -223,12 +223,12 @@ protected:
      *  \param line The line segment which is tested if it is close enough
      *         to this item so that this item would be collected.
      */
-    bool hitLine(const core::line2df &line,
+    bool hitLine(const core::line3df &line,
                   const AbstractKart *kart=NULL) const
     {
         if(m_event_handler==kart && m_deactive_time >0) return false;
-        core::vector2df p2d = m_xyz.toIrrVector2d();
-        core::vector2df closest = line.getClosestPoint(p2d);
+        
+        Vec3 closest = line.getClosestPoint(m_xyz.toIrrVector());
         return hitKart(closest, kart);
     }   // hitLine
 
