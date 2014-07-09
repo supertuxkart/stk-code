@@ -86,6 +86,7 @@ void MainMenuScreen::loadedFromFile()
     rw->removeChildNamed("test_gpwin");
     rw->removeChildNamed("test_gplose");
     rw->removeChildNamed("test_unlocked");
+    rw->removeChildNamed("test_unlocked2");
 #endif
 }   // loadedFromFile
 
