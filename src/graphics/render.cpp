@@ -933,6 +933,47 @@ void IrrDriver::renderParticles()
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT_EFFECT);
 }
 
+/** Given a matrix transform and a set of points returns an orthogonal projection matrix that maps coordinates of
+    transformed points between -1 and 1.
+*  \param transform a transform matrix.
+*  \param pointsInside a vector of point in 3d space.
+*/
+core::matrix4 getTighestFitOrthoProj(const core::matrix4 &transform, const std::vector<vector3df> &pointsInside)
+{
+    float xmin = std::numeric_limits<float>::infinity();
+    float xmax = -std::numeric_limits<float>::infinity();
+    float ymin = std::numeric_limits<float>::infinity();
+    float ymax = -std::numeric_limits<float>::infinity();
+    float zmin = std::numeric_limits<float>::infinity();
+    float zmax = -std::numeric_limits<float>::infinity();
+
+    for (unsigned i = 0; i < pointsInside.size(); i++)
+    {
+        vector3df TransformedVector;
+        transform.transformVect(TransformedVector, pointsInside[i]);
+        xmin = MIN2(xmin, TransformedVector.X);
+        xmax = MAX2(xmax, TransformedVector.X);
+        ymin = MIN2(ymin, TransformedVector.Y);
+        ymax = MAX2(ymax, TransformedVector.Y);
+        zmin = MIN2(zmin, TransformedVector.Z);
+        zmax = MAX2(zmax, TransformedVector.Z);
+    }
+
+    float left = xmin;
+    float right = xmax;
+    float up = ymin;
+    float down = ymax;
+
+    core::matrix4 tmp_matrix;
+    // Prevent Matrix without extend
+    if (left == right || up == down)
+        return tmp_matrix;
+    tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
+        down, up,
+        30, zmax);
+    return tmp_matrix;
+}
+
 void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, size_t width, size_t height)
 {
     m_scene_manager->drawAll(scene::ESNRP_CAMERA);
@@ -1015,34 +1056,17 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             core::aabbox3df box = smallcambox;
             box = box.intersect(trackbox);
 
-            float xmin =  std::numeric_limits<float>::infinity();
-            float xmax = -std::numeric_limits<float>::infinity();
-            float ymin =  std::numeric_limits<float>::infinity();
-            float ymax = -std::numeric_limits<float>::infinity();
-            float zmin =  std::numeric_limits<float>::infinity();
-            float zmax = -std::numeric_limits<float>::infinity();
-            const vector3df vectors[] =
-            {
-                frustrum->getFarLeftDown(),
-                frustrum->getFarLeftUp(),
-                frustrum->getFarRightDown(),
-                frustrum->getFarRightUp(),
-                frustrum->getNearLeftDown(),
-                frustrum->getNearLeftUp(),
-                frustrum->getNearRightDown(),
-                frustrum->getNearRightUp()
-            };
-            for (unsigned j = 0; j < 8; j++)
-            {
-                vector3df vector;
-                SunCamViewMatrix.transformVect(vector, vectors[j]);
-                xmin = MIN2(xmin, vector.X);
-                xmax = MAX2(xmax, vector.X);
-                ymin = MIN2(ymin, vector.Y);
-                ymax = MAX2(ymax, vector.Y);
-                zmin = MIN2(zmin, vector.Z);
-                zmax = MAX2(zmax, vector.Z);
-            }
+
+            std::vector<vector3df> vectors;
+            vectors.push_back(frustrum->getFarLeftDown());
+            vectors.push_back(frustrum->getFarLeftUp());
+            vectors.push_back(frustrum->getFarRightDown());
+            vectors.push_back(frustrum->getFarRightUp());
+            vectors.push_back(frustrum->getNearLeftDown());
+            vectors.push_back(frustrum->getNearLeftUp());
+            vectors.push_back(frustrum->getNearRightDown());
+            vectors.push_back(frustrum->getNearRightUp());
+
 /*            SunCamViewMatrix.transformBoxEx(trackbox);
             SunCamViewMatrix.transformBoxEx(box);
 
@@ -1055,25 +1079,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             const float units_per_w = w / 1024;
             const float units_per_h = h / 1024;*/
 
-            float left = xmin;
-            float right = xmax;
-            float up = ymin;
-            float down = ymax;
-
-            core::matrix4 tmp_matrix;
-
-            // Prevent Matrix without extend
-            if (left == right || up == down)
-            {
-                Log::error("Shadows", "Shadows Near/Far plane have a 0 area");
-                sun_ortho_matrix.push_back(tmp_matrix);
-                continue;
-            }
-
-            tmp_matrix.buildProjectionMatrixOrthoLH(left, right,
-                down, up,
-                30, zmax);
-            m_suncam->setProjectionMatrix(tmp_matrix, true);
+            m_suncam->setProjectionMatrix(getTighestFitOrthoProj(SunCamViewMatrix, vectors) , true);
             m_suncam->render();
 
             sun_ortho_matrix.push_back(getVideoDriver()->getTransform(video::ETS_PROJECTION) * getVideoDriver()->getTransform(video::ETS_VIEW));
