@@ -220,6 +220,8 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
         if (xml_node.get("displacing", &displacing) && displacing && glownode)
         {
             irr_driver->addDisplacingNode(glownode);
+            glownode->setVisible(false);
+            glownode->updateAbsolutePosition();
         }
     }
 

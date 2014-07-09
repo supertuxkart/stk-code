@@ -74,23 +74,22 @@ bool DeviceManager::initialize()
     }
 
     const int keyboard_amount = m_keyboard_configs.size();
-    for (int n=0; n<keyboard_amount; n++)
+    for (int n = 0; n < keyboard_amount; n++)
     {
         m_keyboards.push_back(new KeyboardDevice(m_keyboard_configs.get(n)));
     }
 
     if(UserConfigParams::logMisc())
-            Log::info("Device manager","Initializing gamepad support.");
+        Log::info("Device manager","Initializing gamepad support.");
 
     irr_driver->getDevice()->activateJoysticks(m_irrlicht_gamepads);
+
     int num_gamepads = m_irrlicht_gamepads.size();
     if(UserConfigParams::logMisc())
     {
         Log::info("Device manager","Irrlicht reports %d gamepads are attached to the system.",
                num_gamepads);
     }
-
-
 
     // Create GamePadDevice for each physical gamepad and find a GamepadConfig to match
     for (int id = 0; id < num_gamepads; id++)
@@ -112,6 +111,7 @@ bool DeviceManager::initialize()
         {
             Log::info("Device manager","#%d: %s detected...", id, name.c_str());
         }
+
         // Returns true if new configuration was created
         if (getConfigForGamepad(id, name, &gamepadConfig) == true)
         {
@@ -135,6 +135,7 @@ bool DeviceManager::initialize()
     } // end for
 
     if (created) serialize();
+
     return created;
 }   // initialize
 

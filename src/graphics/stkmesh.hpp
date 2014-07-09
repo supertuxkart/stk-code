@@ -12,7 +12,8 @@
 
 enum GeometricMaterial
 {
-    FPSM_DEFAULT,
+    FPSM_DEFAULT_STANDARD,
+    FPSM_DEFAULT_2TCOORD,
     FPSM_ALPHA_REF_TEXTURE,
     FPSM_NORMAL_MAP,
     FPSM_GRASS,
@@ -21,7 +22,8 @@ enum GeometricMaterial
 
 enum ShadedMaterial
 {
-    SM_DEFAULT,
+    SM_DEFAULT_STANDARD,
+    SM_DEFAULT_TANGENT,
     SM_ALPHA_REF_TEXTURE,
     SM_RIMLIT,
     SM_SPHEREMAP,
@@ -29,7 +31,6 @@ enum ShadedMaterial
     SM_GRASS,
     SM_UNLIT,
     SM_DETAILS,
-    SM_UNTEXTURED,
     SM_COUNT
 };
 
@@ -52,9 +53,13 @@ struct GLMesh {
     size_t IndexCount;
     size_t Stride;
     core::matrix4 TextureMatrix;
+    size_t vaoBaseVertex;
+    size_t vaoOffset;
+    video::E_VERTEX_TYPE VAOType;
 };
 
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
+void fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
 GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
 void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
@@ -90,7 +95,7 @@ std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
 
 
 template<typename Shader, typename...uniforms>
-void draw(const GLMesh &mesh, GLuint vao, uniforms... Args)
+void draw(const GLMesh &mesh, uniforms... Args)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh.PrimitiveType;
@@ -98,10 +103,7 @@ void draw(const GLMesh &mesh, GLuint vao, uniforms... Args)
     size_t count = mesh.IndexCount;
 
     Shader::setUniforms(Args...);
-
-    assert(vao);
-    glBindVertexArray(vao);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
@@ -129,15 +131,8 @@ std::vector<core::matrix4> GroupedSM<T>::MVPSet;
 template<enum ShadedMaterial T>
 std::vector<core::matrix4> GroupedSM<T>::TIMVSet;
 
-void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
-void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
-void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
-void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView);
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
-void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix);
-void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 // Shadow pass
 void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
@@ -167,8 +162,8 @@ void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewPro
 void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
-GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE);
-ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures);
+GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
+ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures, video::E_VERTEX_TYPE tp);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
 
 #endif // STKMESH_H

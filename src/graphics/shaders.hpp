@@ -375,10 +375,10 @@ class DisplaceShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_dir, uniform_dir2;
+    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_tex, uniform_dir, uniform_dir2;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex);
 };
 
 class SkyboxShader
@@ -759,11 +759,11 @@ class MotionBlurShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_boost_amount, uniform_color_buffer, uniform_center, uniform_direction, uniform_mask_radius, uniform_max_tex_height;
+    static GLuint uniform_boost_amount, uniform_color_buffer, uniform_dtex, uniform_previous_viewproj, uniform_center, uniform_mask_radius;
     static GLuint vao;
 
     static void init();
-    static void setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb);
+    static void setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center,  float mask_radius, unsigned TU_cb, unsigned TU_dtex);
 };
 
 class GodFadeShader

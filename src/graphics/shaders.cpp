@@ -876,7 +876,6 @@ namespace MeshShader
         GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
         GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
         uniform_ambient = glGetUniformLocation(Program, "ambient");
-        GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1100,7 +1099,6 @@ namespace MeshShader
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_ambient = glGetUniformLocation(Program, "ambient");
         GLuint uniform_tex = glGetUniformLocation(Program, "tex");
-        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
         GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
         GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
         GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
@@ -1539,6 +1537,7 @@ namespace MeshShader
     GLuint DisplaceShader::uniform_displacement_tex;
     GLuint DisplaceShader::uniform_mask_tex;
     GLuint DisplaceShader::uniform_color_tex;
+    GLuint DisplaceShader::uniform_tex;
     GLuint DisplaceShader::uniform_dir;
     GLuint DisplaceShader::uniform_dir2;
 
@@ -1553,11 +1552,12 @@ namespace MeshShader
         uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
         uniform_dir = glGetUniformLocation(Program, "dir");
         uniform_dir2 = glGetUniformLocation(Program, "dir2");
+        uniform_tex = glGetUniformLocation(Program, "tex");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
+    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform2f(uniform_dir, dir.X, dir.Y);
@@ -1565,6 +1565,7 @@ namespace MeshShader
         glUniform1i(uniform_displacement_tex, TU_displacement_tex);
         glUniform1i(uniform_mask_tex, TU_mask_tex);
         glUniform1i(uniform_color_tex, TU_color_tex);
+        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint SkyboxShader::Program;
@@ -2665,33 +2666,34 @@ namespace FullScreenShader
     GLuint MotionBlurShader::uniform_boost_amount;
     GLuint MotionBlurShader::uniform_center;
     GLuint MotionBlurShader::uniform_color_buffer;
-    GLuint MotionBlurShader::uniform_direction;
+    GLuint MotionBlurShader::uniform_dtex;
+    GLuint MotionBlurShader::uniform_previous_viewproj;
     GLuint MotionBlurShader::uniform_mask_radius;
-    GLuint MotionBlurShader::uniform_max_tex_height;
     GLuint MotionBlurShader::vao;
 
     void MotionBlurShader::init()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
         uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
         uniform_center = glGetUniformLocation(Program, "center");
         uniform_color_buffer = glGetUniformLocation(Program, "color_buffer");
-        uniform_direction = glGetUniformLocation(Program, "direction");
         uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
-        uniform_max_tex_height = glGetUniformLocation(Program, "max_tex_height");
+        uniform_dtex = glGetUniformLocation(Program, "dtex");
+        uniform_previous_viewproj = glGetUniformLocation(Program, "previous_viewproj");
         vao = createFullScreenVAO(Program);
     }
 
-    void MotionBlurShader::setUniforms(float boost_amount, const core::vector2df &center, const core::vector2df &direction, float mask_radius, float max_tex_height, unsigned TU_cb)
+    void MotionBlurShader::setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center, float mask_radius, unsigned TU_cb, unsigned TU_dtex)
     {
+        glUniformMatrix4fv(uniform_previous_viewproj, 1, GL_FALSE, previousVP.pointer());
         glUniform1f(uniform_boost_amount, boost_amount);
         glUniform2f(uniform_center, center.X, center.Y);
-        glUniform2f(uniform_direction, direction.X, direction.Y);
         glUniform1f(uniform_mask_radius, mask_radius);
-        glUniform1f(uniform_max_tex_height, max_tex_height);
         glUniform1i(uniform_color_buffer, TU_cb);
+        glUniform1i(uniform_dtex, TU_dtex);
     }
 
     GLuint GodFadeShader::Program;

@@ -35,7 +35,6 @@
 #include "utils/no_copy.hpp"
 
 class btKart;
-class btUprightConstraint;
 
 class Attachment;
 class Controller;
@@ -146,7 +145,6 @@ private:
     btCompoundShape          m_kart_chassis;
     btVehicleRaycaster      *m_vehicle_raycaster;
     btKart                  *m_vehicle;
-    btUprightConstraint     *m_uprightConstraint;
 
      /** The amount of energy collected by hitting coins. Note that it
       *  must be float, since dt is subtraced in each timestep. */
@@ -342,11 +340,7 @@ public:
     virtual Skidding *getSkidding() { return m_skidding; }
     // ------------------------------------------------------------------------
     /** Returns the bullet vehicle which represents this kart. */
-    virtual btKart    *getVehicle      () const {return m_vehicle;                }
-    // ------------------------------------------------------------------------
-    /** Returns the upright constraint for this kart. */
-    virtual btUprightConstraint *getUprightConstraint() const
-                                                  {return m_uprightConstraint;}
+    virtual btKart    *getVehicle() const {return m_vehicle;               }
     // ------------------------------------------------------------------------
     /** Returns the speed of the kart in meters/second. */
     virtual float        getSpeed() const {return m_speed;                 }

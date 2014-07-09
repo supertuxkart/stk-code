@@ -110,8 +110,9 @@ IrrDriver::IrrDriver()
     m_post_processing     = NULL;
     m_wind                = new Wind();
     m_mipviz = m_wireframe = m_normals = m_ssaoviz = \
-        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = 0;
-    SkyboxCubeMap = 0;
+        m_lightviz = m_shadowviz = m_distortviz = m_rsm = m_rh = m_gi = false;
+    SkyboxCubeMap = m_last_light_bucket_distance = 0;
+    memset(object_count, 0, sizeof(object_count));
 }   // IrrDriver
 
 // ----------------------------------------------------------------------------
@@ -442,12 +443,12 @@ void IrrDriver::initDevice()
     {
         glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
         glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
-    }
-    Log::info("IrrDriver", "OpenGL version: %d.%d", GLMajorVersion, GLMinorVersion);
-    Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
-    Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
-    Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
+        Log::info("IrrDriver", "OpenGL version: %d.%d", GLMajorVersion, GLMinorVersion);
+        Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
+        Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
+        Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     //m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
+    }
     m_glsl = false;
 
     // Parse extensions
@@ -1658,8 +1659,14 @@ void IrrDriver::displayFPS()
 
     if (UserConfigParams::m_artist_debug_mode)
     {
-        sprintf(buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) - LightDst : ~%d",
-                min, fps, max, object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[SOLID_NORMAL_AND_DEPTH_PASS], object_count[TRANSPARENT_PASS], m_last_light_bucket_distance);
+        sprintf(
+            buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) - LightDst : ~%d",
+            min, fps, max,
+            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
+            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
+            object_count[TRANSPARENT_PASS],
+            m_last_light_bucket_distance
+        );
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[TRANSPARENT_PASS] = 0;
@@ -2056,7 +2063,10 @@ bool IrrDriver::supportsSplatting()
 #endif
 
 // ----------------------------------------------------------------------------
-/** Begins a rendering to a texture.
+/**
+ * THIS IS THE OLD OPENGL 1 RTT PROVIDER, USE THE SHADER-BASED
+ * RTT FOR NEW DEVELOPMENT
+ * Begins a rendering to a texture.
  *  \param dimension The size of the texture.
  *  \param name Name of the texture.
  *  \param persistent_texture Whether the created RTT texture should persist in

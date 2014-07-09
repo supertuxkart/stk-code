@@ -81,7 +81,7 @@ void EnterGPNameDialog::onEnterPressedInternal()
     TextBoxWidget* textCtrl = getWidget<TextBoxWidget>("textfield");
     assert(textCtrl != NULL);
     stringw name = textCtrl->getText().trim();
-    if (name.size() > 0)
+    if (name.size() > 0 && name != "Random Grand Prix")
     {
         // check for duplicate names
         for (unsigned int i = 0; i < grand_prix_manager->getNumberOfGrandPrix(); i++)

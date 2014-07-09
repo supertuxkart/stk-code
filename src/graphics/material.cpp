@@ -757,7 +757,6 @@ void  Material::setMaterialProperties(video::SMaterial *m, scene::IMeshBuffer* m
 
     if (m_shader_type == SHADERTYPE_SOLID && m_normal_map_tex.size() > 0)
     {
-        IVideoDriver* video_driver = irr_driver->getVideoDriver();
         if (irr_driver->isGLSL())
         {
             // FIXME; cannot perform this check atm, because setMaterialProperties

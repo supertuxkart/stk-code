@@ -460,12 +460,12 @@ void QuadGraph::createMesh(bool show_invisible,
         // Set up the indices for the triangles
         // (note, afaik with opengl we could use quads directly, but the code
         // would not be portable to directx anymore).
-        ind[6*i  ] = 4*i;  // First triangle: vertex 0, 1, 2
+        ind[6*i  ] = 4*i+2;  // First triangle: vertex 0, 1, 2
         ind[6*i+1] = 4*i+1;
-        ind[6*i+2] = 4*i+2;
-        ind[6*i+3] = 4*i;  // second triangle: vertex 0, 1, 3
+        ind[6*i+2] = 4*i;
+        ind[6*i+3] = 4*i+3;  // second triangle: vertex 0, 1, 3
         ind[6*i+4] = 4*i+2;
-        ind[6*i+5] = 4*i+3;
+        ind[6*i+5] = 4*i;
         i++;
     }   // for i=1; i<QuadSet::get()
 
@@ -499,12 +499,12 @@ void QuadGraph::createMesh(bool show_invisible,
             lap_v[2].Pos = lap_v[1].Pos+core::vector3df(0, 0, 1);
         else
             lap_v[2].Pos = lap_v[1].Pos+dr*length/sqrt(lr2);
-        lap_ind[0] = 0;
+        lap_ind[0] = 2;
         lap_ind[1] = 1;
-        lap_ind[2] = 2;
-        lap_ind[3] = 0;
+        lap_ind[2] = 0;
+        lap_ind[3] = 3;
         lap_ind[4] = 2;
-        lap_ind[5] = 3;
+        lap_ind[5] = 0;
         // Set it a bit higher to avoid issued with z fighting,
         // i.e. part of the lap line might not be visible.
         for(unsigned int i=0; i<4; i++)
@@ -1084,20 +1084,37 @@ int QuadGraph::findOutOfRoadSector(const Vec3& xyz,
 //-----------------------------------------------------------------------------
 /** Takes a snapshot of the driveline quads so they can be used as minimap.
  */
-video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
-                                        const std::string &name,
-                                        const video::SColor &fill_color)
+void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
+                            const std::string &name,
+                            const video::SColor &fill_color,
+                            video::ITexture** oldRttMinimap,
+                            FrameBuffer** newRttMinimap)
 {
-    const core::dimension2du dimension = origdimension * 2;
+    const SColor oldClearColor = World::getWorld()->getClearColor();
+    World::getWorld()->setClearbackBufferColor(SColor(0, 255, 255, 255));
+    *oldRttMinimap = NULL;
+    *newRttMinimap = NULL;
 
-    IrrDriver::RTTProvider rttProvider(dimension, name, true);
+    RTT* newRttProvider = NULL;
+    IrrDriver::RTTProvider* oldRttProvider = NULL;
+    if (irr_driver->isGLSL())
+    {
+        newRttProvider = new RTT(dimension.Width, dimension.Height);
+    }
+    else
+    {
+        oldRttProvider = new IrrDriver::RTTProvider(dimension, name, true);
+    }
+
+    irr_driver->getSceneManager()->setAmbientLight(video::SColor(255, 255, 255, 255));
+
     video::SColor red(128, 255, 0, 0);
     createMesh(/*show_invisible part of the track*/ false,
                /*enable_transparency*/ false,
                /*track_color*/    &fill_color,
                /*lap line color*/  &red                       );
 
-    m_node = irr_driver->getSceneManager()->addMeshSceneNode(m_mesh);   // add Debug Mesh
+    m_node = irr_driver->addMesh(m_mesh);
 #ifdef DEBUG
     m_node->setName("minimap-mesh");
 #endif
@@ -1145,32 +1162,54 @@ video::ITexture *QuadGraph::makeMiniMap(const core::dimension2du &origdimension,
     float range = (dx>dz) ? dx : dz;
 
     core::matrix4 projection;
-    projection.buildProjectionMatrixOrthoLH(range,
-                                            range,
+    projection.buildProjectionMatrixOrthoLH(range /* width */,
+                                            range /* height */,
                                             -1, bb_max.getY()-bb_min.getY()+1);
     camera->setProjectionMatrix(projection, true);
+
+    irr_driver->suppressSkyBox();
+    irr_driver->clearLights();
+
     // Adjust Y position by +1 for max, -1 for min - this helps in case that
     // the maximum Y coordinate is negative (otherwise the minimap is mirrored)
     // and avoids problems for tracks which have a flat (max Y = min Y) minimap.
-    camera->setPosition(core::vector3df(center.getX(), bb_max.getY()+1, center.getZ()));
+    camera->setPosition(core::vector3df(center.getX(), bb_min.getY() + 1.0f, center.getZ()));
+    //camera->setPosition(core::vector3df(center.getX() - 5.0f, bb_min.getY() - 1 - 5.0f, center.getZ() - 15.0f));
     camera->setUpVector(core::vector3df(0, 0, 1));
     camera->setTarget(core::vector3df(center.getX(),bb_min.getY()-1,center.getZ()));
+    //camera->setAspectRatio(1.0f);
+    camera->updateAbsolutePosition();
 
-    video::ITexture *texture = rttProvider.renderToTexture();
+    video::ITexture* texture = NULL;
+    FrameBuffer* frame_buffer = NULL;
+
+    if (irr_driver->isGLSL())
+    {
+        frame_buffer = newRttProvider->render(camera, GUIEngine::getLatestDt());
+
+        // TODO: leak
+        //delete newRttProvider;
+    }
+    else
+    {
+        texture = oldRttProvider->renderToTexture();
+        delete oldRttProvider;
+    }
 
     cleanupDebugMesh();
     irr_driver->removeCameraSceneNode(camera);
     m_min_coord = bb_min;
 
 
-    if (texture == NULL)
+    if (texture == NULL && frame_buffer == NULL)
     {
         Log::error("Quad Graph", "[makeMiniMap] WARNING: RTT does not appear to work,"
                         "mini-map will not be available.");
-        return NULL;
     }
 
-    return texture;
+    *oldRttMinimap = texture;
+    *newRttMinimap = frame_buffer;
+    World::getWorld()->setClearbackBufferColor(oldClearColor);
 }   // makeMiniMap
 
 //-----------------------------------------------------------------------------

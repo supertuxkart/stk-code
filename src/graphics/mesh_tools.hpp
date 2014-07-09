@@ -21,7 +21,7 @@
 
 namespace irr
 {
-    namespace scene { class IMesh; }
+    namespace scene { class IMesh; class IMeshBuffer; }
 }
 using namespace irr;
 
@@ -33,6 +33,12 @@ using namespace irr;
 namespace MeshTools
 {
     void minMax3D(scene::IMesh* mesh, Vec3 *min, Vec3 *max);
+
+    bool isNormalMap(scene::IMeshBuffer* mb);
+
+    // Copied from irrlicht
+    scene::IMesh* createMeshWithTangents(scene::IMesh* mesh, bool(*predicate)(scene::IMeshBuffer*),
+        bool recalculateNormals = false, bool smooth = false, bool angleWeighted = false, bool calculateTangents = true);
 }   // MeshTools
 
 #endif

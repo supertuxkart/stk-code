@@ -115,7 +115,8 @@ Track::Track(const std::string &filename)
     m_is_soccer             = false;
     m_is_cutscene           = false;
     m_camera_far            = 1000.0f;
-    m_mini_map              = NULL;
+    m_old_rtt_mini_map      = NULL;
+    m_new_rtt_mini_map      = NULL;
     m_bloom                 = true;
     m_bloom_threshold       = 0.75f;
     m_color_inlevel         = core::vector3df(0.0,1.0, 255.0);
@@ -266,6 +267,7 @@ void Track::cleanup()
 {
     QuadGraph::destroy();
     ItemManager::destroy();
+    resetVAO();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     // Clear reminder of transformed textures
@@ -273,13 +275,13 @@ void Track::cleanup()
     // Clear reminder of the link between textures and file names.
     irr_driver->clearTexturesFileName();
 
-    for(unsigned int i=0; i<m_animated_textures.size(); i++)
+    for (unsigned int i = 0; i < m_animated_textures.size(); i++)
     {
         delete m_animated_textures[i];
     }
     m_animated_textures.clear();
 
-    for(unsigned int i=0; i<m_all_nodes.size(); i++)
+    for (unsigned int i = 0; i < m_all_nodes.size(); i++)
     {
         irr_driver->removeNode(m_all_nodes[i]);
     }
@@ -310,37 +312,42 @@ void Track::cleanup()
     // than once are in m_all_cached_mesh more than once (which is easier
     // than storing the mesh only once, but then having to test for each
     // mesh if it is already contained in the list or not).
-    for(unsigned int i=0; i<m_all_cached_meshes.size(); i++)
+    for (unsigned int i = 0; i < m_all_cached_meshes.size(); i++)
     {
         irr_driver->dropAllTextures(m_all_cached_meshes[i]);
         // If a mesh is not in Irrlicht's texture cache, its refcount is
         // 1 (since its scene node was removed, so the only other reference
         // is in m_all_cached_meshes). In this case we only drop it once
         // and don't try to remove it from the cache.
-        if(m_all_cached_meshes[i]->getReferenceCount()==1)
+        if (m_all_cached_meshes[i]->getReferenceCount() == 1)
         {
             m_all_cached_meshes[i]->drop();
             continue;
         }
         m_all_cached_meshes[i]->drop();
-        if(m_all_cached_meshes[i]->getReferenceCount()==1)
+        if (m_all_cached_meshes[i]->getReferenceCount() == 1)
             irr_driver->removeMeshFromCache(m_all_cached_meshes[i]);
     }
     m_all_cached_meshes.clear();
 
     // Now free meshes that are not associated to any scene node.
-    for (unsigned int i=0; i<m_detached_cached_meshes.size(); i++)
+    for (unsigned int i = 0; i < m_detached_cached_meshes.size(); i++)
     {
         irr_driver->dropAllTextures(m_detached_cached_meshes[i]);
         irr_driver->removeMeshFromCache(m_detached_cached_meshes[i]);
     }
     m_detached_cached_meshes.clear();
 
-    if(m_mini_map)
+    if (m_old_rtt_mini_map)
     {
-        assert(m_mini_map->getReferenceCount()==1);
-        irr_driver->removeTexture(m_mini_map);
-        m_mini_map = NULL;
+        assert(m_old_rtt_mini_map->getReferenceCount() == 1);
+        irr_driver->removeTexture(m_old_rtt_mini_map);
+        m_old_rtt_mini_map = NULL;
+    }
+    if (m_new_rtt_mini_map)
+    {
+        delete m_new_rtt_mini_map;
+        m_new_rtt_mini_map = NULL;
     }
 
     for(unsigned int i=0; i<m_sky_textures.size(); i++)
@@ -515,10 +522,10 @@ void Track::loadTrackInfo()
     delete root;
 
     std::string dir = StringUtils::getPath(m_filename);
-    std::string easter_name = dir+"/easter_eggs.xml";
+    std::string easter_name = dir + "/easter_eggs.xml";
 
     XMLNode *easter = file_manager->createXMLTree(easter_name);
-  
+
     if(easter)
     {
         for(unsigned int i=0; i<easter->getNumNodes(); i++)
@@ -637,11 +644,18 @@ void Track::loadQuadGraph(unsigned int mode_id, const bool reverse)
         m_mini_map_size = World::getWorld()->getRaceGUI()->getMiniMapSize();
         core::dimension2du size = m_mini_map_size
                                  .getOptimalSize(!nonpower,!nonsquare);
-        m_mini_map = QuadGraph::get()->makeMiniMap(size, "minimap::"+m_ident);
-        if (m_mini_map)
+
+        QuadGraph::get()->makeMiniMap(size, "minimap::" + m_ident, video::SColor(127, 255, 255, 255),
+            &m_old_rtt_mini_map, &m_new_rtt_mini_map);
+        if (m_old_rtt_mini_map)
         {
-            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_mini_map->getSize().Width);
-            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_mini_map->getSize().Height);
+            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_old_rtt_mini_map->getSize().Width);
+            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_old_rtt_mini_map->getSize().Height);
+        }
+        else if (m_new_rtt_mini_map)
+        {
+            m_minimap_x_scale = float(m_mini_map_size.Width) / float(m_new_rtt_mini_map->getWidth());
+            m_minimap_y_scale = float(m_mini_map_size.Height) / float(m_new_rtt_mini_map->getHeight());
         }
         else
         {
@@ -692,6 +706,8 @@ void Track::createPhysicsModel(unsigned int main_track_count)
 }   // createPhysicsModel
 
 // -----------------------------------------------------------------------------
+
+
 /** Convert the graohics track into its physics equivalents.
  *  \param mesh The mesh to convert.
  *  \param node The scene node.
@@ -919,7 +935,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     {
         mesh = irr_driver->getMesh(full_path);
     }
-    
+
     if(!mesh)
     {
         Log::fatal("track",
@@ -939,9 +955,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     merged_mesh->addMesh(mesh);
     merged_mesh->finalize();
 
-    scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-    // TODO: memory leak?
-    scene::IMesh* tangent_mesh = manip->createMeshWithTangents(merged_mesh);
+    scene::IMesh* tangent_mesh = MeshTools::createMeshWithTangents(merged_mesh, &MeshTools::isNormalMap);
 
     adjustForFog(tangent_mesh, NULL);
 
@@ -1150,8 +1164,6 @@ bool Track::loadMainTrack(const XMLNode &root)
 
         if (tangent)
         {
-            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-
             scene::IMesh* original_mesh = irr_driver->getMesh(full_path);
 
             if (std::find(m_detached_cached_meshes.begin(),
@@ -1173,7 +1185,7 @@ bool Track::loadMainTrack(const XMLNode &root)
             scene_node->remove();
             irr_driver->grabAllTextures(original_mesh);
 
-            scene::IMesh* mesh = manip->createMeshWithTangents(original_mesh);
+            scene::IMesh* mesh = MeshTools::createMeshWithTangents(original_mesh, &MeshTools::isNormalMap);
             mesh->grab();
             irr_driver->grabAllTextures(mesh);
 
@@ -1947,7 +1959,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
                 libroot = library_nodes[name];
                 create_lod_definitions = false; // LOD definitions are already created, don't create them again
             }
-    
+
             scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
             parent->setPosition(xyz);
             parent->setRotation(hpr);

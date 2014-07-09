@@ -78,8 +78,8 @@ void main()
     col += texture(tex, uv + (vec2(0.0, 0.4) * offset) * blur * 0.4);
     
     col = vec4(col.rgb / 41.0, col.a);
-    depth = clamp((FragPos.z/280), 0., 1.);
-    depth  = (1 - depth);
+    depth = clamp(max(1.1666 - (FragPos.z/240.0), FragPos.z - 2000.0), 0., 1.);
+    
     vec3 final = colOriginal.rgb * depth + col.rgb * (1 - depth);
 
     FragColor = vec4(final, colOriginal.a);

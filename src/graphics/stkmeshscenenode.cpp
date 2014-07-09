@@ -16,13 +16,16 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
-    reload_each_frame = false;
+    immediate_draw = false;
+    update_each_frame = false;
     createGLMeshes();
 }
 
 void STKMeshSceneNode::setReloadEachFrame(bool val)
 {
-    reload_each_frame = val;
+    update_each_frame = val;
+    if (val)
+        immediate_draw = true;
 }
 
 void STKMeshSceneNode::createGLMeshes()
@@ -60,16 +63,38 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       if (rnd->isTransparent())
       {
           TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
-          initvaostate(mesh, TranspMat);
-          TransparentMesh[TranspMat].push_back(&mesh);
+          if (immediate_draw)
+          {
+              fillLocalBuffer(mesh, mb);
+              initvaostate(mesh, TranspMat);
+              glBindVertexArray(0);
+          }
+          else
+              TransparentMesh[TranspMat].push_back(&mesh);
       }
       else
       {
-          GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type);
-          ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures);
-          initvaostate(mesh, GeometricType, ShadedType);
-          GeometricMesh[GeometricType].push_back(&mesh);
-          ShadedMesh[ShadedType].push_back(&mesh);
+          GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
+          ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
+          if (immediate_draw)
+          {
+              fillLocalBuffer(mesh, mb);
+              initvaostate(mesh, GeometricType, ShadedType);
+              glBindVertexArray(0);
+          }
+          else
+          {
+              GeometricMesh[GeometricType].push_back(&mesh);
+              ShadedMesh[ShadedType].push_back(&mesh);
+          }
+      }
+
+      if (!immediate_draw)
+      {
+          std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
+          mesh.vaoBaseVertex = p.first;
+          mesh.vaoOffset = p.second;
+          mesh.VAOType = mb->getVertexType();
       }
   }
   isMaterialInitialized = true;
@@ -109,22 +134,26 @@ STKMeshSceneNode::~STKMeshSceneNode()
 void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
 {
     ColorizeProvider * const cb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
+    assert(mesh.VAOType == video::EVT_STANDARD);
 
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
     MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 static video::ITexture *displaceTex = 0;
 
 void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
 {
+    if (mesh.VAOType != video::EVT_2TCOORDS)
+    {
+        Log::error("Materials", "Displacement has wrong vertex type");
+        return;
+    }
+    glBindVertexArray(getVAO(video::EVT_2TCOORDS));
     DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
 
     GLenum ptype = mesh.PrimitiveType;
@@ -137,9 +166,7 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
 
     glUseProgram(MeshShader::DisplaceMaskShader::Program);
     MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
-
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 
     // Render the effect
     if (!displaceTex)
@@ -148,57 +175,16 @@ void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
     setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
     setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
     setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
+    setTexture(3, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
     glUseProgram(MeshShader::DisplaceShader::Program);
     MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
                                             core::vector2df(cb->getDirX(), cb->getDirY()),
                                             core::vector2df(cb->getDir2X(), cb->getDir2Y()),
                                             core::vector2df(float(UserConfigParams::m_width),
                                                             float(UserConfigParams::m_height)),
-                                            0, 1, 2);
+                                            0, 1, 2, 3);
 
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void STKMeshSceneNode::drawTransparent(const GLMesh &mesh, video::E_MATERIAL_TYPE type)
-{
-    assert(irr_driver->getPhase() == TRANSPARENT_PASS);
-
-    ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-
-    if (type == irr_driver->getShader(ES_BUBBLES))
-        drawBubble(mesh, ModelViewProjectionMatrix);
-//    else if (World::getWorld()->getTrack()->isFogEnabled())
-//        drawTransparentFogObject(mesh, ModelViewProjectionMatrix, TextureMatrix);
-    else
-        drawTransparentObject(mesh, ModelViewProjectionMatrix, mesh.TextureMatrix);
-    return;
-}
-
-void STKMeshSceneNode::drawSolidPass1(const GLMesh &mesh, GeometricMaterial type)
-{
-    irr_driver->IncreaseObjectCount();
-    windDir = getWind();
-    switch (type)
-    {
-    case FPSM_GRASS:
-        drawGrassPass1(mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
-        break;
-    default:
-        assert(0 && "wrong geometric material");
-    }
-}
-
-void STKMeshSceneNode::drawSolidPass2(const GLMesh &mesh, ShadedMaterial type)
-{
-    switch (type)
-    {
-    case SM_GRASS:
-        drawGrassPass2(mesh, ModelViewProjectionMatrix, windDir);
-        break;
-    default:
-        assert(0 && "Wrong shaded material");
-        break;
-    }
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 void STKMeshSceneNode::updatevbo()
@@ -220,7 +206,7 @@ void STKMeshSceneNode::updatevbo()
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
         const void* indices = mb->getIndices();
         mesh.IndexCount = mb->getIndexCount();
-        GLenum indexSize;
+        size_t indexSize = 0;
         switch (mb->getIndexType())
         {
         case irr::video::EIT_16BIT:
@@ -243,9 +229,6 @@ void STKMeshSceneNode::render()
     if (!Mesh || !driver)
         return;
 
-    if (reload_each_frame)
-        updatevbo();
-
     bool isTransparentPass =
         SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
 
@@ -263,20 +246,52 @@ void STKMeshSceneNode::render()
         GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
-        if (reload_each_frame)
-            glDisable(GL_CULL_FACE);
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
-        GLMesh* mesh;
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
+
+        if (immediate_draw)
         {
-            GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(invmodel);
+            glDisable(GL_CULL_FACE);
+            if (update_each_frame)
+                updatevbo();
+            glUseProgram(MeshShader::ObjectPass1Shader::Program);
+            // Only untextured
+            for (unsigned i = 0; i < GLmeshes.size(); i++)
+            {
+                irr_driver->IncreaseObjectCount();
+                GLMesh &mesh = GLmeshes[i];
+                GLenum ptype = mesh.PrimitiveType;
+                GLenum itype = mesh.IndexType;
+                size_t count = mesh.IndexCount;
+
+                MeshShader::ObjectPass1Shader::setUniforms(AbsoluteTransformation, invmodel, 0);
+                assert(mesh.vao);
+                glBindVertexArray(mesh.vao);
+                glDrawElements(ptype, count, itype, 0);
+                glBindVertexArray(0);
+            }
+            glEnable(GL_CULL_FACE);
+            return;
+        }
+
+
+        GLMesh* mesh;
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
+        {
+            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
+            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
+        {
+            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.push_back(mesh);
+            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet.push_back(invmodel);
         }
 
         for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
@@ -293,33 +308,57 @@ void STKMeshSceneNode::render()
             GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet.push_back(invmodel);
         }
 
-        if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
-        {
-            if (!GeometricMesh[FPSM_GRASS].empty())
-                glUseProgram(MeshShader::GrassPass1Shader::Program);
-            for_in(mesh, GeometricMesh[FPSM_GRASS])
-                drawSolidPass1(*mesh, FPSM_GRASS);
-        }
+        if (!GeometricMesh[FPSM_GRASS].empty())
+            glUseProgram(MeshShader::GrassPass1Shader::Program);
+        windDir = getWind();
+        glBindVertexArray(getVAO(video::EVT_STANDARD));
+        for_in(mesh, GeometricMesh[FPSM_GRASS])
+            drawGrassPass1(*mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
 
-        if (reload_each_frame)
-            glEnable(GL_CULL_FACE);
         return;
     }
 
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
-        if (reload_each_frame)
-            glDisable(GL_CULL_FACE);
-
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
-        GLMesh* mesh;
-        for_in(mesh, ShadedMesh[SM_DEFAULT])
+        if (immediate_draw)
         {
-            GroupedSM<SM_DEFAULT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT>::TIMVSet.push_back(invmodel);
+            glDisable(GL_CULL_FACE);
+            glUseProgram(MeshShader::UntexturedObjectShader::Program);
+            // Only untextured
+            for (unsigned i = 0; i < GLmeshes.size(); i++)
+            {
+                irr_driver->IncreaseObjectCount();
+                GLMesh &mesh = GLmeshes[i];
+                GLenum ptype = mesh.PrimitiveType;
+                GLenum itype = mesh.IndexType;
+                size_t count = mesh.IndexCount;
+
+                MeshShader::UntexturedObjectShader::setUniforms(AbsoluteTransformation);
+                assert(mesh.vao);
+                glBindVertexArray(mesh.vao);
+                glDrawElements(ptype, count, itype, 0);
+                glBindVertexArray(0);
+            }
+            glEnable(GL_CULL_FACE);
+            return;
+        }
+
+        GLMesh* mesh;
+        for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
+        {
+            GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
+        {
+            GroupedSM<SM_DEFAULT_TANGENT>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DEFAULT_TANGENT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DEFAULT_TANGENT>::TIMVSet.push_back(invmodel);
         }
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
@@ -365,20 +404,12 @@ void STKMeshSceneNode::render()
             GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
         }
 
-        for_in(mesh, ShadedMesh[SM_UNTEXTURED])
-        {
-            GroupedSM<SM_UNTEXTURED>::MeshSet.push_back(mesh);
-            GroupedSM<SM_UNTEXTURED>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_UNTEXTURED>::TIMVSet.push_back(invmodel);
-        }
-
         if (!ShadedMesh[SM_GRASS].empty())
             glUseProgram(MeshShader::GrassPass2Shader::Program);
+        glBindVertexArray(getVAO(video::EVT_STANDARD));
         for_in(mesh, ShadedMesh[SM_GRASS])
-            drawSolidPass2(*mesh, SM_GRASS);
+            drawGrassPass2(*mesh, ModelViewProjectionMatrix, windDir);
 
-        if (reload_each_frame)
-            glEnable(GL_CULL_FACE);
         return;
     }
 
@@ -390,6 +421,7 @@ void STKMeshSceneNode::render()
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
+            glBindVertexArray(getVAO(video::EVT_STANDARD));
             drawGlow(GLmeshes[i]);
         }
     }
@@ -397,6 +429,71 @@ void STKMeshSceneNode::render()
     if (irr_driver->getPhase() == TRANSPARENT_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
+
+        if (immediate_draw)
+        {
+            if (update_each_frame)
+                updatevbo();
+            glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+
+            if (World::getWorld() && World::getWorld()->isFogEnabled())
+            {
+                glUseProgram(MeshShader::TransparentFogShader::Program);
+                for (unsigned i = 0; i < GLmeshes.size(); i++)
+                {
+                    GLMesh &mesh = GLmeshes[i];
+                    irr_driver->IncreaseObjectCount();
+                    GLenum ptype = mesh.PrimitiveType;
+                    GLenum itype = mesh.IndexType;
+                    size_t count = mesh.IndexCount;
+
+                    const Track * const track = World::getWorld()->getTrack();
+
+                    // This function is only called once per frame - thus no need for setters.
+                    const float fogmax = track->getFogMax();
+                    const float startH = track->getFogStartHeight();
+                    const float endH = track->getFogEndHeight();
+                    const float start = track->getFogStart();
+                    const float end = track->getFogEnd();
+                    const video::SColor tmpcol = track->getFogColor();
+
+                    core::vector3df col(tmpcol.getRed() / 255.0f,
+                        tmpcol.getGreen() / 255.0f,
+                        tmpcol.getBlue() / 255.0f);
+
+                    compressTexture(mesh.textures[0], true);
+                    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    MeshShader::TransparentFogShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+
+                    assert(mesh.vao);
+                    glBindVertexArray(mesh.vao);
+                    glDrawElements(ptype, count, itype, 0);
+                    glBindVertexArray(0);
+                }
+            }
+            else
+            {
+                glUseProgram(MeshShader::TransparentShader::Program);
+                for (unsigned i = 0; i < GLmeshes.size(); i++)
+                {
+                    irr_driver->IncreaseObjectCount();
+                    GLMesh &mesh = GLmeshes[i];
+                    GLenum ptype = mesh.PrimitiveType;
+                    GLenum itype = mesh.IndexType;
+                    size_t count = mesh.IndexCount;
+
+                    compressTexture(mesh.textures[0], true);
+                    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+
+                    MeshShader::TransparentShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix, 0);
+                    assert(mesh.vao);
+                    glBindVertexArray(mesh.vao);
+                    glDrawElements(ptype, count, itype, 0);
+                    glBindVertexArray(0);
+                }
+            }
+            return;
+        }
 
         GLMesh* mesh;
 
@@ -414,6 +511,7 @@ void STKMeshSceneNode::render()
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
+        glBindVertexArray(getVAO(video::EVT_STANDARD));
         for_in(mesh, TransparentMesh[TM_BUBBLE])
             drawBubble(*mesh, ModelViewProjectionMatrix);
         return;

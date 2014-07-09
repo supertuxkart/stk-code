@@ -24,6 +24,7 @@
 #include "config/user_config.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
 #include "graphics/stkinstancedscenenode.hpp"
@@ -96,13 +97,22 @@ const core::vector3df& TrackObjectPresentationSceneNode::getScale() const
 
 
 void TrackObjectPresentationSceneNode::move(const core::vector3df& xyz, const core::vector3df& hpr,
-                                            const core::vector3df& scale)
+    const core::vector3df& scale)
 {
     if (m_node == NULL) return;
 
-    m_node->setPosition(xyz);
+    if (m_node->getParent() != NULL)
+    {
+        scene::ISceneNode* parent = m_node->getParent();
+        m_node->setPosition((xyz - parent->getAbsolutePosition()) / parent->getScale());
+    }
+    else
+    {
+        m_node->setPosition(xyz);
+    }
     m_node->setRotation(hpr);
     m_node->setScale(scale);
+    m_node->updateAbsolutePosition();
 }
 
 void TrackObjectPresentationSceneNode::setEnable(bool enabled)
@@ -257,10 +267,8 @@ TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node
         
         if (tangent)
         {
-            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-            // TODO: perhaps the original mesh leaks here?
-            m_mesh = manip->createMeshWithTangents(m_mesh);
-       }
+            m_mesh = MeshTools::createMeshWithTangents(m_mesh, &MeshTools::isNormalMap);
+        }
     }
 
     if (!m_mesh)

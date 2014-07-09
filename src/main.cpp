@@ -854,7 +854,7 @@ int handleCmdLine()
             Log::warn("main", "There is no GP named '%s'.", s.c_str());
             return 0;
         }
-        race_manager->setGrandPrix(*gp);
+        race_manager->setGrandPrix(gp);
     }   // --gp
 
     if(CommandLine::has("--numkarts", &n) ||CommandLine::has("-k", &n))
