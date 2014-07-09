@@ -26,6 +26,7 @@
   */
 
 #include <vector>
+#include <stdexcept>
 
 #include "modes/world_status.hpp"
 #include "race/highscores.hpp"
