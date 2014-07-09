@@ -80,7 +80,7 @@ void main()
     blur_factor *= boost_amount;
 
     // Scale the blur direction
-    blur_dir *= boost_amount;
+    blur_dir *= blur_factor;
 
     // Compute the blur
     vec2 inc_vec = blur_dir / vec2(NB_SAMPLES);
