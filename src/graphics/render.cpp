@@ -185,7 +185,8 @@ void IrrDriver::renderGLSL(float dt)
         // Render the post-processed scene
         if (UserConfigParams::m_dynamic_lights)
         {
-            FrameBuffer *fbo = m_post_processing->render(camnode, true);
+            bool isRace = StateManager::get()->getGameState() == GUIEngine::GAME;
+            FrameBuffer *fbo = m_post_processing->render(camnode, isRace);
 
             if (irr_driver->getNormals())
                 irr_driver->getFBO(FBO_NORMAL_AND_DEPTHS).BlitToDefault(viewport.UpperLeftCorner.X, viewport.UpperLeftCorner.Y, viewport.LowerRightCorner.X, viewport.LowerRightCorner.Y);
