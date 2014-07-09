@@ -443,11 +443,11 @@ void IrrDriver::initDevice()
     {
         glGetIntegerv(GL_MAJOR_VERSION, &GLMajorVersion);
         glGetIntegerv(GL_MINOR_VERSION, &GLMinorVersion);
+        Log::info("IrrDriver", "OpenGL version: %d.%d", GLMajorVersion, GLMinorVersion);
+        Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
+        Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
+        Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     }
-    Log::info("IrrDriver", "OpenGL version: %d.%d", GLMajorVersion, GLMinorVersion);
-    Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
-    Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
-    Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
     // Parse extensions
