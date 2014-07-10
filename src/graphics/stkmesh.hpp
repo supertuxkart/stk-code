@@ -133,6 +133,12 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
+class ListUnlitSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+};
+
 template<enum ShadedMaterial T>
 class GroupedSM
 {

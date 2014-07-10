@@ -185,9 +185,7 @@ void STKAnimatedMesh::render()
 
         for_in (mesh, ShadedMesh[SM_UNLIT])
         {
-            GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_UNLIT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_UNLIT>::TIMVSet.push_back(invmodel);
+            ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
         }
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
