@@ -537,7 +537,7 @@ void IrrDriver::renderSolidFirstPass()
                 mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::ObjectPass1Shader>(mesh, GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet[i], 0);
+            draw<MeshShader::ObjectPass1Shader>(&mesh, GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet[i], 0);
         }
 
         glBindVertexArray(getVAO(video::EVT_2TCOORDS));
@@ -548,14 +548,14 @@ void IrrDriver::renderSolidFirstPass()
                 mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::ObjectPass1Shader>(mesh, GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet[i], 0);
+            draw<MeshShader::ObjectPass1Shader>(&mesh, GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet[i], 0);
         }
 
         glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
         glBindVertexArray(getVAO(EVT_STANDARD));
         for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
         {
-            const GLMesh &mesh = *GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i];
+            GLMesh &mesh = *GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i];
             if (mesh.VAOType != video::EVT_STANDARD)
             {
 #ifdef DEBUG
@@ -566,13 +566,13 @@ void IrrDriver::renderSolidFirstPass()
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-            draw<MeshShader::ObjectRefPass1Shader>(mesh, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
+            draw<MeshShader::ObjectRefPass1Shader>(&mesh, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
         }
         glUseProgram(MeshShader::NormalMapShader::Program);
         glBindVertexArray(getVAO(EVT_TANGENTS));
         for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
         {
-            const GLMesh &mesh = *GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i];
+            GLMesh &mesh = *GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i];
             assert(mesh.VAOType == video::EVT_TANGENTS);
             assert(mesh.textures[1]);
             compressTexture(mesh.textures[1], false);
@@ -580,15 +580,35 @@ void IrrDriver::renderSolidFirstPass()
             compressTexture(mesh.textures[0], true);
             setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-            draw<MeshShader::NormalMapShader>(mesh, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
+            draw<MeshShader::NormalMapShader>(&mesh, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
         }
     }
 }
 
+template<unsigned N>
+struct unroll_args
+{
+    template<typename Shader, typename ...TupleTypes, typename ...Args>
+    static void exec(std::tuple<TupleTypes...> t, Args... args)
+    {
+        unroll_args<N - 1>::exec<Shader>(t, std::get<N - 1>(t), args...);
+    }
+};
+
+template<>
+struct unroll_args<0>
+{
+    template<typename Shader, typename ...TupleTypes, typename ...Args>
+    static void exec(std::tuple<TupleTypes...> t, Args... args)
+    {
+        draw<Shader>(args...);
+    }
+};
+
 template<typename Shader>
 void apply(std::tuple<GLMesh *, core::matrix4, core::matrix4> arg)
 {
-    draw<Shader>(*std::get<0>(arg), std::get<1>(arg), std::get<2>(arg));
+    unroll_args<std::tuple_size<decltype(arg)>::value>::exec<Shader>(arg);
 }
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType>
@@ -672,7 +692,7 @@ void IrrDriver::renderSolidSecondPass()
         glBindVertexArray(getVAO(EVT_STANDARD));
         for (unsigned i = 0; i < GroupedSM<SM_SPHEREMAP>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *GroupedSM<SM_SPHEREMAP>::MeshSet[i];
+            GLMesh &mesh = *GroupedSM<SM_SPHEREMAP>::MeshSet[i];
             assert(mesh.VAOType == EVT_STANDARD);
             compressTexture(mesh.textures[0], true);
             if (irr_driver->getLightViz())
@@ -686,7 +706,7 @@ void IrrDriver::renderSolidSecondPass()
                 glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
             }
             setTexture(MeshShader::SphereMapShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::SphereMapShader>(mesh, GroupedSM<SM_SPHEREMAP>::MVPSet[i], GroupedSM<SM_SPHEREMAP>::TIMVSet[i], irr_driver->getSceneManager()->getAmbientLight());
+            draw<MeshShader::SphereMapShader>(&mesh, GroupedSM<SM_SPHEREMAP>::MVPSet[i], GroupedSM<SM_SPHEREMAP>::TIMVSet[i], irr_driver->getSceneManager()->getAmbientLight());
         }
 
         glUseProgram(MeshShader::SplattingShader::Program);
@@ -698,7 +718,7 @@ void IrrDriver::renderSolidSecondPass()
         glBindVertexArray(getVAO(EVT_STANDARD));
         for (unsigned i = 0; i < GroupedSM<SM_UNLIT>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *GroupedSM<SM_UNLIT>::MeshSet[i];
+            GLMesh &mesh = *GroupedSM<SM_UNLIT>::MeshSet[i];
             assert(mesh.VAOType == EVT_STANDARD);
             compressTexture(mesh.textures[0], true);
             setTexture(MeshShader::ObjectUnlitShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
@@ -712,7 +732,7 @@ void IrrDriver::renderSolidSecondPass()
                 GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
                 glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
             }
-            draw<MeshShader::ObjectUnlitShader>(mesh, GroupedSM<SM_UNLIT>::MVPSet[i]);
+            draw<MeshShader::ObjectUnlitShader>(&mesh, GroupedSM<SM_UNLIT>::MVPSet[i]);
         }
 
         glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
@@ -742,7 +762,7 @@ void IrrDriver::renderSolidSecondPass()
             }
             compressTexture(mesh.textures[1], true);
             setTexture(MeshShader::DetailledObjectPass2Shader::TU_detail, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::DetailledObjectPass2Shader>(mesh, GroupedSM<SM_DETAILS>::MVPSet[i]);
+            draw<MeshShader::DetailledObjectPass2Shader>(&mesh, GroupedSM<SM_DETAILS>::MVPSet[i]);
         }
     }
 }
@@ -797,7 +817,7 @@ void IrrDriver::renderTransparent()
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-            draw<MeshShader::TransparentFogShader>(mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+            draw<MeshShader::TransparentFogShader>(&mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
             if (mesh.VAOType != EVT_STANDARD)
                 glBindVertexArray(getVAO(EVT_STANDARD));
         }
@@ -819,7 +839,7 @@ void IrrDriver::renderTransparent()
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-            draw<MeshShader::TransparentFogShader>(mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+            draw<MeshShader::TransparentFogShader>(&mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
             if (mesh.VAOType != EVT_STANDARD)
                 glBindVertexArray(getVAO(EVT_STANDARD));
         }
@@ -843,7 +863,7 @@ void IrrDriver::renderTransparent()
                 mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::TransparentShader>(mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, 0);
+            draw<MeshShader::TransparentShader>(&mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, 0);
             if (mesh.VAOType != EVT_STANDARD)
                 glBindVertexArray(getVAO(EVT_STANDARD));
         }
@@ -851,7 +871,7 @@ void IrrDriver::renderTransparent()
         glBlendFunc(GL_ONE, GL_ONE);
         for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
         {
-            const GLMesh &mesh = *TransparentMeshes<TM_ADDITIVE>::MeshSet[i];
+            GLMesh &mesh = *TransparentMeshes<TM_ADDITIVE>::MeshSet[i];
             if (mesh.VAOType != EVT_STANDARD)
             {
 #ifdef DEBUG
@@ -862,7 +882,7 @@ void IrrDriver::renderTransparent()
             glBindVertexArray(getVAO(mesh.VAOType));
             compressTexture(mesh.textures[0], true);
             setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::TransparentShader>(mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, 0);
+            draw<MeshShader::TransparentShader>(&mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, 0);
             if (mesh.VAOType != EVT_STANDARD)
                 glBindVertexArray(getVAO(EVT_STANDARD));
         }
@@ -1113,22 +1133,22 @@ void IrrDriver::renderShadows()
     glBindVertexArray(getVAO(EVT_STANDARD));
     for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.size(); ++i)
     {
-        const GLMesh mesh = *GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet[i];
+        GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet[i];
         if (!mesh.textures[0])
             continue;
         compressTexture(mesh.textures[0], true);
         setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        draw<MeshShader::RSMShader>(mesh, rsm_matrix, GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i], 0);
+        draw<MeshShader::RSMShader>(&mesh, rsm_matrix, GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i], 0);
     }
     glBindVertexArray(getVAO(EVT_2TCOORDS));
     for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.size(); ++i)
     {
-        const GLMesh mesh = *GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet[i];
+        GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet[i];
         if (!mesh.textures[0])
             continue;
         compressTexture(mesh.textures[0], true);
         setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        draw<MeshShader::RSMShader>(mesh, rsm_matrix, GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i], 0);
+        draw<MeshShader::RSMShader>(&mesh, rsm_matrix, GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i], 0);
     }
 }
 
