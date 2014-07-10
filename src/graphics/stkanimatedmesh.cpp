@@ -184,16 +184,10 @@ void STKAnimatedMesh::render()
             ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in (mesh, ShadedMesh[SM_UNLIT])
-        {
             ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
-        }
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
-        {
-            GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
-        }
+            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
 
         return;
     }

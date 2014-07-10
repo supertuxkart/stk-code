@@ -357,9 +357,7 @@ void STKMeshSceneNode::render()
             ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in(mesh, ShadedMesh[SM_SPHEREMAP])
-        {
             ListSphereMapSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight()));
-        }
 
         for_in(mesh, ShadedMesh[SM_SPLATTING])
         {
@@ -369,16 +367,10 @@ void STKMeshSceneNode::render()
         }
 
         for_in(mesh, ShadedMesh[SM_UNLIT])
-        {
             ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
-        }
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
-        {
-            GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
-        }
+            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
 
         if (!ShadedMesh[SM_GRASS].empty())
             glUseProgram(MeshShader::GrassPass2Shader::Program);

@@ -139,6 +139,12 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
 };
 
+class ListDetailSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+};
+
 template<enum ShadedMaterial T>
 class GroupedSM
 {

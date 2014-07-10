@@ -612,33 +612,37 @@ void apply(std::tuple<TupleType...> arg)
 }
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
-void renderMeshes2ndPass(std::vector<std::tuple<TupleType...> > &meshes)
+void renderMeshes2ndPass(const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
 {
     glUseProgram(Shader::Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
         GLMesh &mesh = *(std::get<0>(meshes[i]));
-        if (!mesh.textures[0])
-            mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+        for (unsigned j = 0; j < TexUnits.size(); j++)
+        {
+            if (!mesh.textures[j])
+                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[j], true);
+            setTexture(TexUnits[j], getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            if (irr_driver->getLightViz())
+            {
+                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+            }
+            else
+            {
+                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+            }
+        }
+
         if (mesh.VAOType != VertexType)
         {
 #ifdef DEBUG
             Log::error("Materials", "Wrong vertex Type associed to pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
 #endif
             continue;
-        }
-        compressTexture(mesh.textures[0], true);
-        setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        if (irr_driver->getLightViz())
-        {
-            GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-        }
-        else
-        {
-            GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
         }
         apply<Shader>(meshes[i]);
     }
@@ -671,8 +675,8 @@ void IrrDriver::renderSolidSecondPass()
     ListAlphaRefSM::Arguments.clear();
     ListSphereMapSM::Arguments.clear();
     ListUnlitSM::Arguments.clear();
+    ListDetailSM::Arguments.clear();
     GroupedSM<SM_SPLATTING>::reset();
-    GroupedSM<SM_DETAILS>::reset();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
@@ -682,46 +686,17 @@ void IrrDriver::renderSolidSecondPass()
 
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(ListDefaultStandardSM::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(ListDefaultTangentSM::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(ListAlphaRefSM::Arguments);
-        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>(ListSphereMapSM::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD>(ListUnlitSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>({ MeshShader::ObjectPass2Shader::TU_Albedo }, ListDefaultStandardSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>({ MeshShader::ObjectPass2Shader::TU_Albedo }, ListDefaultTangentSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>({ MeshShader::ObjectRefPass2Shader::TU_Albedo }, ListAlphaRefSM::Arguments);
+        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>({ MeshShader::SphereMapShader::TU_tex }, ListSphereMapSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD>({ MeshShader::ObjectUnlitShader::TU_tex }, ListUnlitSM::Arguments);
+        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS>({ MeshShader::DetailledObjectPass2Shader::TU_Albedo, MeshShader::DetailledObjectPass2Shader::TU_detail }, ListDetailSM::Arguments);
 
         glUseProgram(MeshShader::SplattingShader::Program);
         glBindVertexArray(getVAO(EVT_2TCOORDS));
         for (unsigned i = 0; i < GroupedSM<SM_SPLATTING>::MeshSet.size(); i++)
             drawSplatting(*GroupedSM<SM_SPLATTING>::MeshSet[i], GroupedSM<SM_SPLATTING>::MVPSet[i]);
-
-        glUseProgram(MeshShader::DetailledObjectPass2Shader::Program);
-        glBindVertexArray(getVAO(EVT_2TCOORDS));
-        for (unsigned i = 0; i < GroupedSM<SM_DETAILS>::MeshSet.size(); i++)
-        {
-            GLMesh &mesh = *GroupedSM<SM_DETAILS>::MeshSet[i];
-            assert(mesh.VAOType == EVT_2TCOORDS);
-            compressTexture(mesh.textures[0], true);
-            setTexture(MeshShader::DetailledObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            if (!mesh.textures[1])
-            {
-#ifdef DEBUG
-                Log::error("Materials", "No detail/lightmap texture provided for detail/lightmap material.");
-#endif
-                mesh.textures[1] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            }
-            compressTexture(mesh.textures[1], true);
-            setTexture(MeshShader::DetailledObjectPass2Shader::TU_detail, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::DetailledObjectPass2Shader>(&mesh, GroupedSM<SM_DETAILS>::MVPSet[i]);
-        }
     }
 }
 

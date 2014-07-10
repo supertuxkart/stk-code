@@ -524,3 +524,4 @@ std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultTang
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAlphaRefSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4> > ListDetailSM::Arguments;
