@@ -304,7 +304,7 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
 
     btCollisionWorld::ClosestRayResultCallback result(from, to);
 
-    /** A special ray result class that stores the index of the triangle 
+    /** A special ray result class that stores the index of the triangle
      *  that was hit. */
     class MaterialRayResult : public btCollisionWorld::ClosestRayResultCallback
     {
@@ -351,7 +351,7 @@ bool TriangleMesh::castRay(const btVector3 &from, const btVector3 &to,
             // the normal of the triangle interpolate the normal at the
             // hit position based on the three normals of the triangle.
             if(interpolate_normal)
-                *normal = getInterpolatedNormal(ray_callback.m_index, 
+                *normal = getInterpolatedNormal(ray_callback.m_index,
                                                 ray_callback.m_hitPointWorld);
             else
                 *normal = ray_callback.m_hitNormalWorld;

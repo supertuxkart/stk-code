@@ -84,7 +84,7 @@ void OnlineProfileFriends::init()
     m_visiting_profile->fetchFriends();
     m_waiting_for_friends = true;
     m_friends_list_widget->clear();
-    m_friends_list_widget->addItem("loading", 
+    m_friends_list_widget->addItem("loading",
                               StringUtils::loadingDots(_("Fetching friends")));
 }   // init
 
