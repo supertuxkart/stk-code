@@ -9,6 +9,7 @@ void onStart()
      SoundEmitter @cowmoo = t_obj.getSoundEmitter();
      Vec3 newlocation = Vec3(0,2,5);
      cowmoo.move(newlocation);
+     teleportKart(0,newlocation);
 
 }
 
