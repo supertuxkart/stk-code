@@ -8,6 +8,7 @@
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
 
+#include <tuple>
 #include <vector>
 
 enum GeometricMaterial
@@ -108,6 +109,24 @@ void draw(const GLMesh &mesh, uniforms... Args)
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)
+class ListDefaultStandardSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListDefaultTangentSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListAlphaRefSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
 template<enum ShadedMaterial T>
 class GroupedSM
 {

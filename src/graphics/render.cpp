@@ -585,14 +585,20 @@ void IrrDriver::renderSolidFirstPass()
     }
 }
 
+template<typename Shader>
+void apply(std::tuple<GLMesh *, core::matrix4, core::matrix4> arg)
+{
+    draw<Shader>(*std::get<0>(arg), std::get<1>(arg), std::get<2>(arg));
+}
+
 template<typename Shader, enum E_VERTEX_TYPE VertexType>
-void renderMeshes2ndPass(std::vector<GLMesh *> &meshes, const std::vector<core::matrix4> &MVPMatrixes)
+void renderMeshes2ndPass(std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > &meshes)
 {
     glUseProgram(Shader::Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *meshes[i];
+        GLMesh &mesh = *(std::get<0>(meshes[i]));
         if (!mesh.textures[0])
             mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
         if (mesh.VAOType != VertexType)
@@ -614,7 +620,7 @@ void renderMeshes2ndPass(std::vector<GLMesh *> &meshes, const std::vector<core::
             GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
             glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
         }
-        draw<Shader>(mesh, MVPMatrixes[i], mesh.TextureMatrix);
+        apply<Shader>(meshes[i]);
     }
 }
 
@@ -640,7 +646,9 @@ void IrrDriver::renderSolidSecondPass()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
-    GroupedSM<SM_DEFAULT_STANDARD>::reset();
+    ListDefaultStandardSM::Arguments.clear();
+    ListDefaultTangentSM::Arguments.clear();
+    ListAlphaRefSM::Arguments.clear();
     GroupedSM<SM_DEFAULT_TANGENT>::reset();
     GroupedSM<SM_ALPHA_REF_TEXTURE>::reset();
     GroupedSM<SM_SPHEREMAP>::reset();
@@ -656,9 +664,9 @@ void IrrDriver::renderSolidSecondPass()
 
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(GroupedSM<SM_DEFAULT_STANDARD>::MeshSet, GroupedSM<SM_DEFAULT_STANDARD>::MVPSet);
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(GroupedSM<SM_DEFAULT_TANGENT>::MeshSet, GroupedSM<SM_DEFAULT_TANGENT>::MVPSet);
-        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet, GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(ListDefaultStandardSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(ListDefaultTangentSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(ListAlphaRefSM::Arguments);
 
         glUseProgram(MeshShader::SphereMapShader::Program);
         glBindVertexArray(getVAO(EVT_STANDARD));

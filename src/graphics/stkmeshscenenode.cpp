@@ -348,25 +348,13 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-        {
-            GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
-        }
+            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-        {
-            GroupedSM<SM_DEFAULT_TANGENT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT_TANGENT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT_TANGENT>::TIMVSet.push_back(invmodel);
-        }
+            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-        {
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
+            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in(mesh, ShadedMesh[SM_SPHEREMAP])
         {

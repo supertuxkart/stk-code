@@ -519,3 +519,6 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
     mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
 }
 
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultTangentSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAlphaRefSM::Arguments;
