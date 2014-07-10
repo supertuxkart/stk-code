@@ -605,14 +605,14 @@ struct unroll_args<0>
     }
 };
 
-template<typename Shader>
-void apply(std::tuple<GLMesh *, core::matrix4, core::matrix4> arg)
+template<typename Shader, typename... TupleType>
+void apply(std::tuple<TupleType...> arg)
 {
     unroll_args<std::tuple_size<decltype(arg)>::value>::exec<Shader>(arg);
 }
 
-template<typename Shader, enum E_VERTEX_TYPE VertexType>
-void renderMeshes2ndPass(std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > &meshes)
+template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
+void renderMeshes2ndPass(std::vector<std::tuple<TupleType...> > &meshes)
 {
     glUseProgram(Shader::Program);
     glBindVertexArray(getVAO(VertexType));
@@ -669,6 +669,7 @@ void IrrDriver::renderSolidSecondPass()
     ListDefaultStandardSM::Arguments.clear();
     ListDefaultTangentSM::Arguments.clear();
     ListAlphaRefSM::Arguments.clear();
+    ListSphereMapSM::Arguments.clear();
     GroupedSM<SM_DEFAULT_TANGENT>::reset();
     GroupedSM<SM_ALPHA_REF_TEXTURE>::reset();
     GroupedSM<SM_SPHEREMAP>::reset();
@@ -687,27 +688,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(ListDefaultStandardSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(ListDefaultTangentSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(ListAlphaRefSM::Arguments);
-
-        glUseProgram(MeshShader::SphereMapShader::Program);
-        glBindVertexArray(getVAO(EVT_STANDARD));
-        for (unsigned i = 0; i < GroupedSM<SM_SPHEREMAP>::MeshSet.size(); i++)
-        {
-            GLMesh &mesh = *GroupedSM<SM_SPHEREMAP>::MeshSet[i];
-            assert(mesh.VAOType == EVT_STANDARD);
-            compressTexture(mesh.textures[0], true);
-            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            setTexture(MeshShader::SphereMapShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::SphereMapShader>(&mesh, GroupedSM<SM_SPHEREMAP>::MVPSet[i], GroupedSM<SM_SPHEREMAP>::TIMVSet[i], irr_driver->getSceneManager()->getAmbientLight());
-        }
+        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>(ListSphereMapSM::Arguments);
 
         glUseProgram(MeshShader::SplattingShader::Program);
         glBindVertexArray(getVAO(EVT_2TCOORDS));

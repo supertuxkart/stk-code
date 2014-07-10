@@ -127,6 +127,12 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
+class ListSphereMapSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+};
+
 template<enum ShadedMaterial T>
 class GroupedSM
 {

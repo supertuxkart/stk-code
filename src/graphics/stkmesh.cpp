@@ -522,3 +522,4 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultTangentSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAlphaRefSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;

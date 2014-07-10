@@ -358,9 +358,7 @@ void STKMeshSceneNode::render()
 
         for_in(mesh, ShadedMesh[SM_SPHEREMAP])
         {
-            GroupedSM<SM_SPHEREMAP>::MeshSet.push_back(mesh);
-            GroupedSM<SM_SPHEREMAP>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_SPHEREMAP>::TIMVSet.push_back(invmodel);
+            ListSphereMapSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight()));
         }
 
         for_in(mesh, ShadedMesh[SM_SPLATTING])
