@@ -585,6 +585,39 @@ void IrrDriver::renderSolidFirstPass()
     }
 }
 
+template<typename Shader, enum E_VERTEX_TYPE VertexType>
+void renderMeshes2ndPass(std::vector<GLMesh *> &meshes, const std::vector<core::matrix4> &MVPMatrixes)
+{
+    glUseProgram(Shader::Program);
+    glBindVertexArray(getVAO(VertexType));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh &mesh = *meshes[i];
+        if (!mesh.textures[0])
+            mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+        if (mesh.VAOType != VertexType)
+        {
+#ifdef DEBUG
+            Log::error("Materials", "Wrong vertex Type associed to pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
+#endif
+            continue;
+        }
+        compressTexture(mesh.textures[0], true);
+        setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        if (irr_driver->getLightViz())
+        {
+            GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+        }
+        else
+        {
+            GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+            glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+        }
+        draw<Shader>(mesh, MVPMatrixes[i], mesh.TextureMatrix);
+    }
+}
+
 void IrrDriver::renderSolidSecondPass()
 {
     SColor clearColor(0, 150, 150, 150);
@@ -619,87 +652,13 @@ void IrrDriver::renderSolidSecondPass()
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
 
     {
-
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS2));
 
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-        glUseProgram(MeshShader::ObjectPass2Shader::Program);
-        glBindVertexArray(getVAO(video::EVT_STANDARD));
-        for (unsigned i = 0; i < GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.size(); i++)
-        {
-            GLMesh &mesh = *GroupedSM<SM_DEFAULT_STANDARD>::MeshSet[i];
-            if (mesh.VAOType != video::EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                continue;
-            }
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[0], true);
-            setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            draw<MeshShader::ObjectPass2Shader>(mesh, GroupedSM<SM_DEFAULT_STANDARD>::MVPSet[i], GroupedSM<SM_DEFAULT_STANDARD>::MeshSet[i]->TextureMatrix);
-        }
-
-        glBindVertexArray(getVAO(video::EVT_TANGENTS));
-        for (unsigned i = 0; i < GroupedSM<SM_DEFAULT_TANGENT>::MeshSet.size(); i++)
-        {
-            const GLMesh &mesh = *GroupedSM<SM_DEFAULT_TANGENT>::MeshSet[i];
-            assert(mesh.VAOType == video::EVT_TANGENTS);
-            compressTexture(mesh.textures[0], true);
-            setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            draw<MeshShader::ObjectPass2Shader>(mesh, GroupedSM<SM_DEFAULT_TANGENT>::MVPSet[i], GroupedSM<SM_DEFAULT_TANGENT>::MeshSet[i]->TextureMatrix);
-        }
-
-        glUseProgram(MeshShader::ObjectRefPass2Shader::Program);
-        glBindVertexArray(getVAO(EVT_STANDARD));
-        for (unsigned i = 0; i < GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.size(); i++)
-        {
-            const GLMesh &mesh = *GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i];
-            if (mesh.VAOType != video::EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to alpha ref pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                continue;
-            }
-            compressTexture(mesh.textures[0], true);
-            setTexture(MeshShader::ObjectRefPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-
-            draw<MeshShader::ObjectRefPass2Shader>(mesh, GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix);
-        }
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(GroupedSM<SM_DEFAULT_STANDARD>::MeshSet, GroupedSM<SM_DEFAULT_STANDARD>::MVPSet);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(GroupedSM<SM_DEFAULT_TANGENT>::MeshSet, GroupedSM<SM_DEFAULT_TANGENT>::MVPSet);
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet, GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet);
 
         glUseProgram(MeshShader::SphereMapShader::Program);
         glBindVertexArray(getVAO(EVT_STANDARD));
