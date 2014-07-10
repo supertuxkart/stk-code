@@ -9,4 +9,6 @@ void onUpdate()
      sheepMesh.setLoop(8,48);
      sheepMesh.setCurrentFrame(9);
      }
+     Vec3 speed = Vec3(10,0,0);
+     setVelocity(0,speed);
 }
