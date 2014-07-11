@@ -124,9 +124,9 @@ if(UNIX AND USE_XRANDR)
 endif()
 
 if(UNIX)
-    if(USE_CPP2011)
+#    if(USE_CPP2011)
         add_definitions("-std=c++0x")
-    endif()
+#    endif()
 endif()
 
 # OpenGL
