@@ -11,7 +11,7 @@ if (NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "STKRelease")
 endif()
 
-option(USE_WIIUSE "Support for wiimote input devices" ON)
+option(USE_WIIUSE "Support for wiimote input devices" OFF)
 option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
@@ -25,8 +25,8 @@ if(MSVC)
     # which also needs an absolute path :(
     option(WIIUSE_BUILD "Build wiiuse lib (only for developers)" OFF)
     mark_as_advanced(WIIUSE_BUILD)
-else()
-    set(WIIUSE_BUILD ON)
+#else()
+#    set(WIIUSE_BUILD ON)
 endif()
 
 set(STK_SOURCE_DIR "src")
