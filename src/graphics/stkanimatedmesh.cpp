@@ -6,6 +6,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "graphics/camera.hpp"
 #include "utils/profiler.hpp"
 
 using namespace irr;
@@ -145,25 +146,13 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
-        {
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
-        }
+            ListDefaultStandardG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
-        {
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet.push_back(invmodel);
-        }
+            ListDefault2TCoordG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-        {
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
+            ListAlphaRefG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix));
 
         return;
     }
@@ -175,39 +164,19 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-        {
-            GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
-        }
+            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-        {
-            GroupedSM<SM_DEFAULT_TANGENT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT_TANGENT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT_TANGENT>::TIMVSet.push_back(invmodel);
-        }
+            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-        {
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
+            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
         for_in (mesh, ShadedMesh[SM_UNLIT])
-        {
-            GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_UNLIT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_UNLIT>::TIMVSet.push_back(invmodel);
-        }
+            ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
-        {
-            GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
-        }
+            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
 
         return;
     }
@@ -220,16 +189,40 @@ void STKAnimatedMesh::render()
             glUseProgram(MeshShader::BubbleShader::Program);
 
         GLMesh* mesh;
-        for_in(mesh, TransparentMesh[TM_DEFAULT])
+        if (World::getWorld() && World::getWorld()->isFogEnabled())
         {
-            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-        }
+            const Track * const track = World::getWorld()->getTrack();
 
-        for_in(mesh, TransparentMesh[TM_ADDITIVE])
+            // Todo : put everything in a ubo
+            const float fogmax = track->getFogMax();
+            const float startH = track->getFogStartHeight();
+            const float endH = track->getFogEndHeight();
+            const float start = track->getFogStart();
+            const float end = track->getFogEnd();
+            const video::SColor tmpcol = track->getFogColor();
+
+            core::vector3df col(tmpcol.getRed() / 255.0f,
+                tmpcol.getGreen() / 255.0f,
+                tmpcol.getBlue() / 255.0f);
+
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col,
+                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col,
+                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+        }
+        else
         {
-            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(AbsoluteTransformation);
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
         }
         return;
     }

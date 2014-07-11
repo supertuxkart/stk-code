@@ -8,6 +8,7 @@
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
 
+#include <tuple>
 #include <vector>
 
 enum GeometricMaterial
@@ -70,6 +71,31 @@ bool isObject(video::E_MATERIAL_TYPE type);
 core::vector3df getWind();
 
 // Pass 1 shader (ie shaders that outputs normals and depth)
+class ListDefaultStandardG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListDefault2TCoordG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListAlphaRefG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListNormalG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+
 template<enum GeometricMaterial T>
 class GroupedFPSM
 {
@@ -94,20 +120,80 @@ std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
 
 
 template<typename Shader, typename...uniforms>
-void draw(const GLMesh &mesh, uniforms... Args)
+void draw(const GLMesh *mesh, uniforms... Args)
 {
     irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
+    GLenum ptype = mesh->PrimitiveType;
+    GLenum itype = mesh->IndexType;
+    size_t count = mesh->IndexCount;
 
     Shader::setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
 }
 
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)
+class ListDefaultStandardSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListDefaultTangentSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListAlphaRefSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListSphereMapSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+};
+
+class ListUnlitSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+};
+
+class ListDetailSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+};
+
+class ListBlendTransparent
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListAdditiveTransparent
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListBlendTransparentFog
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > Arguments;
+};
+
+class ListAdditiveTransparentFog
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > Arguments;
+};
+
 template<enum ShadedMaterial T>
 class GroupedSM
 {
@@ -157,8 +243,6 @@ template<enum TransparentMaterial T>
 std::vector<core::matrix4> TransparentMeshes<T>::MVPSet;
 
 // Forward pass (for transparents meshes)
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);

@@ -379,58 +379,6 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-    MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    const Track * const track = World::getWorld()->getTrack();
-
-    // This function is only called once per frame - thus no need for setters.
-    const float fogmax = track->getFogMax();
-    const float startH = track->getFogStartHeight();
-    const float endH = track->getFogEndHeight();
-    const float start = track->getFogStart();
-    const float end = track->getFogEnd();
-    const video::SColor tmpcol = track->getFogColor();
-
-    core::vector3df col(tmpcol.getRed() / 255.0f,
-        tmpcol.getGreen() / 255.0f,
-        tmpcol.getBlue() / 255.0f);
-
-    if (mesh.textures[0] != NULL)
-    {
-        compressTexture(mesh.textures[0], true);
-        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    }
-
-    glUseProgram(MeshShader::TransparentFogShader::Program);
-    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
-}
-
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
     irr_driver->IncreaseObjectCount();
@@ -519,3 +467,18 @@ void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
     mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
 }
 
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardG::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefault2TCoordG::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListAlphaRefG::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Arguments;
+
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultTangentSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAlphaRefSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4> > ListDetailSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > ListBlendTransparentFog::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > ListAdditiveTransparentFog::Arguments;
