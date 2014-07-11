@@ -53,20 +53,22 @@ class ObjectPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MM, uniform_IMM, uniform_tex;
+    static GLuint uniform_MM, uniform_IMM;
+    static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix);
 };
 
 class ObjectRefPass1Shader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MM, uniform_TM, uniform_IMM, uniform_tex;
+    static GLuint uniform_MM, uniform_TM, uniform_IMM;
+    static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix, unsigned TU_texture);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix);
 };
 
 class GrassPass1Shader
@@ -83,10 +85,11 @@ class NormalMapShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MM, uniform_IMM, uniform_normalMap, uniform_DiffuseForAlpha;
+    static GLuint uniform_MM, uniform_IMM;
+    static GLuint TU_normalmap, TU_glossy;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap, unsigned TU_uniform_DiffuseForAlpha);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix);
 };
 
 class InstancedObjectPass1Shader

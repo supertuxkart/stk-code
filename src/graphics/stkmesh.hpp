@@ -71,6 +71,31 @@ bool isObject(video::E_MATERIAL_TYPE type);
 core::vector3df getWind();
 
 // Pass 1 shader (ie shaders that outputs normals and depth)
+class ListDefaultStandardG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListDefault2TCoordG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListAlphaRefG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListNormalG
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+
 template<enum GeometricMaterial T>
 class GroupedFPSM
 {

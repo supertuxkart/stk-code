@@ -53,6 +53,32 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
+template<unsigned N>
+struct unroll_args
+{
+    template<typename Shader, typename ...TupleTypes, typename ...Args>
+    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
+    {
+        unroll_args<N - 1>::template exec<Shader>(t, std::get<N - 1>(t), args...);
+    }
+};
+
+template<>
+struct unroll_args<0>
+{
+    template<typename Shader, typename ...TupleTypes, typename ...Args>
+    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
+    {
+        draw<Shader>(args...);
+    }
+};
+
+template<typename Shader, typename... TupleType>
+void apply(const std::tuple<TupleType...> &arg)
+{
+    unroll_args<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<Shader>(arg);
+}
+
 void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
@@ -504,6 +530,32 @@ void IrrDriver::computeSunVisibility()
     }
 }
 
+template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
+void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+{
+    glUseProgram(Shader::Program);
+    glBindVertexArray(getVAO(VertexType));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh &mesh = *(std::get<0>(meshes[i]));
+        for (unsigned j = 0; j < TexUnits.size(); j++)
+        {
+            if (!mesh.textures[j])
+                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[j], true);
+            setTexture(TexUnits[j], getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        }
+        if (mesh.VAOType != VertexType)
+        {
+#ifdef DEBUG
+            Log::error("Materials", "Wrong vertex Type associed to pass 1 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
+#endif
+            continue;
+        }
+        apply<Shader>(meshes[i]);
+    }
+}
+
 void IrrDriver::renderSolidFirstPass()
 {
     m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
@@ -517,10 +569,10 @@ void IrrDriver::renderSolidFirstPass()
     glDisable(GL_BLEND);
     glEnable(GL_CULL_FACE);
     irr_driver->setPhase(SOLID_NORMAL_AND_DEPTH_PASS);
-    GroupedFPSM<FPSM_DEFAULT_STANDARD>::reset();
-    GroupedFPSM<FPSM_DEFAULT_2TCOORD>::reset();
-    GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::reset();
-    GroupedFPSM<FPSM_NORMAL_MAP>::reset();
+    ListDefaultStandardG::Arguments.clear();
+    ListDefault2TCoordG::Arguments.clear();
+    ListAlphaRefG::Arguments.clear();
+    ListNormalG::Arguments.clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -528,87 +580,11 @@ void IrrDriver::renderSolidFirstPass()
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
-        glUseProgram(MeshShader::ObjectPass1Shader::Program);
-        glBindVertexArray(getVAO(video::EVT_STANDARD));
-        for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.size(); ++i)
-        {
-            GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet[i];
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::ObjectPass1Shader>(&mesh, GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet[i], 0);
-        }
-
-        glBindVertexArray(getVAO(video::EVT_2TCOORDS));
-        for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.size(); ++i)
-        {
-            GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet[i];
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::ObjectPass1Shader>(&mesh, GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i], GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet[i], 0);
-        }
-
-        glUseProgram(MeshShader::ObjectRefPass1Shader::Program);
-        glBindVertexArray(getVAO(EVT_STANDARD));
-        for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
-        {
-            GLMesh &mesh = *GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i];
-            if (mesh.VAOType != video::EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to alpha ref pass 1 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                continue;
-            }
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-            draw<MeshShader::ObjectRefPass1Shader>(&mesh, GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i]->TextureMatrix, 0);
-        }
-        glUseProgram(MeshShader::NormalMapShader::Program);
-        glBindVertexArray(getVAO(EVT_TANGENTS));
-        for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
-        {
-            GLMesh &mesh = *GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i];
-            assert(mesh.VAOType == video::EVT_TANGENTS);
-            assert(mesh.textures[1]);
-            compressTexture(mesh.textures[1], false);
-            setTexture(0, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            compressTexture(mesh.textures[0], true);
-            setTexture(1, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-            draw<MeshShader::NormalMapShader>(&mesh, GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::TIMVSet[i], 0, 1);
-        }
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD>({ MeshShader::ObjectPass1Shader::TU_tex }, ListDefaultStandardG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS>({ MeshShader::ObjectPass1Shader::TU_tex }, ListDefault2TCoordG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD>({ MeshShader::ObjectRefPass1Shader::TU_tex }, ListAlphaRefG::Arguments);
+        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS>({ MeshShader::NormalMapShader::TU_glossy, MeshShader::NormalMapShader::TU_normalmap }, ListNormalG::Arguments);
     }
-}
-
-template<unsigned N>
-struct unroll_args
-{
-    template<typename Shader, typename ...TupleTypes, typename ...Args>
-    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
-    {
-        unroll_args<N - 1>::template exec<Shader>(t, std::get<N - 1>(t), args...);
-    }
-};
-
-template<>
-struct unroll_args<0>
-{
-    template<typename Shader, typename ...TupleTypes, typename ...Args>
-    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
-    {
-        draw<Shader>(args...);
-    }
-};
-
-template<typename Shader, typename... TupleType>
-void apply(const std::tuple<TupleType...> &arg)
-{
-    unroll_args<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<Shader>(arg);
 }
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>

@@ -146,25 +146,13 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
-        {
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
-        }
+            ListDefaultStandardG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
-        {
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet.push_back(invmodel);
-        }
+            ListDefault2TCoordG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-        {
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
+            ListAlphaRefG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix));
 
         return;
     }

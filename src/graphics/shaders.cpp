@@ -451,7 +451,7 @@ namespace MeshShader
     GLuint ObjectPass1Shader::Program;
     GLuint ObjectPass1Shader::uniform_MM;
     GLuint ObjectPass1Shader::uniform_IMM;
-    GLuint ObjectPass1Shader::uniform_tex;
+    GLuint ObjectPass1Shader::TU_tex;
 
     void ObjectPass1Shader::init()
     {
@@ -461,28 +461,31 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
+        TU_tex = 0;
+        glUseProgram(Program);
+        glUniform1i(uniform_tex, TU_tex);
+        glUseProgram(0);
     }
 
-    void ObjectPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_tex)
+    void ObjectPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint ObjectRefPass1Shader::Program;
     GLuint ObjectRefPass1Shader::uniform_MM;
     GLuint ObjectRefPass1Shader::uniform_IMM;
     GLuint ObjectRefPass1Shader::uniform_TM;
-    GLuint ObjectRefPass1Shader::uniform_tex;
+    GLuint ObjectRefPass1Shader::TU_tex;
 
     void ObjectRefPass1Shader::init()
     {
@@ -493,22 +496,25 @@ namespace MeshShader
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
         uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        GLuint uniform_tex = glGetUniformLocation(Program, "tex");
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
+        TU_tex = 0;
+        glUseProgram(Program);
+        glUniform1i(uniform_tex, TU_tex);
+        glUseProgram(0);
     }
 
-    void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex)
+    void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint GrassPass1Shader::Program;
@@ -540,8 +546,8 @@ namespace MeshShader
     GLuint NormalMapShader::Program;
     GLuint NormalMapShader::uniform_MM;
     GLuint NormalMapShader::uniform_IMM;
-    GLuint NormalMapShader::uniform_normalMap;
-    GLuint NormalMapShader::uniform_DiffuseForAlpha;
+    GLuint NormalMapShader::TU_normalmap;
+    GLuint NormalMapShader::TU_glossy;
 
     void NormalMapShader::init()
     {
@@ -551,23 +557,27 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
-        uniform_normalMap = glGetUniformLocation(Program, "normalMap");
-        uniform_DiffuseForAlpha = glGetUniformLocation(Program, "DiffuseForAlpha");
+        GLuint uniform_normalMap = glGetUniformLocation(Program, "normalMap");
+        GLuint uniform_DiffuseForAlpha = glGetUniformLocation(Program, "DiffuseForAlpha");
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
+        TU_normalmap = 1;
+        TU_glossy = 0;
+        glUseProgram(Program);
+        glUniform1i(uniform_normalMap, TU_normalmap);
+        glUniform1i(uniform_DiffuseForAlpha, TU_glossy);
+        glUseProgram(0);
     }
 
-    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, unsigned TU_normalMap, unsigned TU_uniform_DiffuseForAlpha)
+    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
-        glUniform1i(uniform_normalMap, TU_normalMap);
-        glUniform1i(uniform_DiffuseForAlpha, TU_uniform_DiffuseForAlpha);
     }
 
     GLuint InstancedObjectPass1Shader::Program;
