@@ -319,8 +319,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     }
 
     PROFILER_PUSH_CPU_MARKER("- Skybox", 0xFF, 0x00, 0xFF);
-    if (!SkyboxTextures.empty())
-        renderSkybox(camnode);
+    renderSkybox(camnode);
     PROFILER_POP_CPU_MARKER();
 
     if (getRH())
@@ -1850,6 +1849,8 @@ void IrrDriver::generateSkyboxCubemap()
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
+    if (!SkyboxTextures.empty())
+        return;
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
     glBindVertexArray(MeshShader::SkyboxShader::cubevao);
