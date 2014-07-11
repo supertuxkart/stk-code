@@ -1849,7 +1849,7 @@ void IrrDriver::generateSkyboxCubemap()
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
 {
-    if (!SkyboxTextures.empty())
+    if (SkyboxTextures.empty())
         return;
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
