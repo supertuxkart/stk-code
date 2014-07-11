@@ -1,6 +1,7 @@
 uniform sampler2D displacement_tex;
 uniform sampler2D mask_tex;
 uniform sampler2D color_tex;
+uniform sampler2D tex;
 uniform vec2 dir;
 uniform vec2 dir2;
 
@@ -64,5 +65,8 @@ void main()
 	float mask = texture(mask_tex, tc + shift).x;
 	tc += (mask < 1.) ? vec2(0.) : shift;
 
-	FragColor = texture(color_tex, tc);
+    vec4 col = texture(color_tex, tc);
+    vec4 blend_tex = texture(tex, uv);
+    col.rgb = blend_tex.rgb * blend_tex.a + (1. - blend_tex.a) * col.rgb;
+    FragColor = vec4(col.rgb, 1.);
 }

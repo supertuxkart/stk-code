@@ -93,17 +93,19 @@ void STKAnimatedMesh::render()
             if (rnd->isTransparent())
             {
                 TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
-                initvaostate(mesh, TranspMat);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
             else
             {
-                GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type);
-                ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures);
-                initvaostate(mesh, GeometricType, ShadedType);
+                GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
+                ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
                 GeometricMesh[GeometricType].push_back(&mesh);
                 ShadedMesh[ShadedType].push_back(&mesh);
             }
+            std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
+            mesh.vaoBaseVertex = p.first;
+            mesh.vaoOffset = p.second;
+            mesh.VAOType = mb->getVertexType();
         }
     }
     firstTime = false;
@@ -117,8 +119,9 @@ void STKAnimatedMesh::render()
            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
            {
                glBindVertexArray(0);
-               glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
-               glBufferSubData(GL_ARRAY_BUFFER, 0, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+               glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
+               glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+               glBindBuffer(GL_ARRAY_BUFFER, 0);
            }
         }
         if (mb)
@@ -133,7 +136,7 @@ void STKAnimatedMesh::render()
           continue;
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
@@ -141,11 +144,18 @@ void STKAnimatedMesh::render()
         AbsoluteTransformation.getInverse(invmodel);
 
         GLMesh* mesh;
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT])
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
         {
-            GroupedFPSM<FPSM_DEFAULT>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT>::TIMVSet.push_back(invmodel);
+            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
+            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
+        {
+            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.push_back(mesh);
+            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet.push_back(invmodel);
         }
 
         for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
@@ -164,11 +174,18 @@ void STKAnimatedMesh::render()
         AbsoluteTransformation.getInverse(invmodel);
 
         GLMesh* mesh;
-        for_in(mesh, ShadedMesh[SM_DEFAULT])
+        for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
         {
-            GroupedSM<SM_DEFAULT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT>::TIMVSet.push_back(invmodel);
+            GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
+        }
+
+        for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
+        {
+            GroupedSM<SM_DEFAULT_TANGENT>::MeshSet.push_back(mesh);
+            GroupedSM<SM_DEFAULT_TANGENT>::MVPSet.push_back(AbsoluteTransformation);
+            GroupedSM<SM_DEFAULT_TANGENT>::TIMVSet.push_back(invmodel);
         }
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
@@ -176,13 +193,6 @@ void STKAnimatedMesh::render()
             GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
             GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
             GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
-
-        for_in(mesh, ShadedMesh[SM_RIMLIT])
-        {
-            GroupedSM<SM_RIMLIT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_RIMLIT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_RIMLIT>::TIMVSet.push_back(invmodel);
         }
 
         for_in (mesh, ShadedMesh[SM_UNLIT])

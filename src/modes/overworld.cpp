@@ -149,12 +149,12 @@ void OverWorld::update(float dt)
     if (m_return_to_garage)
     {
         m_return_to_garage = false;
-        delayedSelfDestruct();
-        race_manager->exitRace(false);
+        race_manager->exitRace();
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance();
         s->setMultiplayer(false);
         s->setFromOverworld(true);
         StateManager::get()->resetAndGoToScreen(s);
+        throw AbortWorldUpdateException();
     }
 }   // update
 

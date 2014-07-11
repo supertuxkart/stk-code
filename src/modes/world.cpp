@@ -795,7 +795,14 @@ void World::updateWorld(float dt)
         getPhase() == IN_GAME_MENU_PHASE      )
         return;
 
-    update(dt);
+    try
+    {
+        update(dt);
+    }
+    catch (AbortWorldUpdateException& e)
+    {
+        return;
+    }
 
 #ifdef DEBUG
     assert(m_magic_number == 0xB01D6543);

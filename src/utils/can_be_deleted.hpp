@@ -54,9 +54,9 @@ public:
         Log::verbose("Thread", "Start waiting %lf", start);
         while(1)
         {
-            if(m_can_be_deleted.getAtomic()) 
+            if(m_can_be_deleted.getAtomic())
             {
-                Log::verbose("Thread", 
+                Log::verbose("Thread",
                          "Waited %lf seconds for thread to become deleteable.",
                          StkTime::getRealTime()-start);
                 Log::verbose("Thread", "Stop waiting %lf", StkTime::getRealTime());
@@ -67,7 +67,7 @@ public:
             {
                 Log::verbose("Thread", "Stop waiting %lf", StkTime::getRealTime());
                 Log::verbose("Thread", "Waited for more than %f seconds for "
-                                       "thread to become deleteable", 
+                                       "thread to become deleteable",
                                        waiting_time);
                 return false;
             }

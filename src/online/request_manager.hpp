@@ -67,7 +67,7 @@ namespace Online
      *  manager which might be accessed if a download just finished before the
      *  abort). On executing the quit request, the request manager will set
      *  a flag that it is ready to be deleted (using the CanBeDeleted class).
-     *  The main thread will wait for a certain amount of time for the 
+     *  The main thread will wait for a certain amount of time for the
      *  RequestManager to be ready to be deleted (i.e. the sign-out and quit
      *  request have been processes), before deleting the RequestManager.
      *  Typically the RequestManager will finish while the rest of stk is

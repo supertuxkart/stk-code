@@ -26,6 +26,7 @@
   */
 
 #include <vector>
+#include <stdexcept>
 
 #include "modes/world_status.hpp"
 #include "race/highscores.hpp"
@@ -41,14 +42,22 @@ class Controller;
 class PhysicalObject;
 class Physics;
 class Track;
+
 namespace Scripting
 {
-	class ScriptEngine;
+    class ScriptEngine;
 }
+
 namespace irr
 {
     namespace scene { class ISceneNode; }
 }
+
+class AbortWorldUpdateException : public std::runtime_error
+{
+public:
+    AbortWorldUpdateException() : std::runtime_error("race abort") { };
+};
 
 /**
  *  \brief base class for all game modes
@@ -72,7 +81,6 @@ class World : public WorldStatus
 {
 public:
     typedef std::vector<AbstractKart*> KartList;
-
 private:
     /** A pointer to the global world object for a race. */
     static World *m_world;
@@ -119,8 +127,8 @@ protected:
     /** Pointer to the track. The track is managed by world. */
     Track* m_track;
 
-	/**Pointer to scripting engine  */
-	Scripting::ScriptEngine* m_script_engine;
+    /**Pointer to scripting engine  */
+    Scripting::ScriptEngine* m_script_engine;
 
     /** Pointer to the race GUI. The race GUI is handled by world. */
     RaceGUIBase *m_race_gui;
@@ -218,8 +226,6 @@ public:
     // ------------------------------------------------------------------------
     void moveKartAfterRescue(AbstractKart* kart);
     // ------------------------------------------------------------------------
-    void moveKartTo(AbstractKart* kart, const btTransform &t);
-    // ------------------------------------------------------------------------
     /** Called when it is needed to know whether this kind of race involves
      *  counting laps. */
     virtual bool raceHasLaps() = 0;
@@ -310,13 +316,13 @@ public:
     /** Returns a pointer to the track. */
     Track          *getTrack() const { return m_track; }
     // ------------------------------------------------------------------------
-
-	// ------------------------------------------------------------------------
     /** Returns a pointer to the Scripting Engine. */
-    Scripting::ScriptEngine   *getScriptEngine() const { return m_script_engine; }
-
-	//------------------------------------------------------------------------
+    Scripting::ScriptEngine   *getScriptEngine() 
+                               const { return m_script_engine; }
+    //-------------------------------------------------------------------------
     bool            isFogEnabled() const;
+    // ------------------------------------------------------------------------
+    void moveKartTo(AbstractKart* kart, const btTransform &t);
     // ------------------------------------------------------------------------
     /** The code that draws the timer should call this first to know
      *  whether the game mode wants a timer drawn. */

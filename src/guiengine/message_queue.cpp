@@ -87,7 +87,7 @@ public:
 
 // ============================================================================
 /** List of all messages. */
-std::priority_queue<Message*, std::vector<Message*>, 
+std::priority_queue<Message*, std::vector<Message*>,
                    CompareMessages> g_all_messages;
 
 /** How long the current message has been displayed. The special value
@@ -139,7 +139,7 @@ void add(MessageType mt, const irr::core::stringw &message)
 }   // add
 
 // ----------------------------------------------------------------------------
-/** Update function called from the GUIEngine to handle displaying of the 
+/** Update function called from the GUIEngine to handle displaying of the
  *  messages. It will make sure that each message is shown for a certain
  *  amount of time, before it is discarded and the next message (if any)
  *  is displayed.
@@ -166,7 +166,7 @@ void update(float dt)
     }
 
     Message *current = g_all_messages.top();
-    GUIEngine::getSkin()->drawMessage(g_container, g_area, 
+    GUIEngine::getSkin()->drawMessage(g_container, g_area,
                                       current->getRenderType());
     gui::ScalableFont *font = GUIEngine::getFont();
     

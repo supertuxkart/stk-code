@@ -9,7 +9,7 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE MaterialType)
+GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
 {
     if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
         return FPSM_NORMAL_MAP;
@@ -17,11 +17,13 @@ GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE Materia
         return FPSM_ALPHA_REF_TEXTURE;
     else if (MaterialType == irr_driver->getShader(ES_GRASS) || MaterialType == irr_driver->getShader(ES_GRASS_REF))
         return FPSM_GRASS;
-    else
-        return FPSM_DEFAULT;
+    else if (tp == video::EVT_2TCOORDS)
+        return FPSM_DEFAULT_2TCOORD;
+    assert(tp == video::EVT_STANDARD);
+    return FPSM_DEFAULT_STANDARD;
 }
 
-ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::ITexture **textures)
+ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::ITexture **textures, video::E_VERTEX_TYPE tp)
 {
     if (type == irr_driver->getShader(ES_SPHERE_MAP))
         return SM_SPHEREMAP;
@@ -29,16 +31,15 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
         return SM_SPLATTING;
     else if (type == irr_driver->getShader(ES_OBJECTPASS_REF) || type == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
         return SM_ALPHA_REF_TEXTURE;
-    else if (type == irr_driver->getShader(ES_OBJECTPASS_RIMLIT) && textures[0])
-        return SM_RIMLIT;
     else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
         return SM_GRASS;
     else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
         return SM_UNLIT;
-    else if (textures[1] && type != irr_driver->getShader(ES_NORMAL_MAP))
+    else if (tp == video::EVT_2TCOORDS)
         return SM_DETAILS;
-    else
-        return SM_DEFAULT;
+    else if (tp == video::EVT_TANGENTS)
+        return SM_DEFAULT_TANGENT;
+    return SM_DEFAULT_STANDARD;
 }
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
@@ -49,7 +50,7 @@ TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE typ
     video::E_MODULATE_FUNC mod;
     u32 alpha;
     unpack_textureBlendFunc(srcFact, DstFact, mod, alpha, MaterialTypeParam);
-    if (DstFact == video::EBF_ONE)
+    if (DstFact == video::EBF_ONE || type == video::EMT_TRANSPARENT_ADD_COLOR)
         return TM_ADDITIVE;
     return TM_DEFAULT;
 }
@@ -137,46 +138,28 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
     GLMesh result = {};
     if (!mb)
         return result;
-    glBindVertexArray(0);
-    glGenBuffers(1, &(result.vertex_buffer));
-    glGenBuffers(1, &(result.index_buffer));
 
-    glBindBuffer(GL_ARRAY_BUFFER, result.vertex_buffer);
-    const void* vertices = mb->getVertices();
-    const u32 vertexCount = mb->getVertexCount();
-    const irr::video::E_VERTEX_TYPE vType = mb->getVertexType();
-    result.Stride = getVertexPitchFromType(vType);
-    const c8* vbuf = static_cast<const c8*>(vertices);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * result.Stride, vbuf, GL_STATIC_DRAW);
-    assert(vertexCount);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, result.index_buffer);
-    const void* indices = mb->getIndices();
-    u32 indexCount = mb->getIndexCount();
-    size_t indexSize = 0;
+    result.IndexCount = mb->getIndexCount();
     switch (mb->getIndexType())
     {
-        case irr::video::EIT_16BIT:
-        {
-            indexSize = sizeof(u16);
-            result.IndexType = GL_UNSIGNED_SHORT;
-            break;
-        }
-        case irr::video::EIT_32BIT:
-        {
-            indexSize = sizeof(u32);
-            result.IndexType = GL_UNSIGNED_INT;
-            break;
-        }
-        default:
-        {
-            assert(0 && "Wrong index size");
-        }
+    case irr::video::EIT_16BIT:
+    {
+        result.IndexType = GL_UNSIGNED_SHORT;
+        break;
     }
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexCount * indexSize, indices, GL_STATIC_DRAW);
+    case irr::video::EIT_32BIT:
+    {
+        result.IndexType = GL_UNSIGNED_INT;
+        break;
+    }
+    default:
+    {
+        assert(0 && "Wrong index size");
+    }
+    }
+    result.VAOType = mb->getVertexType();
+    result.Stride = getVertexPitchFromType(result.VAOType);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     result.IndexCount = mb->getIndexCount();
     switch (mb->getPrimitiveType())
@@ -208,6 +191,44 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.TextureMatrix = 0;
     return result;
+}
+
+static
+size_t getUnsignedSize(unsigned tp)
+{
+    switch (tp)
+    {
+    case GL_UNSIGNED_SHORT:
+        return sizeof(u16);
+    case GL_UNSIGNED_INT:
+        return sizeof(u32);
+    default:
+        assert(0 && "Unsupported index type");
+        return 0;
+    }
+}
+
+void fillLocalBuffer(GLMesh &mesh, scene::IMeshBuffer* mb)
+{
+    glBindVertexArray(0);
+    glGenBuffers(1, &(mesh.vertex_buffer));
+    glGenBuffers(1, &(mesh.index_buffer));
+
+    glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
+    const void* vertices = mb->getVertices();
+    const u32 vertexCount = mb->getVertexCount();
+
+    const c8* vbuf = static_cast<const c8*>(vertices);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf, GL_STATIC_DRAW);
+    assert(vertexCount);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
+    const void* indices = mb->getIndices();
+
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * getUnsignedSize(mesh.IndexType), indices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
 
@@ -243,149 +264,93 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
+    assert(mesh.VAOType == video::EVT_STANDARD);
 
     compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, windDir, 0);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
-void drawSphereMap(const GLMesh &mesh, const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
-
-  compressTexture(mesh.textures[0], true);
-  if (irr_driver->getLightViz())
-  {
-      GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-      GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  setTexture(MeshShader::SphereMapShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-  MeshShader::SphereMapShader::setUniforms(ModelMatrix, InverseModelMatrix, irr_driver->getSceneManager()->getAmbientLight());
-  assert(mesh.vao);
-  glBindVertexArray(mesh.vao);
-  glDrawElements(ptype, count, itype, 0);
-}
 
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
 {
     irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
 
-  // Texlayout
-  compressTexture(mesh.textures[1], true);
-  setTexture(MeshShader::SplattingShader::TU_tex_layout, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  //Tex detail0
-  compressTexture(mesh.textures[2], true);
-  setTexture(MeshShader::SplattingShader::TU_tex_detail0, getTextureGLuint(mesh.textures[2]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  //Tex detail1
-  compressTexture(mesh.textures[3], true);
-  setTexture(MeshShader::SplattingShader::TU_tex_detail1, getTextureGLuint(mesh.textures[3]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  compressTexture(mesh.textures[4], true);
-  //Tex detail2
-  setTexture(MeshShader::SplattingShader::TU_tex_detail2, getTextureGLuint(mesh.textures[4]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  //Tex detail3
-  compressTexture(mesh.textures[5], true);
-  setTexture(MeshShader::SplattingShader::TU_tex_detail3, getTextureGLuint(mesh.textures[5]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
+    // Texlayout
+    compressTexture(mesh.textures[1], true);
+    setTexture(MeshShader::SplattingShader::TU_tex_layout, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
+      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    //Tex detail0
+    compressTexture(mesh.textures[2], true);
+    setTexture(MeshShader::SplattingShader::TU_tex_detail0, getTextureGLuint(mesh.textures[2]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    //Tex detail1
+    compressTexture(mesh.textures[3], true);
+    setTexture(MeshShader::SplattingShader::TU_tex_detail1, getTextureGLuint(mesh.textures[3]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    compressTexture(mesh.textures[4], true);
+    //Tex detail2
+    setTexture(MeshShader::SplattingShader::TU_tex_detail2, getTextureGLuint(mesh.textures[4]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    //Tex detail3
+    compressTexture(mesh.textures[5], true);
+    setTexture(MeshShader::SplattingShader::TU_tex_detail3, getTextureGLuint(mesh.textures[5]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    if (irr_driver->getLightViz())
+    {
+        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
+    else
+    {
+        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+    }
 
-  MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix);
-
-  assert(mesh.vao);
-  glBindVertexArray(mesh.vao);
-  glDrawElements(ptype, count, itype, 0);
+    MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
-void drawObjectRefPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
-
-  compressTexture(mesh.textures[0], true);
-  setTexture(MeshShader::ObjectRefPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-
-  MeshShader::ObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix);
-
-  assert(mesh.vao);
-  glBindVertexArray(mesh.vao);
-  glDrawElements(ptype, count, itype, 0);
-}
 
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
 {
@@ -393,7 +358,10 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
     GLenum ptype = mesh.PrimitiveType;
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
+    assert(mesh.VAOType == video::EVT_STANDARD);
 
+    if (!mesh.textures[0])
+        const_cast<GLMesh &>(mesh).textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     compressTexture(mesh.textures[0], true);
     setTexture(MeshShader::GrassPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     if (irr_driver->getLightViz())
@@ -408,136 +376,7 @@ void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
     }
 
     MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void drawUntexturedObject(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
-
-  MeshShader::UntexturedObjectShader::setUniforms(ModelMatrix);
-
-  assert(mesh.vao);
-  glBindVertexArray(mesh.vao);
-  glDrawElements(ptype, count, itype, 0);
-}
-
-void drawObjectRimLimit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::ObjectRimLimitShader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    MeshShader::ObjectRimLimitShader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, TextureMatrix);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void drawObjectUnlit(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::ObjectUnlitShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    MeshShader::ObjectUnlitShader::setUniforms(ModelViewProjectionMatrix);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void drawDetailledObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-  GLenum ptype = mesh.PrimitiveType;
-  GLenum itype = mesh.IndexType;
-  size_t count = mesh.IndexCount;
-
-  compressTexture(mesh.textures[0], true);
-  setTexture(MeshShader::DetailledObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-  if (irr_driver->getLightViz())
-  {
-    GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  else
-  {
-    GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-    glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-  }
-  compressTexture(mesh.textures[1], true);
-  setTexture(MeshShader::DetailledObjectPass2Shader::TU_detail, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-  MeshShader::DetailledObjectPass2Shader::setUniforms(ModelViewProjectionMatrix);
-
-  assert(mesh.vao);
-  glBindVertexArray(mesh.vao);
-  glDrawElements(ptype, count, itype, 0);
-}
-
-void drawObjectPass2(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    if (!mesh.textures[0])
-        const_cast<GLMesh &>(mesh).textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    MeshShader::ObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, TextureMatrix);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
@@ -606,10 +445,7 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
     MeshShader::BubbleShader::setUniforms(ModelViewProjectionMatrix, 0, time, transparency);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
 void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
@@ -622,10 +458,7 @@ void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
     compressTexture(mesh.textures[0], true);
     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElementsInstanced(ptype, count, itype, 0, 4);
+    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, 4, mesh.vaoBaseVertex);
 }
 
 void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
@@ -636,10 +469,7 @@ void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
     size_t count = mesh.IndexCount;
 
     MeshShader::ShadowShader::setUniforms(ModelMatrix);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElementsInstanced(ptype, count, itype, 0, 4);
+    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *) mesh.vaoOffset, 4, mesh.vaoBaseVertex);
 }
 
 bool isObject(video::E_MATERIAL_TYPE type)

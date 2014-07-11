@@ -126,11 +126,11 @@ void GrandPrixData::changeReverse(const RandomGPInfoDialog::REVERSED use_reverse
             m_reversed[i] = false;
         else if (use_reverse == RandomGPInfoDialog::MIXED)
             if (track_manager->getTrack(m_tracks[i])->reverseAvailable())
-                m_reversed[i] = (rand() % 2!=0);
+                m_reversed[i] = (rand() % 2 != 0);
             else
                 m_reversed[i] = false;
         else // all reversed
-            m_reversed[i] = true;
+            m_reversed[i] = track_manager->getTrack(m_tracks[i])->reverseAvailable();
     }
 }
 

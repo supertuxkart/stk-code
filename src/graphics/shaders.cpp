@@ -336,7 +336,6 @@ void Shaders::loadShaders()
     MeshShader::InstancedObjectRefPass2Shader::init();
     MeshShader::InstancedGrassPass2Shader::init();
     MeshShader::DetailledObjectPass2Shader::init();
-    MeshShader::ObjectRimLimitShader::init();
     MeshShader::UntexturedObjectShader::init();
     MeshShader::ObjectRefPass2Shader::init();
     MeshShader::ObjectUnlitShader::init();
@@ -854,54 +853,6 @@ namespace MeshShader
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-    }
-
-    GLuint ObjectRimLimitShader::Program;
-    GLuint ObjectRimLimitShader::uniform_MM;
-    GLuint ObjectRimLimitShader::uniform_IMM;
-    GLuint ObjectRimLimitShader::uniform_TM;
-    GLuint ObjectRimLimitShader::uniform_ambient;
-    GLuint ObjectRimLimitShader::TU_Albedo;
-
-    void ObjectRimLimitShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_rimlit.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
-        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
-        GLuint uniform_Albedo = glGetUniformLocation(Program, "Albedo");
-        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
-        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
-        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
-        if (!UserConfigParams::m_ubo_disabled)
-        {
-            GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-            glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-        }
-        TU_Albedo = 3;
-
-        glUseProgram(Program);
-        glUniform1i(uniform_DiffuseMap, 0);
-        glUniform1i(uniform_SpecularMap, 1);
-        glUniform1i(uniform_SSAO, 2);
-        glUniform1i(uniform_Albedo, TU_Albedo);
-        glUseProgram(0);
-    }
-
-    void ObjectRimLimitShader::setUniforms(const core::matrix4 &ModelMatrix,
-                                           const core::matrix4 &InverseModelMatrix,
-                                           const core::matrix4 &TextureMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-        glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
 
     GLuint UntexturedObjectShader::Program;
@@ -1537,6 +1488,7 @@ namespace MeshShader
     GLuint DisplaceShader::uniform_displacement_tex;
     GLuint DisplaceShader::uniform_mask_tex;
     GLuint DisplaceShader::uniform_color_tex;
+    GLuint DisplaceShader::uniform_tex;
     GLuint DisplaceShader::uniform_dir;
     GLuint DisplaceShader::uniform_dir2;
 
@@ -1551,11 +1503,12 @@ namespace MeshShader
         uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
         uniform_dir = glGetUniformLocation(Program, "dir");
         uniform_dir2 = glGetUniformLocation(Program, "dir2");
+        uniform_tex = glGetUniformLocation(Program, "tex");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex)
+    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex)
     {
         glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform2f(uniform_dir, dir.X, dir.Y);
@@ -1563,6 +1516,7 @@ namespace MeshShader
         glUniform1i(uniform_displacement_tex, TU_displacement_tex);
         glUniform1i(uniform_mask_tex, TU_mask_tex);
         glUniform1i(uniform_color_tex, TU_color_tex);
+        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint SkyboxShader::Program;
