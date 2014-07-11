@@ -1769,6 +1769,8 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
 */
 GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &textures)
 {
+    assert(textures.size() == 6);
+
     GLuint result;
     glGenTextures(1, &result);
 
@@ -1813,6 +1815,7 @@ void IrrDriver::generateSkyboxCubemap()
 {
     glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
+    assert(SkyboxTextures.size() == 6);
     SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
     
