@@ -253,20 +253,22 @@ class TransparentShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MVP, uniform_TM, uniform_tex;
+    static GLuint uniform_MVP, uniform_TM;
+    static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix);
 };
 
 class TransparentFogShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MVP, uniform_TM, uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
+    static GLuint uniform_MVP, uniform_TM, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
+    static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos);
 };
 
 class BillboardShader

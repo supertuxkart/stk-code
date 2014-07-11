@@ -709,116 +709,27 @@ void IrrDriver::renderTransparent()
     glEnable(GL_BLEND);
     glBlendEquation(GL_FUNC_ADD);
     glDisable(GL_CULL_FACE);
-    TransparentMeshes<TM_DEFAULT>::reset();
-    TransparentMeshes<TM_ADDITIVE>::reset();
+    ListBlendTransparent::Arguments.clear();
+    ListAdditiveTransparent::Arguments.clear();
+    ListBlendTransparentFog::Arguments.clear();
+    ListAdditiveTransparentFog::Arguments.clear();
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
 
     glBindVertexArray(getVAO(EVT_STANDARD));
 
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
-        const Track * const track = World::getWorld()->getTrack();
-
-        // This function is only called once per frame - thus no need for setters.
-        const float fogmax = track->getFogMax();
-        const float startH = track->getFogStartHeight();
-        const float endH = track->getFogEndHeight();
-        const float start = track->getFogStart();
-        const float end = track->getFogEnd();
-        const video::SColor tmpcol = track->getFogColor();
-
-        core::vector3df col(tmpcol.getRed() / 255.0f,
-            tmpcol.getGreen() / 255.0f,
-            tmpcol.getBlue() / 255.0f);
-
-        glUseProgram(MeshShader::TransparentFogShader::Program);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
-        {
-            GLMesh &mesh = *TransparentMeshes<TM_DEFAULT>::MeshSet[i];
-            if (mesh.VAOType != EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to fog + transparent blend (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                glBindVertexArray(getVAO(mesh.VAOType));
-            }
-
-
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-            draw<MeshShader::TransparentFogShader>(&mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
-            if (mesh.VAOType != EVT_STANDARD)
-                glBindVertexArray(getVAO(EVT_STANDARD));
-        }
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD>({ MeshShader::TransparentFogShader::TU_tex }, ListBlendTransparentFog::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-        for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
-        {
-            GLMesh &mesh = *TransparentMeshes<TM_ADDITIVE>::MeshSet[i];
-            if (mesh.VAOType != EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to fog + transparent additive (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                glBindVertexArray(getVAO(mesh.VAOType));
-            }
-            glBindVertexArray(getVAO(mesh.VAOType));
-
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-            draw<MeshShader::TransparentFogShader>(&mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
-            if (mesh.VAOType != EVT_STANDARD)
-                glBindVertexArray(getVAO(EVT_STANDARD));
-        }
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD>({ MeshShader::TransparentFogShader::TU_tex }, ListAdditiveTransparentFog::Arguments);
     }
     else
     {
-        glUseProgram(MeshShader::TransparentShader::Program);
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        for (unsigned i = 0; i < TransparentMeshes<TM_DEFAULT>::MeshSet.size(); i++)
-        {
-             GLMesh &mesh = *TransparentMeshes<TM_DEFAULT>::MeshSet[i];
-             if (mesh.VAOType != EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to fog + transparent additive (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                glBindVertexArray(getVAO(mesh.VAOType));
-            }
-            glBindVertexArray(getVAO(mesh.VAOType));
-            if (!mesh.textures[0])
-                mesh.textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::TransparentShader>(&mesh, TransparentMeshes<TM_DEFAULT>::MVPSet[i], TransparentMeshes<TM_DEFAULT>::MeshSet[i]->TextureMatrix, 0);
-            if (mesh.VAOType != EVT_STANDARD)
-                glBindVertexArray(getVAO(EVT_STANDARD));
-        }
-
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>({ MeshShader::TransparentShader::TU_tex }, ListBlendTransparent::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-        for (unsigned i = 0; i < TransparentMeshes<TM_ADDITIVE>::MeshSet.size(); i++)
-        {
-            GLMesh &mesh = *TransparentMeshes<TM_ADDITIVE>::MeshSet[i];
-            if (mesh.VAOType != EVT_STANDARD)
-            {
-#ifdef DEBUG
-                Log::error("Materials", "Wrong vertex Type associed to fog + transparent additive (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
-#endif
-                glBindVertexArray(getVAO(mesh.VAOType));
-            }
-            glBindVertexArray(getVAO(mesh.VAOType));
-            compressTexture(mesh.textures[0], true);
-            setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-            draw<MeshShader::TransparentShader>(&mesh, TransparentMeshes<TM_ADDITIVE>::MVPSet[i], TransparentMeshes<TM_ADDITIVE>::MeshSet[i]->TextureMatrix, 0);
-            if (mesh.VAOType != EVT_STANDARD)
-                glBindVertexArray(getVAO(EVT_STANDARD));
-        }
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>({ MeshShader::TransparentShader::TU_tex }, ListAdditiveTransparent::Arguments);
     }
 }
 

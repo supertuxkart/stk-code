@@ -6,6 +6,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "graphics/camera.hpp"
 #include "utils/profiler.hpp"
 
 using namespace irr;
@@ -200,16 +201,40 @@ void STKAnimatedMesh::render()
             glUseProgram(MeshShader::BubbleShader::Program);
 
         GLMesh* mesh;
-        for_in(mesh, TransparentMesh[TM_DEFAULT])
+        if (World::getWorld() && World::getWorld()->isFogEnabled())
         {
-            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-        }
+            const Track * const track = World::getWorld()->getTrack();
 
-        for_in(mesh, TransparentMesh[TM_ADDITIVE])
+            // Todo : put everything in a ubo
+            const float fogmax = track->getFogMax();
+            const float startH = track->getFogStartHeight();
+            const float endH = track->getFogEndHeight();
+            const float start = track->getFogStart();
+            const float end = track->getFogEnd();
+            const video::SColor tmpcol = track->getFogColor();
+
+            core::vector3df col(tmpcol.getRed() / 255.0f,
+                tmpcol.getGreen() / 255.0f,
+                tmpcol.getBlue() / 255.0f);
+
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col,
+                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col,
+                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+        }
+        else
         {
-            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(AbsoluteTransformation);
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
         }
         return;
     }

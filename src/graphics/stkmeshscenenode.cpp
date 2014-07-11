@@ -431,7 +431,7 @@ void STKMeshSceneNode::render()
 
                     compressTexture(mesh.textures[0], true);
                     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-                    MeshShader::TransparentFogShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
+                    MeshShader::TransparentFogShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition());
 
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
@@ -451,9 +451,9 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    setTexture(MeshShader::TransparentShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-                    MeshShader::TransparentShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix, 0);
+                    MeshShader::TransparentShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
                     glDrawElements(ptype, count, itype, 0);
@@ -465,16 +465,40 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
 
-        for_in(mesh, TransparentMesh[TM_DEFAULT])
+        if (World::getWorld() && World::getWorld()->isFogEnabled())
         {
-            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-        }
+            const Track * const track = World::getWorld()->getTrack();
 
-        for_in(mesh, TransparentMesh[TM_ADDITIVE])
+            // Todo : put everything in a ubo
+            const float fogmax = track->getFogMax();
+            const float startH = track->getFogStartHeight();
+            const float endH = track->getFogEndHeight();
+            const float start = track->getFogStart();
+            const float end = track->getFogEnd();
+            const video::SColor tmpcol = track->getFogColor();
+
+            core::vector3df col(tmpcol.getRed() / 255.0f,
+                tmpcol.getGreen() / 255.0f,
+                tmpcol.getBlue() / 255.0f);
+
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col,
+                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col,
+                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+        }
+        else
         {
-            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(AbsoluteTransformation);
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
         }
 
         if (!TransparentMesh[TM_BUBBLE].empty())

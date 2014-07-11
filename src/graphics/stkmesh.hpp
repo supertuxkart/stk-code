@@ -145,6 +145,30 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
 };
 
+class ListBlendTransparent
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListAdditiveTransparent
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+};
+
+class ListBlendTransparentFog
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > Arguments;
+};
+
+class ListAdditiveTransparentFog
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > Arguments;
+};
+
 template<enum ShadedMaterial T>
 class GroupedSM
 {
@@ -194,8 +218,6 @@ template<enum TransparentMaterial T>
 std::vector<core::matrix4> TransparentMeshes<T>::MVPSet;
 
 // Forward pass (for transparents meshes)
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
