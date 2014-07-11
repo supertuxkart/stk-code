@@ -95,7 +95,7 @@ std::vector<core::matrix4> GroupedFPSM<T>::TIMVSet;
 
 
 template<typename Shader, typename...uniforms>
-void draw(GLMesh *mesh, uniforms... Args)
+void draw(const GLMesh *mesh, uniforms... Args)
 {
     irr_driver->IncreaseObjectCount();
     GLenum ptype = mesh->PrimitiveType;

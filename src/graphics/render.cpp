@@ -589,7 +589,7 @@ template<unsigned N>
 struct unroll_args
 {
     template<typename Shader, typename ...TupleTypes, typename ...Args>
-    static void exec(std::tuple<TupleTypes...> t, Args... args)
+    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
     {
         unroll_args<N - 1>::template exec<Shader>(t, std::get<N - 1>(t), args...);
     }
@@ -599,16 +599,16 @@ template<>
 struct unroll_args<0>
 {
     template<typename Shader, typename ...TupleTypes, typename ...Args>
-    static void exec(std::tuple<TupleTypes...> t, Args... args)
+    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
     {
         draw<Shader>(args...);
     }
 };
 
 template<typename Shader, typename... TupleType>
-void apply(std::tuple<TupleType...> arg)
+void apply(const std::tuple<TupleType...> &arg)
 {
-    unroll_args<std::tuple_size<decltype(arg) >::value >::template exec<Shader>(arg);
+    unroll_args<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<Shader>(arg);
 }
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
