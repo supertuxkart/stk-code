@@ -83,6 +83,16 @@ namespace Scripting
             
             kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
         }
+        void getKartLocation(asIScriptGeneric *gen)
+        {
+            int id = (int)gen->GetArgDWord(0);
+
+            AbstractKart* kart = World::getWorld()->getKart(id);
+            Vec3 kart_loc = kart->getXYZ();
+            void *pointer = &kart_loc;
+
+            gen->SetReturnObject(pointer);
+        }
         void setVelocity(asIScriptGeneric *gen)
         {
             int id = (int)gen->GetArgDWord(0);
@@ -102,6 +112,9 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void teleportKart(int id, Vec3 &in)", asFUNCTION(teleportKart), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void setVelocity(int id, Vec3 &in)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void jumpKartTo(int id, float x, float y)", asFUNCTION(jumpKartTo), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("Vec3 getKartLocation(int id)", asFUNCTION(getKartLocation), asCALL_GENERIC); assert(r >= 0);
+
+
         }
     }
 }

@@ -11,4 +11,7 @@ void onUpdate()
      }
      Vec3 speed = Vec3(10,0,0);
      setVelocity(0,speed);
+     Vec3 kartLoc = getKartLocation(0);
+     sheepMesh.move(kartLoc);
+     printVec3(kartLoc);
 }
