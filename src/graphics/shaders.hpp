@@ -163,17 +163,6 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
-class ObjectRimLimitShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_IMM, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix);
-};
-
 class UntexturedObjectShader
 {
 public:

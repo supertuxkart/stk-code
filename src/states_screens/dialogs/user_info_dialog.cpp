@@ -452,7 +452,7 @@ bool UserInfoDialog::onEscapePressed()
 
 void UserInfoDialog::onUpdate(float dt)
 {
-    if(m_processing) 
+    if(m_processing)
         m_info_widget->setText(StringUtils::loadingDots(_("Processing")), false);
 
     //If we want to open the registration dialog, we need to close this one first

@@ -275,7 +275,7 @@ void OnlineUserSearch::onUpdate(float dt)
         }
         else
         {
-            m_user_list_widget->renameItem("loading", 
+            m_user_list_widget->renameItem("loading",
                                     StringUtils::loadingDots(_("Searching")) );
         }
     }

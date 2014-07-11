@@ -1119,6 +1119,7 @@ void QuadGraph::makeMiniMap(const core::dimension2du &dimension,
     m_node->setName("minimap-mesh");
 #endif
 
+    m_node->setAutomaticCulling(0);
     m_node->setMaterialFlag(video::EMF_LIGHTING, false);
 
     // Add the camera:

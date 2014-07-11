@@ -323,6 +323,8 @@ void recalculateTangents(scene::IMesh* mesh, bool recalculateNormals, bool smoot
 
 bool MeshTools::isNormalMap(scene::IMeshBuffer* mb)
 {
+    if (!irr_driver->isGLSL())
+        return false;
     return (mb->getMaterial().MaterialType == irr_driver->getShader(ES_NORMAL_MAP));
 }
 

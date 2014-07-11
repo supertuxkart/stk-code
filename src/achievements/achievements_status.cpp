@@ -114,7 +114,7 @@ Achievement * AchievementsStatus::getAchievement(uint32_t id)
 
 // ----------------------------------------------------------------------------
 /** Synchronises the achievements between local and online usage. It takes
- *  the list of online achievements, and marks them all to be achieved 
+ *  the list of online achievements, and marks them all to be achieved
  *  locally. Then it issues 'achieved' requests to the server for all local
  *  achievements that are not set online.
 */

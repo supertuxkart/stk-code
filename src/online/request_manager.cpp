@@ -220,7 +220,7 @@ namespace Online
         }   // while
 
         // Signal that the request manager can now be deleted.
-        // We signal this even before cleaning up memory, since there's no 
+        // We signal this even before cleaning up memory, since there's no
         // need to keep the user waiting for STK to exit.
         me->setCanBeDeleted();
 
