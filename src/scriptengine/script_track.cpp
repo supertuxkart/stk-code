@@ -79,6 +79,10 @@ namespace Scripting
             core::vector3df scale = core::vector3df(1, 1, 1);
             ((TrackObjectPresentation*)(memory))->move(xyz, hpr, scale);
         }
+        void stop(void *memory)
+        {
+            ((TrackObjectPresentationSound*)memory)->stopSound();
+        }
         void setLoop(int start, int end, void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
@@ -177,6 +181,7 @@ namespace Scripting
             r = engine->RegisterObjectType("SoundEmitter", 0, asOBJ_REF | asOBJ_NOCOUNT); assert(r >= 0);
             r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter @getSoundEmitter()", asMETHOD(TrackObject, getSound), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("SoundEmitter", "void move(Vec3 &in)", asFUNCTION(movePresentation), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("SoundEmitter", "void stop()", asFUNCTION(stop), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
 
 

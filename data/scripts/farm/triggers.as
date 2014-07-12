@@ -15,6 +15,9 @@ void haybail()
      Animator @haybailAnimator = t_obj.getAnimator();
      haybailAnimator.setPaused(true);
      //if (haybail.isFlattener())squashKart(0,35.0);
+     TrackObject @moo_sound = getTrackObject("cow");
+     SoundEmitter @cowmoo = moo_sound.getSoundEmitter();
+     cowmoo.stop();
 }
 
 void haybail_deactivate()

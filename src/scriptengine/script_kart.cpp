@@ -113,8 +113,6 @@ namespace Scripting
             r = engine->RegisterGlobalFunction("void setVelocity(int id, Vec3 &in)", asFUNCTION(setVelocity), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void jumpKartTo(int id, float x, float y)", asFUNCTION(jumpKartTo), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("Vec3 getKartLocation(int id)", asFUNCTION(getKartLocation), asCALL_GENERIC); assert(r >= 0);
-
-
         }
     }
 }
