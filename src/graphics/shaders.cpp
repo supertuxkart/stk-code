@@ -464,6 +464,11 @@ AssignUniforms(GLuint Program, std::vector<GLuint> &uniforms, const std::vector<
     }
 }
 
+void glUniformMatrix4fvWraper(GLuint a, size_t b, unsigned c, const float *d)
+{
+    glUniformMatrix4fv(a, b, c, d);
+}
+
 namespace MeshShader
 {
 

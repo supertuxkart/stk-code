@@ -20,7 +20,6 @@
 #include <IShaderConstantSetCallBack.h>
 #include <IMeshSceneNode.h>
 #include <vector>
-#include "glwrap.hpp"
 
 typedef unsigned int    GLuint;
 using namespace irr;
@@ -53,13 +52,15 @@ void setUniformsHelper(const std::vector<GLuint> &uniforms)
 {
 }
 
+void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
+
 template<unsigned N = 0, typename... Args>
 void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 &mat, Args... arg)
 {
 #ifndef GL_FALSE
 #define GL_FALSE 0
 #endif
-    glUniformMatrix4fv(uniforms[N], 1, GL_FALSE, mat.pointer());
+    glUniformMatrix4fvWraper(uniforms[N], 1, GL_FALSE, mat.pointer());
     setUniformsHelper<N + 1>(uniforms, arg...);
 }
 
