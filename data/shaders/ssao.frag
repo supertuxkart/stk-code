@@ -38,8 +38,8 @@ const float invSamples = 1. / SAMPLES;
 vec3 getXcYcZc(int x, int y, float zC)
 {
     // We use perspective symetric projection matrix hence P(0,2) = P(1, 2) = 0
-    float xC= (1. - 2 * (float(x) + 0.5) / screen.x) * zC / ProjectionMatrix[0][0];
-    float yC= (1. + 2 * (float(y) + 0.5) / screen.y) * zC / ProjectionMatrix[1][1];
+    float xC= (2 * (float(x)) / screen.x - 1.) * zC / ProjectionMatrix[0][0];
+    float yC= (2 * (float(y)) / screen.y - 1.) * zC / ProjectionMatrix[1][1];
     return vec3(xC, yC, zC);
 }
 
@@ -53,7 +53,7 @@ void main(void)
     // get the normal of current fragment
     vec3 ddx = dFdx(FragPos);
     vec3 ddy = dFdy(FragPos);
-    vec3 norm = -normalize(cross(ddy, ddx));
+    vec3 norm = normalize(cross(ddy, ddx));
 
     float r = radius / FragPos.z;
     float phi = 3. * (x ^ y) + x * y;
