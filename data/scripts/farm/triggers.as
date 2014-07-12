@@ -27,12 +27,15 @@ void haybail_deactivate()
 <object type="action-trigger" action="haybail-activate" distance="10.0" xyz="69.97 8.08 -107.84" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
 
 */
-    displayMessage("Haybail reactivated");
-    //enableAnimation("hayBail.b3d");
-    squashKart(0,35.0); //id of kart,time to squash
-    TrackObject @t_obj = getTrackObject("hayBail.b3d");
-    Animator @haybailAnimator = t_obj.getAnimator();
-    haybailAnimator.setPaused(false);
+     displayMessage("Haybail reactivated");
+     //enableAnimation("hayBail.b3d");
+     squashKart(0,35.0); //id of kart,time to squash
+     TrackObject @t_obj = getTrackObject("hayBail.b3d");
+     Animator @haybailAnimator = t_obj.getAnimator();
+     haybailAnimator.setPaused(false);
+     TrackObject @moo_sound = getTrackObject("cow");
+     SoundEmitter @cowmoo = moo_sound.getSoundEmitter();
+     cowmoo.playOnce();
 }
 
 

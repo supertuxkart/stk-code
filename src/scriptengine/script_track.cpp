@@ -83,6 +83,14 @@ namespace Scripting
         {
             ((TrackObjectPresentationSound*)memory)->stopSound();
         }
+        void playOnce(void *memory)
+        {
+            ((TrackObjectPresentationSound*)memory)->triggerSound(false); //false = once
+        }
+        void playLoop(void *memory)
+        {
+            ((TrackObjectPresentationSound*)memory)->triggerSound(true); //true = loop
+        }
         void setLoop(int start, int end, void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
@@ -182,6 +190,8 @@ namespace Scripting
             r = engine->RegisterObjectMethod("TrackObject", "SoundEmitter @getSoundEmitter()", asMETHOD(TrackObject, getSound), asCALL_THISCALL); assert(r >= 0);
             r = engine->RegisterObjectMethod("SoundEmitter", "void move(Vec3 &in)", asFUNCTION(movePresentation), asCALL_CDECL_OBJLAST); assert(r >= 0);
             r = engine->RegisterObjectMethod("SoundEmitter", "void stop()", asFUNCTION(stop), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("SoundEmitter", "void playOnce()", asFUNCTION(playOnce), asCALL_CDECL_OBJLAST); assert(r >= 0);
+            r = engine->RegisterObjectMethod("SoundEmitter", "void playLoop()", asFUNCTION(playLoop), asCALL_CDECL_OBJLAST); assert(r >= 0);
 
 
 
