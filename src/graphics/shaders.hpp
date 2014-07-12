@@ -300,10 +300,11 @@ class RSMShader
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MM, uniform_tex, uniform_RSMMatrix;
+    static GLuint uniform_MM, uniform_RSMMatrix;
+    static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix, unsigned TU_tex);
+    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix);
 };
 
 class InstancedShadowShader

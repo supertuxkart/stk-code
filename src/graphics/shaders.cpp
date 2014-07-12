@@ -1200,8 +1200,8 @@ namespace MeshShader
 
     GLuint RSMShader::Program;
     GLuint RSMShader::uniform_MM;
-    GLuint RSMShader::uniform_tex;
     GLuint RSMShader::uniform_RSMMatrix;
+    GLuint RSMShader::TU_tex;
 
     void RSMShader::init()
     {
@@ -1211,15 +1211,14 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void RSMShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix, unsigned TU_tex)
+    void RSMShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix)
     {
         glUniformMatrix4fv(uniform_RSMMatrix, 1, GL_FALSE, RSMMatrix.pointer());
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint InstancedShadowShader::Program;

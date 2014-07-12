@@ -933,6 +933,23 @@ void drawShadow(const std::vector<GLuint> TextureUnits, const std::vector<std::t
     }
 }
 
+template<enum E_VERTEX_TYPE VertexType, typename... Args>
+void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+{
+    glUseProgram(MeshShader::RSMShader::Program);
+    glBindVertexArray(getVAO(VertexType));
+    for (unsigned i = 0; i < t.size(); i++)
+    {
+        const GLMesh *mesh = std::get<0>(t[i]);
+        for (unsigned j = 0; j < TextureUnits.size(); j++)
+        {
+            compressTexture(mesh->textures[j], true);
+            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        }
+        draw<MeshShader::RSMShader>(mesh, rsm_matrix, std::get<1>(t[i]));
+    }
+}
+
 void IrrDriver::renderShadows()
 {
     irr_driver->setPhase(SHADOW_PASS);
@@ -960,27 +977,8 @@ void IrrDriver::renderShadows()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glUseProgram(MeshShader::RSMShader::Program);
-    glBindVertexArray(getVAO(EVT_STANDARD));
-    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.size(); ++i)
-    {
-        GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet[i];
-        if (!mesh.textures[0])
-            continue;
-        compressTexture(mesh.textures[0], true);
-        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        draw<MeshShader::RSMShader>(&mesh, rsm_matrix, GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i], 0);
-    }
-    glBindVertexArray(getVAO(EVT_2TCOORDS));
-    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.size(); ++i)
-    {
-        GLMesh &mesh = *GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet[i];
-        if (!mesh.textures[0])
-            continue;
-        compressTexture(mesh.textures[0], true);
-        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        draw<MeshShader::RSMShader>(&mesh, rsm_matrix, GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i], 0);
-    }
+    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListDefaultStandardG::Arguments);
+    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListDefault2TCoordG::Arguments);
 }
 
 static void renderWireFrameFrustrum(float *tmp, unsigned i)
