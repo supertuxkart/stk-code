@@ -47,17 +47,50 @@ public:
 };
 }
 
+template<unsigned N>
+void setUniformsHelper(const std::vector<GLuint> &uniforms)
+{
+}
+
+template<unsigned N = 0, typename... Args>
+void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 &mat, Args... arg)
+{
+#ifndef GL_FALSE
+#define GL_FALSE 0
+#endif
+    glUniformMatrix4fv(uniforms[N], 1, GL_FALSE, mat.pointer());
+    ::template setUniformsHelper<N + 1>(uniforms, arg...);
+}
+
+void bypassUBO(GLuint Program);
+
+template<typename... Args>
+class ShaderHelper
+{
+protected:
+    static std::vector<GLuint> uniforms;
+    static GLuint Program;
+public:
+    static void setUniforms(const Args & ... args)
+    {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
+        ::template setUniformsHelper(uniforms, args...);
+    }
+};
+
+template<typename... Args> std::vector<GLuint> ShaderHelper<Args...>::uniforms;
+template<typename... Args> GLuint ShaderHelper<Args...>::Program;
+
 namespace MeshShader
 {
-class ObjectPass1Shader
+class ObjectPass1Shader : public ShaderHelper<core::matrix4, core::matrix4>
 {
 public:
     static GLuint Program;
-    static GLuint uniform_MM, uniform_IMM;
     static GLuint TU_tex;
 
     static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix);
 };
 
 class ObjectRefPass1Shader

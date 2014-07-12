@@ -394,7 +394,7 @@ void Shaders::check(const int num) const
     }
 }
 
-static void bypassUBO(GLint Program)
+void bypassUBO(GLuint Program)
 {
     GLint VM = glGetUniformLocation(Program, "ViewMatrix");
     glUniformMatrix4fv(VM, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
@@ -455,13 +455,20 @@ AssignTextureUnit(GLuint Program, const std::vector<std::pair<GLuint, const char
     glUseProgram(0);
 }
 
+static void
+AssignUniforms(GLuint Program, std::vector<GLuint> &uniforms, const std::vector<const char*> &name)
+{
+    for (unsigned i = 0; i < name.size(); i++)
+    {
+        uniforms.push_back(glGetUniformLocation(Program, name[i]));
+    }
+}
+
 namespace MeshShader
 {
 
     // Solid Normal and depth pass shaders
     GLuint ObjectPass1Shader::Program;
-    GLuint ObjectPass1Shader::uniform_MM;
-    GLuint ObjectPass1Shader::uniform_IMM;
     GLuint ObjectPass1Shader::TU_tex;
 
     void ObjectPass1Shader::init()
@@ -470,8 +477,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
+        AssignUniforms(Program, uniforms, {"ModelMatrix", "InverseModelMatrix"});
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -479,14 +485,6 @@ namespace MeshShader
         }
         TU_tex = 0;
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
-    }
-
-    void ObjectPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
     }
 
     GLuint ObjectRefPass1Shader::Program;
@@ -517,9 +515,7 @@ namespace MeshShader
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-        glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
+        setUniformsHelper({ uniform_MM, uniform_TM, uniform_IMM }, ModelMatrix, InverseModelMatrix, TextureMatrix);
     }
 
     GLuint GrassPass1Shader::Program;
