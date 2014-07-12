@@ -325,9 +325,9 @@ void Shaders::loadShaders()
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
     MeshShader::ColorizeShader::init();
-    MeshShader::NormalMapShader::init();
-    MeshShader::ObjectPass1Shader::init();
-    MeshShader::ObjectRefPass1Shader::init();
+    MeshShader::NormalMapShaderInstance = new MeshShader::NormalMapShader();
+    MeshShader::ObjectPass1ShaderInstance = new MeshShader::ObjectPass1Shader();
+    MeshShader::ObjectRefPass1ShaderInstance = new MeshShader::ObjectRefPass1Shader();
     MeshShader::InstancedObjectPass1Shader::init();
     MeshShader::InstancedObjectRefPass1Shader::init();
     MeshShader::InstancedGrassPass1Shader::init();
@@ -468,10 +468,7 @@ namespace MeshShader
 {
 
     // Solid Normal and depth pass shaders
-    GLuint ObjectPass1Shader::Program;
-    GLuint ObjectPass1Shader::TU_tex;
-
-    void ObjectPass1Shader::init()
+    ObjectPass1Shader::ObjectPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
@@ -486,22 +483,15 @@ namespace MeshShader
         TU_tex = 0;
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
+    ObjectPass1Shader *ObjectPass1ShaderInstance;
 
-    GLuint ObjectRefPass1Shader::Program;
-    GLuint ObjectRefPass1Shader::uniform_MM;
-    GLuint ObjectRefPass1Shader::uniform_IMM;
-    GLuint ObjectRefPass1Shader::uniform_TM;
-    GLuint ObjectRefPass1Shader::TU_tex;
-
-    void ObjectRefPass1Shader::init()
+    ObjectRefPass1Shader::ObjectRefPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
-        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "InverseModelMatrix", "TextureMatrix" });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -510,13 +500,7 @@ namespace MeshShader
         TU_tex = 0;
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
-
-    void ObjectRefPass1Shader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        setUniformsHelper({ uniform_MM, uniform_TM, uniform_IMM }, ModelMatrix, InverseModelMatrix, TextureMatrix);
-    }
+    ObjectRefPass1Shader *ObjectRefPass1ShaderInstance;
 
     GLuint GrassPass1Shader::Program;
     GLuint GrassPass1Shader::uniform_MVP;
@@ -544,20 +528,13 @@ namespace MeshShader
         glUniform1i(uniform_tex, TU_tex);
     }
 
-    GLuint NormalMapShader::Program;
-    GLuint NormalMapShader::uniform_MM;
-    GLuint NormalMapShader::uniform_IMM;
-    GLuint NormalMapShader::TU_normalmap;
-    GLuint NormalMapShader::TU_glossy;
-
-    void NormalMapShader::init()
+    NormalMapShader::NormalMapShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/normalmap.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
+        AssignUniforms(Program, uniforms, {"ModelMatrix", "InverseModelMatrix"});
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -567,14 +544,7 @@ namespace MeshShader
         TU_glossy = 0;
         AssignTextureUnit(Program, { { TU_normalmap, "normalMap" }, { TU_glossy, "DiffuseForAlpha" } });
     }
-
-    void NormalMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
-    }
+    NormalMapShader *NormalMapShaderInstance;
 
     GLuint InstancedObjectPass1Shader::Program;
     GLuint InstancedObjectPass1Shader::uniform_tex;

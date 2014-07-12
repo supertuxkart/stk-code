@@ -131,6 +131,18 @@ void draw(const GLMesh *mesh, uniforms... Args)
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
 }
 
+template<typename T, typename...uniforms>
+void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh->PrimitiveType;
+    GLenum itype = mesh->IndexType;
+    size_t count = mesh->IndexCount;
+
+    Shader->setUniforms(Args...);
+    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
+}
+
 void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir);
 
 // Pass 2 shader (ie shaders that outputs final color)

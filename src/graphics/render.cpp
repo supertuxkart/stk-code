@@ -529,10 +529,36 @@ void IrrDriver::computeSunVisibility()
     }
 }
 
-template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
-void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+template<unsigned N>
+struct unroll_args_instance
 {
-    glUseProgram(Shader::Program);
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    {
+        unroll_args_instance<N - 1>::template exec<T>(Shader, t, std::get<N - 1>(t), args...);
+    }
+};
+
+template<>
+struct unroll_args_instance<0>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    {
+        draw<T>(Shader, args...);
+    }
+};
+
+template<typename T, typename... TupleType>
+void apply_instance(const T *Shader, const std::tuple<TupleType...> &arg)
+{
+    unroll_args_instance<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<T>(Shader, arg);
+}
+
+template<typename T, enum E_VERTEX_TYPE VertexType, typename... TupleType>
+void renderMeshes1stPass(const T *Shader, const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+{
+    glUseProgram(Shader->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
@@ -551,7 +577,7 @@ void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<std::t
 #endif
             continue;
         }
-        apply<Shader>(meshes[i]);
+        apply_instance(Shader, meshes[i]);
     }
 }
 
@@ -579,10 +605,10 @@ void IrrDriver::renderSolidFirstPass()
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD>({ MeshShader::ObjectPass1Shader::TU_tex }, ListDefaultStandardG::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS>({ MeshShader::ObjectPass1Shader::TU_tex }, ListDefault2TCoordG::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD>({ MeshShader::ObjectRefPass1Shader::TU_tex }, ListAlphaRefG::Arguments);
-        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS>({ MeshShader::NormalMapShader::TU_glossy, MeshShader::NormalMapShader::TU_normalmap }, ListNormalG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD>(MeshShader::ObjectPass1ShaderInstance, { MeshShader::ObjectPass1ShaderInstance->TU_tex }, ListDefaultStandardG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS>(MeshShader::ObjectPass1ShaderInstance, { MeshShader::ObjectPass1ShaderInstance->TU_tex }, ListDefault2TCoordG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD>(MeshShader::ObjectRefPass1ShaderInstance, { MeshShader::ObjectRefPass1ShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
+        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS>(MeshShader::NormalMapShaderInstance, { MeshShader::NormalMapShaderInstance->TU_glossy, MeshShader::NormalMapShaderInstance->TU_normalmap }, ListNormalG::Arguments);
     }
 }
 

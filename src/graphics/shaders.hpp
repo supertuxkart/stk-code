@@ -68,10 +68,11 @@ template<typename... Args>
 class ShaderHelper
 {
 protected:
-    static std::vector<GLuint> uniforms;
-    static GLuint Program;
+    std::vector<GLuint> uniforms;
 public:
-    static void setUniforms(const Args & ... args)
+    GLuint Program;
+
+    void setUniforms(const Args & ... args) const
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
@@ -79,30 +80,26 @@ public:
     }
 };
 
-template<typename... Args> std::vector<GLuint> ShaderHelper<Args...>::uniforms;
-template<typename... Args> GLuint ShaderHelper<Args...>::Program;
-
 namespace MeshShader
 {
 class ObjectPass1Shader : public ShaderHelper<core::matrix4, core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint TU_tex;
-
-    static void init();
+    GLuint TU_tex;
+    ObjectPass1Shader();
 };
 
-class ObjectRefPass1Shader
+extern ObjectPass1Shader *ObjectPass1ShaderInstance;
+
+
+class ObjectRefPass1Shader : public ShaderHelper<core::matrix4, core::matrix4, core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_TM, uniform_IMM;
-    static GLuint TU_tex;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const core::matrix4 &TextureMatrix);
+    GLuint TU_tex;
+    ObjectRefPass1Shader();
 };
+
+extern ObjectRefPass1Shader *ObjectRefPass1ShaderInstance;
 
 class GrassPass1Shader
 {
@@ -114,16 +111,14 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::vector3df &windDirection, unsigned TU_tex);
 };
 
-class NormalMapShader
+class NormalMapShader : public ShaderHelper<core::matrix4, core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_IMM;
-    static GLuint TU_normalmap, TU_glossy;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix);
+    GLuint TU_normalmap, TU_glossy;
+    NormalMapShader();
 };
+
+extern NormalMapShader *NormalMapShaderInstance;
 
 class InstancedObjectPass1Shader
 {
