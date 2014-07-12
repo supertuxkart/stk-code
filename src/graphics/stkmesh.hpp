@@ -158,6 +158,12 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
+class ListSplattingSM
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+};
+
 class ListUnlitSM
 {
 public:
@@ -216,7 +222,6 @@ std::vector<core::matrix4> GroupedSM<T>::MVPSet;
 template<enum ShadedMaterial T>
 std::vector<core::matrix4> GroupedSM<T>::TIMVSet;
 
-void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
 
 template<enum TransparentMaterial T>

@@ -651,7 +651,7 @@ void IrrDriver::renderSolidSecondPass()
     ListSphereMapSM::Arguments.clear();
     ListUnlitSM::Arguments.clear();
     ListDetailSM::Arguments.clear();
-    GroupedSM<SM_SPLATTING>::reset();
+    ListSplattingSM::Arguments.clear();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
@@ -667,11 +667,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>({ MeshShader::SphereMapShader::TU_tex }, ListSphereMapSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD>({ MeshShader::ObjectUnlitShader::TU_tex }, ListUnlitSM::Arguments);
         renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS>({ MeshShader::DetailledObjectPass2Shader::TU_Albedo, MeshShader::DetailledObjectPass2Shader::TU_detail }, ListDetailSM::Arguments);
-
-        glUseProgram(MeshShader::SplattingShader::Program);
-        glBindVertexArray(getVAO(EVT_2TCOORDS));
-        for (unsigned i = 0; i < GroupedSM<SM_SPLATTING>::MeshSet.size(); i++)
-            drawSplatting(*GroupedSM<SM_SPLATTING>::MeshSet[i], GroupedSM<SM_SPLATTING>::MVPSet[i]);
+        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS>({ 8, MeshShader::SplattingShader::TU_tex_layout, MeshShader::SplattingShader::TU_tex_detail0, MeshShader::SplattingShader::TU_tex_detail1, MeshShader::SplattingShader::TU_tex_detail2, MeshShader::SplattingShader::TU_tex_detail3 }, ListSplattingSM::Arguments);
     }
 }
 

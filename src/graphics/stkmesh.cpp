@@ -273,85 +273,6 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
-
-void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    // Texlayout
-    compressTexture(mesh.textures[1], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_layout, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    //Tex detail0
-    compressTexture(mesh.textures[2], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_detail0, getTextureGLuint(mesh.textures[2]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    //Tex detail1
-    compressTexture(mesh.textures[3], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_detail1, getTextureGLuint(mesh.textures[3]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    compressTexture(mesh.textures[4], true);
-    //Tex detail2
-    setTexture(MeshShader::SplattingShader::TU_tex_detail2, getTextureGLuint(mesh.textures[4]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    //Tex detail3
-    compressTexture(mesh.textures[5], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_detail3, getTextureGLuint(mesh.textures[5]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
-
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
 {
     irr_driver->IncreaseObjectCount();
@@ -451,6 +372,7 @@ std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Ar
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultTangentSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAlphaRefSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4> > ListSplattingSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListDetailSM::Arguments;
