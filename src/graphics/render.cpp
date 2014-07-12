@@ -910,6 +910,29 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     delete []tmp;
 }
 
+template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... Args>
+void drawShadow(const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+{
+    glUseProgram(Shader::Program);
+    glBindVertexArray(getVAO(VertexType));
+    for (unsigned i = 0; i < t.size(); i++)
+    {
+        const GLMesh *mesh = std::get<0>(t[i]);
+        irr_driver->IncreaseObjectCount();
+        GLenum ptype = mesh->PrimitiveType;
+        GLenum itype = mesh->IndexType;
+        size_t count = mesh->IndexCount;
+        for (unsigned j = 0; j < TextureUnits.size(); j++)
+        {
+            compressTexture(mesh->textures[j], true);
+            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        }
+
+        Shader::setUniforms(std::get<1>(t[i]));
+        glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
+    }
+}
+
 void IrrDriver::renderShadows()
 {
     irr_driver->setPhase(SHADOW_PASS);
@@ -924,21 +947,10 @@ void IrrDriver::renderShadows()
 
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-    glUseProgram(MeshShader::ShadowShader::Program);
-    glBindVertexArray(getVAO(EVT_STANDARD));
-    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.size(); ++i)
-        drawShadow(*GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet[i], GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet[i]);
-    glBindVertexArray(getVAO(EVT_2TCOORDS));
-    for (unsigned i = 0; i < GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.size(); ++i)
-        drawShadow(*GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet[i], GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet[i]);
-    glBindVertexArray(getVAO(EVT_TANGENTS));
-    for (unsigned i = 0; i < GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet.size(); ++i)
-        drawShadow(*GroupedFPSM<FPSM_NORMAL_MAP>::MeshSet[i], GroupedFPSM<FPSM_NORMAL_MAP>::MVPSet[i]);
-
-    glUseProgram(MeshShader::RefShadowShader::Program);
-    glBindVertexArray(getVAO(EVT_STANDARD));
-    for (unsigned i = 0; i < GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.size(); ++i)
-        drawShadowRef(*GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet[i], GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet[i]);
+    drawShadow<MeshShader::ShadowShader, EVT_STANDARD>({}, ListDefaultStandardG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS>({}, ListDefault2TCoordG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS>({}, ListNormalG::Arguments);
+    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD>({ MeshShader::RefShadowShader::TU_tex }, ListAlphaRefG::Arguments);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 

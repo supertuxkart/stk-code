@@ -219,10 +219,6 @@ std::vector<core::matrix4> GroupedSM<T>::TIMVSet;
 void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir);
 
-// Shadow pass
-void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
-void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix);
-
 template<enum TransparentMaterial T>
 class TransparentMeshes
 {

@@ -1254,7 +1254,7 @@ namespace MeshShader
 
     GLuint RefShadowShader::Program;
     GLuint RefShadowShader::uniform_MM;
-    GLuint RefShadowShader::uniform_tex;
+    GLuint RefShadowShader::TU_tex;
 
     void RefShadowShader::init()
     {
@@ -1274,16 +1274,16 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        uniform_tex = glGetUniformLocation(Program, "tex");
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void RefShadowShader::setUniforms(const core::matrix4 &ModelMatrix, unsigned TU_tex)
+    void RefShadowShader::setUniforms(const core::matrix4 &ModelMatrix)
     {
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint InstancedRefShadowShader::Program;

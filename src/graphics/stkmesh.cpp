@@ -396,30 +396,6 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
-void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, 4, mesh.vaoBaseVertex);
-}
-
-void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    MeshShader::ShadowShader::setUniforms(ModelMatrix);
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *) mesh.vaoOffset, 4, mesh.vaoBaseVertex);
-}
-
 bool isObject(video::E_MATERIAL_TYPE type)
 {
     if (type == irr_driver->getShader(ES_OBJECTPASS))
