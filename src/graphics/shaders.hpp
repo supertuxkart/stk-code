@@ -59,7 +59,7 @@ void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 
 #define GL_FALSE 0
 #endif
     glUniformMatrix4fv(uniforms[N], 1, GL_FALSE, mat.pointer());
-    ::template setUniformsHelper<N + 1>(uniforms, arg...);
+    setUniformsHelper<N + 1>(uniforms, arg...);
 }
 
 void bypassUBO(GLuint Program);
@@ -76,7 +76,7 @@ public:
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
-        ::template setUniformsHelper(uniforms, args...);
+        setUniformsHelper(uniforms, args...);
     }
 };
 
