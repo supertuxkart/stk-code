@@ -336,7 +336,6 @@ void Shaders::loadShaders()
     MeshShader::InstancedObjectRefPass2Shader::init();
     MeshShader::InstancedGrassPass2Shader::init();
     MeshShader::DetailledObjectPass2Shader::init();
-    MeshShader::UntexturedObjectShader::init();
     MeshShader::ObjectRefPass2Shader::init();
     MeshShader::ObjectUnlitShader::init();
     MeshShader::SphereMapShader::init();
@@ -864,44 +863,6 @@ namespace MeshShader
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
     }
-
-    GLuint UntexturedObjectShader::Program;
-    GLuint UntexturedObjectShader::uniform_MM;
-    GLuint UntexturedObjectShader::uniform_ambient;
-
-    void UntexturedObjectShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/untextured_object.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        GLuint uniform_DiffuseMap = glGetUniformLocation(Program, "DiffuseMap");
-        GLuint uniform_SpecularMap = glGetUniformLocation(Program, "SpecularMap");
-        GLuint uniform_SSAO = glGetUniformLocation(Program, "SSAO");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
-        if (!UserConfigParams::m_ubo_disabled)
-        {
-            GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-            glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-        }
-
-        glUseProgram(Program);
-        glUniform1i(uniform_DiffuseMap, 0);
-        glUniform1i(uniform_SpecularMap, 1);
-        glUniform1i(uniform_SSAO, 2);
-        glUseProgram(0);
-    }
-
-    void UntexturedObjectShader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-        glUniform3f(uniform_ambient, s.r, s.g, s.b);
-    }
-
 
     GLuint ObjectRefPass2Shader::Program;
     GLuint ObjectRefPass2Shader::uniform_MM;

@@ -222,6 +222,8 @@ void STKMeshSceneNode::updatevbo()
     }
 }
 
+static video::ITexture *spareWhiteTex = 0;
+
 void STKMeshSceneNode::render()
 {
     irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
@@ -310,7 +312,9 @@ void STKMeshSceneNode::render()
         if (immediate_draw)
         {
             glDisable(GL_CULL_FACE);
-            glUseProgram(MeshShader::UntexturedObjectShader::Program);
+            if (!spareWhiteTex)
+                spareWhiteTex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            glUseProgram(MeshShader::ObjectPass2Shader::Program);
             // Only untextured
             for (unsigned i = 0; i < GLmeshes.size(); i++)
             {
@@ -320,7 +324,8 @@ void STKMeshSceneNode::render()
                 GLenum itype = mesh.IndexType;
                 size_t count = mesh.IndexCount;
 
-                MeshShader::UntexturedObjectShader::setUniforms(AbsoluteTransformation);
+                setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
+                MeshShader::ObjectPass2Shader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
                 glDrawElements(ptype, count, itype, 0);

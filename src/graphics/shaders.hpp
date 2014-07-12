@@ -166,16 +166,6 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
-class UntexturedObjectShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_ambient;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
-};
-
 class ObjectUnlitShader
 {
 public:
