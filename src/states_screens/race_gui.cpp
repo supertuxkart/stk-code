@@ -63,9 +63,9 @@ RaceGUI::RaceGUI()
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
-    m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_marker_ai_size        = (int)( 14.0f * scaling);
-    m_marker_player_size    = (int)( 16.0f * scaling);
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_ai_size       = (int)( 14.0f * scaling);
+    m_minimap_player_size   = (int)( 16.0f * scaling);
     m_map_width             = (int)(100.0f * scaling);
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
@@ -87,7 +87,7 @@ RaceGUI::RaceGUI()
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    createMarkerTexture();
+    //createMarkerTexture();
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
@@ -238,15 +238,17 @@ void RaceGUI::drawScores()
     irr::video::ITexture *team_icon;
 
     int numLeader = 1;
-    for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
+    for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++)
+    {
         int j = soccerWorld->getTeamLeader(i);
         if(j < 0) break;
 
-        core::rect<s32> source(j*m_marker_rendered_size, 0,
-            (j+1)*m_marker_rendered_size,m_marker_rendered_size);
+        AbstractKart* kart = soccerWorld->getKart(i);
+        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         core::recti position(offsetX, offsetY,
-            offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
-        draw2DImage(m_marker, position, source,
+            offsetX + 2*m_minimap_player_size, offsetY + 2*m_minimap_player_size);
+        draw2DImage(icon, position, source,
             NULL, NULL, true);
         core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
         int string_height =
@@ -265,8 +267,8 @@ void RaceGUI::drawScores()
             default: break;
         }
         core::rect<s32> indicatorPos(offsetX, offsetY,
-                                     offsetX + (int)(m_marker_player_size/1.25f),
-                                     offsetY + (int)(m_marker_player_size/1.25f));
+                                     offsetX + (int)(m_minimap_player_size/1.25f),
+                                     offsetY + (int)(m_minimap_player_size/1.25f));
         core::rect<s32> sourceRect(core::position2d<s32>(0,0),
                                                    team_icon->getOriginalSize());
         draw2DImage(team_icon,indicatorPos,sourceRect,
@@ -373,20 +375,19 @@ void RaceGUI::drawGlobalMiniMap()
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+
+        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+
         // int marker_height = m_marker->getOriginalSize().Height;
-        core::rect<s32> source(i    *m_marker_rendered_size,
-                               0,
-                               (i+1)*m_marker_rendered_size,
-                               m_marker_rendered_size);
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         int marker_half_size = (kart->getController()->isPlayerController()
-                                ? m_marker_player_size
-                                : m_marker_ai_size                        )>>1;
+                                ? m_minimap_player_size
+                                : m_minimap_ai_size                        )>>1;
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size),
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
-        draw2DImage(m_marker, position, source,
-                                                  NULL, NULL, true);
+        draw2DImage(icon, position, source, NULL, NULL, true);
     }   // for i<getNumKarts
 }   // drawGlobalMiniMap
 
