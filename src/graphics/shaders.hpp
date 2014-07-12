@@ -20,6 +20,7 @@
 #include <IShaderConstantSetCallBack.h>
 #include <IMeshSceneNode.h>
 #include <vector>
+#include "config/user_config.hpp"
 
 typedef unsigned int    GLuint;
 using namespace irr;
