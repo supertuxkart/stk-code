@@ -53,32 +53,6 @@
 #define MAX2(a, b) ((a) > (b) ? (a) : (b))
 #define MIN2(a, b) ((a) > (b) ? (b) : (a))
 
-template<unsigned N>
-struct unroll_args
-{
-    template<typename Shader, typename ...TupleTypes, typename ...Args>
-    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
-    {
-        unroll_args<N - 1>::template exec<Shader>(t, std::get<N - 1>(t), args...);
-    }
-};
-
-template<>
-struct unroll_args<0>
-{
-    template<typename Shader, typename ...TupleTypes, typename ...Args>
-    static void exec(const std::tuple<TupleTypes...> &t, Args... args)
-    {
-        draw<Shader>(args...);
-    }
-};
-
-template<typename Shader, typename... TupleType>
-void apply(const std::tuple<TupleType...> &arg)
-{
-    unroll_args<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<Shader>(arg);
-}
-
 void IrrDriver::renderGLSL(float dt)
 {
     World *world = World::getWorld(); // Never NULL.
