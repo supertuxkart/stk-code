@@ -375,7 +375,7 @@ std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> >
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListSplattingSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4> > ListDetailSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > ListDetailSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > ListBlendTransparentFog::Arguments;

@@ -194,16 +194,15 @@ public:
     static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
 };
 
-class DetailledObjectPass2Shader
+class DetailledObjectPass2Shader : public ShaderHelper<core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_ambient;
-    static GLuint TU_Albedo, TU_detail;
+    GLuint TU_Albedo, TU_detail;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    DetailledObjectPass2Shader();
 };
+
+extern DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
 
 class ObjectUnlitShader
 {
@@ -248,16 +247,15 @@ public:
     static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir);
 };
 
-class SphereMapShader
+class SphereMapShader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_IMM, uniform_ambient;
-    static GLuint TU_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const video::SColorf &ambient);
+    SphereMapShader();
 };
+
+extern SphereMapShader *SphereMapShaderInstance;
 
 class SplattingShader
 {

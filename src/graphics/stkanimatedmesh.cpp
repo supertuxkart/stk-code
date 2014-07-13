@@ -176,7 +176,7 @@ void STKAnimatedMesh::render()
             ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
-            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
+            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
 
         return;
     }

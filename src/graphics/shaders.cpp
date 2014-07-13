@@ -335,10 +335,10 @@ void Shaders::loadShaders()
     MeshShader::InstancedObjectPass2Shader::init();
     MeshShader::InstancedObjectRefPass2Shader::init();
     MeshShader::InstancedGrassPass2Shader::init();
-    MeshShader::DetailledObjectPass2Shader::init();
+    MeshShader::DetailledObjectPass2ShaderInstance = new MeshShader::DetailledObjectPass2Shader();
     MeshShader::ObjectRefPass2ShaderInstance = new MeshShader::ObjectRefPass2Shader();
     MeshShader::ObjectUnlitShader::init();
-    MeshShader::SphereMapShader::init();
+    MeshShader::SphereMapShaderInstance = new MeshShader::SphereMapShader();
     MeshShader::SplattingShader::init();
     MeshShader::GrassPass1Shader::init();
     MeshShader::GrassPass2Shader::init();
@@ -720,20 +720,13 @@ namespace MeshShader
         glUniform3f(uniform_ambient, s.r, s.g, s.b);
     }
 
-    GLuint DetailledObjectPass2Shader::Program;
-    GLuint DetailledObjectPass2Shader::uniform_MM;
-    GLuint DetailledObjectPass2Shader::uniform_ambient;
-    GLuint DetailledObjectPass2Shader::TU_Albedo;
-    GLuint DetailledObjectPass2Shader::TU_detail;
-
-    void DetailledObjectPass2Shader::init()
+    DetailledObjectPass2Shader::DetailledObjectPass2Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/detailledobject_pass2.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "ambient" });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         TU_Albedo = 3;
@@ -742,14 +735,7 @@ namespace MeshShader
         AssignTextureUnit(Program, { { 0, "DiffuseMap" }, { 1, "SpecularMap" }, { 2, "SSAO" }, { TU_Albedo, "Albedo" }, { TU_detail, "Detail" } });
     }
 
-    void DetailledObjectPass2Shader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-        glUniform3f(uniform_ambient, s.r, s.g, s.b);
-    }
+    DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
 
     GLuint ObjectUnlitShader::Program;
     GLuint ObjectUnlitShader::uniform_MM;
@@ -874,22 +860,15 @@ namespace MeshShader
         glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
     }
 
-    GLuint SphereMapShader::Program;
-    GLuint SphereMapShader::uniform_MM;
-    GLuint SphereMapShader::uniform_IMM;
-    GLuint SphereMapShader::uniform_ambient;
-    GLuint SphereMapShader::TU_tex;
 
-    void SphereMapShader::init()
+    SphereMapShader::SphereMapShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectpass_spheremap.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_IMM = glGetUniformLocation(Program, "InverseModelMatrix");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "InverseModelMatrix", "ambient" });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -900,14 +879,7 @@ namespace MeshShader
         AssignTextureUnit(Program, { { 0, "DiffuseMap" }, { 1, "SpecularMap" }, { 2, "SSAO" }, { TU_tex, "tex" } });
     }
 
-    void SphereMapShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &InverseModelMatrix, const SColorf &ambient)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_IMM, 1, GL_FALSE, InverseModelMatrix.pointer());
-        glUniform3f(uniform_ambient, ambient.r, ambient.g, ambient.b);
-    }
+    SphereMapShader *SphereMapShaderInstance;
 
     GLuint SplattingShader::Program;
     GLuint SplattingShader::uniform_MM;

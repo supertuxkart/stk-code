@@ -690,9 +690,9 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(MeshShader::ObjectPass2ShaderInstance, { MeshShader::ObjectPass2ShaderInstance->TU_Albedo }, ListDefaultStandardSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(MeshShader::ObjectPass2ShaderInstance, { MeshShader::ObjectPass2ShaderInstance->TU_Albedo }, ListDefaultTangentSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(MeshShader::ObjectRefPass2ShaderInstance, { MeshShader::ObjectRefPass2ShaderInstance->TU_Albedo }, ListAlphaRefSM::Arguments);
-//        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>({ MeshShader::SphereMapShader::TU_tex }, ListSphereMapSM::Arguments);
+        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>(MeshShader::SphereMapShaderInstance, { MeshShader::SphereMapShaderInstance->TU_tex }, ListSphereMapSM::Arguments);
 //        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD>({ MeshShader::ObjectUnlitShader::TU_tex }, ListUnlitSM::Arguments);
-//        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS>({ MeshShader::DetailledObjectPass2Shader::TU_Albedo, MeshShader::DetailledObjectPass2Shader::TU_detail }, ListDetailSM::Arguments);
+        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS>(MeshShader::DetailledObjectPass2ShaderInstance, { MeshShader::DetailledObjectPass2ShaderInstance->TU_Albedo, MeshShader::DetailledObjectPass2ShaderInstance->TU_detail }, ListDetailSM::Arguments);
 //        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS>({ 8, MeshShader::SplattingShader::TU_tex_layout, MeshShader::SplattingShader::TU_tex_detail0, MeshShader::SplattingShader::TU_tex_detail1, MeshShader::SplattingShader::TU_tex_detail2, MeshShader::SplattingShader::TU_tex_detail3 }, ListSplattingSM::Arguments);
     }
 }
