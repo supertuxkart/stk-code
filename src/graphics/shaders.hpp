@@ -48,40 +48,42 @@ public:
 };
 }
 
-template<unsigned N>
-void setUniformsHelper(const std::vector<GLuint> &uniforms)
-{
-}
-
 void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
+void glUniform3fWraper(GLuint, float, float, float);
+void glUniform1fWrapper(GLuint, float);
 
-template<unsigned N = 0, typename... Args>
-void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 &mat, Args... arg)
+struct UniformHelper
 {
+    template<unsigned N>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms)
+    {
+    }
+
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 &mat, Args... arg)
+    {
 #ifndef GL_FALSE
 #define GL_FALSE 0
 #endif
-    glUniformMatrix4fvWraper(uniforms[N], 1, GL_FALSE, mat.pointer());
-    setUniformsHelper<N + 1>(uniforms, arg...);
-}
+        glUniformMatrix4fvWraper(uniforms[N], 1, GL_FALSE, mat.pointer());
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
 
-void glUniform3fWraper(GLuint, float, float, float);
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf &col, Args... arg)
+    {
+        glUniform3fWraper(uniforms[N], col.r, col.g, col.b);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
 
-template<unsigned N = 0, typename... Args>
-void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf &col, Args... arg)
-{
-    glUniform3fWraper(uniforms[N], col.r, col.g, col.b);
-    setUniformsHelper<N + 1>(uniforms, arg...);
-}
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
+    {
+        glUniform1fWrapper(uniforms[N], f);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
 
-void glUniform1fWrapper(GLuint, float);
-
-template<unsigned N = 0, typename... Args>
-void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
-{
-    glUniform1fWrapper(uniforms[N], f);
-    setUniformsHelper<N + 1>(uniforms, arg...);
-}
+};
 
 void bypassUBO(GLuint Program);
 
@@ -97,7 +99,7 @@ public:
     {
         if (UserConfigParams::m_ubo_disabled)
             bypassUBO(Program);
-        setUniformsHelper(uniforms, args...);
+        UniformHelper::setUniformsHelper(uniforms, args...);
     }
 };
 
