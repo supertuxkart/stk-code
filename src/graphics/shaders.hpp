@@ -65,12 +65,12 @@ void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 
     setUniformsHelper<N + 1>(uniforms, arg...);
 }
 
-void glUniform3fWraper(GLuint, size_t, unsigned, const float *mat);
+void glUniform3fWraper(GLuint, float, float, float);
 
 template<unsigned N = 0, typename... Args>
 void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf &col, Args... arg)
 {
-    glUniform3f(uniforms[N], col.r, col.g, col.b);
+    glUniform3fWraper(uniforms[N], col.r, col.g, col.b);
     setUniformsHelper<N + 1>(uniforms, arg...);
 }
 

@@ -469,6 +469,11 @@ void glUniformMatrix4fvWraper(GLuint a, size_t b, unsigned c, const float *d)
     glUniformMatrix4fv(a, b, c, d);
 }
 
+void glUniform3fWraper(GLuint a, float b, float c, float d)
+{
+    glUniform3f(a, b, c, d);
+}
+
 namespace MeshShader
 {
 
