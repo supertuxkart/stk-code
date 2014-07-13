@@ -354,7 +354,7 @@ void Shaders::loadShaders()
     MeshShader::InstancedShadowShader::init();
     MeshShader::RefShadowShaderInstance = new MeshShader::RefShadowShader();
     MeshShader::InstancedRefShadowShader::init();
-    MeshShader::GrassShadowShader::init();
+    MeshShader::GrassShadowShaderInstance = new MeshShader::GrassShadowShader();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     ParticleShader::FlipParticleRender::init();
@@ -1130,30 +1130,33 @@ namespace MeshShader
         glUniform1i(uniform_tex, TU_tex);
     }
 
-    GLuint GrassShadowShader::Program;
-    GLuint GrassShadowShader::uniform_MVP;
-    GLuint GrassShadowShader::uniform_tex;
-    GLuint GrassShadowShader::uniform_windDir;
-
-    void GrassShadowShader::init()
+    GrassShadowShader::GrassShadowShader()
     {
-        return;
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_windDir = glGetUniformLocation(Program, "windDir");
+        // Geometry shader needed
+        if (irr_driver->getGLSLVersion() < 150)
+            return;
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/shadow_grass.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "windDir" });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        TU_tex = 0;
+
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void GrassShadowShader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
-    }
+    GrassShadowShader *GrassShadowShaderInstance;
 
     GLuint DisplaceMaskShader::Program;
     GLuint DisplaceMaskShader::uniform_MVP;

@@ -383,15 +383,14 @@ public:
     static void setUniforms(unsigned TU_tex);
 };
 
-class GrassShadowShader
+class GrassShadowShader : public ShaderHelper<core::matrix4, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_tex, uniform_windDir;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection, unsigned TU_tex);
+    GLuint TU_tex;
+    GrassShadowShader();
 };
+
+extern GrassShadowShader *GrassShadowShaderInstance;
 
 class DisplaceMaskShader
 {
