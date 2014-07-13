@@ -391,7 +391,7 @@ void STKMeshSceneNode::render()
 
             if (World::getWorld() && World::getWorld()->isFogEnabled())
             {
-                glUseProgram(MeshShader::TransparentFogShader::Program);
+                glUseProgram(MeshShader::TransparentFogShaderInstance->Program);
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     GLMesh &mesh = GLmeshes[i];
@@ -410,13 +410,13 @@ void STKMeshSceneNode::render()
                     const float end = track->getFogEnd();
                     const video::SColor tmpcol = track->getFogColor();
 
-                    core::vector3df col(tmpcol.getRed() / 255.0f,
+                    video::SColorf col(tmpcol.getRed() / 255.0f,
                         tmpcol.getGreen() / 255.0f,
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
                     setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-                    MeshShader::TransparentFogShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition());
+                    MeshShader::TransparentFogShaderInstance->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col);
 
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
@@ -426,7 +426,7 @@ void STKMeshSceneNode::render()
             }
             else
             {
-                glUseProgram(MeshShader::TransparentShader::Program);
+                glUseProgram(MeshShader::TransparentShaderInstance->Program);
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     irr_driver->IncreaseObjectCount();
@@ -436,9 +436,9 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    setTexture(MeshShader::TransparentShader::TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    setTexture(MeshShader::TransparentShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-                    MeshShader::TransparentShader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
+                    MeshShader::TransparentShaderInstance->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
                     glDrawElements(ptype, count, itype, 0);
@@ -462,20 +462,18 @@ void STKMeshSceneNode::render()
             const float end = track->getFogEnd();
             const video::SColor tmpcol = track->getFogColor();
 
-            core::vector3df col(tmpcol.getRed() / 255.0f,
+            video::SColorf col(tmpcol.getRed() / 255.0f,
                 tmpcol.getGreen() / 255.0f,
                 tmpcol.getBlue() / 255.0f);
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
                 ListBlendTransparentFog::Arguments.push_back(
                     std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col,
-                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+                                    fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 ListAdditiveTransparentFog::Arguments.push_back(
                     std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col,
-                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+                                    fogmax, startH, endH, start, end, col));
         }
         else
         {

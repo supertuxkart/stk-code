@@ -74,6 +74,15 @@ void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf
     setUniformsHelper<N + 1>(uniforms, arg...);
 }
 
+void glUniform1fWrapper(GLuint, float);
+
+template<unsigned N = 0, typename... Args>
+void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
+{
+    glUniform1fWrapper(uniforms[N], f);
+    setUniformsHelper<N + 1>(uniforms, arg...);
+}
+
 void bypassUBO(GLuint Program);
 
 template<typename... Args>
@@ -277,27 +286,25 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency);
 };
 
-class TransparentShader
+class TransparentShader : public ShaderHelper<core::matrix4, core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_TM;
-    static GLuint TU_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix);
+    TransparentShader();
 };
 
-class TransparentFogShader
+extern TransparentShader *TransparentShaderInstance;
+
+class TransparentFogShader : public ShaderHelper<core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_TM, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
-    static GLuint TU_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos);
+    TransparentFogShader();
 };
+
+extern TransparentFogShader *TransparentFogShaderInstance;
 
 class BillboardShader
 {

@@ -201,20 +201,18 @@ void STKAnimatedMesh::render()
             const float end = track->getFogEnd();
             const video::SColor tmpcol = track->getFogColor();
 
-            core::vector3df col(tmpcol.getRed() / 255.0f,
+            video::SColorf col(tmpcol.getRed() / 255.0f,
                 tmpcol.getGreen() / 255.0f,
                 tmpcol.getBlue() / 255.0f);
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
                 ListBlendTransparentFog::Arguments.push_back(
                     std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col,
-                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+                                    fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 ListAdditiveTransparentFog::Arguments.push_back(
                     std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col,
-                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+                                    fogmax, startH, endH, start, end, col));
         }
         else
         {

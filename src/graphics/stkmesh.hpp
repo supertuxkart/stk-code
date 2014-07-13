@@ -203,13 +203,13 @@ public:
 class ListBlendTransparentFog
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > Arguments;
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
 };
 
 class ListAdditiveTransparentFog
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, core::vector3df, core::vector3df> > Arguments;
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
 };
 
 template<enum ShadedMaterial T>

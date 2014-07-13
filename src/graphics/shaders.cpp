@@ -343,8 +343,8 @@ void Shaders::loadShaders()
     MeshShader::GrassPass1Shader::init();
     MeshShader::GrassPass2Shader::init();
     MeshShader::BubbleShader::init();
-    MeshShader::TransparentShader::init();
-    MeshShader::TransparentFogShader::init();
+    MeshShader::TransparentShaderInstance = new MeshShader::TransparentShader();
+    MeshShader::TransparentFogShaderInstance = new MeshShader::TransparentFogShader();
     MeshShader::BillboardShader::init();
     LightShader::PointLightShader::init();
     MeshShader::DisplaceShader::init();
@@ -472,6 +472,11 @@ void glUniformMatrix4fvWraper(GLuint a, size_t b, unsigned c, const float *d)
 void glUniform3fWraper(GLuint a, float b, float c, float d)
 {
     glUniform3f(a, b, c, d);
+}
+
+void glUniform1fWrapper(GLuint a, float b)
+{
+    glUniform1f(a, b);
 }
 
 namespace MeshShader
@@ -931,18 +936,12 @@ namespace MeshShader
         glUniform1f(uniform_transparency, transparency);
     }
 
-    GLuint TransparentShader::Program;
-    GLuint TransparentShader::uniform_MVP;
-    GLuint TransparentShader::uniform_TM;
-    GLuint TransparentShader::TU_tex;
-
-    void TransparentShader::init()
+    TransparentShader::TransparentShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparent.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
+        AssignUniforms(Program, uniforms, {"ModelMatrix", "TextureMatrix" });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -953,36 +952,14 @@ namespace MeshShader
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void TransparentShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-    }
+    TransparentShader *TransparentShaderInstance;
 
-    GLuint TransparentFogShader::Program;
-    GLuint TransparentFogShader::uniform_MVP;
-    GLuint TransparentFogShader::uniform_TM;
-    GLuint TransparentFogShader::TU_tex;
-    GLuint TransparentFogShader::uniform_fogmax;
-    GLuint TransparentFogShader::uniform_startH;
-    GLuint TransparentFogShader::uniform_endH;
-    GLuint TransparentFogShader::uniform_start;
-    GLuint TransparentFogShader::uniform_end;
-    GLuint TransparentFogShader::uniform_col;
-
-    void TransparentFogShader::init()
+    TransparentFogShader::TransparentFogShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/transparentfog.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_TM = glGetUniformLocation(Program, "TextureMatrix");
-        uniform_fogmax = glGetUniformLocation(Program, "fogmax");
-        uniform_startH = glGetUniformLocation(Program, "startH");
-        uniform_endH = glGetUniformLocation(Program, "endH");
-        uniform_start = glGetUniformLocation(Program, "start");
-        uniform_end = glGetUniformLocation(Program, "end");
-        uniform_col = glGetUniformLocation(Program, "col");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "TextureMatrix", "fogmax", "startH", "endH", "start", "end", "col" });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -993,17 +970,7 @@ namespace MeshShader
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void TransparentFogShader::setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix, float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, const core::vector3df &campos)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniformMatrix4fv(uniform_TM, 1, GL_FALSE, TextureMatrix.pointer());
-        glUniform1f(uniform_fogmax, fogmax);
-        glUniform1f(uniform_startH, startH);
-        glUniform1f(uniform_endH, endH);
-        glUniform1f(uniform_start, start);
-        glUniform1f(uniform_end, end);
-        glUniform3f(uniform_col, col.X, col.Y, col.Z);
-    }
+    TransparentFogShader *TransparentFogShaderInstance;
 
     GLuint BillboardShader::Program;
     GLuint BillboardShader::attrib_corner;
