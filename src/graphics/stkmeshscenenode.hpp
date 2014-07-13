@@ -25,6 +25,7 @@ protected:
     bool isMaterialInitialized;
     bool immediate_draw;
     bool update_each_frame;
+    bool isDisplacement;
 public:
     void setReloadEachFrame(bool);
     STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
@@ -34,6 +35,7 @@ public:
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
     virtual ~STKMeshSceneNode();
+    void setIsDisplacement(bool v) { isDisplacement = v; }
 };
 
 #endif

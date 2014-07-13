@@ -16,6 +16,7 @@ STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, 
     const irr::core::vector3df& scale) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
+    isDisplacement = false;
     immediate_draw = false;
     update_each_frame = false;
     createGLMeshes();
