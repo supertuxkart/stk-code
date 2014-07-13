@@ -8,10 +8,8 @@ layout (std140) uniform MatrixesData
 };
 
 uniform mat4 ModelMatrix;
-uniform vec3 windDir;
 
 layout(location = 0) in vec3 Position;
-layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
 
 #ifdef VSLayer
@@ -26,10 +24,10 @@ void main(void)
 #ifdef VSLayer
     gl_Layer = gl_InstanceID & 3;
     uv = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position, 1.);
 #else
     layerId = gl_InstanceID & 3;
     tc = Texcoord;
-    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
+    gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position, 1.);
 #endif
 }
