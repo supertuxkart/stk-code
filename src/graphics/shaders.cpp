@@ -337,7 +337,7 @@ void Shaders::loadShaders()
     MeshShader::InstancedGrassPass2Shader::init();
     MeshShader::DetailledObjectPass2ShaderInstance = new MeshShader::DetailledObjectPass2Shader();
     MeshShader::ObjectRefPass2ShaderInstance = new MeshShader::ObjectRefPass2Shader();
-    MeshShader::ObjectUnlitShader::init();
+    MeshShader::ObjectUnlitShaderInstance = new MeshShader::ObjectUnlitShader();
     MeshShader::SphereMapShaderInstance = new MeshShader::SphereMapShader();
     MeshShader::SplattingShader::init();
     MeshShader::GrassPass1Shader::init();
@@ -742,17 +742,12 @@ namespace MeshShader
 
     DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
 
-    GLuint ObjectUnlitShader::Program;
-    GLuint ObjectUnlitShader::uniform_MM;
-    GLuint ObjectUnlitShader::TU_tex;
-
-    void ObjectUnlitShader::init()
+    ObjectUnlitShader::ObjectUnlitShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        GLuint uniform_tex = glGetUniformLocation(Program, "tex");
+        AssignUniforms(Program, uniforms, { "ModelMatrix" });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -760,17 +755,10 @@ namespace MeshShader
         }
         TU_tex = 3;
 
-        glUseProgram(Program);
-        glUniform1i(uniform_tex, TU_tex);
-        glUseProgram(0);
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void ObjectUnlitShader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-    }
+    ObjectUnlitShader *ObjectUnlitShaderInstance;
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
     {

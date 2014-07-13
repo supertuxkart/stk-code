@@ -204,16 +204,15 @@ public:
 
 extern DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
 
-class ObjectUnlitShader
+class ObjectUnlitShader : public ShaderHelper<core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM;
-    static GLuint TU_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    ObjectUnlitShader();
 };
+
+extern ObjectUnlitShader *ObjectUnlitShaderInstance;
 
 class ObjectRefPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
