@@ -39,6 +39,7 @@ enum TransparentMaterial
     TM_DEFAULT,
     TM_ADDITIVE,
     TM_BUBBLE,
+    TM_DISPLACEMENT,
     TM_COUNT
 };
 
@@ -198,11 +199,17 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
 };
 
+class ListDisplacement
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+};
+
 // Forward pass (for transparents meshes)
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
 ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures, video::E_VERTEX_TYPE tp);
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, bool isDisplacement);
 
 #endif // STKMESH_H

@@ -63,7 +63,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       GLMesh &mesh = GLmeshes[i];
       if (rnd->isTransparent())
       {
-          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
+          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, isDisplacement);
           if (immediate_draw)
           {
               fillLocalBuffer(mesh, mb);
@@ -142,49 +142,6 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     size_t count = mesh.IndexCount;
 
     MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
-static video::ITexture *displaceTex = 0;
-
-void STKMeshSceneNode::drawDisplace(const GLMesh &mesh)
-{
-    if (mesh.VAOType != video::EVT_2TCOORDS)
-    {
-        Log::error("Materials", "Displacement has wrong vertex type");
-        return;
-    }
-    glBindVertexArray(getVAO(video::EVT_2TCOORDS));
-    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    // Generate displace mask
-    // Use RTT_TMP4 as displace mask
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
-
-    glUseProgram(MeshShader::DisplaceMaskShader::Program);
-    MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-
-    // Render the effect
-    if (!displaceTex)
-        displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
-    irr_driver->getFBO(FBO_DISPLACE).Bind();
-    setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
-    setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
-    setTexture(3, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
-    glUseProgram(MeshShader::DisplaceShader::Program);
-    MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
-                                            core::vector2df(cb->getDirX(), cb->getDirY()),
-                                            core::vector2df(cb->getDir2X(), cb->getDir2Y()),
-                                            core::vector2df(float(UserConfigParams::m_width),
-                                                            float(UserConfigParams::m_height)),
-                                            0, 1, 2, 3);
-
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
@@ -477,22 +434,14 @@ void STKMeshSceneNode::render()
                 ListAdditiveTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
         }
 
+        for_in(mesh, TransparentMesh[TM_DISPLACEMENT])
+            ListDisplacement::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
+
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
         glBindVertexArray(getVAO(video::EVT_STANDARD));
         for_in(mesh, TransparentMesh[TM_BUBBLE])
             drawBubble(*mesh, ModelViewProjectionMatrix);
         return;
-    }
-
-    if (irr_driver->getPhase() == DISPLACEMENT_PASS)
-    {
-        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
-        {
-            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-            if (!mb)
-                continue;
-            drawDisplace(GLmeshes[i]);
-        }
     }
 }

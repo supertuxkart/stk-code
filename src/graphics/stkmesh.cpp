@@ -42,8 +42,10 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
     return SM_DEFAULT_STANDARD;
 }
 
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, bool isDisplacement)
 {
+    if (isDisplacement)
+        return TM_DISPLACEMENT;
     if (type == irr_driver->getShader(ES_BUBBLES))
         return TM_BUBBLE;
     video::E_BLEND_FACTOR srcFact, DstFact;
@@ -328,6 +330,7 @@ std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > ListDetailSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > ListGrassSM::Arguments;

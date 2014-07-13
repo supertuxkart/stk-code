@@ -378,13 +378,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         return;
     }
 
-    // Render displacement
-    {
-        PROFILER_PUSH_CPU_MARKER("- Displacement", 0x00, 0x00, 0xFF);
-        ScopedGPUTimer Timer(getGPUTimer(Q_DISPLACEMENT));
-        renderDisplacement();
-        PROFILER_POP_CPU_MARKER();
-    }
     // Ensure that no object will be drawn after that by using invalid pass
     irr_driver->setPhase(PASS_COUNT);
 }
@@ -1463,40 +1456,4 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
                                           0);
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
-}
-
-// ----------------------------------------------------------------------------
-
-void IrrDriver::renderDisplacement()
-{
-    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-    irr_driver->getFBO(FBO_DISPLACE).Bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-    cb->update();
-
-    const int displacingcount = m_displacing.size();
-    irr_driver->setPhase(DISPLACEMENT_PASS);
-    glEnable(GL_DEPTH_TEST);
-    glDisable(GL_ALPHA_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_BLEND);
-    glClear(GL_STENCIL_BUFFER_BIT);
-    glEnable(GL_STENCIL_TEST);
-    glStencilFunc(GL_ALWAYS, 1, 0xFF);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-
-    glBindVertexArray(getVAO(EVT_2TCOORDS));
-    for (int i = 0; i < displacingcount; i++)
-    {
-        m_scene_manager->setCurrentRendertime(scene::ESNRP_TRANSPARENT);
-        m_displacing[i]->render();
-    }
-
-    irr_driver->getFBO(FBO_COLORS).Bind();
-    glStencilFunc(GL_EQUAL, 1, 0xFF);
-    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE));
-    glDisable(GL_STENCIL_TEST);
 }

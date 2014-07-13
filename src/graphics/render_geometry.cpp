@@ -204,6 +204,7 @@ void IrrDriver::renderSolidSecondPass()
     }
 }
 
+static video::ITexture *displaceTex = 0;
 
 void IrrDriver::renderTransparent()
 {
@@ -218,6 +219,7 @@ void IrrDriver::renderTransparent()
     ListAdditiveTransparent::Arguments.clear();
     ListBlendTransparentFog::Arguments.clear();
     ListAdditiveTransparentFog::Arguments.clear();
+    ListDisplacement::Arguments.clear();
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
 
     glBindVertexArray(getVAO(EVT_STANDARD));
@@ -236,6 +238,77 @@ void IrrDriver::renderTransparent()
         glBlendFunc(GL_ONE, GL_ONE);
         renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>(MeshShader::TransparentShaderInstance, { MeshShader::TransparentShaderInstance->TU_tex }, ListAdditiveTransparent::Arguments);
     }
+
+    if (!UserConfigParams::m_dynamic_lights)
+        return;
+
+    // Render displacement nodes
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    irr_driver->getFBO(FBO_DISPLACE).Bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+    cb->update();
+
+    glEnable(GL_DEPTH_TEST);
+    glDisable(GL_ALPHA_TEST);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_BLEND);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_ALWAYS, 1, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+
+    glBindVertexArray(getVAO(EVT_2TCOORDS));
+    for (int i = 0; i < ListDisplacement::Arguments.size(); i++)
+    {
+        const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
+        const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
+        if (mesh.VAOType != video::EVT_2TCOORDS)
+        {
+            Log::error("Materials", "Displacement has wrong vertex type");
+            continue;
+        }
+        glBindVertexArray(getVAO(video::EVT_2TCOORDS));
+        DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
+
+        GLenum ptype = mesh.PrimitiveType;
+        GLenum itype = mesh.IndexType;
+        size_t count = mesh.IndexCount;
+
+        // Generate displace mask
+        // Use RTT_TMP4 as displace mask
+        irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
+
+        glUseProgram(MeshShader::DisplaceMaskShader::Program);
+        MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
+        glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+
+        // Render the effect
+        if (!displaceTex)
+            displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
+        irr_driver->getFBO(FBO_DISPLACE).Bind();
+        setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
+        setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
+        setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
+        setTexture(3, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
+        glUseProgram(MeshShader::DisplaceShader::Program);
+        MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
+            core::vector2df(cb->getDirX(), cb->getDirY()),
+            core::vector2df(cb->getDir2X(), cb->getDir2Y()),
+            core::vector2df(float(UserConfigParams::m_width),
+            float(UserConfigParams::m_height)),
+            0, 1, 2, 3);
+
+        glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+    }
+
+    irr_driver->getFBO(FBO_COLORS).Bind();
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE));
+    glDisable(GL_STENCIL_TEST);
+
 }
 
 template<typename T, enum E_VERTEX_TYPE VertexType, typename... Args>

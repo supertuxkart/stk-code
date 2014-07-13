@@ -17,7 +17,6 @@ protected:
 
     // Misc passes shaders (glow, displace...)
     void drawGlow(const GLMesh &mesh);
-    void drawDisplace(const GLMesh &mesh);
     void createGLMeshes();
     void cleanGLMeshes();
     void setFirstTimeMaterial();

@@ -70,7 +70,6 @@ enum STKRenderingPass
     SOLID_LIT_PASS,
     TRANSPARENT_PASS,
     GLOW_PASS,
-    DISPLACEMENT_PASS,
     SHADOW_PASS,
     PASS_COUNT,
 };
@@ -378,7 +377,6 @@ private:
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderLights(unsigned pointlightCount);
-    void renderDisplacement();
     void renderShadowsDebug();
     void doScreenShot();
 public:
