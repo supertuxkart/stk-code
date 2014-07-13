@@ -349,10 +349,10 @@ void Shaders::loadShaders()
     LightShader::PointLightShader::init();
     MeshShader::DisplaceShader::init();
     MeshShader::DisplaceMaskShader::init();
-    MeshShader::ShadowShader::init();
+    MeshShader::ShadowShaderInstance = new MeshShader::ShadowShader();
     MeshShader::RSMShader::init();
     MeshShader::InstancedShadowShader::init();
-    MeshShader::RefShadowShader::init();
+    MeshShader::RefShadowShaderInstance = new MeshShader::RefShadowShader();
     MeshShader::InstancedRefShadowShader::init();
     MeshShader::GrassShadowShader::init();
     MeshShader::SkyboxShader::init();
@@ -991,10 +991,7 @@ namespace MeshShader
         glUniform3f(uniform_col, r, g, b);
     }
 
-    GLuint ShadowShader::Program;
-    GLuint ShadowShader::uniform_MM;
-
-    void ShadowShader::init()
+    ShadowShader::ShadowShader()
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
@@ -1012,16 +1009,12 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         }
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
+        AssignUniforms(Program, uniforms, { "ModelMatrix" });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void ShadowShader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-    }
+    ShadowShader *ShadowShaderInstance;
 
     GLuint RSMShader::Program;
     GLuint RSMShader::uniform_MM;
@@ -1076,11 +1069,7 @@ namespace MeshShader
     {
     }
 
-    GLuint RefShadowShader::Program;
-    GLuint RefShadowShader::uniform_MM;
-    GLuint RefShadowShader::TU_tex;
-
-    void RefShadowShader::init()
+    RefShadowShader::RefShadowShader()
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
@@ -1098,17 +1087,15 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
+        AssignUniforms(Program, uniforms, { "ModelMatrix" });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        TU_tex = 0;
 
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void RefShadowShader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-    }
+    RefShadowShader *RefShadowShaderInstance;
 
     GLuint InstancedRefShadowShader::Program;
     GLuint InstancedRefShadowShader::uniform_tex;

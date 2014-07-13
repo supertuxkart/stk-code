@@ -335,15 +335,13 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b);
 };
 
-class ShadowShader
+class ShadowShader : public ShaderHelper<core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_ViewProjectionMatrixesUBO;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    ShadowShader();
 };
+
+extern ShadowShader *ShadowShaderInstance;
 
 class RSMShader
 {
@@ -365,16 +363,15 @@ public:
     static void setUniforms();
 };
 
-class RefShadowShader
+class RefShadowShader : public ShaderHelper<core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM;
-    static GLuint TU_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    RefShadowShader();
 };
+
+extern RefShadowShader *RefShadowShaderInstance;
 
 class InstancedRefShadowShader
 {

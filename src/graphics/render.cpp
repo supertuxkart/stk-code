@@ -910,10 +910,10 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     delete []tmp;
 }
 
-template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... Args>
-void drawShadow(const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+template<typename T, enum E_VERTEX_TYPE VertexType, typename... Args>
+void drawShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
-    glUseProgram(Shader::Program);
+    glUseProgram(Shader->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
@@ -928,7 +928,7 @@ void drawShadow(const std::vector<GLuint> TextureUnits, const std::vector<std::t
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
 
-        Shader::setUniforms(std::get<1>(t[i]));
+        Shader->setUniforms(std::get<1>(t[i]));
         glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
     }
 }
@@ -964,10 +964,10 @@ void IrrDriver::renderShadows()
 
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-    drawShadow<MeshShader::ShadowShader, EVT_STANDARD>({}, ListDefaultStandardG::Arguments);
-    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS>({}, ListDefault2TCoordG::Arguments);
-    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS>({}, ListNormalG::Arguments);
-    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD>({ MeshShader::RefShadowShader::TU_tex }, ListAlphaRefG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_STANDARD>(MeshShader::ShadowShaderInstance, {}, ListDefaultStandardG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS>(MeshShader::ShadowShaderInstance, {}, ListDefault2TCoordG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS>(MeshShader::ShadowShaderInstance, {}, ListNormalG::Arguments);
+    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD>(MeshShader::RefShadowShaderInstance, { MeshShader::RefShadowShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
