@@ -77,6 +77,13 @@ struct UniformHelper
     }
 
     template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector3df &v, Args... arg)
+    {
+        glUniform3fWraper(uniforms[N], v.X, v.Y, v.Z);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
+    template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
     {
         glUniform1fWrapper(uniforms[N], f);
@@ -124,15 +131,15 @@ public:
 
 extern ObjectRefPass1Shader *ObjectRefPass1ShaderInstance;
 
-class GrassPass1Shader
+class GrassPass1Shader : public ShaderHelper<core::matrix4, core::matrix4, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_TIMV, uniform_tex, uniform_windDir;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::vector3df &windDirection, unsigned TU_tex);
+    GrassPass1Shader();
 };
+
+extern GrassPass1Shader *GrassPass1ShaderInstance;
 
 class NormalMapShader : public ShaderHelper<core::matrix4, core::matrix4>
 {
@@ -235,16 +242,15 @@ public:
 
 extern ObjectRefPass2Shader *ObjectRefPass2ShaderInstance;
 
-class GrassPass2Shader
+class GrassPass2Shader : public ShaderHelper<core::matrix4, core::vector3df, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_ambient, uniform_windDir;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::vector3df &windDirection);
+    GrassPass2Shader();
 };
+
+extern GrassPass2Shader *GrassPass2ShaderInstance;
 
 class InstancedGrassPass2Shader
 {

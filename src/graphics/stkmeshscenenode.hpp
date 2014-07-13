@@ -11,7 +11,7 @@ protected:
     PtrVector<GLMesh, REF> ShadedMesh[SM_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
-    core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
+    core::matrix4 ModelViewProjectionMatrix;
     core::vector3df windDir;
     core::vector2df caustic_dir, caustic_dir2;
 

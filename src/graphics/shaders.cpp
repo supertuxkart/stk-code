@@ -340,8 +340,8 @@ void Shaders::loadShaders()
     MeshShader::ObjectUnlitShaderInstance = new MeshShader::ObjectUnlitShader();
     MeshShader::SphereMapShaderInstance = new MeshShader::SphereMapShader();
     MeshShader::SplattingShaderInstance = new MeshShader::SplattingShader();
-    MeshShader::GrassPass1Shader::init();
-    MeshShader::GrassPass2Shader::init();
+    MeshShader::GrassPass1ShaderInstance = new MeshShader::GrassPass1Shader();
+    MeshShader::GrassPass2ShaderInstance = new MeshShader::GrassPass2Shader();
     MeshShader::BubbleShader::init();
     MeshShader::TransparentShaderInstance = new MeshShader::TransparentShader();
     MeshShader::TransparentFogShaderInstance = new MeshShader::TransparentFogShader();
@@ -517,31 +517,18 @@ namespace MeshShader
     }
     ObjectRefPass1Shader *ObjectRefPass1ShaderInstance;
 
-    GLuint GrassPass1Shader::Program;
-    GLuint GrassPass1Shader::uniform_MVP;
-    GLuint GrassPass1Shader::uniform_TIMV;
-    GLuint GrassPass1Shader::uniform_tex;
-    GLuint GrassPass1Shader::uniform_windDir;
-
-    void GrassPass1Shader::init()
+    GrassPass1Shader::GrassPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_TIMV = glGetUniformLocation(Program, "TransposeInverseModelView");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_windDir = glGetUniformLocation(Program, "windDir");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "InverseModelMatrix", "windDir" });
+        TU_tex = 0;
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
 
-    void GrassPass1Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, const core::vector3df &windDirection, unsigned TU_tex)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        glUniformMatrix4fv(uniform_TIMV, 1, GL_FALSE, TransposeInverseModelView.pointer());
-        glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
-        glUniform1i(uniform_tex, TU_tex);
-    }
+    GrassPass1Shader *GrassPass1ShaderInstance;
 
     NormalMapShader::NormalMapShader()
     {
@@ -784,34 +771,19 @@ namespace MeshShader
 
     ObjectRefPass2Shader *ObjectRefPass2ShaderInstance;
 
-    GLuint GrassPass2Shader::Program;
-    GLuint GrassPass2Shader::uniform_MVP;
-    GLuint GrassPass2Shader::uniform_ambient;
-    GLuint GrassPass2Shader::uniform_windDir;
-    GLuint GrassPass2Shader::TU_Albedo;
-
-    void GrassPass2Shader::init()
+    GrassPass2Shader::GrassPass2Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/grass_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelViewProjectionMatrix");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
-        uniform_windDir = glGetUniformLocation(Program, "windDir");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "windDir", "ambient" });
         TU_Albedo = 3;
 
         AssignTextureUnit(Program, { { 0, "DiffuseMap" }, { 1, "SpecularMap" }, { 2, "SSAO" }, { TU_Albedo, "Albedo" } });
     }
 
-    void GrassPass2Shader::setUniforms(const core::matrix4 &ModelViewProjectionMatrix,
-                                       const core::vector3df &windDirection)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelViewProjectionMatrix.pointer());
-        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-        glUniform3f(uniform_ambient, s.r, s.g, s.b);
-        glUniform3f(uniform_windDir, windDirection.X, windDirection.Y, windDirection.Z);
-    }
+    GrassPass2Shader *GrassPass2ShaderInstance;
 
     GLuint InstancedGrassPass2Shader::Program;
     GLuint InstancedGrassPass2Shader::uniform_VP;

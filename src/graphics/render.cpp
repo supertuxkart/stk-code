@@ -572,6 +572,7 @@ void IrrDriver::renderSolidFirstPass()
     ListDefault2TCoordG::Arguments.clear();
     ListAlphaRefG::Arguments.clear();
     ListNormalG::Arguments.clear();
+    ListGrassG::Arguments.clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -583,6 +584,7 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS>(MeshShader::ObjectPass1ShaderInstance, { MeshShader::ObjectPass1ShaderInstance->TU_tex }, ListDefault2TCoordG::Arguments);
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD>(MeshShader::ObjectRefPass1ShaderInstance, { MeshShader::ObjectRefPass1ShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
         renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS>(MeshShader::NormalMapShaderInstance, { MeshShader::NormalMapShaderInstance->TU_glossy, MeshShader::NormalMapShaderInstance->TU_normalmap }, ListNormalG::Arguments);
+        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD>(MeshShader::GrassPass1ShaderInstance, { MeshShader::GrassPass1ShaderInstance->TU_tex }, ListGrassG::Arguments);
     }
 }
 
@@ -652,6 +654,7 @@ void IrrDriver::renderSolidSecondPass()
     ListUnlitSM::Arguments.clear();
     ListDetailSM::Arguments.clear();
     ListSplattingSM::Arguments.clear();
+    ListGrassSM::Arguments.clear();
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
@@ -668,6 +671,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD>(MeshShader::ObjectUnlitShaderInstance, { MeshShader::ObjectUnlitShaderInstance->TU_tex }, ListUnlitSM::Arguments);
         renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS>(MeshShader::DetailledObjectPass2ShaderInstance, { MeshShader::DetailledObjectPass2ShaderInstance->TU_Albedo, MeshShader::DetailledObjectPass2ShaderInstance->TU_detail }, ListDetailSM::Arguments);
         renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS>(MeshShader::SplattingShaderInstance, { 8, MeshShader::SplattingShaderInstance->TU_tex_layout, MeshShader::SplattingShaderInstance->TU_tex_detail0, MeshShader::SplattingShaderInstance->TU_tex_detail1, MeshShader::SplattingShaderInstance->TU_tex_detail2, MeshShader::SplattingShaderInstance->TU_tex_detail3 }, ListSplattingSM::Arguments);
+        renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD>(MeshShader::GrassPass2ShaderInstance, { MeshShader::GrassPass2ShaderInstance->TU_Albedo }, ListGrassSM::Arguments);
     }
 }
 

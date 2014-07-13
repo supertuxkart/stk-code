@@ -140,7 +140,6 @@ void STKAnimatedMesh::render()
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 

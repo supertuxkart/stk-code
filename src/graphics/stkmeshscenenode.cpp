@@ -250,8 +250,6 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
-        ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
@@ -294,12 +292,9 @@ void STKMeshSceneNode::render()
         for_in(mesh, GeometricMesh[FPSM_NORMAL_MAP])
             ListNormalG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
-        if (!GeometricMesh[FPSM_GRASS].empty())
-            glUseProgram(MeshShader::GrassPass1Shader::Program);
         windDir = getWind();
-        glBindVertexArray(getVAO(video::EVT_STANDARD));
         for_in(mesh, GeometricMesh[FPSM_GRASS])
-            drawGrassPass1(*mesh, ModelViewProjectionMatrix, TransposeInverseModelView, windDir);
+            ListGrassG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, windDir));
 
         return;
     }
@@ -357,11 +352,8 @@ void STKMeshSceneNode::render()
         for_in(mesh, ShadedMesh[SM_DETAILS])
             ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
 
-        if (!ShadedMesh[SM_GRASS].empty())
-            glUseProgram(MeshShader::GrassPass2Shader::Program);
-        glBindVertexArray(getVAO(video::EVT_STANDARD));
         for_in(mesh, ShadedMesh[SM_GRASS])
-            drawGrassPass2(*mesh, ModelViewProjectionMatrix, windDir);
+            ListGrassSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, windDir, irr_driver->getSceneManager()->getAmbientLight()));
 
         return;
     }
