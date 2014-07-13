@@ -314,7 +314,7 @@ void STKMeshSceneNode::render()
             glDisable(GL_CULL_FACE);
             if (!spareWhiteTex)
                 spareWhiteTex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            glUseProgram(MeshShader::ObjectPass2Shader::Program);
+            glUseProgram(MeshShader::ObjectPass2ShaderInstance->Program);
             // Only untextured
             for (unsigned i = 0; i < GLmeshes.size(); i++)
             {
@@ -324,8 +324,8 @@ void STKMeshSceneNode::render()
                 GLenum itype = mesh.IndexType;
                 size_t count = mesh.IndexCount;
 
-                setTexture(MeshShader::ObjectPass2Shader::TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
-                MeshShader::ObjectPass2Shader::setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
+                setTexture(MeshShader::ObjectPass2ShaderInstance->TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
+                MeshShader::ObjectPass2ShaderInstance->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
                 glDrawElements(ptype, count, itype, 0);
@@ -337,13 +337,13 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_SPHEREMAP])
             ListSphereMapSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight()));

@@ -164,13 +164,13 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in (mesh, ShadedMesh[SM_UNLIT])
             ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));

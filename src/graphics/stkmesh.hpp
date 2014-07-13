@@ -149,19 +149,19 @@ void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectio
 class ListDefaultStandardSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListDefaultTangentSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListAlphaRefSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListSphereMapSM

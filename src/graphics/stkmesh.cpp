@@ -369,9 +369,9 @@ std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefault2TCo
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListAlphaRefG::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Arguments;
 
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultTangentSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAlphaRefSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultStandardSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultTangentSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListAlphaRefSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListSplattingSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;

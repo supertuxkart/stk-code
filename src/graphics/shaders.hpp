@@ -65,6 +65,15 @@ void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 
     setUniformsHelper<N + 1>(uniforms, arg...);
 }
 
+void glUniform3fWraper(GLuint, size_t, unsigned, const float *mat);
+
+template<unsigned N = 0, typename... Args>
+void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf &col, Args... arg)
+{
+    glUniform3f(uniforms[N], col.r, col.g, col.b);
+    setUniformsHelper<N + 1>(uniforms, arg...);
+}
+
 void bypassUBO(GLuint Program);
 
 template<typename... Args>
@@ -153,16 +162,15 @@ public:
     static void setUniforms(const core::vector3df &windDir, unsigned TU_tex);
 };
 
-class ObjectPass2Shader
+class ObjectPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix);
+    ObjectPass2Shader();
 };
+
+extern ObjectPass2Shader *ObjectPass2ShaderInstance;
 
 class InstancedObjectPass2Shader
 {
@@ -208,16 +216,15 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix);
 };
 
-class ObjectRefPass2Shader
+class ObjectRefPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::matrix4 &TextureMatrix);
+    ObjectRefPass2Shader();
 };
+
+extern ObjectRefPass2Shader *ObjectRefPass2ShaderInstance;
 
 class GrassPass2Shader
 {
