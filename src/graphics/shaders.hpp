@@ -265,16 +265,15 @@ public:
 
 extern SphereMapShader *SphereMapShaderInstance;
 
-class SplattingShader
+class SplattingShader : public ShaderHelper<core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_ambient;
-    static GLuint TU_tex_layout, TU_tex_detail0, TU_tex_detail1, TU_tex_detail2, TU_tex_detail3;
+    GLuint TU_tex_layout, TU_tex_detail0, TU_tex_detail1, TU_tex_detail2, TU_tex_detail3;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    SplattingShader();
 };
+
+extern SplattingShader *SplattingShaderInstance;
 
 class BubbleShader
 {

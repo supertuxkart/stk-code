@@ -372,7 +372,7 @@ std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Ar
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultStandardSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultTangentSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListAlphaRefSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4> > ListSplattingSM::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > ListSplattingSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > ListDetailSM::Arguments;

@@ -339,7 +339,7 @@ void Shaders::loadShaders()
     MeshShader::ObjectRefPass2ShaderInstance = new MeshShader::ObjectRefPass2Shader();
     MeshShader::ObjectUnlitShaderInstance = new MeshShader::ObjectUnlitShader();
     MeshShader::SphereMapShaderInstance = new MeshShader::SphereMapShader();
-    MeshShader::SplattingShader::init();
+    MeshShader::SplattingShaderInstance = new MeshShader::SplattingShader();
     MeshShader::GrassPass1Shader::init();
     MeshShader::GrassPass2Shader::init();
     MeshShader::BubbleShader::init();
@@ -879,22 +879,12 @@ namespace MeshShader
 
     SphereMapShader *SphereMapShaderInstance;
 
-    GLuint SplattingShader::Program;
-    GLuint SplattingShader::uniform_MM;
-    GLuint SplattingShader::uniform_ambient;
-    GLuint SplattingShader::TU_tex_layout;
-    GLuint SplattingShader::TU_tex_detail0;
-    GLuint SplattingShader::TU_tex_detail1;
-    GLuint SplattingShader::TU_tex_detail2;
-    GLuint SplattingShader::TU_tex_detail3;
-
-    void SplattingShader::init()
+    SplattingShader::SplattingShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_ambient = glGetUniformLocation(Program, "ambient");
+        AssignUniforms(Program, uniforms, {"ModelMatrix", "ambient"});
         TU_tex_layout = 3;
         TU_tex_detail0 = 4;
         TU_tex_detail1 = 5;
@@ -905,12 +895,7 @@ namespace MeshShader
             { TU_tex_detail0, "tex_detail0" }, { TU_tex_detail1, "tex_detail1" }, { TU_tex_detail2, "tex_detail2" }, { TU_tex_detail3, "tex_detail3" } });
     }
 
-    void SplattingShader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        const video::SColorf s = irr_driver->getSceneManager()->getAmbientLight();
-        glUniform3f(uniform_ambient, s.r, s.g, s.b);
-    }
+    SplattingShader *SplattingShaderInstance;
 
     GLuint BubbleShader::Program;
     GLuint BubbleShader::uniform_MVP;
