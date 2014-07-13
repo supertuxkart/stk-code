@@ -353,8 +353,6 @@ private:
 
     std::vector<BloomData> m_forcedbloom;
 
-    std::vector<scene::ISceneNode *> m_displacing;
-
     std::vector<scene::ISceneNode *> m_background;
 
     STKRenderingPass m_phase;
@@ -667,12 +665,6 @@ public:
     void clearForcedBloom() { m_forcedbloom.clear(); }
     // ------------------------------------------------------------------------
     const std::vector<BloomData> &getForcedBloom() const { return m_forcedbloom; }
-    // ------------------------------------------------------------------------
-    void clearDisplacingNodes() { m_displacing.clear(); }
-    // ------------------------------------------------------------------------
-    const std::vector<scene::ISceneNode *> &getDisplacingNodes() const { return m_displacing; }
-    // ------------------------------------------------------------------------
-    void addDisplacingNode(scene::ISceneNode * const n) { m_displacing.push_back(n); }
     // ------------------------------------------------------------------------
     void clearBackgroundNodes() { m_background.clear(); }
     // ------------------------------------------------------------------------
