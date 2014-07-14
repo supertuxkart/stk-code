@@ -83,6 +83,14 @@ struct UniformHelper
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
+
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector2df &v, Args... arg)
+    {
+        glUniform2f(uniforms[N], v.X, v.Y);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
     {
@@ -392,25 +400,23 @@ public:
 
 extern GrassShadowShader *GrassShadowShaderInstance;
 
-class DisplaceMaskShader
+class DisplaceMaskShader : public ShaderHelper<core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    DisplaceMaskShader();
 };
 
-class DisplaceShader
+extern DisplaceMaskShader *DisplaceMaskShaderInstance;
+
+class DisplaceShader : public ShaderHelper<core::matrix4, core::vector2df, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_tex, uniform_dir, uniform_dir2;
+    GLuint TU_displacement_tex, TU_mask_tex, TU_color_tex, TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex);
+    DisplaceShader();
 };
+
+extern DisplaceShader *DisplaceShaderInstance;
 
 class SkyboxShader
 {

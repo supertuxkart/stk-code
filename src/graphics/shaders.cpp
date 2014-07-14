@@ -347,8 +347,8 @@ void Shaders::loadShaders()
     MeshShader::TransparentFogShaderInstance = new MeshShader::TransparentFogShader();
     MeshShader::BillboardShader::init();
     LightShader::PointLightShader::init();
-    MeshShader::DisplaceShader::init();
-    MeshShader::DisplaceMaskShader::init();
+    MeshShader::DisplaceShaderInstance = new MeshShader::DisplaceShader();
+    MeshShader::DisplaceMaskShaderInstance = new MeshShader::DisplaceMaskShader();
     MeshShader::ShadowShaderInstance = new MeshShader::ShadowShader();
     MeshShader::RSMShader::init();
     MeshShader::InstancedShadowShader::init();
@@ -1158,15 +1158,12 @@ namespace MeshShader
 
     GrassShadowShader *GrassShadowShaderInstance;
 
-    GLuint DisplaceMaskShader::Program;
-    GLuint DisplaceMaskShader::uniform_MVP;
-
-    void DisplaceMaskShader::init()
+    DisplaceMaskShader::DisplaceMaskShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
+        AssignUniforms(Program, uniforms, { "ModelMatrix"});
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1174,46 +1171,25 @@ namespace MeshShader
         }
     }
 
-    void DisplaceMaskShader::setUniforms(const core::matrix4 &ModelMatrix)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
-    }
+    DisplaceMaskShader *DisplaceMaskShaderInstance;
 
-    GLuint DisplaceShader::Program;
-    GLuint DisplaceShader::uniform_MVP;
-    GLuint DisplaceShader::uniform_displacement_tex;
-    GLuint DisplaceShader::uniform_mask_tex;
-    GLuint DisplaceShader::uniform_color_tex;
-    GLuint DisplaceShader::uniform_tex;
-    GLuint DisplaceShader::uniform_dir;
-    GLuint DisplaceShader::uniform_dir2;
 
-    void DisplaceShader::init()
+    DisplaceShader::DisplaceShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/displace.frag").c_str());
-        uniform_MVP = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_displacement_tex = glGetUniformLocation(Program, "displacement_tex");
-        uniform_color_tex = glGetUniformLocation(Program, "color_tex");
-        uniform_mask_tex = glGetUniformLocation(Program, "mask_tex");
-        uniform_dir = glGetUniformLocation(Program, "dir");
-        uniform_dir2 = glGetUniformLocation(Program, "dir2");
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        AssignUniforms(Program, uniforms, { "ModelMatrix", "dir", "dir2" });
+        TU_displacement_tex = 0;
+        TU_color_tex = 1;
+        TU_mask_tex = 2;
+        TU_tex = 3;
+        AssignTextureUnit(Program, { { TU_displacement_tex, "displacement_tex" }, { TU_color_tex, "color_tex" }, { TU_mask_tex, "mask_tex" }, { TU_tex, "tex" } });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void DisplaceShader::setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex)
-    {
-        glUniformMatrix4fv(uniform_MVP, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform2f(uniform_dir, dir.X, dir.Y);
-        glUniform2f(uniform_dir2, dir2.X, dir2.Y);
-        glUniform1i(uniform_displacement_tex, TU_displacement_tex);
-        glUniform1i(uniform_mask_tex, TU_mask_tex);
-        glUniform1i(uniform_color_tex, TU_color_tex);
-        glUniform1i(uniform_tex, TU_tex);
-    }
+    DisplaceShader *DisplaceShaderInstance;
 
     GLuint SkyboxShader::Program;
     GLuint SkyboxShader::attrib_position;

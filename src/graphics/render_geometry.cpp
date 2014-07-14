@@ -283,25 +283,22 @@ void IrrDriver::renderTransparent()
         // Use RTT_TMP4 as displace mask
         irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
 
-        glUseProgram(MeshShader::DisplaceMaskShader::Program);
-        MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
+        glUseProgram(MeshShader::DisplaceMaskShaderInstance->Program);
+        MeshShader::DisplaceMaskShaderInstance->setUniforms(AbsoluteTransformation);
         glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 
         // Render the effect
         if (!displaceTex)
             displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
         irr_driver->getFBO(FBO_DISPLACE).Bind();
-        setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
-        setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
-        setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
-        setTexture(3, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
-        glUseProgram(MeshShader::DisplaceShader::Program);
-        MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
+        setTexture(MeshShader::DisplaceShaderInstance->TU_displacement_tex, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
+        setTexture(MeshShader::DisplaceShaderInstance->TU_mask_tex, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
+        setTexture(MeshShader::DisplaceShaderInstance->TU_color_tex, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
+        setTexture(MeshShader::DisplaceShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
+        glUseProgram(MeshShader::DisplaceShaderInstance->Program);
+        MeshShader::DisplaceShaderInstance->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),
-            core::vector2df(cb->getDir2X(), cb->getDir2Y()),
-            core::vector2df(float(UserConfigParams::m_width),
-            float(UserConfigParams::m_height)),
-            0, 1, 2, 3);
+            core::vector2df(cb->getDir2X(), cb->getDir2Y()));
 
         glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
     }
