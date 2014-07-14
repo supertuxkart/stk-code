@@ -476,7 +476,7 @@ void glUniform3fWraper(GLuint a, float b, float c, float d)
 
 void glUniform2fWraper(GLuint a, float b, float c)
 {
-    glUniform2f(a, b, c, d);
+    glUniform2f(a, b, c);
 }
 
 void glUniform1fWrapper(GLuint a, float b)
