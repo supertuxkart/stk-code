@@ -50,6 +50,7 @@ public:
 
 void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
 void glUniform3fWraper(GLuint, float, float, float);
+void glUniform2fWraper(GLuint a, float b, float c);
 void glUniform1fWrapper(GLuint, float);
 
 struct UniformHelper
@@ -87,7 +88,7 @@ struct UniformHelper
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector2df &v, Args... arg)
     {
-        glUniform2f(uniforms[N], v.X, v.Y);
+        glUniform2fWraper(uniforms[N], v.X, v.Y);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
