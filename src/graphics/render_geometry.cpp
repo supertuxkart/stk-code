@@ -267,7 +267,9 @@ void IrrDriver::renderTransparent()
         const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
         if (mesh.VAOType != video::EVT_2TCOORDS)
         {
+#ifdef DEBUG
             Log::error("Materials", "Displacement has wrong vertex type");
+#endif
             continue;
         }
 

@@ -185,6 +185,15 @@ void STKMeshSceneNode::updatevbo()
 
 static video::ITexture *spareWhiteTex = 0;
 
+
+void STKMeshSceneNode::OnRegisterSceneNode()
+{
+    if (isDisplacement)
+        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+    else
+        CMeshSceneNode::OnRegisterSceneNode();
+}
+
 void STKMeshSceneNode::render()
 {
     irr::video::IVideoDriver* driver = irr_driver->getVideoDriver();
