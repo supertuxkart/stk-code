@@ -117,13 +117,13 @@ void STKAnimatedMesh::render()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-           if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
-           {
-               glBindVertexArray(0);
-               glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
-               glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
-               glBindBuffer(GL_ARRAY_BUFFER, 0);
-           }
+            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS)
+            {
+                glBindVertexArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
+                glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
         }
         if (mb)
             GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
