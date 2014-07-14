@@ -351,9 +351,9 @@ void Shaders::loadShaders()
     MeshShader::DisplaceMaskShaderInstance = new MeshShader::DisplaceMaskShader();
     MeshShader::ShadowShaderInstance = new MeshShader::ShadowShader();
     MeshShader::RSMShader::init();
-    MeshShader::InstancedShadowShader::init();
+    MeshShader::InstancedShadowShaderInstance = new MeshShader::InstancedShadowShader();
     MeshShader::RefShadowShaderInstance = new MeshShader::RefShadowShader();
-    MeshShader::InstancedRefShadowShader::init();
+    MeshShader::InstancedRefShadowShaderInstance = new MeshShader::InstancedRefShadowShader();
     MeshShader::GrassShadowShaderInstance = new MeshShader::GrassShadowShader();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
@@ -962,9 +962,7 @@ namespace MeshShader
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
     }
 
-    GLuint InstancedShadowShader::Program;
-
-    void InstancedShadowShader::init()
+    InstancedShadowShader::InstancedShadowShader()
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
@@ -988,9 +986,7 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void InstancedShadowShader::setUniforms()
-    {
-    }
+    InstancedShadowShader *InstancedShadowShaderInstance;
 
     RefShadowShader::RefShadowShader()
     {
@@ -1020,10 +1016,7 @@ namespace MeshShader
 
     RefShadowShader *RefShadowShaderInstance;
 
-    GLuint InstancedRefShadowShader::Program;
-    GLuint InstancedRefShadowShader::uniform_tex;
-
-    void InstancedRefShadowShader::init()
+    InstancedRefShadowShader::InstancedRefShadowShader()
     {
         // Geometry shader needed
         if (irr_driver->getGLSLVersion() < 150)
@@ -1043,15 +1036,13 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        TU_tex = 0;
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    void InstancedRefShadowShader::setUniforms(unsigned TU_tex)
-    {
-        glUniform1i(uniform_tex, TU_tex);
-    }
+    InstancedRefShadowShader *InstancedRefShadowShaderInstance;
 
     GrassShadowShader::GrassShadowShader()
     {

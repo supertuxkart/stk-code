@@ -158,7 +158,7 @@ static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    MeshShader::InstancedShadowShader::setUniforms();
+    MeshShader::InstancedShadowShaderInstance->setUniforms();
 
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
@@ -187,8 +187,8 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedRefShadowShader::setUniforms(0);
+    setTexture(MeshShader::InstancedRefShadowShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedRefShadowShaderInstance->setUniforms();
 
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
@@ -343,12 +343,12 @@ void STKInstancedSceneNode::render()
     if (irr_driver->getPhase() == SHADOW_PASS)
     {
         if (!GeometricMesh[FPSM_DEFAULT_STANDARD].empty())
-            glUseProgram(MeshShader::InstancedShadowShader::Program);
+            glUseProgram(MeshShader::InstancedShadowShaderInstance->Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT_STANDARD].size(); i++)
             drawShadowDefault(*GeometricMesh[FPSM_DEFAULT_STANDARD][i], instance_pos.size() / 9);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::InstancedRefShadowShader::Program);
+            glUseProgram(MeshShader::InstancedRefShadowShaderInstance->Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
             drawShadowAlphaRefTexture(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], instance_pos.size() / 9);
         return;

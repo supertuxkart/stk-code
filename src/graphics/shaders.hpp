@@ -360,14 +360,13 @@ public:
     static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix);
 };
 
-class InstancedShadowShader
+class InstancedShadowShader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-
-    static void init();
-    static void setUniforms();
+    InstancedShadowShader();
 };
+
+extern InstancedShadowShader *InstancedShadowShaderInstance;
 
 class RefShadowShader : public ShaderHelper<core::matrix4>
 {
@@ -379,15 +378,15 @@ public:
 
 extern RefShadowShader *RefShadowShaderInstance;
 
-class InstancedRefShadowShader
+class InstancedRefShadowShader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    InstancedRefShadowShader();
 };
+
+extern InstancedRefShadowShader *InstancedRefShadowShaderInstance;
 
 class GrassShadowShader : public ShaderHelper<core::matrix4, core::vector3df>
 {
