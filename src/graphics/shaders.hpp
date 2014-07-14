@@ -397,6 +397,15 @@ public:
 
 extern GrassShadowShader *GrassShadowShaderInstance;
 
+class InstancedGrassShadowShader : public ShaderHelper<core::vector3df>
+{
+public:
+    GLuint TU_tex;
+    InstancedGrassShadowShader();
+};
+
+extern InstancedGrassShadowShader *InstancedGrassShadowShaderInstance;
+
 class DisplaceMaskShader : public ShaderHelper<core::matrix4>
 {
 public:

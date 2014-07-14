@@ -194,6 +194,21 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
 }
 
+static void drawShadowGrass(GLMesh &mesh, const core::vector3df &windDir, size_t instance_count)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    compressTexture(mesh.textures[0], true);
+    setTexture(MeshShader::InstancedGrassShadowShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedGrassShadowShaderInstance->setUniforms(windDir);
+
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+}
+
 static void drawFSPMGrass(GLMesh &mesh, const core::vector3df &windDir, size_t instance_count)
 {
     irr_driver->IncreaseObjectCount();
@@ -351,6 +366,11 @@ void STKInstancedSceneNode::render()
             glUseProgram(MeshShader::InstancedRefShadowShaderInstance->Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
             drawShadowAlphaRefTexture(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], instance_pos.size() / 9);
+
+        if (!GeometricMesh[FPSM_GRASS].empty())
+            glUseProgram(MeshShader::InstancedGrassShadowShaderInstance->Program);
+        for (unsigned i = 0; i < GeometricMesh[FPSM_GRASS].size(); i++)
+            drawShadowGrass(*GeometricMesh[FPSM_GRASS][i], windDir, instance_pos.size() / 9);
         return;
     }
 }

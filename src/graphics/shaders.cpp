@@ -355,6 +355,7 @@ void Shaders::loadShaders()
     MeshShader::RefShadowShaderInstance = new MeshShader::RefShadowShader();
     MeshShader::InstancedRefShadowShaderInstance = new MeshShader::InstancedRefShadowShader();
     MeshShader::GrassShadowShaderInstance = new MeshShader::GrassShadowShader();
+    MeshShader::InstancedGrassShadowShaderInstance = new MeshShader::InstancedGrassShadowShader();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     ParticleShader::FlipParticleRender::init();
@@ -1071,6 +1072,36 @@ namespace MeshShader
     }
 
     GrassShadowShader *GrassShadowShaderInstance;
+
+    InstancedGrassShadowShader::InstancedGrassShadowShader()
+    {
+        // Geometry shader needed
+        if (irr_driver->getGLSLVersion() < 150)
+            return;
+        if (irr_driver->hasVSLayerExtension())
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedgrassshadow.vert").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
+        else
+        {
+            Program = LoadProgram(
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+                GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedgrassshadow.vert").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+        }
+        TU_tex = 0;
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
+
+        AssignUniforms(Program, uniforms, { "windDir" });
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    InstancedGrassShadowShader *InstancedGrassShadowShaderInstance;
 
     DisplaceMaskShader::DisplaceMaskShader()
     {
