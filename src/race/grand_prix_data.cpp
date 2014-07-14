@@ -49,7 +49,7 @@ GrandPrixData::GrandPrixData(const std::string& filename)
 // ----------------------------------------------------------------------------
 GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
                              const std::string&  track_group,
-                             const RandomGPInfoDialog::REVERSED use_reverse)
+                             const GrandPrixData::GP_Reversed use_reverse)
 {
     m_filename = "Random GP - Not loaded from a file!";
     m_id       = "random";
@@ -118,13 +118,13 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
 
 // ----------------------------------------------------------------------------
 
-void GrandPrixData::changeReverse(const RandomGPInfoDialog::REVERSED use_reverse)
+void GrandPrixData::changeReverse(const GrandPrixData::GP_Reversed use_reverse)
 {
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
-        if (use_reverse == RandomGPInfoDialog::NO_REVERSE)
+        if (use_reverse == NO_REVERSE)
             m_reversed[i] = false;
-        else if (use_reverse == RandomGPInfoDialog::MIXED)
+        else if (use_reverse == MIXED)
             if (track_manager->getTrack(m_tracks[i])->reverseAvailable())
                 m_reversed[i] = (rand() % 2 != 0);
             else

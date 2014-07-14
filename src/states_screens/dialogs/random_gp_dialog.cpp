@@ -37,7 +37,7 @@ RandomGPInfoDialog::RandomGPInfoDialog()
     // Defaults - loading selection from last time frrom a file would be better
     m_number_of_tracks = 2; // We can assume that there are at least 2 standard tracks
     m_trackgroup = "standard";
-    m_use_reverse = NO_REVERSE;
+    m_use_reverse = GrandPrixData::NO_REVERSE;
 
     doInit();
     m_curr_time = 0.0f;
@@ -46,7 +46,7 @@ RandomGPInfoDialog::RandomGPInfoDialog()
     m_over_body = m_area.getHeight()/7 + SPINNER_HEIGHT + 10; // 10px space
     m_lower_bound = m_area.getHeight()*6/7;
 
-    m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+    m_gp = GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
 
     addTitle();
     addSpinners();
@@ -135,14 +135,14 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
     if (eventSource == "start")
     {
         ModalDialog::dismiss();
-        race_manager->startGP(m_gp, false, false);
+        race_manager->startGP(&m_gp, false, false);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "Number of tracks")
     {
         // The old gp can be reused because there's only track deletion/adding
         m_number_of_tracks = getWidget<Spinner>("Number of tracks")->getValue();
-        m_gp->changeTrackNumber(m_number_of_tracks, m_trackgroup);
+        m_gp.changeTrackNumber(m_number_of_tracks, m_trackgroup);
         addTracks();
     }
     else if (eventSource == "Trackgroup")
@@ -164,18 +164,18 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
         if (s->getValue() > (signed)max)
             s->setValue(max);
 
-        new (m_gp) GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+        m_gp = GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
         addTracks();
     }
     else if (eventSource == "reverse")
     {
         Spinner* r = getWidget<Spinner>("reverse");
-        m_use_reverse = static_cast<REVERSED>(r->getValue());
-        m_gp->changeReverse(m_use_reverse);
+        m_use_reverse = static_cast<GrandPrixData::GP_Reversed>(r->getValue());
+        m_gp.changeReverse(m_use_reverse);
     }
     else if (eventSource == "reload")
     {
-        new (m_gp) GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
+        m_gp = GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
         addTracks();
     }
 

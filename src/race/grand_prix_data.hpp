@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "utils/translation.hpp"
 
 using irr::core::stringw;
@@ -70,6 +69,14 @@ private:
     bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
+    enum GP_Reversed
+    {
+        NO_REVERSE = 0,
+        ALL_REVERSE = 1,
+        MIXED = 2
+    };
+
+public:
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #  pragma warning(disable:4290)
 #endif
@@ -80,10 +87,10 @@ public:
     /** Creates a new random GP */
     GrandPrixData(const unsigned int number_of_tracks,
                   const std::string& track_group,
-                  const RandomGPInfoDialog::REVERSED use_reverse);
+                  const GP_Reversed use_reverse);
     void changeTrackNumber(const unsigned int number_of_tracks,
                            const std::string& track_group);
-    void changeReverse(const RandomGPInfoDialog::REVERSED use_reverse);
+    void changeReverse(const GP_Reversed use_reverse);
 
     // Methods for the GP editor
     void setId(const std::string& id);
