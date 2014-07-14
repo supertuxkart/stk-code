@@ -199,27 +199,25 @@ public:
 
 extern ObjectPass2Shader *ObjectPass2ShaderInstance;
 
-class InstancedObjectPass2Shader
+class InstancedObjectPass2Shader : public ShaderHelper<video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_VP, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+    InstancedObjectPass2Shader();
 };
 
-class InstancedObjectRefPass2Shader
+extern InstancedObjectPass2Shader *InstancedObjectPass2ShaderInstance;
+
+class InstancedObjectRefPass2Shader : public ShaderHelper<video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_VP, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+    InstancedObjectRefPass2Shader();
 };
+
+extern InstancedObjectRefPass2Shader *InstancedObjectRefPass2ShaderInstance;
 
 class DetailledObjectPass2Shader : public ShaderHelper<core::matrix4, video::SColorf>
 {
@@ -261,16 +259,15 @@ public:
 
 extern GrassPass2Shader *GrassPass2ShaderInstance;
 
-class InstancedGrassPass2Shader
+class InstancedGrassPass2Shader : public ShaderHelper<core::vector3df, core::vector3df, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_VP, uniform_TM, uniform_IVM, uniform_ambient, uniform_windDir, uniform_invproj, uniform_SunDir;
-    static GLuint TU_Albedo, TU_dtex;
+    GLuint TU_Albedo, TU_dtex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir);
+    InstancedGrassPass2Shader();
 };
+
+extern InstancedGrassPass2Shader *InstancedGrassPass2ShaderInstance;
 
 class SphereMapShader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {

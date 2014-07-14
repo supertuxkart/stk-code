@@ -216,7 +216,7 @@ static void drawSMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjection
   GLenum itype = mesh.IndexType;
   size_t count = mesh.IndexCount;
 
-  setTexture(MeshShader::InstancedObjectPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+  setTexture(MeshShader::InstancedObjectPass2ShaderInstance->TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   if (irr_driver->getLightViz())
   {
       GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
@@ -228,7 +228,7 @@ static void drawSMDefault(GLMesh &mesh, const core::matrix4 &ModelViewProjection
       glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
 
-  MeshShader::InstancedObjectPass2Shader::setUniforms(ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
+  MeshShader::InstancedObjectPass2ShaderInstance->setUniforms(irr_driver->getSceneManager()->getAmbientLight());
 
   glBindVertexArray(mesh.vao);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -242,7 +242,7 @@ static void drawSMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelViewPr
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::InstancedObjectRefPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(MeshShader::InstancedObjectRefPass2ShaderInstance->TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     if (irr_driver->getLightViz())
     {
         GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
@@ -254,7 +254,7 @@ static void drawSMAlphaRefTexture(GLMesh &mesh, const core::matrix4 &ModelViewPr
         glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     }
 
-    MeshShader::InstancedObjectRefPass2Shader::setUniforms(ModelViewProjectionMatrix, core::matrix4::EM4CONST_IDENTITY);
+    MeshShader::InstancedObjectRefPass2ShaderInstance->setUniforms(irr_driver->getSceneManager()->getAmbientLight());
 
     glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -268,7 +268,7 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::InstancedGrassPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    setTexture(MeshShader::InstancedGrassPass2ShaderInstance->TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
     if (irr_driver->getLightViz())
     {
         GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
@@ -279,10 +279,10 @@ static void drawSMGrass(GLMesh &mesh, const core::matrix4 &ModelViewProjectionMa
         GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
         glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
     }
-    setTexture(MeshShader::InstancedGrassPass2Shader::TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    setTexture(MeshShader::InstancedGrassPass2ShaderInstance->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
-    MeshShader::InstancedGrassPass2Shader::setUniforms(ModelViewProjectionMatrix, irr_driver->getInvViewMatrix(), irr_driver->getInvProjMatrix(), windDir, cb->getPosition());
+    MeshShader::InstancedGrassPass2ShaderInstance->setUniforms(windDir, cb->getPosition(), irr_driver->getSceneManager()->getAmbientLight());
 
     glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -324,17 +324,17 @@ void STKInstancedSceneNode::render()
     if (irr_driver->getPhase() == SOLID_LIT_PASS)
     {
         if (!ShadedMesh[SM_DEFAULT_STANDARD].empty())
-            glUseProgram(MeshShader::InstancedObjectPass2Shader::Program);
+            glUseProgram(MeshShader::InstancedObjectPass2ShaderInstance->Program);
         for (unsigned i = 0; i < ShadedMesh[SM_DEFAULT_STANDARD].size(); i++)
             drawSMDefault(*ShadedMesh[SM_DEFAULT_STANDARD][i], ModelViewProjectionMatrix, instance_pos.size() / 9);
 
         if (!ShadedMesh[SM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::InstancedObjectRefPass2Shader::Program);
+            glUseProgram(MeshShader::InstancedObjectRefPass2ShaderInstance->Program);
         for (unsigned i = 0; i < ShadedMesh[SM_ALPHA_REF_TEXTURE].size(); i++)
             drawSMAlphaRefTexture(*ShadedMesh[SM_ALPHA_REF_TEXTURE][i], ModelViewProjectionMatrix, instance_pos.size() / 9);
 
         if (!ShadedMesh[SM_GRASS].empty())
-            glUseProgram(MeshShader::InstancedGrassPass2Shader::Program);
+            glUseProgram(MeshShader::InstancedGrassPass2ShaderInstance->Program);
         for (unsigned i = 0; i < ShadedMesh[SM_GRASS].size(); i++)
             drawSMGrass(*ShadedMesh[SM_GRASS][i], ModelViewProjectionMatrix, windDir, instance_pos.size() / 9);
         return;
