@@ -93,7 +93,7 @@ void STKAnimatedMesh::render()
             GLMesh &mesh = GLmeshes[i];
             if (rnd->isTransparent())
             {
-                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, false);
+                TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
                 TransparentMesh[TranspMat].push_back(&mesh);
             }
             else

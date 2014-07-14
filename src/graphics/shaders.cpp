@@ -258,8 +258,8 @@ void Shaders::loadShaders()
 
     m_shaders[ES_SUNLIGHT] = glsl_noinput(dir + "pass.vert", dir + "pass.frag");
 
-    m_shaders[ES_DISPLACE] = glsl(dir + "pass.vert", dir + "pass.frag",
-                                  m_callbacks[ES_DISPLACE]);
+    m_shaders[ES_DISPLACE] = glslmat(dir + "pass.vert", dir + "pass.frag",
+        m_callbacks[ES_DISPLACE], EMT_TRANSPARENT_ALPHA_CHANNEL);
 
     m_shaders[ES_PASSFAR] = glsl(dir + "pass.vert", dir + "pass.frag",
                                  m_callbacks[ES_COLORIZE]);

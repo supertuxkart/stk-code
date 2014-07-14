@@ -34,7 +34,17 @@ public:
     virtual void render();
     virtual void setMesh(irr::scene::IMesh* mesh);
     virtual ~STKMeshSceneNode();
-    void setIsDisplacement(bool v) { isDisplacement = v; }
+    void setIsDisplacement(bool v) {
+        isDisplacement = v;
+        for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
+        {
+            scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+            if (!mb)
+                continue;
+            if (isDisplacement)
+                mb->getMaterial().MaterialType = irr_driver->getShader(ES_DISPLACE);
+        }
+    }
 };
 
 #endif

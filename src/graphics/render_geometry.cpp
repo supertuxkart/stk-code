@@ -261,7 +261,7 @@ void IrrDriver::renderTransparent()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     glBindVertexArray(getVAO(EVT_2TCOORDS));
-    for (int i = 0; i < ListDisplacement::Arguments.size(); i++)
+    for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
     {
         const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
         const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
@@ -270,7 +270,7 @@ void IrrDriver::renderTransparent()
             Log::error("Materials", "Displacement has wrong vertex type");
             continue;
         }
-        glBindVertexArray(getVAO(video::EVT_2TCOORDS));
+
         DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
 
         GLenum ptype = mesh.PrimitiveType;

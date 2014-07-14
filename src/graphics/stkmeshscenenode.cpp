@@ -49,6 +49,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
       if (!mb)
         continue;
+
       video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
       f32 MaterialTypeParam = mb->getMaterial().MaterialTypeParam;
       video::IMaterialRenderer* rnd = driver->getMaterialRenderer(type);
@@ -60,10 +61,11 @@ void STKMeshSceneNode::setFirstTimeMaterial()
           continue;
       }
 
+
       GLMesh &mesh = GLmeshes[i];
       if (rnd->isTransparent())
       {
-          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam, isDisplacement);
+          TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
           if (immediate_draw)
           {
               fillLocalBuffer(mesh, mb);
@@ -75,6 +77,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       }
       else
       {
+          assert(!isDisplacement);
           GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
           ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
           if (immediate_draw)
@@ -188,9 +191,6 @@ void STKMeshSceneNode::render()
 
     if (!Mesh || !driver)
         return;
-
-    bool isTransparentPass =
-        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
 
     ++PassCount;
 

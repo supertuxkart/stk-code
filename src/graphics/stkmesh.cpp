@@ -42,9 +42,9 @@ ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::
     return SM_DEFAULT_STANDARD;
 }
 
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam, bool isDisplacement)
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
 {
-    if (isDisplacement)
+    if (type == irr_driver->getShader(ES_DISPLACE))
         return TM_DISPLACEMENT;
     if (type == irr_driver->getShader(ES_BUBBLES))
         return TM_BUBBLE;
@@ -287,6 +287,8 @@ bool isObject(video::E_MATERIAL_TYPE type)
     if (type == irr_driver->getShader(ES_GRASS_REF))
         return true;
     if (type == irr_driver->getShader(ES_BUBBLES))
+        return true;
+    if (type == irr_driver->getShader(ES_DISPLACE))
         return true;
     if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
         return true;

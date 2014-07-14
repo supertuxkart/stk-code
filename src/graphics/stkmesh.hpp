@@ -210,6 +210,6 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 
 GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
 ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures, video::E_VERTEX_TYPE tp);
-TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam, bool isDisplacement);
+TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
 
 #endif // STKMESH_H
