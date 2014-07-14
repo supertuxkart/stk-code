@@ -131,15 +131,15 @@ static void drawFSPMDefault(GLMesh &mesh, size_t instance_count)
   if (mesh.textures[0])
   {
       compressTexture(mesh.textures[0], true);
-      setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+      setTexture(MeshShader::InstancedObjectPass1ShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
   }
   else
   {
-      setTexture(0, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
+      setTexture(MeshShader::InstancedObjectPass1ShaderInstance->TU_tex, 0, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, false);
       GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ONE };
       glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
   }
-  MeshShader::InstancedObjectPass1Shader::setUniforms(0);
+  MeshShader::InstancedObjectPass1ShaderInstance->setUniforms();
 
   glBindVertexArray(mesh.vao);
   glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -304,7 +304,7 @@ void STKInstancedSceneNode::render()
         ModelViewProjectionMatrix *= irr_driver->getViewMatrix();
 
         if (!GeometricMesh[FPSM_DEFAULT_STANDARD].empty())
-            glUseProgram(MeshShader::InstancedObjectPass1Shader::Program);
+            glUseProgram(MeshShader::InstancedObjectPass1ShaderInstance->Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_DEFAULT_STANDARD].size(); i++)
             drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT_STANDARD][i], instance_pos.size() / 9);
 

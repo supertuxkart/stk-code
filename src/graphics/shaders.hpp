@@ -55,7 +55,7 @@ void glUniform1fWrapper(GLuint, float);
 
 struct UniformHelper
 {
-    template<unsigned N>
+    template<unsigned N = 0>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms)
     {
     }
@@ -159,15 +159,15 @@ public:
 
 extern NormalMapShader *NormalMapShaderInstance;
 
-class InstancedObjectPass1Shader
+class InstancedObjectPass1Shader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    InstancedObjectPass1Shader();
 };
+
+extern InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
 
 class InstancedObjectRefPass1Shader
 {

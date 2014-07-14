@@ -328,7 +328,7 @@ void Shaders::loadShaders()
     MeshShader::NormalMapShaderInstance = new MeshShader::NormalMapShader();
     MeshShader::ObjectPass1ShaderInstance = new MeshShader::ObjectPass1Shader();
     MeshShader::ObjectRefPass1ShaderInstance = new MeshShader::ObjectRefPass1Shader();
-    MeshShader::InstancedObjectPass1Shader::init();
+    MeshShader::InstancedObjectPass1ShaderInstance = new MeshShader::InstancedObjectPass1Shader();
     MeshShader::InstancedObjectRefPass1Shader::init();
     MeshShader::InstancedGrassPass1Shader::init();
     MeshShader::ObjectPass2ShaderInstance = new MeshShader::ObjectPass2Shader();
@@ -553,17 +553,15 @@ namespace MeshShader
     }
     NormalMapShader *NormalMapShaderInstance;
 
-    GLuint InstancedObjectPass1Shader::Program;
-    GLuint InstancedObjectPass1Shader::uniform_tex;
-
-    void InstancedObjectPass1Shader::init()
+    InstancedObjectPass1Shader::InstancedObjectPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        TU_tex = 0;
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -571,12 +569,7 @@ namespace MeshShader
         }
     }
 
-    void InstancedObjectPass1Shader::setUniforms(unsigned TU_tex)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniform1i(uniform_tex, TU_tex);
-    }
+    InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
 
     GLuint InstancedObjectRefPass1Shader::Program;
     GLuint InstancedObjectRefPass1Shader::uniform_tex;
