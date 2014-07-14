@@ -329,8 +329,8 @@ void Shaders::loadShaders()
     MeshShader::ObjectPass1ShaderInstance = new MeshShader::ObjectPass1Shader();
     MeshShader::ObjectRefPass1ShaderInstance = new MeshShader::ObjectRefPass1Shader();
     MeshShader::InstancedObjectPass1ShaderInstance = new MeshShader::InstancedObjectPass1Shader();
-    MeshShader::InstancedObjectRefPass1Shader::init();
-    MeshShader::InstancedGrassPass1Shader::init();
+    MeshShader::InstancedObjectRefPass1ShaderInstance = new MeshShader::InstancedObjectRefPass1Shader();
+    MeshShader::InstancedGrassPass1ShaderInstance = new MeshShader::InstancedGrassPass1Shader();
     MeshShader::ObjectPass2ShaderInstance = new MeshShader::ObjectPass2Shader();
     MeshShader::InstancedObjectPass2Shader::init();
     MeshShader::InstancedObjectRefPass2Shader::init();
@@ -571,17 +571,15 @@ namespace MeshShader
 
     InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
 
-    GLuint InstancedObjectRefPass1Shader::Program;
-    GLuint InstancedObjectRefPass1Shader::uniform_tex;
-
-    void InstancedObjectRefPass1Shader::init()
+    InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        TU_tex = 0;
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -589,26 +587,18 @@ namespace MeshShader
         }
     }
 
-    void InstancedObjectRefPass1Shader::setUniforms(unsigned TU_tex)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniform1i(uniform_tex, TU_tex);
-    }
+    InstancedObjectRefPass1Shader *InstancedObjectRefPass1ShaderInstance;
 
-    GLuint InstancedGrassPass1Shader::Program;
-    GLuint InstancedGrassPass1Shader::uniform_windDir;
-    GLuint InstancedGrassPass1Shader::uniform_tex;
-
-    void InstancedGrassPass1Shader::init()
+    InstancedGrassPass1Shader::InstancedGrassPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        uniform_windDir = glGetUniformLocation(Program, "windDir");
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        AssignUniforms(Program, uniforms, { "windDir" });
+        TU_tex = 0;
+        AssignTextureUnit(Program, { { TU_tex, "tex" } });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -616,13 +606,7 @@ namespace MeshShader
         }
     }
 
-    void InstancedGrassPass1Shader::setUniforms(const core::vector3df &windDir, unsigned TU_tex)
-    {
-        if (UserConfigParams::m_ubo_disabled)
-            bypassUBO(Program);
-        glUniform3f(uniform_windDir, windDir.X, windDir.Y, windDir.Z);
-        glUniform1i(uniform_tex, TU_tex);
-    }
+    InstancedGrassPass1Shader *InstancedGrassPass1ShaderInstance;
 
     // Solid Lit pass shaders
     ObjectPass2Shader::ObjectPass2Shader()

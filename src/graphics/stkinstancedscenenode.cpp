@@ -172,8 +172,8 @@ static void drawFSPMAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedObjectRefPass1Shader::setUniforms(0);
+    setTexture(MeshShader::InstancedObjectRefPass1ShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedObjectRefPass1ShaderInstance->setUniforms();
 
     glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -202,8 +202,8 @@ static void drawFSPMGrass(GLMesh &mesh, const core::vector3df &windDir, size_t i
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedGrassPass1Shader::setUniforms(windDir, 0);
+    setTexture(MeshShader::InstancedGrassPass1ShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedGrassPass1ShaderInstance->setUniforms(windDir);
 
     glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
@@ -309,13 +309,13 @@ void STKInstancedSceneNode::render()
             drawFSPMDefault(*GeometricMesh[FPSM_DEFAULT_STANDARD][i], instance_pos.size() / 9);
 
         if (!GeometricMesh[FPSM_ALPHA_REF_TEXTURE].empty())
-            glUseProgram(MeshShader::InstancedObjectRefPass1Shader::Program);
+            glUseProgram(MeshShader::InstancedObjectRefPass1ShaderInstance->Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_ALPHA_REF_TEXTURE].size(); i++)
             drawFSPMAlphaRefTexture(*GeometricMesh[FPSM_ALPHA_REF_TEXTURE][i], instance_pos.size() / 9);
 
         windDir = getWind();
         if (!GeometricMesh[FPSM_GRASS].empty())
-            glUseProgram(MeshShader::InstancedGrassPass1Shader::Program);
+            glUseProgram(MeshShader::InstancedGrassPass1ShaderInstance->Program);
         for (unsigned i = 0; i < GeometricMesh[FPSM_GRASS].size(); i++)
             drawFSPMGrass(*GeometricMesh[FPSM_GRASS][i], windDir, instance_pos.size() / 9);
         return;

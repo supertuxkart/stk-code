@@ -169,25 +169,25 @@ public:
 
 extern InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
 
-class InstancedObjectRefPass1Shader
+class InstancedObjectRefPass1Shader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    InstancedObjectRefPass1Shader();
 };
 
-class InstancedGrassPass1Shader
+extern InstancedObjectRefPass1Shader *InstancedObjectRefPass1ShaderInstance;
+
+class InstancedGrassPass1Shader : public ShaderHelper<core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_windDir, uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::vector3df &windDir, unsigned TU_tex);
+    InstancedGrassPass1Shader();
 };
+
+extern InstancedGrassPass1Shader *InstancedGrassPass1ShaderInstance;
 
 class ObjectPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
