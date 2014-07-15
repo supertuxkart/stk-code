@@ -259,15 +259,19 @@ void GPInfoDialog::onEnterPressedInternal()
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& event_source)
 {
-    if (eventSource == "start" || eventSource == "continue")
+    if (event_source == "start" || event_source == "continue")
     {
         // Save GP identifier, since dismiss will delete this object.
         std::string gp_id = m_gp.getId();
+        // Also create a copy of the string: it is a reference to data
+        // in a widget in the dialog - so if we call dismiss, this reference
+        // becomes invalid!
+        std::string save_source = event_source;
         ModalDialog::dismiss();
         race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false,
-                              (eventSource == "continue"));
+                              (save_source == "continue"));
         return GUIEngine::EVENT_BLOCK;
     }
 

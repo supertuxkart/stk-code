@@ -307,16 +307,6 @@ bool isObject(video::E_MATERIAL_TYPE type)
     return false;
 }
 
-void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat)
-{
-    mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-}
-
-void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
-{
-    mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-}
-
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardG::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefault2TCoordG::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListAlphaRefG::Arguments;

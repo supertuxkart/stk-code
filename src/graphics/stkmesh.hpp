@@ -63,8 +63,6 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
 void fillLocalBuffer(GLMesh &, scene::IMeshBuffer* mb);
 video::E_VERTEX_TYPE getVTXTYPEFromStride(size_t stride);
 GLuint createVAO(GLuint vbo, GLuint idx, video::E_VERTEX_TYPE type);
-void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
-void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat);
 core::matrix4 computeMVP(const core::matrix4 &ModelViewProjectionMatrix);
 bool isObject(video::E_MATERIAL_TYPE type);
 

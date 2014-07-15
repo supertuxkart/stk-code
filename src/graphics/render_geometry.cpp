@@ -261,6 +261,9 @@ void IrrDriver::renderTransparent()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     glBindVertexArray(getVAO(EVT_2TCOORDS));
+    // Generate displace mask
+    // Use RTT_TMP4 as displace mask
+    irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
     for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
     {
         const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
@@ -273,35 +276,37 @@ void IrrDriver::renderTransparent()
             continue;
         }
 
-        DisplaceProvider * const cb = (DisplaceProvider *)irr_driver->getCallback(ES_DISPLACE);
-
         GLenum ptype = mesh.PrimitiveType;
         GLenum itype = mesh.IndexType;
         size_t count = mesh.IndexCount;
 
-        // Generate displace mask
-        // Use RTT_TMP4 as displace mask
-        irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
-
-        glUseProgram(MeshShader::DisplaceMaskShader::Program);
-        MeshShader::DisplaceMaskShader::setUniforms(AbsoluteTransformation);
+        glUseProgram(MeshShader::DisplaceMaskShaderInstance->Program);
+        MeshShader::DisplaceMaskShaderInstance->setUniforms(AbsoluteTransformation);
         glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
+    }
 
+    irr_driver->getFBO(FBO_DISPLACE).Bind();
+    if (!displaceTex)
+        displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
+    for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
+    {
+        const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
+        const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
+        if (mesh.VAOType != video::EVT_2TCOORDS)
+            continue;
+
+        GLenum ptype = mesh.PrimitiveType;
+        GLenum itype = mesh.IndexType;
+        size_t count = mesh.IndexCount;
         // Render the effect
-        if (!displaceTex)
-            displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
-        irr_driver->getFBO(FBO_DISPLACE).Bind();
-        setTexture(0, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
-        setTexture(1, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
-        setTexture(2, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
-        setTexture(3, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
-        glUseProgram(MeshShader::DisplaceShader::Program);
-        MeshShader::DisplaceShader::setUniforms(AbsoluteTransformation,
+        setTexture(MeshShader::DisplaceShaderInstance->TU_displacement_tex, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
+        setTexture(MeshShader::DisplaceShaderInstance->TU_mask_tex, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
+        setTexture(MeshShader::DisplaceShaderInstance->TU_color_tex, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
+        setTexture(MeshShader::DisplaceShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
+        glUseProgram(MeshShader::DisplaceShaderInstance->Program);
+        MeshShader::DisplaceShaderInstance->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),
-            core::vector2df(cb->getDir2X(), cb->getDir2Y()),
-            core::vector2df(float(UserConfigParams::m_width),
-            float(UserConfigParams::m_height)),
-            0, 1, 2, 3);
+            core::vector2df(cb->getDir2X(), cb->getDir2Y()));
 
         glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
     }

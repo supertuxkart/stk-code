@@ -69,7 +69,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
           if (immediate_draw)
           {
               fillLocalBuffer(mesh, mb);
-              initvaostate(mesh, TranspMat);
+              mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
               glBindVertexArray(0);
           }
           else
@@ -83,7 +83,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
           if (immediate_draw)
           {
               fillLocalBuffer(mesh, mb);
-              initvaostate(mesh, GeometricType, ShadedType);
+              mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
               glBindVertexArray(0);
           }
           else

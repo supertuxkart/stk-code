@@ -50,11 +50,12 @@ public:
 
 void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
 void glUniform3fWraper(GLuint, float, float, float);
+void glUniform2fWraper(GLuint a, float b, float c);
 void glUniform1fWrapper(GLuint, float);
 
 struct UniformHelper
 {
-    template<unsigned N>
+    template<unsigned N = 0>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms)
     {
     }
@@ -80,6 +81,14 @@ struct UniformHelper
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector3df &v, Args... arg)
     {
         glUniform3fWraper(uniforms[N], v.X, v.Y, v.Z);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
+
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector2df &v, Args... arg)
+    {
+        glUniform2fWraper(uniforms[N], v.X, v.Y);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
@@ -150,35 +159,35 @@ public:
 
 extern NormalMapShader *NormalMapShaderInstance;
 
-class InstancedObjectPass1Shader
+class InstancedObjectPass1Shader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    InstancedObjectPass1Shader();
 };
 
-class InstancedObjectRefPass1Shader
+extern InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
+
+class InstancedObjectRefPass1Shader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    InstancedObjectRefPass1Shader();
 };
 
-class InstancedGrassPass1Shader
+extern InstancedObjectRefPass1Shader *InstancedObjectRefPass1ShaderInstance;
+
+class InstancedGrassPass1Shader : public ShaderHelper<core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_windDir, uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::vector3df &windDir, unsigned TU_tex);
+    InstancedGrassPass1Shader();
 };
+
+extern InstancedGrassPass1Shader *InstancedGrassPass1ShaderInstance;
 
 class ObjectPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
@@ -190,27 +199,25 @@ public:
 
 extern ObjectPass2Shader *ObjectPass2ShaderInstance;
 
-class InstancedObjectPass2Shader
+class InstancedObjectPass2Shader : public ShaderHelper<video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_VP, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+    InstancedObjectPass2Shader();
 };
 
-class InstancedObjectRefPass2Shader
+extern InstancedObjectPass2Shader *InstancedObjectPass2ShaderInstance;
+
+class InstancedObjectRefPass2Shader : public ShaderHelper<video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_VP, uniform_TM, uniform_ambient;
-    static GLuint TU_Albedo;
+    GLuint TU_Albedo;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &TextureMatrix);
+    InstancedObjectRefPass2Shader();
 };
+
+extern InstancedObjectRefPass2Shader *InstancedObjectRefPass2ShaderInstance;
 
 class DetailledObjectPass2Shader : public ShaderHelper<core::matrix4, video::SColorf>
 {
@@ -252,16 +259,15 @@ public:
 
 extern GrassPass2Shader *GrassPass2ShaderInstance;
 
-class InstancedGrassPass2Shader
+class InstancedGrassPass2Shader : public ShaderHelper<core::vector3df, core::vector3df, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_VP, uniform_TM, uniform_IVM, uniform_ambient, uniform_windDir, uniform_invproj, uniform_SunDir;
-    static GLuint TU_Albedo, TU_dtex;
+    GLuint TU_Albedo, TU_dtex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewProjectionMatrix, const core::matrix4 &InverseViewMatrix, const core::matrix4 &invproj, const core::vector3df &windDirection, const core::vector3df &SunDir);
+    InstancedGrassPass2Shader();
 };
+
+extern InstancedGrassPass2Shader *InstancedGrassPass2ShaderInstance;
 
 class SphereMapShader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
 {
@@ -354,14 +360,13 @@ public:
     static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix);
 };
 
-class InstancedShadowShader
+class InstancedShadowShader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-
-    static void init();
-    static void setUniforms();
+    InstancedShadowShader();
 };
+
+extern InstancedShadowShader *InstancedShadowShaderInstance;
 
 class RefShadowShader : public ShaderHelper<core::matrix4>
 {
@@ -373,15 +378,15 @@ public:
 
 extern RefShadowShader *RefShadowShaderInstance;
 
-class InstancedRefShadowShader
+class InstancedRefShadowShader : public ShaderHelper<>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    InstancedRefShadowShader();
 };
+
+extern InstancedRefShadowShader *InstancedRefShadowShaderInstance;
 
 class GrassShadowShader : public ShaderHelper<core::matrix4, core::vector3df>
 {
@@ -392,25 +397,32 @@ public:
 
 extern GrassShadowShader *GrassShadowShaderInstance;
 
-class DisplaceMaskShader
+class InstancedGrassShadowShader : public ShaderHelper<core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix);
+    GLuint TU_tex;
+    InstancedGrassShadowShader();
 };
 
-class DisplaceShader
+extern InstancedGrassShadowShader *InstancedGrassShadowShaderInstance;
+
+class DisplaceMaskShader : public ShaderHelper<core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MVP, uniform_displacement_tex, uniform_mask_tex, uniform_color_tex, uniform_tex, uniform_dir, uniform_dir2;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &dir, const core::vector2df &dir2, const core::vector2df &screen, unsigned TU_displacement_tex, unsigned TU_mask_tex, unsigned TU_color_tex, unsigned TU_tex);
+    DisplaceMaskShader();
 };
+
+extern DisplaceMaskShader *DisplaceMaskShaderInstance;
+
+class DisplaceShader : public ShaderHelper<core::matrix4, core::vector2df, core::vector2df>
+{
+public:
+    GLuint TU_displacement_tex, TU_mask_tex, TU_color_tex, TU_tex;
+
+    DisplaceShader();
+};
+
+extern DisplaceShader *DisplaceShaderInstance;
 
 class SkyboxShader
 {
