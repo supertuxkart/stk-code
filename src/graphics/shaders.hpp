@@ -120,26 +120,40 @@ public:
     }
 };
 
+template<typename T, typename... Args>
+class ShaderHelperSingleton : public Singleton<T>
+{
+protected:
+    std::vector<GLuint> uniforms;
+public:
+    friend class Singleton<class ObjectPass1Shader>;
+    GLuint Program;
+
+    void setUniforms(const Args & ... args) const
+    {
+        if (UserConfigParams::m_ubo_disabled)
+            bypassUBO(Program);
+        UniformHelper::setUniformsHelper(uniforms, args...);
+    }
+};
+
 namespace MeshShader
 {
-class ObjectPass1Shader : public ShaderHelper<core::matrix4, core::matrix4>, public Singleton<class ObjectPass1Shader>
+class ObjectPass1Shader : public ShaderHelperSingleton<ObjectPass1Shader, core::matrix4, core::matrix4>
 {
-    friend class Singleton<class ObjectPass1Shader>;
 public:
     GLuint TU_tex;
     ObjectPass1Shader();
 };
 
-class ObjectRefPass1Shader : public ShaderHelper<core::matrix4, core::matrix4, core::matrix4>
+class ObjectRefPass1Shader : public ShaderHelperSingleton<ObjectRefPass1Shader, core::matrix4, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_tex;
     ObjectRefPass1Shader();
 };
 
-extern ObjectRefPass1Shader *ObjectRefPass1ShaderInstance;
-
-class GrassPass1Shader : public ShaderHelper<core::matrix4, core::matrix4, core::vector3df>
+class GrassPass1Shader : public ShaderHelperSingleton<GrassPass1Shader, core::matrix4, core::matrix4, core::vector3df>
 {
 public:
     GLuint TU_tex;
@@ -147,16 +161,12 @@ public:
     GrassPass1Shader();
 };
 
-extern GrassPass1Shader *GrassPass1ShaderInstance;
-
-class NormalMapShader : public ShaderHelper<core::matrix4, core::matrix4>
+class NormalMapShader : public ShaderHelperSingleton<NormalMapShader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_normalmap, TU_glossy;
     NormalMapShader();
 };
-
-extern NormalMapShader *NormalMapShaderInstance;
 
 class InstancedObjectPass1Shader : public ShaderHelper<>
 {

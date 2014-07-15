@@ -325,9 +325,6 @@ void Shaders::loadShaders()
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
     MeshShader::ColorizeShader::init();
-    MeshShader::NormalMapShaderInstance = new MeshShader::NormalMapShader();
-//    MeshShader::ObjectPass1ShaderInstance = new MeshShader::ObjectPass1Shader();
-    MeshShader::ObjectRefPass1ShaderInstance = new MeshShader::ObjectRefPass1Shader();
     MeshShader::InstancedObjectPass1ShaderInstance = new MeshShader::InstancedObjectPass1Shader();
     MeshShader::InstancedObjectRefPass1ShaderInstance = new MeshShader::InstancedObjectRefPass1Shader();
     MeshShader::InstancedGrassPass1ShaderInstance = new MeshShader::InstancedGrassPass1Shader();
@@ -340,7 +337,6 @@ void Shaders::loadShaders()
     MeshShader::ObjectUnlitShaderInstance = new MeshShader::ObjectUnlitShader();
     MeshShader::SphereMapShaderInstance = new MeshShader::SphereMapShader();
     MeshShader::SplattingShaderInstance = new MeshShader::SplattingShader();
-    MeshShader::GrassPass1ShaderInstance = new MeshShader::GrassPass1Shader();
     MeshShader::GrassPass2ShaderInstance = new MeshShader::GrassPass2Shader();
     MeshShader::BubbleShader::init();
     MeshShader::TransparentShaderInstance = new MeshShader::TransparentShader();
@@ -489,7 +485,7 @@ namespace MeshShader
 {
 
     // Solid Normal and depth pass shaders
-    ObjectPass1Shader::ObjectPass1Shader() : Singleton<ObjectPass1Shader>()
+    ObjectPass1Shader::ObjectPass1Shader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
@@ -520,7 +516,6 @@ namespace MeshShader
         TU_tex = 0;
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
-    ObjectRefPass1Shader *ObjectRefPass1ShaderInstance;
 
     GrassPass1Shader::GrassPass1Shader()
     {
@@ -532,8 +527,6 @@ namespace MeshShader
         TU_tex = 0;
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
-
-    GrassPass1Shader *GrassPass1ShaderInstance;
 
     NormalMapShader::NormalMapShader()
     {
@@ -551,7 +544,6 @@ namespace MeshShader
         TU_glossy = 0;
         AssignTextureUnit(Program, { { TU_normalmap, "normalMap" }, { TU_glossy, "DiffuseForAlpha" } });
     }
-    NormalMapShader *NormalMapShaderInstance;
 
     InstancedObjectPass1Shader::InstancedObjectPass1Shader()
     {
