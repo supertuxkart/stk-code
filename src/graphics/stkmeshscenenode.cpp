@@ -276,7 +276,7 @@ void STKMeshSceneNode::render()
             glDisable(GL_CULL_FACE);
             if (!spareWhiteTex)
                 spareWhiteTex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            glUseProgram(MeshShader::ObjectPass2ShaderInstance->Program);
+            glUseProgram(MeshShader::ObjectPass2Shader::getInstance<MeshShader::ObjectPass2Shader>()->Program);
             // Only untextured
             for (unsigned i = 0; i < GLmeshes.size(); i++)
             {
@@ -286,8 +286,8 @@ void STKMeshSceneNode::render()
                 GLenum itype = mesh.IndexType;
                 size_t count = mesh.IndexCount;
 
-                setTexture(MeshShader::ObjectPass2ShaderInstance->TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
-                MeshShader::ObjectPass2ShaderInstance->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+                setTexture(MeshShader::ObjectPass2Shader::getInstance<MeshShader::ObjectPass2Shader>()->TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
+                MeshShader::ObjectPass2Shader::getInstance<MeshShader::ObjectPass2Shader>()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
                 glDrawElements(ptype, count, itype, 0);
@@ -350,7 +350,7 @@ void STKMeshSceneNode::render()
 
             if (World::getWorld() && World::getWorld()->isFogEnabled())
             {
-                glUseProgram(MeshShader::TransparentFogShaderInstance->Program);
+                glUseProgram(MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->Program);
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     GLMesh &mesh = GLmeshes[i];
@@ -374,8 +374,8 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-                    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-                    MeshShader::TransparentFogShaderInstance->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col);
+                    setTexture(MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col);
 
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
@@ -385,7 +385,7 @@ void STKMeshSceneNode::render()
             }
             else
             {
-                glUseProgram(MeshShader::TransparentShaderInstance->Program);
+                glUseProgram(MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->Program);
                 for (unsigned i = 0; i < GLmeshes.size(); i++)
                 {
                     irr_driver->IncreaseObjectCount();
@@ -395,9 +395,9 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    setTexture(MeshShader::TransparentShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    setTexture(MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
 
-                    MeshShader::TransparentShaderInstance->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
+                    MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                     assert(mesh.vao);
                     glBindVertexArray(mesh.vao);
                     glDrawElements(ptype, count, itype, 0);
