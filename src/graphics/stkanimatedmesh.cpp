@@ -117,13 +117,13 @@ void STKAnimatedMesh::render()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-           if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
-           {
-               glBindVertexArray(0);
-               glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
-               glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
-               glBindBuffer(GL_ARRAY_BUFFER, 0);
-           }
+            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS)
+            {
+                glBindVertexArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
+                glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
         }
         if (mb)
             GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
@@ -140,7 +140,6 @@ void STKAnimatedMesh::render()
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
@@ -164,19 +163,19 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in (mesh, ShadedMesh[SM_UNLIT])
             ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
-            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
+            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
 
         return;
     }
@@ -201,20 +200,18 @@ void STKAnimatedMesh::render()
             const float end = track->getFogEnd();
             const video::SColor tmpcol = track->getFogColor();
 
-            core::vector3df col(tmpcol.getRed() / 255.0f,
+            video::SColorf col(tmpcol.getRed() / 255.0f,
                 tmpcol.getGreen() / 255.0f,
                 tmpcol.getBlue() / 255.0f);
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
                 ListBlendTransparentFog::Arguments.push_back(
                     std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col,
-                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+                                    fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 ListAdditiveTransparentFog::Arguments.push_back(
                     std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
-                                    fogmax, startH, endH, start, end, col,
-                                    Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition()));
+                                    fogmax, startH, endH, start, end, col));
         }
         else
         {

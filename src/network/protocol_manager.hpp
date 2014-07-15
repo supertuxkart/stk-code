@@ -23,10 +23,10 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
-#include "network/singleton.hpp"
 #include "network/event.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol.hpp"
+#include "utils/singleton.hpp"
 #include "utils/types.hpp"
 
 #include <vector>

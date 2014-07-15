@@ -117,7 +117,6 @@ void FocusDispatcher::add()
     m_element->setTabStop(true);
     m_element->setTabGroup(false);
     m_element->setTabOrder(m_id);
-    m_element->setVisible(false);
 }
 
 static FocusDispatcher* g_dispatcher = NULL;

@@ -72,6 +72,7 @@ class Singleton
             if (m_singleton)
             {
                 delete m_singleton;
+                m_singleton = NULL;
             }
         }
 

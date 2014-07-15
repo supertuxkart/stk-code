@@ -27,6 +27,7 @@
 #include "graphics/mesh_tools.hpp"
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stkmeshscenenode.hpp"
 #include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -373,7 +374,16 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
     }
     else
     {
+        bool displacing = false;
+        if (xml_node)
+            xml_node->get("displacing", &displacing);
+
         m_node = irr_driver->addMesh(m_mesh, parent);
+
+        STKMeshSceneNode* stkmesh = dynamic_cast<STKMeshSceneNode*>(m_node);
+        if (displacing && stkmesh != NULL)
+            stkmesh->setIsDisplacement(displacing);
+
         m_frame_start = 0;
         m_frame_end = 0;
 
