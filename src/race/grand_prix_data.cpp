@@ -98,7 +98,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                 continue;
 
             m_tracks.push_back(id);
-            m_laps.push_back(3); // TODO: Take the default number from the track
+            m_laps.push_back(track_manager->getTrack(index)->getDefaultNumberOfLaps());
             m_reversed.push_back(false); // This will be changed later
         }
     }
