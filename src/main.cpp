@@ -201,6 +201,7 @@
 #include "utils/leak_check.hpp"
 #include "utils/log.hpp"
 #include "utils/translation.hpp"
+#include "utils/tuple.hpp"
 
 static void cleanSuperTuxKart();
 static void cleanUserConfig();
@@ -1162,6 +1163,12 @@ void askForInternetPermission()
 // ----------------------------------------------------------------------------
 int main(int argc, char *argv[] )
 {
+    STK::Tuple<int, float, std::string> tup(1, 3.14f, "Hello");
+    auto tup2 = STK::make_tuple(1, 3.14f, "Hello");
+
+    Log::info("TEST", "Tuple 1 : %i  %f  %s", STK::tuple_get<0>(tup), STK::tuple_get<1>(tup), STK::tuple_get<2>(tup).c_str());
+    Log::info("TEST", "Tuple 2 : %i  %f  %s", STK::tuple_get<0>(tup2), STK::tuple_get<1>(tup2), STK::tuple_get<2>(tup2));
+
     CommandLine::init(argc, argv);
 
     CrashReporting::installHandlers();

@@ -28,6 +28,7 @@
 #include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+#include "utils/tuple.hpp"
 
 #include <algorithm>
 
@@ -36,9 +37,9 @@ template<unsigned N>
 struct unroll_args_instance
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        unroll_args_instance<N - 1>::template exec<T>(Shader, t, std::get<N - 1>(t), args...);
+        unroll_args_instance<N - 1>::template exec<T>(Shader, t, STK::tuple_get<N - 1>(t), args...);
     }
 };
 
@@ -46,26 +47,27 @@ template<>
 struct unroll_args_instance<0>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
         draw<T>(Shader, args...);
     }
 };
 
 template<typename T, typename... TupleType>
-void apply_instance(const T *Shader, const std::tuple<TupleType...> &arg)
+void apply_instance(const T *Shader, const STK::Tuple<TupleType...> &arg)
 {
-    unroll_args_instance<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<T>(Shader, arg);
+    unroll_args_instance<sizeof...(TupleType)>::template exec<T>(Shader, arg);
+    //unroll_args_instance<STK::TupleSize<STK::Tuple<TupleType...> >::value >::template exec<T>(Shader, arg);
 }
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
-void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<STK::Tuple<TupleType...> > &meshes)
 {
     glUseProgram(Shader::getInstance<Shader>()->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(std::get<0>(meshes[i]));
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes[i]));
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (!mesh.textures[j])
@@ -118,13 +120,13 @@ void IrrDriver::renderSolidFirstPass()
 }
 
 template<typename T, enum E_VERTEX_TYPE VertexType, typename... TupleType>
-void renderMeshes2ndPass(const T *Shader, const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+void renderMeshes2ndPass(const T *Shader, const std::vector<GLuint> &TexUnits, std::vector<STK::Tuple<TupleType...> > &meshes)
 {
     glUseProgram(Shader->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(std::get<0>(meshes[i]));
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes[i]));
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (!mesh.textures[j])
@@ -266,8 +268,8 @@ void IrrDriver::renderTransparent()
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
     for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
     {
-        const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
-        const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
+        const GLMesh &mesh = *(STK::tuple_get<0>(ListDisplacement::Arguments[i]));
+        const core::matrix4 &AbsoluteTransformation = STK::tuple_get<1>(ListDisplacement::Arguments[i]);
         if (mesh.VAOType != video::EVT_2TCOORDS)
         {
 #ifdef DEBUG
@@ -290,8 +292,8 @@ void IrrDriver::renderTransparent()
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
     {
-        const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
-        const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
+        const GLMesh &mesh = *(STK::tuple_get<0>(ListDisplacement::Arguments[i]));
+        const core::matrix4 &AbsoluteTransformation = STK::tuple_get<1>(ListDisplacement::Arguments[i]);
         if (mesh.VAOType != video::EVT_2TCOORDS)
             continue;
 
@@ -319,13 +321,13 @@ void IrrDriver::renderTransparent()
 }
 
 template<typename T, enum E_VERTEX_TYPE VertexType, typename... Args>
-void drawShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+void drawShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
     glUseProgram(Shader->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        const GLMesh *mesh = std::get<0>(t[i]);
+        const GLMesh *mesh = STK::tuple_get<0>(t[i]);
         irr_driver->IncreaseObjectCount();
         GLenum ptype = mesh->PrimitiveType;
         GLenum itype = mesh->IndexType;
@@ -336,18 +338,18 @@ void drawShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const s
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
 
-        Shader->setUniforms(std::get<1>(t[i]));
+        Shader->setUniforms(STK::tuple_get<1>(t[i]));
         glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
     }
 }
 
-static void drawShadowGrass(const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > &t)
+static void drawShadowGrass(const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > &t)
 {
     glUseProgram(MeshShader::GrassShadowShaderInstance->Program);
     glBindVertexArray(getVAO(EVT_STANDARD));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        const GLMesh *mesh = std::get<0>(t[i]);
+        const GLMesh *mesh = STK::tuple_get<0>(t[i]);
         irr_driver->IncreaseObjectCount();
         GLenum ptype = mesh->PrimitiveType;
         GLenum itype = mesh->IndexType;
@@ -358,25 +360,25 @@ static void drawShadowGrass(const std::vector<GLuint> TextureUnits, const std::v
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
 
-        MeshShader::GrassShadowShaderInstance->setUniforms(std::get<1>(t[i]), std::get<3>(t[i]));
+        MeshShader::GrassShadowShaderInstance->setUniforms(STK::tuple_get<1>(t[i]), STK::tuple_get<3>(t[i]));
         glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
     }
 }
 
 template<enum E_VERTEX_TYPE VertexType, typename... Args>
-void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
     glUseProgram(MeshShader::RSMShader::Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        const GLMesh *mesh = std::get<0>(t[i]);
+        const GLMesh *mesh = STK::tuple_get<0>(t[i]);
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
-        draw<MeshShader::RSMShader>(mesh, rsm_matrix, std::get<1>(t[i]));
+        draw<MeshShader::RSMShader>(mesh, rsm_matrix, STK::tuple_get<1>(t[i]));
     }
 }
 

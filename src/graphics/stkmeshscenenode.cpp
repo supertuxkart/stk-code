@@ -6,9 +6,10 @@
 #include <IMaterialRenderer.h>
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
-#include "utils/helpers.hpp"
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
+#include "utils/helpers.hpp"
+#include "utils/tuple.hpp"
 
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,
@@ -248,20 +249,20 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
-            ListDefaultStandardG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
+            ListDefaultStandardG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
-            ListDefault2TCoordG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
+            ListDefault2TCoordG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-            ListAlphaRefG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix));
+            ListAlphaRefG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix));
 
         for_in(mesh, GeometricMesh[FPSM_NORMAL_MAP])
-            ListNormalG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
+            ListNormalG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel));
 
         windDir = getWind();
         for_in(mesh, GeometricMesh[FPSM_GRASS])
-            ListGrassG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, windDir));
+            ListGrassG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel, windDir));
 
         return;
     }
@@ -299,28 +300,28 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-            ListDefaultStandardSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
+            ListDefaultStandardSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
+            ListDefaultTangentSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-            ListAlphaRefSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
+            ListAlphaRefSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_SPHEREMAP])
-            ListSphereMapSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight()));
+            ListSphereMapSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_SPLATTING])
-            ListSplattingSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
+            ListSplattingSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_UNLIT])
-            ListUnlitSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
+            ListUnlitSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation));
 
         for_in(mesh, ShadedMesh[SM_DETAILS])
-            ListDetailSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
+            ListDetailSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
 
         for_in(mesh, ShadedMesh[SM_GRASS])
-            ListGrassSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, windDir, irr_driver->getSceneManager()->getAmbientLight()));
+            ListGrassSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, windDir, irr_driver->getSceneManager()->getAmbientLight()));
 
         return;
     }
@@ -427,24 +428,24 @@ void STKMeshSceneNode::render()
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
                 ListBlendTransparentFog::Arguments.push_back(
-                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                    STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 ListAdditiveTransparentFog::Arguments.push_back(
-                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                    STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
         }
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+                ListBlendTransparent::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+                ListAdditiveTransparent::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
         }
 
         for_in(mesh, TransparentMesh[TM_DISPLACEMENT])
-            ListDisplacement::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation));
+            ListDisplacement::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation));
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);

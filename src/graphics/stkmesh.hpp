@@ -3,12 +3,13 @@
 
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "utils/tuple.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
 
-#include <tuple>
+//#include <STK::Tuple>
 #include <vector>
 
 enum GeometricMaterial
@@ -72,31 +73,31 @@ core::vector3df getWind();
 class ListDefaultStandardG
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListDefault2TCoordG
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListAlphaRefG
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListNormalG
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListGrassG
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > Arguments;
 };
 
 template<typename Shader, typename...uniforms>
@@ -128,79 +129,79 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
 class ListDefaultStandardSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListDefaultTangentSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListAlphaRefSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListSphereMapSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListSplattingSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListUnlitSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4> > Arguments;
 };
 
 class ListDetailSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, video::SColorf> > Arguments;
 };
 
 class ListGrassSM
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > Arguments;
 };
 
 class ListBlendTransparent
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListAdditiveTransparent
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListBlendTransparentFog
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
 };
 
 class ListAdditiveTransparentFog
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
 };
 
 class ListDisplacement
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4> > Arguments;
 };
 
 // Forward pass (for transparents meshes)

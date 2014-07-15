@@ -307,22 +307,22 @@ bool isObject(video::E_MATERIAL_TYPE type)
     return false;
 }
 
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardG::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefault2TCoordG::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListAlphaRefG::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > ListGrassG::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardG::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefault2TCoordG::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListAlphaRefG::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > ListGrassG::Arguments;
 
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultStandardSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultTangentSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListAlphaRefSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > ListSplattingSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > ListDetailSM::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > ListGrassSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultStandardSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultTangentSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListAlphaRefSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, video::SColorf> > ListSplattingSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, video::SColorf> > ListDetailSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > ListGrassSM::Arguments;
