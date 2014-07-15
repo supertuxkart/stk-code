@@ -387,7 +387,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         m_frame_start = 0;
         m_frame_end = 0;
 
-        if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+        if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL && xml_node != NULL)
             World::getWorld()->getTrack()->handleAnimatedTextures(m_node, *xml_node);
     }
 //#ifdef DEBUG

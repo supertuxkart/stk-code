@@ -34,6 +34,7 @@ ProgressBarWidget::ProgressBarWidget(bool show_label) : Widget(WTYPE_PROGRESS)
 {
     m_value = 0;
     m_show_label = show_label;
+    setFocusable(false);
 }
 
 // -----------------------------------------------------------------------------
