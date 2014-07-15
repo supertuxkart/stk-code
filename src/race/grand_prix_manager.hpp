@@ -22,7 +22,8 @@
 #include <vector>
 #include <string>
 
-#include "race/grand_prix_data.hpp"
+#include "irrlicht.h"
+class GrandPrixData;
 
 /**
   * \ingroup race
