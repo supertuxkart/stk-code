@@ -22,8 +22,8 @@
 #ifndef NETWORK_WORLD_HPP
 #define NETWORK_WORLD_HPP
 
-#include "network/singleton.hpp"
 #include "input/input.hpp"
+#include "utils/singleton.hpp"
 #include <map>
 
 class Controller;

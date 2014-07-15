@@ -70,7 +70,6 @@ enum STKRenderingPass
     SOLID_LIT_PASS,
     TRANSPARENT_PASS,
     GLOW_PASS,
-    DISPLACEMENT_PASS,
     SHADOW_PASS,
     PASS_COUNT,
 };
@@ -353,8 +352,6 @@ private:
 
     std::vector<BloomData> m_forcedbloom;
 
-    std::vector<scene::ISceneNode *> m_displacing;
-
     std::vector<scene::ISceneNode *> m_background;
 
     STKRenderingPass m_phase;
@@ -380,7 +377,6 @@ private:
     void renderGlow(std::vector<GlowData>& glows);
     void renderSSAO();
     void renderLights(unsigned pointlightCount);
-    void renderDisplacement();
     void renderShadowsDebug();
     void doScreenShot();
 public:
@@ -667,12 +663,6 @@ public:
     void clearForcedBloom() { m_forcedbloom.clear(); }
     // ------------------------------------------------------------------------
     const std::vector<BloomData> &getForcedBloom() const { return m_forcedbloom; }
-    // ------------------------------------------------------------------------
-    void clearDisplacingNodes() { m_displacing.clear(); }
-    // ------------------------------------------------------------------------
-    const std::vector<scene::ISceneNode *> &getDisplacingNodes() const { return m_displacing; }
-    // ------------------------------------------------------------------------
-    void addDisplacingNode(scene::ISceneNode * const n) { m_displacing.push_back(n); }
     // ------------------------------------------------------------------------
     void clearBackgroundNodes() { m_background.clear(); }
     // ------------------------------------------------------------------------

@@ -21,6 +21,7 @@
 #include "addons/addon.hpp"
 #include "config/stk_config.hpp"
 #include "config/player_manager.hpp"
+#include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/material_manager.hpp"
 #include "io/file_manager.hpp"
@@ -242,6 +243,11 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_minimap_icon = irr_driver->getTexture(m_root+m_minimap_icon_file);
     else
         m_minimap_icon = NULL;
+
+    if (m_minimap_icon == NULL)
+    {
+        m_minimap_icon = getUnicolorTexture(m_color);
+    }
 
     // Only load the model if the .kart file has the appropriate version,
     // otherwise warnings are printed.
