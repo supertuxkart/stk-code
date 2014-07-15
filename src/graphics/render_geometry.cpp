@@ -61,7 +61,7 @@ void apply_instance(const T *Shader, const std::tuple<TupleType...> &arg)
 template<typename Shader, enum E_VERTEX_TYPE VertexType, typename... TupleType>
 void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
 {
-    glUseProgram(Shader::getInstance<Shader>()->Program);
+    glUseProgram(Shader::getInstance()->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
@@ -80,7 +80,7 @@ void renderMeshes1stPass(const std::vector<GLuint> &TexUnits, std::vector<std::t
 #endif
             continue;
         }
-        apply_instance(Shader::getInstance<Shader>(), meshes[i]);
+        apply_instance(Shader::getInstance(), meshes[i]);
     }
 }
 
