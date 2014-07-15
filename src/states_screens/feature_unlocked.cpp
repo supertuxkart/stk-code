@@ -493,7 +493,7 @@ void FeatureUnlockedCutScene::onUpdate(float dt)
 
     if (m_global_time > GIFT_EXIT_TO)
     {
-        const irr::video::SColor color2(255, 255, 126, 21);
+        const irr::video::SColor color2(255, 0, 0, 0);
         const int fontH = GUIEngine::getFontHeight();
         const int MARGIN = 10;
 

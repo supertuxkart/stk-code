@@ -302,7 +302,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                                    const_cast<KartProperties*>(
                                         kart_properties_manager->getKart("tux")
                                                               ),
-                                   L"Unlocked"
+                                    L"You unlocked <actual text would go here...>"
                                    );
             scene->addUnlockedTrack(track_manager->getTrack("lighthouse"));
             StateManager::get()->pushScreen(scene);
@@ -323,7 +323,7 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
                 track_manager->getTrack("snowmountain")
                              ->getScreenshotFile().c_str()));
 
-            scene->addUnlockedPictures(textures, 4.0, 3.0, L"You did it");
+            scene->addUnlockedPictures(textures, 4.0, 3.0, L"You unlocked <actual text would go here...>");
 
             StateManager::get()->pushScreen(scene);
         }
