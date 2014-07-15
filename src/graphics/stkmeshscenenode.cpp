@@ -225,7 +225,7 @@ void STKMeshSceneNode::render()
             glDisable(GL_CULL_FACE);
             if (update_each_frame)
                 updatevbo();
-            glUseProgram(MeshShader::ObjectPass1ShaderInstance->Program);
+            glUseProgram(MeshShader::ObjectPass1Shader::getInstance()->Program);
             // Only untextured
             for (unsigned i = 0; i < GLmeshes.size(); i++)
             {
@@ -235,7 +235,7 @@ void STKMeshSceneNode::render()
                 GLenum itype = mesh.IndexType;
                 size_t count = mesh.IndexCount;
 
-                MeshShader::ObjectPass1ShaderInstance->setUniforms(AbsoluteTransformation, invmodel);
+                MeshShader::ObjectPass1Shader::getInstance()->setUniforms(AbsoluteTransformation, invmodel);
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
                 glDrawElements(ptype, count, itype, 0);

@@ -326,7 +326,7 @@ void Shaders::loadShaders()
     FullScreenShader::MLAAGatherSHader::init();
     MeshShader::ColorizeShader::init();
     MeshShader::NormalMapShaderInstance = new MeshShader::NormalMapShader();
-    MeshShader::ObjectPass1ShaderInstance = new MeshShader::ObjectPass1Shader();
+//    MeshShader::ObjectPass1ShaderInstance = new MeshShader::ObjectPass1Shader();
     MeshShader::ObjectRefPass1ShaderInstance = new MeshShader::ObjectRefPass1Shader();
     MeshShader::InstancedObjectPass1ShaderInstance = new MeshShader::InstancedObjectPass1Shader();
     MeshShader::InstancedObjectRefPass1ShaderInstance = new MeshShader::InstancedObjectRefPass1Shader();
@@ -489,7 +489,7 @@ namespace MeshShader
 {
 
     // Solid Normal and depth pass shaders
-    ObjectPass1Shader::ObjectPass1Shader()
+    ObjectPass1Shader::ObjectPass1Shader() : Singleton<ObjectPass1Shader>()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
@@ -504,7 +504,6 @@ namespace MeshShader
         TU_tex = 0;
         AssignTextureUnit(Program, { { TU_tex, "tex" } });
     }
-    ObjectPass1Shader *ObjectPass1ShaderInstance;
 
     ObjectRefPass1Shader::ObjectRefPass1Shader()
     {

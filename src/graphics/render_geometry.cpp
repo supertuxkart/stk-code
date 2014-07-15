@@ -109,8 +109,8 @@ void IrrDriver::renderSolidFirstPass()
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD>(MeshShader::ObjectPass1ShaderInstance, { MeshShader::ObjectPass1ShaderInstance->TU_tex }, ListDefaultStandardG::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS>(MeshShader::ObjectPass1ShaderInstance, { MeshShader::ObjectPass1ShaderInstance->TU_tex }, ListDefault2TCoordG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD>(MeshShader::ObjectPass1Shader::getInstance<MeshShader::ObjectPass1Shader>(), { MeshShader::ObjectPass1Shader::getInstance<MeshShader::ObjectPass1Shader>()->TU_tex }, ListDefaultStandardG::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS>(MeshShader::ObjectPass1Shader::getInstance(), { MeshShader::ObjectPass1Shader::getInstance()->TU_tex }, ListDefault2TCoordG::Arguments);
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD>(MeshShader::ObjectRefPass1ShaderInstance, { MeshShader::ObjectRefPass1ShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
         renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS>(MeshShader::NormalMapShaderInstance, { MeshShader::NormalMapShaderInstance->TU_glossy, MeshShader::NormalMapShaderInstance->TU_normalmap }, ListNormalG::Arguments);
         renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD>(MeshShader::GrassPass1ShaderInstance, { MeshShader::GrassPass1ShaderInstance->TU_tex }, ListGrassG::Arguments);

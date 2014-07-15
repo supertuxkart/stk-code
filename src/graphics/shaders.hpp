@@ -21,6 +21,7 @@
 #include <IMeshSceneNode.h>
 #include <vector>
 #include "config/user_config.hpp"
+#include "utils/singleton.hpp"
 
 typedef unsigned int    GLuint;
 using namespace irr;
@@ -121,15 +122,13 @@ public:
 
 namespace MeshShader
 {
-class ObjectPass1Shader : public ShaderHelper<core::matrix4, core::matrix4>
+class ObjectPass1Shader : public ShaderHelper<core::matrix4, core::matrix4>, public Singleton<class ObjectPass1Shader>
 {
+    friend class Singleton<class ObjectPass1Shader>;
 public:
     GLuint TU_tex;
     ObjectPass1Shader();
 };
-
-extern ObjectPass1Shader *ObjectPass1ShaderInstance;
-
 
 class ObjectRefPass1Shader : public ShaderHelper<core::matrix4, core::matrix4, core::matrix4>
 {
