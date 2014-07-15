@@ -40,7 +40,7 @@ namespace Online
 
     class OnlineProfile;
 
-    // ============================================================================
+    // ----------------------------------------------------------------------------
 
     /**
       * \brief Class that represents an online registered user

@@ -139,7 +139,7 @@ void ItemManager::removeTextures()
 }   // removeTextures
 
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** Creates a new instance of the item manager. This is done at startup
  *  of each race. */
 ItemManager::ItemManager()

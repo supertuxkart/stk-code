@@ -549,7 +549,7 @@ void BaseUserScreen::unloaded()
 
 
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** In the tab version, make sure the right tab is selected.
  */
 void TabbedUserScreen::init()

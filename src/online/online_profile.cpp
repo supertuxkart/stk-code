@@ -53,7 +53,7 @@ void OnlineProfile::RelationInfo::setOnline(bool online)
         m_is_pending = false;
 }
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** Constructor for a new profile.  It does only store the ID, a name, and
  *  if it is the current user.
  */

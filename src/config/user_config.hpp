@@ -75,7 +75,7 @@ public:
     virtual irr::core::stringc toString() const = 0;
 };   // UserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 class GroupUserConfigParam : public UserConfigParam
 {
     std::vector<UserConfigParam*> m_attributes;
@@ -97,7 +97,7 @@ public:
     irr::core::stringc toString() const;
 };   // GroupUserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 template<typename T, typename U>
 class ListUserConfigParam : public UserConfigParam
 {
@@ -136,7 +136,7 @@ public:
 };   // ListUserConfigParam
 typedef ListUserConfigParam<std::string, const char*>    StringListUserConfigParam;
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 class IntUserConfigParam : public UserConfigParam
 {
     int m_value;
@@ -164,7 +164,7 @@ public:
                                  { m_value = (int)v; return m_value; }
 };   // IntUserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 class TimeUserConfigParam : public UserConfigParam
 {
     StkTime::TimeType m_value;
@@ -190,7 +190,7 @@ public:
                                           { m_value = (int)v; return m_value; }
 };   // TimeUserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 class StringUserConfigParam : public UserConfigParam
 {
     std::string m_value;
@@ -223,7 +223,7 @@ public:
     const char* c_str() const { return m_value.c_str(); }
 };   // StringUserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 class BoolUserConfigParam : public UserConfigParam
 {
     bool m_value;
@@ -248,7 +248,7 @@ public:
                               { m_value = (bool)v; return m_value; }
 };   // BoolUserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 class FloatUserConfigParam : public UserConfigParam
 {
     float m_value;
@@ -274,7 +274,7 @@ public:
                               { m_value = (float)v; return m_value; }
 };   // FloatUserConfigParam
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 enum AnimType {ANIMS_NONE         = 0,
                ANIMS_PLAYERS_ONLY = 1,
                ANIMS_ALL          = 2 };
@@ -294,7 +294,7 @@ enum AnimType {ANIMS_NONE         = 0,
 #define PARAM_DEFAULT(X)
 #endif
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** \brief Contains all parameters that are stored in the user's config file
  *  \ingroup config
  */
@@ -773,7 +773,7 @@ namespace UserConfigParams
 #undef PARAM_PREFIX
 #undef PARAM_SUFFIX
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /**
   * \brief Class for managing general STK user configuration data.
   * \ingroup config

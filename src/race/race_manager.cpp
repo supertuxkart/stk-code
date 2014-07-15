@@ -295,7 +295,7 @@ void RaceManager::startNew(bool from_overworld)
         m_num_karts = (int)m_player_karts.size();
 
     // Create the kart status data structure to keep track of scores, times, ...
-    // ==========================================================================
+    // --------------------------------------------------------------------------
     m_kart_status.clear();
     Log::verbose("RaceManager", "Nb of karts=%u, ai:%lu players:%lu\n", (unsigned int)m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
 
@@ -344,7 +344,7 @@ void RaceManager::startNew(bool from_overworld)
         !NetworkWorld::getInstance<NetworkWorld>()->isRunning()) // offline mode only
     {
         //We look if Player 1 has a saved version of this GP.
-        // =================================================
+        // -------------------------------------------------
         SavedGrandPrix* gp = SavedGrandPrix::getSavedGP( StateManager::get()
                                                          ->getActivePlayerProfile(0)
                                                          ->getUniqueID(),
@@ -354,7 +354,7 @@ void RaceManager::startNew(bool from_overworld)
                                                          m_player_karts.size());
 
         // Start the race with the appropriate track
-        // =========================================
+        // -----------------------------------------
         if(gp != NULL)
         {
             if (m_continue_saved_gp)
@@ -392,7 +392,7 @@ void RaceManager::startNextRace()
     m_num_finished_players = 0;
 
     // if subsequent race, sort kart status structure
-    // ==============================================
+    // ----------------------------------------------
     if (m_track_number > 0)
     {
         // In follow the leader mode do not change the first kart,

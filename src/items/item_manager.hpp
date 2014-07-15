@@ -71,7 +71,7 @@ public:
         return m_item_manager;
     }   // get
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
 private:
     /** The vector of all items of the current track. */
     typedef std::vector<Item*> AllItemTypes;

@@ -99,7 +99,7 @@ namespace MemoryLeaks
 
     }   // print
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     /** Adds an object to the sets of all allocated objects. */
     void addObject(AllocatedObject* obj)
     {

@@ -121,7 +121,7 @@ void FocusDispatcher::add()
 
 static FocusDispatcher* g_dispatcher = NULL;
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 /** A small extension to the spinner widget to add features like player ID
  *  management or badging */
@@ -176,7 +176,7 @@ void PlayerNameSpinner::markAsCorrect()
         m_incorrect = false;
     }
 }   // markAsCorrect
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 #if 0
 #pragma mark -
@@ -871,7 +871,7 @@ bool sameKart(const PlayerKartWidget& player1, const PlayerKartWidget& player2)
 #pragma mark -
 #pragma mark KartHoverListener
 #endif
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 KartHoverListener::KartHoverListener(KartSelectionScreen* parent)
 {
@@ -921,7 +921,7 @@ void KartHoverListener::onSelectionChanged(DynamicRibbonWidget* theWidget,
 #pragma mark KartSelectionScreen
 #endif
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename)
 {
@@ -931,7 +931,7 @@ KartSelectionScreen::KartSelectionScreen(const char* filename) : Screen(filename
     m_go_to_overworld_next = false;
 }   // KartSelectionScreen
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 KartSelectionScreen* KartSelectionScreen::getRunningInstance()
 {

@@ -152,7 +152,7 @@ Online::OnlineProfile* PlayerManager::getCurrentOnlineProfile()
     return getCurrentPlayer()->getProfile();
 }   // getCurrentOnlineProfile
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** Constructor.
  */
 PlayerManager::PlayerManager()

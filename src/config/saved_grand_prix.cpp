@@ -62,7 +62,7 @@ SavedGrandPrix::SavedGPKart::SavedGPKart(GroupUserConfigParam * group,
     m_overall_time.findYourDataInAnAttributeOf(node);
 }   // SavedGPKart
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 SavedGrandPrix::SavedGrandPrix(unsigned int player_id,
                                const std::string &gp_id,
                                RaceManager::Difficulty difficulty,

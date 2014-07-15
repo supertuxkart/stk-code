@@ -85,7 +85,7 @@ public:
     virtual core::stringw getName() const;
     virtual void   reset();
     virtual void   init(RaceManager::KartType type) = 0;
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Functions related to controlling the kart
     // ------------------------------------------------------------------------
     /** Returns the current steering value for this kart. */
@@ -100,7 +100,7 @@ public:
     /** Sets the kart controls. Used e.g. by replaying history. */
     void setControls(const KartControl &c) { m_controls = c; }
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Access to the kart properties.
     // ------------------------------------------------------------------------
     /** Returns the kart properties of this kart. */
@@ -124,7 +124,7 @@ public:
      */
     virtual float getTimeFullSteer(float steer) const = 0;
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Attachment related functions.
     // ------------------------------------------------------------------------
     /** Returns the current attachment. */
@@ -133,7 +133,7 @@ public:
     /** Returns the current attachment, non-const version. */
     Attachment*    getAttachment() {return m_attachment; }
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Access to the graphical kart model.
     // ------------------------------------------------------------------------
     /** Returns this kart's kart model. */
@@ -163,7 +163,7 @@ public:
     const Vec3& getWheelGraphicsPosition(int i) const
                 {assert(i>=0 && i<4); return m_wheel_graphics_position[i];}
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Emergency animation related functions.
     // ------------------------------------------------------------------------
     /** Returns a kart animation (if any), or NULL if currently no kart

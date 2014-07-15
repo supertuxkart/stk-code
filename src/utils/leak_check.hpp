@@ -52,7 +52,7 @@ namespace MemoryLeaks
         virtual void print() const;
     };   // AllocatedObjects
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     void checkForLeaks();
 
     void addObject(AllocatedObject* obj);

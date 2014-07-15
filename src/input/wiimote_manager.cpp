@@ -396,7 +396,7 @@ int WiimoteManager::askUserToConnectWiimotes()
     return getNumberOfWiimotes();
 }   // askUserToConnectWiimotes
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** Calles when the user clicks on OK, i.e. all wiimotes are in discovery
  *  mode.
  */

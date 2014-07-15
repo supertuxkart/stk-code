@@ -172,7 +172,7 @@ public:
 
     };   // ActivePlayer
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     const PtrVector<ActivePlayer, HOLD>& getActivePlayers()
                                  { return m_active_players; }
     ActivePlayer* getActivePlayer(const int id);

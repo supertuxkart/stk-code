@@ -100,7 +100,7 @@ private:
         }   // getContactPointCS
     };  // CollisionPair
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // This class is the list of collision objects, where each collision
     // pair is stored as most once.
     class CollisionList : public std::vector<CollisionPair>
@@ -121,7 +121,7 @@ private:
             push_back(CollisionPair(a, contact_point_a, b, contact_point_b));
         }
     };  // CollisionList
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     /** This flag is set while bullets time step processing is taking
     *  place. It is used to avoid altering data structures that might

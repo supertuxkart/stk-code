@@ -69,7 +69,7 @@ public:
         delete m_achievements_manager;
         m_achievements_manager = NULL;
     }   // destroy
-    // ========================================================================
+    // ------------------------------------------------------------------------
 
     AchievementInfo* getAchievementInfo(uint32_t id) const;
     AchievementsStatus* createAchievementsStatus(const XMLNode *node=NULL);

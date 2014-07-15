@@ -363,7 +363,7 @@ float Ipo::IpoData::getCubicBezier(float t, float p0, float p1,
     return ((a*t+b)*t+c)*t+p0;
 }   // bezier
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** The Ipo constructor. Ipos can share the actual data to interpolate, which
  *  is stored in a separate IpoData object, see Ipo(const Ipo *ipo)
  *  constructor. This is used for cannons: the actual check line stores the

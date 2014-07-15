@@ -205,9 +205,9 @@
 static void cleanSuperTuxKart();
 static void cleanUserConfig();
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 //                        gamepad visualisation screen
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 void gamepadVisualisation()
 {
@@ -360,7 +360,7 @@ void gamepadVisualisation()
     }
 }   // gamepadVisualisation
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** Sets the hat mesh name depending on the current christmas mode
  *  m_xmas_mode (0: use current date, 1: always on, 2: always off).
  */
@@ -385,7 +385,7 @@ void handleXmasMode()
     if(xmas)
         kart_properties_manager->setHatMeshName("christmas_hat.b3d");
 }   // handleXmasMode
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** This function sets up all data structure for an immediate race start.
  *  It is used when the -N or -R command line options are used.
  */
@@ -642,7 +642,7 @@ int handleCmdLinePreliminary()
     return 0;
 }   // handleCmdLinePreliminary
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** Handles command line options.
  *  \param argc Number of command line options
  */
@@ -1331,7 +1331,7 @@ int main(int argc, char *argv[] )
 
 
         // Replay a race
-        // =============
+        // -------------
         if(history->replayHistory())
         {
             // This will setup the race manager etc.
@@ -1346,13 +1346,13 @@ int main(int argc, char *argv[] )
         }
 
         // Not replaying
-        // =============
+        // -------------
         if(!ProfileWorld::isProfileMode())
         {
             if(UserConfigParams::m_no_start_screen)
             {
                 // Quickstart (-N)
-                // ===============
+                // ---------------
                 // all defaults are set in InitTuxkart()
                 race_manager->setupPlayerKartInfo();
                 race_manager->startNew(false);
@@ -1361,7 +1361,7 @@ int main(int argc, char *argv[] )
         else  // profile
         {
             // Profiling
-            // =========
+            // ---------
             race_manager->setMajorMode (RaceManager::MAJOR_MODE_SINGLE);
             race_manager->setupPlayerKartInfo();
             race_manager->startNew(false);
@@ -1410,7 +1410,7 @@ int main(int argc, char *argv[] )
     return 0 ;
 }   // main
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 #ifdef WIN32
 //routine for running under windows
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,

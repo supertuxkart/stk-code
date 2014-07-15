@@ -185,7 +185,7 @@ public:
                     World();
     virtual        ~World();
     // Static functions to access world:
-    // =================================
+    // ---------------------------------
     // ------------------------------------------------------------------------
     /** Returns a pointer to the (singleton) world object. */
     static World*   getWorld() { return m_world; }
@@ -201,7 +201,7 @@ public:
     // ------------------------------------------------------------------------
 
     // Pure virtual functions
-    // ======================
+    // ----------------------
 
     /** Each game mode should have a unique identifier. Override
       * this method in child classes to provide it. */
@@ -237,7 +237,7 @@ public:
     // ------------------------------------------------------------------------
 
     // Virtual functions
-    // =================
+    // -----------------
     virtual void    init();
     virtual void    terminateRace() OVERRIDE;
     virtual void    reset();
@@ -269,7 +269,7 @@ public:
     virtual void onMouseClick(int x, int y) {};
 
     // Other functions
-    // ===============
+    // ---------------
     Highscores     *getHighscores() const;
     void            schedulePause(Phase phase);
     void            scheduleUnpause();

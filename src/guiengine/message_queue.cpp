@@ -70,7 +70,7 @@ public:
     }
 };   // class Message
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** A function class to compare messages, required for priority_queue. */
 class CompareMessages
 {
@@ -85,7 +85,7 @@ public:
 };   // operator()
 
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 /** List of all messages. */
 std::priority_queue<Message*, std::vector<Message*>,
                    CompareMessages> g_all_messages;
@@ -101,7 +101,7 @@ float        g_max_display_time     = -1.0f;
 SkinWidgetContainer *g_container    = NULL;
 core::recti g_area;
 
-// ============================================================================
+// ----------------------------------------------------------------------------
 
 void createLabel(const Message *message)
 {

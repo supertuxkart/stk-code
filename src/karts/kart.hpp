@@ -268,7 +268,7 @@ public:
     virtual bool   playCustomSFX    (unsigned int type);
     virtual void   setController(Controller *controller);
 
-    // ========================================================================
+    // ------------------------------------------------------------------------
     // Powerup related functions.
     // ------------------------------------------------------------------------
     /** Sets a new powerup. */

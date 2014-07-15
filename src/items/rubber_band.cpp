@@ -236,7 +236,7 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
 
 
     // A kart was hit
-    // ==============
+    // --------------
     if(kart_hit)
     {
         if(kart_hit->isShielded())
@@ -253,7 +253,7 @@ void RubberBand::hit(AbstractKart *kart_hit, const Vec3 *track_xyz)
     }
 
     // The track was hit
-    // =================
+    // -----------------
     m_hit_position   = *track_xyz;
     m_attached_state = RB_TO_TRACK;
 }   // hit
