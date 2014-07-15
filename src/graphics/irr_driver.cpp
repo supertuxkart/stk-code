@@ -449,7 +449,7 @@ void IrrDriver::initDevice()
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
     }
-    //m_glsl = false;
+    m_glsl = false;
 
     // Parse extensions
     hasVSLayer = false;
