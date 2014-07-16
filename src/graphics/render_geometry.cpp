@@ -274,16 +274,16 @@ void IrrDriver::renderTransparent()
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-//        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>({ MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->TU_tex }, ListBlendTransparentFog::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>({ { MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->TU_tex, true } }, ListBlendTransparentFog::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-//        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>({ MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->TU_tex }, ListAdditiveTransparentFog::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>({ { MeshShader::TransparentFogShader::getInstance<MeshShader::TransparentFogShader>()->TU_tex, true } }, ListAdditiveTransparentFog::Arguments);
     }
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-//        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>({ MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->TU_tex }, ListBlendTransparent::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>({ { MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->TU_tex, true } }, ListBlendTransparent::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-//        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>({ MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->TU_tex }, ListAdditiveTransparent::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>({ { MeshShader::TransparentShader::getInstance<MeshShader::TransparentShader>()->TU_tex, true } }, ListAdditiveTransparent::Arguments);
     }
 
     if (!UserConfigParams::m_dynamic_lights)
