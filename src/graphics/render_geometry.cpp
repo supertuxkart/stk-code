@@ -318,7 +318,43 @@ void IrrDriver::renderTransparent()
 
 }
 
-template<typename T, enum E_VERTEX_TYPE VertexType, typename... Args>
+template<typename T, typename...uniforms>
+void drawShadow(const T *Shader, const GLMesh *mesh, uniforms... Args)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh->PrimitiveType;
+    GLenum itype = mesh->IndexType;
+    size_t count = mesh->IndexCount;
+
+    Shader->setUniforms(Args...);
+    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
+}
+
+template<int...List>
+struct custom_unroll_args;
+
+template<>
+struct custom_unroll_args<>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    {
+        drawShadow<T>(Shader, std::get<0>(t), args...);
+    }
+};
+
+template<int N, int...List>
+struct custom_unroll_args<N, List...>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    {
+        custom_unroll_args<List...>::template exec<T>(Shader, t, std::get<N>(t), args...);
+    }
+};
+
+
+template<typename T, enum E_VERTEX_TYPE VertexType, int...List, typename... Args>
 void drawShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
     glUseProgram(Shader->Program);
@@ -326,40 +362,13 @@ void drawShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const s
     for (unsigned i = 0; i < t.size(); i++)
     {
         const GLMesh *mesh = std::get<0>(t[i]);
-        irr_driver->IncreaseObjectCount();
-        GLenum ptype = mesh->PrimitiveType;
-        GLenum itype = mesh->IndexType;
-        size_t count = mesh->IndexCount;
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
 
-        Shader->setUniforms(std::get<1>(t[i]));
-        glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
-    }
-}
-
-static void drawShadowGrass(const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > &t)
-{
-    glUseProgram(MeshShader::GrassShadowShaderInstance->Program);
-    glBindVertexArray(getVAO(EVT_STANDARD));
-    for (unsigned i = 0; i < t.size(); i++)
-    {
-        const GLMesh *mesh = std::get<0>(t[i]);
-        irr_driver->IncreaseObjectCount();
-        GLenum ptype = mesh->PrimitiveType;
-        GLenum itype = mesh->IndexType;
-        size_t count = mesh->IndexCount;
-        for (unsigned j = 0; j < TextureUnits.size(); j++)
-        {
-            compressTexture(mesh->textures[j], true);
-            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-        }
-
-        MeshShader::GrassShadowShaderInstance->setUniforms(std::get<1>(t[i]), std::get<3>(t[i]));
-        glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, 4, mesh->vaoBaseVertex);
+        custom_unroll_args<List...>::template exec<T>(Shader, t[i]);
     }
 }
 
@@ -394,11 +403,11 @@ void IrrDriver::renderShadows()
 
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-    drawShadow<MeshShader::ShadowShader, EVT_STANDARD>(MeshShader::ShadowShaderInstance, {}, ListDefaultStandardG::Arguments);
-    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS>(MeshShader::ShadowShaderInstance, {}, ListDefault2TCoordG::Arguments);
-    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS>(MeshShader::ShadowShaderInstance, {}, ListNormalG::Arguments);
-    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD>(MeshShader::RefShadowShaderInstance, { MeshShader::RefShadowShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
-    drawShadowGrass({ MeshShader::GrassShadowShaderInstance->TU_tex }, ListGrassG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, {}, ListDefaultStandardG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, {}, ListDefault2TCoordG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS, 1>(MeshShader::ShadowShaderInstance, {}, ListNormalG::Arguments);
+    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(MeshShader::RefShadowShaderInstance, { MeshShader::RefShadowShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
+    drawShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(MeshShader::GrassShadowShaderInstance, { MeshShader::GrassShadowShaderInstance->TU_tex }, ListGrassG::Arguments);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
