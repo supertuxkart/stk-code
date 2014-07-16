@@ -24,7 +24,9 @@
 #include "graphics/material.hpp"
 #include "io/xml_node.hpp"
 #include "karts/abstract_kart.hpp"
+#include "modes/linear_world.hpp"
 #include "utils/random_generator.hpp"
+#include "tracks/quad_graph.hpp"
 
 #include "utils/log.hpp" //TODO: remove after debugging is done
 
@@ -55,11 +57,23 @@ Bowling::Bowling(AbstractKart *kart)
         if(m_speed < min_speed) m_speed = min_speed;
     }
 
+    Vec3 quadNormal;
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    {
+        unsigned int sector = ((LinearWorld*)World::getWorld())->
+            getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
+        quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+    }
+    else
+        quadNormal = btVector3(.0f, 1.0f, .0f);
+
     createPhysics(y_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                  new btSphereShape(0.5f*m_extend.getY()),
-                  1.0f /*restitution*/,
-                  -70.0f /*gravity*/,
-                  true /*rotates*/);
+                    new btSphereShape(0.5f*m_extend.getY()),
+                    1.0f /*restitution*/,
+                    -70.0f*quadNormal /*gravity*/,
+                    true /*rotates*/);
+
     // Even if the ball is fired backwards, m_speed must be positive,
     // otherwise the ball can start to vibrate when energy is added.
     m_speed = fabsf(m_speed);
@@ -136,14 +150,15 @@ bool Bowling::updateAndDelete(float dt)
             m_body->applyCentralForce(direction);
         }
     }
-
+    
+   
     // Bowling balls lose energy (e.g. when hitting the track), so increase
     // the speed if the ball is too slow, but only if it's not too high (if
     // the ball is too high, it is 'pushed down', which can reduce the
     // speed, which causes the speed to increase, which in turn causes
     // the ball to fly higher and higher.
     //btTransform trans = getTrans();
-    float hat         = getXYZ().getY()-getHoT();
+    float hat = (getXYZ() - getHitPoint()).length();
     if(hat-0.5f*m_extend.getY()<0.01f)
     {
         const Material *material = getMaterial();

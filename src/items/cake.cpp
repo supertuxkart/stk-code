@@ -35,6 +35,15 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
 
+    Vec3 gravity_vector;
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    {
+        gravity_vector = kart->getBody()->getGravity();
+        gravity_vector = gravity_vector.normalize() * m_gravity;
+    }
+    else
+        gravity_vector = Vec3(0.0f, -1.0f, 0.0f) * m_gravity;
     // A bit of a hack: the mass of this kinematic object is still 1.0
     // (see flyable), which enables collisions. I tried setting
     // collisionFilterGroup/mask, but still couldn't get this object to
@@ -91,7 +100,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
         createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, -m_gravity,
+                      0.5f /* restitution */, btVector3(gravity_vector),
                       true /* rotation */, false /* backwards */, &trans);
     }
     else
@@ -105,7 +114,7 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 
         createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, -m_gravity,
+                      0.5f /* restitution */, btVector3(gravity_vector),
                       true /* rotation */, backwards, &trans);
     }
 
@@ -128,6 +137,7 @@ void Cake::init(const XMLNode &node, scene::IMesh *cake_model)
 {
     Flyable::init(node, cake_model, PowerupManager::POWERUP_CAKE);
     float max_distance        = 80.0f;
+    
     m_gravity                 = 9.8f;
 
     if (m_gravity < 0) m_gravity *= -1.0f;

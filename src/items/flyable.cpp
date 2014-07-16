@@ -34,7 +34,7 @@
 #include "items/projectile_manager.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/explosion_animation.hpp"
-#include "modes/world.hpp"
+#include "modes/linear_world.hpp"
 #include "physics/physics.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
@@ -100,7 +100,7 @@ Flyable::Flyable(AbstractKart *kart, PowerupManager::PowerupType type,
  */
 void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
                             btCollisionShape *shape,
-                            float restitution, const float gravity,
+                            float restitution, const btVector3 gravity,
                             const bool rotates, const bool turn_around,
                             const btTransform* custom_direction)
 {
@@ -132,7 +132,7 @@ void Flyable::createPhysics(float forw_offset, const Vec3 &velocity,
     m_user_pointer.set(this);
     World::getWorld()->getPhysics()->addBody(getBody());
 
-    m_body->setGravity(btVector3(0.0f, gravity, 0));
+    m_body->setGravity(gravity);
 
     // Rotate velocity to point in the right direction
     btVector3 v=trans.getBasis()*velocity;
@@ -290,6 +290,23 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
     btTransform trans = target_kart->getTrans();
     Vec3 target_direction(trans.getBasis().getColumn(2));
 
+    Vec3 owner_gravity;
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    {
+        owner_gravity = m_owner->getBody()->getGravity();
+        core::matrix4 m;
+        m.buildRotateFromTo(core::vector3df(0.0f, -1.0f, 0.0f), owner_gravity.toIrrVector());
+
+        core::vector3df r_t_k_l = relative_target_kart_loc.toIrrVector();
+        m.rotateVect(r_t_k_l);
+        relative_target_kart_loc = r_t_k_l;
+
+        core::vector3df t_d = target_direction.toIrrVector();
+        m.rotateVect(t_d);
+        target_direction = t_d;
+    }
+
     float dx = relative_target_kart_loc.getX();
     float dy = relative_target_kart_loc.getY();
     float dz = relative_target_kart_loc.getZ();
@@ -301,6 +318,7 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                             * target_kart->getSpeed();
 
     float target_kart_heading = target_kart->getHeading();
+     target_kart_heading = atan2f(target_direction.getX(), target_direction.getZ());
 
     float dist = -(target_kart_speed / item_XZ_speed)
                * (dx * cosf(target_kart_heading) -
@@ -378,15 +396,35 @@ bool Flyable::updateAndDelete(float dt)
         return true;
     }
 
-    // Add the position offset so that the flyable can adjust its position
-    // (usually to do the raycast from a slightly higher position to avoid
-    // problems finding the terrain in steep uphill sections).
-    if(m_do_terrain_info)
-        TerrainInfo::update(xyz+m_position_offset);
+    if (m_do_terrain_info)
+    {
+        Vec3 towards = getBody()->getGravity();
+        towards.normalize();
+        // Add the position offset so that the flyable can adjust its position
+        // (usually to do the raycast from a slightly higher position to avoid
+        // problems finding the terrain in steep uphill sections).
+        // towards is a unit vector. so we can multiply -towards to offset the position
+        // by one unit.
+        TerrainInfo::update(xyz + m_position_offset*(-towards), towards);
+    }
 
+    // Update gravity
+    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
+    {
+        int sector = QuadGraph::UNKNOWN_SECTOR;
+        QuadGraph::get()->findRoadSector(getXYZ(), &sector);
+        if (sector != QuadGraph::UNKNOWN_SECTOR)
+        {
+            float g = World::getWorld()->getTrack()->getGravity();
+            Vec3 gravity = -g*QuadGraph::get()->getQuadOfNode(sector).getNormal();
+            getBody()->setGravity(gravity);
+        }
+    }
+    
     if(m_adjust_up_velocity)
     {
-        float hat = xyz.getY()-getHoT();
+        float hat = (xyz - getHitPoint()).length();
 
         // Use the Height Above Terrain to set the Z velocity.
         // HAT is clamped by min/max height. This might be somewhat

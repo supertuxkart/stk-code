@@ -66,8 +66,8 @@ RubberBall::RubberBall(AbstractKart *kart)
     float forw_offset = 0.5f*kart->getKartLength() + m_extend.getZ()*0.5f+5.0f;
 
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
-                  new btSphereShape(0.5f*m_extend.getY()),
-                  -70.0f /*gravity*/,
+                  new btSphereShape(0.5f*m_extend.getY()), -70.0f,
+                  btVector3(.0f,-70.0f,.0f) /*gravity*/,
                   true /*rotates*/);
 
     // Do not adjust the up velocity

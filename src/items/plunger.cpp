@@ -78,14 +78,14 @@ Plunger::Plunger(AbstractKart *kart)
 
         createPhysics(forward_offset, m_initial_velocity,
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */ , gravity,
+                      0.5f /* restitution */ , btVector3(.0f,gravity,.0f),
                       /* rotates */false , /*turn around*/false, &trans);
     }
     else
     {
         createPhysics(forward_offset, btVector3(pitch, 0.0f, plunger_speed),
                       new btCylinderShape(0.5f*m_extend),
-                      0.5f /* restitution */, gravity,
+                      0.5f /* restitution */, btVector3(.0f,gravity,.0f),
                       false /* rotates */, m_reverse_mode, &kart_transform);
     }
 

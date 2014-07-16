@@ -547,7 +547,7 @@ void Kart::blockViewWithPlunger()
 btTransform Kart::getAlignedTransform(const float custom_pitch)
 {
     btTransform trans = getTrans();
-
+    /*
     float pitch = (custom_pitch == -1 ? getTerrainPitch(getHeading())
                                       : custom_pitch);
 
@@ -555,7 +555,12 @@ btTransform Kart::getAlignedTransform(const float custom_pitch)
     m.setEulerZYX(pitch, getHeading()+m_skidding->getVisualSkidRotation(),
                   0.0f);
     trans.setBasis(m);
-
+    */
+    btTransform trans2;
+    trans2.setIdentity();
+    trans2.setRotation(btQuaternion(m_skidding->getVisualSkidRotation(), 0, 0));
+    trans *= trans2;
+    
     return trans;
 }   // getAlignedTransform
 
