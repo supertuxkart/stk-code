@@ -225,7 +225,7 @@ void STKMeshSceneNode::render()
             glDisable(GL_CULL_FACE);
             if (update_each_frame)
                 updatevbo();
-            glUseProgram(MeshShader::ObjectPass1Shader::template getInstance<MeshShader::ObjectPass1Shader>()->Program);
+            glUseProgram(MeshShader::ObjectPass1Shader::getInstance<MeshShader::ObjectPass1Shader>()->Program);
             // Only untextured
             for (unsigned i = 0; i < GLmeshes.size(); i++)
             {
