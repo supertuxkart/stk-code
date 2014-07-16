@@ -89,8 +89,8 @@ private:
     enum AnimationState {AS_NONE, AS_SMALLER, AS_BIGGER};
     std::vector<AnimationState> m_animation_states;
 
-    /** When the animation state was changed. */
-    std::vector<float> m_rank_animation_start_times;
+    /** How long the rank animation has been shown. */
+    std::vector<float> m_rank_animation_duration;
 
     /** Stores the previous rank for each kart. Used for the rank animation. */
     std::vector<int> m_last_ranks;
@@ -103,14 +103,14 @@ private:
                                 const core::vector2df &scaling);
     void drawSpeedEnergyRank   (const AbstractKart* kart,
                                 const core::recti &viewport,
-                                const core::vector2df &scaling);
+                                const core::vector2df &scaling, float dt);
     void drawLap               (const AbstractKart* kart,
                                 const core::recti &viewport,
                                 const core::vector2df &scaling);
     void drawRank              (const AbstractKart *kart,
                                 const core::vector2df &offset,
                                 float min_ratio, int meter_width,
-                                int meter_height);
+                                int meter_height, float dt);
 
     /** Display items that are shown once only (for all karts). */
     void drawGlobalMiniMap     ();
