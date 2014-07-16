@@ -114,7 +114,7 @@ public:
     void logoutError(const irr::core::stringw &error_message);
 };   // class BaseUserScreen
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 class UserScreen : public BaseUserScreen,
                    public GUIEngine::ScreenSingleton<UserScreen>
 {
@@ -125,7 +125,7 @@ public:
     friend class GUIEngine::ScreenSingleton<UserScreen>;
 };   // class UserScreenTabed
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 class TabbedUserScreen : public BaseUserScreen,
                          public GUIEngine::ScreenSingleton<TabbedUserScreen>
 {

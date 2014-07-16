@@ -22,7 +22,7 @@
 void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
                                btVehicleRaycasterResult& result)
 {
-    // ------------------------------------------------------------------------
+    // ========================================================================
     class ClosestWithNormal : public btCollisionWorld::ClosestRayResultCallback
     {
     private:
@@ -55,7 +55,7 @@ void* btKartRaycaster::castRay(const btVector3& from, const btVector3& to,
         int getTriangleIndex() const { return m_triangle_index; }
 
     };   // CloestWithNormal
-    // ------------------------------------------------------------------------
+    // ========================================================================
 
     ClosestWithNormal rayCallback(from,to);
 

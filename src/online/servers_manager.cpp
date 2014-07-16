@@ -45,7 +45,7 @@ namespace Online{
         manager_singleton = NULL;
     }   // deallocate
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     ServersManager::ServersManager(){
         m_last_load_time.setAtomic(0.0f);
         m_joined_server.setAtomic(NULL);
@@ -57,7 +57,7 @@ namespace Online{
         delete m_joined_server.getData();
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     void ServersManager::cleanUpServers()
     {
         m_sorted_servers.lock();
@@ -68,7 +68,7 @@ namespace Online{
         m_mapped_servers.unlock();
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     ServersManager::RefreshRequest * ServersManager::refreshRequest(bool request_now) const
     {
         RefreshRequest * request = NULL;
@@ -103,7 +103,7 @@ namespace Online{
         ServersManager::get()->refresh(isSuccess(), getXMLData());
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     const Server * ServersManager::getQuickPlay() const
     {
         if(m_sorted_servers.getData().size() > 0)
@@ -112,7 +112,7 @@ namespace Online{
         return NULL;
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     void ServersManager::setJoinedServer(uint32_t id)
     {
         MutexLocker(m_joined_server);
@@ -121,7 +121,7 @@ namespace Online{
         m_joined_server.getData() = new Server(*getServerByID(id));
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     void ServersManager::unsetJoinedServer()
     {
         MutexLocker(m_joined_server);
@@ -129,7 +129,7 @@ namespace Online{
         m_joined_server.getData() = NULL;
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     void ServersManager::addServer(Server * server)
     {
         m_sorted_servers.lock();
@@ -140,34 +140,34 @@ namespace Online{
         m_mapped_servers.unlock();
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     int ServersManager::getNumServers () const
     {
         MutexLocker(m_sorted_servers);
         return m_sorted_servers.getData().size();
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     const Server * ServersManager::getServerBySort (int index) const
     {
         MutexLocker(m_sorted_servers);
         return m_sorted_servers.getData().get(index);
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     const Server * ServersManager::getServerByID (uint32_t id) const
     {
         MutexLocker(m_mapped_servers);
         return m_mapped_servers.getData().at(id);
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     Server * ServersManager::getJoinedServer() const
     {
         return m_joined_server.getAtomic();
     }
 
-    // ----------------------------------------------------------------------------
+    // ============================================================================
     void ServersManager::sort(bool sort_desc){
         MutexLocker(m_sorted_servers);
         m_sorted_servers.getData().insertionSort(0, sort_desc);

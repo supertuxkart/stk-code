@@ -211,7 +211,7 @@ namespace Online
          *  members to a valid value. */
         virtual bool isAllowedToAdd()   const   { return isPreparing(); }
 
-        // --------------------------------------------------------------------
+        // ====================================================================
         /** This class is used by the priority queue to sort requests by
          *  priority.
          */

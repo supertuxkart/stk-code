@@ -407,7 +407,7 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
             continue;
         }
         // Check for stkversion comparisons
-        // --------------------------------
+        // ================================
         if(cond[0]=="stkversion")
         {
             int news_version = StringUtils::versionToInt(cond[2]);
@@ -431,7 +431,7 @@ bool NewsManager::conditionFulfilled(const std::string &cond)
                                      "assumed true.", cond_list[i].c_str());
         }
         // Check for addons not installed
-        // ------------------------------
+        // ==============================
         else if(cond[1]=="not" && cond[2]=="installed")
         {
             // The addons_manager can not be access, since it's

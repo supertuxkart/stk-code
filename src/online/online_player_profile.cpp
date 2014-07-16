@@ -68,7 +68,7 @@ namespace Online
             request->addParameter("action", action);
     }   // setUserDetails
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     OnlinePlayerProfile::OnlinePlayerProfile(const XMLNode *player)
                : PlayerProfile(player)
     {

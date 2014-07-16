@@ -29,7 +29,7 @@
 class UTFWriter;
 class XMLNode;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 /** This is the base class for any achievement. It allows achievement status
  *  to be saved, and detects when an achievement is fulfilled. It provides
  *  storage for state information by a generic key-value mapping. The values

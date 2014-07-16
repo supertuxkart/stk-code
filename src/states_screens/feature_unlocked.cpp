@@ -58,7 +58,7 @@ const int GIFT_EXIT_TO = GIFT_EXIT_FROM + 7;
 
 DEFINE_SCREEN_SINGLETON( FeatureUnlockedCutScene );
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 #if 0
 #pragma mark FeatureUnlockedCutScene::UnlockedThing
@@ -124,7 +124,7 @@ FeatureUnlockedCutScene::UnlockedThing::~UnlockedThing()
     m_root_gift_node = NULL;
 }   // UnlockedThing::~UnlockedThing
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 
 #if 0
 #pragma mark -

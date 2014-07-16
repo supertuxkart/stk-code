@@ -29,7 +29,7 @@
 namespace Online
 {
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     /**
      *  Creates a request that can be handled by the RequestManager
      *  \param manage_memory whether or not the RequestManager should take care of

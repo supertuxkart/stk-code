@@ -69,7 +69,7 @@ void UserConfigParam::writeInner(std::ofstream& stream, int level) const
            << toString().c_str() << "\"\n";
 }   // writeInner
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
                                            const char* comment)
 {
@@ -78,7 +78,7 @@ GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
     if(comment != NULL) m_comment = comment;
 }   // GroupUserConfigParam
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 GroupUserConfigParam::GroupUserConfigParam(const char* group_name,
                                            GroupUserConfigParam* group,
                                            const char* comment)
@@ -184,7 +184,7 @@ void GroupUserConfigParam::addChild(UserConfigParam* child)
 }   // addChild
 
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 template<typename T, typename U>
 ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            const char* comment)
@@ -194,7 +194,7 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
     if(comment != NULL) m_comment = comment;
 }   // ListUserConfigParam
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 template<typename T, typename U>
 ListUserConfigParam<T,U>::ListUserConfigParam(const char* param_name,
                                            const char* comment,
@@ -213,7 +213,7 @@ ListUserConfigParam<T,U>::ListUserConfigParam(const char* param_name,
     va_end ( arguments );                  // Cleans up the list
 }   // ListUserConfigParam
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 template<typename T, typename U>
 ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            GroupUserConfigParam* group,
@@ -224,7 +224,7 @@ ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
     if(comment != NULL) m_comment = comment;
 }   // ListUserConfigParam
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 template<typename T, typename U>
 ListUserConfigParam<T, U>::ListUserConfigParam(const char* param_name,
                                            GroupUserConfigParam* group,
@@ -326,7 +326,7 @@ core::stringc ListUserConfigParam<T, U>::toString() const
 
 
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 IntUserConfigParam::IntUserConfigParam(int default_value,
                                        const char* param_name,
                                        const char* comment)
@@ -389,7 +389,7 @@ void IntUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
     node->get( m_param_name, &m_value );
 }   // findYourDataInAnAttributeOf
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 TimeUserConfigParam::TimeUserConfigParam(StkTime::TimeType default_value,
                                          const char* param_name,
                                          const char* comment)
@@ -460,7 +460,7 @@ void TimeUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
     m_value = tmp;
 }   // findYourDataInAnAttributeOf
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 StringUserConfigParam::StringUserConfigParam(const char* default_value,
                                              const char* param_name,
                                              const char* comment)
@@ -509,7 +509,7 @@ void StringUserConfigParam::findYourDataInAnAttributeOf(const XMLNode* node)
     node->get( m_param_name, &m_value );
 }   // findYourDataInAnAttributeOf
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 BoolUserConfigParam::BoolUserConfigParam(bool default_value,
                                          const char* param_name,
                                          const char* comment)
@@ -597,7 +597,7 @@ irr::core::stringc BoolUserConfigParam::toString() const
     return (m_value ? "true" : "false" );
 }   // toString
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 FloatUserConfigParam::FloatUserConfigParam(float default_value,
                                            const char* param_name,
                                            const char* comment)
@@ -656,8 +656,8 @@ core::stringc FloatUserConfigParam::toString() const
     return tmp;
 }   // toString
 
-// -------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------
+// =====================================================================================
+// =====================================================================================
 
 #if 0
 #pragma mark -

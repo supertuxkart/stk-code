@@ -45,7 +45,7 @@
 AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
 std::vector<Camera*>                       Camera::m_all_cameras;
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
     m_mode          = CM_NORMAL;

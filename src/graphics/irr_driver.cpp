@@ -1928,7 +1928,7 @@ void IrrDriver::doScreenShot()
 void IrrDriver::update(float dt)
 {
     // User aborted (e.g. closed window)
-    // ---------------------------------
+    // =================================
     if (!m_device->run())
     {
         GUIEngine::cleanUp();

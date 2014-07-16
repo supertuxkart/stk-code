@@ -95,7 +95,7 @@ bool macSetBundlePathIfRelevant(std::string& data_dir)
 }
 #endif
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 FileManager* file_manager = 0;
 
 /** With irrlicht the constructor creates a NULL device. This is necessary to
@@ -139,7 +139,7 @@ FileManager::FileManager()
     irr::io::path exe_path;
 
     // Search for the root directory
-    // -----------------------------
+    // =============================
 
     // Also check for data dirs relative to the path of the executable.
     // This is esp. useful for Visual Studio, since it's not necessary
@@ -212,7 +212,7 @@ FileManager::FileManager()
                m_gp_dir.c_str());
 
     /** Now search for the path to all needed subdirectories. */
-    // ----------------------------------------------------------
+    // ==========================================================
     // This must be done here since otherwise translations will not be found.
     std::vector<bool> dir_found;
     dir_found.resize(ASSET_COUNT, false);
@@ -296,7 +296,7 @@ void FileManager::reInit()
 FileManager::~FileManager()
 {
     // Clean up left-over files in addons/tmp that are older than 24h
-    // --------------------------------------------------------------
+    // ==============================================================
     // (The 24h delay is useful when debugging a problem with a zip file)
     std::set<std::string> allfiles;
     std::string tmp=getAddonsFile("tmp");
@@ -341,7 +341,7 @@ FileManager::~FileManager()
     }   // for i in all files in tmp
 
     // Clean up rest of file manager
-    // -----------------------------
+    // =============================
     popMusicSearchPath();
     popModelSearchPath();
     popTextureSearchPath();

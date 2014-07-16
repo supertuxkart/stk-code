@@ -111,7 +111,7 @@ void AddonsLoading::beforeAddingWidgets()
     rating->setStarNumber(3);
 
     // Display flags for this addon
-    // ----------------------------
+    // ============================
     std::vector<core::stringw> l;
     if(UserConfigParams::m_artist_debug_mode)
     {
@@ -154,7 +154,7 @@ void AddonsLoading::beforeAddingWidgets()
     }
 
     // Display the size
-    // ----------------
+    // ================
     int n = m_addon.getSize();
     core::stringw unit="";
     if(n>1024*1024)

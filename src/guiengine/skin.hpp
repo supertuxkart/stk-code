@@ -190,7 +190,7 @@ namespace GUIEngine
         }   // SkinWidgetContainer
     };   // class SkinWidgetContainer
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     class Widget;
 
     /**
@@ -256,7 +256,7 @@ namespace GUIEngine
         video::ITexture* getImage() { return m_image; }
     };   // BoxRenderParams
 
-    // ------------------------------------------------------------------------
+    // ========================================================================
     /**
       * \brief Object used to render the GUI widgets
       * see \ref skin for more information about skinning in STK

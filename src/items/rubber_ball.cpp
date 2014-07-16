@@ -384,7 +384,7 @@ bool RubberBall::updateAndDelete(float dt)
     TrackSector::update(next_xyz);
 
     // Ball squashing:
-    // ---------------
+    // ===============
     if(height<1.5f*m_extend.getY())
         m_node->setScale(core::vector3df(1.0f, height/m_extend.getY(),1.0f));
     else
@@ -574,7 +574,7 @@ float RubberBall::updateHeight()
 
 
     // Determine the height of the ball
-    // --------------------------------
+    // ================================
     // Consider f(x) = s * x*(x-m_intervall), which is a parabolic function
     // with f(0) = 0, f(m_intervall)=0. We then scale this function to
     // fulfill: f(m_intervall/2) = max_height, or:

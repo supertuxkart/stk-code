@@ -98,7 +98,7 @@ void PhysicalObject::Settings::init()
     m_flatten_kart       = false;
 }   // Settings
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 PhysicalObject* PhysicalObject::fromXML(bool is_dynamic,
                                         const XMLNode &xml_node,
                                         TrackObject* object)

@@ -35,7 +35,7 @@ btRigidBody& btKart::getFixedBody()
     return s_fixed;
 }
 
-// ----------------------------------------------------------------------------
+// ============================================================================
 btKart::btKart(btRigidBody* chassis, btVehicleRaycaster* raycaster,
                Kart *kart)
       : m_vehicleRaycaster(raycaster)

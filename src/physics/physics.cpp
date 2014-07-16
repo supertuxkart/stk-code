@@ -224,7 +224,7 @@ void Physics::update(float dt)
 
         }
         // now the first object must be a projectile
-        // -----------------------------------------
+        // =========================================
         if(p->getUserPointer(1)->is(UserPointer::UP_TRACK))
         {
             // Projectile hits track
@@ -487,7 +487,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
         if(!upA || !upB) continue;
 
         // 1) object A is a track
-        // -----------------------
+        // =======================
         if(upA->is(UserPointer::UP_TRACK))
         {
             if(upB->is(UserPointer::UP_FLYABLE))   // 1.1 projectile hits track
@@ -520,7 +520,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             }
         }
         // 2) object a is a kart
-        // ---------------------
+        // =====================
         else if(upA->is(UserPointer::UP_KART))
         {
             if(upB->is(UserPointer::UP_TRACK))
@@ -555,7 +555,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
                     upA, contact_manifold->getContactPoint(0).m_localPointA);
         }
         // 3) object is a projectile
-        // -------------------------
+        // =========================
         else if(upA->is(UserPointer::UP_FLYABLE))
         {
             // 3.1) projectile hits track
@@ -573,7 +573,7 @@ btScalar Physics::solveGroup(btCollisionObject** bodies, int numBodies,
             }
         }
         // Object is a physical object
-        // ---------------------------
+        // ===========================
         else if(upA->is(UserPointer::UP_PHYSICAL_OBJECT))
         {
             if(upB->is(UserPointer::UP_FLYABLE))

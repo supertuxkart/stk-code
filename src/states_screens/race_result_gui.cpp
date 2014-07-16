@@ -635,7 +635,7 @@ void RaceResultGUI::renderGlobal(float dt)
     unsigned int num_karts = m_all_row_infos.size();
 
     // First: Update the finite state machine
-    // --------------------------------------
+    // ======================================
     switch(m_animation_state)
     {
     case RR_INIT:
@@ -733,7 +733,7 @@ void RaceResultGUI::renderGlobal(float dt)
     }   // switch
 
     // Second phase: update X and Y positions for the various animations
-    // -----------------------------------------------------------------
+    // =================================================================
     float v = 0.9f*UserConfigParams::m_width/m_time_single_scroll;
     if(!isSoccerWorld)
     {
@@ -902,7 +902,7 @@ void RaceResultGUI::displayOneEntry(unsigned int x, unsigned int y,
     }
 
     // Only display points in GP mode and when the GP results are displayed.
-    // ---------------------------------------------------------------------
+    // =====================================================================
     if (race_manager->getMajorMode() == RaceManager::MAJOR_MODE_GRAND_PRIX &&
         m_animation_state != RR_RACE_RESULT)
     {
