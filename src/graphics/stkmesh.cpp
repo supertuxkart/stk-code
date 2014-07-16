@@ -11,7 +11,7 @@
 
 MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
 {
-    if (tp == irr_driver->getShader(ES_SPHERE_MAP))
+    if (MaterialType == irr_driver->getShader(ES_SPHERE_MAP))
         return MAT_SPHEREMAP;
     if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
         return MAT_NORMAL_MAP;
@@ -19,9 +19,9 @@ MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, vid
         return MAT_ALPHA_REF;
     else if (MaterialType == irr_driver->getShader(ES_GRASS) || MaterialType == irr_driver->getShader(ES_GRASS_REF))
         return MAT_GRASS;
-    else if (tp == irr_driver->getShader(ES_SPLATTING))
+    else if (MaterialType == irr_driver->getShader(ES_SPLATTING))
         return MAT_SPLATTING;
-    else if (tp == irr_driver->getShader(ES_OBJECT_UNLIT))
+    else if (MaterialType == irr_driver->getShader(ES_OBJECT_UNLIT))
         return MAT_UNLIT;
     else if (tp == video::EVT_2TCOORDS)
         return MAT_DETAIL;
