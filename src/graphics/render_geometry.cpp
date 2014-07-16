@@ -306,7 +306,7 @@ void IrrDriver::renderTransparent()
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-/*    glBindVertexArray(getVAO(EVT_2TCOORDS));
+    glBindVertexArray(getVAO(EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
@@ -360,7 +360,7 @@ void IrrDriver::renderTransparent()
     irr_driver->getFBO(FBO_COLORS).Bind();
     glStencilFunc(GL_EQUAL, 1, 0xFF);
     m_post_processing->renderPassThrough(m_rtts->getRenderTarget(RTT_DISPLACE));
-    glDisable(GL_STENCIL_TEST);*/
+    glDisable(GL_STENCIL_TEST);
 
 }
 

@@ -8,8 +8,7 @@ class STKInstancedSceneNode : public irr::scene::CMeshSceneNode
 {
 protected:
     int m_ref_count;
-    std::vector<GLMesh *> GeometricMesh[FPSM_COUNT];
-    std::vector<GLMesh *> ShadedMesh[SM_COUNT];
+    std::vector<GLMesh *> MeshSolidMaterial[MAT_COUNT];
     std::vector<GLMesh> GLmeshes;
     std::vector<float> instance_pos;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;

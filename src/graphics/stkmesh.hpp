@@ -11,30 +11,6 @@
 #include <tuple>
 #include <vector>
 
-enum GeometricMaterial
-
-{
-    FPSM_DEFAULT_STANDARD,
-    FPSM_DEFAULT_2TCOORD,
-    FPSM_ALPHA_REF_TEXTURE,
-    FPSM_NORMAL_MAP,
-    FPSM_GRASS,
-    FPSM_COUNT
-};
-
-enum ShadedMaterial
-{
-    SM_DEFAULT_STANDARD,
-    SM_DEFAULT_TANGENT,
-    SM_ALPHA_REF_TEXTURE,
-    SM_SPHEREMAP,
-    SM_SPLATTING,
-    SM_GRASS,
-    SM_UNLIT,
-    SM_DETAILS,
-    SM_COUNT
-};
-
 enum MeshMaterial
 {
     MAT_DEFAULT,
