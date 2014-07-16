@@ -266,20 +266,8 @@ void STKMeshSceneNode::render()
         for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
             ListMatSplatting::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight()));
 
-        /*
-
-        for_in(mesh, GeometricMesh[FPSM_NORMAL_MAP])
-            ListNormalG::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel));
-
-*/
-
-        /*
-
-
-        for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-            ListDefaultTangentSM::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
-
-        */
+        for_in(mesh, MeshSolidMaterials[MAT_NORMAL_MAP])
+            ListMatNormalMap::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY, irr_driver->getSceneManager()->getAmbientLight()));
 
         return;
     }

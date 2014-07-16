@@ -168,7 +168,7 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>({ MeshShader::ObjectPass1Shader::getInstance<MeshShader::ObjectPass1Shader>()->TU_tex }, ListMatSplatting::Arguments);
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>({ MeshShader::ObjectRefPass1Shader::getInstance<MeshShader::ObjectRefPass1Shader>()->TU_tex }, ListMatAlphaRef::Arguments);
         renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>({ MeshShader::GrassPass1Shader::getInstance<MeshShader::GrassPass1Shader>()->TU_tex }, ListMatGrass::Arguments);
-//        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS>({ MeshShader::NormalMapShader::getInstance<MeshShader::NormalMapShader>()->TU_glossy, MeshShader::NormalMapShader::getInstance<MeshShader::NormalMapShader>()->TU_normalmap }, ListNormalG::Arguments);
+        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>({ MeshShader::NormalMapShader::getInstance<MeshShader::NormalMapShader>()->TU_glossy, MeshShader::NormalMapShader::getInstance<MeshShader::NormalMapShader>()->TU_normalmap }, ListMatNormalMap::Arguments);
     }
 }
 
@@ -247,6 +247,7 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 4, 3, 1>({ MeshShader::GrassPass2Shader::getInstance<MeshShader::GrassPass2Shader>()->TU_Albedo }, ListMatGrass::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 1>({ MeshShader::ObjectUnlitShader::getInstance<MeshShader::ObjectUnlitShader>()->TU_tex }, ListMatUnlit::Arguments);
         renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 3, 1>({ 8, MeshShader::SplattingShader::getInstance<MeshShader::SplattingShader>()->TU_tex_layout, MeshShader::SplattingShader::getInstance<MeshShader::SplattingShader>()->TU_tex_detail0, MeshShader::SplattingShader::getInstance<MeshShader::SplattingShader>()->TU_tex_detail1, MeshShader::SplattingShader::getInstance<MeshShader::SplattingShader>()->TU_tex_detail2, MeshShader::SplattingShader::getInstance<MeshShader::SplattingShader>()->TU_tex_detail3 }, ListMatSplatting::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 4, 3, 1>({ MeshShader::ObjectPass2Shader::getInstance<MeshShader::ObjectPass2Shader>()->TU_Albedo }, ListMatNormalMap::Arguments);
     }
 }
 
@@ -465,6 +466,7 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, {}, ListMatUnlit::Arguments);
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, {}, ListMatDetails::Arguments);
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, {}, ListMatSplatting::Arguments);
+    renderShadow<MeshShader::ShadowShader, EVT_TANGENTS, 1>(MeshShader::ShadowShaderInstance, {}, ListMatNormalMap::Arguments);
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(MeshShader::RefShadowShaderInstance, { MeshShader::RefShadowShaderInstance->TU_tex }, ListMatAlphaRef::Arguments);
     renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(MeshShader::GrassShadowShaderInstance, { MeshShader::GrassShadowShaderInstance->TU_tex }, ListMatGrass::Arguments);
 

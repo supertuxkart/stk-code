@@ -300,7 +300,7 @@ std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, vi
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > ListMatGrass::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListMatUnlit::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListMatSplatting::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListMatNormalMap::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatNormalMap::Arguments;
 
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
 std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
