@@ -141,16 +141,16 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
-            ListMatDefault::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
+            ListMatDefault::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
         for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
-            ListMatAlphaRef::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
+            ListMatAlphaRef::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
         for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
-            ListMatDetails::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
+            ListMatDetails::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
         for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
-            ListMatUnlit::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY));
+            ListMatUnlit::Arguments.emplace_back(mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -191,10 +191,10 @@ void STKAnimatedMesh::render()
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+                ListBlendTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparent::Arguments.push_back(std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+                ListAdditiveTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
         return;
     }
