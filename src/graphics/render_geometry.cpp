@@ -424,9 +424,11 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> Texture
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        const GLMesh *mesh = std::get<0>(t[i]);
+        GLMesh *mesh = std::get<0>(t[i]);
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
+            if (!mesh->textures[j])
+                mesh->textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
@@ -445,8 +447,6 @@ void IrrDriver::renderShadows()
     m_rtts->getShadowFBO().Bind();
     glClear(GL_DEPTH_BUFFER_BIT);
     glDrawBuffer(GL_NONE);
-
-    glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
     irr_driver->setPhase(SHADOW_PASS);
     ListMatDefault::Arguments.clear();
@@ -475,6 +475,9 @@ void IrrDriver::renderShadows()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-//    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListDefaultStandardG::Arguments);
-//    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListDefault2TCoordG::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatDefault::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatSphereMap::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatUnlit::Arguments);
+    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatDetails::Arguments);
+    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatSplatting::Arguments);
 }
