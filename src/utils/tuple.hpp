@@ -54,13 +54,18 @@ namespace STK {
     }
 
     template<size_t _Index, class... _Types> inline
-        typename const tuple_element<_Index, Tuple<_Types...>>::type
-        tuple_get(const Tuple<_Types...>& _Tuple)
+    typename tuple_element<_Index, Tuple<_Types...>>::type tuple_get(const Tuple<_Types...>& _Tuple)
     {
         typedef typename tuple_element<_Index, Tuple<_Types...>>::_Ttype _Ttype;
         return (((_Ttype&)_Tuple)._Elem);
     }
-
+    
+    template<size_t Index, typename... T> inline
+        Tuple<T...> make_tuple(T... values)
+    {
+        return Tuple<T...>(values...);
+    }
+    
     template<typename... T> inline
         Tuple<T...> make_tuple(T... values)
     {
