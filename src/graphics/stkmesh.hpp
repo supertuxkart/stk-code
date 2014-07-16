@@ -99,30 +99,6 @@ public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > Arguments;
 };
 
-template<typename Shader, typename...uniforms>
-void draw(const GLMesh *mesh, uniforms... Args)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh->PrimitiveType;
-    GLenum itype = mesh->IndexType;
-    size_t count = mesh->IndexCount;
-
-    Shader::setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
-}
-
-
-template<typename T, typename...uniforms>
-void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh->PrimitiveType;
-    GLenum itype = mesh->IndexType;
-    size_t count = mesh->IndexCount;
-
-    Shader->setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
-}
 
 // Pass 2 shader (ie shaders that outputs final color)
 class ListDefaultStandardSM
