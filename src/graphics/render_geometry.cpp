@@ -198,18 +198,18 @@ void IrrDriver::renderSolidSecondPass()
 
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD>(MeshShader::ObjectPass2ShaderInstance, std::vector<GLuint>({ MeshShader::ObjectPass2ShaderInstance->TU_Albedo }), ListDefaultStandardSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS>(MeshShader::ObjectPass2ShaderInstance, std::vector<GLuint>({ MeshShader::ObjectPass2ShaderInstance->TU_Albedo }), ListDefaultTangentSM::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(MeshShader::ObjectRefPass2ShaderInstance, std::vector<GLuint>({ (GLuint)MeshShader::ObjectRefPass2ShaderInstance->TU_Albedo }, ListAlphaRefSM::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD>(MeshShader::ObjectRefPass2ShaderInstance, std::vector<GLuint>({ MeshShader::ObjectRefPass2ShaderInstance->TU_Albedo }), ListAlphaRefSM::Arguments);
         renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD>(MeshShader::SphereMapShaderInstance, std::vector<GLuint>({ MeshShader::SphereMapShaderInstance->TU_tex }), ListSphereMapSM::Arguments);
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD>(MeshShader::ObjectUnlitShaderInstance, std::vector<GLuint>({ MeshShader::ObjectUnlitShaderInstance->TU_tex }), ListUnlitSM::Arguments);
         renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS>(MeshShader::DetailledObjectPass2ShaderInstance, std::vector<GLuint>({ MeshShader::DetailledObjectPass2ShaderInstance->TU_Albedo, MeshShader::DetailledObjectPass2ShaderInstance->TU_detail }), ListDetailSM::Arguments);
-        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS>(MeshShader::SplattingShaderInstance,
-            std::vector<GLuint>({
-                (GLuint)8,
-                (GLuint)MeshShader::SplattingShaderInstance->TU_tex_layout,
-                (GLuint)MeshShader::SplattingShaderInstance->TU_tex_detail0,
-                (GLuint)MeshShader::SplattingShaderInstance->TU_tex_detail1,
-                (GLuint)MeshShader::SplattingShaderInstance->TU_tex_detail2,
-                (GLuint)MeshShader::SplattingShaderInstance->TU_tex_detail3 }),
+        std::vector<GLuint> v;
+        v.push_back(8);
+        v.push_back(MeshShader::SplattingShaderInstance->TU_tex_layout);
+        v.push_back(MeshShader::SplattingShaderInstance->TU_tex_detail0);
+        v.push_back(MeshShader::SplattingShaderInstance->TU_tex_detail1);
+        v.push_back(MeshShader::SplattingShaderInstance->TU_tex_detail2);
+        v.push_back(MeshShader::SplattingShaderInstance->TU_tex_detail3);
+        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS>(MeshShader::SplattingShaderInstance, v,
             ListSplattingSM::Arguments);
         renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD>(MeshShader::GrassPass2ShaderInstance, std::vector<GLuint>({ MeshShader::GrassPass2ShaderInstance->TU_Albedo }), ListGrassSM::Arguments);
     }
@@ -238,16 +238,16 @@ void IrrDriver::renderTransparent()
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD>(MeshShader::TransparentFogShaderInstance, { MeshShader::TransparentFogShaderInstance->TU_tex }, ListBlendTransparentFog::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD>(MeshShader::TransparentFogShaderInstance, std::vector<GLuint>({ MeshShader::TransparentFogShaderInstance->TU_tex }), ListBlendTransparentFog::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD>(MeshShader::TransparentFogShaderInstance, { MeshShader::TransparentFogShaderInstance->TU_tex }, ListAdditiveTransparentFog::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD>(MeshShader::TransparentFogShaderInstance, std::vector<GLuint>({ MeshShader::TransparentFogShaderInstance->TU_tex }), ListAdditiveTransparentFog::Arguments);
     }
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>(MeshShader::TransparentShaderInstance, { MeshShader::TransparentShaderInstance->TU_tex }, ListBlendTransparent::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>(MeshShader::TransparentShaderInstance, std::vector<GLuint>({ MeshShader::TransparentShaderInstance->TU_tex }), ListBlendTransparent::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>(MeshShader::TransparentShaderInstance, { MeshShader::TransparentShaderInstance->TU_tex }, ListAdditiveTransparent::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD>(MeshShader::TransparentShaderInstance, std::vector<GLuint>({ MeshShader::TransparentShaderInstance->TU_tex }), ListAdditiveTransparent::Arguments);
     }
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -405,11 +405,11 @@ void IrrDriver::renderShadows()
 
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-    drawShadow<MeshShader::ShadowShader, EVT_STANDARD>(MeshShader::ShadowShaderInstance, {}, ListDefaultStandardG::Arguments);
-    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS>(MeshShader::ShadowShaderInstance, {}, ListDefault2TCoordG::Arguments);
-    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS>(MeshShader::ShadowShaderInstance, {}, ListNormalG::Arguments);
-    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD>(MeshShader::RefShadowShaderInstance, { MeshShader::RefShadowShaderInstance->TU_tex }, ListAlphaRefG::Arguments);
-    drawShadowGrass({ MeshShader::GrassShadowShaderInstance->TU_tex }, ListGrassG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_STANDARD>(MeshShader::ShadowShaderInstance, std::vector<GLuint>(), ListDefaultStandardG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_2TCOORDS>(MeshShader::ShadowShaderInstance, std::vector<GLuint>(), ListDefault2TCoordG::Arguments);
+    drawShadow<MeshShader::ShadowShader, EVT_TANGENTS>(MeshShader::ShadowShaderInstance, std::vector<GLuint>(), ListNormalG::Arguments);
+    drawShadow<MeshShader::RefShadowShader, EVT_STANDARD>(MeshShader::RefShadowShaderInstance, std::vector<GLuint>({ MeshShader::RefShadowShaderInstance->TU_tex }), ListAlphaRefG::Arguments);
+    drawShadowGrass(std::vector<GLuint>({ MeshShader::GrassShadowShaderInstance->TU_tex }), ListGrassG::Arguments);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -419,6 +419,6 @@ void IrrDriver::renderShadows()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListDefaultStandardG::Arguments);
-    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListDefault2TCoordG::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, std::vector<GLuint>({ MeshShader::RSMShader::TU_tex }), ListDefaultStandardG::Arguments);
+    drawRSM<EVT_2TCOORDS>(rsm_matrix, std::vector<GLuint>({ MeshShader::RSMShader::TU_tex }), ListDefault2TCoordG::Arguments);
 }
