@@ -34,7 +34,6 @@ const char* GrandPrixManager::SUFFIX = ".grandprix";
 // ----------------------------------------------------------------------------
 GrandPrixManager::GrandPrixManager()
 {
-    m_random_gp = NULL; // better do it explicitly and avoid weird stuff
     loadFiles();
 }   // GrandPrixManager
 
@@ -42,10 +41,7 @@ GrandPrixManager::GrandPrixManager()
 GrandPrixManager::~GrandPrixManager()
 {
     for(unsigned int i=0; i<m_gp_data.size(); i++)
-    {
         delete m_gp_data[i];
-    }
-    delete m_random_gp;
 }   // ~GrandPrixManager
 
 // ----------------------------------------------------------------------------
@@ -97,7 +93,7 @@ void GrandPrixManager::load(const std::string& filename)
     catch (std::runtime_error& e)
     {
         Log::error("GrandPrixManager",
-                   "Ignoring grand prix %s (%s)\n", filename.c_str(), e.what());
+                   "Ignoring Grand Prix %s (%s)\n", filename.c_str(), e.what());
     }
 }   // load
 
@@ -156,9 +152,6 @@ GrandPrixData* GrandPrixManager::getGrandPrix(const std::string& s) const
 // ----------------------------------------------------------------------------
 GrandPrixData* GrandPrixManager::editGrandPrix(const std::string& s) const
 {
-    if (s == "random")
-        return m_random_gp;
-
     for(unsigned int i=0; i<m_gp_data.size(); i++)
     {
         if(m_gp_data[i]->getId() == s)
