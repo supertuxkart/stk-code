@@ -40,7 +40,9 @@ namespace GUIEngine
     {
         MENU,
         GAME,
-        INGAME_MENU
+        INGAME_MENU,
+        /** Dummy GameState e. g. for parameters. */
+        CURRENT = MENU | GAME | INGAME_MENU
     };   // GameState
 
     /**
@@ -82,7 +84,7 @@ namespace GUIEngine
           * without displaying the second-topmost menu of the stack
           * in-between)
           */
-        void replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState = GUIEngine::MENU);
+        void replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState = GUIEngine::CURRENT);
 
         /**
           * \brief removes the menu at the top of the screens stack

@@ -150,6 +150,15 @@ void OptionsScreenInput2::init()
     actions->addItem(KartActionStrings[PA_MENU_CANCEL], L"" );
 
     updateInputButtons();
+
+    // Disable deletion keyboard configurations
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        getWidget<ButtonWidget>("delete")->setDeactivated();
+    } else
+    {
+        getWidget<ButtonWidget>("delete")->setActivated();
+    }
 }   // init
 
 // -----------------------------------------------------------------------------
@@ -443,18 +452,21 @@ void OptionsScreenInput2::eventCallback(Widget* widget,
     StateManager *sm = StateManager::get();
     if (name == "options_choice")
     {
-        const std::string &selection =
-          ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if      (selection == "tab_audio")
-            sm->replaceTopMostScreen(OptionsScreenAudio::getInstance());
-        else if (selection == "tab_video")
-            sm->replaceTopMostScreen(OptionsScreenVideo::getInstance());
+        Screen *screen = NULL;
+        if (selection == "tab_audio")
+            screen = OptionsScreenAudio::getInstance();
+        //else if (selection == "tab_video")
+        //    screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
-            sm->replaceTopMostScreen(TabbedUserScreen::getInstance());
+            screen = TabbedUserScreen::getInstance();
+        //else if (selection == "tab_controls")
+        //    screen = OptionsScreenInput::getInstance();
         else if (selection == "tab_ui")
-            sm->replaceTopMostScreen(OptionsScreenUI::getInstance());
-        else if (selection == "tab_controls") {}
+            screen = OptionsScreenUI::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if (name == "back_to_device_list")
     {
