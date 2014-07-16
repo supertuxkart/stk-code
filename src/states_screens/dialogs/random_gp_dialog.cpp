@@ -33,7 +33,6 @@ using irr::gui::IGUIStaticText;
 typedef GUIEngine::SpinnerWidget Spinner;
 
 RandomGPInfoDialog::RandomGPInfoDialog()
-
 {
     // Defaults - loading selection from last time frrom a file would be better
     m_number_of_tracks = 2; // We can assume that there are at least 2 standard tracks
