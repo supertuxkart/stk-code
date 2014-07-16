@@ -12,6 +12,7 @@
 #include <vector>
 
 enum GeometricMaterial
+
 {
     FPSM_DEFAULT_STANDARD,
     FPSM_DEFAULT_2TCOORD,
@@ -32,6 +33,19 @@ enum ShadedMaterial
     SM_UNLIT,
     SM_DETAILS,
     SM_COUNT
+};
+
+enum MeshMaterial
+{
+    MAT_DEFAULT,
+    MAT_ALPHA_REF,
+    MAT_NORMAL_MAP,
+    MAT_GRASS,
+    MAT_SPHEREMAP,
+    MAT_SPLATTING,
+    MAT_UNLIT,
+    MAT_DETAIL,
+    MAT_COUNT
 };
 
 enum TransparentMaterial
@@ -69,85 +83,54 @@ bool isObject(video::E_MATERIAL_TYPE type);
 core::vector3df getWind();
 
 // Pass 1 shader (ie shaders that outputs normals and depth)
-class ListDefaultStandardG
+class ListMatDefault
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+};
+
+class ListMatAlphaRef
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+};
+
+class ListMatNormalMap
 {
 public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
-class ListDefault2TCoordG
+class ListMatGrass
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > Arguments;
+};
+
+class ListMatSphereMap
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+};
+
+class ListMatSplatting
+{
+public:
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+};
+
+class ListMatUnlit
 {
 public:
     static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
-class ListAlphaRefG
+class ListMatDetails
 {
 public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
 };
 
-class ListNormalG
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
-};
-
-class ListGrassG
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > Arguments;
-};
-
-
-// Pass 2 shader (ie shaders that outputs final color)
-class ListDefaultStandardSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
-
-class ListDefaultTangentSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
-
-class ListAlphaRefSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
-
-class ListSphereMapSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
-
-class ListSplattingSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > Arguments;
-};
-
-class ListUnlitSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
-};
-
-class ListDetailSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, video::SColorf> > Arguments;
-};
-
-class ListGrassSM
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > Arguments;
-};
 
 class ListBlendTransparent
 {
@@ -182,8 +165,7 @@ public:
 // Forward pass (for transparents meshes)
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
-GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
-ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE, irr::video::ITexture **textures, video::E_VERTEX_TYPE tp);
+MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
 
 #endif // STKMESH_H

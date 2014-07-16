@@ -266,10 +266,6 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
 
-    PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
-    renderSolidFirstPass();
-    PROFILER_POP_CPU_MARKER();
-
     // Shadows
     {
         PROFILER_PUSH_CPU_MARKER("- Shadow", 0x30, 0x6F, 0x90);
@@ -282,6 +278,12 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_scene_manager->setActiveCamera(camnode);
         PROFILER_POP_CPU_MARKER();
     }
+
+    PROFILER_PUSH_CPU_MARKER("- Solid Pass 1", 0xFF, 0x00, 0x00);
+    renderSolidFirstPass();
+    PROFILER_POP_CPU_MARKER();
+
+
 
     // Lights
     {

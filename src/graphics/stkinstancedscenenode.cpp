@@ -55,7 +55,7 @@ void STKInstancedSceneNode::createGLMeshes()
     isMaterialInitialized = false;
 }
 
-void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat)
+void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh)
 {
     mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
     glGenBuffers(1, &instances_vbo);
@@ -99,9 +99,9 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
         video::E_MATERIAL_TYPE type = mb->getMaterial().MaterialType;
 
         GLMesh &mesh = GLmeshes[i];
-        GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
-        ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
-        initinstancedvaostate(mesh, GeometricType, ShadedType);
+        GeometricMaterial GeometricType;// = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
+        ShadedMaterial ShadedType;// = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
+        initinstancedvaostate(mesh);
         GeometricMesh[GeometricType].push_back(&mesh);
         ShadedMesh[ShadedType].push_back(&mesh);
     }

@@ -17,7 +17,7 @@ protected:
     void createGLMeshes();
     bool isMaterialInitialized;
     void setFirstTimeMaterial();
-    void initinstancedvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat);
+    void initinstancedvaostate(GLMesh &mesh);
     void cleanGL();
     core::vector3df windDir;
 public:
