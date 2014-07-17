@@ -17,6 +17,7 @@ layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
 #else
 in vec3 Position;
+in vec4 Color;
 in vec2 Texcoord;
 
 in vec3 Origin;
