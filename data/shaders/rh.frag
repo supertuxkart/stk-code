@@ -60,7 +60,7 @@ void main(void)
         vec2 uv = RHuv + offset * 0.01;
 
         // Get world position and normal from the RSM sample
-        float depth = texture2D(dtex, uv).z;
+        float depth = texture(dtex, uv).z;
         vec4 RSMPos = inverse(RSMMatrix) * (2. * vec4(uv, depth, 1.) - 1.);
         RSMPos /= RSMPos.w;
         vec3 RSMAlbedo = texture(ctex, uv).xyz;
