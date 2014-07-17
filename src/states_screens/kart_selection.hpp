@@ -77,8 +77,6 @@ protected:
 
     bool m_must_delete_on_back; //!< To delete the screen if back is pressed
 
-    KartSelectionScreen(const char* filename);
-
     /** Stores whether any player confirmed their choice; then, some things
       * are "frozen", for instance the selected kart group tab
       */
@@ -88,6 +86,8 @@ protected:
 
     /** Message shown in multiplayer mode */
     GUIEngine::BubbleWidget* m_multiplayer_message;
+
+    KartSelectionScreen(const char* filename);
 
     /** Called when all players selected their kart */
     void allPlayersDone();

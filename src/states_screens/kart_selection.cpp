@@ -251,9 +251,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
 
 
     m_kart_stats = new GUIEngine::KartStatsWidget(statsArea, player_id, kart_group,
-                                                  m_parent_screen->m_multiplayer);
-    m_kart_stats->m_properties[PROP_ID] =
-            StringUtils::insertValues("@p%i_stats", m_player_id);
+                       m_parent_screen->m_multiplayer,
+                       !m_parent_screen->m_multiplayer || parent->m_kart_widgets.size() == 0);
+    m_kart_stats->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_stats", m_player_id);
     m_children.push_back(m_kart_stats);
 
     if (parent->m_multiplayer && associated_player)
@@ -433,13 +433,14 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
         assert(false);
     }
 
-    // Remove current focus, but rembmer it
+    // Remove current focus, but remember it
     Widget* focus = GUIEngine::getFocusForPlayer(m_player_id);
     GUIEngine::focusNothingForPlayer(m_player_id);
 
     // Change the player ID
     m_player_id = newPlayerID;
     m_player_ident_spinner->setID(m_player_id);
+    m_kart_stats->setDisplayText(m_player_id == 0);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
 
@@ -1347,6 +1348,28 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
     // Tell the StateManager to remove this player
     StateManager::get()->removeActivePlayer(playerID);
 
+    if (m_kart_widgets.size() == 1)
+    {
+        // Add multiplayer message
+        if (m_multiplayer_message == NULL)
+        {
+            Widget* fullarea = getWidget("playerskarts");
+            const int splitWidth = fullarea->m_w / 2;
+            m_multiplayer_message = new BubbleWidget();
+            m_multiplayer_message->m_properties[PROP_TEXT_ALIGN] = "center";
+            m_multiplayer_message->setText( _("Everyone:\nPress 'Select' now to "
+                                          "join the game!") );
+            m_multiplayer_message->m_x =
+                (int)(fullarea->m_x + splitWidth + splitWidth*0.2f);
+            m_multiplayer_message->m_y = (int)(fullarea->m_y + fullarea->m_h*0.3f);
+            m_multiplayer_message->m_w = (int)(splitWidth*0.6f);
+            m_multiplayer_message->m_h = (int)(fullarea->m_h*0.6f);
+            m_multiplayer_message->setFocusable(false);
+            m_multiplayer_message->add();
+            manualAddWidget(m_multiplayer_message);
+        }
+    }
+
     // Karts count changed, maybe order too, so renumber them.
     renumberKarts();
 
@@ -2060,7 +2083,9 @@ void KartSelectionScreen::renumberKarts()
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     assert( w != NULL );
     Widget* fullarea = getWidget("playerskarts");
-    const int splitWidth = fullarea->m_w / m_kart_widgets.size();
+    int splitWidth = fullarea->m_w / m_kart_widgets.size();
+    if (m_kart_widgets.size() == 1)
+        splitWidth /= 2;
 
     for (unsigned int n=0; n < m_kart_widgets.size(); n++)
     {

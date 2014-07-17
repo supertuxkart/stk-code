@@ -37,9 +37,7 @@ namespace GUIEngine
       * \brief A progress bar widget.
       * \ingroup widgetsgroup
       */
-
-
-class KartStatsWidget : public Widget
+	class KartStatsWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
@@ -70,8 +68,8 @@ class KartStatsWidget : public Widget
         LEAK_CHECK()
         
         KartStatsWidget(core::recti area, const int player_id,
-                        std::string kart_group,
-                        bool multiplayer);
+                        std::string kart_group, bool multiplayer,
+                        bool display_text);
         virtual ~KartStatsWidget() {};
 
         // ------------------------------------------------------------------------
@@ -98,6 +96,9 @@ class KartStatsWidget : public Widget
         
         /** Get the current values of the widget. */
         int getValue(Stats type);
+
+        /** If the labels should be displayed. */
+        void setDisplayText(bool display_text);
     };
 }
 

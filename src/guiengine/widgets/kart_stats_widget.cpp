@@ -38,8 +38,8 @@ using namespace irr;
 // -----------------------------------------------------------------------------
 
 KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
-                                 std::string kart_group,
-                                 bool multiplayer) : Widget(WTYPE_DIV)
+                                 std::string kart_group, bool multiplayer,
+                                 bool display_text) : Widget(WTYPE_DIV)
 {
     m_player_id = player_id;
 
@@ -85,7 +85,7 @@ KartStatsWidget::KartStatsWidget(core::recti area, const int player_id,
 
         SkillLevelWidget* skill_bar = NULL;
 
-            skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer);
+            skill_bar = new SkillLevelWidget(skillArea, m_player_id, multiplayer, display_text);
 
             m_skills.push_back(skill_bar);
             m_children.push_back(skill_bar);
@@ -167,4 +167,13 @@ void KartStatsWidget::setSize(const int x, const int y, const int w, const int h
     m_skill_bar_y = y + h/2 - m_skill_bar_h/2;
 }   // setSize
 
+void KartStatsWidget::setDisplayText(bool display_text)
+{
+    for (int i = 0; i < SKILL_COUNT; ++i)
+    {
+        m_skills[i]->setDisplayText(display_text);
+    }
+}   // setDisplayText
+
 // -----------------------------------------------------------------------------
+
