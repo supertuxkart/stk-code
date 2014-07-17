@@ -43,9 +43,9 @@
  *  Here are defined some functions that will be specifically implemented by
  *  the ServerNetworkManager and the ClientNetworkManager.
  */
-class NetworkManager : public Singleton<NetworkManager>
+class NetworkManager : public AbstractSingleton<NetworkManager>
 {
-    friend class Singleton<NetworkManager>;
+    friend class AbstractSingleton<NetworkManager>;
     public:
         /** \brief Function to start the Network Manager (start threads) */
         virtual void run();

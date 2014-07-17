@@ -26,7 +26,7 @@ out float AO;
 
 const float sigma = 1.;
 const float tau = 7.;
-const float beta = 0.001;
+const float beta = 0.002;
 const float epsilon = .00001;
 const float radius = 1.;
 const float k = 1.5;
