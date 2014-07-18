@@ -61,8 +61,18 @@ RandomGPInfoDialog::RandomGPInfoDialog()
 
 void RandomGPInfoDialog::addSpinners()
 {
-    const int trackgroup_width = 200, laps_with = 150, reverse_width = 200;
-    const int left =  (m_area.getWidth() - trackgroup_width - 150 - 250)/2;
+    const int laps_width = 150;
+    // "20*4" because there a 4 separators between the spinners with 20px each
+    int label_spinner_width = m_area.getWidth() - laps_width - 20*4;
+    // This scaling ensures that the spinners are smaller than the available
+    // area, look well and are (hopefully) big enough for their labels
+    if (m_area.getWidth() < 700)
+        label_spinner_width /= 2;
+    else if (m_area.getWidth() < 1500)
+        label_spinner_width /= 3;
+    else
+        label_spinner_width /= 4;
+    const int left = (m_area.getWidth() - label_spinner_width*2 - laps_width)/2;
 
     // Trackgroup chooser
     Spinner* spinner = new Spinner(false);
@@ -71,7 +81,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->setParent(m_irrlicht_window);
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left, m_under_title, trackgroup_width, SPINNER_HEIGHT);
+    spinner->move(left, m_under_title, label_spinner_width, SPINNER_HEIGHT);
     // Fill it with all the track group names
     spinner->addLabel("all");
     int index_standard;
@@ -100,7 +110,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + trackgroup_width + 10, m_under_title, laps_with, SPINNER_HEIGHT);
+    spinner->move(left + label_spinner_width + 20/2, m_under_title, laps_width, SPINNER_HEIGHT);
 
     // reverse choose
     spinner = new Spinner(false);
@@ -109,7 +119,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + trackgroup_width + laps_with + 10, m_under_title, reverse_width, SPINNER_HEIGHT);
+    spinner->move(left + label_spinner_width + laps_width + 20/2, m_under_title, label_spinner_width, SPINNER_HEIGHT);
     spinner->addLabel("no reverse");
     spinner->addLabel("all reverse");
     spinner->addLabel("mixed");

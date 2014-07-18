@@ -119,7 +119,7 @@ void GPInfoDialog::addTracks()
 
         Label* widget = dynamic_cast<Label*>(m_widgets.get(widgets_iter));
         widget->setText(translations->fribidize(track->getName()), false);
-        widget->move(20, m_over_body + height_of_one_line*(i+1),
+        widget->move(20, m_over_body + height_of_one_line*i,
                      m_area.getWidth()/2 - 20, height_of_one_line);
 
         widgets_iter++;
@@ -141,7 +141,7 @@ void GPInfoDialog::addTracks()
             m_widgets.push_back(widget);
             widget->add();
 
-            widget->move(20, m_over_body + height_of_one_line*(i+1),
+            widget->move(20, m_over_body + height_of_one_line*i,
                          m_area.getWidth()/2 - 20, height_of_one_line);
         }
     }
