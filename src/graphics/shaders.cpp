@@ -431,14 +431,26 @@ namespace UtilShader
     }
 }
 
+struct TexUnit
+{
+    GLuint m_index;
+    const char* m_uniform;
+
+    TexUnit(GLuint index, const char* uniform)
+    {
+        m_index = index;
+        m_uniform = uniform;
+    }
+};
+
 static void
-AssignTextureUnit(GLuint Program, const std::vector<std::pair<GLuint, const char*> > assoc)
+AssignTextureUnit(GLuint Program, const std::vector<TexUnit> assoc)
 {
     glUseProgram(Program);
     for (unsigned i = 0; i < assoc.size(); i++)
     {
-        GLuint uniform = glGetUniformLocation(Program, assoc[i].second);
-        glUniform1i(uniform, assoc[i].first);
+        GLuint uniform = glGetUniformLocation(Program, assoc[i].m_uniform);
+        glUniform1i(uniform, assoc[i].m_index);
     }
     glUseProgram(0);
 }
@@ -474,90 +486,6 @@ void glUniform1fWrapper(GLuint a, float b)
 
 namespace MeshShader
 {
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2,
-            GLuint tex3, const char* n3)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        v.push_back(std::pair<GLuint, const char *>(tex3, n3));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2,
-            GLuint tex3, const char* n3, GLuint tex4, const char* n4)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        v.push_back(std::pair<GLuint, const char *>(tex3, n3));
-        v.push_back(std::pair<GLuint, const char *>(tex4, n4));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2,
-            GLuint tex3, const char* n3, GLuint tex4, const char* n4, GLuint tex5, const char* n5)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        v.push_back(std::pair<GLuint, const char *>(tex3, n3));
-        v.push_back(std::pair<GLuint, const char *>(tex4, n4));
-        v.push_back(std::pair<GLuint, const char *>(tex5, n5));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2,
-            GLuint tex3, const char* n3, GLuint tex4, const char* n4, GLuint tex5, const char* n5,
-            GLuint tex6, const char* n6)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        v.push_back(std::pair<GLuint, const char *>(tex3, n3));
-        v.push_back(std::pair<GLuint, const char *>(tex4, n4));
-        v.push_back(std::pair<GLuint, const char *>(tex5, n5));
-        v.push_back(std::pair<GLuint, const char *>(tex6, n6));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2,
-            GLuint tex3, const char* n3, GLuint tex4, const char* n4, GLuint tex5, const char* n5,
-            GLuint tex6, const char* n6, GLuint tex7, const char* n7)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        v.push_back(std::pair<GLuint, const char *>(tex3, n3));
-        v.push_back(std::pair<GLuint, const char *>(tex4, n4));
-        v.push_back(std::pair<GLuint, const char *>(tex5, n5));
-        v.push_back(std::pair<GLuint, const char *>(tex6, n6));
-        v.push_back(std::pair<GLuint, const char *>(tex7, n7));
-        return v;
-    }
-    std::vector<std::pair<GLuint, const char *> > TexUnit(GLuint tex, const char* n, GLuint tex2, const char* n2,
-            GLuint tex3, const char* n3, GLuint tex4, const char* n4, GLuint tex5, const char* n5,
-            GLuint tex6, const char* n6, GLuint tex7, const char* n7, GLuint tex8, const char* n8)
-    {
-        std::vector<std::pair<GLuint, const char *> > v;
-        v.push_back(std::pair<GLuint, const char *>(tex, n));
-        v.push_back(std::pair<GLuint, const char *>(tex2, n2));
-        v.push_back(std::pair<GLuint, const char *>(tex3, n3));
-        v.push_back(std::pair<GLuint, const char *>(tex4, n4));
-        v.push_back(std::pair<GLuint, const char *>(tex5, n5));
-        v.push_back(std::pair<GLuint, const char *>(tex6, n6));
-        v.push_back(std::pair<GLuint, const char *>(tex8, n8));
-        return v;
-    }
     std::vector<const char*> Uniforms(const char* c1)
     {
         std::vector<const char*> v;
@@ -649,7 +577,7 @@ namespace MeshShader
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit( TU_tex, "tex" ));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex" ) });
     }
 
     ObjectRefPass1Shader::ObjectRefPass1Shader()
@@ -665,7 +593,7 @@ namespace MeshShader
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     GrassPass1Shader::GrassPass1Shader()
@@ -676,7 +604,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms(Program, uniforms, Uniforms("ModelMatrix", "InverseModelMatrix", "windDir"));
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     NormalMapShader::NormalMapShader()
@@ -693,7 +621,7 @@ namespace MeshShader
         }
         TU_normalmap = 1;
         TU_glossy = 0;
-        AssignTextureUnit(Program, TexUnit(TU_normalmap, "normalMap", TU_glossy, "DiffuseForAlpha"));
+        AssignTextureUnit(Program, { TexUnit(TU_normalmap, "normalMap"), TexUnit(TU_glossy, "DiffuseForAlpha") });
     }
 
     InstancedObjectPass1Shader::InstancedObjectPass1Shader()
@@ -704,7 +632,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -722,7 +650,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -741,7 +669,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms(Program, uniforms, Uniforms("windDir"));
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
         if (!UserConfigParams::m_ubo_disabled)
         {
             GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -766,7 +694,12 @@ namespace MeshShader
         }
         TU_Albedo = 3;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo")
+        });
     }
 
     ObjectPass2Shader *ObjectPass2ShaderInstance;
@@ -781,7 +714,12 @@ namespace MeshShader
         AssignUniforms(Program, uniforms, Uniforms("ambient"));
         TU_Albedo = 3;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo"));
+        AssignTextureUnit(Program, { 
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo")
+        });
 
         if (!UserConfigParams::m_ubo_disabled)
         {
@@ -802,7 +740,12 @@ namespace MeshShader
         AssignUniforms(Program, uniforms, Uniforms("ambient"));
         TU_Albedo = 3;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"), 
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo")
+        });
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -822,7 +765,13 @@ namespace MeshShader
         TU_Albedo = 3;
         TU_detail = 4;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo", TU_detail, "Detail"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo"),
+            TexUnit(TU_detail, "Detail")
+        });
     }
 
     DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
@@ -840,7 +789,7 @@ namespace MeshShader
         }
         TU_tex = 3;
 
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     ObjectUnlitShader *ObjectUnlitShaderInstance;
@@ -859,7 +808,12 @@ namespace MeshShader
         }
         TU_Albedo = 3;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo")
+        });
     }
 
     ObjectRefPass2Shader *ObjectRefPass2ShaderInstance;
@@ -873,7 +827,12 @@ namespace MeshShader
         AssignUniforms(Program, uniforms, Uniforms("ModelMatrix", "windDir", "ambient"));
         TU_Albedo = 3;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo")
+        });
     }
 
     GrassPass2Shader *GrassPass2ShaderInstance;
@@ -889,7 +848,13 @@ namespace MeshShader
         TU_Albedo = 3;
         TU_dtex = 4;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_Albedo, "Albedo", TU_dtex, "dtex"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_Albedo, "Albedo"),
+            TexUnit(TU_dtex, "dtex")
+        });
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -912,7 +877,12 @@ namespace MeshShader
         }
         TU_tex = 3;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_tex, "tex"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_tex, "tex")
+        });
     }
 
     SphereMapShader *SphereMapShaderInstance;
@@ -929,8 +899,16 @@ namespace MeshShader
         TU_tex_detail2 = 6;
         TU_tex_detail3 = 7;
 
-        AssignTextureUnit(Program, TexUnit(0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", TU_tex_layout, "tex_layout",
-            TU_tex_detail0, "tex_detail0", TU_tex_detail1, "tex_detail1", TU_tex_detail2, "tex_detail2", TU_tex_detail3, "tex_detail3"));
+        AssignTextureUnit(Program, {
+            TexUnit(0, "DiffuseMap"),
+            TexUnit(1, "SpecularMap"),
+            TexUnit(2, "SSAO"),
+            TexUnit(TU_tex_layout, "tex_layout"),
+            TexUnit(TU_tex_detail0, "tex_detail0"),
+            TexUnit(TU_tex_detail1, "tex_detail1"),
+            TexUnit(TU_tex_detail2, "tex_detail2"),
+            TexUnit(TU_tex_detail3, "tex_detail3")
+        });
     }
 
     SplattingShader *SplattingShaderInstance;
@@ -972,7 +950,7 @@ namespace MeshShader
         }
         TU_tex = 0;
 
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     TransparentShader *TransparentShaderInstance;
@@ -990,7 +968,7 @@ namespace MeshShader
         }
         TU_tex = 0;
 
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     TransparentFogShader *TransparentFogShaderInstance;
@@ -1096,7 +1074,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
         uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
         uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     void RSMShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix)
@@ -1154,7 +1132,7 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         TU_tex = 0;
 
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     RefShadowShader *RefShadowShaderInstance;
@@ -1180,7 +1158,7 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -1210,7 +1188,7 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         TU_tex = 0;
 
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
 
     GrassShadowShader *GrassShadowShaderInstance;
@@ -1236,7 +1214,7 @@ namespace MeshShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
         TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
 
         AssignUniforms(Program, uniforms, Uniforms("windDir"));
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1271,8 +1249,12 @@ namespace MeshShader
         TU_color_tex = 1;
         TU_mask_tex = 2;
         TU_tex = 3;
-        AssignTextureUnit(Program, TexUnit(TU_displacement_tex, "displacement_tex", TU_color_tex, "color_tex",
-            TU_mask_tex, "mask_tex", TU_tex, "tex"));
+        AssignTextureUnit(Program, {
+            TexUnit(TU_displacement_tex, "displacement_tex"),
+            TexUnit(TU_color_tex, "color_tex"),
+            TexUnit(TU_mask_tex, "mask_tex"),
+            TexUnit(TU_tex, "tex")
+        });
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
