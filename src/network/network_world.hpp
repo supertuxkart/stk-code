@@ -34,9 +34,9 @@ class Item;
 /*! \brief Manages the world updates during an online game
  *  This function's update is to be called instead of the normal World update
 */
-class NetworkWorld : public Singleton<NetworkWorld>
+class NetworkWorld : public AbstractSingleton<NetworkWorld>
 {
-    friend class Singleton<NetworkWorld>;
+    friend class AbstractSingleton<NetworkWorld>;
     public:
         void update(float dt);
 

@@ -7,8 +7,7 @@
 class STKMeshSceneNode : public irr::scene::CMeshSceneNode
 {
 protected:
-    PtrVector<GLMesh, REF> GeometricMesh[FPSM_COUNT];
-    PtrVector<GLMesh, REF> ShadedMesh[SM_COUNT];
+    PtrVector<GLMesh, REF> MeshSolidMaterials[MAT_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;

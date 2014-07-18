@@ -9,37 +9,23 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
+MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
 {
+    if (MaterialType == irr_driver->getShader(ES_SPHERE_MAP))
+        return MAT_SPHEREMAP;
     if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
-        return FPSM_NORMAL_MAP;
+        return MAT_NORMAL_MAP;
     else if (MaterialType == irr_driver->getShader(ES_OBJECTPASS_REF) || MaterialType == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
-        return FPSM_ALPHA_REF_TEXTURE;
+        return MAT_ALPHA_REF;
     else if (MaterialType == irr_driver->getShader(ES_GRASS) || MaterialType == irr_driver->getShader(ES_GRASS_REF))
-        return FPSM_GRASS;
+        return MAT_GRASS;
+    else if (MaterialType == irr_driver->getShader(ES_SPLATTING))
+        return MAT_SPLATTING;
+    else if (MaterialType == irr_driver->getShader(ES_OBJECT_UNLIT))
+        return MAT_UNLIT;
     else if (tp == video::EVT_2TCOORDS)
-        return FPSM_DEFAULT_2TCOORD;
-    assert(tp == video::EVT_STANDARD);
-    return FPSM_DEFAULT_STANDARD;
-}
-
-ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::ITexture **textures, video::E_VERTEX_TYPE tp)
-{
-    if (type == irr_driver->getShader(ES_SPHERE_MAP))
-        return SM_SPHEREMAP;
-    else if (type == irr_driver->getShader(ES_SPLATTING))
-        return SM_SPLATTING;
-    else if (type == irr_driver->getShader(ES_OBJECTPASS_REF) || type == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
-        return SM_ALPHA_REF_TEXTURE;
-    else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-        return SM_GRASS;
-    else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-        return SM_UNLIT;
-    else if (tp == video::EVT_2TCOORDS)
-        return SM_DETAILS;
-    else if (tp == video::EVT_TANGENTS)
-        return SM_DEFAULT_TANGENT;
-    return SM_DEFAULT_STANDARD;
+        return MAT_DETAIL;
+    return MAT_DEFAULT;
 }
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
@@ -307,22 +293,17 @@ bool isObject(video::E_MATERIAL_TYPE type)
     return false;
 }
 
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefaultStandardG::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListDefault2TCoordG::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListAlphaRefG::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListNormalG::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > ListGrassG::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatDefault::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatAlphaRef::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatSphereMap::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatDetails::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > ListMatGrass::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListMatUnlit::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListMatSplatting::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatNormalMap::Arguments;
 
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultStandardSM::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListDefaultTangentSM::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListAlphaRefSM::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, video::SColorf> > ListSplattingSM::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListSphereMapSM::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4> > ListUnlitSM::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, video::SColorf> > ListDetailSM::Arguments;
 std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
 std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;
 std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
 std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::vector3df, video::SColorf> > ListGrassSM::Arguments;
+std::vector<STK::Tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;

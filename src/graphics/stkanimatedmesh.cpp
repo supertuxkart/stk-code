@@ -8,7 +8,6 @@
 #include "tracks/track.hpp"
 #include "graphics/camera.hpp"
 #include "utils/profiler.hpp"
-#include "utils/tuple.hpp"
 
 using namespace irr;
 
@@ -40,10 +39,8 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 {
     firstTime = true;
     GLmeshes.clear();
-    for (unsigned i = 0; i < FPSM_COUNT; i++)
-        GeometricMesh[i].clearWithoutDeleting();
-    for (unsigned i = 0; i < SM_COUNT; i++)
-        ShadedMesh[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < MAT_COUNT; i++)
+        MeshSolidMaterial[i].clearWithoutDeleting();
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
@@ -99,10 +96,8 @@ void STKAnimatedMesh::render()
             }
             else
             {
-                GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
-                ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
-                GeometricMesh[GeometricType].push_back(&mesh);
-                ShadedMesh[ShadedType].push_back(&mesh);
+                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
+                MeshSolidMaterial[MatType].push_back(&mesh);
             }
             std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
             mesh.vaoBaseVertex = p.first;
@@ -118,7 +113,7 @@ void STKAnimatedMesh::render()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS)
+            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS || irr_driver->getPhase() == SHADOW_PASS)
             {
                 glBindVertexArray(0);
                 glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
@@ -138,45 +133,24 @@ void STKAnimatedMesh::render()
           continue;
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
         GLMesh* mesh;
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
-            ListDefaultStandardG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel));
+        for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
+            ListMatDefault::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
-            ListDefault2TCoordG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel));
+        for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
+            ListMatAlphaRef::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
-        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-            ListAlphaRefG::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix));
+        for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
+            ListMatDetails::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
-        return;
-    }
-
-    if (irr_driver->getPhase() == SOLID_LIT_PASS)
-    {
-        core::matrix4 invmodel;
-        AbsoluteTransformation.getInverse(invmodel);
-
-        GLMesh* mesh;
-        for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-            ListDefaultStandardSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
-
-        for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-            ListDefaultTangentSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
-
-        for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-            ListAlphaRefSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight()));
-
-        for_in (mesh, ShadedMesh[SM_UNLIT])
-            ListUnlitSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation));
-
-        for_in(mesh, ShadedMesh[SM_DETAILS])
-            ListDetailSM::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, irr_driver->getSceneManager()->getAmbientLight()));
+        for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
+            ListMatUnlit::Arguments.emplace_back(mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -211,16 +185,16 @@ void STKAnimatedMesh::render()
                                     fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 ListAdditiveTransparentFog::Arguments.push_back(
-                    STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
         }
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparent::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+                ListBlendTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparent::Arguments.push_back(STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix));
+                ListAdditiveTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
         return;
     }

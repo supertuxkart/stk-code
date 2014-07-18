@@ -33,9 +33,9 @@
 /** \class NetworkInterface
   * \ingroup network
   */
-class NetworkInterface : public Singleton<NetworkInterface>
+class NetworkInterface : public AbstractSingleton<NetworkInterface>
 {
-    friend class Singleton<NetworkInterface>;
+    friend class AbstractSingleton<NetworkInterface>;
     public:
 
         /*! \brief Used to init the network.
