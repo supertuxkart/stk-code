@@ -32,17 +32,51 @@
 
 #include <algorithm>
 
-struct TexUnit
+namespace RenderGeometry
 {
-    GLuint m_id;
-    bool m_premul_alpha;
-
-    TexUnit(GLuint id, bool premul_alpha)
+    struct TexUnit
     {
-        m_id = id;
-        m_premul_alpha = premul_alpha;
+        GLuint m_id;
+        bool m_premul_alpha;
+
+        TexUnit(GLuint id, bool premul_alpha)
+        {
+            m_id = id;
+            m_premul_alpha = premul_alpha;
+        }
+    };
+
+    template <typename T>
+    std::vector<TexUnit> TexUnits(T curr) // required on older clang versions
+    {
+        std::vector<TexUnit> v;
+        v.push_back(curr);
+        return v;
     }
-};
+
+    template <typename T, typename... R>
+    std::vector<TexUnit> TexUnits(T curr, R... rest) // required on older clang versions
+    {
+        std::vector<TexUnit> v;
+        v.push_back(curr);
+        VTexUnits(v, rest...);
+        return v;
+    }
+
+    template <typename T, typename... R>
+    void VTexUnits(std::vector<TexUnit>& v, T curr, R... rest) // required on older clang versions
+    {
+        v.push_back(curr);
+        VTexUnits(v, rest...);
+    }
+
+    template <typename T>
+    void VTexUnits(std::vector<TexUnit>& v, T curr)
+    {
+        v.push_back(curr);
+    }
+}
+using namespace RenderGeometry;
 
 template<typename Shader, typename...uniforms>
 void draw(const GLMesh *mesh, uniforms... Args)
@@ -175,18 +209,18 @@ void IrrDriver::renderSolidFirstPass()
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
 
-        std::vector<TexUnit> object_pass1_texunits{ TexUnit(MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true) };
+        std::vector<TexUnit> object_pass1_texunits = TexUnits(TexUnit(MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true) );
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatDefault::Arguments);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatSphereMap::Arguments);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatUnlit::Arguments);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatDetails::Arguments);
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatSplatting::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(std::vector<TexUnit>{ TexUnit(MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true) }, ListMatAlphaRef::Arguments);
-        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>(std::vector<TexUnit>{ TexUnit(MeshShader::GrassPass1Shader::getInstance()->TU_tex, true) }, ListMatGrass::Arguments);
-        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>(std::vector<TexUnit>{
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true)), ListMatAlphaRef::Arguments);
+        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::GrassPass1Shader::getInstance()->TU_tex, true)), ListMatGrass::Arguments);
+        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>(TexUnits(
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_glossy, true),
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_normalmap, false)
-        }, ListMatNormalMap::Arguments);
+        ), ListMatNormalMap::Arguments);
     }
 }
 

@@ -109,6 +109,19 @@ class ShaderHelper
 {
 protected:
     std::vector<GLuint> uniforms;
+
+    void AssignUniforms(const char* name)
+    {
+        uniforms.push_back(glGetUniformLocation(Program, name));
+    }
+
+    template<typename... T>
+    void AssignUniforms(const char* name, T... rest)
+    {
+        uniforms.push_back(glGetUniformLocation(Program, name));
+        AssignUniforms(rest...);
+    }
+
 public:
     GLuint Program;
 
@@ -125,6 +138,19 @@ class ShaderHelperSingleton : public Singleton<T>
 {
 protected:
     std::vector<GLuint> uniforms;
+    
+    void AssignUniforms(const char* name)
+    {
+        uniforms.push_back(glGetUniformLocation(Program, name));
+    }
+
+    template<typename... T>
+    void AssignUniforms(const char* name, T... rest)
+    {
+        uniforms.push_back(glGetUniformLocation(Program, name));
+        AssignUniforms(rest...);
+    }
+
 public:
     friend class Singleton<class ObjectPass1Shader>;
     GLuint Program;
