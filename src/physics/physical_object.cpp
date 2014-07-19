@@ -238,10 +238,7 @@ void PhysicalObject::init()
         }
         else
         {
-            fprintf(stderr, "[PhysicalObject] Unknown node type\n");
-            max = 1.0f;
-            min = 0.0f;
-            assert(false);
+            Log::fatal("PhysicalObject", "Unknown node type");
         }
     }
     else if (dynamic_cast<TrackObjectPresentationInstancing*>(presentation) != NULL)
@@ -256,10 +253,7 @@ void PhysicalObject::init()
     }
     else
     {
-        fprintf(stderr, "[PhysicalObject] Unknown node type\n");
-        max = 1.0f;
-        min = 0.0f;
-        assert(false);
+        Log::fatal("PhysicalObject", "Unknown node type");
     }
     Vec3 extend = max-min;
     // Adjust the mesth of the graphical object so that its center is where it
@@ -453,7 +447,7 @@ void PhysicalObject::init()
     }
     case MP_NONE:
     default:
-        fprintf(stderr, "WARNING: Uninitialised moving shape\n");
+        Log::warn("PhysicalObject", "Uninitialised moving shape");
         // intended fall-through
     case MP_BOX:
     {

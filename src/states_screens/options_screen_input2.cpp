@@ -567,7 +567,8 @@ void OptionsScreenInput2::onConfirm()
     const bool success =
         input_manager->getDeviceList()->deleteConfig(m_config);
     assert(success);
-    if (!success) fprintf(stderr, "Failed to delete config!\n");
+    if (!success)
+        Log::error("OptionsScreenInput2", "Failed to delete config!");
 
     m_config = NULL;
     input_manager->getDeviceList()->serialize();

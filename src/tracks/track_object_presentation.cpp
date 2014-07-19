@@ -496,10 +496,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
         }
     }
     else
-    {
-        fprintf(stderr,
-             "[TrackObject] Sound emitter object could not be created\n");
-    }
+        Log::error("TrackObject", "Sound emitter object could not be created.");
 
     if (trigger_when_near)
     {
@@ -753,9 +750,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
     m_action_active = true;
 
     if (m_action.size() == 0)
-    {
-        fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
-    }
+        Log::warn("TrackObject", "Action-trigger has no action defined.");
 
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }
@@ -891,10 +886,7 @@ void TrackObjectPresentationActionTrigger::onTriggerItemApproached(Item* who)
         return;
     }
     else
-    {
-        fprintf(stderr, "[TrackObject] WARNING: unknown action <%s>\n",
-                m_action.c_str());
-    }
+        Log::warn("TrackObject", "Unknown action '%s'", m_action.c_str());
 }
 
 

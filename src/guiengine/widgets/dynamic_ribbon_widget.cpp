@@ -189,7 +189,7 @@ void DynamicRibbonWidget::add()
 
     if (m_child_width <= 0 || m_child_height <= 0)
     {
-        std::cerr << "/!\\ Warning /!\\ : ribbon grid widgets require 'child_width' and 'child_height' arguments" << std::endl;
+        Log::warn("DynamicRibbonWidget", "Ribbon grid widgets require 'child_width' and 'child_height' arguments");
         m_child_width = 256;
         m_child_height = 256;
     }
@@ -206,7 +206,7 @@ void DynamicRibbonWidget::add()
 
         if (m_h - m_label_height < 0)
         {
-            fprintf(stderr, "[DynamicRibbonWidget] WARNING: the widget is too small for anything to fit in it!!\n");
+            Log::warn("DynamicRibbonWidget", "The widget is too small for anything to fit in it!!");
             m_row_amount = 1;
         }
         else

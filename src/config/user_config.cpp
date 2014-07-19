@@ -713,8 +713,8 @@ bool UserConfig::loadConfig()
         // add back the code previously there that upgraded the config file to the new
         // format instead of overwriting it.
 
-        GUIEngine::showMessage( _("Your config file was too old, so it was deleted and a new one will be created."), 10.0f);
-        printf("Your config file was too old, so it was deleted and a new one will be created.");
+        GUIEngine::showMessage(_("Your config file was too old, so it was deleted and a new one will be created."), 10.0f);
+        Log::info("UserConfig", "Your config file was too old, so it was deleted and a new one will be created.");
         delete root;
         return false;
 

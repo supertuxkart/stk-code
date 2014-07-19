@@ -57,8 +57,7 @@ ScalableFont::ScalableFont(IGUIEnvironment *env, const std::string &filename)
     io::IXMLReader* reader = file_manager->createXMLReader(filename.c_str());
     if (!load( reader ))
     {
-        fprintf(stderr, "[ScalableFont] Loading font failed\n");
-        assert(false);
+        Log::fatal("ScalableFont", "Loading font failed");
     }
     reader->drop();
 
@@ -157,7 +156,7 @@ void ScalableFont::doReadXmlFile(io::IXMLReader* xml)
 #ifdef DEBUG
                 if (m_texture_files.find(i) != m_texture_files.end())
                 {
-                    fprintf(stderr, "[ScalableFont] WARNING: Font conflict, two images have texture %i\n", i);
+                    Log::warn("ScalableFont", "Font conflict, two images have texture %i.", i);
                 }
 #endif
 
@@ -258,7 +257,7 @@ bool ScalableFont::load(io::IXMLReader* xml)
 {
     if (!SpriteBank)
     {
-        fprintf(stderr, "[ScalableFont::load] SpriteBank is NULL!!\n");
+        Log::error("ScalableFont::load", "SpriteBank is NULL!!");
         return false;
     }
 
@@ -633,7 +632,7 @@ void ScalableFont::draw(const core::stringw& text,
 
             if (texture == NULL)
             {
-                fprintf(stderr, "WARNING: character not found in current font\n");
+                Log::warn("ScalableFont", "Character not found in current font");
                 continue; // no such character
             }
         }
@@ -709,7 +708,7 @@ void ScalableFont::lazyLoadTexture(int texID)
     // couldn't load texture, abort.
     if (!SpriteBank->getTexture(texID))
     {
-        fprintf(stderr, "!!!!! Unable to load all textures in the font\n");
+        Log::error("ScalableFont::lazyLoadTexture", "Unable to load all textures in the font");
         _IRR_IMPLEMENT_MANAGED_MARSHALLING_BUGFIX;
         return;
     }

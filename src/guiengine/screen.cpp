@@ -184,7 +184,7 @@ void Screen::addWidgets()
     Widget* w = getFirstWidget();
     //std::cout << "First widget is " << (w == NULL ? "null" : w->m_properties[PROP_ID].c_str()) << std::endl;
     if (w != NULL) w->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-    else           fprintf(stderr, "Couldn't select first widget, NULL was returned\n");
+    else           Log::warn("Screen::AddWidgets", "Couldn't select first widget, NULL was returned");
 }   // addWidgets
 
 // -----------------------------------------------------------------------------
@@ -206,9 +206,9 @@ void Screen::manualRemoveWidget(Widget* w)
 #ifdef DEBUG
     if(!m_widgets.contains(w))
     {
-        fprintf(stderr, "Widget '%d' not found in screen when removing.\n",
-                w->m_id);
-        fprintf(stderr, "This can be ignored, but is probably wrong.\n");
+        Log::info("Screen", "Widget '%d' not found in screen when removing.",
+                  w->m_id);
+        Log::info("Screen", "This can be ignored, but is probably wrong.");
     }
 #endif
     m_widgets.remove(w);
