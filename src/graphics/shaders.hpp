@@ -144,8 +144,8 @@ protected:
         uniforms.push_back(glGetUniformLocation(Program, name));
     }
 
-    template<typename... T>
-    void AssignUniforms(const char* name, T... rest)
+    template<typename... U>
+    void AssignUniforms(const char* name, U... rest)
     {
         uniforms.push_back(glGetUniformLocation(Program, name));
         AssignUniforms(rest...);
