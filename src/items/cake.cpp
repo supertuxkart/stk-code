@@ -35,11 +35,14 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
 {
     m_target = NULL;
 
+    setDoTerrainInfo(false);
+
     Vec3 gravity_vector;
     if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
         race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
     {
-        gravity_vector = kart->getBody()->getGravity();
+        btQuaternion q = kart->getTrans().getRotation();
+        gravity_vector = Vec3(0, -1, 0).rotate(q.getAxis(), q.getAngle());
         gravity_vector = gravity_vector.normalize() * m_gravity;
     }
     else
@@ -94,8 +97,10 @@ Cake::Cake (AbstractKart *kart) : Flyable(kart, PowerupManager::POWERUP_CAKE)
                                        &fire_angle, &up_velocity);
 
         // apply transformation to the bullet object (without pitch)
-        trans.setRotation(btQuaternion(btVector3(0,1,0), fire_angle));
-
+        btQuaternion q;
+        q = trans.getRotation() * btQuaternion(btVector3(0, 1, 0), fire_angle);
+        trans.setRotation(q);
+        
         m_initial_velocity = Vec3(0.0f, up_velocity, m_speed);
 
         createPhysics(forward_offset, m_initial_velocity,

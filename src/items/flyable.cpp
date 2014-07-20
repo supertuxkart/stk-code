@@ -285,76 +285,61 @@ void Flyable::getLinearKartItemIntersection (const Vec3 &origin,
                                              float *fire_angle,
                                              float *up_velocity)
 {
-    Vec3 relative_target_kart_loc = target_kart->getXYZ() - origin;
-
+    // Transform the target into the firing kart's frame of reference
+    btTransform inv_trans = m_owner->getTrans().inverse();
+    
+    Vec3 relative_target_kart_loc = inv_trans(target_kart->getXYZ());
+    
+    // Find the direction target is moving in
     btTransform trans = target_kart->getTrans();
     Vec3 target_direction(trans.getBasis().getColumn(2));
 
-    Vec3 owner_gravity;
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
-    {
-        owner_gravity = m_owner->getBody()->getGravity();
-        core::matrix4 m;
-        m.buildRotateFromTo(core::vector3df(0.0f, -1.0f, 0.0f), owner_gravity.toIrrVector());
+    // Now rotate it to the firing kart's frame of reference
+    btQuaternion inv_rotate = inv_trans.getRotation();
+    target_direction = 
+        target_direction.rotate(inv_rotate.getAxis(), inv_rotate.getAngle());
+    
+    // Now we try to find the angle to aim at to hit the target. 
+    // Warning : Funky stuff going on below. To understand, see answer by 
+    // Jeffrey Hantin here : 
+    // http://stackoverflow.com/questions/2248876/2d-game-fire-at-a-moving-target-by-predicting-intersection-of-projectile-and-u
+    
+    float target_x_speed = target_direction.getX()*target_kart->getSpeed();
+    float target_z_speed = target_direction.getZ()*target_kart->getSpeed();
+    float target_y_speed = target_direction.getY()*target_kart->getSpeed();
 
-        core::vector3df r_t_k_l = relative_target_kart_loc.toIrrVector();
-        m.rotateVect(r_t_k_l);
-        relative_target_kart_loc = r_t_k_l;
+    float a = (target_x_speed*target_x_speed) + (target_z_speed*target_z_speed) -
+                (item_XZ_speed*item_XZ_speed);
+    float b = 2 * (target_x_speed * (relative_target_kart_loc.getX())
+                    + target_z_speed * (relative_target_kart_loc.getZ()));
+    float c = relative_target_kart_loc.getX()*relative_target_kart_loc.getX()
+                + relative_target_kart_loc.getZ()*relative_target_kart_loc.getZ();
+    
+    float discriminant = b*b - 4 * a*c;
+    if (discriminant < 0) discriminant = 0;
 
-        core::vector3df t_d = target_direction.toIrrVector();
-        m.rotateVect(t_d);
-        target_direction = t_d;
-    }
-
-    float dx = relative_target_kart_loc.getX();
-    float dy = relative_target_kart_loc.getY();
-    float dz = relative_target_kart_loc.getZ();
-
-    float gy = target_direction.getY();
-
-    //Projected onto X-Z plane
-    float target_kart_speed = target_direction.length_2d()
-                            * target_kart->getSpeed();
-
-    float target_kart_heading = target_kart->getHeading();
-     target_kart_heading = atan2f(target_direction.getX(), target_direction.getZ());
-
-    float dist = -(target_kart_speed / item_XZ_speed)
-               * (dx * cosf(target_kart_heading) -
-                  dz * sinf(target_kart_heading)   );
-
-    float fire_th = (dx*dist - dz * sqrtf(dx*dx + dz*dz - dist*dist))
-                  / (dx*dx + dz*dz);
-    if(fire_th>1)
-        fire_th = 1.0f;
-    else if (fire_th<-1.0f)
-        fire_th = -1.0f;
-    fire_th = (((dist - dx*fire_th) / dz > 0) ? -acosf(fire_th)
-                                              :  acosf(fire_th));
-
-    float time = 0.0f;
-    float a = item_XZ_speed     * sinf (fire_th)
-            + target_kart_speed * sinf (target_kart_heading);
-    float b = item_XZ_speed     * cosf (fire_th)
-            + target_kart_speed * cosf (target_kart_heading);
-
-    if (fabsf(a) > fabsf(b)) time = fabsf (dx / a);
-    else if (b != 0.0f)      time = fabsf(dz / b);
-
-    if (fire_th > M_PI)
-        fire_th -= M_PI;
-    else
-        fire_th += M_PI;
-
+    float t1 = (-b + sqrt(discriminant)) / (2 * a);
+    float t2 = (-b - sqrt(discriminant)) / (2 * a);
+    float time;
+    if (t1 >= 0 && t1<t2) time = t1;
+    else time = t2;
+    
     //createPhysics offset
-    assert(sqrt(a*a+b*b)!=0);
-    time -= forw_offset / sqrt(a*a+b*b);
+    time -= forw_offset / item_XZ_speed;
 
+    float aimX = time*target_x_speed + relative_target_kart_loc.getX();
+    float aimZ = time*target_z_speed + relative_target_kart_loc.getZ();
+
+    Vec3 velocityXZ = Vec3(aimX, 0, aimZ).normalize() * item_XZ_speed;
+    
     assert(time!=0);
-    *fire_angle = fire_th;
-    *up_velocity = (0.5f * time * gravity) + (dy / time)
-                 + (gy * target_kart->getSpeed());
+    float angle = atan2f(aimX, aimZ);
+    
+    *fire_angle = angle;
+
+    // Now find the up_velocity. This is an application of newton's equation.
+    *up_velocity = (0.5f * time * gravity) + (relative_target_kart_loc.getY() / time)
+                 + ( target_y_speed);
 }   // getLinearKartItemIntersection
 
 //-----------------------------------------------------------------------------
@@ -406,21 +391,15 @@ bool Flyable::updateAndDelete(float dt)
         // towards is a unit vector. so we can multiply -towards to offset the position
         // by one unit.
         TerrainInfo::update(xyz + m_position_offset*(-towards), towards);
-    }
-
-    // Update gravity
-    if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
-        race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
-    {
-        int sector = QuadGraph::UNKNOWN_SECTOR;
-        QuadGraph::get()->findRoadSector(getXYZ(), &sector);
-        if (sector != QuadGraph::UNKNOWN_SECTOR)
+        if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
+            race_manager->getMinorMode() != RaceManager::MINOR_MODE_SOCCER)
         {
+            Vec3 normal = TerrainInfo::getNormal();
             float g = World::getWorld()->getTrack()->getGravity();
-            Vec3 gravity = -g*QuadGraph::get()->getQuadOfNode(sector).getNormal();
-            getBody()->setGravity(gravity);
+            getBody()->setGravity(-g*normal);
         }
     }
+
     
     if(m_adjust_up_velocity)
     {
