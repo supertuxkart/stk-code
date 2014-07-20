@@ -342,11 +342,7 @@ bool RubberBall::updateAndDelete(float dt)
     bool close_to_ground = 2.0*m_previous_height < m_current_max_height;
 
     float vertical_offset = close_to_ground ? 4.0f : 2.0f;
-    // Note that at this stage getHoT still reports the height at
-    // the previous location (since TerrainInfo wasn't updated). On
-    // the other hand, we can't update TerrainInfo without having
-    // at least a good estimation of the height.
-   
+       
     // Update height of terrain (which isn't done as part of
     // Flyable::update for rubber balls.
     TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
