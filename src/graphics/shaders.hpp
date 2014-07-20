@@ -56,8 +56,6 @@ void glUniform1fWrapper(GLuint, float);
 
 struct UniformHelper
 {
-    GLuint getUniformLocation(GLuint program, const char* name);
-
     template<unsigned N = 0>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms)
     {
@@ -105,6 +103,7 @@ struct UniformHelper
 };
 
 void bypassUBO(GLuint Program);
+GLuint getUniformLocation(GLuint program, const char* name);
 
 template<typename... Args>
 class ShaderHelper
@@ -114,13 +113,13 @@ protected:
 
     void AssignUniforms(const char* name)
     {
-        uniforms.push_back(UniformHelper::getUniformLocation(Program, name));
+        uniforms.push_back(getUniformLocation(Program, name));
     }
 
     template<typename... T>
     void AssignUniforms(const char* name, T... rest)
     {
-        uniforms.push_back(UniformHelper::getUniformLocation(Program, name));
+        uniforms.push_back(getUniformLocation(Program, name));
         AssignUniforms(rest...);
     }
 
@@ -143,13 +142,13 @@ protected:
     
     void AssignUniforms(const char* name)
     {
-        uniforms.push_back(UniformHelper::getUniformLocation(Program, name));
+        uniforms.push_back(getUniformLocation(Program, name));
     }
 
     template<typename... U>
     void AssignUniforms(const char* name, U... rest)
     {
-        uniforms.push_back(UniformHelper::getUniformLocation(Program, name));
+        uniforms.push_back(getUniformLocation(Program, name));
         AssignUniforms(rest...);
     }
 
