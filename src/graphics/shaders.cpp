@@ -28,6 +28,11 @@
 
 using namespace video;
 
+GLuint UniformHelper::getUniformLocation(GLuint program, const char* name)
+{
+    return glGetUniformLocation(program, name);
+}
+
 Shaders::Shaders()
 {
     // Callbacks
