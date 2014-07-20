@@ -346,35 +346,34 @@ bool RubberBall::updateAndDelete(float dt)
     // the previous location (since TerrainInfo wasn't updated). On
     // the other hand, we can't update TerrainInfo without having
     // at least a good estimation of the height.
-    next_xyz.setY(getHoT() + vertical_offset);
+   
     // Update height of terrain (which isn't done as part of
     // Flyable::update for rubber balls.
-    TerrainInfo::update(next_xyz);
+    TerrainInfo::update(next_xyz + getNormal()*vertical_offset, -getNormal());
 
     m_height_timer += dt;
     float height    = updateHeight()+m_extend.getY()*0.5f;
-    float new_y     = getHoT()+height;
-
+    
     if(UserConfigParams::logFlyable())
-        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f new_y %f gethot %f ",
-                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, new_y, getHoT());
+        Log::debug("[RubberBall]", "ball %d: %f %f %f height %f gethot %f ",
+                m_id, next_xyz.getX(), next_xyz.getY(), next_xyz.getZ(), height, getHoT());
 
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)
     {
         float terrain_height = getMaxTerrainHeight(vertical_offset)
                              - m_extend.getY();
-        if(new_y>terrain_height)
-            new_y = terrain_height;
+        if(height>terrain_height)
+            height = terrain_height;
     }
 
     if(UserConfigParams::logFlyable())
-        Log::verbose("RubberBall", "newy2 %f gmth %f", new_y,
+        Log::verbose("RubberBall", "newy2 %f gmth %f", height,
                      getMaxTerrainHeight(vertical_offset));
 
-    next_xyz.setY(new_y);
+    next_xyz = next_xyz + getNormal()*(height);
     m_previous_xyz = getXYZ();
-    m_previous_height = next_xyz.getY()-getHoT();
+    m_previous_height = (getXYZ() - getHitPoint()).length();
     setXYZ(next_xyz);
 
     if(checkTunneling())
@@ -405,12 +404,12 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // If the rubber ball is already close to a target, i.e. aiming
     // at it directly, stop interpolating, instead fly straight
     // towards it.
-    Vec3 diff = m_target->getXYZ()-getXYZ();
+    Vec3 diff = m_target->getXYZ() - getXYZ();
     // Avoid potential division by zero
     if(diff.length2()==0)
         *next_xyz = getXYZ();
     else
-        *next_xyz = getXYZ() + (dt*m_speed/diff.length())*diff;
+        *next_xyz = getXYZ() + (dt*m_speed / diff.length())*diff;
 
     Vec3 old_vec = getXYZ()-m_previous_xyz;
     Vec3 new_vec = *next_xyz - getXYZ();
@@ -421,7 +420,7 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         angle += 2*M_PI;
     else if(angle > M_PI)
         angle -= 2*M_PI;
-
+    
     // If the angle is too large, adjust next xyz
     if(fabsf(angle)>m_st_target_max_angle*dt)
     {
@@ -434,6 +433,8 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         next_xyz->setX(getXYZ().getX() + old_2d.X*dt*m_speed);
         next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
     }   // if fabsf(angle) > m_st_target_angle_max*dt
+    
+    *next_xyz -= getNormal()*m_previous_height;
 
     assert(!isnan((*next_xyz)[0]));
     assert(!isnan((*next_xyz)[1]));
@@ -594,19 +595,18 @@ float RubberBall::updateHeight()
  *         happen that the raycast down find the track since it uses the
  *         vertical offset, while the raycast up would hit under the track
  *         if the vertical offset is not used).
- *  \returns The height (Y coordinate) of the next terrain element found by
- *           a raycast up. If no terrain is found, it returns 99990
+ *  \returns The distance to the terrain element found by raycast in the up
+              direction. If no terrain found, it returns 99990
  */
 float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
 {
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    Vec3 to(getXYZ());
-    to.setY(10000.0f);
-    Vec3 hit_point;
+    Vec3 to(getXYZ() + 10000.0f*getNormal());
+     Vec3 hit_point;
     const Material *material;
     tm.castRay(getXYZ()+vertical_offset, to, &hit_point, &material);
 
-    return (material) ? hit_point.getY() : 99999.f;
+    return (material) ? (hit_point - getXYZ()).length() : 99999.f;
 }   // getMaxTerrainHeight
 
 // ----------------------------------------------------------------------------
@@ -633,7 +633,7 @@ void RubberBall::updateDistanceToTarget()
         m_target->getXYZ().getZ(),m_distance_to_target
         );
 
-    float height_diff = fabsf(m_target->getXYZ().getY() - getXYZ().getY());
+    float height_diff = fabsf((m_target->getXYZ() - getXYZ()).dot(getNormal().normalized()));
 
     if(m_distance_to_target < m_st_fast_ping_distance &&
         height_diff < m_st_max_height_difference)
