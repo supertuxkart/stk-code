@@ -45,27 +45,20 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
 
     m_kart->getAttachment()->clear();
 
-    // We get the final transform of the kart so that it is rotated
-    // accordingly during the rescue animation
-    World * world = World::getWorld();
-    unsigned int index = world->getRescuePositionIndex(m_kart);
-    btTransform t = world->getRescueTransform(index);
-    Vec3 up = t.getBasis().getColumn(1);
-    float target_pitch = atan2(up.getZ(), fabsf(up.getY()));
-    float target_roll = atan2(up.getX(), up.getY());
+    // Get the current rotation of the kart
+    m_curr_rotation = m_kart->getNode()->getRotation() * DEGREE_TO_RAD;
 
-
-    m_curr_rotation.setPitch(m_kart->getPitch());
-    m_curr_rotation.setRoll(m_kart->getRoll());
-    m_curr_rotation.setHeading(0);
-
-    Vec3 required_rotation;
-    required_rotation.setPitch(target_pitch - m_kart->getPitch());
-    required_rotation.setRoll(target_roll - m_kart->getRoll());
-    required_rotation.setHeading(0);
-    m_add_rotation = -required_rotation/m_timer;
-
-    m_curr_rotation.setHeading(m_kart->getHeading());
+    // Determine the rotation that will rotate the kart from the current
+    // up direction to the right up direction it should have according to
+    // the normal at the kart's location
+    Vec3 up = m_kart->getTrans().getBasis().getColumn(1);
+    btQuaternion q = shortestArcQuat(up, m_kart->getNormal());
+   
+    // Store this rotation as 'delta HPR', which is added over time to the
+    // current rotation to end up (after m_timer seconds) with the right up
+    // rotation
+    m_add_rotation.setHPR(q);
+    m_add_rotation /= m_timer;
 
     // Add a hit unless it was auto-rescue
     if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_3_STRIKES &&
@@ -112,13 +105,13 @@ RescueAnimation::~RescueAnimation()
  */
 void RescueAnimation::update(float dt)
 {
-    btQuaternion q1 = m_kart->getTrans().getRotation();
     m_xyz += dt*m_velocity * m_kart->getNormal();
     m_kart->setXYZ(m_xyz);
     m_curr_rotation += dt*m_add_rotation;
-    btQuaternion q(m_curr_rotation.getHeading(), m_curr_rotation.getPitch(),
+    btMatrix3x3 m;
+    m.setEulerZYX(m_curr_rotation.getPitch(), m_curr_rotation.getHeading(),
                    m_curr_rotation.getRoll());
-    m_kart->setRotation(q);
+    m_kart->setRotation(m);
 
     AbstractKartAnimation::update(dt);
 
