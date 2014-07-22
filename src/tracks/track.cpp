@@ -2453,7 +2453,7 @@ bool Track::findGround(AbstractKart *kart)
     // - so I'll leave it in for now.
     float offset = kart->getKartProperties()->getSuspensionRest() +
                    kart->getKartProperties()->getWheelRadius();
-    t.setOrigin(hit_point+ (btVector3(0, offset, 0).rotate(q.getAxis(),q.getAngle()) ) );
+    t.setOrigin(hit_point+ quadNormal * offset);
     kart->getBody()->setCenterOfMassTransform(t);
     kart->setTrans(t);
 
