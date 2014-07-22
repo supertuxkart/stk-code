@@ -636,6 +636,7 @@ btTransform LinearWorld::getRescueTransform(unsigned int index) const
     const Vec3 &xyz = QuadGraph::get()->getQuadOfNode(index).getCenter();
     const Vec3 &normal = QuadGraph::get()->getQuadOfNode(index).getNormal();
     btTransform pos;
+    pos.setOrigin(xyz);
 
     // First rotate into the quad's plane (q1), then rotate so that the kart points in the
     // right direction (q2).
@@ -646,9 +647,18 @@ btTransform LinearWorld::getRescueTransform(unsigned int index) const
     }
     else q1 = btQuaternion(Vec3(0,1,0),0);
 
-    btQuaternion q2(btVector3(normal), m_track->getAngle(index));
-    pos.setOrigin(xyz);
-    pos.setRotation(q2*q1);
+    btQuaternion q2(btVector3(0,1,0), m_track->getAngle(index));
+
+    // First apply the heading change, than the 'parallelisation' to the plane
+    pos.setRotation(q1*q2);
+#ifdef DEBUG
+    btQuaternion r = q1*q2;
+    btVector3 axis = r.getAxis();
+    float angle = r.getAngle();
+    Log::verbose("rescue", "%d angle %f axis %f %f %f pos %f %f %f",
+                 index, angle, axis.getX(),axis.getY(),axis.getZ(),
+                 xyz.getX(),xyz.getY(),xyz.getZ());
+#endif
     return pos;
 }   // getRescueTransform
 
