@@ -401,23 +401,29 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
     // at it directly, stop interpolating, instead fly straight
     // towards it.
     Vec3 diff = m_target->getXYZ() - getXYZ();
+    diff = diff - diff.dot(getNormal())*getNormal();
     // Avoid potential division by zero
     if(diff.length2()==0)
-        *next_xyz = getXYZ();
+        *next_xyz = getXYZ() - getNormal()*m_previous_height;
     else
-        *next_xyz = getXYZ() + (dt*m_speed / diff.length())*diff;
+        *next_xyz = getXYZ() - getNormal()*m_previous_height +(dt*m_speed / diff.length())*diff;
 
     Vec3 old_vec = getXYZ()-m_previous_xyz;
     Vec3 new_vec = *next_xyz - getXYZ();
-    float angle  = atan2(new_vec.getZ(), new_vec.getX())
-                 - atan2(old_vec.getZ(), old_vec.getX());
+    //float angle  = atan2(new_vec.getZ(), new_vec.getX())
+    //             - atan2(old_vec.getZ(), old_vec.getX());
+    float angle = new_vec.angle(old_vec);
+    
     // Adjust angle to be between -180 and 180 degrees
     if(angle < -M_PI)
         angle += 2*M_PI;
     else if(angle > M_PI)
         angle -= 2*M_PI;
-    
+
+    if (diff.length() < m_target->getKartLength()) 
+        hit((AbstractKart*)m_target);
     // If the angle is too large, adjust next xyz
+    /*
     if(fabsf(angle)>m_st_target_max_angle*dt)
     {
         core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
@@ -429,9 +435,8 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         next_xyz->setX(getXYZ().getX() + old_2d.X*dt*m_speed);
         next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
     }   // if fabsf(angle) > m_st_target_angle_max*dt
-    
-    *next_xyz -= getNormal()*m_previous_height;
-
+    */
+    //*next_xyz -= getNormal()*m_previous_height;
     assert(!isnan((*next_xyz)[0]));
     assert(!isnan((*next_xyz)[1]));
     assert(!isnan((*next_xyz)[2]));
