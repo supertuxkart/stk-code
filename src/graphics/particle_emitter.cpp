@@ -581,7 +581,7 @@ void ParticleEmitter::setParticleType(const ParticleKind* type)
             }
             default:
             {
-                fprintf(stderr, "[ParticleEmitter] Unknown shape\n");
+                Log::error("ParticleEmitter", "Unknown shape");
                 return;
             }
         }

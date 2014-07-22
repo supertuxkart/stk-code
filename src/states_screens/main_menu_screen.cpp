@@ -380,8 +380,8 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
-            fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
-                    UserConfigParams::m_default_kart.c_str());
+            Log::warn("MainMenuScreen", "Cannot find kart '%s', will revert to default",
+                      UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);

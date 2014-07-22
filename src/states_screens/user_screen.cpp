@@ -108,6 +108,21 @@ void BaseUserScreen::init()
     else if (PlayerManager::get()->getNumPlayers() > 0)
         selectUser(0);
 
+    // Disable changing the user while in game
+    if (StateManager::get()->getGameState() == GUIEngine::INGAME_MENU)
+    {
+        getWidget<IconButtonWidget>("ok")->setDeactivated();
+        getWidget<IconButtonWidget>("new_user")->setDeactivated();
+        getWidget<IconButtonWidget>("rename")->setDeactivated();
+        getWidget<IconButtonWidget>("delete")->setDeactivated();
+    }
+    else
+    {
+        getWidget<IconButtonWidget>("ok")->setActivated();
+        getWidget<IconButtonWidget>("new_user")->setActivated();
+        getWidget<IconButtonWidget>("rename")->setActivated();
+        getWidget<IconButtonWidget>("delete")->setActivated();
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -572,16 +587,21 @@ void TabbedUserScreen::eventCallback(GUIEngine::Widget* widget,
 {
     if (name == "options_choice")
     {
-        const std::string &selection =
-            ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
-        Screen *s;
-        if      (selection=="tab_audio"   ) s = OptionsScreenAudio::getInstance();
-        else if (selection=="tab_video"   ) s = OptionsScreenVideo::getInstance();
-        else if (selection=="tab_players" ) s = TabbedUserScreen::getInstance();
-        else if (selection=="tab_controls") s = OptionsScreenInput::getInstance();
-        else if (selection=="tab_ui"      ) s = OptionsScreenUI::getInstance();
-        assert(s);
-        StateManager::get()->replaceTopMostScreen(s);
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
+        Screen *screen = NULL;
+        if (selection == "tab_audio")
+            screen = OptionsScreenAudio::getInstance();
+        else if (selection == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
+        //else if (selection == "tab_players")
+        //    screen = TabbedUserScreen::getInstance();
+        else if (selection == "tab_controls")
+            screen = OptionsScreenInput::getInstance();
+        else if (selection == "tab_ui")
+            screen = OptionsScreenUI::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else
         BaseUserScreen::eventCallback(widget, name, player_id);

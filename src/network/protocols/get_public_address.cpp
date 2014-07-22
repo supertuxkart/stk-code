@@ -118,7 +118,7 @@ void GetPublicAddress::asynchronousUpdate()
         hints.ai_socktype = SOCK_STREAM;
 
         if ((status = getaddrinfo(stun_servers[rand_result].c_str(), NULL, &hints, &res)) != 0) {
-            fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(status));
+            Log::error("getaddrinfo", gai_strerror(status));
             return;
         }
         for(p = res;p != NULL; p = p->ai_next)

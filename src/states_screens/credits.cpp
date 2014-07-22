@@ -85,7 +85,7 @@ bool CreditsScreen::getWideLine(std::ifstream& file, core::stringw* out)
 {
     if (!file.good())
     {
-        fprintf(stderr, "getWideLine : File is not good!\n");
+        Log::error("CreditsScreen", "getWideLine: File is not good!");
         return false;
     }
     wchar_t wide_char;
@@ -147,8 +147,8 @@ void CreditsScreen::loadedFromFile()
 
     if (file.fail() || !file.is_open() || file.eof())
     {
-        fprintf(stderr, "\n/!\\ Failed to open file at '%s'\n\n",
-                creditsfile.c_str());
+        Log::error("CreditsScreen", "Failed to open file at '%s'.",
+                   creditsfile.c_str());
         return;
     }
 
@@ -160,10 +160,8 @@ void CreditsScreen::loadedFromFile()
 
     if (file.fail() || !file.is_open() || file.eof())
     {
-        fprintf(stderr,
-                "\n/!\\ Failed to read file at '%s', unexpected EOF\n\n",
-                creditsfile.c_str());
-        assert(false);
+        Log::error("CreditsScreen", "Failed to read file at '%s', unexpected EOF.",
+                   creditsfile.c_str());
         return;
     }
 
@@ -203,9 +201,7 @@ void CreditsScreen::loadedFromFile()
 
     if (lineCount == 0)
     {
-        fprintf(stderr,
-                "\n/!\\ Could not read anything from CREDITS file!\n\n");
-        assert(false);
+        Log::error("CreditsScreen", "Could not read anything from CREDITS file!");
         return;
     }
 

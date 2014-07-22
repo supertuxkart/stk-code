@@ -71,8 +71,8 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
 
         if (kart_properties_manager->getKart(UserConfigParams::m_default_kart) == NULL)
         {
-            fprintf(stderr, "[MainMenuScreen] WARNING: cannot find kart '%s', will revert to default\n",
-                    UserConfigParams::m_default_kart.c_str());
+            Log::warn("HelpScreen1", "Cannot find kart '%s', will revert to default",
+                      UserConfigParams::m_default_kart.c_str());
             UserConfigParams::m_default_kart.revertToDefaults();
         }
         race_manager->setLocalKartInfo(0, UserConfigParams::m_default_kart);
@@ -89,13 +89,19 @@ void HelpScreen1::eventCallback(Widget* widget, const std::string& name, const i
     }
     else if (name == "category")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        //if (selection == "page1") StateManager::get()->replaceTopMostScreen(Help1Screen::getInstance());
-        //else
-        if (selection == "page2") StateManager::get()->replaceTopMostScreen(HelpScreen2::getInstance());
-        else if (selection == "page3") StateManager::get()->replaceTopMostScreen(HelpScreen3::getInstance());
-        else if (selection == "page4") StateManager::get()->replaceTopMostScreen(HelpScreen4::getInstance());
+        Screen *screen = NULL;
+        //if (selection == "page1")
+        //    screen = HelpScreen1::getInstance();
+        if (selection == "page2")
+            screen = HelpScreen2::getInstance();
+        else if (selection == "page3")
+            screen = HelpScreen3::getInstance();
+        else if (selection == "page4")
+            screen = HelpScreen4::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if (name == "back")
     {

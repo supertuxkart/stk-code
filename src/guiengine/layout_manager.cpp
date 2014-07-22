@@ -47,7 +47,7 @@ int atoi_p(const char* val)
     }
     else
     {
-        fprintf(stderr, "[LayoutManager] WARNING: Invalid value '%s' found in XML file where integer was expected\n", val);
+        Log::warn("LayoutManager", "Invalid value '%s' found in XML file where integer was expected.", val);
         return 0;
     }
 }
@@ -461,7 +461,7 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
 
         if (left_space < 0)
         {
-            fprintf(stderr, "[LayoutManager] WARNING: statically sized widgets took all the place!!\n");
+            Log::warn("LayoutManager", "Statically sized widgets took all the place!!");
             left_space = 0;
         }
 
@@ -536,9 +536,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
 
                     if (widgets[n].m_w <= 0)
                     {
-                        fprintf(stderr, "WARNING: widget '%s' has a width of %i (left_space = %i, "
-                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
-                                widgets[n].m_w, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        Log::warn("LayoutManager", "Widget '%s' has a width of %i (left_space = %i, "
+                                  "fraction = %f, max_width = %s)", widgets[n].m_properties[PROP_ID].c_str(),
+                                  widgets[n].m_w, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
                         widgets[n].m_w = 1;
                     }
 
@@ -556,9 +556,9 @@ void LayoutManager::doCalculateLayout(PtrVector<Widget>& widgets, AbstractTopLev
 
                     if (widgets[n].m_h <= 0)
                     {
-                        fprintf(stderr, "WARNING: widget '%s' has a height of %i (left_space = %i, "
-                                "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
-                                widgets[n].m_h, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
+                        Log::warn("LayoutManager", "Widget '%s' has a height of %i (left_space = %i, "
+                                  "fraction = %f, max_width = %s)\n", widgets[n].m_properties[PROP_ID].c_str(),
+                                  widgets[n].m_h, left_space, fraction, widgets[n].m_properties[PROP_MAX_WIDTH].c_str());
                         widgets[n].m_h = 1;
                     }
 
