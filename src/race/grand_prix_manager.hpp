@@ -22,7 +22,8 @@
 #include <vector>
 #include <string>
 
-#include "race/grand_prix_data.hpp"
+#include "irrlicht.h"
+class GrandPrixData;
 
 /**
   * \ingroup race
@@ -47,10 +48,6 @@ private:
     bool existsName(const irr::core::stringw& name) const;
 
 public:
-    /** saved here by a random GP dialog to avoid dangling pinters or
-     * memory leaks */
-    GrandPrixData* m_random_gp;
-
                    GrandPrixManager();
                   ~GrandPrixManager();
     void           reload();

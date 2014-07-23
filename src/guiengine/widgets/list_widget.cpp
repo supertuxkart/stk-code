@@ -43,6 +43,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sort_desc = false;
     m_sort_default = true;
     m_sort_col = 0;
+    m_sortable = false;
 }
 
 // -----------------------------------------------------------------------------
@@ -270,9 +271,11 @@ std::string ListWidget::getSelectionInternalName()
 
     CGUISTKListBox* list = getIrrlichtElement<CGUISTKListBox>();
     assert(list != NULL);
-    if (getSelectionID() == -1 || (getSelectionID() >= (int)list->getItemCount()))
+    int selectionID = getSelectionID();
+    if (selectionID == -1 || selectionID >= (int)list->getItemCount())
         return "";
-    return list->getItem(getSelectionID()).m_internal_name;
+    const CGUISTKListBox::ListItem& item = list->getItem(selectionID);
+    return item.m_internal_name;
 }
 
 // -----------------------------------------------------------------------------
@@ -418,6 +421,8 @@ EventPropagation ListWidget::transmitEvent(Widget* w,
 
     if (originator.find(m_properties[PROP_ID] + "_column_") != std::string::npos)
     {
+        if (!m_sortable) return EVENT_BLOCK;
+
         if (m_sort_col != originator[(m_properties[PROP_ID] + "_column_").size()] - '0')
         {
             m_sort_desc = false;

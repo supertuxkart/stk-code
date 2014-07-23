@@ -608,7 +608,7 @@ EventPropagation EventHandler::onGUIEvent(const SEvent& event)
 
                 if (w == NULL) break;
 
-                if (!w->m_focusable) return GUIEngine::EVENT_BLOCK;
+                if (!w->isFocusable() || !w->isActivated()) return GUIEngine::EVENT_BLOCK;
 
                 // When a modal dialog is shown, don't select widgets out of the dialog
                 if (ModalDialog::isADialogActive() && !ModalDialog::getCurrent()->isMyChild(w))

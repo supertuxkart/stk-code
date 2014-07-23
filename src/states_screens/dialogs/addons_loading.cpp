@@ -384,11 +384,10 @@ void AddonsLoading::doUninstall()
     error = !addons_manager->uninstall(m_addon);
     if(error)
     {
-        printf("[addons]Directory '%s' can not be removed.\n",
-               m_addon.getDataDir().c_str());
-        printf("[addons]Please remove this directory manually.\n");
-        core::stringw msg = StringUtils::insertValues(
-                                                      _("Problems removing the addon '%s'."),
+        Log::warn("Addons", "Directory '%s' can not be removed.",
+                  m_addon.getDataDir().c_str());
+        Log::warn("Addons", "Please remove this directory manually.");
+        core::stringw msg = StringUtils::insertValues(_("Problems removing the addon '%s'."),
                                                       core::stringw(m_addon.getName().c_str()));
         getWidget<BubbleWidget>("description")->setText(msg.c_str());
     }

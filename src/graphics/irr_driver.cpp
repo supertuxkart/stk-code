@@ -1932,8 +1932,9 @@ void IrrDriver::update(float dt)
     // =================================
     if (!m_device->run())
     {
-        GUIEngine::cleanUp();
-        GUIEngine::deallocate();
+        // Don't bother cleaning up GUI, has no use and may result in crashes
+        //GUIEngine::cleanUp();
+        //GUIEngine::deallocate();
         main_loop->abort();
         return;
     }

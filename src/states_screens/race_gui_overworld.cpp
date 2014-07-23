@@ -77,11 +77,11 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     const float scaling = irr_driver->getFrameSize().Height / 420.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
-    m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_marker_challenge_size        = (int)( 12.0f * scaling);
-    m_marker_player_size    = (int)( 24.0f * scaling);
-    m_map_width             = (int)(250.0f * scaling);
-    m_map_height            = (int)(250.0f * scaling);
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_challenge_size = (int)( 12.0f * scaling);
+    m_minimap_player_size    = (int)( 24.0f * scaling);
+    m_map_width              = (int)(250.0f * scaling);
+    m_map_height             = (int)(250.0f * scaling);
 
     m_map_left   = 20;
     m_map_bottom = UserConfigParams::m_height-10;
@@ -100,7 +100,7 @@ RaceGUIOverworld::RaceGUIOverworld()
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    createMarkerTexture();
+    //createMarkerTexture();
 
     // Translate strings only one in constructor to avoid calling
     // gettext in each frame.
@@ -363,13 +363,11 @@ void RaceGUIOverworld::drawGlobalMiniMap()
             Vec3 draw_at;
             track->mapPoint2MiniMap(kart_xyz, &draw_at);
 
-            core::rect<s32> source(i    *m_marker_rendered_size,
-                                   0,
-                                   (i+1)*m_marker_rendered_size,
-                                   m_marker_rendered_size);
+            video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+            core::rect<s32> source(core::position2di(0, 0), icon->getSize());
             int marker_half_size = (kart->getController()->isPlayerController()
-                                    ? m_marker_player_size
-                                    : m_marker_challenge_size                        )>>1;
+                                    ? m_minimap_player_size
+                                    : m_minimap_challenge_size                        )>>1;
             core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
                                      lower_y   -(int)(draw_at.getY()+marker_half_size),
                                      m_map_left+(int)(draw_at.getX()+marker_half_size),
@@ -390,8 +388,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                                                           rect, NULL, colors, true);
             }   // if isPlayerController
 
-            draw2DImage(m_marker, position, source,
-                                                      NULL, NULL, true);
+            draw2DImage(icon, position, source, NULL, NULL, true);
         }   // for i<getNumKarts
     }   // for only_draw_player_kart
 
@@ -416,7 +413,7 @@ void RaceGUIOverworld::drawGlobalMiniMap()
         const core::rect<s32> source(core::position2d<s32>(0,0),
                                      m_icons[state]->getOriginalSize());
 
-        int marker_size = m_marker_challenge_size;
+        int marker_size = m_minimap_challenge_size;
         core::position2di mouse = irr_driver->getMouseLocation();
         core::rect<s32> dest(m_map_left+(int)(draw_at.getX()-marker_size/2),
                              lower_y   -(int)(draw_at.getY()+marker_size/2),
@@ -474,8 +471,8 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
             if (challenge == NULL)
             {
-                fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find challenge <%s>\n",
-                        challenges[n].m_challenge_id.c_str());
+                Log::error("RaceGUIOverworld", "Cannot find challenge <%s>.",
+                           challenges[n].m_challenge_id.c_str());
                 break;
             }
 
@@ -486,10 +483,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
 
                 if (gp == NULL)
                 {
-                    fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find GP <%s>, "
-                            "referenced from challenge <%s>\n",
-                            challenge->getGPId().c_str(),
-                            challenges[n].m_challenge_id.c_str());
+                    Log::error("RaceGUIOverworld", "Cannot find GP <%s>, "
+                               "referenced from challenge <%s>",
+                               challenge->getGPId().c_str(),
+                               challenges[n].m_challenge_id.c_str());
                     break;
                 }
 
@@ -511,10 +508,10 @@ void RaceGUIOverworld::drawGlobalMiniMap()
                 Track* track = track_manager->getTrack(challenge->getTrackId());
                 if (track == NULL)
                 {
-                    fprintf(stderr, "[RaceGUIOverworld] ERROR: Cannot find track <%s>, "
-                            "referenced from challenge <%s>\n",
-                            challenge->getTrackId().c_str(),
-                            challenges[n].m_challenge_id.c_str());
+                    Log::error("RaceGUIOverworld", "Cannot find track <%s>, "
+                               "referenced from challenge <%s>",
+                               challenge->getTrackId().c_str(),
+                               challenges[n].m_challenge_id.c_str());
                     break;
                 }
 

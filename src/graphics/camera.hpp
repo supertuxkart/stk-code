@@ -155,10 +155,9 @@ private:
                 m_type = EC_AHEAD_OF_KART;
             else
             {
-                fprintf(stderr,
-                        "Invalid camera type '%s' - camera is ignored.\n",
-                        s.c_str());
-                 return false;
+                Log::warn("Camera", "Invalid camera type '%s' - camera is ignored.",
+                          s.c_str());
+                return false;
             }
             node.get("xyz", &m_position);
             node.get("distance", &m_distance2);
