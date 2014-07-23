@@ -41,7 +41,7 @@ class GrandPrixWin :
 
     GrandPrixWin();
 
-    virtual ~GrandPrixWin();
+    virtual ~GrandPrixWin() {};
 
     /** Global evolution of time */
     double m_global_time;

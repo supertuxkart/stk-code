@@ -49,7 +49,6 @@
 #include <ICameraSceneNode.h>
 #include <ILightSceneNode.h>
 #include <IMeshSceneNode.h>
-//#include <iostream>
 
 using namespace irr::core;
 using namespace irr::gui;
@@ -86,7 +85,6 @@ DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
 void GrandPrixLose::onCutsceneEnd()
 {
-    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
     if (m_kart_node[0] != NULL)
         m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
     if (m_kart_node[1] != NULL)
@@ -121,9 +119,7 @@ void GrandPrixLose::loadedFromFile()
 
 void GrandPrixLose::init()
 {
-    std::vector<std::string> parts;
-    parts.push_back("gplose");
-    ((CutsceneWorld*)World::getWorld())->setParts(parts);
+    ((CutsceneWorld*)World::getWorld())->setParts({"gplose"});
     CutsceneWorld::setUseDuration(false);
 
     Screen::init();
