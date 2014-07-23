@@ -61,17 +61,11 @@ class GrandPrixWin :
     float m_kart_rotation[3];
 
 public:
-
-    virtual void onCutsceneEnd() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE {};
-
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt) OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
+    // implement callbacks from parent class GUIEngine::Screen
     void init() OVERRIDE;
+    void loadedFromFile() OVERRIDE {};
+    void onCutsceneEnd() OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
 
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
     void setKarts(const std::string idents[3]);

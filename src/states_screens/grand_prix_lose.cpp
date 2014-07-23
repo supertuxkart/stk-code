@@ -85,25 +85,18 @@ DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
 void GrandPrixLose::onCutsceneEnd()
 {
-    if (m_kart_node[0] != NULL)
-        m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[1] != NULL)
-        m_kart_node[1]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[2] != NULL)
-        m_kart_node[2]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[3] != NULL)
-        m_kart_node[3]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    for (int i = 0; i < 3; i++)
+    {
+        if (m_kart_node[i] != NULL)
+            m_kart_node[i]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+        m_kart_node[i] = NULL;
+    }
 
     for (unsigned int i = 0; i<m_all_kart_models.size(); i++)
         delete m_all_kart_models[i];
 
     m_all_kart_models.clear();
-
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-    m_kart_node[3] = NULL;
-}
+}   // onCutsceneEnd
 
 // -------------------------------------------------------------------------------------
 
@@ -179,9 +172,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
 
     assert(ident_arg.size() > 0);
     if ((int)ident_arg.size() > MAX_KART_COUNT)
-    {
         ident_arg.resize(MAX_KART_COUNT);
-    }
 
     // (there is at least one kart so kart node 0 is sure to be set)
     m_kart_node[1] = NULL;
@@ -219,7 +210,8 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         }
         else
         {
-            fprintf(stderr, "[GrandPrixLose] WARNING: could not find a kart named '%s'\n", ident_arg[n].c_str());
+            Log::warn("GrandPrixLose", "A kart named '%s' could not be found\n",
+                      ident_arg[n].c_str());
             m_kart_node[n] = NULL;
         }// if kart !=NULL
     }

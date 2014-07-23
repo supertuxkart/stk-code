@@ -236,7 +236,8 @@ void GrandPrixWin::onUpdate(float dt)
             }
         } // end for
 
-        if (karts_not_yet_done == 0) m_phase = 3;
+        if (karts_not_yet_done == 0)
+            m_phase = 3;
     }
 
     // ---- Podium Rises

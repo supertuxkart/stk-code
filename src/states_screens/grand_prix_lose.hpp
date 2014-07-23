@@ -55,17 +55,11 @@ class GrandPrixLose :
     float m_kart_x, m_kart_y, m_kart_z;
 
 public:
-    virtual void onCutsceneEnd() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE;
-
-    /** \brief implement optional callback from parent class GUIEngine::Screen */
-    void onUpdate(float dt) OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
+    // implement callbacks from parent class GUIEngine::Screen
     void init() OVERRIDE;
-
+    void loadedFromFile() OVERRIDE;
+    void onCutsceneEnd() OVERRIDE;
+    void onUpdate(float dt) OVERRIDE;
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);
 };
