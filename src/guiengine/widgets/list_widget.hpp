@@ -87,6 +87,8 @@ namespace GUIEngine
         
         IListWidgetHeaderListener* m_listener;
 
+        bool m_sortable;
+
     public:
         typedef irr::gui::CGUISTKListBox::ListItem ListItem;
         typedef ListItem::ListCell ListCell;
@@ -240,6 +242,8 @@ namespace GUIEngine
         void addColumn(irr::core::stringw col, int proportion=1) { m_header.push_back( Column(col, proportion) ); }
         
         void clearColumns() { m_header.clear(); }
+
+        void setSortable(bool sortable) { m_sortable = sortable; }
     };
 }
 

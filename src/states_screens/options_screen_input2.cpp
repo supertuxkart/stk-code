@@ -61,6 +61,19 @@ void OptionsScreenInput2::loadedFromFile()
 
 // ----------------------------------------------------------------------------
 
+void OptionsScreenInput2::beforeAddingWidget()
+{
+    GUIEngine::ListWidget* w_list =
+        getWidget<GUIEngine::ListWidget>("actions");
+    assert(w_list != NULL);
+    w_list->clearColumns();
+    w_list->addColumn(_("Action"), 1);
+    w_list->addColumn(_("Key binding"), 1);
+    w_list->setSortable(false);
+}
+
+// ----------------------------------------------------------------------------
+
 void OptionsScreenInput2::init()
 {
     Screen::init();
@@ -127,27 +140,27 @@ void OptionsScreenInput2::init()
     //      their actualy contents will be adapted as needed after
 
     //I18N: Key binding section
-    actions->addItem("game_keys_section", _("Game Keys") );
-    actions->addItem(KartActionStrings[PA_STEER_LEFT],  L"" );
-    actions->addItem(KartActionStrings[PA_STEER_RIGHT], L"" );
-    actions->addItem(KartActionStrings[PA_ACCEL],       L"" );
-    actions->addItem(KartActionStrings[PA_BRAKE],       L"" );
-    actions->addItem(KartActionStrings[PA_FIRE],        L"" );
-    actions->addItem(KartActionStrings[PA_NITRO],       L"" );
-    actions->addItem(KartActionStrings[PA_DRIFT],       L"" );
-    actions->addItem(KartActionStrings[PA_LOOK_BACK],   L"" );
-    actions->addItem(KartActionStrings[PA_RESCUE],      L"" );
-    actions->addItem(KartActionStrings[PA_PAUSE_RACE],  L"" );
+    addListItemSubheader(actions, "game_keys_section", _("Game Keys"));
+    addListItem(actions, PA_STEER_LEFT);
+    addListItem(actions, PA_STEER_RIGHT);
+    addListItem(actions, PA_ACCEL);
+    addListItem(actions, PA_BRAKE);
+    addListItem(actions, PA_FIRE);
+    addListItem(actions, PA_NITRO);
+    addListItem(actions, PA_DRIFT);
+    addListItem(actions, PA_LOOK_BACK);
+    addListItem(actions, PA_RESCUE);
+    addListItem(actions, PA_PAUSE_RACE);
 
 
     //I18N: Key binding section
-    actions->addItem("menu_keys_section", _("Menu Keys") );
-    actions->addItem(KartActionStrings[PA_MENU_UP],     L"" );
-    actions->addItem(KartActionStrings[PA_MENU_DOWN],   L"" );
-    actions->addItem(KartActionStrings[PA_MENU_LEFT],   L"" );
-    actions->addItem(KartActionStrings[PA_MENU_RIGHT],  L"" );
-    actions->addItem(KartActionStrings[PA_MENU_SELECT], L"");
-    actions->addItem(KartActionStrings[PA_MENU_CANCEL], L"" );
+    addListItemSubheader(actions, "menu_keys_section", _("Menu Keys"));
+    addListItem(actions, PA_MENU_UP);
+    addListItem(actions, PA_MENU_DOWN);
+    addListItem(actions, PA_MENU_LEFT);
+    addListItem(actions, PA_MENU_RIGHT);
+    addListItem(actions, PA_MENU_SELECT);
+    addListItem(actions, PA_MENU_CANCEL);
 
     updateInputButtons();
 
@@ -163,16 +176,36 @@ void OptionsScreenInput2::init()
 
 // -----------------------------------------------------------------------------
 
-irr::core::stringw OptionsScreenInput2::makeLabel(
+void OptionsScreenInput2::addListItemSubheader(GUIEngine::ListWidget* actions,
+    const char* id,
+    const core::stringw& text)
+{
+    std::vector<GUIEngine::ListWidget::ListCell> row;
+    row.push_back(GUIEngine::ListWidget::ListCell(text, -1, 1, false));
+    row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, 1, false));
+    actions->addItem(id, row);
+}
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput2::addListItem(GUIEngine::ListWidget* actions, PlayerAction pa)
+{
+    std::vector<GUIEngine::ListWidget::ListCell> row;
+    row.push_back(GUIEngine::ListWidget::ListCell(core::stringw(KartActionStrings[pa].c_str()), -1, 1, false));
+    row.push_back(GUIEngine::ListWidget::ListCell(L"", -1, 1, false));
+    actions->addItem(KartActionStrings[pa], row);
+}
+
+// -----------------------------------------------------------------------------
+
+void OptionsScreenInput2::renameRow(GUIEngine::ListWidget* actions,
+                                    int idRow,
                                     const irr::core::stringw &translatedName,
                                     PlayerAction action) const
 {
-    //hack: one tab character is supported by out font object, it moves the
-    // cursor to the middle of the area
-    core::stringw out = irr::core::stringw("    ") + translatedName + L"\t";
+    actions->renameCell(idRow, 0, core::stringw("    ") + translatedName);
+    actions->renameCell(idRow, 1, m_config->getBindingAsString(action));
 
-    out += m_config->getBindingAsString(action);
-    return out;
 }   // makeLabel
 
 // -----------------------------------------------------------------------------
@@ -191,54 +224,54 @@ void OptionsScreenInput2::updateInputButtons()
     i++; // section header
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Steer Left"), PA_STEER_LEFT) );
+    renameRow(actions, i++, _("Steer Left"), PA_STEER_LEFT);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Steer Right"), PA_STEER_RIGHT) );
+    renameRow(actions, i++, _("Steer Right"), PA_STEER_RIGHT);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Accelerate"), PA_ACCEL) );
+    renameRow(actions, i++, _("Accelerate"), PA_ACCEL);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Brake"), PA_BRAKE) );
+    renameRow(actions, i++, _("Brake"), PA_BRAKE);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Fire"), PA_FIRE) );
+    renameRow(actions, i++, _("Fire"), PA_FIRE);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Nitro"), PA_NITRO) );
+    renameRow(actions, i++, _("Nitro"), PA_NITRO);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Skidding"), PA_DRIFT) );
+    renameRow(actions, i++, _("Skidding"), PA_DRIFT);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Look Back"), PA_LOOK_BACK) );
+    renameRow(actions, i++, _("Look Back"), PA_LOOK_BACK);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Rescue"), PA_RESCUE) );
+    renameRow(actions, i++, _("Rescue"), PA_RESCUE);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Pause Game"), PA_PAUSE_RACE) );
+    renameRow(actions, i++, _("Pause Game"), PA_PAUSE_RACE);
 
     i++; // section header
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Up"), PA_MENU_UP) );
+    renameRow(actions, i++, _("Up"), PA_MENU_UP);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Down"), PA_MENU_DOWN) );
+    renameRow(actions, i++, _("Down"), PA_MENU_DOWN);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Left"), PA_MENU_LEFT) );
+    renameRow(actions, i++, _("Left"), PA_MENU_LEFT);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Right"), PA_MENU_RIGHT) );
+    renameRow(actions, i++, _("Right"), PA_MENU_RIGHT);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Select"), PA_MENU_SELECT) );
+    renameRow(actions, i++, _("Select"), PA_MENU_SELECT);
 
     //I18N: Key binding name
-    actions->renameItem(i++, makeLabel( _("Cancel/Back"), PA_MENU_CANCEL) );
+    renameRow(actions, i++, _("Cancel/Back"), PA_MENU_CANCEL);
 
 
 
