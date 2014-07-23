@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #include <stdexcept>
 
