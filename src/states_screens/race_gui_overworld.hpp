@@ -75,11 +75,11 @@ private:
 
     /** The size of a single marker on the screen for AI karts,
      *  need not be a power of 2. */
-    int              m_marker_challenge_size;
+    int              m_minimap_challenge_size;
 
     /** The size of a single marker on the screen or player karts,
      *  need not be a power of 2. */
-    int              m_marker_player_size;
+    int              m_minimap_player_size;
 
     /** The width of the rendered mini map in pixels, must be a power of 2. */
     int              m_map_rendered_width;

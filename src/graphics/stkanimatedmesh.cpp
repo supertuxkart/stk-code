@@ -6,6 +6,7 @@
 #include "config/user_config.hpp"
 #include "modes/world.hpp"
 #include "tracks/track.hpp"
+#include "graphics/camera.hpp"
 #include "utils/profiler.hpp"
 
 using namespace irr;
@@ -38,10 +39,8 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
 {
     firstTime = true;
     GLmeshes.clear();
-    for (unsigned i = 0; i < FPSM_COUNT; i++)
-        GeometricMesh[i].clearWithoutDeleting();
-    for (unsigned i = 0; i < SM_COUNT; i++)
-        ShadedMesh[i].clearWithoutDeleting();
+    for (unsigned i = 0; i < MAT_COUNT; i++)
+        MeshSolidMaterial[i].clearWithoutDeleting();
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
@@ -97,10 +96,8 @@ void STKAnimatedMesh::render()
             }
             else
             {
-                GeometricMaterial GeometricType = MaterialTypeToGeometricMaterial(type, mb->getVertexType());
-                ShadedMaterial ShadedType = MaterialTypeToShadedMaterial(type, mesh.textures, mb->getVertexType());
-                GeometricMesh[GeometricType].push_back(&mesh);
-                ShadedMesh[ShadedType].push_back(&mesh);
+                MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
+                MeshSolidMaterial[MatType].push_back(&mesh);
             }
             std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
             mesh.vaoBaseVertex = p.first;
@@ -116,13 +113,13 @@ void STKAnimatedMesh::render()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-           if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
-           {
-               glBindVertexArray(0);
-               glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
-               glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
-               glBindBuffer(GL_ARRAY_BUFFER, 0);
-           }
+            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS || irr_driver->getPhase() == SHADOW_PASS)
+            {
+                glBindVertexArray(0);
+                glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
+                glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
         }
         if (mb)
             GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
@@ -136,78 +133,24 @@ void STKAnimatedMesh::render()
           continue;
     }
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         ModelViewProjectionMatrix = computeMVP(AbsoluteTransformation);
-        TransposeInverseModelView = computeTIMV(AbsoluteTransformation);
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
 
         GLMesh* mesh;
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT_STANDARD])
-        {
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
-        }
+        for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
+            ListMatDefault::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
-        for_in(mesh, GeometricMesh[FPSM_DEFAULT_2TCOORD])
-        {
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_DEFAULT_2TCOORD>::TIMVSet.push_back(invmodel);
-        }
+        for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
+            ListMatAlphaRef::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
-        for_in(mesh, GeometricMesh[FPSM_ALPHA_REF_TEXTURE])
-        {
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedFPSM<FPSM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
+        for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
+            ListMatDetails::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
-        return;
-    }
-
-    if (irr_driver->getPhase() == SOLID_LIT_PASS)
-    {
-        core::matrix4 invmodel;
-        AbsoluteTransformation.getInverse(invmodel);
-
-        GLMesh* mesh;
-        for_in(mesh, ShadedMesh[SM_DEFAULT_STANDARD])
-        {
-            GroupedSM<SM_DEFAULT_STANDARD>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT_STANDARD>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT_STANDARD>::TIMVSet.push_back(invmodel);
-        }
-
-        for_in(mesh, ShadedMesh[SM_DEFAULT_TANGENT])
-        {
-            GroupedSM<SM_DEFAULT_TANGENT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DEFAULT_TANGENT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DEFAULT_TANGENT>::TIMVSet.push_back(invmodel);
-        }
-
-        for_in(mesh, ShadedMesh[SM_ALPHA_REF_TEXTURE])
-        {
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MeshSet.push_back(mesh);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_ALPHA_REF_TEXTURE>::TIMVSet.push_back(invmodel);
-        }
-
-        for_in (mesh, ShadedMesh[SM_UNLIT])
-        {
-            GroupedSM<SM_UNLIT>::MeshSet.push_back(mesh);
-            GroupedSM<SM_UNLIT>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_UNLIT>::TIMVSet.push_back(invmodel);
-        }
-
-        for_in(mesh, ShadedMesh[SM_DETAILS])
-        {
-            GroupedSM<SM_DETAILS>::MeshSet.push_back(mesh);
-            GroupedSM<SM_DETAILS>::MVPSet.push_back(AbsoluteTransformation);
-            GroupedSM<SM_DETAILS>::TIMVSet.push_back(invmodel);
-        }
+        for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
+            ListMatUnlit::Arguments.emplace_back(mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -220,16 +163,38 @@ void STKAnimatedMesh::render()
             glUseProgram(MeshShader::BubbleShader::Program);
 
         GLMesh* mesh;
-        for_in(mesh, TransparentMesh[TM_DEFAULT])
+        if (World::getWorld() && World::getWorld()->isFogEnabled())
         {
-            TransparentMeshes<TM_DEFAULT>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_DEFAULT>::MVPSet.push_back(AbsoluteTransformation);
-        }
+            const Track * const track = World::getWorld()->getTrack();
 
-        for_in(mesh, TransparentMesh[TM_ADDITIVE])
+            // Todo : put everything in a ubo
+            const float fogmax = track->getFogMax();
+            const float startH = track->getFogStartHeight();
+            const float endH = track->getFogEndHeight();
+            const float start = track->getFogStart();
+            const float end = track->getFogEnd();
+            const video::SColor tmpcol = track->getFogColor();
+
+            video::SColorf col(tmpcol.getRed() / 255.0f,
+                tmpcol.getGreen() / 255.0f,
+                tmpcol.getBlue() / 255.0f);
+
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col));
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparentFog::Arguments.push_back(
+                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                                    fogmax, startH, endH, start, end, col));
+        }
+        else
         {
-            TransparentMeshes<TM_ADDITIVE>::MeshSet.push_back(mesh);
-            TransparentMeshes<TM_ADDITIVE>::MVPSet.push_back(AbsoluteTransformation);
+            for_in(mesh, TransparentMesh[TM_DEFAULT])
+                ListBlendTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
+
+            for_in(mesh, TransparentMesh[TM_ADDITIVE])
+                ListAdditiveTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
         return;
     }

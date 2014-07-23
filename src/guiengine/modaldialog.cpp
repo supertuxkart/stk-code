@@ -26,6 +26,7 @@
 #include "utils/log.hpp"
 
 #include <IGUIEnvironment.h>
+#include <IGUIButton.h>
 
 using namespace irr;
 using namespace core;
@@ -134,6 +135,8 @@ void ModalDialog::doInit()
 
     m_irrlicht_window = GUIEngine::getGUIEnv()->addWindow(m_area,
                                                           true /* modal */);
+    m_irrlicht_window->setDrawTitlebar(false);
+    m_irrlicht_window->getCloseButton()->setVisible(false);
 
     GUIEngine::getSkin()->m_dialog = true;
     GUIEngine::getSkin()->m_dialog_size = 0.0f;

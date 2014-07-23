@@ -1,8 +1,24 @@
+#ifdef UBO_DISABLED
+uniform mat4 ViewMatrix;
+uniform mat4 ProjectionMatrix;
+uniform mat4 InverseViewMatrix;
+uniform mat4 InverseProjectionMatrix;
+uniform vec2 screen;
+#else
+layout (std140) uniform MatrixesData
+{
+    mat4 ViewMatrix;
+    mat4 ProjectionMatrix;
+    mat4 InverseViewMatrix;
+    mat4 InverseProjectionMatrix;
+    mat4 ShadowViewProjMatrixes[4];
+    vec2 screen;
+};
+#endif
+
 uniform sampler2D Albedo;
 uniform vec3 SunDir;
-uniform mat4 invproj;
 uniform sampler2D dtex;
-uniform vec2 screen;
 
 in vec3 nor;
 in vec2 uv;
@@ -16,7 +32,7 @@ void main(void)
     float z = texture(dtex, texc).x;
 
     vec4 xpos = 2.0 * vec4(texc, z, 1.0) - 1.0f;
-    xpos = invproj * xpos;
+    xpos = InverseProjectionMatrix * xpos;
     xpos /= xpos.w;
     vec3 eyedir = normalize(xpos.xyz);
 

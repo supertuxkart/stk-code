@@ -31,13 +31,13 @@
  *  classes.
  */
 template <typename T>
-class Singleton
+class AbstractSingleton
 {
     protected:
         /*! \brief Constructor */
-        Singleton () { m_singleton = NULL; }
+        AbstractSingleton() { m_singleton = NULL; }
         /*! \brief Destructor */
-        virtual ~Singleton ()
+        virtual ~AbstractSingleton()
         {
             Log::info("Singleton", "Destroyed singleton.");
         }
@@ -72,6 +72,7 @@ class Singleton
             if (m_singleton)
             {
                 delete m_singleton;
+                m_singleton = NULL;
             }
         }
 
@@ -79,6 +80,44 @@ class Singleton
         static T *m_singleton;
 };
 
+template <typename T> T *AbstractSingleton<T>::m_singleton = NULL;
+
+template <typename T>
+class Singleton
+{
+protected:
+    /*! \brief Constructor */
+    Singleton() { m_singleton = NULL; }
+    /*! \brief Destructor */
+    virtual ~Singleton()
+    {
+        Log::info("Singleton", "Destroyed singleton.");
+    }
+
+public:
+    /*! \brief Used to get the instance. */
+    static T *getInstance()
+    {
+        if (m_singleton == NULL)
+            m_singleton = new T;
+        return m_singleton;
+    }
+
+    /*! \brief Used to kill the singleton, if needed. */
+    static void kill()
+    {
+        if (m_singleton)
+        {
+            delete m_singleton;
+            m_singleton = NULL;
+        }
+    }
+
+private:
+    static T *m_singleton;
+};
+
 template <typename T> T *Singleton<T>::m_singleton = NULL;
+
 
 #endif // SINGLETON_HPP

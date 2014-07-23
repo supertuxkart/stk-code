@@ -130,8 +130,12 @@ void ReplayRecorder::update(float dt)
         {
             // Only print this message once.
             if(m_count_transforms[i]==m_transform_events[i].size())
-                printf("Can't store more events for kart %s.\n",
+            {
+                char buffer[100];
+                sprintf(buffer, "Can't store more events for kart %s.",
                         kart->getIdent().c_str());
+                Log::warn("ReplayRecorder", buffer);
+            }
             continue;
         }
         TransformEvent *p = &(m_transform_events[i][m_count_transforms[i]-1]);
@@ -153,12 +157,12 @@ void ReplayRecorder::Save()
     FILE *fd = openReplayFile(/*writeable*/true);
     if(!fd)
     {
-        printf("Can't open '%s' for writing - can't save replay data.\n",
-            getReplayFilename().c_str());
+        Log::error("ReplayRecorder", "Can't open '%s' for writing - can't save replay data.",
+                   getReplayFilename().c_str());
         return;
     }
 
-    printf("Replay saved in '%s'.\n", getReplayFilename().c_str());
+    Log::info("ReplayRecorder", "Replay saved in '%s'.\n", getReplayFilename().c_str());
 
     World *world   = World::getWorld();
     unsigned int num_karts = world->getNumKarts();

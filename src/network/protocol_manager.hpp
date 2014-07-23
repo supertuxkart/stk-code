@@ -23,10 +23,10 @@
 #ifndef PROTOCOL_MANAGER_HPP
 #define PROTOCOL_MANAGER_HPP
 
-#include "network/singleton.hpp"
 #include "network/event.hpp"
 #include "network/network_string.hpp"
 #include "network/protocol.hpp"
+#include "utils/singleton.hpp"
 #include "utils/types.hpp"
 
 #include <vector>
@@ -102,9 +102,9 @@ typedef struct EventProcessingInfo
  * frames per second. Then, the management of protocols is thread-safe: any
  * object can start/pause/stop protocols whithout problems.
  */
-class ProtocolManager : public Singleton<ProtocolManager>
+class ProtocolManager : public AbstractSingleton<ProtocolManager>
 {
-    friend class Singleton<ProtocolManager>;
+    friend class AbstractSingleton<ProtocolManager>;
     friend void* protocolManagerAsynchronousUpdate(void* data);
     public:
         

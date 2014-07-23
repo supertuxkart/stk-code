@@ -27,11 +27,11 @@
 
 class ServerNetworkManager : public NetworkManager
 {
-    friend class Singleton<NetworkManager>;
+    friend class AbstractSingleton<NetworkManager>;
     public:
         static ServerNetworkManager* getInstance()
         {
-            return Singleton<NetworkManager>::getInstance<ServerNetworkManager>();
+            return AbstractSingleton<NetworkManager>::getInstance<ServerNetworkManager>();
         }
 
         virtual void run();

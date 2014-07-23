@@ -22,8 +22,8 @@
 #ifndef NETWORK_WORLD_HPP
 #define NETWORK_WORLD_HPP
 
-#include "network/singleton.hpp"
 #include "input/input.hpp"
+#include "utils/singleton.hpp"
 #include <map>
 
 class Controller;
@@ -34,9 +34,9 @@ class Item;
 /*! \brief Manages the world updates during an online game
  *  This function's update is to be called instead of the normal World update
 */
-class NetworkWorld : public Singleton<NetworkWorld>
+class NetworkWorld : public AbstractSingleton<NetworkWorld>
 {
-    friend class Singleton<NetworkWorld>;
+    friend class AbstractSingleton<NetworkWorld>;
     public:
         void update(float dt);
 

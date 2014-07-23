@@ -170,10 +170,10 @@ protected:
     core::vector2df m_plunger_speed;
 
     /** The size of a single marker in pixels, must be a power of 2. */
-    int              m_marker_rendered_size;
+    //int              m_marker_rendered_size;
 
     /** A texture with all mini dots to be displayed in the minimap for all karts. */
-    video::ITexture *m_marker;
+    //video::ITexture *m_marker;
     video::ITexture *m_gauge_empty;
     /** Default texture for nitro gauge. */
     video::ITexture *m_gauge_full;
@@ -186,7 +186,7 @@ protected:
     Material         *m_icons_frame;
 
     void cleanupMessages(const float dt);
-    void createMarkerTexture();
+    //void createMarkerTexture();
     void createRegularPolygon(unsigned int n, float radius,
                               const core::vector2df &center,
                               const video::SColor &color,

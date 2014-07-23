@@ -63,9 +63,9 @@ RaceGUI::RaceGUI()
     // Originally m_map_height was 100, and we take 480 as minimum res
     const float scaling = irr_driver->getFrameSize().Height / 480.0f;
     // Marker texture has to be power-of-two for (old) OpenGL compliance
-    m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
-    m_marker_ai_size        = (int)( 14.0f * scaling);
-    m_marker_player_size    = (int)( 16.0f * scaling);
+    //m_marker_rendered_size  =  2 << ((int) ceil(1.0 + log(32.0 * scaling)));
+    m_minimap_ai_size       = (int)( 14.0f * scaling);
+    m_minimap_player_size   = (int)( 16.0f * scaling);
     m_map_width             = (int)(100.0f * scaling);
     m_map_height            = (int)(100.0f * scaling);
     m_map_left              = (int)( 10.0f * scaling);
@@ -87,7 +87,7 @@ RaceGUI::RaceGUI()
 
     m_speed_meter_icon = material_manager->getMaterial("speedback.png");
     m_speed_bar_icon   = material_manager->getMaterial("speedfore.png");
-    createMarkerTexture();
+    //createMarkerTexture();
 
     // Determine maximum length of the rank/lap text, in order to
     // align those texts properly on the right side of the viewport.
@@ -108,7 +108,7 @@ RaceGUI::RaceGUI()
     int n = race_manager->getNumberOfKarts();
 
     m_animation_states.resize(n);
-    m_rank_animation_start_times.resize(n);
+    m_rank_animation_duration.resize(n);
     m_last_ranks.resize(n);
 }   // RaceGUI
 
@@ -211,7 +211,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     if(!World::getWorld()->isRacePhase()) return;
 
     drawPowerupIcons   (kart, viewport, scaling);
-    drawSpeedEnergyRank(kart, viewport, scaling);
+    drawSpeedEnergyRank(kart, viewport, scaling, dt);
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
@@ -238,15 +238,17 @@ void RaceGUI::drawScores()
     irr::video::ITexture *team_icon;
 
     int numLeader = 1;
-    for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++){
+    for(unsigned int i=0; i<soccerWorld->getNumKarts(); i++)
+    {
         int j = soccerWorld->getTeamLeader(i);
         if(j < 0) break;
 
-        core::rect<s32> source(j*m_marker_rendered_size, 0,
-            (j+1)*m_marker_rendered_size,m_marker_rendered_size);
+        AbstractKart* kart = soccerWorld->getKart(i);
+        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         core::recti position(offsetX, offsetY,
-            offsetX + 2*m_marker_player_size, offsetY + 2*m_marker_player_size);
-        draw2DImage(m_marker, position, source,
+            offsetX + 2*m_minimap_player_size, offsetY + 2*m_minimap_player_size);
+        draw2DImage(icon, position, source,
             NULL, NULL, true);
         core::stringw score = StringUtils::toWString(soccerWorld->getScore(i));
         int string_height =
@@ -265,8 +267,8 @@ void RaceGUI::drawScores()
             default: break;
         }
         core::rect<s32> indicatorPos(offsetX, offsetY,
-                                     offsetX + (int)(m_marker_player_size/1.25f),
-                                     offsetY + (int)(m_marker_player_size/1.25f));
+                                     offsetX + (int)(m_minimap_player_size/1.25f),
+                                     offsetY + (int)(m_minimap_player_size/1.25f));
         core::rect<s32> sourceRect(core::position2d<s32>(0,0),
                                                    team_icon->getOriginalSize());
         draw2DImage(team_icon,indicatorPos,sourceRect,
@@ -373,20 +375,19 @@ void RaceGUI::drawGlobalMiniMap()
         const Vec3& xyz = kart->getXYZ();
         Vec3 draw_at;
         world->getTrack()->mapPoint2MiniMap(xyz, &draw_at);
+
+        video::ITexture* icon = kart->getKartProperties()->getMinimapIcon();
+
         // int marker_height = m_marker->getOriginalSize().Height;
-        core::rect<s32> source(i    *m_marker_rendered_size,
-                               0,
-                               (i+1)*m_marker_rendered_size,
-                               m_marker_rendered_size);
+        core::rect<s32> source(core::position2di(0, 0), icon->getSize());
         int marker_half_size = (kart->getController()->isPlayerController()
-                                ? m_marker_player_size
-                                : m_marker_ai_size                        )>>1;
+                                ? m_minimap_player_size
+                                : m_minimap_ai_size                        )>>1;
         core::rect<s32> position(m_map_left+(int)(draw_at.getX()-marker_half_size),
                                  lower_y   -(int)(draw_at.getY()+marker_half_size),
                                  m_map_left+(int)(draw_at.getX()+marker_half_size),
                                  lower_y   -(int)(draw_at.getY()-marker_half_size));
-        draw2DImage(m_marker, position, source,
-                                                  NULL, NULL, true);
+        draw2DImage(icon, position, source, NULL, NULL, true);
     }   // for i<getNumKarts
 }   // drawGlobalMiniMap
 
@@ -600,10 +601,18 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
+/** Draws the rank of a player.
+ *  \param kart The kart of the player.
+ *  \param offset Offset of top left corner for this display (for splitscreen).
+ *  \param min_ratio Scaling of the screen (for splitscreen).
+ *  \param meter_width Width of the meter (inside which the rank is shown).
+ *  \param meter_height Height of the meter (inside which the rank is shown).
+ *  \param dt Time step size.
+ */
 void RaceGUI::drawRank(const AbstractKart *kart,
                       const core::vector2df &offset,
                       float min_ratio, int meter_width,
-                      int meter_height)
+                      int meter_height, float dt)
 {
     // Draw rank
     WorldWithRank *world = dynamic_cast<WorldWithRank*>(World::getWorld());
@@ -616,9 +625,13 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     {
         if (m_last_ranks[id] != kart->getPosition())
         {
-            m_rank_animation_start_times[id] = world->getTime();
+            m_rank_animation_duration[id] = 0.0f;
             m_animation_states[id] = AS_SMALLER;
         }
+    }
+    else
+    {
+        m_rank_animation_duration[id] += dt;
     }
 
     float scale = 1.0f;
@@ -627,13 +640,12 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     const float MIN_SHRINK = 0.3f;
     if (m_animation_states[id] == AS_SMALLER)
     {
-        scale = 1.0f - (world->getTime() - m_rank_animation_start_times[id])
-            / DURATION;
+        scale = 1.0f - m_rank_animation_duration[id]/ DURATION;
         rank = m_last_ranks[id];
         if (scale < MIN_SHRINK)
         {
             m_animation_states[id] = AS_BIGGER;
-            m_rank_animation_start_times[id] = world->getTime();
+            m_rank_animation_duration[id] = 0.0f;
             // Store the new rank
             m_last_ranks[id] = kart->getPosition();
             scale = MIN_SHRINK;
@@ -641,8 +653,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
     else if (m_animation_states[id] == AS_BIGGER)
     {
-        scale = (world->getTime() - m_rank_animation_start_times[id])
-            / DURATION + MIN_SHRINK;
+        scale = m_rank_animation_duration[id] / DURATION + MIN_SHRINK;
         rank = m_last_ranks[id];
         if (scale > 1.0f)
         {
@@ -679,10 +690,12 @@ void RaceGUI::drawRank(const AbstractKart *kart,
  *  \param kart The kart for which to show the data.
  *  \param viewport The viewport to use.
  *  \param scaling Which scaling to apply to the speedometer.
+ *  \param dt Time step size.
  */
 void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  const core::recti &viewport,
-                                 const core::vector2df &scaling)
+                                 const core::vector2df &scaling,
+                                 float dt)
 {
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
@@ -711,7 +724,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     const float speed =  kart->getSpeed();
 
-    drawRank(kart, offset, min_ratio, meter_width, meter_height);
+    drawRank(kart, offset, min_ratio, meter_width, meter_height, dt);
 
 
     if(speed <=0) return;  // Nothing to do if speed is negative.

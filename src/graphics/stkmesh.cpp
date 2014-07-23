@@ -9,41 +9,29 @@
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
 
-GeometricMaterial MaterialTypeToGeometricMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
+MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE MaterialType, video::E_VERTEX_TYPE tp)
 {
+    if (MaterialType == irr_driver->getShader(ES_SPHERE_MAP))
+        return MAT_SPHEREMAP;
     if (MaterialType == irr_driver->getShader(ES_NORMAL_MAP))
-        return FPSM_NORMAL_MAP;
+        return MAT_NORMAL_MAP;
     else if (MaterialType == irr_driver->getShader(ES_OBJECTPASS_REF) || MaterialType == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
-        return FPSM_ALPHA_REF_TEXTURE;
+        return MAT_ALPHA_REF;
     else if (MaterialType == irr_driver->getShader(ES_GRASS) || MaterialType == irr_driver->getShader(ES_GRASS_REF))
-        return FPSM_GRASS;
+        return MAT_GRASS;
+    else if (MaterialType == irr_driver->getShader(ES_SPLATTING))
+        return MAT_SPLATTING;
+    else if (MaterialType == irr_driver->getShader(ES_OBJECT_UNLIT))
+        return MAT_UNLIT;
     else if (tp == video::EVT_2TCOORDS)
-        return FPSM_DEFAULT_2TCOORD;
-    assert(tp == video::EVT_STANDARD);
-    return FPSM_DEFAULT_STANDARD;
-}
-
-ShadedMaterial MaterialTypeToShadedMaterial(video::E_MATERIAL_TYPE type, video::ITexture **textures, video::E_VERTEX_TYPE tp)
-{
-    if (type == irr_driver->getShader(ES_SPHERE_MAP))
-        return SM_SPHEREMAP;
-    else if (type == irr_driver->getShader(ES_SPLATTING))
-        return SM_SPLATTING;
-    else if (type == irr_driver->getShader(ES_OBJECTPASS_REF) || type == video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF)
-        return SM_ALPHA_REF_TEXTURE;
-    else if (type == irr_driver->getShader(ES_GRASS) || type == irr_driver->getShader(ES_GRASS_REF))
-        return SM_GRASS;
-    else if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
-        return SM_UNLIT;
-    else if (tp == video::EVT_2TCOORDS)
-        return SM_DETAILS;
-    else if (tp == video::EVT_TANGENTS)
-        return SM_DEFAULT_TANGENT;
-    return SM_DEFAULT_STANDARD;
+        return MAT_DETAIL;
+    return MAT_DEFAULT;
 }
 
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE type, f32 MaterialTypeParam)
 {
+    if (type == irr_driver->getShader(ES_DISPLACE))
+        return TM_DISPLACEMENT;
     if (type == irr_driver->getShader(ES_BUBBLES))
         return TM_BUBBLE;
     video::E_BLEND_FACTOR srcFact, DstFact;
@@ -240,15 +228,6 @@ core::matrix4 computeMVP(const core::matrix4 &ModelMatrix)
     return ModelViewProjectionMatrix;
 }
 
-core::matrix4 computeTIMV(const core::matrix4 &ModelMatrix)
-{
-    core::matrix4 TransposeInverseModelView = irr_driver->getViewMatrix();
-    TransposeInverseModelView *= ModelMatrix;
-    TransposeInverseModelView.makeInverse();
-    TransposeInverseModelView = TransposeInverseModelView.getTransposed();
-    return TransposeInverseModelView;
-}
-
 core::vector3df getWind()
 {
     const float time = irr_driver->getDevice()->getTimer()->getTime() / 1000.0f;
@@ -256,179 +235,6 @@ core::vector3df getWind()
     float m_speed = gsp->getSpeed();
 
     return m_speed * vector3df(1., 0., 0.) * cos(time);
-}
-
-void drawGrassPass1(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, const core::matrix4 &TransposeInverseModelView, core::vector3df windDir)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-    assert(mesh.VAOType == video::EVT_STANDARD);
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-    MeshShader::GrassPass1Shader::setUniforms(ModelViewProjectionMatrix, TransposeInverseModelView, windDir, 0);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
-
-void drawSplatting(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    // Texlayout
-    compressTexture(mesh.textures[1], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_layout, getTextureGLuint(mesh.textures[1]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    //Tex detail0
-    compressTexture(mesh.textures[2], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_detail0, getTextureGLuint(mesh.textures[2]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    //Tex detail1
-    compressTexture(mesh.textures[3], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_detail1, getTextureGLuint(mesh.textures[3]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    compressTexture(mesh.textures[4], true);
-    //Tex detail2
-    setTexture(MeshShader::SplattingShader::TU_tex_detail2, getTextureGLuint(mesh.textures[4]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    //Tex detail3
-    compressTexture(mesh.textures[5], true);
-    setTexture(MeshShader::SplattingShader::TU_tex_detail3, getTextureGLuint(mesh.textures[5]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-        GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-        GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-        glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    MeshShader::SplattingShader::setUniforms(ModelViewProjectionMatrix);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
-
-void drawGrassPass2(const GLMesh &mesh, const core::matrix4 & ModelViewProjectionMatrix, core::vector3df windDir)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-    assert(mesh.VAOType == video::EVT_STANDARD);
-
-    if (!mesh.textures[0])
-        const_cast<GLMesh &>(mesh).textures[0] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::GrassPass2Shader::TU_Albedo, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    if (irr_driver->getLightViz())
-    {
-      GLint swizzleMask[] = {GL_ONE, GL_ONE, GL_ONE, GL_ALPHA};
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-    else
-    {
-      GLint swizzleMask[] = {GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA};
-      glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-    }
-
-    MeshShader::GrassPass2Shader::setUniforms(ModelViewProjectionMatrix, windDir);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
-void drawTransparentObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-
-    MeshShader::TransparentShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, 0);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
-}
-
-void drawTransparentFogObject(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix, const core::matrix4 &TextureMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    const Track * const track = World::getWorld()->getTrack();
-
-    // This function is only called once per frame - thus no need for setters.
-    const float fogmax = track->getFogMax();
-    const float startH = track->getFogStartHeight();
-    const float endH = track->getFogEndHeight();
-    const float start = track->getFogStart();
-    const float end = track->getFogEnd();
-    const video::SColor tmpcol = track->getFogColor();
-
-    core::vector3df col(tmpcol.getRed() / 255.0f,
-        tmpcol.getGreen() / 255.0f,
-        tmpcol.getBlue() / 255.0f);
-
-    if (mesh.textures[0] != NULL)
-    {
-        compressTexture(mesh.textures[0], true);
-        setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    }
-
-    glUseProgram(MeshShader::TransparentFogShader::Program);
-    MeshShader::TransparentFogShader::setUniforms(ModelViewProjectionMatrix, TextureMatrix, fogmax, startH, endH, start, end, col, Camera::getCamera(0)->getCameraSceneNode()->getAbsolutePosition(), 0);
-
-    assert(mesh.vao);
-    glBindVertexArray(mesh.vao);
-    glDrawElements(ptype, count, itype, 0);
 }
 
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix)
@@ -446,30 +252,6 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 
     MeshShader::BubbleShader::setUniforms(ModelViewProjectionMatrix, 0, time, transparency);
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
-}
-
-void drawShadowRef(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    compressTexture(mesh.textures[0], true);
-    setTexture(0, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::RefShadowShader::setUniforms(ModelMatrix, 0);
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, 4, mesh.vaoBaseVertex);
-}
-
-void drawShadow(const GLMesh &mesh, const core::matrix4 &ModelMatrix)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
-
-    MeshShader::ShadowShader::setUniforms(ModelMatrix);
-    glDrawElementsInstancedBaseVertex(ptype, count, itype, (GLvoid *) mesh.vaoOffset, 4, mesh.vaoBaseVertex);
 }
 
 bool isObject(video::E_MATERIAL_TYPE type)
@@ -492,6 +274,8 @@ bool isObject(video::E_MATERIAL_TYPE type)
         return true;
     if (type == irr_driver->getShader(ES_BUBBLES))
         return true;
+    if (type == irr_driver->getShader(ES_DISPLACE))
+        return true;
     if (type == irr_driver->getShader(ES_OBJECT_UNLIT))
         return true;
     if (type == video::EMT_TRANSPARENT_ALPHA_CHANNEL)
@@ -509,13 +293,17 @@ bool isObject(video::E_MATERIAL_TYPE type)
     return false;
 }
 
-void initvaostate(GLMesh &mesh, GeometricMaterial GeoMat, ShadedMaterial ShadedMat)
-{
-    mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-}
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatDefault::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatAlphaRef::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatSphereMap::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatDetails::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > ListMatGrass::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListMatUnlit::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListMatSplatting::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatNormalMap::Arguments;
 
-void initvaostate(GLMesh &mesh, TransparentMaterial TranspMat)
-{
-    mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-}
-
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
+std::vector<std::tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;

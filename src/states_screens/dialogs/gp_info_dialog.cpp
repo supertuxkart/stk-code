@@ -53,8 +53,8 @@ GPInfoDialog::GPInfoDialog(const std::string& gp_ident)
     doInit();
     m_curr_time = 0.0f;
 
-    m_gp = grand_prix_manager->getGrandPrix(gp_ident);
-    m_gp->checkConsistency();
+    m_gp = *grand_prix_manager->getGrandPrix(gp_ident);
+    m_gp.checkConsistency();
 
     m_under_title = m_area.getHeight()/7;
     m_over_body = m_area.getHeight()/7;
@@ -72,7 +72,7 @@ GPInfoDialog::~GPInfoDialog()
 {
     GUIEngine::Screen* curr_screen = GUIEngine::getCurrentScreen();
     if (curr_screen->getName() == "tracks.stkgui")
-        static_cast<TracksScreen*>(curr_screen)->setFocusOnGP(m_gp->getId());
+        static_cast<TracksScreen*>(curr_screen)->setFocusOnGP(m_gp.getId());
 }
 
 // ----------------------------------------------------------------------------
@@ -81,7 +81,7 @@ void GPInfoDialog::addTitle()
 {
     core::rect< s32 > area_top(0, 0, m_area.getWidth(), m_under_title);
     IGUIStaticText* title = GUIEngine::getGUIEnv()->addStaticText(
-        translations->fribidize(m_gp->getName()),
+        translations->fribidize(m_gp.getName()),
         area_top, false, true, // border, word wrap
         m_irrlicht_window);
     title->setTabStop(false);
@@ -92,7 +92,7 @@ void GPInfoDialog::addTitle()
 
 void GPInfoDialog::addTracks()
 {
-    const std::vector<std::string> tracks = m_gp->getTrackNames();
+    const std::vector<std::string> tracks = m_gp.getTrackNames();
     const unsigned int track_amount = tracks.size();
 
     int height_of_one_line = std::min((m_lower_bound - m_over_body)/(track_amount+1),
@@ -119,7 +119,7 @@ void GPInfoDialog::addTracks()
 
         Label* widget = dynamic_cast<Label*>(m_widgets.get(widgets_iter));
         widget->setText(translations->fribidize(track->getName()), false);
-        widget->move(20, m_over_body + height_of_one_line*(i+1),
+        widget->move(20, m_over_body + height_of_one_line*i,
                      m_area.getWidth()/2 - 20, height_of_one_line);
 
         widgets_iter++;
@@ -141,7 +141,7 @@ void GPInfoDialog::addTracks()
             m_widgets.push_back(widget);
             widget->add();
 
-            widget->move(20, m_over_body + height_of_one_line*(i+1),
+            widget->move(20, m_over_body + height_of_one_line*i,
                          m_area.getWidth()/2 - 20, height_of_one_line);
         }
     }
@@ -185,7 +185,7 @@ void GPInfoDialog::addScreenshot()
         m_screenshot_widget->m_h = m_area.getWidth()*3/8; // *(3/4)*(1/2)
     }
 
-    Track* track = track_manager->getTrack(m_gp->getTrackNames()[0]);
+    Track* track = track_manager->getTrack(m_gp.getTrackNames()[0]);
     m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = (track->getScreenshotFile().c_str());
     m_screenshot_widget->setParent(m_irrlicht_window);
     m_screenshot_widget->add();
@@ -203,7 +203,7 @@ void GPInfoDialog::addButtons()
     SavedGrandPrix* saved_gp = SavedGrandPrix::getSavedGP( StateManager::get()
                                                ->getActivePlayerProfile(0)
                                                ->getUniqueID(),
-                                               m_gp->getId(),
+                                               m_gp.getId(),
                                                race_manager->getDifficulty(),
                                                race_manager->getNumberOfKarts(),
                                                race_manager->getNumLocalPlayers());
@@ -250,7 +250,7 @@ void GPInfoDialog::addButtons()
 void GPInfoDialog::onEnterPressedInternal()
 {
     // Save the GP id because dismiss() will destroy this instance
-    std::string gp_id = m_gp->getId();
+    std::string gp_id = m_gp.getId();
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
@@ -259,15 +259,19 @@ void GPInfoDialog::onEnterPressedInternal()
 
 // ----------------------------------------------------------------------------
 
-GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& eventSource)
+GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& event_source)
 {
-    if (eventSource == "start" || eventSource == "continue")
+    if (event_source == "start" || event_source == "continue")
     {
         // Save GP identifier, since dismiss will delete this object.
-        std::string gp_id = m_gp->getId();
+        std::string gp_id = m_gp.getId();
+        // Also create a copy of the string: it is a reference to data
+        // in a widget in the dialog - so if we call dismiss, this reference
+        // becomes invalid!
+        std::string save_source = event_source;
         ModalDialog::dismiss();
         race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false,
-                              (eventSource == "continue"));
+                              (save_source == "continue"));
         return GUIEngine::EVENT_BLOCK;
     }
 
@@ -284,7 +288,7 @@ void GPInfoDialog::onUpdate(float dt)
     m_curr_time += dt;
     int frameAfter = (int)(m_curr_time / 1.5f);
 
-    const std::vector<std::string> tracks = m_gp->getTrackNames();
+    const std::vector<std::string> tracks = m_gp.getTrackNames();
     if (frameAfter >= (int)tracks.size())
     {
         frameAfter = 0;

@@ -50,6 +50,8 @@ LabelWidget::LabelWidget(bool title, bool bright) : Widget(WTYPE_LABEL)
     }
     else
         m_has_color = false;
+
+    setFocusable(false);
 }   // LabelWidget
 
 // ----------------------------------------------------------------------------
