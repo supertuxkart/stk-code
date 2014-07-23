@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -142,6 +143,23 @@ void GrandPrixLose::init()
 
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 
+    if (race_manager->getGrandPrix().getId() == "random")
+    {
+        core::stringw text = _("Save Grand Prix");
+
+        typedef GUIEngine::ButtonWidget Button;
+        Button* save_button = new Button();
+        save_button->m_properties[GUIEngine::PROP_ID] = "save gp";
+        Button* c = getWidget<Button>("continue");
+        save_button->m_x = c->m_x + c->m_w + 20;
+        save_button->m_y = c->m_y;
+        save_button->m_w = GUIEngine::getFont()->getDimension(text.c_str()).Width + 30;
+        save_button->m_h = c->m_h;
+        save_button->setText(text);
+        save_button->add();
+        manualAddWidget(save_button);
+    }
+
     m_phase = 1;
     m_global_time = 0.0f;
 }   // init
@@ -177,7 +195,7 @@ void GrandPrixLose::onUpdate(float dt)
             }
         }
     }
-    
+
     // ---- title
     const int w = irr_driver->getFrameSize().Width;
     const int h = irr_driver->getFrameSize().Height;
@@ -201,6 +219,9 @@ void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
     if (name == "continue")
     {
         ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    }
+    else if (name == "save_gp")
+    {
     }
 }   // eventCallback
 
