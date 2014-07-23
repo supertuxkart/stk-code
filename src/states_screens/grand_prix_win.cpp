@@ -68,7 +68,7 @@ DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixWin::GrandPrixWin() : CutsceneScreen("grand_prix_win.stkgui")
+GrandPrixWin::GrandPrixWin() : GrandPrixCutscene("grand_prix_win.stkgui")
 {
     m_kart_node[0] = NULL;
     m_kart_node[1] = NULL;
@@ -117,12 +117,6 @@ void GrandPrixWin::onCutsceneEnd()
     m_podium_steps[1] = NULL;
     m_podium_steps[2] = NULL;
 }
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::loadedFromFile()
-{
-}   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 

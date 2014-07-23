@@ -34,7 +34,7 @@ class TrackObject;
   * \ingroup states_screens
   */
 class GrandPrixWin :
-    public GUIEngine::CutsceneScreen,
+    public GrandPrixCutscene,
     public GUIEngine::ScreenSingleton<GrandPrixWin>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixWin>;
@@ -50,9 +50,6 @@ class GrandPrixWin :
 
     TrackObject* m_kart_node[3];
 
-    //irr::scene::IMeshSceneNode* m_podium_step[3];
-    //irr::scene::ISceneNode* m_kart_node[3];
-
     /** A copy of the kart model for each kart used. */
     std::vector<KartModel*> m_all_kart_models;
 
@@ -61,7 +58,6 @@ class GrandPrixWin :
     int m_phase;
 
     float m_kart_x[3], m_kart_y[3], m_kart_z[3];
-    //float m_podium_x[3], m_podium_z[3];
     float m_kart_rotation[3];
 
 public:
@@ -71,7 +67,7 @@ public:
     virtual bool onEscapePressed() OVERRIDE;
 
     /** \brief implement callback from parent class GUIEngine::Screen */
-    virtual void loadedFromFile() OVERRIDE;
+    virtual void loadedFromFile() OVERRIDE {};
 
     /** \brief implement optional callback from parent class GUIEngine::Screen */
     void onUpdate(float dt) OVERRIDE;
