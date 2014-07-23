@@ -57,8 +57,6 @@ class GrandPrixLose :
 public:
     virtual void onCutsceneEnd() OVERRIDE;
 
-    virtual bool onEscapePressed() OVERRIDE;
-
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 
@@ -67,13 +65,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     void init() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                       const int playerID) OVERRIDE;
 
     /** \brief set which karts lost this GP */
     void setKarts(std::vector<std::string> ident);

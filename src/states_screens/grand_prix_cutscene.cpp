@@ -16,12 +16,16 @@
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
+#include "modes/cutscene_world.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
 
 typedef GUIEngine::ButtonWidget Button;
 
+/** A Button to save the GP if it was a random one */
 void GrandPrixCutscene::saveGPButton()
 {
+    #ifdef IMPLEMENTATION_FINISHED
     if (race_manager->getGrandPrix().getId() == "random")
     {
         core::stringw text = _("Save Grand Prix");
@@ -36,4 +40,37 @@ void GrandPrixCutscene::saveGPButton()
         save_button->add();
         manualAddWidget(save_button);
     }
-}
+    #endif
+}   // saveGPButton
+
+// ----------------------------------------------------------------------------
+
+
+void GrandPrixCutscene::eventCallback(GUIEngine::Widget* widget,
+                                      const std::string& name,
+                                      const int playerID)
+{
+    if (name == "continue")
+    {
+        ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    }
+    else if (name == "save_gp")
+    {
+    }
+}   // eventCallback
+
+// ----------------------------------------------------------------------------
+
+bool GrandPrixCutscene::onEscapePressed()
+{
+    ((CutsceneWorld*)World::getWorld())->abortCutscene();
+    return false;
+}   // onEscapePressed
+
+// ----------------------------------------------------------------------------
+
+void GrandPrixCutscene::tearDown()
+{
+    Screen::tearDown();
+}   // tearDown
+

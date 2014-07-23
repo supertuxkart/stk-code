@@ -64,8 +64,6 @@ public:
 
     virtual void onCutsceneEnd() OVERRIDE;
 
-    virtual bool onEscapePressed() OVERRIDE;
-
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE {};
 
@@ -74,13 +72,6 @@ public:
 
     /** \brief implement callback from parent class GUIEngine::Screen */
     void init() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void tearDown() OVERRIDE;
-
-    /** \brief implement callback from parent class GUIEngine::Screen */
-    void eventCallback(GUIEngine::Widget* widget, const std::string& name,
-                       const int playerID) OVERRIDE;
 
     /** \pre must be called after pushing the screen, but before onUpdate had the chance to be invoked */
     void setKarts(const std::string idents[3]);

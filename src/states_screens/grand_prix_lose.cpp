@@ -109,14 +109,6 @@ void GrandPrixLose::onCutsceneEnd()
 
 // -------------------------------------------------------------------------------------
 
-bool GrandPrixLose::onEscapePressed()
-{
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    return false;
-}
-
-// -------------------------------------------------------------------------------------
-
 void GrandPrixLose::loadedFromFile()
 {
     m_kart_node[0] = NULL;
@@ -138,33 +130,11 @@ void GrandPrixLose::init()
 
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 
-    if (race_manager->getGrandPrix().getId() == "random")
-    {
-        core::stringw text = _("Save Grand Prix");
-
-        typedef GUIEngine::ButtonWidget Button;
-        Button* save_button = new Button();
-        save_button->m_properties[GUIEngine::PROP_ID] = "save gp";
-        Button* c = getWidget<Button>("continue");
-        save_button->m_x = c->m_x + c->m_w + 20;
-        save_button->m_y = c->m_y;
-        save_button->m_w = GUIEngine::getFont()->getDimension(text.c_str()).Width + 30;
-        save_button->m_h = c->m_h;
-        save_button->setText(text);
-        save_button->add();
-        manualAddWidget(save_button);
-    }
+    saveGPButton();
 
     m_phase = 1;
     m_global_time = 0.0f;
 }   // init
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixLose::tearDown()
-{
-    Screen::tearDown();
-}   // tearDown
 
 // -------------------------------------------------------------------------------------
 
@@ -204,21 +174,6 @@ void GrandPrixLose::onUpdate(float dt)
                                     color,
                                     true/* center h */, false /* center v */ );
 }   // onUpdate
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
-                                            const std::string& name,
-                                            const int playerID)
-{
-    if (name == "continue")
-    {
-        ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    }
-    else if (name == "save_gp")
-    {
-    }
-}   // eventCallback
 
 // -------------------------------------------------------------------------------------
 

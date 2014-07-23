@@ -31,6 +31,13 @@ public:
     GrandPrixCutscene(const char * filename) : CutsceneScreen(filename) {}
 protected:
     void saveGPButton();
+
+    // implement callbacks from parent class GUIEngine::Screen
+    void eventCallback(GUIEngine::Widget* widget,
+                       const std::string& name,
+                       const int playerID) OVERRIDE;
+    bool onEscapePressed() OVERRIDE;
+    void tearDown() OVERRIDE;
 };
 
 #endif
