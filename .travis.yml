@@ -29,7 +29,8 @@ script:
   - make VERBOSE=1 -j 4 
 
   # Then a release build: 
-  - mkdir ../build-release
+  - cd ..
+  - mkdir build-release
   - cd build-release
   - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off
   - make VERBOSE=1 -j 4 
