@@ -167,15 +167,6 @@ void OptionsScreenVideo::init()
     if (UserConfigParams::m_fullscreen) rememberWinpos->setDeactivated();
     else rememberWinpos->setActivated();
 
-    // Enable back widgets if they were visited in-game previously
-    if (StateManager::get()->getGameState() != GUIEngine::INGAME_MENU)
-    {
-        res->setActivated();
-        full->setActivated();
-        applyBtn->setActivated();
-        gfx->setActivated();
-        getWidget<ButtonWidget>("custom")->setActivated();
-    }
 
     // --- get resolution list from irrlicht the first time
     if (!m_inited)
@@ -342,6 +333,15 @@ void OptionsScreenVideo::init()
         gfx->setDeactivated();
         getWidget<ButtonWidget>("custom")->setDeactivated();
     }
+    else
+    {
+        // Enable back widgets if they were visited in-game previously
+        res->setActivated();
+        full->setActivated();
+        applyBtn->setActivated();
+        gfx->setActivated();
+        getWidget<ButtonWidget>("custom")->setActivated();
+    }
 }   // init
 
 // ----------------------------------------------------------------------------
@@ -469,15 +469,13 @@ void OptionsScreenVideo::eventCallback(Widget* widget, const std::string& name,
 {
     if (name == "options_choice")
     {
-        std::string selection =
-            ((RibbonWidget*)widget)
-                                 ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
         Screen *screen = NULL;
         if (selection == "tab_audio")
             screen = OptionsScreenAudio::getInstance();
-        else if (selection == "tab_video")
-            screen = OptionsScreenVideo::getInstance();
+        //else if (selection == "tab_video")
+        //    screen = OptionsScreenVideo::getInstance();
         else if (selection == "tab_players")
             screen = TabbedUserScreen::getInstance();
         else if (selection == "tab_controls")

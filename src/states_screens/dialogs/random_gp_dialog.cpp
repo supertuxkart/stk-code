@@ -33,11 +33,12 @@ using irr::gui::IGUIStaticText;
 typedef GUIEngine::SpinnerWidget Spinner;
 
 RandomGPInfoDialog::RandomGPInfoDialog()
+
 {
     // Defaults - loading selection from last time frrom a file would be better
     m_number_of_tracks = 2; // We can assume that there are at least 2 standard tracks
     m_trackgroup = "standard";
-    m_use_reverse = NO_REVERSE;
+    m_use_reverse = GrandPrixData::GP_NO_REVERSE;
 
     doInit();
     m_curr_time = 0.0f;
@@ -46,14 +47,7 @@ RandomGPInfoDialog::RandomGPInfoDialog()
     m_over_body = m_area.getHeight()/7 + SPINNER_HEIGHT + 10; // 10px space
     m_lower_bound = m_area.getHeight()*6/7;
 
-    // The GP manager is be used to make the GP live longer than this dialog
-    if (grand_prix_manager->m_random_gp)
-    {
-        delete grand_prix_manager->m_random_gp;
-        grand_prix_manager->m_random_gp = NULL;
-    }
-    m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
-    grand_prix_manager->m_random_gp = m_gp;
+    m_gp.createRandomGP(m_number_of_tracks, m_trackgroup, m_use_reverse);
 
     addTitle();
     addSpinners();
@@ -67,8 +61,18 @@ RandomGPInfoDialog::RandomGPInfoDialog()
 
 void RandomGPInfoDialog::addSpinners()
 {
-    const int trackgroup_width = 200, laps_with = 150, reverse_width = 200;
-    const int left =  (m_area.getWidth() - trackgroup_width - 150 - 250)/2;
+    const int laps_width = 150;
+    // "20*4" because there a 4 separators between the spinners with 20px each
+    int label_spinner_width = m_area.getWidth() - laps_width - 20*4;
+    // This scaling ensures that the spinners are smaller than the available
+    // area, look well and are (hopefully) big enough for their labels
+    if (m_area.getWidth() < 700)
+        label_spinner_width /= 2;
+    else if (m_area.getWidth() < 1500)
+        label_spinner_width /= 3;
+    else
+        label_spinner_width /= 4;
+    const int left = (m_area.getWidth() - label_spinner_width*2 - laps_width)/2;
 
     // Trackgroup chooser
     Spinner* spinner = new Spinner(false);
@@ -77,7 +81,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->setParent(m_irrlicht_window);
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left, m_under_title, trackgroup_width, SPINNER_HEIGHT);
+    spinner->move(left, m_under_title, label_spinner_width, SPINNER_HEIGHT);
     // Fill it with all the track group names
     spinner->addLabel("all");
     int index_standard;
@@ -106,7 +110,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + trackgroup_width + 10, m_under_title, laps_with, SPINNER_HEIGHT);
+    spinner->move(left + label_spinner_width + 20/2, m_under_title, laps_width, SPINNER_HEIGHT);
 
     // reverse choose
     spinner = new Spinner(false);
@@ -115,7 +119,7 @@ void RandomGPInfoDialog::addSpinners()
     spinner->m_properties[GUIEngine::PROP_WRAP_AROUND] = "true";
     m_widgets.push_back(spinner);
     spinner->add();
-    spinner->move(left + trackgroup_width + laps_with + 10, m_under_title, reverse_width, SPINNER_HEIGHT);
+    spinner->move(left + label_spinner_width + laps_width + 20/2, m_under_title, label_spinner_width, SPINNER_HEIGHT);
     spinner->addLabel("no reverse");
     spinner->addLabel("all reverse");
     spinner->addLabel("mixed");
@@ -141,15 +145,17 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
 {
     if (eventSource == "start")
     {
+        // Save GP data, since dismiss will delete this object.
+        GrandPrixData gp = m_gp;
         ModalDialog::dismiss();
-        race_manager->startGP(grand_prix_manager->m_random_gp, false, false);
+        race_manager->startGP(&gp, false, false);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "Number of tracks")
     {
         // The old gp can be reused because there's only track deletion/adding
         m_number_of_tracks = getWidget<Spinner>("Number of tracks")->getValue();
-        m_gp->changeTrackNumber(m_number_of_tracks, m_trackgroup);
+        m_gp.changeTrackNumber(m_number_of_tracks, m_trackgroup);
         addTracks();
     }
     else if (eventSource == "Trackgroup")
@@ -171,22 +177,22 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
         if (s->getValue() > (signed)max)
             s->setValue(max);
 
-        delete m_gp;
-        m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
-        grand_prix_manager->m_random_gp = m_gp;
+        // Create a new (i.e. with new tracks) random gp, since the old
+        // tracks might not all belong to the newly selected group.
+        m_gp.createRandomGP(m_number_of_tracks, m_trackgroup, m_use_reverse,
+                            /*new_tracks*/true);
         addTracks();
     }
     else if (eventSource == "reverse")
     {
         Spinner* r = getWidget<Spinner>("reverse");
-        m_use_reverse = static_cast<REVERSED>(r->getValue());
-        m_gp->changeReverse(m_use_reverse);
+        m_use_reverse = static_cast<GrandPrixData::GPReverseType>(r->getValue());
+        m_gp.changeReverse(m_use_reverse);
     }
     else if (eventSource == "reload")
     {
-        delete m_gp;
-        m_gp = new GrandPrixData(m_number_of_tracks, m_trackgroup, m_use_reverse);
-        grand_prix_manager->m_random_gp = m_gp;
+        m_gp.createRandomGP(m_number_of_tracks, m_trackgroup, m_use_reverse,
+                           /*new_tracks*/true);
         addTracks();
     }
 

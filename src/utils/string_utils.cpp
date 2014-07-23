@@ -520,7 +520,7 @@ namespace StringUtils
         // which admittedly only works for min < 100000 - which is about 68
         // days - good enough.
         char s[12];
-        sprintf ( s, "%02d:%02d:%02d", min,  sec,  hundredths) ;
+        sprintf(s, "%02d:%02d:%02d", min,  sec,  hundredths);
         return std::string(s);
     }   // timeToString
 
@@ -738,8 +738,8 @@ namespace StringUtils
                     +      10*very_minor
                     +         release_candidate;
 
-        if(version<=0)
-            printf("Invalid version string '%s'.\n", s.c_str());
+        if(version <= 0)
+            Log::error("StringUtils", "Invalid version string '%s'.", s.c_str());
         return version;
     }   // versionToInt
 

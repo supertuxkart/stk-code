@@ -102,29 +102,19 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 {
     if (eventSource == "close")
     {
-        bool dynamic_light = getWidget<CheckBoxWidget>("dynamiclight")->getState();
-        UserConfigParams::m_dynamic_lights = dynamic_light;
+        bool advanced_pipeline = getWidget<CheckBoxWidget>("dynamiclight")->getState();
+        UserConfigParams::m_dynamic_lights = advanced_pipeline;
 
-        UserConfigParams::m_graphical_effects =
-            getWidget<CheckBoxWidget>("anim_gfx")->getState();
-        UserConfigParams::m_weather_effects =
-            getWidget<CheckBoxWidget>("weather_gfx")->getState();
-        UserConfigParams::m_ubo_disabled             =
-            !getWidget<CheckBoxWidget>("ubo")->getState();
         UserConfigParams::m_dof =
-            getWidget<CheckBoxWidget>("dof")->getState();
-        UserConfigParams::m_high_definition_textures =
-            getWidget<CheckBoxWidget>("hd-textures")->getState();
-
+            advanced_pipeline && getWidget<CheckBoxWidget>("dof")->getState();
+        
         UserConfigParams::m_motionblur      =
-            getWidget<CheckBoxWidget>("motionblur")->getState();
-        UserConfigParams::m_show_steering_animations =
-            getWidget<SpinnerWidget>("steering_animations")->getValue();
-
-        if (dynamic_light)
+            advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
+        
+        if (advanced_pipeline)
         {
             UserConfigParams::m_shadows =
-                getWidget<SpinnerWidget>("shadows")->getValue();
+                advanced_pipeline && getWidget<SpinnerWidget>("shadows")->getValue();
         }
         else
         {
@@ -132,25 +122,40 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         }
 
         UserConfigParams::m_mlaa =
-            getWidget<CheckBoxWidget>("mlaa")->getState();
+            advanced_pipeline && getWidget<CheckBoxWidget>("mlaa")->getState();
 
         UserConfigParams::m_ssao =
-            getWidget<CheckBoxWidget>("ssao")->getState();
+            advanced_pipeline && getWidget<CheckBoxWidget>("ssao")->getState();
 
         UserConfigParams::m_light_shaft =
-            getWidget<CheckBoxWidget>("lightshaft")->getState();
+            advanced_pipeline && getWidget<CheckBoxWidget>("lightshaft")->getState();
 
         UserConfigParams::m_gi =
-            getWidget<CheckBoxWidget>("global_illumination")->getState();
+            advanced_pipeline && getWidget<CheckBoxWidget>("global_illumination")->getState();
 
         UserConfigParams::m_glow =
-            getWidget<CheckBoxWidget>("glow")->getState();
+            advanced_pipeline && getWidget<CheckBoxWidget>("glow")->getState();
 
         UserConfigParams::m_bloom =
-            getWidget<CheckBoxWidget>("bloom")->getState();
+            advanced_pipeline && getWidget<CheckBoxWidget>("bloom")->getState();
 
         UserConfigParams::m_texture_compression =
             getWidget<CheckBoxWidget>("texture_compression")->getState();
+
+        UserConfigParams::m_graphical_effects =
+            getWidget<CheckBoxWidget>("anim_gfx")->getState();
+
+        UserConfigParams::m_weather_effects =
+            getWidget<CheckBoxWidget>("weather_gfx")->getState();
+
+        UserConfigParams::m_ubo_disabled =
+            !getWidget<CheckBoxWidget>("ubo")->getState();
+
+        UserConfigParams::m_high_definition_textures =
+            getWidget<CheckBoxWidget>("hd-textures")->getState();
+
+        UserConfigParams::m_show_steering_animations =
+            getWidget<SpinnerWidget>("steering_animations")->getValue();
 
         switch (getWidget<SpinnerWidget>("filtering")->getValue())
         {

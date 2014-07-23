@@ -206,12 +206,21 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
 {
     if (name == "options_choice")
     {
-        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER).c_str();
+        std::string selection = ((RibbonWidget*)widget)->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (selection == "tab_audio") StateManager::get()->replaceTopMostScreen(OptionsScreenAudio::getInstance());
-        else if (selection == "tab_video") StateManager::get()->replaceTopMostScreen(OptionsScreenVideo::getInstance());
-        else if (selection == "tab_players") StateManager::get()->replaceTopMostScreen(TabbedUserScreen::getInstance());
-        else if (selection == "tab_controls") StateManager::get()->replaceTopMostScreen(OptionsScreenInput::getInstance());
+        Screen *screen = NULL;
+        if (selection == "tab_audio")
+            screen = OptionsScreenAudio::getInstance();
+        else if (selection == "tab_video")
+            screen = OptionsScreenVideo::getInstance();
+        else if (selection == "tab_players")
+            screen = TabbedUserScreen::getInstance();
+        else if (selection == "tab_controls")
+            screen = OptionsScreenInput::getInstance();
+        //else if (selection == "tab_ui")
+        //    screen = OptionsScreenUI::getInstance();
+        if(screen)
+            StateManager::get()->replaceTopMostScreen(screen);
     }
     else if(name == "back")
     {

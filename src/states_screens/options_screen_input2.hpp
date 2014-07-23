@@ -25,7 +25,7 @@
 #include "guiengine/screen.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
 
-namespace GUIEngine { class Widget; }
+namespace GUIEngine { class Widget; class ListWidget; }
 class DeviceConfig;
 namespace irr { namespace gui { class STKModifiedSpriteBank; } }
 
@@ -50,8 +50,15 @@ class OptionsScreenInput2 : public GUIEngine::Screen,
 
     DeviceConfig* m_config;
 
-    irr::core::stringw makeLabel(const irr::core::stringw &translatedName,
-                                 PlayerAction action) const;
+    void renameRow(GUIEngine::ListWidget* actions,
+        int idRow,
+        const irr::core::stringw &translatedName,
+        PlayerAction action) const;
+
+    void addListItem(GUIEngine::ListWidget* actions, PlayerAction pa);
+    void addListItemSubheader(GUIEngine::ListWidget* actions,
+        const char* id,
+        const core::stringw& text);
 
 public:
     friend class GUIEngine::ScreenSingleton<OptionsScreenInput2>;
@@ -84,6 +91,8 @@ public:
 
     /** \brief Implement IConfirmDialogListener callback */
     virtual void onConfirm() OVERRIDE;
+
+    virtual void beforeAddingWidget() OVERRIDE;
 };
 
 #endif

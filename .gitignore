@@ -6,12 +6,15 @@ build-win/
 cmake_build/
 dependencies/
 CMakeFiles/
+stk-editor/
 
 .config/
 supertuxkart-64
 
+data/editor
 data/karts
 data/library
+data/models
 data/music
 data/sfx
 data/textures
