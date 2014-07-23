@@ -331,13 +331,9 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         }
 
         if(!props)
-        {
-            fprintf(stderr,
-                    "[KartSelectionScreen] WARNING: Can't find default "
-                    "kart '%s' nor any other kart.\n",
-                    default_kart.c_str());
-            exit(-1);
-        }
+            Log::fatal("KartSelectionScreen", "Can't find default "
+                       "kart '%s' nor any other kart.",
+                       default_kart.c_str());
     }
     m_kartInternalName = props->getIdent();
 
@@ -423,14 +419,12 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
     if (StateManager::get()->getActivePlayer(newPlayerID)
             != m_associated_player)
     {
-        Log::warn("[KartSelectionScreen]",  "Internal "
-                  "inconsistency, PlayerKartWidget has IDs and "
-                  "pointers that do not correspond to one player");
-        fprintf(stderr,
-                "    Player: %p  -  Index: %d  -  m_associated_player: %p\n",
-                StateManager::get()->getActivePlayer(newPlayerID),
-                newPlayerID, m_associated_player);
-        assert(false);
+        Log::error("KartSelectionScreen",  "Internal "
+                   "inconsistency, PlayerKartWidget has IDs and "
+                   "pointers that do not correspond to one player");
+        Log::fatal("KartSelectionScreen", "    Player: %p  -  Index: %d  -  m_associated_player: %p",
+                   StateManager::get()->getActivePlayer(newPlayerID),
+                   newPlayerID, m_associated_player);
     }
 
     // Remove current focus, but rembmer it
@@ -1612,11 +1606,9 @@ void KartSelectionScreen::updateKartWidgetModel(uint8_t widget_id,
             ->setText( selectionText.c_str(), false );
         }
         else
-        {
-            fprintf(stderr, "[KartSelectionScreen] WARNING: could not "
-                    "find a kart named '%s'\n",
-                    selection.c_str());
-        }
+            Log::warn("KartSelectionScreen", "could not "
+                      "find a kart named '%s'",
+                      selection.c_str());
     }
 }
 

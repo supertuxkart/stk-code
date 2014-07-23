@@ -213,7 +213,7 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
             Log::warn("GrandPrixLose", "A kart named '%s' could not be found\n",
                       ident_arg[n].c_str());
             m_kart_node[n] = NULL;
-        }// if kart !=NULL
+        } // if kart != NULL
     }
 }   // setKarts
 

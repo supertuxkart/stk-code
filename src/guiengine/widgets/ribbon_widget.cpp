@@ -115,8 +115,8 @@ void RibbonWidget::add()
         if (m_active_children[i].m_type != WTYPE_ICON_BUTTON &&
             m_active_children[i].m_type != WTYPE_BUTTON)
         {
-            fprintf(stderr, "/!\\ Warning /!\\ : ribbon widgets can only have "
-                            "(icon)button widgets as children\n");
+            Log::warn("RiggonWidget", "Ribbon widgets can only have "
+                            "(icon)button widgets as children");
             continue;
         }
 
@@ -275,7 +275,7 @@ void RibbonWidget::add()
             }
             else
             {
-                fprintf(stderr, "Invalid tab bar contents\n");
+                Log::error("RibbonWidget", "Invalid tab bar contents");
             }
 
             m_active_children[i].m_element = subbtn;
@@ -375,8 +375,7 @@ void RibbonWidget::add()
         }
         else
         {
-            fprintf(stderr,
-                    "/!\\ Warning /!\\ : Invalid contents type in ribbon\n");
+            Log::warn("RiggonWidget", "Invalid contents type in ribbon");
         }
 
 

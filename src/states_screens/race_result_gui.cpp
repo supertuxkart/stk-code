@@ -297,9 +297,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
             }
             return;
         }
-        fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n",
-                name.c_str());
-        assert(false);
+        Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+                   name.c_str());
     }
 
     // If we're playing online :
@@ -342,11 +341,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
                               MessageDialog::MESSAGE_DIALOG_CONFIRM, this, false);
         }
         else if (!getWidget(name.c_str())->isVisible())
-        {
-            fprintf(stderr, "Incorrect event '%s' when things are unlocked.\n",
-                            name.c_str());
-            assert(false);
-        }
+            Log::fatal("RaceResultGUI", "Incorrect event '%s' when things are unlocked.",
+                       name.c_str());
         return;
     }
 
@@ -387,10 +383,8 @@ void RaceResultGUI::eventCallback(GUIEngine::Widget* widget,
         }
     }
     else
-    {
-        fprintf(stderr, "Incorrect event '%s' for normal race.\n",
-                name.c_str());
-    }
+        Log::fatal("RaceResultGUI", "Incorrect event '%s' for normal race.",
+                   name.c_str());
     return;
 }   // eventCallback
 
@@ -615,8 +609,8 @@ void RaceResultGUI::onUpdate(float dt)
         }
         catch (std::exception& e)
         {
-            fprintf(stderr, "[RaceResultGUI] WARNING: exception caught when "
-                            "trying to load music: %s\n", e.what());
+            Log::error("RaceResultGUI", "Exception caught when "
+                       "trying to load music: %s", e.what());
         }
     }
 }   // onUpdate
