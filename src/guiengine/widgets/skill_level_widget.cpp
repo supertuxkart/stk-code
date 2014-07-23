@@ -148,7 +148,7 @@ void SkillLevelWidget::setSize(const int x, const int y, const int w, const int 
 
 void SkillLevelWidget::setValue(const int value)
 {
-    m_bar->setValue(value);
+    m_bar->moveValue(value);
 }
 
 // -----------------------------------------------------------------------------

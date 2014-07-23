@@ -76,7 +76,7 @@
        time for skidmarks to fade out. -->
   <skid-marks max-number="100"  fadeout-time="60"/>   
  
-  <!-- Defines when the upright constraint should be acctive, it's
+  <!-- Defines when the upright constraint should be active, it's
        disabled when the kart is more than this value from the track. -->
   <near-ground distance="2"/> 
 
@@ -149,7 +149,7 @@
     <!-- Camera: Distance between kart and camera. 
          forward-up-angle: Angle between camera and plane of kart (pitch) 
                  when the camera is pointing forward
-         backward-up-angke: Angle between camera and plane of kart (pitch)
+         backward-up-angle: Angle between camera and plane of kart (pitch)
                  when the camera is pointing backwards. This is usually 
                  larger than the forward-up-angle, since the kart itself
                  otherwise obstricts too much of the view.  -->
@@ -334,6 +334,16 @@
                 skidding-threshold="2.0"
                 />
     </ai>
+
+    <!-- The per-player difficulties in multiplayer games.
+         These values are multiplied with the current values of a car. (except ai) -->
+    <difficulties>
+        <easiest power="4.0"  max-speed="4.0"  ai="-2"/>
+        <easier  power="2.0"  max-speed="2.0"  ai="-1"/>
+        <normal  power="1.0"  max-speed="1.0"  ai="0"/>
+        <harder  power="0.5"  max-speed="0.5"  ai="+1"/>
+        <hardest power="0.25" max-speed="0.25" ai="+2"/>
+    </difficulties>
 	
     <!-- Suspension related values. stiffness: kart's suspension stiffness.
          rest: Length of suspension when at rest. 

@@ -234,6 +234,13 @@ public:
                           DIFFICULTY_LAST = DIFFICULTY_BEST,
                           DIFFICULTY_COUNT};
 
+    /** Game difficulty. */
+    enum PerPlayerDifficulty { PLAYER_DIFFICULTY_EASIEST,
+                               PLAYER_DIFFICULTY_EASY,
+                               PLAYER_DIFFICULTY_NORMAL,
+                               PLAYER_DIFFICULTY_HARD,
+                               PLAYER_DIFFICULTY_HARDEST };
+
     /** Different kart types: A local player, a player connected via network,
      *  an AI kart, the leader kart (currently not used), a ghost kart. */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER,
@@ -522,6 +529,21 @@ public:
         }
         return "";
     }   // getDifficultyAsString
+    // ------------------------------------------------------------------------
+    /** Returns the specified difficulty as a string. */
+    std::string getPerPlayerDifficultyAsString(PerPlayerDifficulty diff) const
+    {
+        switch(diff)
+        {
+        case RaceManager::PLAYER_DIFFICULTY_EASIEST: return "easiest"; break;
+        case RaceManager::PLAYER_DIFFICULTY_EASY:    return "easy";    break;
+        case RaceManager::PLAYER_DIFFICULTY_NORMAL:  return "normal";  break;
+        case RaceManager::PLAYER_DIFFICULTY_HARD:    return "hard";    break;
+        case RaceManager::PLAYER_DIFFICULTY_HARDEST: return "hardest"; break;
+        default:  assert(false);
+        }
+        return "";
+    }   // getPerPlayerDifficultyAsString
     // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
