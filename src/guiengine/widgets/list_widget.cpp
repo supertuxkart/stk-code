@@ -274,7 +274,7 @@ std::string ListWidget::getSelectionInternalName()
     int selectionID = getSelectionID();
     if (selectionID == -1 || selectionID >= (int)list->getItemCount())
         return "";
-    CGUISTKListBox::ListItem& item = list->getItem(selectionID);
+    const CGUISTKListBox::ListItem& item = list->getItem(selectionID);
     return item.m_internal_name;
 }
 
