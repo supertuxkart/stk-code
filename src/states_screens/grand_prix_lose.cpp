@@ -35,6 +35,7 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -80,12 +81,6 @@ const float GARAGE_DOOR_OPEN_TIME = 6.0f;
 const int MAX_KART_COUNT = 4;
 
 DEFINE_SCREEN_SINGLETON( GrandPrixLose );
-
-// -------------------------------------------------------------------------------------
-
-GrandPrixLose::GrandPrixLose() : CutsceneScreen("grand_prix_lose.stkgui")
-{
-}   // GrandPrixLose
 
 // -------------------------------------------------------------------------------------
 

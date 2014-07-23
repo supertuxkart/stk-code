@@ -22,6 +22,7 @@
 #include "audio/sfx_base.hpp"
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
+#include "states_screens/grand_prix_cutscene.hpp"
 
 namespace irr { namespace scene { class ISceneNode; class ICameraSceneNode; class ILightSceneNode; class IMeshSceneNode; } }
 namespace GUIEngine { class LabelWidget; }
@@ -32,7 +33,9 @@ class TrackObject;
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixWin : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<GrandPrixWin>
+class GrandPrixWin :
+    public GUIEngine::CutsceneScreen,
+    public GUIEngine::ScreenSingleton<GrandPrixWin>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixWin>;
 
@@ -56,7 +59,7 @@ class GrandPrixWin : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenS
     GUIEngine::LabelWidget* m_unlocked_label;
 
     int m_phase;
-    
+
     float m_kart_x[3], m_kart_y[3], m_kart_z[3];
     //float m_podium_x[3], m_podium_z[3];
     float m_kart_rotation[3];

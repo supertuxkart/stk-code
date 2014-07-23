@@ -21,6 +21,7 @@
 
 #include "guiengine/screen.hpp"
 #include "karts/kart_model.hpp"
+#include "states_screens/grand_prix_cutscene.hpp"
 
 #include <vector>
 #include <string>
@@ -33,11 +34,13 @@ class TrackObject;
   * \brief Screen shown at the end of a Grand Prix
   * \ingroup states_screens
   */
-class GrandPrixLose : public GUIEngine::CutsceneScreen, public GUIEngine::ScreenSingleton<GrandPrixLose>
+class GrandPrixLose :
+    public GrandPrixCutscene,
+    public GUIEngine::ScreenSingleton<GrandPrixLose>
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixLose>;
 
-    GrandPrixLose();
+    GrandPrixLose(): GrandPrixCutscene("grand_prix_lose.stkgui") {};
 
     /** Global evolution of time */
     float m_global_time;
@@ -52,11 +55,10 @@ class GrandPrixLose : public GUIEngine::CutsceneScreen, public GUIEngine::Screen
     float m_kart_x, m_kart_y, m_kart_z;
 
 public:
-
     virtual void onCutsceneEnd() OVERRIDE;
 
     virtual bool onEscapePressed() OVERRIDE;
-    
+
     /** \brief implement callback from parent class GUIEngine::Screen */
     virtual void loadedFromFile() OVERRIDE;
 

@@ -36,6 +36,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"

@@ -46,6 +46,7 @@
 #include "network/protocol_manager.hpp"
 #include "network/network_world.hpp"
 #include "network/protocols/start_game_protocol.hpp"
+#include "states_screens/grand_prix_cutscene.hpp"
 #include "states_screens/grand_prix_lose.hpp"
 #include "states_screens/grand_prix_win.hpp"
 #include "states_screens/kart_selection.hpp"
