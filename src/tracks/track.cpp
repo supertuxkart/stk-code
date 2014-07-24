@@ -135,6 +135,7 @@ Track::Track(const std::string &filename)
                               m_ident=="overworld";
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
+    m_default_number_of_laps= UserConfigParams::m_num_laps;
     m_all_nodes.clear();
     m_all_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
@@ -482,6 +483,7 @@ void Track::loadTrackInfo()
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
+    root->get("default-number-of-laps",&m_default_number_of_laps);
 
     // Make the default for auto-rescue in battle mode and soccer mode to be false
     if(m_is_arena || m_is_soccer)
