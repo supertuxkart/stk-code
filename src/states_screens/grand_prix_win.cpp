@@ -105,7 +105,9 @@ void GrandPrixWin::onCutsceneEnd()
 
 void GrandPrixWin::init()
 {
-    ((CutsceneWorld*)World::getWorld())->setParts({"gpwin"});
+    std::vector<std::string> parts;
+    parts.push_back("gpwin");
+    ((CutsceneWorld*)World::getWorld())->setParts(parts);
     CutsceneWorld::setUseDuration(false);
 
     Screen::init();

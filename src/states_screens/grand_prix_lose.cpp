@@ -112,7 +112,9 @@ void GrandPrixLose::loadedFromFile()
 
 void GrandPrixLose::init()
 {
-    ((CutsceneWorld*)World::getWorld())->setParts({"gplose"});
+    std::vector<std::string> parts;
+    parts.push_back("gplose");
+    ((CutsceneWorld*)World::getWorld())->setParts(parts);
     CutsceneWorld::setUseDuration(false);
 
     Screen::init();

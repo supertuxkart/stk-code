@@ -709,7 +709,9 @@ void RaceManager::exitRace(bool delete_world)
             {
                 Log::error("RaceManager", "There are no winners and no losers."
                            "This should have never happend\n");
-                scene->setKarts({UserConfigParams::m_default_kart});
+                std::vector<std::string> karts;
+                karts.push_back(UserConfigParams::m_default_kart);
+                scene->setKarts(karts);
             }
         }
     }
