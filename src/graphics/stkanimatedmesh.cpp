@@ -181,11 +181,11 @@ void STKAnimatedMesh::render()
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
                 ListBlendTransparentFog::Arguments.push_back(
-                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                    STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
                 ListAdditiveTransparentFog::Arguments.push_back(
-                    std::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
         }
         else
