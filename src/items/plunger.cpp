@@ -40,6 +40,8 @@ Plunger::Plunger(AbstractKart *kart)
 {
     const float gravity = 0.0f;
 
+    setDoTerrainInfo(false);
+
     float forward_offset = 0.5f*kart->getKartLength()+0.5f*m_extend.getZ();
     float up_velocity = 0.0f;
     float plunger_speed = 2 * m_speed;
@@ -71,8 +73,9 @@ Plunger::Plunger(AbstractKart *kart)
                                        &fire_angle, &up_velocity);
 
         btTransform trans = kart->getTrans();
-
-        trans.setRotation(btQuaternion(btVector3(0, 1, 0), fire_angle));
+        btQuaternion q;
+        q = trans.getRotation()*(btQuaternion(btVector3(0, 1, 0), fire_angle));
+        trans.setRotation(q);
 
         m_initial_velocity = btVector3(0.0f, up_velocity, plunger_speed);
 

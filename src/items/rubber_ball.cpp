@@ -357,15 +357,23 @@ bool RubberBall::updateAndDelete(float dt)
     // No need to check for terrain height if the ball is low to the ground
     if(height > 0.5f)
     {
-        float terrain_height = getMaxTerrainHeight(vertical_offset)
+        float tunnel_height = getTunnelHeight(next_xyz, vertical_offset)
                              - m_extend.getY();
-        if(height>terrain_height)
-            height = terrain_height;
+        // If the current height of ball (above terrain) is higher than the 
+        // tunnel height then set adjust max height and compute new height again.
+        // Else reset the max height.
+        if (height > tunnel_height)
+        {
+            m_max_height = tunnel_height;
+            height = updateHeight();
+        }
+        else
+            m_max_height = m_st_max_height[m_type];
     }
 
     if(UserConfigParams::logFlyable())
         Log::verbose("RubberBall", "newy2 %f gmth %f", height,
-                     getMaxTerrainHeight(vertical_offset));
+                     getTunnelHeight(next_xyz,vertical_offset));
 
     next_xyz = next_xyz + getNormal()*(height);
     m_previous_xyz = getXYZ();
@@ -419,24 +427,10 @@ void RubberBall::moveTowardsTarget(Vec3 *next_xyz, float dt)
         angle += 2*M_PI;
     else if(angle > M_PI)
         angle -= 2*M_PI;
-
+    // If ball is close to the target, then explode
     if (diff.length() < m_target->getKartLength()) 
         hit((AbstractKart*)m_target);
-    // If the angle is too large, adjust next xyz
-    /*
-    if(fabsf(angle)>m_st_target_max_angle*dt)
-    {
-        core::vector2df old_2d(old_vec.getX(), old_vec.getZ());
-        if(old_2d.getLengthSQ()==0.0f) old_2d.Y = 1.0f;
-        old_2d.normalize();
-        old_2d.rotateBy(  RAD_TO_DEGREE * dt
-                                       * (angle > 0 ?  m_st_target_max_angle
-                                                    : -m_st_target_max_angle));
-        next_xyz->setX(getXYZ().getX() + old_2d.X*dt*m_speed);
-        next_xyz->setZ(getXYZ().getZ() + old_2d.Y*dt*m_speed);
-    }   // if fabsf(angle) > m_st_target_angle_max*dt
-    */
-    //*next_xyz -= getNormal()*m_previous_height;
+    
     assert(!isnan((*next_xyz)[0]));
     assert(!isnan((*next_xyz)[1]));
     assert(!isnan((*next_xyz)[2]));
@@ -599,15 +593,16 @@ float RubberBall::updateHeight()
  *  \returns The distance to the terrain element found by raycast in the up
               direction. If no terrain found, it returns 99990
  */
-float RubberBall::getMaxTerrainHeight(const Vec3 &vertical_offset) const
+float RubberBall::getTunnelHeight(const Vec3 &next_xyz, const float vertical_offset) const
 {
     const TriangleMesh &tm = World::getWorld()->getTrack()->getTriangleMesh();
-    Vec3 to(getXYZ() + 10000.0f*getNormal());
-     Vec3 hit_point;
+    Vec3 from(next_xyz + vertical_offset*getNormal());
+    Vec3 to(next_xyz + 10000.0f*getNormal());
+    Vec3 hit_point;
     const Material *material;
-    tm.castRay(getXYZ()+vertical_offset, to, &hit_point, &material);
+    tm.castRay(from, to, &hit_point, &material);
 
-    return (material) ? (hit_point - getXYZ()).length() : 99999.f;
+    return (material) ? (hit_point - next_xyz).length() : 99999.f;
 }   // getMaxTerrainHeight
 
 // ----------------------------------------------------------------------------

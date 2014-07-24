@@ -196,7 +196,8 @@ private:
     void         interpolate(Vec3 *next_xyz, float dt);
     void         moveTowardsTarget(Vec3 *next_xyz, float dt);
     void         initializeControlPoints(const Vec3 &xyz);
-    float        getMaxTerrainHeight(const Vec3 &vertical_offset) const;
+    float        getTunnelHeight(const Vec3 &next_xyz, 
+                                     const float vertical_offset) const;
     bool         checkTunneling();
 public:
                  RubberBall  (AbstractKart* kart);
