@@ -472,6 +472,7 @@ void Track::loadTrackInfo()
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
+    root->get("default-number-of-laps",&m_default_number_of_laps);
     root->get("push-back",             &m_enable_push_back);
     root->get("clouds",                &m_clouds);
     root->get("bloom",                 &m_bloom);
@@ -483,7 +484,6 @@ void Track::loadTrackInfo()
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
-    root->get("default-number-of-laps",&m_default_number_of_laps);
 
     // Make the default for auto-rescue in battle mode and soccer mode to be false
     if(m_is_arena || m_is_soccer)

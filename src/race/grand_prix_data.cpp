@@ -37,6 +37,9 @@
 
 
 // ----------------------------------------------------------------------------
+/** Loads a grand prix definition from a file.
+ *  \param filename Name of the file to load.
+ */
 GrandPrixData::GrandPrixData(const std::string& filename)
 {
     m_filename = filename;
@@ -44,18 +47,34 @@ GrandPrixData::GrandPrixData(const std::string& filename)
                                         StringUtils::removeExtension(filename));
     m_editable = (filename.find(file_manager->getGPDir(), 0) == 0);
     reload();
-}
+}   // GrandPrixData
 
 // ----------------------------------------------------------------------------
-GrandPrixData::GrandPrixData(const unsigned int number_of_tracks,
-                             const std::string&  track_group,
-                             const RandomGPInfoDialog::REVERSED use_reverse)
+/** Creates a random grand prix from the specified parameters.
+ *  \param number_of_tracks How many tracks to select.
+ *  \param track_group From which track group to select the tracks.
+ *  \param use_reverse How the reverse setting is to be determined.
+ *  \param new_tracks If true, new tracks are selected, otherwise existing
+ *         tracks will not be changed (used to e.g. increase the number of
+ *         tracks in an already existing random grand prix).
+ * 
+ */
+void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
+                                   const std::string &track_group,
+                                   const GPReverseType use_reverse,
+                                   bool new_tracks)
 {
     m_filename = "Random GP - Not loaded from a file!";
     m_id       = "random";
     m_name     = "Random Grand Prix";
     m_editable = false;
 
+    if(new_tracks)
+    {
+        m_tracks.clear();
+        m_laps.clear();
+        m_reversed.clear();
+    }
     m_tracks.reserve(number_of_tracks);
     m_laps.reserve(number_of_tracks);
     m_reversed.reserve(number_of_tracks);
@@ -92,13 +111,14 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                          rand() % available_tracks :
                          track_indices[rand() % available_tracks];
 
-            std::string id = track_manager->getTrack(index)->getIdent();
+            const Track *track = track_manager->getTrack(index);
+            std::string id = track->getIdent();
             // Avoid duplicate tracks
             if (std::find(m_tracks.begin(), m_tracks.end(), id) != m_tracks.end())
                 continue;
 
             m_tracks.push_back(id);
-            m_laps.push_back(track_manager->getTrack(index)->getDefaultNumberOfLaps());
+            m_laps.push_back(track->getDefaultNumberOfLaps());
             m_reversed.push_back(false); // This will be changed later in the code
         }
     }
@@ -117,48 +137,64 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
 }
 
 // ----------------------------------------------------------------------------
-
-void GrandPrixData::changeReverse(const RandomGPInfoDialog::REVERSED use_reverse)
+/** Updates the GP data with newly decided reverse requirements.
+ *  \param use_reverse How reverse setting for each track is to be determined.
+ */
+void GrandPrixData::changeReverse(const GrandPrixData::GPReverseType use_reverse)
 {
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
-        if (use_reverse == RandomGPInfoDialog::NO_REVERSE)
+        if (use_reverse == GP_NO_REVERSE)
             m_reversed[i] = false;
-        else if (use_reverse == RandomGPInfoDialog::MIXED)
+        else if (use_reverse == GP_RANDOM_REVERSE)
             if (track_manager->getTrack(m_tracks[i])->reverseAvailable())
                 m_reversed[i] = (rand() % 2 != 0);
             else
                 m_reversed[i] = false;
         else // all reversed
             m_reversed[i] = track_manager->getTrack(m_tracks[i])->reverseAvailable();
-    }
-}
+    }   // for i < m_tracks.size()
+}   // changeReverse
 
 // ----------------------------------------------------------------------------
+/** Sets the id of this grand prix.
+ *  \param id The new id.
+ */
 void GrandPrixData::setId(const std::string& id)
 {
     m_id = id;
-}
+}   // setId
 
 // ----------------------------------------------------------------------------
+/** Sets the name of the grand prix.
+ *  \param name New name.
+ */
 void GrandPrixData::setName(const irr::core::stringw& name)
 {
     m_name = name;
-}
+}   // setName
 
 // ----------------------------------------------------------------------------
+/** Sets the filename of this grand prix.
+ *  \param filename New filename.
+ */
 void GrandPrixData::setFilename(const std::string& filename)
 {
     m_filename = filename;
-}
+}   // setFilename
 
 // ----------------------------------------------------------------------------
+/** Sets if this grand prix can be edited.
+ *  \param editable New value.
+ */
 void GrandPrixData::setEditable(const bool editable)
 {
     m_editable = editable;
-}
+}   // setEditable
 
 // ----------------------------------------------------------------------------
+/** Reloads grand prix from file.
+ */
 void GrandPrixData::reload()
 {
     m_tracks.clear();
@@ -270,6 +306,8 @@ void GrandPrixData::reload()
 }   // reload()
 
 // ----------------------------------------------------------------------------
+/** Saves the grand prix data to a file.
+ */
 bool GrandPrixData::writeToFile()
 {
     try
@@ -303,9 +341,12 @@ bool GrandPrixData::writeToFile()
                    m_filename.c_str(), e.what());
         return false;
     }
-}
+}   // writeToFile
 
 // ----------------------------------------------------------------------------
+/** Checks if the grand prix data are consistent.
+ *  \param log_error: If errors should be sent to the logger.
+ */
 bool GrandPrixData::checkConsistency(bool log_error) const
 {
     for (unsigned int i = 0; i < m_tracks.size(); i++)
@@ -323,8 +364,7 @@ bool GrandPrixData::checkConsistency(bool log_error) const
         }
     }
     return true;
-}
-
+}   // checkConsistency
 
 // ----------------------------------------------------------------------------
 /** Returns true if the track is available. This is used to test if Fort Magma
@@ -332,76 +372,99 @@ bool GrandPrixData::checkConsistency(bool log_error) const
  *  story mode, but will be available once all challenges are done and nolok
  *  is unlocked). It also prevents people from using the grand prix editor as
  *  a way to play tracks that still haven't been unlocked
+ *  \param id Name of the track to test.
+ *  \param include_locked If set to true, all tracks (including locked tracks)
+ *         are considered to be available.
  */
 bool GrandPrixData::isTrackAvailable(const std::string &id,
-                                     bool includeLocked     ) const
+                                     bool include_locked     ) const
 {
-    if (includeLocked)
+    if (include_locked)
         return true;
     else if (id == "fortmagma")
         return !PlayerManager::getCurrentPlayer()->isLocked("fortmagma");
     else
         return (!m_editable ||
                 !PlayerManager::get()->getCurrentPlayer()->isLocked(id));
-}
+}   // isTrackAvailable
 
 // ----------------------------------------------------------------------------
-std::vector<std::string> GrandPrixData::getTrackNames(bool includeLocked) const
+/** Returns the list of tracks that is available (i.e. unlocked) of this
+ *   grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ *  \return A copy of the list of available tracks in this grand prix.
+ */
+std::vector<std::string> GrandPrixData::getTrackNames(bool include_locked) const
 {
     std::vector<std::string> names;
     for (unsigned int i = 0; i < m_tracks.size(); i++)
     {
-        if(isTrackAvailable(m_tracks[i], includeLocked))
+        if(isTrackAvailable(m_tracks[i], include_locked))
             names.push_back(m_tracks[i]);
     }
     return names;
-}
+}   // getTrackNames
 
 // ----------------------------------------------------------------------------
-std::vector<int> GrandPrixData::getLaps(bool includeLocked) const
+/** Returns the laps for each available track of the grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ *  \return a std::vector containing the laps for each grand prix.
+ */
+std::vector<int> GrandPrixData::getLaps(bool include_locked) const
 {
     std::vector<int> laps;
     for (unsigned int i = 0; i< m_tracks.size(); i++)
-        if(isTrackAvailable(m_tracks[i], includeLocked))
+        if(isTrackAvailable(m_tracks[i], include_locked))
             laps.push_back(m_laps[i]);
 
     return laps;
-}
+}   // getLaps
 
 // ----------------------------------------------------------------------------
-std::vector<bool> GrandPrixData::getReverse(bool includeLocked) const
+/** Returns the reverse setting for each available grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ *  \return A copy of alist with the reverse status for each track.
+ */
+std::vector<bool> GrandPrixData::getReverse(bool include_locked) const
 {
     std::vector<bool> reverse;
     for (unsigned int i = 0; i< m_tracks.size(); i++)
-        if(isTrackAvailable(m_tracks[i], includeLocked))
+        if(isTrackAvailable(m_tracks[i], include_locked))
             reverse.push_back(m_reversed[i]);
 
     return reverse;
-}
+}   // getReverse
 
 // ----------------------------------------------------------------------------
+/** Returns true if this grand prix can be edited.
+ */
 bool GrandPrixData::isEditable() const
 {
     return m_editable;
-}
+}   // isEditable
 
 // ----------------------------------------------------------------------------
+/** Returns the number of tracks in this grand prix.
+ *  \param include_locked If data for locked tracks should be included or not.
+ */
 unsigned int GrandPrixData::getNumberOfTracks(bool includeLocked) const
 {
     if (includeLocked)
         return m_tracks.size();
     else
         return getTrackNames(false).size();
-}
+}   // getNumberOfTracks
 
 // ----------------------------------------------------------------------------
+/** Returns the (translated) name of the track with the specified index.
+ */
 irr::core::stringw GrandPrixData::getTrackName(const unsigned int track) const
 {
     assert(track < getNumberOfTracks(true));
     Track* t = track_manager->getTrack(m_tracks[track]);
     assert(t != NULL);
     return t->getName();
-}
+}   // getTrackName
 
 // ----------------------------------------------------------------------------
 const std::string& GrandPrixData::getTrackId(const unsigned int track) const

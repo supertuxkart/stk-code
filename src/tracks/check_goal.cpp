@@ -72,8 +72,8 @@ void CheckGoal::update(float dt)
         if(isTriggered(m_previous_position[ball_index], xyz, ball_index))
         {
             if(UserConfigParams::m_check_debug)
-                printf("CHECK: Goal check structure %d triggered for object %s.\n",
-                       m_index, obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getDebugName());
+                Log::info("CheckGoal", "Goal check structure %d triggered for object %s.",
+                          m_index, obj->getPresentation<TrackObjectPresentationMesh>()->getNode()->getDebugName());
             trigger(ball_index);
         }
         m_previous_position[ball_index] = xyz;

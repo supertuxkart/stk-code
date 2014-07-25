@@ -11,8 +11,7 @@ class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode
 {
 protected:
     bool firstTime;
-    PtrVector<GLMesh, REF> GeometricMesh[FPSM_COUNT];
-    PtrVector<GLMesh, REF> ShadedMesh[SM_COUNT];
+    PtrVector<GLMesh, REF> MeshSolidMaterial[MAT_COUNT];
     PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;

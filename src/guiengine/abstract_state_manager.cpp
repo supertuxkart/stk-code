@@ -140,6 +140,9 @@ void AbstractStateManager::pushScreen(Screen* screen)
 
 void AbstractStateManager::replaceTopMostScreen(Screen* screen, GUIEngine::GameState gameState)
 {
+    if (gameState == GUIEngine::CURRENT)
+        gameState = getGameState();
+
     //assert(m_game_mode != GAME);
     // you need to close any dialog before calling this
     assert(!ModalDialog::isADialogActive());
