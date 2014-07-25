@@ -2037,23 +2037,25 @@ void Kart::updatePhysics(float dt)
     // that the kart rotates in mid-air and lands on its side.
     if(m_vehicle->getNumWheelsOnGround()==0)
     {
-        btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
-        btVector3 terrain_up = m_body->getGravity();
-        float g = World::getWorld()->getTrack()->getGravity();
-        // Normalize the gravity, g is the length of the vector
-        btVector3 new_up = 0.9f * kart_up + 0.1f * terrain_up/-g;
-        // Get the rotation (hpr) based on current heading.
-        Vec3 rotation(getHeading(), new_up);
-        btMatrix3x3 m;
-        m.setEulerZYX(rotation.getX(), rotation.getY(), rotation.getZ());
-        // We can't use getXYZ() for the position here, since the position is
-        // based on interpolation, while the actual center-of-mass-transform
-        // is based on the actual value every 1/60 of a second (using getXYZ()
-        // would result in the kart being pushed ahead a bit, making it jump
-        // much further, depending on fps)
-        btTransform new_trans(m, m_body->getCenterOfMassTransform().getOrigin());
-        //setTrans(new_trans);
-        m_body->setCenterOfMassTransform(new_trans);
+        Vec3 diff = getXYZ() - getTerrainInfo()->getHitPoint();
+        float height = diff.dot(getNormal());
+        if(height>0.5f)
+        {
+            btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
+            btVector3 new_up = 0.9f * kart_up + 0.1f * getNormal();
+            // Get the rotation (hpr) based on current heading.
+            Vec3 rotation(getHeading(), new_up);
+            btMatrix3x3 m;
+            m.setEulerZYX(rotation.getX(), rotation.getY(), rotation.getZ());
+            // We can't use getXYZ() for the position here, since the position is
+            // based on interpolation, while the actual center-of-mass-transform
+            // is based on the actual value every 1/60 of a second (using getXYZ()
+            // would result in the kart being pushed ahead a bit, making it jump
+            // much further, depending on fps)
+            btTransform new_trans(m, m_body->getCenterOfMassTransform().getOrigin());
+            //setTrans(new_trans);
+            m_body->setCenterOfMassTransform(new_trans);
+        }
     }
 
     // To avoid tunneling (which can happen on long falls), clamp the
