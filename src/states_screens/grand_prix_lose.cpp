@@ -85,7 +85,7 @@ DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
 void GrandPrixLose::onCutsceneEnd()
 {
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 4; i++)
     {
         if (m_kart_node[i] != NULL)
             m_kart_node[i]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
