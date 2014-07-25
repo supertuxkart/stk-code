@@ -236,6 +236,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
     const bool reverse_track = m_checkbox == NULL ? false
                                                   : m_checkbox->getState();
+    track_manager->getTrack(m_track_ident)->setDefaultNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
     // Disable accidentally unlocking of a challenge

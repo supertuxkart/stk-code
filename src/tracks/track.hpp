@@ -616,9 +616,10 @@ public:
 
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
 
-    float getDisplacementSpeed() const { return m_displacement_speed; }
-    float getCausticsSpeed() const { return m_caustics_speed; }
-    const int getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
+    float getDisplacementSpeed()   const { return m_displacement_speed;    }
+    float getCausticsSpeed()       const { return m_caustics_speed;        }
+    int   getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
+    void  setDefaultNumberOfLaps(unsigned int laps) { m_default_number_of_laps = laps;}
     bool operator<(const Track &other) const;
 };   // class Track
 
