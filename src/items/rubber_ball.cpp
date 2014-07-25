@@ -67,7 +67,7 @@ RubberBall::RubberBall(AbstractKart *kart)
 
     createPhysics(forw_offset, btVector3(0.0f, 0.0f, m_speed*2),
                   new btSphereShape(0.5f*m_extend.getY()), -70.0f,
-                  btVector3(.0f,-70.0f,.0f) /*gravity*/,
+                  btVector3(.0f,.0f,.0f) /*gravity*/,
                   true /*rotates*/);
 
     // Do not adjust the up velocity
@@ -97,7 +97,8 @@ RubberBall::RubberBall(AbstractKart *kart)
 
     // initialises the current graph node
     TrackSector::update(getXYZ());
-    TerrainInfo::update(getXYZ());
+    Vec3 normal = QuadGraph::get()->getQuadOfNode(getCurrentGraphNode()).getNormal();
+    TerrainInfo::update(getXYZ(), -normal);
     initializeControlPoints(m_owner->getXYZ());
 
 }   // RubberBall
@@ -302,7 +303,7 @@ void RubberBall::init(const XMLNode &node, scene::IMesh *rubberball)
  */
 bool RubberBall::updateAndDelete(float dt)
 {
-    LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
+     LinearWorld *world = dynamic_cast<LinearWorld*>(World::getWorld());
     // FIXME: what does the rubber ball do in case of battle mode??
     if(!world) return true;
 
