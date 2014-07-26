@@ -24,7 +24,7 @@
 // btAlignedObjectArray to enable bullet SSE optimisations.
 // On the other hand, std::vector gives much better debugging features.
 // So SSE is disabled in bullet on windows debug
-#if !defined(DEBUG) && (WIN32)
+#if !defined(DEBUG) && defined(WIN32)
 #  undef USE_ALIGNED
 #else
 #  undef  USE_ALIGNED

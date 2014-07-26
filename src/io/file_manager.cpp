@@ -723,7 +723,7 @@ void FileManager::checkAndCreateConfigDir()
             if(!checkAndCreateDirectory(m_user_config_dir))
             {
                 Log::error("[FileManager]", "Can't create config dir '%s"
-                            ", falling back to '.'.", m_user_config_dir);
+                            ", falling back to '.'.", m_user_config_dir.c_str());
                 m_user_config_dir = ".";
             }
         }

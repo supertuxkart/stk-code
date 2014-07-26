@@ -3,7 +3,7 @@
  *  so we define the work arounds only for compiler versions before 18.00
  */
 
-#if defined(WIN32) && _MSC_VER < 1800
+#if defined(WIN32) && defined(_MSC_VER) && _MSC_VER < 1800
 #  include <math.h>
 
 #  define isnan _isnan
