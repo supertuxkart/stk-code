@@ -394,8 +394,8 @@ namespace irr
 		XF86VidModeModeInfo oldVideoMode;
 		#endif
 		#ifdef _IRR_LINUX_X11_RANDR_
-		SizeID oldRandrMode;
-		Rotation oldRandrRotation;
+		int xrandr_output;
+		RRMode old_mode;
 		#endif
 		#ifdef _IRR_COMPILE_WITH_OPENGL_
 		GLXWindow glxWin;
