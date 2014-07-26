@@ -14,6 +14,65 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+
+/**
+\page shaders_overview Shaders Overview
+
+ \section shader_declaration Shader declaration
+ You need to create a class for each shader in shaders.cpp
+ This class should inherit from the template ShaderHelper<>.
+ The template first parameter is the shader class being declared and the following ones are the types
+ of every uniform (except samplers) required by the shaders.
+
+ The template inheritance will provide the shader with a setUniforms() variadic function which calls
+ the glUniform*() that pass uniforms value to the shader according to the type given as parameter
+ to the template.
+
+ The class constructor is used to
+ \li \ref shader_declaration_compile
+ \li \ref shader_declaration_uniform_names
+ \li \ref shader_declaration_bind_texture_unit
+
+ Of course it's possible to use the constructor to declare others things if needed.
+
+ \subsection shader_declaration_compile Compile the shader
+
+ The LoadProgram() function is provided to ease shader compilation and link.
+
+ \subsection shader_declaration_uniform_names Declare uniforms
+
+ \subsection shader_declaration_bind_texture_unit Bind texture unit and name
+
+ \section shader_usage
+
+ Shader's class are singleton that can be retrieved using ShaderClassName::getInstance() which automatically
+ creates an instance the first time it is called.
+
+ As the program id of a shader instance is public it can be used to bind a program :
+ \code
+ glUseProgram(MyShaderClass::getInstance()->Program);
+ \endcode
+
+ To set uniforms use the automatically generated function setUniforms:
+
+ \code
+ MyShaderClass::getInstance()->setUniforms(Args...)
+ \endcode
+
+ A Vertex Array must be bound (VAO creation process is currently left to the reader) :
+
+ \code
+ glBindVertexAttrib(vao);
+ \endcode
+
+ To actually perform the rendering you also need to call a glDraw* function (left to the reader as well) :
+
+ \code
+ glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_SHORT);
+ \endcode
+
+*/
+
 #define SHADER_NAMES
 
 #include "graphics/callbacks.hpp"
