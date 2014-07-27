@@ -259,7 +259,6 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 	
 			if (s != Success) 
 			{
-				printf("XRRSetCrtcConfig failed\n");
 				return false;
 			}
 		}
@@ -338,35 +337,24 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 
 		if (!res) 
 		{
-			printf("Couldn't get XRandR screen resources\n");
 			return false;
 		}
-		
-		printf("res->noutput %i \n", res->noutput);
-		printf("res->nmode %i \n", res->nmode);
-		
+
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, res->outputs[output_id]);
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
-
-		printf("wanted width: %i, wanted height: %i\n", Width, Height);
 
 		for (int i = 0; i < res->nmode; i++) 
 		{
 			const XRRModeInfo* info = &res->modes[i];
-			printf("mode %i, width: %i, height: %i\n", i, info->width, info->height);
 
 			if (bestMode == -1 && info->width == Width && info->height == Height)
 			{
-				printf("found info->width %i, info->height %i\n", info->width, info->height);
-				printf("output->nmode, %i\n", output->nmode);
-				
 				for (int j = 0; j < output->nmode; j++) 
 				{
 					if (res->modes[i].id != output->modes[j]) 
 						continue;
 						
 					bestMode = i;
-					printf("Found best mode: %i, width: %i, height: %i\n", bestMode, info->width, info->height);
 					break;
 				}
 			}
@@ -384,7 +372,6 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 	
 			if (s != Success) 
 			{
-				printf("XRRSetCrtcConfig failed\n");
 				return false;
 			}
 	
@@ -1549,14 +1536,11 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				
 				if (!res) 
 				{
-					printf("Couldn't get XRandR screen resources\n");
 					return NULL;
 				}
 				
 				XRROutputInfo *output = NULL;
 				XRRCrtcInfo* crtc = NULL;
-				printf("res->noutput %i \n", res->noutput);
-				printf("res->nmode %i \n", res->nmode);
 		
 				for (int i = 0; i < res->noutput; i++) 
 				{
@@ -1565,30 +1549,24 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					if (!output || !output->crtc || output->connection == RR_Disconnected) 
 					{
 						XRRFreeOutputInfo(output);
-						printf("disconnected\n");
 						continue;
 					}
 		
 					crtc = XRRGetCrtcInfo(display, res, output->crtc);
-					printf("crtc->x %i\n", crtc->x);
-					printf("crtc->y %i\n", crtc->y);
 		
 					if (!crtc || crtc->x != 0 || crtc->y != 0) 
 					{
 						XRRFreeCrtcInfo(crtc);
 						XRRFreeOutputInfo(output);
-						printf("not crtc\n");
 						continue;
 					}
 		
 					output_id = i;
-					printf("found\n");
 					break;
 				}
 				
 				if (crtc == NULL)
 				{
-					printf("error. crtc not found\n");
 					XRRFreeCrtcInfo(crtc);
 					XRRFreeOutputInfo(output);	
 					XRRFreeScreenResources(res);
@@ -1598,24 +1576,19 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				for (int i = 0; i < res->nmode; i++) 
 				{
 					const XRRModeInfo *mode = &res->modes[i];
-					printf("mode %i, width: %i, height: %i\n", i, mode->width, mode->height);
 		
 					for (int j = 0; j < output->nmode; j++) 
 					{
 						if (res->modes[i].id == output->modes[j]) 
 						{
 							VideoModeList.addMode(core::dimension2d<u32>(
-								mode->width, mode->height), defaultDepth);
-								
-							printf("Found mode: %i, width: %i, height: %i\n", i, mode->width, mode->height);
+									mode->width, mode->height), defaultDepth);
 						}
 						
 						if (res->modes[i].id == crtc->mode)
 						{
 							old_mode = i;
-							
 							VideoModeList.setDesktop(defaultDepth, core::dimension2d<u32>(mode->width, mode->height));
-							printf("current resolution, width: %i, height: %i\n", mode->width, mode->height);
 						}
 					}
 				}			
