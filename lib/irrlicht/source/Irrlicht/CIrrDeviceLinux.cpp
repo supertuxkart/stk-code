@@ -1,4 +1,5 @@
 // Copyright (C) 2002-2012 Nikolaus Gebhardt
+// Copyright (C) 2014 Dawid Gan
 // This file is part of the "Irrlicht Engine".
 // For conditions of distribution and use, see copyright notice in irrlicht.h
 
@@ -245,17 +246,21 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		if (UseXRandR && CreationParams.Fullscreen)
 		{
 			XRRScreenResources* res = XRRGetScreenResources (display, DefaultRootWindow(display));
-			XRROutputInfo* output_info = XRRGetOutputInfo(display, res, res->outputs[xrandr_output]);
-			XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output_info->crtc);				
+			XRROutputInfo* output = XRRGetOutputInfo(display, res, res->outputs[output_id]);
+			XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);				
 				
-			Status s = XRRSetCrtcConfig(display, res, output_info->crtc, CurrentTime, 
-									  crtc->x, crtc->y, old_mode, 
-									  crtc->rotation, &res->outputs[xrandr_output], 1);	
+			Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime, 
+									  crtc->x, crtc->y, res->modes[old_mode].id, 
+									  crtc->rotation, &res->outputs[output_id], 1);	
+									  
+			XRRFreeOutputInfo(output);
+			XRRFreeCrtcInfo(crtc);
+			XRRFreeScreenResources(res);
 	
 			if (s != Success) 
 			{
 				printf("XRRSetCrtcConfig failed\n");
-				return 0;
+				return false;
 			}
 		}
 		#endif
@@ -329,53 +334,62 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 	#ifdef _IRR_LINUX_X11_RANDR_
 	if (XRRQueryExtension(display, &eventbase, &errorbase))
 	{		
-		XRRScreenResources* res = XRRGetScreenResources (display, DefaultRootWindow(display));
-		printf("res->noutput %i \n", res->noutput);
-		printf("res->nmode %i \n", res->nmode);
-		
-		XRROutputInfo* output_info = XRRGetOutputInfo(display, res, res->outputs[xrandr_output]);
-		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output_info->crtc);
-		
+		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
+
 		if (!res) 
 		{
 			printf("Couldn't get XRandR screen resources\n");
-			return 0;
+			return false;
 		}
+		
+		printf("res->noutput %i \n", res->noutput);
+		printf("res->nmode %i \n", res->nmode);
+		
+		XRROutputInfo* output = XRRGetOutputInfo(display, res, res->outputs[output_id]);
+		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 
 		printf("wanted width: %i, wanted height: %i\n", Width, Height);
 
 		for (int i = 0; i < res->nmode; i++) 
 		{
-			const XRRModeInfo *info = &res->modes[i];
+			const XRRModeInfo* info = &res->modes[i];
 			printf("mode %i, width: %i, height: %i\n", i, info->width, info->height);
 
 			if (bestMode == -1 && info->width == Width && info->height == Height)
 			{
 				printf("found info->width %i, info->height %i\n", info->width, info->height);
-				printf("output_info->nmode, %i\n", output_info->nmode);
+				printf("output->nmode, %i\n", output->nmode);
 				
-				for (int j = 0; j < output_info->nmode; j++) 
+				for (int j = 0; j < output->nmode; j++) 
 				{
-					if (res->modes[i].id == output_info->modes[j]) 
-					{
-						bestMode = i;
-						printf("Found best mode: %i, width: %i, height: %i\n", bestMode, info->width, info->height);
-					}
+					if (res->modes[i].id != output->modes[j]) 
+						continue;
+						
+					bestMode = i;
+					printf("Found best mode: %i, width: %i, height: %i\n", bestMode, info->width, info->height);
+					break;
 				}
 			}
 		}
 
-		Status s = XRRSetCrtcConfig(display, res, output_info->crtc, CurrentTime, 
-								  crtc->x, crtc->y, res->modes[bestMode].id, 
-								  crtc->rotation, &res->outputs[xrandr_output], 1);	
-
-		if (s != Success) 
+		if (bestMode != -1)
 		{
-			printf("XRRSetCrtcConfig failed\n");
-			return 0;
+			Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
+								crtc->x, crtc->y, res->modes[bestMode].id,
+								crtc->rotation, &res->outputs[output_id], 1);
+								
+			XRRFreeCrtcInfo(crtc);								
+			XRRFreeOutputInfo(output);
+			XRRFreeScreenResources(res);	
+	
+			if (s != Success) 
+			{
+				printf("XRRSetCrtcConfig failed\n");
+				return false;
+			}
+	
+			UseXRandR=true;
 		}
-
-		UseXRandR=true;
 	}
 	else
 	#endif
@@ -1531,81 +1545,84 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			#ifdef _IRR_LINUX_X11_RANDR_
 			if (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
-				XRRScreenResources* res = XRRGetScreenResources (display, DefaultRootWindow(display));
-				XRROutputInfo *output_info = NULL;
-				XRRCrtcInfo* crtc = NULL;
-				printf("res->noutput %i \n", res->noutput);
-				printf("res->nmode %i \n", res->nmode);
+				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 				
 				if (!res) 
 				{
 					printf("Couldn't get XRandR screen resources\n");
-					return 0;
+					return NULL;
 				}
+				
+				XRROutputInfo *output = NULL;
+				XRRCrtcInfo* crtc = NULL;
+				printf("res->noutput %i \n", res->noutput);
+				printf("res->nmode %i \n", res->nmode);
 		
-				for (int output = 0; output < res->noutput; output++) 
+				for (int i = 0; i < res->noutput; i++) 
 				{
-					output_info = XRRGetOutputInfo(display, res, res->outputs[output]);
+					output = XRRGetOutputInfo(display, res, res->outputs[i]);
 					
-					if (!output_info || !output_info->crtc || output_info->connection == RR_Disconnected) 
+					if (!output || !output->crtc || output->connection == RR_Disconnected) 
 					{
-						XRRFreeOutputInfo(output_info);
+						XRRFreeOutputInfo(output);
 						printf("disconnected\n");
 						continue;
 					}
 		
-					crtc = XRRGetCrtcInfo(display, res, output_info->crtc);
+					crtc = XRRGetCrtcInfo(display, res, output->crtc);
 					printf("crtc->x %i\n", crtc->x);
 					printf("crtc->y %i\n", crtc->y);
 		
 					if (!crtc || crtc->x != 0 || crtc->y != 0) 
 					{
-						XRRFreeOutputInfo(output_info);
 						XRRFreeCrtcInfo(crtc);
+						XRRFreeOutputInfo(output);
 						printf("not crtc\n");
 						continue;
 					}
 		
-					xrandr_output = output;
+					output_id = i;
 					printf("found\n");
 					break;
 				}
 				
-				if (output_info == NULL)
+				if (crtc == NULL)
 				{
-					printf("error. output_info is null\n");
-					return 0;
+					printf("error. crtc not found\n");
+					XRRFreeCrtcInfo(crtc);
+					XRRFreeOutputInfo(output);	
+					XRRFreeScreenResources(res);
+					return NULL;
 				}
-						
-				printf("wanted width: %i, wanted height: %i\n", Width, Height);
-		
+
 				for (int i = 0; i < res->nmode; i++) 
 				{
-					const XRRModeInfo *info = &res->modes[i];
-					printf("mode %i, width: %i, height: %i\n", i, info->width, info->height);
+					const XRRModeInfo *mode = &res->modes[i];
+					printf("mode %i, width: %i, height: %i\n", i, mode->width, mode->height);
 		
-					for (int j = 0; j < output_info->nmode; j++) 
+					for (int j = 0; j < output->nmode; j++) 
 					{
-						if (res->modes[i].id == output_info->modes[j]) 
+						if (res->modes[i].id == output->modes[j]) 
 						{
 							VideoModeList.addMode(core::dimension2d<u32>(
-								info->width, info->height), defaultDepth);
+								mode->width, mode->height), defaultDepth);
 								
-							printf("Found best mode: %i, width: %i, height: %i\n", i, info->width, info->height);
+							printf("Found mode: %i, width: %i, height: %i\n", i, mode->width, mode->height);
 						}
 						
 						if (res->modes[i].id == crtc->mode)
 						{
-							old_mode = crtc->mode;
+							old_mode = i;
 							
-							VideoModeList.setDesktop(defaultDepth, core::dimension2d<u32>(info->width, info->height));
-							printf("current resolution, width: %i, height: %i\n", info->width, info->height);
+							VideoModeList.setDesktop(defaultDepth, core::dimension2d<u32>(mode->width, mode->height));
+							printf("current resolution, width: %i, height: %i\n", mode->width, mode->height);
 						}
 					}
 				}			
 				
 				XRRFreeCrtcInfo(crtc);
-				XRRFreeOutputInfo(output_info);		
+				XRRFreeOutputInfo(output);	
+				XRRFreeScreenResources(res);	
 			}
 			else
 			#endif
