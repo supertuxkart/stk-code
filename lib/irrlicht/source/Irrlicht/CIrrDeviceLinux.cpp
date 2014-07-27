@@ -245,6 +245,9 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		#ifdef _IRR_LINUX_X11_RANDR_
 		if (UseXRandR && CreationParams.Fullscreen)
 		{
+			if (old_mode == -1 || output_id == -1)
+				return false;
+
 			XRRScreenResources* res = XRRGetScreenResources (display, DefaultRootWindow(display));
 			XRROutputInfo* output = XRRGetOutputInfo(display, res, res->outputs[output_id]);
 			XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);				
@@ -332,7 +335,10 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 	#endif
 	#ifdef _IRR_LINUX_X11_RANDR_
 	if (XRRQueryExtension(display, &eventbase, &errorbase))
-	{		
+	{
+		if (output_id == -1)
+			return false;
+
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 
 		if (!res) 
@@ -1532,6 +1538,9 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			#ifdef _IRR_LINUX_X11_RANDR_
 			if (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
+				old_mode = -1;
+				output_id = -1;
+
 				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 				
 				if (!res) 
