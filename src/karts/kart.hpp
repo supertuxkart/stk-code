@@ -102,6 +102,10 @@ private:
     /** Current race position (1-num_karts). */
     int m_race_position;
 
+    /** The coordinates of the front of the kart, used to determine when a
+     *  new lap is triggered. */
+    Vec3 m_xyz_front;
+
     /** True if the kart is eliminated. */
     bool m_eliminated;
 
@@ -291,6 +295,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     virtual int    getPosition         () const { return m_race_position;    }
+    // ------------------------------------------------------------------------
+    /** Returns the coordinates of the front of the kart. This is used for
+     *  determining when the lap line is crossed. */
+    virtual const Vec3& getFrontXYZ() const { return m_xyz_front; }
     // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */
     virtual int    getInitialPosition  () const { return m_initial_position; }
