@@ -10,6 +10,7 @@
 #include "modes/world.hpp"
 #include "utils/helpers.hpp"
 #include "utils/tuple.hpp"
+#include "utils/cpp2011.hpp"
 
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,
@@ -187,18 +188,6 @@ void STKMeshSceneNode::OnRegisterSceneNode()
         SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
     else
         CMeshSceneNode::OnRegisterSceneNode();
-}
-
-template<typename T, typename... Args>
-static void
-pushVector(std::vector<T> &vec, Args ...args)
-{
-
-#if __cplusplus >= 201103 || _MSC_VER >=1800
-    vec.emplace_back(args...);
-#else
-    vec.push_back(T(args...));
-#endif
 }
 
 void STKMeshSceneNode::render()

@@ -8,6 +8,7 @@
 #include "tracks/track.hpp"
 #include "graphics/camera.hpp"
 #include "utils/profiler.hpp"
+#include "utils/cpp2011.hpp"
 
 using namespace irr;
 
@@ -141,16 +142,16 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
-            ListMatDefault::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
         for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
-            ListMatAlphaRef::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
         for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
-            ListMatDetails::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
 
         for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
-            ListMatUnlit::Arguments.emplace_back(mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
+            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -191,10 +192,10 @@ void STKAnimatedMesh::render()
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListBlendTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListAdditiveTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
         return;
     }
