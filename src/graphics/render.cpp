@@ -141,6 +141,9 @@ void IrrDriver::renderGLSL(float dt)
 
         const core::recti &viewport = camera->getViewport();
 
+        if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
+            irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
+
         unsigned plc = UpdateLightsInfo(camnode, dt);
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
