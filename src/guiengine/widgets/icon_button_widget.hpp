@@ -109,7 +109,7 @@ namespace GUIEngine
          */
         void setImage(const char* path_to_texture,
                       IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE);
-        
+        // --------------------------------------------------------------------        
         /** Convenience function taking std::string. */
         void setImage(const std::string &path_to_texture,
                       IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE)
@@ -117,6 +117,7 @@ namespace GUIEngine
             setImage(path_to_texture.c_str(), path_type);
         }
 
+        // --------------------------------------------------------------------
         /**
           * Change the texture used for this icon.
           * \pre At the moment, the new texture must have the same aspct ratio
@@ -126,16 +127,22 @@ namespace GUIEngine
           */
         void setImage(irr::video::ITexture* texture);
         
+        // --------------------------------------------------------------------
         void setHighlightedImage(irr::video::ITexture* texture)
         {
             m_highlight_texture = texture;
         }
         
+        // --------------------------------------------------------------------
         /** \brief override from base class */
         virtual EventPropagation focused(const int playerID);
         
+        // --------------------------------------------------------------------
         /** \brief override from base class */
         virtual void unfocused(const int playerID, Widget* new_focus);
+        // --------------------------------------------------------------------
+        /** Returns the texture of this button. */
+        const video::ITexture* getTexture() const { return m_texture; }
     };
 }
 

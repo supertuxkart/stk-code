@@ -216,3 +216,15 @@ bool Addon::filterByWords(const core::stringw words) const
     
     return false;
 } // filterByWords
+
+// ----------------------------------------------------------------------------
+/** Deletes the icon file of this addon, and marks it to be re-downloaded (next
+ *  time AddonsManager::downloadIcons() is called.
+ */
+void Addon::deleteInvalidIconFile()
+{
+    m_icon_ready = false;
+    std::string icon = file_manager->getAddonsFile("icons/"+m_icon_basename);
+    file_manager->removeFile(icon);
+    m_installed = false;
+}   // redownloadIcon

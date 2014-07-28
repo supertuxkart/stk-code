@@ -130,6 +130,8 @@ public:
          Addon() {};
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
+
+    void deleteInvalidIconFile();
     // ------------------------------------------------------------------------
     /** Sets the sort order used in the comparison function. It is static, so
      *  that each instance can access the sort order. */
