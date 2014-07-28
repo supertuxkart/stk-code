@@ -23,6 +23,7 @@
 #include "matrix4.h"
 #include "tracks/quad_graph.hpp"
 #include "tracks/quad_set.hpp"
+#include "utils/log.hpp"
 
 // ----------------------------------------------------------------------------
 /** Constructor. Saves the quad index which belongs to this graph node.

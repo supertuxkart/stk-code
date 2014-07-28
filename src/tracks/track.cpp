@@ -135,6 +135,7 @@ Track::Track(const std::string &filename)
                               m_ident=="overworld";
     m_minimap_x_scale       = 1.0f;
     m_minimap_y_scale       = 1.0f;
+    m_default_number_of_laps= 3;
     m_all_nodes.clear();
     m_all_physics_only_nodes.clear();
     m_all_cached_meshes.clear();
@@ -471,6 +472,7 @@ void Track::loadTrackInfo()
     root->get("groups",                &m_groups);
     root->get("internal",              &m_internal);
     root->get("reverse",               &m_reverse_available);
+    root->get("default-number-of-laps",&m_default_number_of_laps);
     root->get("push-back",             &m_enable_push_back);
     root->get("clouds",                &m_clouds);
     root->get("bloom",                 &m_bloom);

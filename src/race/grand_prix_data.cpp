@@ -111,14 +111,15 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                          rand() % available_tracks :
                          track_indices[rand() % available_tracks];
 
-            std::string id = track_manager->getTrack(index)->getIdent();
+            const Track *track = track_manager->getTrack(index);
+            std::string id = track->getIdent();
             // Avoid duplicate tracks
             if (std::find(m_tracks.begin(), m_tracks.end(), id) != m_tracks.end())
                 continue;
 
             m_tracks.push_back(id);
-            m_laps.push_back(3); // TODO: Take the default number from the track
-            m_reversed.push_back(false); // This will be changed later
+            m_laps.push_back(track->getDefaultNumberOfLaps());
+            m_reversed.push_back(false); // This will be changed later in the code
         }
     }
     else if (m_tracks.size() > number_of_tracks)

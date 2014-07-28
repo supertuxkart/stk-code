@@ -294,6 +294,13 @@ void AddonsLoading::onUpdate(float delta)
         const std::string icon = "icons/"+m_addon.getIconBasename();
         m_icon->setImage( file_manager->getAddonsFile(icon).c_str(),
                           IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE  );
+        // Check if there was an error displaying the icon. If so, the icon
+        // file is (likely) corrupt, and the file needs to be downloaded again.
+        std::string s = m_icon->getTexture()->getName().getPath().c_str();
+        if(StringUtils::getBasename(s)!=StringUtils::getBasename(icon))
+        {
+            m_addon.deleteInvalidIconFile();
+        }
         m_icon_shown = true;
     }
 }   // onUpdate

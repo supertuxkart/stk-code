@@ -6,9 +6,10 @@
 #include <IMaterialRenderer.h>
 #include "config/user_config.hpp"
 #include "graphics/callbacks.hpp"
-#include "utils/helpers.hpp"
 #include "graphics/camera.hpp"
 #include "modes/world.hpp"
+#include "utils/helpers.hpp"
+#include "utils/tuple.hpp"
 
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,

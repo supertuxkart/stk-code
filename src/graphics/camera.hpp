@@ -25,6 +25,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include "SColor.h"

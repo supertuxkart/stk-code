@@ -408,7 +408,8 @@ void Kart::reset()
         m_skidmarks->adjustFog(track->isFogEnabled() );
     }
 
-    m_terrain_info->update(getXYZ(), Vec3(0,-1,0));
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
     
 
     // Reset is also called when the kart is created, at which time
@@ -1200,6 +1201,9 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
+
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
 
     
     
