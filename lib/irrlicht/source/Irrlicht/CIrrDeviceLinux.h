@@ -394,8 +394,8 @@ namespace irr
 		XF86VidModeModeInfo oldVideoMode;
 		#endif
 		#ifdef _IRR_LINUX_X11_RANDR_
-		int output_id;
-		int old_mode;
+		RROutput output_id;
+		RRMode old_mode;
 		#endif
 		#ifdef _IRR_COMPILE_WITH_OPENGL_
 		GLXWindow glxWin;
