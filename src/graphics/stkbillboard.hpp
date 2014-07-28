@@ -4,7 +4,7 @@
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class STKBillboard : public irr::scene::CBillboardSceneNode
 {
