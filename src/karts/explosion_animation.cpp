@@ -76,7 +76,7 @@ ExplosionAnimation::ExplosionAnimation(AbstractKart *kart,
                   : AbstractKartAnimation(kart, "ExplosionAnimation")
  {
     m_xyz = m_kart->getXYZ();
-    m_orig_y = m_xyz.getY();
+    m_orig_xyz = m_xyz;
     m_kart->playCustomSFX(SFXManager::CUSTOM_EXPLODE);
     m_timer     = m_kart->getKartProperties()->getExplosionTime();
 
@@ -144,13 +144,13 @@ ExplosionAnimation::~ExplosionAnimation()
 void ExplosionAnimation::update(float dt)
 {
     m_velocity -= dt*World::getWorld()->getTrack()->getGravity();
-
-    m_xyz.setY(m_xyz.getY() + dt*m_velocity);
+    Vec3 normal = -1.0f*m_kart->getBody()->getGravity().normalized();
+    m_xyz = Vec3(m_xyz + dt*m_velocity*normal);
 
     // Make sure the kart does not end up under the track
-    if(m_xyz.getY()<m_orig_y)
+    if ((m_xyz - m_orig_xyz).dot(normal)<0)
     {
-        m_xyz.setY(m_orig_y);
+        m_xyz = m_orig_xyz;
         // This will trigger the end of the animations
         m_timer = -1;
     }

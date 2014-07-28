@@ -43,7 +43,7 @@ protected:
     /** The original Y coordinate. The kart needs to be restored accurately
      *  otherwise due to floating point errors, time step size variations,
      *  a kart can be restarted under the track. */
-    float m_orig_y;
+    Vec3 m_orig_xyz;
 
     /** The kart's current rotation. */
     Vec3 m_curr_rotation;
