@@ -34,11 +34,13 @@
  */
 AbstractKart::AbstractKart(const std::string& ident,
                            int world_kart_id, int position,
-                           const btTransform& init_transform)
+                           const btTransform& init_transform,
+                           const PlayerDifficulty *difficulty)
              : Moveable()
 {
     m_world_kart_id   = world_kart_id;
     m_kart_properties = kart_properties_manager->getKart(ident);
+    m_difficulty = difficulty;
     m_kart_animation  = NULL;
     assert(m_kart_properties != NULL);
 

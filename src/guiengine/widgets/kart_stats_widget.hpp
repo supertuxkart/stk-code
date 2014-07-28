@@ -37,26 +37,26 @@ namespace GUIEngine
       * \brief A progress bar widget.
       * \ingroup widgetsgroup
       */
-	class KartStatsWidget : public Widget
+    class KartStatsWidget : public Widget
     {
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getWidthNeededAroundLabel()  const { return 35; }
-        
+
         /** When inferring widget size from its label length, this method will be called to
          * if/how much space must be added to the raw label's size for the widget to be large enough */
         virtual int getHeightNeededAroundLabel() const { return 4; }
-        
+
         /** widget coordinates */
         int m_skill_bar_x, m_skill_bar_y, m_skill_bar_h, m_skill_bar_w;
-        
+
         int m_player_id;
 
         std::vector<SkillLevelWidget*> m_skills;
 
 
     public:
-        
+
         enum Stats
         {
             SKILL_MASS,
@@ -66,7 +66,7 @@ namespace GUIEngine
         };
 
         LEAK_CHECK()
-        
+
         KartStatsWidget(core::recti area, const int player_id,
                         std::string kart_group, bool multiplayer,
                         bool display_text);
@@ -93,7 +93,7 @@ namespace GUIEngine
 
         /** Change the value of the widget, it must be a percent. */
         void setValue(Stats type, int value);
-        
+
         /** Get the current values of the widget. */
         int getValue(Stats type);
 

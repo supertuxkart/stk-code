@@ -130,6 +130,7 @@ void StartGameProtocol::update()
                 race_manager->setLocalKartInfo(new_player_id, profile->kart_name);
                 Log::info("StartGameProtocol", "Self player device added.");            // self config
                 NetworkWorld::getInstance()->m_self_kart = profile->kart_name;
+                break;
             }
         }
         for (unsigned int i = 0; i < players.size(); i++)

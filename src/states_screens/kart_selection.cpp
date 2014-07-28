@@ -25,7 +25,6 @@
 #include "guiengine/widgets/bubble_widget.hpp"
 #include "guiengine/widgets/kart_stats_widget.hpp"
 #include "guiengine/widgets/model_view_widget.hpp"
-#include "guiengine/widgets/player_kart_widget.hpp"
 #include "guiengine/widgets/player_name_spinner.hpp"
 #include "input/input_manager.hpp"
 #include "input/device_manager.hpp"

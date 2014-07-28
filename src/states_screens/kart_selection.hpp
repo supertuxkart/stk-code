@@ -21,13 +21,13 @@
 
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/dynamic_ribbon_widget.hpp"
+#include "guiengine/widgets/player_kart_widget.hpp"
 #include "states_screens/state_manager.hpp"
 
 namespace GUIEngine
 {
     class Widget;
     class BubbleWidget;
-    class PlayerKartWidget;
     enum EventPropagation;
 }
 namespace Online

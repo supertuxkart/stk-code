@@ -137,15 +137,15 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         m_player_ident_spinner->m_properties[PROP_MAX_VALUE] =
             StringUtils::toString(player_amount-1);
         m_player_ident_spinner->m_properties[PROP_WRAP_AROUND] = "true";
-        m_difficulty->m_properties[PROP_MIN_VALUE] = StringUtils::toString(RaceManager::PLAYER_DIFFICULTY_EASIEST);
-        m_difficulty->m_properties[PROP_MAX_VALUE] = StringUtils::toString(RaceManager::PLAYER_DIFFICULTY_HARDEST);
+        m_difficulty->m_properties[PROP_MIN_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_EASIEST);
+        m_difficulty->m_properties[PROP_MAX_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_HARDEST);
     }
     else
     {
         m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
         m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = "0";
-        m_difficulty->m_properties[PROP_MIN_VALUE] = StringUtils::toString(RaceManager::PLAYER_DIFFICULTY_NORMAL);
-        m_difficulty->m_properties[PROP_MAX_VALUE] = StringUtils::toString(RaceManager::PLAYER_DIFFICULTY_NORMAL);
+        m_difficulty->m_properties[PROP_MIN_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_NORMAL);
+        m_difficulty->m_properties[PROP_MAX_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_NORMAL);
     }
 
     //m_player_ident_spinner->m_event_handler = this;
@@ -374,7 +374,7 @@ void PlayerKartWidget::add()
         m_difficulty->addLabel(_("Normal"));
         m_difficulty->addLabel(_("Hard"));
         m_difficulty->addLabel(_("Hardest"));
-        m_difficulty->setValue(RaceManager::PLAYER_DIFFICULTY_NORMAL);
+        m_difficulty->setValue(PLAYER_DIFFICULTY_NORMAL);
     }
     else
     {

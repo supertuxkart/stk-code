@@ -31,6 +31,7 @@
 #include "items/powerup.hpp"
 #include "karts/abstract_kart.hpp"
 #include "karts/kart_properties.hpp"
+#include "karts/player_difficulty.hpp"
 #include "tracks/terrain_info.hpp"
 #include "utils/no_copy.hpp"
 
@@ -134,7 +135,7 @@ private:
 
     /** The torque to apply after hitting a bubble gum. */
     float        m_bubblegum_torque;
-    
+
     /** True if fire button was pushed and not released */
     bool         m_fire_clicked;
 
@@ -154,10 +155,10 @@ private:
     // -----------------
     /** Time a kart is jumping. */
     float            m_jump_time;
-    
+
     /** Is time flying activated */
     bool             m_is_jumping;
-    
+
     /** The shadow of a kart. */
     Shadow          *m_shadow;
 
@@ -205,7 +206,7 @@ private:
     SFXBase      *m_goo_sound;
     SFXBase      *m_boing_sound;
     float         m_time_last_crash;
-    
+
     /** To prevent using nitro in too short bursts */
     float         m_min_nitro_time;
 
@@ -223,7 +224,8 @@ private:
 
 public:
                    Kart(const std::string& ident, unsigned int world_kart_id,
-                        int position, const btTransform& init_transform);
+                        int position, const btTransform& init_transform,
+                        const PlayerDifficulty *difficulty);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,

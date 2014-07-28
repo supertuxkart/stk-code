@@ -25,9 +25,10 @@
 
 KartWithStats::KartWithStats(const std::string& ident,
                              unsigned int world_kart_id,
-                             int position, const btTransform& init_transform)
+                             int position, const btTransform& init_transform,
+                             const PlayerDifficulty *difficulty)
              : Kart(ident, world_kart_id, position,
-                    init_transform)
+                    init_transform, difficulty)
 {
 }   // KartWithStats
 

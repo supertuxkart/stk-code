@@ -124,7 +124,7 @@ private:
     /** Weight of kart.  */
     float m_mass;
 
-    /** Maximum force from engine for eachdifficulty. */
+    /** Maximum force from engine for each difficulty. */
     std::vector<float> m_engine_power;
 
     /** Braking factor * engine_power braking force. */

@@ -147,9 +147,8 @@ void RaceManager::setLocalKartInfo(unsigned int player_id,
     assert(kart_properties_manager->getKart(kart) != NULL);
 
     const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(player_id);
-    m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart,
-                                                  profile->getName(),
-                                                    0, false);
+    m_local_player_karts[player_id] = RemoteKartInfo(player_id, kart, profile->getName(),
+                                                     0, false);
 }   // setLocalKartInfo
 
 //-----------------------------------------------------------------------------
@@ -312,7 +311,7 @@ void RaceManager::startNew(bool from_overworld)
     for(unsigned int i=0; i<ai_kart_count; i++)
     {
         m_kart_status.push_back(KartStatus(m_ai_kart_list[i], i, -1, -1,
-                                           init_gp_rank, KT_AI));
+                                           init_gp_rank, KT_AI, PLAYER_DIFFICULTY_NORMAL));
         init_gp_rank ++;
         if(UserConfigParams::m_ftl_debug)
         {
@@ -329,8 +328,8 @@ void RaceManager::startNew(bool from_overworld)
         m_kart_status.push_back(KartStatus(m_player_karts[i].getKartName(), i,
                                            m_player_karts[i].getLocalPlayerId(),
                                            m_player_karts[i].getGlobalPlayerId(),
-                                           init_gp_rank, kt
-                                           ) );
+                                           init_gp_rank, kt,
+                                           m_player_karts[i].getDifficulty()));
         if(UserConfigParams::m_ftl_debug)
         {
             Log::debug("RaceManager", "[ftl] rank %d kart %s", init_gp_rank,

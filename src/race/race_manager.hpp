@@ -234,13 +234,6 @@ public:
                           DIFFICULTY_LAST = DIFFICULTY_BEST,
                           DIFFICULTY_COUNT};
 
-    /** Game difficulty. */
-    enum PerPlayerDifficulty { PLAYER_DIFFICULTY_EASIEST,
-                               PLAYER_DIFFICULTY_EASY,
-                               PLAYER_DIFFICULTY_NORMAL,
-                               PLAYER_DIFFICULTY_HARD,
-                               PLAYER_DIFFICULTY_HARDEST };
-
     /** Different kart types: A local player, a player connected via network,
      *  an AI kart, the leader kart (currently not used), a ghost kart. */
     enum KartType       { KT_PLAYER, KT_NETWORK_PLAYER, KT_AI, KT_LEADER,
@@ -276,16 +269,19 @@ public:
         /** In GPs, at the end, will hold the overall rank of this kart
          *  (0<=m_gp_rank < num_karts-1). */
         int         m_gp_rank;
+        /** The difficulty for this player. */
+        PerPlayerDifficulty m_difficulty;
 
         KartStatus(const std::string& ident, const int& prev_finish_pos,
                    int local_player_id, int global_player_id,
-                   int init_gp_rank, KartType kt) :
+                   int init_gp_rank, KartType kt,
+                   PerPlayerDifficulty difficulty) :
                    m_ident(ident), m_score(0), m_last_score(0),
                    m_overall_time(0.0f), m_last_time(0.0f),
                    m_kart_type(kt),
                    m_local_player_id(local_player_id),
                    m_global_player_id(global_player_id),
-                   m_gp_rank(init_gp_rank)
+                   m_gp_rank(init_gp_rank), m_difficulty(difficulty)
                 {}
 
     };   // KartStatus
@@ -530,21 +526,6 @@ public:
         return "";
     }   // getDifficultyAsString
     // ------------------------------------------------------------------------
-    /** Returns the specified difficulty as a string. */
-    std::string getPerPlayerDifficultyAsString(PerPlayerDifficulty diff) const
-    {
-        switch(diff)
-        {
-        case RaceManager::PLAYER_DIFFICULTY_EASIEST: return "easiest"; break;
-        case RaceManager::PLAYER_DIFFICULTY_EASY:    return "easy";    break;
-        case RaceManager::PLAYER_DIFFICULTY_NORMAL:  return "normal";  break;
-        case RaceManager::PLAYER_DIFFICULTY_HARD:    return "hard";    break;
-        case RaceManager::PLAYER_DIFFICULTY_HARDEST: return "hardest"; break;
-        default:  assert(false);
-        }
-        return "";
-    }   // getPerPlayerDifficultyAsString
-    // ------------------------------------------------------------------------
     const std::string& getTrackName() const { return m_tracks[m_track_number];}
     // ------------------------------------------------------------------------
     const GrandPrixData& getGrandPrix() const { return m_grand_prix; }
@@ -593,6 +574,11 @@ public:
     KartType getKartType(int kart) const
     {
         return m_kart_status[kart].m_kart_type;
+    }
+    // ------------------------------------------------------------------------
+    PerPlayerDifficulty getPlayerDifficulty(int kart) const
+    {
+        return m_kart_status[kart].m_difficulty;
     }
     // ------------------------------------------------------------------------
     int getCoinTarget() const { return m_coin_target; }
