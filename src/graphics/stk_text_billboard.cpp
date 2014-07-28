@@ -13,19 +13,30 @@
 
 using namespace irr;
 
-
 STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     const video::SColor& color, irr::scene::ISceneNode* parent,
     irr::scene::ISceneManager* mgr, irr::s32 id,
-    const irr::core::vector3df& position, const irr::core::dimension2d<irr::f32>& size) : // TODO: use size or remove
-    IBillboardSceneNode(parent, mgr, id, position),
-    CBillboardSceneNode(parent, mgr, id, position, size, video::SColor(255, 255, 255, 255), video::SColor(255, 255, 255, 255))
+    const irr::core::vector3df& position, const irr::core::vector3df& size) :
+    STKMeshSceneNode(new scene::SMesh(),
+        parent, irr_driver->getSceneManager(), -1,
+        position, core::vector3df(0.0f, 0.0f, 0.0f), size, false)
+{
+    getTextMesh(text, font, color);
+    createGLMeshes();
+    Mesh->drop();
+    //setAutomaticCulling(0);
+    setReloadEachFrame(true); // FIXME: should not need that!!
+    updateAbsolutePosition();
+}
+
+scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font,
+    const video::SColor& color)
 {
     font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), color, false, false, NULL, this);
 
     const float scale = 0.05f;
 
-    scene::SMesh* mesh = new scene::SMesh();
+    //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
 
     for (unsigned int i = 0; i < m_chars.size(); i++)
@@ -33,12 +44,10 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
         core::vector3df char_pos(m_chars[i].m_destRect.UpperLeftCorner.X,
             m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
         char_pos *= scale;
-        char_pos += position;
 
         core::vector3df char_pos2(m_chars[i].m_destRect.LowerRightCorner.X,
             m_chars[i].m_destRect.LowerRightCorner.Y, 0);
         char_pos2 *= scale;
-        char_pos2 += position;
 
         core::dimension2di char_size_i = m_chars[i].m_destRect.getSize();
         core::dimension2df char_size(char_size_i.Width*scale, char_size_i.Height*scale);
@@ -96,18 +105,25 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     for (std::map<video::ITexture*, scene::SMeshBuffer*>::iterator map_itr = buffers.begin();
         map_itr != buffers.end(); map_itr++)
     {
-        mesh->addMeshBuffer(map_itr->second);
+        ((scene::SMesh*)Mesh)->addMeshBuffer(map_itr->second);
+
+        map_itr->second->recalculateBoundingBox();
+        Mesh->setBoundingBox(map_itr->second->getBoundingBox()); // TODO: wrong if several buffers
+
         map_itr->second->drop();
     }
 
-    STKMeshSceneNode* stk_mesh = new STKMeshSceneNode(mesh,
-        parent, irr_driver->getSceneManager(), -1,
-        position, core::vector3df(0.0f, 0.0f, 0.0f), core::vector3df(1.0f, 1.0f, 1.0f));
-    stk_mesh->setAutomaticCulling(0);
+    return Mesh;
 }
 
-void STKTextBillboard::render()
+void STKTextBillboard::OnRegisterSceneNode()
 {
+    if (IsVisible)
+    {
+        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+    }
+
+    ISceneNode::OnRegisterSceneNode();
 }
 
 void STKTextBillboard::collectChar(video::ITexture* texture,

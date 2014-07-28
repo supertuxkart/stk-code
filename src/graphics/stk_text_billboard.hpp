@@ -4,7 +4,10 @@
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
+#include <IMesh.h>
+#include "graphics/stkmeshscenenode.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "utils/cpp2011.hpp"
 
 class STKTextBillboardChar
 {
@@ -36,18 +39,21 @@ public:
     }
 };
 
-class STKTextBillboard : public irr::scene::CBillboardSceneNode, irr::gui::FontCharCollector
+class STKTextBillboard : public STKMeshSceneNode, irr::gui::FontCharCollector
 {
     std::vector<STKTextBillboardChar> m_chars;
+
+    irr::scene::IMesh* getTextMesh(irr::core::stringw text, gui::ScalableFont* font,
+        const irr::video::SColor& color);
 
 public:
     STKTextBillboard(irr::core::stringw text, irr::gui::ScalableFont* font,
         const irr::video::SColor& color, irr::scene::ISceneNode* parent,
         irr::scene::ISceneManager* mgr, irr::s32 id,
         const irr::core::vector3df& position,
-        const irr::core::dimension2d<irr::f32>& size);
+        const irr::core::vector3df& size);
 
-    virtual void render();
+    virtual void OnRegisterSceneNode() OVERRIDE;
 
     virtual void collectChar(irr::video::ITexture* texture,
         const irr::core::rect<irr::s32>& destRect,
