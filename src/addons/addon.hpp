@@ -164,7 +164,7 @@ public:
     const std::string& getIconURL() const { return m_icon_url; }
     // ------------------------------------------------------------------------
     /** Returns the name of the icon (i.e. the basename of the url). */
-    const std::string getIconBasename() const { return m_icon_basename; }
+    const std::string& getIconBasename() const { return m_icon_basename; }
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const core::stringw& getDescription() const { return m_description; }
