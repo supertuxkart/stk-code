@@ -20,7 +20,7 @@
 #define HEADER_SUN_HPP
 
 #include "graphics/light.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class ScreenQuad;
 

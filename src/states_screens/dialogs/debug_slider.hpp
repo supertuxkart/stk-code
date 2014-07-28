@@ -20,7 +20,7 @@
 #define HEADER_DEBUG_SLIDER_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
 
 /**

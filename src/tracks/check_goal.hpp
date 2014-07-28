@@ -20,7 +20,7 @@
 #define HEADER_CHECK_GOAL_HPP
 
 #include "tracks/check_structure.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include <line2d.h>
 using namespace irr;
 
