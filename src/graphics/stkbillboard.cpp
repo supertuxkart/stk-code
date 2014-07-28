@@ -2,6 +2,7 @@
 #include "graphics/glwrap.hpp"
 #include "graphics/shaders.hpp"
 #include "graphics/irr_driver.hpp"
+#include <ISceneManager.h>
 
 using namespace irr;
 
@@ -27,6 +28,17 @@ STKBillboard::STKBillboard(irr::scene::ISceneNode* parent, irr::scene::ISceneMan
     if (!billboardvao)
         createbillboardvao();
 }
+
+void STKBillboard::OnRegisterSceneNode()
+{
+    if (IsVisible)
+    {
+        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+    }
+
+    ISceneNode::OnRegisterSceneNode();
+}
+
 
 void STKBillboard::render()
 {
