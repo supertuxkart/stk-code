@@ -12,6 +12,8 @@
 #endif
 
 #if (__cplusplus >= 201103 || _MSC_VER >=1800) && !(defined(__clang__) && defined(__APPLE__))
+#define STDCPP2011
+#else
 #define STDCPP2003
 #endif
 
