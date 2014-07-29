@@ -97,48 +97,8 @@ void PlayerDifficulty::load(const std::string &filename, const std::string &node
  */
 void PlayerDifficulty::getAllData(const XMLNode * root)
 {
-    if(const XMLNode *nitro_node = root->getNode("nitro"))
-    {
-        nitro_node->get("consumption",          &m_nitro_consumption       );
-        nitro_node->get("max-speed-increase",   &m_nitro_max_speed_increase);
-        nitro_node->get("engine-force",         &m_nitro_engine_force      );
-        nitro_node->get("duration",             &m_nitro_duration          );
-        nitro_node->get("fade-out-time",        &m_nitro_fade_out_time     );
-    }
-
-    if(const XMLNode *bubble_node = root->getNode("bubblegum"))
-    {
-        bubble_node->get("time",           &m_bubblegum_time          );
-        bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
-        bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
-        bubble_node->get("torque",         &m_bubblegum_torque        );
-    }
-
-    if(const XMLNode *rescue_node = root->getNode("rescue"))
-    {
-        rescue_node->get("time",        &m_rescue_time       );
-    }
-
-    if(const XMLNode *explosion_node = root->getNode("explosion"))
-    {
-        explosion_node->get("time",   &m_explosion_time  );
-        explosion_node->get("invulnerability-time",
-                        &m_explosion_invulnerability_time);
-    }
-
-    if(const XMLNode *slipstream_node = root->getNode("slipstream"))
-    {
-        slipstream_node->get("length",       &m_slipstream_length            );
-        slipstream_node->get("width",        &m_slipstream_width             );
-        slipstream_node->get("collect-time", &m_slipstream_collect_time      );
-        slipstream_node->get("use-time",     &m_slipstream_use_time          );
-        slipstream_node->get("add-power",    &m_slipstream_add_power         );
-        slipstream_node->get("min-speed",    &m_slipstream_min_speed         );
-        slipstream_node->get("max-speed-increase",
-                                             &m_slipstream_max_speed_increase);
-        slipstream_node->get("duration",     &m_slipstream_duration          );
-        slipstream_node->get("fade-out-time",&m_slipstream_fade_out_time     );
-    }
+    if(const XMLNode *mass_node = root->getNode("mass"))
+        mass_node->get("value", &m_mass);
 
     if(const XMLNode *engine_node = root->getNode("engine"))
     {
@@ -146,7 +106,48 @@ void PlayerDifficulty::getAllData(const XMLNode * root)
         engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
         engine_node->get("power", &m_engine_power);
         engine_node->get("max-speed", &m_max_speed);
-    }   // if getNode("engine")
+    }
+
+    if(const XMLNode *nitro_node = root->getNode("nitro"))
+    {
+        nitro_node->get("consumption",        &m_nitro_consumption       );
+        nitro_node->get("max-speed-increase", &m_nitro_max_speed_increase);
+        nitro_node->get("engine-force",       &m_nitro_engine_force      );
+        nitro_node->get("duration",           &m_nitro_duration          );
+        nitro_node->get("fade-out-time",      &m_nitro_fade_out_time     );
+    }
+
+    if(const XMLNode *bubble_node = root->getNode("bubblegum"))
+    {
+        bubble_node->get("time",           &m_bubblegum_time          );
+        bubble_node->get("speed-fraction", &m_bubblegum_speed_fraction);
+        bubble_node->get("torque",         &m_bubblegum_torque        );
+        bubble_node->get("fade-in-time",   &m_bubblegum_fade_in_time  );
+    }
+
+    if(const XMLNode *rescue_node = root->getNode("rescue"))
+        rescue_node->get("time", &m_rescue_time);
+
+    if(const XMLNode *explosion_node = root->getNode("explosion"))
+    {
+        explosion_node->get("time", &m_explosion_time);
+        explosion_node->get("invulnerability-time",
+                                    &m_explosion_invulnerability_time);
+    }
+
+    if(const XMLNode *slipstream_node = root->getNode("slipstream"))
+    {
+        slipstream_node->get("length",        &m_slipstream_length            );
+        slipstream_node->get("width",         &m_slipstream_width             );
+        slipstream_node->get("collect-time",  &m_slipstream_collect_time      );
+        slipstream_node->get("use-time",      &m_slipstream_use_time          );
+        slipstream_node->get("add-power",     &m_slipstream_add_power         );
+        slipstream_node->get("min-speed",     &m_slipstream_min_speed         );
+        slipstream_node->get("max-speed-increase",
+                                              &m_slipstream_max_speed_increase);
+        slipstream_node->get("duration",      &m_slipstream_duration          );
+        slipstream_node->get("fade-out-time", &m_slipstream_fade_out_time     );
+    }
 
     if(const XMLNode *plunger_node= root->getNode("plunger"))
     {

@@ -112,6 +112,7 @@ void StartGameProtocol::update()
                 NetworkPlayerProfile* profile = players[i];
                 RemoteKartInfo rki(profile->race_id, profile->kart_name,
                     profile->user_profile->getUserName(), profile->race_id, !is_me);
+                rki.setDifficulty(profile->difficulty);
                 rki.setGlobalPlayerId(profile->race_id);
                 rki.setLocalPlayerId(is_me?0:1);
                 rki.setHostId(profile->race_id);
@@ -140,6 +141,7 @@ void StartGameProtocol::update()
             NetworkPlayerProfile* profile = players[i];
             RemoteKartInfo rki(profile->race_id, profile->kart_name,
                 profile->user_profile->getUserName(), profile->race_id, !is_me);
+            rki.setDifficulty(profile->difficulty);
             rki.setGlobalPlayerId(profile->race_id);
             // on the server, the race id must be the local one.
             rki.setLocalPlayerId(m_listener->isServer()?profile->race_id:(is_me?0:1));

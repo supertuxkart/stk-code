@@ -23,6 +23,7 @@
 #define GAME_SETUP_HPP
 
 #include "network/race_config.hpp"
+#include "network/remote_kart_info.hpp"
 
 #include <vector>
 #include <string>
@@ -43,6 +44,7 @@ class NetworkPlayerProfile
         std::string kart_name; //!< The selected kart.
         Online::OnlineProfile* user_profile; //!< Pointer to the lobby profile
         uint8_t world_kart_id; //!< the kart id in the World class (pointer to AbstractKart)
+        PerPlayerDifficulty difficulty;
 };
 
 /*! \class GameSetup
