@@ -38,10 +38,26 @@
  \subsection shader_declaration_compile Compile the shader
 
  The LoadProgram() function is provided to ease shader compilation and link.
+ It takes a flat sequence of SHADER_TYPE, filename pairs that will be linked together.
+ This way you can add any shader stage you want (geometry, domain/hull shader)
+
+ It is highly recommended to use explicit attribute location for a program input.
+ However as not all hardware support this extension, default location are provided for
+ input whose name is either Position (location 0) or Normal (location 1) or
+ Texcoord (location 3) or Color (location 2) or SecondTexcoord (location 4).
+ You can use these predefined name and location in your vao for shader
+ that needs GL pre 3.3 support.
 
  \subsection shader_declaration_uniform_names Declare uniforms
 
+ Use the AssignUniforms() function to pass name of the uniforms in the program.
+ The order of name declaration is the same as the argument passed to setUniforms function.
+
  \subsection shader_declaration_bind_texture_unit Bind texture unit and name
+
+ Texture are optional but if you have one, you must give them determined texture unit (up to 32).
+ You can do this using the AssignTextureUnit function that takes pair of texture unit and sampler name
+ as argument.
 
  \section shader_usage
 
