@@ -295,7 +295,7 @@ static void drawSMGrass(GLMesh &mesh, const core::vector3df &windDir, size_t ins
     setTexture(MeshShader::InstancedGrassPass2ShaderInstance->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
 
-    MeshShader::InstancedGrassPass2ShaderInstance->setUniforms(windDir, cb->getPosition(), irr_driver->getSceneManager()->getAmbientLight());
+    MeshShader::InstancedGrassPass2ShaderInstance->setUniforms(windDir, cb->getPosition());
 
     glBindVertexArray(mesh.vao);
     glDrawElementsInstanced(ptype, count, itype, 0, instance_count);

@@ -292,24 +292,24 @@ void IrrDriver::renderSolidSecondPass()
 
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 4, 3, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatDefault::Arguments);
 
-        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 4, 3, 1 >(TexUnits(
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
             TexUnit(MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatAlphaRef::Arguments);
 
-        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 4, 2, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 2, 1>(TexUnits(
             TexUnit(MeshShader::SphereMapShader::getInstance()->TU_tex, true)
         ), ListMatSphereMap::Arguments);
 
-        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 4, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
             TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true),
             TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true)
         ), ListMatDetails::Arguments);
 
-        renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 4, 3, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(MeshShader::GrassPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatGrass::Arguments);
 
@@ -317,7 +317,7 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
         ), ListMatUnlit::Arguments);
 
-        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 3, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 1>(TexUnits(
             TexUnit(8, true),
             TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_layout, false),
             TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail0, true),
@@ -326,7 +326,7 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail3, true)
         ), ListMatSplatting::Arguments);
 
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 4, 3, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 3, 1>(TexUnits(
             TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatNormalMap::Arguments);
     }

@@ -142,13 +142,13 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
-            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
-            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
-            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
             pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
