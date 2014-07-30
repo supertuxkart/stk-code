@@ -553,7 +553,7 @@ void GrandPrixData::editTrack(unsigned int index, Track* track,
 // ----------------------------------------------------------------------------
 void GrandPrixData::remove(const unsigned int track)
 {
-    assert (0 < track && track < getNumberOfTracks(true));
+    assert (0 <= track && track < getNumberOfTracks(true));
 
     m_tracks.erase(m_tracks.begin() + track);
     m_laps.erase(m_laps.begin() + track);
