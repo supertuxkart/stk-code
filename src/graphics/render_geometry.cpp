@@ -28,9 +28,55 @@
 #include "utils/helpers.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+#include "utils/tuple.hpp"
 
 #include <algorithm>
 
+namespace RenderGeometry
+{
+    struct TexUnit
+    {
+        GLuint m_id;
+        bool m_premul_alpha;
+
+        TexUnit(GLuint id, bool premul_alpha)
+        {
+            m_id = id;
+            m_premul_alpha = premul_alpha;
+        }
+    };
+
+    template <typename T>
+    std::vector<TexUnit> TexUnits(T curr) // required on older clang versions
+    {
+        std::vector<TexUnit> v;
+        v.push_back(curr);
+        return v;
+    }
+
+    template <typename T, typename... R>
+    std::vector<TexUnit> TexUnits(T curr, R... rest) // required on older clang versions
+    {
+        std::vector<TexUnit> v;
+        v.push_back(curr);
+        VTexUnits(v, rest...);
+        return v;
+    }
+
+    template <typename T, typename... R>
+    void VTexUnits(std::vector<TexUnit>& v, T curr, R... rest) // required on older clang versions
+    {
+        v.push_back(curr);
+        VTexUnits(v, rest...);
+    }
+
+    template <typename T>
+    void VTexUnits(std::vector<TexUnit>& v, T curr)
+    {
+        v.push_back(curr);
+    }
+}
+using namespace RenderGeometry;
 
 template<typename Shader, typename...uniforms>
 void draw(const GLMesh *mesh, uniforms... Args)
@@ -61,9 +107,9 @@ template<unsigned N>
 struct unroll_args_instance
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        unroll_args_instance<N - 1>::template exec<T>(Shader, t, std::get<N - 1>(t), args...);
+        unroll_args_instance<N - 1>::template exec<T>(Shader, t, STK::tuple_get<N - 1>(t), args...);
     }
 };
 
@@ -71,16 +117,17 @@ template<>
 struct unroll_args_instance<0>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
         draw<T>(Shader, args...);
     }
 };
 
 template<typename T, typename... TupleType>
-void apply_instance(const T *Shader, const std::tuple<TupleType...> &arg)
+void apply_instance(const T *Shader, const STK::Tuple<TupleType...> &arg)
 {
-    unroll_args_instance<std::tuple_size<std::tuple<TupleType...> >::value >::template exec<T>(Shader, arg);
+    unroll_args_instance<sizeof...(TupleType)>::template exec<T>(Shader, arg);
+    //unroll_args_instance<STK::TupleSize<STK::Tuple<TupleType...> >::value >::template exec<T>(Shader, arg);
 }
 
 template<int...List>
@@ -90,9 +137,9 @@ template<>
 struct custom_unroll_args<>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        draw<T>(Shader, std::get<0>(t), args...);
+        draw<T>(Shader, STK::tuple_get<0>(t), args...);
     }
 };
 
@@ -100,27 +147,27 @@ template<int N, int...List>
 struct custom_unroll_args<N, List...>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        custom_unroll_args<List...>::template exec<T>(Shader, t, std::get<N>(t), args...);
+        custom_unroll_args<List...>::template exec<T>(Shader, t, STK::tuple_get<N>(t), args...);
     }
 };
 
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType, int ...List, typename... TupleType>
-void renderMeshes1stPass(const std::vector<std::pair<GLuint, bool> > &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > &meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(std::get<0>(meshes[i]));
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes[i]));
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (!mesh.textures[j])
                 mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[j], TexUnits[j].second);
-            setTexture(TexUnits[j].first, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
+            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
         if (mesh.VAOType != VertexType)
         {
@@ -161,31 +208,36 @@ void IrrDriver::renderSolidFirstPass()
 
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>({ { MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true } }, ListMatDefault::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>({ { MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true } }, ListMatSphereMap::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>({ { MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true } }, ListMatUnlit::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>({ { MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true } }, ListMatDetails::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>({ { MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true } }, ListMatSplatting::Arguments);
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>({ { MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true } }, ListMatAlphaRef::Arguments);
-        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>({ { MeshShader::GrassPass1Shader::getInstance()->TU_tex, true } }, ListMatGrass::Arguments);
-        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>({ { MeshShader::NormalMapShader::getInstance()->TU_glossy, true }, { MeshShader::NormalMapShader::getInstance()->TU_normalmap, false } }, ListMatNormalMap::Arguments);
+
+        std::vector<TexUnit> object_pass1_texunits = TexUnits(TexUnit(MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true) );
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatDefault::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatSphereMap::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatUnlit::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatDetails::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatSplatting::Arguments);
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true)), ListMatAlphaRef::Arguments);
+        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::GrassPass1Shader::getInstance()->TU_tex, true)), ListMatGrass::Arguments);
+        renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>(TexUnits(
+            TexUnit(MeshShader::NormalMapShader::getInstance()->TU_glossy, true),
+            TexUnit(MeshShader::NormalMapShader::getInstance()->TU_normalmap, false)
+        ), ListMatNormalMap::Arguments);
     }
 }
 
 template<typename Shader, enum E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
-void renderMeshes2ndPass(const std::vector<std::pair<GLuint, bool> > &TexUnits, std::vector<std::tuple<TupleType...> > &meshes)
+void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > &meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes.size(); i++)
     {
-        GLMesh &mesh = *(std::get<0>(meshes[i]));
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes[i]));
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (!mesh.textures[j])
                 mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[j], TexUnits[j].second);
-            setTexture(TexUnits[j].first, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
+            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
             if (irr_driver->getLightViz())
             {
                 GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
@@ -240,14 +292,43 @@ void IrrDriver::renderSolidSecondPass()
 
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 4, 3, 1>({ { MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true } }, ListMatDefault::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 4, 3, 1 >({ { MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true } }, ListMatAlphaRef::Arguments);
-        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 4, 2, 1>({ { MeshShader::SphereMapShader::getInstance()->TU_tex, true } }, ListMatSphereMap::Arguments);
-        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 4, 1>({ { MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true }, { MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true } }, ListMatDetails::Arguments);
-        renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 4, 3, 1>({ { MeshShader::GrassPass2Shader::getInstance()->TU_Albedo, true } }, ListMatGrass::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 1>({ { MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true } }, ListMatUnlit::Arguments);
-        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 3, 1>({ { 8, true }, { MeshShader::SplattingShader::getInstance()->TU_tex_layout, false }, { MeshShader::SplattingShader::getInstance()->TU_tex_detail0, true }, { MeshShader::SplattingShader::getInstance()->TU_tex_detail1, true }, { MeshShader::SplattingShader::getInstance()->TU_tex_detail2, true }, { MeshShader::SplattingShader::getInstance()->TU_tex_detail3, true } }, ListMatSplatting::Arguments);
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 4, 3, 1>({ { MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true } }, ListMatNormalMap::Arguments);
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
+            TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
+        ), ListMatDefault::Arguments);
+
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
+            TexUnit(MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true)
+        ), ListMatAlphaRef::Arguments);
+
+        renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 2, 1>(TexUnits(
+            TexUnit(MeshShader::SphereMapShader::getInstance()->TU_tex, true)
+        ), ListMatSphereMap::Arguments);
+
+        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
+            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true),
+            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true)
+        ), ListMatDetails::Arguments);
+
+        renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
+            TexUnit(MeshShader::GrassPass2Shader::getInstance()->TU_Albedo, true)
+        ), ListMatGrass::Arguments);
+
+        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 1>(TexUnits(
+            TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
+        ), ListMatUnlit::Arguments);
+
+        renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 1>(TexUnits(
+            TexUnit(8, true),
+            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_layout, false),
+            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail0, true),
+            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail1, true),
+            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail2, true),
+            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail3, true)
+        ), ListMatSplatting::Arguments);
+
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 3, 1>(TexUnits(
+            TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
+        ), ListMatNormalMap::Arguments);
     }
 }
 
@@ -274,16 +355,24 @@ void IrrDriver::renderTransparent()
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>({ { MeshShader::TransparentFogShader::getInstance()->TU_tex, true } }, ListBlendTransparentFog::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
+            TexUnit(MeshShader::TransparentFogShader::getInstance()->TU_tex, true)
+        ), ListBlendTransparentFog::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>({ { MeshShader::TransparentFogShader::getInstance()->TU_tex, true } }, ListAdditiveTransparentFog::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
+            TexUnit(MeshShader::TransparentFogShader::getInstance()->TU_tex, true)
+        ), ListAdditiveTransparentFog::Arguments);
     }
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>({ { MeshShader::TransparentShader::getInstance()->TU_tex, true } }, ListBlendTransparent::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
+            TexUnit(MeshShader::TransparentShader::getInstance()->TU_tex, true)
+        ), ListBlendTransparent::Arguments);
         glBlendFunc(GL_ONE, GL_ONE);
-        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>({ { MeshShader::TransparentShader::getInstance()->TU_tex, true } }, ListAdditiveTransparent::Arguments);
+        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
+            TexUnit(MeshShader::TransparentShader::getInstance()->TU_tex, true)
+        ), ListAdditiveTransparent::Arguments);
     }
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -313,8 +402,8 @@ void IrrDriver::renderTransparent()
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
     for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
     {
-        const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
-        const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
+        const GLMesh &mesh = *(STK::tuple_get<0>(ListDisplacement::Arguments[i]));
+        const core::matrix4 &AbsoluteTransformation = STK::tuple_get<1>(ListDisplacement::Arguments[i]);
         if (mesh.VAOType != video::EVT_2TCOORDS)
         {
 #ifdef DEBUG
@@ -337,8 +426,8 @@ void IrrDriver::renderTransparent()
         displaceTex = irr_driver->getTexture(FileManager::TEXTURE, "displace.png");
     for (unsigned i = 0; i < ListDisplacement::Arguments.size(); i++)
     {
-        const GLMesh &mesh = *(std::get<0>(ListDisplacement::Arguments[i]));
-        const core::matrix4 &AbsoluteTransformation = std::get<1>(ListDisplacement::Arguments[i]);
+        const GLMesh &mesh = *(STK::tuple_get<0>(ListDisplacement::Arguments[i]));
+        const core::matrix4 &AbsoluteTransformation = STK::tuple_get<1>(ListDisplacement::Arguments[i]);
         if (mesh.VAOType != video::EVT_2TCOORDS)
             continue;
 
@@ -384,9 +473,9 @@ template<>
 struct shadow_custom_unroll_args<>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        drawShadow<T>(Shader, std::get<0>(t), args...);
+        drawShadow<T>(Shader, STK::tuple_get<0>(t), args...);
     }
 };
 
@@ -394,20 +483,20 @@ template<int N, int...List>
 struct shadow_custom_unroll_args<N, List...>
 {
     template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const std::tuple<TupleTypes...> &t, Args... args)
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
     {
-        shadow_custom_unroll_args<List...>::template exec<T>(Shader, t, std::get<N>(t), args...);
+        shadow_custom_unroll_args<List...>::template exec<T>(Shader, t, STK::tuple_get<N>(t), args...);
     }
 };
 
 template<typename T, enum E_VERTEX_TYPE VertexType, int...List, typename... Args>
-void renderShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+void renderShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
     glUseProgram(Shader->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        const GLMesh *mesh = std::get<0>(t[i]);
+        const GLMesh *mesh = STK::tuple_get<0>(t[i]);
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
             compressTexture(mesh->textures[j], true);
@@ -419,13 +508,13 @@ void renderShadow(const T *Shader, const std::vector<GLuint> TextureUnits, const
 }
 
 template<enum E_VERTEX_TYPE VertexType, typename... Args>
-void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<std::tuple<GLMesh *, core::matrix4, Args...> >&t)
+void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
     glUseProgram(MeshShader::RSMShader::Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
-        GLMesh *mesh = std::get<0>(t[i]);
+        GLMesh *mesh = STK::tuple_get<0>(t[i]);
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
             if (!mesh->textures[j])
@@ -433,7 +522,7 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> Texture
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
-        draw<MeshShader::RSMShader>(mesh, rsm_matrix, std::get<1>(t[i]));
+        draw<MeshShader::RSMShader>(mesh, rsm_matrix, STK::tuple_get<1>(t[i]));
     }
 }
 
@@ -461,14 +550,15 @@ void IrrDriver::renderShadows()
     ListMatSplatting::Arguments.clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
-    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, {}, ListMatDefault::Arguments);
-    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, {}, ListMatSphereMap::Arguments);
-    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, {}, ListMatUnlit::Arguments);
-    renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, {}, ListMatDetails::Arguments);
-    renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, {}, ListMatSplatting::Arguments);
-    renderShadow<MeshShader::ShadowShader, EVT_TANGENTS, 1>(MeshShader::ShadowShaderInstance, {}, ListMatNormalMap::Arguments);
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(MeshShader::RefShadowShaderInstance, { MeshShader::RefShadowShaderInstance->TU_tex }, ListMatAlphaRef::Arguments);
-    renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(MeshShader::GrassShadowShaderInstance, { MeshShader::GrassShadowShaderInstance->TU_tex }, ListMatGrass::Arguments);
+    std::vector<GLuint> noTexUnits;
+    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, noTexUnits, ListMatDefault::Arguments);
+    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, noTexUnits, ListMatSphereMap::Arguments);
+    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(MeshShader::ShadowShaderInstance, noTexUnits, ListMatUnlit::Arguments);
+    renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, noTexUnits, ListMatDetails::Arguments);
+    renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(MeshShader::ShadowShaderInstance, noTexUnits, ListMatSplatting::Arguments);
+    renderShadow<MeshShader::ShadowShader, EVT_TANGENTS, 1>(MeshShader::ShadowShaderInstance, noTexUnits, ListMatNormalMap::Arguments);
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(MeshShader::RefShadowShaderInstance, std::vector<GLuint>{ MeshShader::RefShadowShaderInstance->TU_tex }, ListMatAlphaRef::Arguments);
+    renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(MeshShader::GrassShadowShaderInstance, std::vector<GLuint>{ MeshShader::GrassShadowShaderInstance->TU_tex }, ListMatGrass::Arguments);
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
@@ -478,9 +568,9 @@ void IrrDriver::renderShadows()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatDefault::Arguments);
-    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatSphereMap::Arguments);
-    drawRSM<EVT_STANDARD>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatUnlit::Arguments);
-    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatDetails::Arguments);
-    drawRSM<EVT_2TCOORDS>(rsm_matrix, { MeshShader::RSMShader::TU_tex }, ListMatSplatting::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::TU_tex }, ListMatDefault::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::TU_tex }, ListMatSphereMap::Arguments);
+    drawRSM<EVT_STANDARD>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::TU_tex }, ListMatUnlit::Arguments);
+    drawRSM<EVT_2TCOORDS>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::TU_tex }, ListMatDetails::Arguments);
+    drawRSM<EVT_2TCOORDS>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::TU_tex }, ListMatSplatting::Arguments);
 }

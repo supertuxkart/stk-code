@@ -43,7 +43,7 @@ ListWidget::ListWidget() : Widget(WTYPE_LIST)
     m_sort_desc = false;
     m_sort_default = true;
     m_sort_col = 0;
-    m_sortable = false;
+    m_sortable = true;
 }
 
 // -----------------------------------------------------------------------------

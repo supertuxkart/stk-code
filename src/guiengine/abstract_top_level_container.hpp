@@ -21,6 +21,7 @@
 
 
 #include "guiengine/widget.hpp"
+#include "utils/log.hpp"
 #include "utils/ptr_vector.hpp"
 
 #include <cstring> // for NULL

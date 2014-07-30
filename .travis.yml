@@ -22,11 +22,19 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
 script:
-  #  Build commands
-  - mkdir build
-  - cd build
+  # First a debug build: 
+  - mkdir build-debug
+  - cd build-debug
   - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off
   - make VERBOSE=1 -j 4 
+
+  # Then a release build: 
+  - cd ..
+  - mkdir build-release
+  - cd build-release
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off
+  - make VERBOSE=1 -j 4 
+
 notifications:
   irc:
     channels:

@@ -408,6 +408,8 @@ void Kart::reset()
         m_skidmarks->adjustFog(track->isFogEnabled() );
     }
 
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
 
     m_terrain_info->update(getTrans());
 
@@ -1189,6 +1191,9 @@ void Kart::update(float dt)
         old_group = m_body->getBroadphaseHandle()->m_collisionFilterGroup;
         m_body->getBroadphaseHandle()->m_collisionFilterGroup = 0;
     }
+
+    Vec3 front(0, 0, getKartLength()*0.5f);
+    m_xyz_front = getTrans()(front);
 
     m_terrain_info->update(getTrans(), epsilon);
     if(m_body->getBroadphaseHandle())

@@ -157,6 +157,10 @@ public:
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;
     // ------------------------------------------------------------------------
+    /** Returns the coordinates of the front of the kart. This is used for
+     *  determining when the lap line is crossed. */
+    virtual const Vec3& getFrontXYZ() const = 0;
+    // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
      *           right, 3 = rear left.  */

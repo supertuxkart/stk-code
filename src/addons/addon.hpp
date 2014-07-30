@@ -130,6 +130,8 @@ public:
          Addon() {};
          /** Initialises the object from an XML node. */
          Addon(const XMLNode &xml);
+
+    void deleteInvalidIconFile();
     // ------------------------------------------------------------------------
     /** Sets the sort order used in the comparison function. It is static, so
      *  that each instance can access the sort order. */
@@ -164,7 +166,7 @@ public:
     const std::string& getIconURL() const { return m_icon_url; }
     // ------------------------------------------------------------------------
     /** Returns the name of the icon (i.e. the basename of the url). */
-    const std::string getIconBasename() const { return m_icon_basename; }
+    const std::string& getIconBasename() const { return m_icon_basename; }
     // ------------------------------------------------------------------------
     /** Returns the name of the addon. */
     const core::stringw& getDescription() const { return m_description; }

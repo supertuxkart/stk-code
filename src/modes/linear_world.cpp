@@ -174,7 +174,7 @@ void LinearWorld::update(float dt)
         // rescued or eliminated
         if(kart->getKartAnimation()) continue;
 
-        kart_info.getTrackSector()->update(kart->getXYZ());
+        kart_info.getTrackSector()->update(kart->getFrontXYZ());
         kart_info.m_overall_distance = kart_info.m_race_lap
                                      * m_track->getTrackLength()
                         + getDistanceDownTrackForKart(kart->getWorldKartId());
