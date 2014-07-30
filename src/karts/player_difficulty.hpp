@@ -180,10 +180,6 @@ public:
     float getMaxSpeed               () const { return m_max_speed;            }
 
     // ------------------------------------------------------------------------
-    /** Return the absolute maximum speed, independent on the difficulty. */
-    float getAbsMaxSpeed            () const { return m_max_speed;            }
-
-    // ------------------------------------------------------------------------
     /** Returns the nitro consumption. */
     float getNitroConsumption       () const {return m_nitro_consumption;     }
 

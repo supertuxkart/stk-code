@@ -10,6 +10,8 @@
         <placeholder id="playerskarts" width="100%" align="center" proportion="4">
             <!-- Contents is added programatically -->
         </placeholder>
+        <placeholder id="perPlayerDifficulty" width="100%" align="center" proportion="0">
+        </placeholder>
 
         <spacer height="15" width="25"/>
 

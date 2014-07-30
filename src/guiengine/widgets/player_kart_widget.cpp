@@ -29,6 +29,7 @@
 #include <IGUIEnvironment.h>
 
 static int g_root_id;
+static int g_root_id2;
 static const char RANDOM_KART_ID[] = "randomkart";
 
 using namespace GUIEngine;
@@ -125,6 +126,7 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     if (irrlicht_widget_id == -1)
     {
         m_player_ident_spinner->m_tab_down_root = g_root_id;
+        m_difficulty->m_tab_down_root = g_root_id2;
     }
 
     spinnerID = StringUtils::insertValues("@p%i_spinner", m_player_id);

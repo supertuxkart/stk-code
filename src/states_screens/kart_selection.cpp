@@ -54,6 +54,7 @@ static const char ID_LOCKED[] = "locked/";
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
 
 static int g_root_id;
+static int g_root_id2;
 
 /** Currently, navigation for multiple players at the same time is implemented
     in a somewhat clunky way. An invisible "dispatcher" widget is added above
@@ -338,13 +339,16 @@ void KartSelectionScreen::init()
 
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
+    Widget* placeholder2 = getWidget("perPlayerDifficulty");
+    assert(placeholder2 != NULL);
 
     // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
 
     g_dispatcher->setRootID(placeholder->m_reserved_id);
-    g_dispatcher2->setRootID(placeholder->m_reserved_id);
+    g_dispatcher2->setRootID(placeholder2->m_reserved_id);
 
     g_root_id = placeholder->m_reserved_id;
+    g_root_id2 = placeholder2->m_reserved_id;
     if (!m_widgets.contains(g_dispatcher))
     {
         m_widgets.push_back(g_dispatcher);

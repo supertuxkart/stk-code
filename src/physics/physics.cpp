@@ -189,7 +189,8 @@ void Physics::update(float dt)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+                kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
+		            kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
             }
             else if(obj->isSoccerBall())
             {
@@ -218,7 +219,8 @@ void Physics::update(float dt)
             {
                 AbstractKart *kart = p->getUserPointer(1)->getPointerKart();
                 const KartProperties* kp = kart->getKartProperties();
-                kart->setSquash(kp->getSquashDuration(), kp->getSquashSlowdown());
+                kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
+		            kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
             }
             continue;
 
