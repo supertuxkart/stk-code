@@ -26,20 +26,10 @@ typedef GUIEngine::ButtonWidget Button;
 void GrandPrixCutscene::saveGPButton()
 {
     #ifdef IMPLEMENTATION_FINISHED
-    if (race_manager->getGrandPrix().getId() == "random")
-    {
-        core::stringw text = _("Save Grand Prix");
-        Button* save_button = new Button();
-        save_button->m_properties[GUIEngine::PROP_ID] = "save gp";
-        Button* c = getWidget<Button>("continue");
-        save_button->m_x = c->m_x + c->m_w + 20;
-        save_button->m_y = c->m_y;
-        save_button->m_w = GUIEngine::getFont()->getDimension(text.c_str()).Width + 30;
-        save_button->m_h = c->m_h;
-        save_button->setText(text);
-        save_button->add();
-        manualAddWidget(save_button);
-    }
+    if (race_manager->getGrandPrix().getId() != "random")
+        getWidget<Button>("save")->setVisible(false);
+    #else
+    getWidget<Button>("save")->setVisible(false);
     #endif
 }   // saveGPButton
 
