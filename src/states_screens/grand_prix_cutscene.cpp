@@ -18,23 +18,47 @@
 #include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "modes/cutscene_world.hpp"
+#include "race/grand_prix_data.hpp"
+#include "race/grand_prix_manager.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/grand_prix_cutscene.hpp"
+#include "tracks/track_manager.hpp"
+
+#include <string>
+#include <vector>
 
 typedef GUIEngine::ButtonWidget Button;
 
-/** A Button to save the GP if it was a random one */
+/** A Button to save the GP if it was a random GP */
 void GrandPrixCutscene::saveGPButton()
 {
-    #ifdef IMPLEMENTATION_FINISHED
     if (race_manager->getGrandPrix().getId() != "random")
         getWidget<Button>("save")->setVisible(false);
-    #else
-    getWidget<Button>("save")->setVisible(false);
-    #endif
 }   // saveGPButton
 
 // ----------------------------------------------------------------------------
 
+/** \brief Creates a new GP with the same content as the current and saves it
+ *  The GP that the race_manager provides can't be used because we need some
+ *  functions and settings that the GP manager only gives us through
+ *  createNewGP(). */
+void GrandPrixCutscene::onNewGPWithName(const irr::core::stringw& name)
+{
+    // Create a new gp with the corre
+    GrandPrixData* gp = grand_prix_manager->createNewGP(name);
+    const GrandPrixData current_gp = race_manager->getGrandPrix();
+    std::vector<std::string> tracks  = current_gp.getTrackNames();
+    std::vector<int>         laps    = current_gp.getLaps();
+    std::vector<bool>        reverse = current_gp.getReverse();
+    for (unsigned int i = 0; i < laps.size(); i++)
+        gp->addTrack(track_manager->getTrack(tracks[i]), laps[i], reverse[i]);
+    gp->writeToFile();
+
+    // Avoid double-save
+    getWidget<Button>("save")->setVisible(false);
+}   // onNewGPWithName
+
+// ----------------------------------------------------------------------------
 
 void GrandPrixCutscene::eventCallback(GUIEngine::Widget* widget,
                                       const std::string& name,
@@ -44,8 +68,9 @@ void GrandPrixCutscene::eventCallback(GUIEngine::Widget* widget,
     {
         ((CutsceneWorld*)World::getWorld())->abortCutscene();
     }
-    else if (name == "save_gp")
+    else if (name == "save")
     {
+        new EnterGPNameDialog(this, 0.5f, 0.4f);
     }
 }   // eventCallback
 

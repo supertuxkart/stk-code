@@ -21,16 +21,21 @@
 #include "guiengine/screen.hpp"
 #include "guiengine/widgets/button_widget.hpp"
 #include "race/race_manager.hpp"
+#include "states_screens/dialogs/enter_gp_name_dialog.hpp"
 
 #include <string>
 
-class GrandPrixCutscene: public GUIEngine::CutsceneScreen
+class GrandPrixCutscene: public GUIEngine::CutsceneScreen,
+                         public EnterGPNameDialog::INewGPListener
 {
     friend class GUIEngine::ScreenSingleton<GrandPrixCutscene>;
 public:
     GrandPrixCutscene(const char * filename) : CutsceneScreen(filename) {}
 protected:
     void saveGPButton();
+
+    /** implement callback from INewGPListener */
+    void onNewGPWithName(const irr::core::stringw& name);
 
     // implement callbacks from parent class GUIEngine::Screen
     void eventCallback(GUIEngine::Widget* widget,
