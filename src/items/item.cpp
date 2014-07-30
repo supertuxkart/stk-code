@@ -39,10 +39,10 @@ Item::Item(ItemType type, const Vec3& xyz, const Vec3& normal,
 
     m_distance_2        = 1.2f;
     initItem(type, xyz);
-    // Sets heading to 0, and sets pitch and roll depending on the normal. */
-    m_original_hpr.setHPR(btQuaternion(-normal.cross(Vec3(0, 1, 0)),
-                                        normal.angle(Vec3(0, 1, 0)))
-        );
+    //* Rotate item depending on the normal */
+    if (normal.angle(Vec3(0, 1, 0))!= 0)
+        m_original_hpr.setHPR(btQuaternion(-normal.cross(Vec3(0, 1, 0)),
+                                           normal.angle(Vec3(0, 1, 0))));
     m_original_mesh     = mesh;
     m_original_lowmesh  = lowres_mesh;
     m_listener          = NULL;
