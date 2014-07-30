@@ -33,7 +33,7 @@
    // Shows line from kart to its aim point
 #  undef AI_DEBUG_KART_AIM
 #endif
-
+#define AI_DEBUG
 #include "karts/controller/skidding_ai.hpp"
 
 #ifdef AI_DEBUG
@@ -380,7 +380,7 @@ void SkiddingAI::update(float dt)
             m_controls->m_fire  = true;
         }
     }
-
+    
     /*And obviously general kart stuff*/
     AIBaseController::update(dt);
 }   // update
@@ -2052,7 +2052,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
     Vec3 forw(0, 0, 50);
     m_curve[CURVE_KART]->addPoint(m_kart->getTrans()(forw)+eps);
 #endif
-    *last_node = m_next_node_index[m_track_node];
+    *last_node = m_track_node;
     float angle = QuadGraph::get()->getAngleToNext(m_track_node,
                                               m_successor_index[m_track_node]);
     int target_sector;
@@ -2136,7 +2136,7 @@ void SkiddingAI::findNonCrashingPointFixed(Vec3 *aim_position, int *last_node)
             if ( distance + m_kart_width * 0.5f
                  > QuadGraph::get()->getNode((*last_node+j)%QuadGraph::get()->getNumNodes() ).getPathWidth()*0.5f )
             {
-                *aim_position = QuadGraph::get()->getUnrolledQuadOfNode(m_track_node,future_successor_idx,j)
+                *aim_position = QuadGraph::get()->getUnrolledQuadOfNode(m_track_node,future_successor_idx,j+1)
                                                  .getCenter();
                 return;
             }
