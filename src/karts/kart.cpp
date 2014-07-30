@@ -959,7 +959,7 @@ bool Kart::isOnGround() const
 */
 bool Kart::isNearGround() const
 {
-    if(m_terrain_info->getHoT()==Track::NOHIT)
+    if((m_terrain_info->getHitPoint() - getXYZ()).length() ==Track::NOHIT)
         return false;
     else
         return ((getXYZ().getY() - m_terrain_info->getHoT())
@@ -1179,7 +1179,8 @@ void Kart::update(float dt)
         (!m_terrain_info->getMaterial() ||
          !m_terrain_info->getMaterial()->hasGravity())          &&
         !getKartAnimation() && fabs(roll)>60*DEGREE_TO_RAD &&
-                              fabs(getSpeed())<3.0f                )
+                              fabs(getSpeed())<3.0f         &&
+                              !m_flying)
     {
         new RescueAnimation(this, /*is_auto_rescue*/true);
     }
