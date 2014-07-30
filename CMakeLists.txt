@@ -29,7 +29,7 @@ else()
 endif()
 
 if(UNIX AND NOT APPLE)
-    option(USE_XRANDR "Use xrandr instead of vidmode" OFF)
+    option(USE_XRANDR "Use xrandr instead of vidmode" ON)
 endif()
 
 set(STK_SOURCE_DIR "src")
