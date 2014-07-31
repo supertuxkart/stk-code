@@ -655,9 +655,9 @@ btTransform LinearWorld::getRescueTransform(unsigned int index) const
     btQuaternion r = q1*q2;
     btVector3 axis = r.getAxis();
     float angle = r.getAngle();
-    Log::verbose("rescue", "%d angle %f axis %f %f %f pos %f %f %f",
-                 index, angle, axis.getX(),axis.getY(),axis.getZ(),
-                 xyz.getX(),xyz.getY(),xyz.getZ());
+    //Log::debug("rescue", "%d angle %f axis %f %f %f pos %f %f %f",
+    //             index, angle, axis.getX(),axis.getY(),axis.getZ(),
+    //            xyz.getX(),xyz.getY(),xyz.getZ());
 #endif
     return pos;
 }   // getRescueTransform
