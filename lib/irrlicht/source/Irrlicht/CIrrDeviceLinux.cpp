@@ -49,6 +49,9 @@
 
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 
+#define XRANDR_ROTATION_LEFT    (1 << 1)
+#define XRANDR_ROTATION_RIGHT   (1 << 3)
+
 namespace irr
 {
 	namespace video
@@ -346,8 +349,20 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		for (int i = 0; i < res->nmode; i++)
 		{
 			const XRRModeInfo* mode = &res->modes[i];
+			unsigned int w, h;
+			
+			if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
+			{
+				w = mode->height;
+				h = mode->width;
+			} 
+			else 
+			{
+				w = mode->width;
+				h = mode->height;
+			}
 
-			if (bestMode == -1 && mode->width == Width && mode->height == Height)
+			if (bestMode == -1 && w == Width && h == Height)
 			{
 				for (int j = 0; j < output->nmode; j++)
 				{
@@ -359,7 +374,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					}
 				}
 			}
-			else if (bestMode != -1 && mode->width == Width && mode->height == Height)
+			else if (bestMode != -1 && w == Width && h == Height)
 			{
 				refresh_rate_new = (mode->dotClock * 1000.0) / (mode->hTotal * mode->vTotal);
 
@@ -1628,13 +1643,25 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				for (int i = 0; i < res->nmode; i++)
 				{
 					const XRRModeInfo* mode = &res->modes[i];
+					unsigned int w, h;
+
+					if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
+					{
+						w = mode->height;
+						h = mode->width;
+					} 
+					else 
+					{
+						w = mode->width;
+						h = mode->height;
+					}
 
 					for (int j = 0; j < output->nmode; j++)
-					{
+					{            
 						if (mode->id == output->modes[j])
 						{
 							VideoModeList.addMode(core::dimension2d<u32>(
-									mode->width, mode->height), defaultDepth);
+									w, h), defaultDepth);
 							break;
 						}
 					}
@@ -1643,7 +1670,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					{
 						old_mode = crtc->mode;
 						VideoModeList.setDesktop(defaultDepth,
-							core::dimension2d<u32>(mode->width, mode->height));
+							core::dimension2d<u32>(w, h));
 					}
 				}
 
