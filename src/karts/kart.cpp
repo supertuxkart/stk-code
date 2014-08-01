@@ -1169,20 +1169,31 @@ void Kart::update(float dt)
     // But only do this if auto-rescue is enabled (i.e. it will be disabled in
     // battle mode), and the material the kart is driving on does not have
     // gravity (which can
-    
-    unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
-    const Vec3 quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
-    btQuaternion q = getTrans().getRotation();
-    float roll = quadNormal.angle((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
-
-    if(World::getWorld()->getTrack()->isAutoRescueEnabled()     &&
-        (!m_terrain_info->getMaterial() ||
-         !m_terrain_info->getMaterial()->hasGravity())          &&
-        !getKartAnimation() && fabs(roll)>60*DEGREE_TO_RAD &&
-                              fabs(getSpeed())<3.0f         &&
-                              !m_flying)
+    // For now we onyl do this if no battle mode. Later on we might merge the battle AI
+    // and have a unified interface and remove this if clause
+    unsigned int sector;
+    Vec3 quadNormal;
+    if (!QuadGraph::get())
     {
-        new RescueAnimation(this, /*is_auto_rescue*/true);
+        sector = 0;
+        quadNormal = Vec3(0, 1, 0);
+    }
+    else
+    {
+        sector = ((LinearWorld*)World::getWorld())->getTrackSector(getWorldKartId()).getCurrentGraphNode();
+        quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+        btQuaternion q = getTrans().getRotation();
+        float roll = quadNormal.angle((Vec3(0, 1, 0).rotate(q.getAxis(), q.getAngle())));
+
+        if (World::getWorld()->getTrack()->isAutoRescueEnabled() &&
+            (!m_terrain_info->getMaterial() ||
+            !m_terrain_info->getMaterial()->hasGravity()) &&
+            !getKartAnimation() && fabs(roll) > 60 * DEGREE_TO_RAD &&
+            fabs(getSpeed()) < 3.0f         &&
+            !m_flying)
+        {
+            new RescueAnimation(this, /*is_auto_rescue*/true);
+        }
     }
 
     // Add a certain epsilon (0.3) to the height of the kart. This avoids
@@ -1209,6 +1220,7 @@ void Kart::update(float dt)
     
     
     m_terrain_info->update(getXYZ() + epsilon*(quadNormal), -quadNormal);
+   
 
 
     if(m_body->getBroadphaseHandle())
@@ -1229,7 +1241,15 @@ void Kart::update(float dt)
         // let kart fall a bit before rescuing
         const Vec3 *min, *max;
         World::getWorld()->getTrack()->getAABB(&min, &max);
-        if(min->getY() - getXYZ().getY() > 17 && !m_flying &&
+
+        // We do this for now because dist_to_sector is not defined 
+        float dist_to_sector;
+        if (QuadGraph::get())
+            dist_to_sector = getXYZ().distance(QuadGraph::get()->getQuadOfNode(sector).getCenter());
+        else
+            dist_to_sector = 0;
+        
+        if((min->getY() - getXYZ().getY() > 17 || dist_to_sector > 25) && !m_flying &&
            !getKartAnimation())
             new RescueAnimation(this);
     }
@@ -2044,7 +2064,7 @@ void Kart::updatePhysics(float dt)
     {
         Vec3 diff = getXYZ() - getTerrainInfo()->getHitPoint();
         float height = diff.dot(getNormal());
-        if(height>0.5f)
+        if(height>0.5f && !m_flying)
         {
             btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
             btVector3 new_up = 0.9f * kart_up + 0.1f * getNormal();
