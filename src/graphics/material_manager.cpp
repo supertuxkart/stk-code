@@ -239,7 +239,7 @@ bool MaterialManager::pushTempMaterial(const XMLNode *root,
         if(!node)
         {
             // We don't have access to the filename at this stage anymore :(
-            fprintf(stderr, "Unknown node in material.xml file\n");
+            Log::warn("MaterialManager", "Unknown node in material.xml file.");
             continue;
         }
         try
@@ -249,7 +249,7 @@ bool MaterialManager::pushTempMaterial(const XMLNode *root,
         catch(std::exception& e)
         {
             // The message contains a '%s' for the filename
-            fprintf(stderr, e.what(), filename.c_str());
+            Log::warn("MaterialManager", e.what(), filename.c_str());
         }
     }   // for i<xml->getNumNodes)(
     return true;

@@ -256,7 +256,7 @@ void AddonsManager::initAddons(const XMLNode *xml)
             Log::warn(
                 "[AddonsManager] Removing '%s' which is not on the server anymore.\n",
                 m_addons_list.getData()[i].getId().c_str() );
-        std::string icon = m_addons_list.getData()[i].getIconBasename();
+        const std::string &icon = m_addons_list.getData()[i].getIconBasename();
         std::string icon_file =file_manager->getAddonsFile("icons/"+icon);
         if(file_manager->fileExists(icon_file))
         {

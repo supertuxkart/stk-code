@@ -26,7 +26,7 @@
 using namespace irr;
 
 #include "states_screens/race_gui_base.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class AbstractKart;
 class InputMap;

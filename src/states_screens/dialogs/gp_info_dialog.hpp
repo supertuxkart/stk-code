@@ -20,7 +20,7 @@
 #define HEADER_GP_INFO_DIALOG_HPP
 
 #include "guiengine/modaldialog.hpp"
-// Don't include grand_prix_data.hpp here or the compilation will fail
+#include "race/grand_prix_data.hpp"
 
 
 class GrandPrixData;
@@ -39,7 +39,9 @@ class GPInfoDialog : public GUIEngine::ModalDialog
 protected: // Necessary for RandomGPInfoDialog
     GUIEngine::IconButtonWidget* m_screenshot_widget;
     float m_curr_time;
-    GrandPrixData* m_gp;
+
+    /** The grand prix data. */
+    GrandPrixData m_gp;
 
     /** height of the separator over the body */
     int m_over_body;

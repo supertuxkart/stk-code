@@ -388,7 +388,7 @@ void TrackObjectPresentationMesh::init(const XMLNode* xml_node, scene::ISceneNod
         m_frame_start = 0;
         m_frame_end = 0;
 
-        if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL)
+        if (World::getWorld() != NULL && World::getWorld()->getTrack() != NULL && xml_node != NULL)
             World::getWorld()->getTrack()->handleAnimatedTextures(m_node, *xml_node);
     }
 //#ifdef DEBUG
@@ -531,10 +531,7 @@ TrackObjectPresentationSound::TrackObjectPresentationSound(const XMLNode& xml_no
         }
     }
     else
-    {
-        fprintf(stderr,
-             "[TrackObject] Sound emitter object could not be created\n");
-    }
+        Log::error("TrackObject", "Sound emitter object could not be created.");
 
     if (trigger_when_near)
     {
@@ -788,9 +785,7 @@ TrackObjectPresentationActionTrigger::TrackObjectPresentationActionTrigger(const
     m_action_active = true;
 
     if (m_action.size() == 0)
-    {
-        fprintf(stderr, "[TrackObject] WARNING: action-trigger has no action defined\n");
-    }
+        Log::warn("TrackObject", "Action-trigger has no action defined.");
 
     ItemManager::get()->newItem(m_init_xyz, trigger_distance, this);
 }

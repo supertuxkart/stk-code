@@ -103,12 +103,26 @@ struct UniformHelper
 };
 
 void bypassUBO(GLuint Program);
+GLuint getUniformLocation(GLuint program, const char* name);
 
 template<typename... Args>
 class ShaderHelper
 {
 protected:
     std::vector<GLuint> uniforms;
+
+    void AssignUniforms(const char* name)
+    {
+        uniforms.push_back(getUniformLocation(Program, name));
+    }
+
+    template<typename... T>
+    void AssignUniforms(const char* name, T... rest)
+    {
+        uniforms.push_back(getUniformLocation(Program, name));
+        AssignUniforms(rest...);
+    }
+
 public:
     GLuint Program;
 
@@ -125,6 +139,19 @@ class ShaderHelperSingleton : public Singleton<T>
 {
 protected:
     std::vector<GLuint> uniforms;
+    
+    void AssignUniforms(const char* name)
+    {
+        uniforms.push_back(getUniformLocation(Program, name));
+    }
+
+    template<typename... U>
+    void AssignUniforms(const char* name, U... rest)
+    {
+        uniforms.push_back(getUniformLocation(Program, name));
+        AssignUniforms(rest...);
+    }
+
 public:
     friend class Singleton<class ObjectPass1Shader>;
     GLuint Program;
@@ -168,7 +195,7 @@ public:
     NormalMapShader();
 };
 
-class InstancedObjectPass1Shader : public ShaderHelper<>
+class InstancedObjectPass1Shader : public ShaderHelperSingleton<InstancedObjectPass1Shader>
 {
 public:
     GLuint TU_tex;
@@ -176,9 +203,7 @@ public:
     InstancedObjectPass1Shader();
 };
 
-extern InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
-
-class InstancedObjectRefPass1Shader : public ShaderHelper<>
+class InstancedObjectRefPass1Shader : public ShaderHelperSingleton<InstancedObjectRefPass1Shader>
 {
 public:
     GLuint TU_tex;
@@ -186,9 +211,7 @@ public:
     InstancedObjectRefPass1Shader();
 };
 
-extern InstancedObjectRefPass1Shader *InstancedObjectRefPass1ShaderInstance;
-
-class InstancedGrassPass1Shader : public ShaderHelper<core::vector3df>
+class InstancedGrassPass1Shader : public ShaderHelperSingleton<InstancedGrassPass1Shader, core::vector3df>
 {
 public:
     GLuint TU_tex;
@@ -196,9 +219,7 @@ public:
     InstancedGrassPass1Shader();
 };
 
-extern InstancedGrassPass1Shader *InstancedGrassPass1ShaderInstance;
-
-class ObjectPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
+class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_Albedo;
@@ -206,9 +227,7 @@ public:
     ObjectPass2Shader();
 };
 
-extern ObjectPass2Shader *ObjectPass2ShaderInstance;
-
-class InstancedObjectPass2Shader : public ShaderHelper<video::SColorf>
+class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>
 {
 public:
     GLuint TU_Albedo;
@@ -216,9 +235,7 @@ public:
     InstancedObjectPass2Shader();
 };
 
-extern InstancedObjectPass2Shader *InstancedObjectPass2ShaderInstance;
-
-class InstancedObjectRefPass2Shader : public ShaderHelper<video::SColorf>
+class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>
 {
 public:
     GLuint TU_Albedo;
@@ -226,9 +243,7 @@ public:
     InstancedObjectRefPass2Shader();
 };
 
-extern InstancedObjectRefPass2Shader *InstancedObjectRefPass2ShaderInstance;
-
-class DetailledObjectPass2Shader : public ShaderHelper<core::matrix4, video::SColorf>
+class DetailledObjectPass2Shader : public ShaderHelperSingleton<DetailledObjectPass2Shader, core::matrix4>
 {
 public:
     GLuint TU_Albedo, TU_detail;
@@ -236,9 +251,7 @@ public:
     DetailledObjectPass2Shader();
 };
 
-extern DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
-
-class ObjectUnlitShader : public ShaderHelper<core::matrix4>
+class ObjectUnlitShader : public ShaderHelperSingleton<ObjectUnlitShader, core::matrix4>
 {
 public:
     GLuint TU_tex;
@@ -246,9 +259,7 @@ public:
     ObjectUnlitShader();
 };
 
-extern ObjectUnlitShader *ObjectUnlitShaderInstance;
-
-class ObjectRefPass2Shader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
+class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_Albedo;
@@ -256,9 +267,7 @@ public:
     ObjectRefPass2Shader();
 };
 
-extern ObjectRefPass2Shader *ObjectRefPass2ShaderInstance;
-
-class GrassPass2Shader : public ShaderHelper<core::matrix4, core::vector3df, video::SColorf>
+class GrassPass2Shader : public ShaderHelperSingleton<GrassPass2Shader, core::matrix4, core::vector3df>
 {
 public:
     GLuint TU_Albedo;
@@ -266,9 +275,7 @@ public:
     GrassPass2Shader();
 };
 
-extern GrassPass2Shader *GrassPass2ShaderInstance;
-
-class InstancedGrassPass2Shader : public ShaderHelper<core::vector3df, core::vector3df, video::SColorf>
+class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>
 {
 public:
     GLuint TU_Albedo, TU_dtex;
@@ -276,9 +283,7 @@ public:
     InstancedGrassPass2Shader();
 };
 
-extern InstancedGrassPass2Shader *InstancedGrassPass2ShaderInstance;
-
-class SphereMapShader : public ShaderHelper<core::matrix4, core::matrix4, video::SColorf>
+class SphereMapShader : public ShaderHelperSingleton<SphereMapShader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_tex;
@@ -286,17 +291,13 @@ public:
     SphereMapShader();
 };
 
-extern SphereMapShader *SphereMapShaderInstance;
-
-class SplattingShader : public ShaderHelper<core::matrix4, video::SColorf>
+class SplattingShader : public ShaderHelperSingleton<SplattingShader, core::matrix4>
 {
 public:
     GLuint TU_tex_layout, TU_tex_detail0, TU_tex_detail1, TU_tex_detail2, TU_tex_detail3;
 
     SplattingShader();
 };
-
-extern SplattingShader *SplattingShaderInstance;
 
 class BubbleShader
 {
@@ -308,7 +309,7 @@ public:
     static void setUniforms(const core::matrix4 &ModelViewProjectionMatrix, unsigned TU_tex, float time, float transparency);
 };
 
-class TransparentShader : public ShaderHelper<core::matrix4, core::matrix4>
+class TransparentShader : public ShaderHelperSingleton<TransparentShader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_tex;
@@ -316,17 +317,13 @@ public:
     TransparentShader();
 };
 
-extern TransparentShader *TransparentShaderInstance;
-
-class TransparentFogShader : public ShaderHelper<core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
+class TransparentFogShader : public ShaderHelperSingleton<TransparentFogShader, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
 {
 public:
     GLuint TU_tex;
 
     TransparentFogShader();
 };
-
-extern TransparentFogShader *TransparentFogShaderInstance;
 
 class BillboardShader
 {

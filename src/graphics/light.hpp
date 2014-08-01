@@ -20,7 +20,7 @@
 #define HEADER_LIGHT_HPP
 
 #include <ISceneNode.h>
-#include <utils/cpp2011.h>
+#include <utils/cpp2011.hpp>
 #include <vector>
 
 using namespace irr;

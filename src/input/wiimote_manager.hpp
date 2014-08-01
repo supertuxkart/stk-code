@@ -23,7 +23,7 @@
 
 #include "input/wiimote.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 #include "IEventReceiver.h"
 

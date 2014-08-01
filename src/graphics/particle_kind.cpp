@@ -23,6 +23,7 @@
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "utils/constants.hpp"
+#include "utils/log.hpp"
 
 #include <stdexcept>
 
@@ -100,7 +101,7 @@ ParticleKind::ParticleKind(const std::string file) : m_min_start_color(255,255,2
     }
     else
     {
-        fprintf(stderr, "[ParticleKind] <particles> main node has unknown value for attribute 'emitter'\n");
+        Log::warn("ParticleKind", "<particles> main node has unknown value for attribute 'emitter'.");
         m_shape = EMITTER_POINT;
     }
 
@@ -254,8 +255,8 @@ Material* ParticleKind::getMaterial() const
     }
     else
     {
-        fprintf(stderr, "[ParticleKind] WARNING: particle image '%s' does not appear in the list of "
-                "currently known materials\n", m_material_file.c_str());
+        Log::warn("ParticleKind", "Particle image '%s' does not appear in the list of "
+                  "currently known materials.", m_material_file.c_str());
         return NULL;
     }
 }

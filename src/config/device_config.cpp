@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include "config/device_config.hpp"
+#include "utils/log.hpp"
 #include <SKeyMap.h>
 using namespace irr;
 
@@ -226,7 +227,7 @@ bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
     // Never hurts to check ;)
     if (xml == NULL)
     {
-        fprintf(stderr, "Error: null pointer (DeviceConfig::deserializeAction)\n");
+        Log::error("DeviceConfig", "Null pointer (DeviceConfig::deserializeAction)");
         return false;
     }
 
@@ -243,8 +244,8 @@ bool DeviceConfig::deserializeAction(irr::io::IrrXMLReader* xml)
     }
     if(binding_id==-1)
     {
-        printf("WARNING: DeviceConfig::deserializeAction : action '%s' is unknown\n",
-               name_string);
+        Log::warn("DeviceConfig", "DeviceConfig::deserializeAction : action '%s' is unknown.",
+                  name_string);
         return false;
     }
 
@@ -349,23 +350,15 @@ GamepadConfig::GamepadConfig(irr::io::IrrXMLReader* xml) : DeviceConfig( DEVICE_
 {
     const char* name_string = xml->getAttributeValue("name");
     if(name_string == NULL)
-    {
-        printf("ERROR: Unnamed joystick in config file\n");
-    }
+        Log::error("DeviceConfig", "Unnamed joystick in config file.");
     else
-    {
         m_name = name_string;
-    }
 
     const char* enabled_string = xml->getAttributeValue("enabled");
     if (enabled_string != NULL)
-    {
         m_enabled = (strcmp(enabled_string, "true") == 0);
-    }
     else
-    {
         m_enabled = true;
-    }
 
     m_plugged = 0;
     setDefaultBinds();

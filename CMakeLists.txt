@@ -17,7 +17,6 @@ option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
 if(UNIX)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
-    option(USE_XRANDR "Use xrandr instead of vidmode" OFF)
 endif()
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -27,6 +26,10 @@ if(MSVC)
     mark_as_advanced(WIIUSE_BUILD)
 else()
     set(WIIUSE_BUILD ON)
+endif()
+
+if(UNIX AND NOT APPLE)
+    option(USE_XRANDR "Use xrandr instead of vidmode" ON)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -123,10 +126,6 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
-# Xrandr
-if(UNIX AND USE_XRANDR)
-    find_package(Xrandr REQUIRED)
-endif()
 
 if(UNIX)
 #    if(USE_CPP2011)
@@ -139,12 +138,13 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
-    find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
-    mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
-else()
-    set(IRRLICHT_XF86VM_LIBRARY "")
+    if(USE_XRANDR)
+        find_package(Xrandr REQUIRED)
+    else()
+        find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
+        mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
+    endif()
 endif()
-
 
     
 # Set some compiler options
@@ -158,12 +158,12 @@ if(WIN32)
 
     # And shut up about unsafe stuff
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-	# VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
-	# Since STK uses DEBUG, this is added for debug compilation only:
+    # VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
+    # Since STK uses DEBUG, this is added for debug compilation only:
     set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)
 else()
     # All non VS generators used create only a single compile mode, so
-	# compile flags can be simplye be added
+    # compile flags can be simplye be added
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         add_definitions(-DDEBUG)
     else()
@@ -251,10 +251,16 @@ target_link_libraries(supertuxkart
     angelscript
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
-    ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
-
+    
+if(UNIX AND NOT APPLE)
+    if(USE_XRANDR)
+        target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
+    else()
+        target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
+    endif()
+endif()
 
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
@@ -288,11 +294,6 @@ if(USE_WIIUSE)
     endif()
     add_definitions(-DENABLE_WIIUSE)
 
-endif()
-
-# Xrandr
-if(UNIX AND USE_XRANDR)
-    target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
 endif()
 
 if(MSVC)

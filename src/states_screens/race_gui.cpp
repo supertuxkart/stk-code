@@ -108,7 +108,7 @@ RaceGUI::RaceGUI()
     int n = race_manager->getNumberOfKarts();
 
     m_animation_states.resize(n);
-    m_rank_animation_start_times.resize(n);
+    m_rank_animation_duration.resize(n);
     m_last_ranks.resize(n);
 }   // RaceGUI
 
@@ -211,7 +211,7 @@ void RaceGUI::renderPlayerView(const Camera *camera, float dt)
     if(!World::getWorld()->isRacePhase()) return;
 
     drawPowerupIcons   (kart, viewport, scaling);
-    drawSpeedEnergyRank(kart, viewport, scaling);
+    drawSpeedEnergyRank(kart, viewport, scaling, dt);
 
     if (!m_is_tutorial)
         drawLap(kart, viewport, scaling);
@@ -601,10 +601,18 @@ void RaceGUI::drawEnergyMeter(int x, int y, const AbstractKart *kart,
 }   // drawEnergyMeter
 
 //-----------------------------------------------------------------------------
+/** Draws the rank of a player.
+ *  \param kart The kart of the player.
+ *  \param offset Offset of top left corner for this display (for splitscreen).
+ *  \param min_ratio Scaling of the screen (for splitscreen).
+ *  \param meter_width Width of the meter (inside which the rank is shown).
+ *  \param meter_height Height of the meter (inside which the rank is shown).
+ *  \param dt Time step size.
+ */
 void RaceGUI::drawRank(const AbstractKart *kart,
                       const core::vector2df &offset,
                       float min_ratio, int meter_width,
-                      int meter_height)
+                      int meter_height, float dt)
 {
     // Draw rank
     WorldWithRank *world = dynamic_cast<WorldWithRank*>(World::getWorld());
@@ -617,9 +625,13 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     {
         if (m_last_ranks[id] != kart->getPosition())
         {
-            m_rank_animation_start_times[id] = world->getTime();
+            m_rank_animation_duration[id] = 0.0f;
             m_animation_states[id] = AS_SMALLER;
         }
+    }
+    else
+    {
+        m_rank_animation_duration[id] += dt;
     }
 
     float scale = 1.0f;
@@ -628,13 +640,12 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     const float MIN_SHRINK = 0.3f;
     if (m_animation_states[id] == AS_SMALLER)
     {
-        scale = 1.0f - (world->getTime() - m_rank_animation_start_times[id])
-            / DURATION;
+        scale = 1.0f - m_rank_animation_duration[id]/ DURATION;
         rank = m_last_ranks[id];
         if (scale < MIN_SHRINK)
         {
             m_animation_states[id] = AS_BIGGER;
-            m_rank_animation_start_times[id] = world->getTime();
+            m_rank_animation_duration[id] = 0.0f;
             // Store the new rank
             m_last_ranks[id] = kart->getPosition();
             scale = MIN_SHRINK;
@@ -642,8 +653,7 @@ void RaceGUI::drawRank(const AbstractKart *kart,
     }
     else if (m_animation_states[id] == AS_BIGGER)
     {
-        scale = (world->getTime() - m_rank_animation_start_times[id])
-            / DURATION + MIN_SHRINK;
+        scale = m_rank_animation_duration[id] / DURATION + MIN_SHRINK;
         rank = m_last_ranks[id];
         if (scale > 1.0f)
         {
@@ -680,10 +690,12 @@ void RaceGUI::drawRank(const AbstractKart *kart,
  *  \param kart The kart for which to show the data.
  *  \param viewport The viewport to use.
  *  \param scaling Which scaling to apply to the speedometer.
+ *  \param dt Time step size.
  */
 void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
                                  const core::recti &viewport,
-                                 const core::vector2df &scaling)
+                                 const core::vector2df &scaling,
+                                 float dt)
 {
     float min_ratio         = std::min(scaling.X, scaling.Y);
     const int SPEEDWIDTH   = 128;
@@ -712,7 +724,7 @@ void RaceGUI::drawSpeedEnergyRank(const AbstractKart* kart,
 
     const float speed =  kart->getSpeed();
 
-    drawRank(kart, offset, min_ratio, meter_width, meter_height);
+    drawRank(kart, offset, min_ratio, meter_width, meter_height, dt);
 
 
     if(speed <=0) return;  // Nothing to do if speed is negative.

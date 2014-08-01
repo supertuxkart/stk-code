@@ -24,17 +24,15 @@
 
 class RandomGPInfoDialog : public GPInfoDialog
 {
-public:
-    enum REVERSED
-    {
-        NO_REVERSE = 0,
-        ALL_REVERSE = 1,
-        MIXED = 2
-    };
 private:
+    /** How many tracks to pick. */
     unsigned int m_number_of_tracks;
+
+    /** Name of the track group from which to pick tracks. */
     std::string m_trackgroup;
-    REVERSED m_use_reverse;
+
+    /** How reverse settings should be determined. */
+    GrandPrixData::GPReverseType m_use_reverse;
 
 public:
     static const int SPINNER_HEIGHT = 40;

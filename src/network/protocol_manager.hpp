@@ -102,9 +102,9 @@ typedef struct EventProcessingInfo
  * frames per second. Then, the management of protocols is thread-safe: any
  * object can start/pause/stop protocols whithout problems.
  */
-class ProtocolManager : public Singleton<ProtocolManager>
+class ProtocolManager : public AbstractSingleton<ProtocolManager>
 {
-    friend class Singleton<ProtocolManager>;
+    friend class AbstractSingleton<ProtocolManager>;
     friend void* protocolManagerAsynchronousUpdate(void* data);
     public:
         

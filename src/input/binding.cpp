@@ -51,7 +51,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
     // Proceed only if neccesary tags were found
     if ((id_string == NULL) ||  (event_string == NULL))
     {
-        printf("No id-string or event-string given - ignored.\n");
+        Log::warn("Binding", "No id-string or event-string given - ignored.");
         return false;
     }
 
@@ -66,7 +66,7 @@ bool Binding::deserialize(irr::io::IrrXMLReader* xml)
         // If the action is a stick motion & a direction is defined
         if (dir_string == NULL)
         {
-            printf("WARNING: IT_STICKMOTION without direction, ignoring.\n");
+            Log::warn("Binding", "IT_STICKMOTION without direction, ignoring.");
             return false;
         }
         

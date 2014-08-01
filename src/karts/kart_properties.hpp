@@ -211,7 +211,7 @@ private:
     float       m_nitro_small_container;
     /** Nitro amount for big bittle. */
     float       m_nitro_big_container;
-    /* How much the speed of a kart might exceed its maximum speed (in m/s). */
+    /** How much the speed of a kart might exceed its maximum speed (in m/s). */
     float       m_nitro_max_speed_increase;
     /** Additional engine force to affect the kart. */
     float       m_nitro_engine_force;
@@ -250,7 +250,7 @@ private:
      /** The speed with which the roll (when leaning in a curve) changes
       *  (in radians/second). */
      float      m_lean_speed;
-     
+
      /** How long a jump must be in order to trigger the jump animation. */
      float      m_jump_animation_time;
 
@@ -547,7 +547,7 @@ public:
     {
         return m_speed_weighted_object_properties;
     }
-    
+
     // ------------------------------------------------------------------------
     /** Returns the wheel base (distance front to rear axis). */
     float getWheelBase              () const {return m_wheel_base;            }

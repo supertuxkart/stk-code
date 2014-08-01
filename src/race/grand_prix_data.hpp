@@ -24,7 +24,6 @@
 #include <string>
 #include <vector>
 
-#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "utils/translation.hpp"
 
 using irr::core::stringw;
@@ -70,20 +69,34 @@ private:
     bool isTrackAvailable(const std::string &id, bool includeLocked) const;
 
 public:
+    /** Used to define the reverse setting when creating a random GP:
+     *  No reverse, all reverse (if available on the track), random
+     *  selection. */
+    enum GPReverseType
+    {
+        GP_NO_REVERSE = 0,
+        GP_ALL_REVERSE = 1,
+        GP_RANDOM_REVERSE = 2
+    };   // GPReverseType
+
+public:
 #if (defined(WIN32) || defined(_WIN32)) && !defined(__MINGW32__)
 #  pragma warning(disable:4290)
 #endif
     /** Load the GrandPrixData from the given filename */
     GrandPrixData(const std::string& filename);
+
     /** Needed for simple creation of an instance of GrandPrixData */
     GrandPrixData() {};
-    /** Creates a new random GP */
-    GrandPrixData(const unsigned int number_of_tracks,
-                  const std::string& track_group,
-                  const RandomGPInfoDialog::REVERSED use_reverse);
+
     void changeTrackNumber(const unsigned int number_of_tracks,
                            const std::string& track_group);
-    void changeReverse(const RandomGPInfoDialog::REVERSED use_reverse);
+    void changeReverse(const GPReverseType use_reverse);
+
+    void createRandomGP(const unsigned int number_of_tracks,
+                        const std::string& track_group,
+                        const GPReverseType use_reverse,
+                        bool new_tracks=false);
 
     // Methods for the GP editor
     void setId(const std::string& id);

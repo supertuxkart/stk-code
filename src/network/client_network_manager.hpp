@@ -30,7 +30,7 @@
  */
 class ClientNetworkManager : public NetworkManager
 {
-    friend class Singleton<NetworkManager>;
+    friend class AbstractSingleton<NetworkManager>;
     public:
         /*! \brief Get the instance.
          *  This is a utility function to avoid passing templates parameters
@@ -38,7 +38,7 @@ class ClientNetworkManager : public NetworkManager
          */
         static ClientNetworkManager* getInstance()
         {
-            return Singleton<NetworkManager>::getInstance<ClientNetworkManager>();
+            return AbstractSingleton<NetworkManager>::getInstance<ClientNetworkManager>();
         }
 
         /*! \brief Initializes network.
