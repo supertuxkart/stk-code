@@ -245,6 +245,22 @@ void initGL()
 #endif
 }
 
+static std::string LoadHeader()
+{
+    std::string result;
+    std::ifstream Stream(file_manager->getAsset("shaders/header.txt").c_str(), std::ios::in);
+
+    if (Stream.is_open())
+    {
+        std::string Line = "";
+        while (getline(Stream, Line))
+            result += "\n" + Line;
+        Stream.close();
+    }
+
+    return result;
+}
+
 // Mostly from shader tutorial
 GLuint LoadShader(const char * file, unsigned type)
 {
@@ -258,6 +274,7 @@ GLuint LoadShader(const char * file, unsigned type)
         Code += "#define UBO_DISABLED\n";
     if (irr_driver->hasVSLayerExtension())
         Code += "#define VSLayer\n";
+    Code += LoadHeader();
     if (Stream.is_open())
     {
         std::string Line = "";
@@ -284,6 +301,7 @@ GLuint LoadShader(const char * file, unsigned type)
         ErrorMessage[0]=0;
         glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
         Log::error("GLWrap", ErrorMessage);
+        Log::error("GLWrap", Code.c_str());
         delete[] ErrorMessage;
     }
 

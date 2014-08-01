@@ -1,5 +1,4 @@
 uniform mat4 ModelViewMatrix;
-uniform mat4 ProjectionMatrix;
 uniform vec3 Position;
 uniform vec2 Size;
 
