@@ -30,7 +30,7 @@ using namespace irr;
 
 #include "graphics/lod_node.hpp"
 #include "items/item.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include "utils/no_copy.hpp"
 #include "utils/vec3.hpp"
 #include <string>

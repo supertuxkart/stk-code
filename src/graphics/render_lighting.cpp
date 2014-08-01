@@ -168,9 +168,6 @@ void IrrDriver::renderLights(unsigned pointlightcount)
     }
     m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
 
-    if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && SkyboxCubeMap)
-        irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
-
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {

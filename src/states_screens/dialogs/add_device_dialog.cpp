@@ -26,7 +26,7 @@
 #include "states_screens/dialogs/message_dialog.hpp"
 #include "states_screens/options_screen_input.hpp"
 #include "states_screens/state_manager.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/translation.hpp"
 #include "input/wiimote_manager.hpp"

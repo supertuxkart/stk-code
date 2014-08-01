@@ -20,7 +20,7 @@
 #define HEADER_WATER_HPP
 
 #include <IMeshSceneNode.h>
-#include <utils/cpp2011.h>
+#include <utils/cpp2011.hpp>
 
 using namespace irr;
 

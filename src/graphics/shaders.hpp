@@ -195,7 +195,7 @@ public:
     NormalMapShader();
 };
 
-class InstancedObjectPass1Shader : public ShaderHelper<>
+class InstancedObjectPass1Shader : public ShaderHelperSingleton<InstancedObjectPass1Shader>
 {
 public:
     GLuint TU_tex;
@@ -203,9 +203,7 @@ public:
     InstancedObjectPass1Shader();
 };
 
-extern InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
-
-class InstancedObjectRefPass1Shader : public ShaderHelper<>
+class InstancedObjectRefPass1Shader : public ShaderHelperSingleton<InstancedObjectRefPass1Shader>
 {
 public:
     GLuint TU_tex;
@@ -213,9 +211,7 @@ public:
     InstancedObjectRefPass1Shader();
 };
 
-extern InstancedObjectRefPass1Shader *InstancedObjectRefPass1ShaderInstance;
-
-class InstancedGrassPass1Shader : public ShaderHelper<core::vector3df>
+class InstancedGrassPass1Shader : public ShaderHelperSingleton<InstancedGrassPass1Shader, core::vector3df>
 {
 public:
     GLuint TU_tex;
@@ -223,9 +219,7 @@ public:
     InstancedGrassPass1Shader();
 };
 
-extern InstancedGrassPass1Shader *InstancedGrassPass1ShaderInstance;
-
-class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4, video::SColorf>
+class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_Albedo;
@@ -233,7 +227,7 @@ public:
     ObjectPass2Shader();
 };
 
-class InstancedObjectPass2Shader : public ShaderHelper<video::SColorf>
+class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>
 {
 public:
     GLuint TU_Albedo;
@@ -241,9 +235,7 @@ public:
     InstancedObjectPass2Shader();
 };
 
-extern InstancedObjectPass2Shader *InstancedObjectPass2ShaderInstance;
-
-class InstancedObjectRefPass2Shader : public ShaderHelper<video::SColorf>
+class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>
 {
 public:
     GLuint TU_Albedo;
@@ -251,9 +243,7 @@ public:
     InstancedObjectRefPass2Shader();
 };
 
-extern InstancedObjectRefPass2Shader *InstancedObjectRefPass2ShaderInstance;
-
-class DetailledObjectPass2Shader : public ShaderHelperSingleton<DetailledObjectPass2Shader, core::matrix4, video::SColorf>
+class DetailledObjectPass2Shader : public ShaderHelperSingleton<DetailledObjectPass2Shader, core::matrix4>
 {
 public:
     GLuint TU_Albedo, TU_detail;
@@ -269,7 +259,7 @@ public:
     ObjectUnlitShader();
 };
 
-class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4, video::SColorf>
+class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_Albedo;
@@ -277,7 +267,7 @@ public:
     ObjectRefPass2Shader();
 };
 
-class GrassPass2Shader : public ShaderHelperSingleton<GrassPass2Shader, core::matrix4, core::vector3df, video::SColorf>
+class GrassPass2Shader : public ShaderHelperSingleton<GrassPass2Shader, core::matrix4, core::vector3df>
 {
 public:
     GLuint TU_Albedo;
@@ -285,7 +275,7 @@ public:
     GrassPass2Shader();
 };
 
-class InstancedGrassPass2Shader : public ShaderHelper<core::vector3df, core::vector3df, video::SColorf>
+class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>
 {
 public:
     GLuint TU_Albedo, TU_dtex;
@@ -293,9 +283,7 @@ public:
     InstancedGrassPass2Shader();
 };
 
-extern InstancedGrassPass2Shader *InstancedGrassPass2ShaderInstance;
-
-class SphereMapShader : public ShaderHelperSingleton<SphereMapShader, core::matrix4, core::matrix4, video::SColorf>
+class SphereMapShader : public ShaderHelperSingleton<SphereMapShader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_tex;
@@ -303,7 +291,7 @@ public:
     SphereMapShader();
 };
 
-class SplattingShader : public ShaderHelperSingleton<SplattingShader, core::matrix4, video::SColorf>
+class SplattingShader : public ShaderHelperSingleton<SplattingShader, core::matrix4>
 {
 public:
     GLuint TU_tex_layout, TU_tex_detail0, TU_tex_detail1, TU_tex_detail2, TU_tex_detail3;

@@ -10,6 +10,7 @@
 #include "modes/world.hpp"
 #include "utils/helpers.hpp"
 #include "utils/tuple.hpp"
+#include "utils/cpp2011.hpp"
 
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,
@@ -246,29 +247,29 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterials[MAT_DEFAULT])
-            ListMatDefault::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_ALPHA_REF])
-            ListMatAlphaRef::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPHEREMAP])
-            ListMatSphereMap::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatSphereMap::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_DETAIL])
-            ListMatDetails::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         windDir = getWind();
         for_in(mesh, MeshSolidMaterials[MAT_GRASS])
-            ListMatGrass::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, windDir, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatGrass::Arguments, mesh, AbsoluteTransformation, invmodel, windDir);
 
         for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
-            ListMatUnlit::Arguments.emplace_back(mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
+            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
-            ListMatSplatting::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatSplatting::Arguments, mesh, AbsoluteTransformation, invmodel);
 
         for_in(mesh, MeshSolidMaterials[MAT_NORMAL_MAP])
-            ListMatNormalMap::Arguments.emplace_back(mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector( ListMatNormalMap::Arguments, mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -294,7 +295,7 @@ void STKMeshSceneNode::render()
                 size_t count = mesh.IndexCount;
 
                 setTexture(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
-                MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+                MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
                 glDrawElements(ptype, count, itype, 0);
@@ -408,23 +409,23 @@ void STKMeshSceneNode::render()
                 tmpcol.getBlue() / 255.0f);
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparentFog::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                pushVector(ListBlendTransparentFog::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                                                 fogmax, startH, endH, start, end, col);
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparentFog::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                pushVector(ListAdditiveTransparentFog::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                                                    fogmax, startH, endH, start, end, col);
         }
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListBlendTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparent::Arguments.emplace_back(mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListAdditiveTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
 
         for_in(mesh, TransparentMesh[TM_DISPLACEMENT])
-            ListDisplacement::Arguments.emplace_back(mesh, AbsoluteTransformation);
+            pushVector(ListDisplacement::Arguments, mesh, AbsoluteTransformation);
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);

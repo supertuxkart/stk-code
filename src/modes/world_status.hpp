@@ -18,7 +18,7 @@
 #ifndef HEADER_WORLD_STATUS_HPP
 #define HEADER_WORLD_STATUS_HPP
 
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 
 class SFXBase;
 

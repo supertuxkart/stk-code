@@ -137,6 +137,12 @@ void WorldStatus::update(const float dt)
             return;
         case TRACK_INTRO_PHASE:
             m_auxiliary_timer += dt;
+
+            if (UserConfigParams::m_artist_debug_mode &&
+                race_manager->getNumberOfKarts() == 1 &&
+                race_manager->getTrackName() != "tutorial")
+                m_auxiliary_timer += dt * 6;
+
             // Work around a bug that occurred on linux once:
             // the sfx_manager kept on reporting that it is playing,
             // while it was not - so STK would never reach the ready
