@@ -301,7 +301,6 @@ GLuint LoadShader(const char * file, unsigned type)
         ErrorMessage[0]=0;
         glGetShaderInfoLog(Id, InfoLogLength, NULL, ErrorMessage);
         Log::error("GLWrap", ErrorMessage);
-        Log::error("GLWrap", Code.c_str());
         delete[] ErrorMessage;
     }
 
