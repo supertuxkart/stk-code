@@ -68,6 +68,7 @@ void TrackObjectManager::add(const XMLNode &xml_node, scene::ISceneNode* parent,
  */
 void TrackObjectManager::init()
 {
+
     TrackObject* curr;
     for_in (curr, m_all_objects)
     {
@@ -98,7 +99,8 @@ void TrackObjectManager::disable(std::string name)
 				curr->setEnable(false);
                 if (curr->getType() == "mesh")
                 {
-                    curr->getPhysicalObject()->removeBody();
+                    if (curr->getPhysicalObject()!=NULL)
+                        curr->getPhysicalObject()->removeBody();
                 }
             }
      }
