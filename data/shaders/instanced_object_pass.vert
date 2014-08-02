@@ -1,20 +1,3 @@
-#ifdef UBO_DISABLED
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat4 InverseViewMatrix;
-uniform mat4 InverseProjectionMatrix;
-#else
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-#endif
-
 #if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
