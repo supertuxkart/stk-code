@@ -433,6 +433,10 @@ void IrrDriver::generateSkyboxCubemap()
 
     assert(SkyboxTextures.size() == 6);
     SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
+}
+
+void IrrDriver::generateDiffuseCoefficients()
+{
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
 
     if (SphericalHarmonicsTextures.size() == 6)
@@ -503,6 +507,7 @@ void IrrDriver::generateSkyboxCubemap()
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
+
 }
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
