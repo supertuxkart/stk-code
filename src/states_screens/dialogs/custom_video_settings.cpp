@@ -83,7 +83,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel( _("Disabled") );   // 0
     shadows->addLabel( _("low") );        // 1
     shadows->addLabel( _("high") );       // 2
-    shadows->setValue( UserConfigParams::m_shadows );
+    shadows->setValue(UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled);
     
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
@@ -114,7 +114,8 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         if (advanced_pipeline)
         {
             UserConfigParams::m_shadows =
-                advanced_pipeline && getWidget<SpinnerWidget>("shadows")->getValue();
+                advanced_pipeline && getWidget<SpinnerWidget>("shadows")->getValue() &&
+                getWidget<CheckBoxWidget>("ubo")->getState();
         }
         else
         {

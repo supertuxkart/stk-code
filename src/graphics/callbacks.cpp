@@ -220,7 +220,7 @@ void SunLightProvider::OnSetConstants(IMaterialRendererServices *srv, int)
     m_wind[1] += winddir.Z;
     srv->setVertexShaderConstant("wind", m_wind, 2);
 
-    if (UserConfigParams::m_shadows)
+    if (UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled)
     {
         srv->setVertexShaderConstant("shadowmat", m_shadowmat.pointer(), 16);
     }
