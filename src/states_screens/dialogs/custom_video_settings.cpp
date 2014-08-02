@@ -116,7 +116,7 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         if (advanced_pipeline && getWidget<CheckBoxWidget>("ubo")->getState())
         {
             UserConfigParams::m_shadows =
-                advanced_pipeline && getWidget<SpinnerWidget>("shadows")->getValue();
+                getWidget<SpinnerWidget>("shadows")->getValue();
         }
         else
         {
