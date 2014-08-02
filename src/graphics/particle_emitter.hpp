@@ -74,6 +74,7 @@ private:
     /** The irrlicht emitter contains this info, but as an int. We want it as a float */
     float m_min_rate, m_max_rate;
 
+    bool m_randomize_initial_y;
 
 public:
 
@@ -81,7 +82,8 @@ public:
 
     ParticleEmitter             (const ParticleKind* type,
                                  const Vec3 &position,
-                                 scene::ISceneNode* parent = NULL);
+                                 scene::ISceneNode* parent = NULL,
+                                 bool randomize_initial_y =  false);
     virtual     ~ParticleEmitter();
     virtual void update         (float dt);
     void         setCreationRateAbsolute(float fraction);
@@ -104,6 +106,8 @@ public:
     void         unsetNode() { m_node = NULL; }
 
     void         addHeightMapAffector(Track* t);
+
+    bool         randomizeInitialY() const { return m_randomize_initial_y; }
 };
 #endif
 
