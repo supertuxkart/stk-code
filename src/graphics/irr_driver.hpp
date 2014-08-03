@@ -196,6 +196,7 @@ class IrrDriver : public IEventReceiver, public NoCopy
 private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
+    bool m_need_ubo_workaround;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -277,6 +278,11 @@ public:
             return 100 + (GLMinorVersion + 3) * 10;
         else
             return 120;
+    }
+
+    bool needUBOWorkaround() const
+    {
+        return m_need_ubo_workaround;
     }
 
     bool hasVSLayerExtension() const

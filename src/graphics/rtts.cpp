@@ -226,7 +226,7 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
-    if (UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled)
+    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
     {
         shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R8, GL_RED, GL_UNSIGNED_BYTE);
         shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
@@ -265,7 +265,7 @@ RTT::~RTT()
 {
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
-    if (UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled)
+    if (UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
     {
         delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);

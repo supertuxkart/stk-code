@@ -128,7 +128,7 @@ public:
 
     void setUniforms(const Args & ... args) const
     {
-        if (UserConfigParams::m_ubo_disabled)
+        if (irr_driver->needUBOWorkaround())
             bypassUBO(Program);
         UniformHelper::setUniformsHelper(uniforms, args...);
     }
@@ -158,7 +158,7 @@ public:
 
     void setUniforms(const Args & ... args) const
     {
-        if (UserConfigParams::m_ubo_disabled)
+        if (irr_driver->needUBOWorkaround())
             bypassUBO(Program);
         UniformHelper::setUniformsHelper(uniforms, args...);
     }

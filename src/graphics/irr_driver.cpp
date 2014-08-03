@@ -454,6 +454,13 @@ void IrrDriver::initDevice()
         Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
+
+        m_need_ubo_workaround = false;
+#ifdef WIN32
+        // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != nullptr && (GLMajorVersion == 3 && GLMinorVersion == 1))
+            m_need_ubo_workaround = true;
+#endif
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
