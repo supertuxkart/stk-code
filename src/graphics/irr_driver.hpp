@@ -233,6 +233,7 @@ private:
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
+    bool m_SH_dirty;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];

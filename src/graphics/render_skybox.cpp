@@ -437,6 +437,9 @@ void IrrDriver::generateSkyboxCubemap()
 
 void IrrDriver::generateDiffuseCoefficients()
 {
+    if (!m_SH_dirty)
+        return;
+    m_SH_dirty = false;
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
 
     if (SphericalHarmonicsTextures.size() == 6)
