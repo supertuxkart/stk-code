@@ -10,18 +10,22 @@
 #include <SMesh.h>
 #include <SMeshBuffer.h>
 #include <ISceneManager.h>
+#include <ICameraSceneNode.h>
 
 using namespace irr;
 
 STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
-    const video::SColor& color, irr::scene::ISceneNode* parent,
+    const video::SColor& color_top, const video::SColor& color_bottom,
+    irr::scene::ISceneNode* parent,
     irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position, const irr::core::vector3df& size) :
     STKMeshSceneNode(new scene::SMesh(),
         parent, irr_driver->getSceneManager(), -1,
         position, core::vector3df(0.0f, 0.0f, 0.0f), size, false)
 {
-    getTextMesh(text, font, color);
+    m_color_top = color_top;
+    m_color_bottom = color_bottom;
+    getTextMesh(text, font);
     createGLMeshes();
     Mesh->drop();
     //setAutomaticCulling(0);
@@ -29,12 +33,12 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     updateAbsolutePosition();
 }
 
-scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font,
-    const video::SColor& color)
+scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font)
 {
-    font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), color, false, false, NULL, this);
+    font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), video::SColor(255,255,255,255),
+        false, false, NULL, this);
 
-    const float scale = 0.025f;
+    const float scale = 0.018f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
@@ -56,7 +60,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
             max_y = char_max_y;
     }
     float scaled_center_x = (max_x / 2.0f) * scale;
-    float scaled_y = -max_y * scale;
+    float scaled_y = (max_y / 2.0f) * scale; // -max_y * scale;
 
     for (unsigned int i = 0; i < m_chars.size(); i++)
     {
@@ -93,25 +97,25 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
         {
             video::S3DVertex(char_pos.X - scaled_center_x, char_pos.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                m_chars[i].m_colors[0],
+                m_color_bottom,
                 m_chars[i].m_sourceRect.UpperLeftCorner.X / tex_width,
                 m_chars[i].m_sourceRect.LowerRightCorner.Y / tex_height),
 
             video::S3DVertex(char_pos2.X - scaled_center_x, char_pos.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                m_chars[i].m_colors[1],
+                m_color_bottom,
                 m_chars[i].m_sourceRect.LowerRightCorner.X / tex_width,
                 m_chars[i].m_sourceRect.LowerRightCorner.Y / tex_height),
 
             video::S3DVertex(char_pos2.X - scaled_center_x, char_pos2.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                m_chars[i].m_colors[2],
+                m_color_top,
                 m_chars[i].m_sourceRect.LowerRightCorner.X / tex_width,
                 m_chars[i].m_sourceRect.UpperLeftCorner.Y / tex_height),
 
             video::S3DVertex(char_pos.X - scaled_center_x, char_pos2.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                m_chars[i].m_colors[3],
+                m_color_top,
                 m_chars[i].m_sourceRect.UpperLeftCorner.X / tex_width,
                 m_chars[i].m_sourceRect.UpperLeftCorner.Y / tex_height)
         };
@@ -142,6 +146,12 @@ void STKTextBillboard::OnRegisterSceneNode()
     if (IsVisible)
     {
         SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+
+        scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+        core::vector3df cam_pos = curr_cam->getPosition();
+        core::vector3df text_pos = this->getAbsolutePosition();
+        float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
+        this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
     }
 
     ISceneNode::OnRegisterSceneNode();
