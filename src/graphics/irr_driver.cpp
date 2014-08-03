@@ -865,12 +865,8 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         video::SMaterial &irr_material=mb->getMaterial();
-        for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-        {
-            video::ITexture* t=irr_material.getTexture(j);
-            if(t) material_manager->setAllMaterialFlags(t, mb);
-
-        }   // for j<MATERIAL_MAX_TEXTURES
+        video::ITexture* t=irr_material.getTexture(0);
+        if(t) material_manager->setAllMaterialFlags(t, mb);
         material_manager->setAllUntexturedMaterialFlags(mb);
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
