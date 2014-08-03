@@ -34,10 +34,29 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
 {
     font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), color, false, false, NULL, this);
 
-    const float scale = 0.05f;
+    const float scale = 0.025f;
 
     //scene::SMesh* mesh = new scene::SMesh();
     std::map<video::ITexture*, scene::SMeshBuffer*> buffers;
+
+    int max_x = 0;
+    int min_y = 0;
+    int max_y = 0;
+    for (unsigned int i = 0; i < m_chars.size(); i++)
+    {
+        int char_x = m_chars[i].m_destRect.LowerRightCorner.X;
+        if (char_x > max_x)
+            max_x = char_x;
+
+        int char_min_y = m_chars[i].m_destRect.UpperLeftCorner.Y;
+        int char_max_y = m_chars[i].m_destRect.LowerRightCorner.Y;
+        if (char_min_y < min_y)
+            min_y = char_min_y;
+        if (char_max_y > min_y)
+            max_y = char_max_y;
+    }
+    float scaled_center_x = (max_x / 2.0f) * scale;
+    float scaled_y = -max_y * scale;
 
     for (unsigned int i = 0; i < m_chars.size(); i++)
     {
@@ -72,27 +91,27 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
 
         video::S3DVertex vertices[] =
         {
-            video::S3DVertex(char_pos.X, char_pos.Y, 0.0f,
+            video::S3DVertex(char_pos.X - scaled_center_x, char_pos.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                video::SColor(255, 255, 255, 255),
+                m_chars[i].m_colors[0],
                 m_chars[i].m_sourceRect.UpperLeftCorner.X / tex_width,
                 m_chars[i].m_sourceRect.LowerRightCorner.Y / tex_height),
 
-           video::S3DVertex(char_pos2.X, char_pos.Y, 0.0f,
+            video::S3DVertex(char_pos2.X - scaled_center_x, char_pos.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                video::SColor(255, 255, 255, 255),
+                m_chars[i].m_colors[1],
                 m_chars[i].m_sourceRect.LowerRightCorner.X / tex_width,
                 m_chars[i].m_sourceRect.LowerRightCorner.Y / tex_height),
 
-            video::S3DVertex(char_pos2.X, char_pos2.Y, 0.0f,
+            video::S3DVertex(char_pos2.X - scaled_center_x, char_pos2.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                video::SColor(255, 255, 255, 255),
+                m_chars[i].m_colors[2],
                 m_chars[i].m_sourceRect.LowerRightCorner.X / tex_width,
                 m_chars[i].m_sourceRect.UpperLeftCorner.Y / tex_height),
 
-            video::S3DVertex(char_pos.X, char_pos2.Y, 0.0f,
+            video::S3DVertex(char_pos.X - scaled_center_x, char_pos2.Y - scaled_y, 0.0f,
                 0.0f, 0.0f, 1.0f,
-                video::SColor(255, 255, 255, 255),
+                m_chars[i].m_colors[3],
                 m_chars[i].m_sourceRect.UpperLeftCorner.X / tex_width,
                 m_chars[i].m_sourceRect.UpperLeftCorner.Y / tex_height)
         };
@@ -112,6 +131,8 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
 
         map_itr->second->drop();
     }
+
+    getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
 
     return Mesh;
 }
