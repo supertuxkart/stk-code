@@ -370,6 +370,11 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
         delete[] Y1minus1[face];
         delete[] Y10[face];
         delete[] Y11[face];
+        delete[] Y2minus2[face];
+        delete[] Y2minus1[face];
+        delete[] Y20[face];
+        delete[] Y21[face];
+        delete[] Y22[face];
     }
 }
 
