@@ -131,11 +131,6 @@
         <spacer height="4" width="10" />
 
         <div layout="horizontal-row" width="100%" proportion="1">
-            <div layout="horizontal-row" proportion="1" height="fit">
-                <checkbox id="ubo"/>
-                <spacer width="10" height="10"/>
-                <label text="Uniform buffer objects" I18N="Video settings"/>
-            </div>
 
             <spacer height="4" width="10" />
 
