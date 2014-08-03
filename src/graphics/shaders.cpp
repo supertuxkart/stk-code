@@ -38,10 +38,26 @@
  \subsection shader_declaration_compile Compile the shader
 
  The LoadProgram() function is provided to ease shader compilation and link.
+ It takes a flat sequence of SHADER_TYPE, filename pairs that will be linked together.
+ This way you can add any shader stage you want (geometry, domain/hull shader)
+
+ It is highly recommended to use explicit attribute location for a program input.
+ However as not all hardware support this extension, default location are provided for
+ input whose name is either Position (location 0) or Normal (location 1) or
+ Texcoord (location 3) or Color (location 2) or SecondTexcoord (location 4).
+ You can use these predefined name and location in your vao for shader
+ that needs GL pre 3.3 support.
 
  \subsection shader_declaration_uniform_names Declare uniforms
 
+ Use the AssignUniforms() function to pass name of the uniforms in the program.
+ The order of name declaration is the same as the argument passed to setUniforms function.
+
  \subsection shader_declaration_bind_texture_unit Bind texture unit and name
+
+ Texture are optional but if you have one, you must give them determined texture unit (up to 32).
+ You can do this using the AssignTextureUnit function that takes pair of texture unit and sampler name
+ as argument.
 
  \section shader_usage
 
@@ -389,12 +405,6 @@ void Shaders::loadShaders()
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
     MeshShader::ColorizeShader::init();
-    MeshShader::InstancedObjectPass1ShaderInstance = new MeshShader::InstancedObjectPass1Shader();
-    MeshShader::InstancedObjectRefPass1ShaderInstance = new MeshShader::InstancedObjectRefPass1Shader();
-    MeshShader::InstancedGrassPass1ShaderInstance = new MeshShader::InstancedGrassPass1Shader();
-    MeshShader::InstancedObjectPass2ShaderInstance = new MeshShader::InstancedObjectPass2Shader();
-    MeshShader::InstancedObjectRefPass2ShaderInstance = new MeshShader::InstancedObjectRefPass2Shader();
-    MeshShader::InstancedGrassPass2ShaderInstance = new MeshShader::InstancedGrassPass2Shader();
     MeshShader::BubbleShader::init();
     MeshShader::BillboardShader::init();
     LightShader::PointLightShader::init();
@@ -456,6 +466,8 @@ void bypassUBO(GLuint Program)
     glUniformMatrix4fv(IVM, 1, GL_FALSE, irr_driver->getInvViewMatrix().pointer());
     GLint IPM = glGetUniformLocation(Program, "InverseProjectionMatrix");
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
+    GLint Screen = glGetUniformLocation(Program, "screen");
+    glUniform2f(Screen, UserConfigParams::m_width, UserConfigParams::m_height);
 }
 
 namespace UtilShader
@@ -666,8 +678,6 @@ namespace MeshShader
         }
     }
 
-    InstancedObjectPass1Shader *InstancedObjectPass1ShaderInstance;
-
     InstancedObjectRefPass1Shader::InstancedObjectRefPass1Shader()
     {
         Program = LoadProgram(
@@ -683,8 +693,6 @@ namespace MeshShader
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
     }
-
-    InstancedObjectRefPass1Shader *InstancedObjectRefPass1ShaderInstance;
 
     InstancedGrassPass1Shader::InstancedGrassPass1Shader()
     {
@@ -702,8 +710,6 @@ namespace MeshShader
             glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         }
     }
-
-    InstancedGrassPass1Shader *InstancedGrassPass1ShaderInstance;
 
     // Solid Lit pass shaders
     ObjectPass2Shader::ObjectPass2Shader()
@@ -727,8 +733,6 @@ namespace MeshShader
             TexUnit(TU_Albedo, "Albedo")
         );
     }
-
-    ObjectPass2Shader *ObjectPass2ShaderInstance;
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
     {
@@ -754,8 +758,6 @@ namespace MeshShader
         }
     }
 
-    InstancedObjectPass2Shader *InstancedObjectPass2ShaderInstance;
-
     InstancedObjectRefPass2Shader::InstancedObjectRefPass2Shader()
     {
         Program = LoadProgram(
@@ -776,8 +778,6 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
-
-    InstancedObjectRefPass2Shader *InstancedObjectRefPass2ShaderInstance;
 
     DetailledObjectPass2Shader::DetailledObjectPass2Shader()
     {
@@ -800,8 +800,6 @@ namespace MeshShader
         );
     }
 
-    DetailledObjectPass2Shader *DetailledObjectPass2ShaderInstance;
-
     ObjectUnlitShader::ObjectUnlitShader()
     {
         Program = LoadProgram(
@@ -817,8 +815,6 @@ namespace MeshShader
 
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
-
-    ObjectUnlitShader *ObjectUnlitShaderInstance;
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
     {
@@ -842,8 +838,6 @@ namespace MeshShader
         );
     }
 
-    ObjectRefPass2Shader *ObjectRefPass2ShaderInstance;
-
     GrassPass2Shader::GrassPass2Shader()
     {
         Program = LoadProgram(
@@ -860,8 +854,6 @@ namespace MeshShader
             TexUnit(TU_Albedo, "Albedo")
         );
     }
-
-    GrassPass2Shader *GrassPass2ShaderInstance;
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
     {
@@ -886,8 +878,6 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    InstancedGrassPass2Shader *InstancedGrassPass2ShaderInstance;
-
     SphereMapShader::SphereMapShader()
     {
         Program = LoadProgram(
@@ -910,8 +900,6 @@ namespace MeshShader
             TexUnit(TU_tex, "tex")
         );
     }
-
-    SphereMapShader *SphereMapShaderInstance;
 
     SplattingShader::SplattingShader()
     {
@@ -936,8 +924,6 @@ namespace MeshShader
             TexUnit(TU_tex_detail3, "tex_detail3")
         );
     }
-
-    SplattingShader *SplattingShaderInstance;
 
     GLuint BubbleShader::Program;
     GLuint BubbleShader::uniform_MVP;
@@ -979,8 +965,6 @@ namespace MeshShader
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
 
-    TransparentShader *TransparentShaderInstance;
-
     TransparentFogShader::TransparentFogShader()
     {
         Program = LoadProgram(
@@ -996,8 +980,6 @@ namespace MeshShader
 
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
-
-    TransparentFogShader *TransparentFogShaderInstance;
 
     GLuint BillboardShader::Program;
     GLuint BillboardShader::attrib_corner;

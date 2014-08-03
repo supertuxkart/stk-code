@@ -83,8 +83,10 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel( _("Disabled") );   // 0
     shadows->addLabel( _("low") );        // 1
     shadows->addLabel( _("high") );       // 2
-    shadows->setValue( UserConfigParams::m_shadows );
-    
+    if (!UserConfigParams::m_ubo_disabled)
+        shadows->setValue(UserConfigParams::m_shadows);
+    else
+        shadows->setValue(0);
     getWidget<CheckBoxWidget>("dynamiclight")->setState(UserConfigParams::m_dynamic_lights);
     getWidget<CheckBoxWidget>("lightshaft")->setState(UserConfigParams::m_light_shaft);
     getWidget<CheckBoxWidget>("global_illumination")->setState(UserConfigParams::m_gi);
@@ -111,10 +113,10 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
         
-        if (advanced_pipeline)
+        if (advanced_pipeline && getWidget<CheckBoxWidget>("ubo")->getState())
         {
             UserConfigParams::m_shadows =
-                advanced_pipeline && getWidget<SpinnerWidget>("shadows")->getValue();
+                getWidget<SpinnerWidget>("shadows")->getValue();
         }
         else
         {

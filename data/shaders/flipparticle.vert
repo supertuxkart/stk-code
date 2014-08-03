@@ -1,13 +1,3 @@
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
 in vec2 quadcorner;
 in vec2 texcoord;
 in vec3 position;

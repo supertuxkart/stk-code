@@ -62,37 +62,37 @@ core::vector3df getWind();
 class ListMatDefault
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListMatAlphaRef
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListMatNormalMap
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListMatGrass
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > Arguments;
 };
 
 class ListMatSphereMap
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListMatSplatting
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListMatUnlit
@@ -104,7 +104,7 @@ public:
 class ListMatDetails
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 

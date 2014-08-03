@@ -7,17 +7,6 @@ uniform float start;
 uniform float end;
 uniform vec3 col;
 
-
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
 in vec2 uv;
 in vec4 color;
 out vec4 FragColor;

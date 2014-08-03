@@ -249,29 +249,29 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterials[MAT_DEFAULT])
-            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_ALPHA_REF])
-            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPHEREMAP])
-            pushVector(ListMatSphereMap::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatSphereMap::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_DETAIL])
-            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         windDir = getWind();
         for_in(mesh, MeshSolidMaterials[MAT_GRASS])
-            pushVector(ListMatGrass::Arguments, mesh, AbsoluteTransformation, invmodel, windDir, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatGrass::Arguments, mesh, AbsoluteTransformation, invmodel, windDir);
 
         for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
             pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
-            pushVector(ListMatSplatting::Arguments, mesh, AbsoluteTransformation, invmodel, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector(ListMatSplatting::Arguments, mesh, AbsoluteTransformation, invmodel);
 
         for_in(mesh, MeshSolidMaterials[MAT_NORMAL_MAP])
-            pushVector( ListMatNormalMap::Arguments, mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY, irr_driver->getSceneManager()->getAmbientLight());
+            pushVector( ListMatNormalMap::Arguments, mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -297,7 +297,7 @@ void STKMeshSceneNode::render()
                 size_t count = mesh.IndexCount;
 
                 setTexture(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
-                MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, irr_driver->getSceneManager()->getAmbientLight());
+                MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
                 glDrawElements(ptype, count, itype, 0);

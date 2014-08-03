@@ -3,15 +3,6 @@ uniform float greenLmn[9];
 uniform float redLmn[9];
 uniform sampler2D ntex;
 uniform mat4 TransposeViewMatrix;
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
 
 out vec4 Diff;
 

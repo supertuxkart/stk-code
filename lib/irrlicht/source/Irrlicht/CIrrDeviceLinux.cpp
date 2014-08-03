@@ -49,6 +49,9 @@
 
 #endif // _IRR_COMPILE_WITH_JOYSTICK_EVENTS_
 
+#define XRANDR_ROTATION_LEFT    (1 << 1)
+#define XRANDR_ROTATION_RIGHT   (1 << 3)
+
 namespace irr
 {
 	namespace video
@@ -342,12 +345,31 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		float refresh_rate, refresh_rate_new;
+		unsigned int mode0_width = -1, mode0_height = -1;
 
 		for (int i = 0; i < res->nmode; i++)
 		{
 			const XRRModeInfo* mode = &res->modes[i];
+			unsigned int w, h;
+			
+			if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
+			{
+				w = mode->height;
+				h = mode->width;
+			} 
+			else 
+			{
+				w = mode->width;
+				h = mode->height;
+			}
+			
+			if (bestMode == -1 && mode->id == output->modes[0])
+			{
+				mode0_width = w;
+				mode0_height = h;
+			}
 
-			if (bestMode == -1 && mode->width == Width && mode->height == Height)
+			if (bestMode == -1 && w == Width && h == Height)
 			{
 				for (int j = 0; j < output->nmode; j++)
 				{
@@ -359,7 +381,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					}
 				}
 			}
-			else if (bestMode != -1 && mode->width == Width && mode->height == Height)
+			else if (bestMode != -1 && w == Width && h == Height)
 			{
 				refresh_rate_new = (mode->dotClock * 1000.0) / (mode->hTotal * mode->vTotal);
 
@@ -382,6 +404,8 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		if (bestMode == -1)
 		{
 			bestMode = 0;
+			Width = mode0_width;
+			Height = mode0_height;
 		}
 
 		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
@@ -826,6 +850,17 @@ bool CIrrDeviceLinux::createWindow()
 		{
 			if (netWM)
 			{
+				// Some window managers don't respect values from XCreateWindow and
+				// place window in random position. This may cause that fullscreen
+				// window is showed in wrong screen. It doesn't matter for vidmode
+				// which displays cloned image in all devices.
+				#ifdef _IRR_LINUX_X11_RANDR_
+				XResizeWindow(display, window, Width, Height);
+				XMoveWindow(display, window, crtc_x, crtc_y);
+				XRaiseWindow(display, window);
+				XFlush(display);
+				#endif
+
 				// Workaround for Gnome which sometimes creates window smaller than display
 				XSizeHints *hints = XAllocSizeHints();
 				hints->flags=PMinSize;
@@ -839,7 +874,8 @@ bool CIrrDeviceLinux::createWindow()
 				Atom WMStateAtom = XInternAtom(display, "_NET_WM_STATE", true);
 				Atom WMFullscreenAtom = XInternAtom(display, "_NET_WM_STATE_FULLSCREEN", true);
 				// Set the fullscreen property
-				XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, reinterpret_cast<unsigned char *>(& WMFullscreenAtom), 1);
+				XChangeProperty(display, window, WMStateAtom, XA_ATOM, 32, PropModeReplace, 
+								reinterpret_cast<unsigned char*>(&WMFullscreenAtom), 1);
 
 				// Notify the root window
 				XEvent xev = {0}; // The event should be filled with zeros before setting its attributes
@@ -850,7 +886,10 @@ bool CIrrDeviceLinux::createWindow()
 				xev.xclient.format = 32;
 				xev.xclient.data.l[0] = 1;
 				xev.xclient.data.l[1] = WMFullscreenAtom;
-				XSendEvent(display, DefaultRootWindow(display), false, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+				XSendEvent(display, RootWindow(display, visual->screen), false, 
+							SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+
+				XFlush(display);
 			}
 			else
 			{
@@ -1557,10 +1596,11 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 
 				if (!res)
-					return NULL;
+					return &VideoModeList;
 
 				XRROutputInfo *output = NULL;
 				XRRCrtcInfo* crtc = NULL;
+				crtc_x = crtc_y = -1;
 		
 				for (int i = 0; i < res->noutput; i++) 
 				{
@@ -1574,35 +1614,63 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 		
 					crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		
-					if (!crtc || crtc->x != 0 || crtc->y != 0) 
+					if (!crtc) 
 					{
 						XRRFreeCrtcInfo(crtc);
 						XRRFreeOutputInfo(output);
 						continue;
 					}
-		
-					output_id = res->outputs[i];
-					break;
+					
+					if (crtc_x == -1 || crtc->x < crtc_x)
+					{
+						crtc_x = crtc->x;
+						crtc_y = crtc->y;						
+						output_id = res->outputs[i];
+					}
+					else if (crtc_x == crtc->x && crtc->y < crtc_y)
+					{
+						crtc_x = crtc->x;
+						crtc_y = crtc->y;
+						output_id = res->outputs[i];			
+					}
+					
+					XRRFreeCrtcInfo(crtc);
+					XRRFreeOutputInfo(output);
 				}
+				
+				output = XRRGetOutputInfo(display, res, output_id);
+				crtc = XRRGetCrtcInfo(display, res, output->crtc);
 
 				if (crtc == NULL)
 				{
 					XRRFreeCrtcInfo(crtc);
 					XRRFreeOutputInfo(output);
 					XRRFreeScreenResources(res);
-					return NULL;
+					return &VideoModeList;
 				}
 
 				for (int i = 0; i < res->nmode; i++)
 				{
 					const XRRModeInfo* mode = &res->modes[i];
+					unsigned int w, h;
+
+					if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
+					{
+						w = mode->height;
+						h = mode->width;
+					} 
+					else 
+					{
+						w = mode->width;
+						h = mode->height;
+					}
 
 					for (int j = 0; j < output->nmode; j++)
-					{
+					{            
 						if (mode->id == output->modes[j])
 						{
 							VideoModeList.addMode(core::dimension2d<u32>(
-									mode->width, mode->height), defaultDepth);
+									w, h), defaultDepth);
 							break;
 						}
 					}
@@ -1611,7 +1679,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					{
 						old_mode = crtc->mode;
 						VideoModeList.setDesktop(defaultDepth,
-							core::dimension2d<u32>(mode->width, mode->height));
+							core::dimension2d<u32>(w, h));
 					}
 				}
 

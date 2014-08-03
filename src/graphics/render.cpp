@@ -144,6 +144,9 @@ void IrrDriver::renderGLSL(float dt)
         if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
+        // TODO: put this outside of the rendering loop
+        generateDiffuseCoefficients();
+
         unsigned plc = UpdateLightsInfo(camnode, dt);
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
@@ -276,7 +279,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
-            UserConfigParams::m_shadows && hasShadow)
+            UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled && hasShadow)
             renderShadows();
         m_scene_manager->setActiveCamera(camnode);
         PROFILER_POP_CPU_MARKER();

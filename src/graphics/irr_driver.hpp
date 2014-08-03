@@ -385,6 +385,7 @@ public:
     void initDevice();
     void reset();
     void generateSkyboxCubemap();
+    void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;

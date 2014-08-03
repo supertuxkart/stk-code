@@ -335,9 +335,15 @@ void IrrDriver::initDevice()
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
-            UserConfigParams::m_width = 800;
-            UserConfigParams::m_height = 600;
+            UserConfigParams::m_width = (int)ssize.Width;
+            UserConfigParams::m_height = (int)ssize.Height;
         }
+        
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height);
+        res = m_device->getVideoModeList()->getVideoModeResolution(res, res);
+        
+        UserConfigParams::m_width = res.Width;
+        UserConfigParams::m_height = res.Height;
 
         m_device->closeDevice();
         m_video_driver  = NULL;
@@ -398,17 +404,18 @@ void IrrDriver::initDevice()
             }
             */
             m_device = createDeviceEx(params);
+
             if(m_device)
                 break;
         }   // for bits=32, 24, 16
 
 
-        // if still no device, try with a standard 800x600 window size, maybe
+        // if still no device, try with a default screen size, maybe
         // size is the problem
         if(!m_device)
         {
-            UserConfigParams::m_width  = 800;
-            UserConfigParams::m_height = 600;
+            UserConfigParams::m_width  = (int)ssize.Width;
+            UserConfigParams::m_height = (int)ssize.Height;
 
             m_device = createDevice(video::EDT_OPENGL,
                         core::dimension2du(UserConfigParams::m_width,
@@ -865,12 +872,8 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         video::SMaterial &irr_material=mb->getMaterial();
-        for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-        {
-            video::ITexture* t=irr_material.getTexture(j);
-            if(t) material_manager->setAllMaterialFlags(t, mb);
-
-        }   // for j<MATERIAL_MAX_TEXTURES
+        video::ITexture* t=irr_material.getTexture(0);
+        if(t) material_manager->setAllMaterialFlags(t, mb);
         material_manager->setAllUntexturedMaterialFlags(mb);
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags

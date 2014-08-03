@@ -226,7 +226,7 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_TMP_128]);
     FrameBuffers.push_back(new FrameBuffer(somevector, 128, 128));
 
-    if (UserConfigParams::m_shadows)
+    if (UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled)
     {
         shadowColorTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_R8, GL_RED, GL_UNSIGNED_BYTE);
         shadowDepthTex = generateRTT3D(GL_TEXTURE_2D_ARRAY, 1024, 1024, 4, GL_DEPTH24_STENCIL8, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8);
@@ -265,7 +265,7 @@ RTT::~RTT()
 {
     glDeleteTextures(RTT_COUNT, RenderTargetTextures);
     glDeleteTextures(1, &DepthStencilTexture);
-    if (UserConfigParams::m_shadows)
+    if (UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled)
     {
         delete m_shadow_FBO;
         glDeleteTextures(1, &shadowColorTex);
@@ -291,6 +291,8 @@ FrameBuffer* RTT::render(scene::ICameraSceneNode* camera, float dt)
     irr_driver->getSceneManager()->setActiveCamera(camera);
 
     std::vector<IrrDriver::GlowData> glows;
+    // TODO: put this outside of the rendering loop
+    irr_driver->generateDiffuseCoefficients();
     irr_driver->computeCameraMatrix(camera, m_width, m_height);
     unsigned plc = irr_driver->UpdateLightsInfo(camera, dt);
     irr_driver->renderScene(camera, plc, glows, dt, false, true);
