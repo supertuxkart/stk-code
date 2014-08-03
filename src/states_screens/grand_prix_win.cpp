@@ -115,6 +115,7 @@ void GrandPrixWin::init()
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 
 
+    saveGPButton();
     if (PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -164,7 +165,6 @@ void GrandPrixWin::init()
     else
     {
         m_unlocked_label = NULL;
-        saveGPButton();
     }
 
     m_global_time = 0.0f;
