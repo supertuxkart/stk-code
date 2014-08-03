@@ -339,7 +339,7 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
         
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height});
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height);
         res = m_device->getVideoModeList()->getVideoModeResolution(res, res);
         
         UserConfigParams::m_width = res.Width;
