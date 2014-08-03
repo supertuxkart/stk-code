@@ -15,13 +15,15 @@
 STKMeshSceneNode::STKMeshSceneNode(irr::scene::IMesh* mesh, ISceneNode* parent, irr::scene::ISceneManager* mgr, irr::s32 id,
     const irr::core::vector3df& position,
     const irr::core::vector3df& rotation,
-    const irr::core::vector3df& scale) :
+    const irr::core::vector3df& scale, bool createGLMeshes) :
     CMeshSceneNode(mesh, parent, mgr, id, position, rotation, scale)
 {
     isDisplacement = false;
     immediate_draw = false;
     update_each_frame = false;
-    createGLMeshes();
+
+    if (createGLMeshes)
+        this->createGLMeshes();
 }
 
 void STKMeshSceneNode::setReloadEachFrame(bool val)
