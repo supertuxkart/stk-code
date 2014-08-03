@@ -467,7 +467,7 @@ void IrrDriver::generateDiffuseCoefficients()
             SphericalHarmonicsTextures[idx]->unlock();
 
             image->copyToScaling(sh_rgba[i], sh_w, sh_h);
-            image->drop();
+            delete image;
         }
 
         testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
