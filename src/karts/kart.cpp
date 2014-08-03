@@ -36,6 +36,7 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
+#include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "karts/explosion_animation.hpp"
@@ -2598,21 +2599,18 @@ btQuaternion Kart::getVisualRotation() const
 void Kart::setOnScreenText(const wchar_t *text)
 {
     core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
+
     // FIXME: Titlefont is the only font guaranteed to be loaded if STK
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
-    // TODO: Add support in the engine for BillboardText or find a replacement
-    /*scene::ISceneManager* sm = irr_driver->getSceneManager();
-    sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
-                                                  : GUIEngine::getTitleFont(),
-                                  text,
-                                  getNode(),
-                                  core::dimension2df(textsize.Width/55.0f,
-                                                     textsize.Height/55.0f),
-                                  core::vector3df(0.0f, 1.5f, 0.0f),
-                                  -1, // id
-                                  video::SColor(255, 255, 225, 0),
-                                  video::SColor(255, 255, 89, 0));*/
+
+    // TODO: memory management?
+    gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
+    STKTextBillboard* tb = new STKTextBillboard(text, font, video::SColor(255, 255, 225, 255),
+        getNode(), irr_driver->getSceneManager(), -1,
+        core::vector3df(0.f, 0.0f, 0.0f),
+        core::vector3df(1.0f, 1.0f, 1.0f));
+
     // No need to store the reference to the billboard scene node:
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.
