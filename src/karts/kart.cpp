@@ -1098,7 +1098,7 @@ void Kart::update(float dt)
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
-    // straight after jumping, but still allowing some "boat shake" (roll and pitch).
+    // straight after jumping, but still allowing some "boat shake" (roIll and pitch).
     // Otherwise many non perfect jumps end in a total roll over or a serious change of
     // direction, sometimes 90 or even full U turn (real but less fun for a karting game).
     // As side effect steering becames a bit less responsive (any wheel on air), but not too bad.
@@ -2022,30 +2022,6 @@ void Kart::updatePhysics(float dt)
     float min_speed =  m && m->isZipper() ? m->getZipperMinSpeed() : -1.0f;
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
-
-    // If the kart is flying, keep its up-axis aligned to gravity (which in
-    // turn typically means the kart is parallel to the ground). This avoids
-    // that the kart rotates in mid-air and lands on its side.
-    if(m_vehicle->getNumWheelsOnGround()==0)
-    {
-        btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
-        btVector3 terrain_up = m_body->getGravity();
-        float g = World::getWorld()->getTrack()->getGravity();
-        // Normalize the gravity, g is the length of the vector
-        btVector3 new_up = 0.9f * kart_up + 0.1f * terrain_up/-g;
-        // Get the rotation (hpr) based on current heading.
-        Vec3 rotation(getHeading(), new_up);
-        btMatrix3x3 m;
-        m.setEulerZYX(rotation.getX(), rotation.getY(), rotation.getZ());
-        // We can't use getXYZ() for the position here, since the position is
-        // based on interpolation, while the actual center-of-mass-transform
-        // is based on the actual value every 1/60 of a second (using getXYZ()
-        // would result in the kart being pushed ahead a bit, making it jump
-        // much further, depending on fps)
-        btTransform new_trans(m, m_body->getCenterOfMassTransform().getOrigin());
-        //setTrans(new_trans);
-        m_body->setCenterOfMassTransform(new_trans);
-    }
 
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
