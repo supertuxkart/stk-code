@@ -45,8 +45,7 @@ void GetPeerAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "get",
-                                      "address-management.php");
+        PlayerManager::setUserDetails(m_request, "get", API_ADDRESS_PATH);
         m_request->addParameter("peer_id",m_peer_id);
 
         Online::RequestManager::get()->addRequest(m_request);

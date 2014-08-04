@@ -183,8 +183,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         last_poll_time = StkTime::getRealTime();
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(request, "poll-connection-requests",
-                                      "address-management.php");
+        PlayerManager::setUserDetails(request, "poll-connection-requests", API_ADDRESS_PATH);
         request->addParameter("address",addr.ip);
         request->addParameter("port",addr.port);
 
@@ -564,7 +563,7 @@ void ServerLobbyRoomProtocol::playerMinorVote(Event* event)
  *  Byte 0   1            5   6            N+6 N+7                 N+8
  *       -----------------------------------------------------------
  *  Size | 1 |      4     | 1 |      N     | 1 |       1           |
- *  Data | 4 | priv token | N | track name | 1 | track number (gp) |
+ *  Data | 4 | priv token | N | track name | 1 | track number (gp) |
  *       -----------------------------------------------------------
  */
 void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
@@ -597,7 +596,7 @@ void ServerLobbyRoomProtocol::playerTrackVote(Event* event)
  *  Byte 0   1            5   6          7   8                   9
  *       ---------------------------------------------------------
  *  Size | 1 |      4     | 1 |     1    | 1 |       1           |
- *  Data | 4 | priv token | 1 | reversed | 1 | track number (gp) |
+ *  Data | 4 | priv token | 1 | reversed | 1 | track number (gp) |
  *       ---------------------------------------------------------
  */
 void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
@@ -630,7 +629,7 @@ void ServerLobbyRoomProtocol::playerReversedVote(Event* event)
  *  Byte 0   1            5   6      7   8                   9
  *       -----------------------------------------------------
  *  Size | 1 |      4     | 1 |   1  | 1 |       1           |
- *  Data | 4 | priv token | 1 | laps | 1 | track number (gp) |
+ *  Data | 4 | priv token | 1 | laps | 1 | track number (gp) |
  *       -----------------------------------------------------
  */
 void ServerLobbyRoomProtocol::playerLapsVote(Event* event)

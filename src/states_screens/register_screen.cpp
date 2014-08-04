@@ -72,9 +72,9 @@ void RegisterScreen::init()
     getWidget<TextBoxWidget>("local_username")->setText(username);
 
     TextBoxWidget *password_widget = getWidget<TextBoxWidget>("password");
-    password_widget->setPasswordBox(true,L'*');
+    password_widget->setPasswordBox(true, L'*');
     password_widget = getWidget<TextBoxWidget>("password_confirm");
-    password_widget->setPasswordBox(true,L'*');
+    password_widget->setPasswordBox(true, L'*');
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
@@ -147,7 +147,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
  */
 void RegisterScreen::handleLocalName(const stringw &local_name)
 {
-    if (local_name.size()==0)
+    if (local_name.size() == 0)
         return;
 
     // If a local player with that name does not exist, create one
@@ -267,8 +267,8 @@ void RegisterScreen::acceptTerms()
     core::stringw password_confirm= getWidget<TextBoxWidget>("password_confirm")->getText().trim();
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 
-     m_signup_request = new XMLRequest();
-    m_signup_request->setServerURL("client-user.php");
+    m_signup_request = new XMLRequest();
+    m_signup_request->setServerURL(API_USER_PATH);
     m_signup_request->addParameter("action",           "register"      );
     m_signup_request->addParameter("username",         username        );
     m_signup_request->addParameter("password",         password        );

@@ -191,7 +191,7 @@ void OnlineScreen::doQuickPlay()
     }
 
     PlayerManager::setUserDetails(request2, "request-connection");
-    request2->setServerURL("address-management.php");
+    request2->setServerURL(API_ADDRESS_PATH);
     request2->addParameter("server_id", server->getServerId());
 
     request2->executeNow();

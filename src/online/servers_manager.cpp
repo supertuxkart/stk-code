@@ -16,7 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 #include "online/servers_manager.hpp"
 
 #include <string>
@@ -28,14 +27,15 @@
 
 #define SERVER_REFRESH_INTERVAL 5.0f
 
-namespace Online{
-
+namespace Online
+{
     static ServersManager* manager_singleton(NULL);
 
     ServersManager* ServersManager::get()
     {
         if (manager_singleton == NULL)
             manager_singleton = new ServersManager();
+
         return manager_singleton;
     }
 
@@ -46,12 +46,14 @@ namespace Online{
     }   // deallocate
 
     // ============================================================================
-    ServersManager::ServersManager(){
+    ServersManager::ServersManager()
+    {
         m_last_load_time.setAtomic(0.0f);
         m_joined_server.setAtomic(NULL);
     }
 
-    ServersManager::~ServersManager(){
+    ServersManager::~ServersManager()
+    {
         cleanUpServers();
         MutexLocker(m_joined_server);
         delete m_joined_server.getData();
@@ -75,27 +77,31 @@ namespace Online{
         if(StkTime::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
         {
             request = new RefreshRequest();
-            request->setServerURL("client-user.php");
-            request->addParameter("action","get_server_list");
+            request->setServerURL(API_USER_PATH);
+            request->addParameter("action", "get_server_list");
+
             if (request_now)
                 RequestManager::get()->addRequest(request);
         }
+
         return request;
     }
 
     void ServersManager::refresh(bool success, const XMLNode * input)
     {
-        if (success)
+        if (!success)
         {
-            const XMLNode * servers_xml = input->getNode("servers");
-            cleanUpServers();
-            for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
-            {
-                addServer(new Server(*servers_xml->getNode(i)));
-            }
-            m_last_load_time.setAtomic((float)StkTime::getRealTime());
+            Log::error("Server Manager", "Could not refresh server list");
+            return;
         }
-        //FIXME error message
+
+        const XMLNode * servers_xml = input->getNode("servers");
+        cleanUpServers();
+        for (unsigned int i = 0; i < servers_xml->getNumNodes(); i++)
+        {
+            addServer(new Server(*servers_xml->getNode(i)));
+        }
+        m_last_load_time.setAtomic((float)StkTime::getRealTime());
     }
 
     void ServersManager::RefreshRequest::callback()
@@ -117,7 +123,8 @@ namespace Online{
     {
         MutexLocker(m_joined_server);
         delete m_joined_server.getData();
-        //It's a copy!
+
+        // It's a copy!
         m_joined_server.getData() = new Server(*getServerByID(id));
     }
 
@@ -135,6 +142,7 @@ namespace Online{
         m_sorted_servers.lock();
         m_sorted_servers.getData().push_back(server);
         m_sorted_servers.unlock();
+
         m_mapped_servers.lock();
         m_mapped_servers.getData()[server->getServerId()] = server;
         m_mapped_servers.unlock();
@@ -168,7 +176,8 @@ namespace Online{
     }
 
     // ============================================================================
-    void ServersManager::sort(bool sort_desc){
+    void ServersManager::sort(bool sort_desc)
+    {
         MutexLocker(m_sorted_servers);
         m_sorted_servers.getData().insertionSort(0, sort_desc);
     }

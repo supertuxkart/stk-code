@@ -72,8 +72,7 @@ void RequestConnection::asynchronousUpdate()
         case NONE:
         {
             m_request = new ServerJoinRequest();
-            PlayerManager::setUserDetails(m_request, "request-connection",
-                                          "address-management.php");
+            PlayerManager::setUserDetails(m_request, "request-connection", API_ADDRESS_PATH);
             m_request->addParameter("server_id",m_server_id);
             m_request->queue();
             m_state = REQUEST_PENDING;

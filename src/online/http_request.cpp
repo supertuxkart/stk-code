@@ -26,9 +26,7 @@
 #endif
 
 #include <curl/curl.h>
-
 #include <assert.h>
-
 
 namespace Online
 {
@@ -60,7 +58,8 @@ namespace Online
         // A http request should not even be created when internet is disabled
         assert(UserConfigParams::m_internet_status ==
                RequestManager::IPERM_ALLOWED);
-        assert(filename.size()>0);
+        assert(filename.size() > 0);
+
         init();
         m_filename = file_manager->getAddonsFile(filename);
     }   // HTTPRequest(filename ...)
@@ -76,6 +75,7 @@ namespace Online
         // A http request should not even be created when internet is disabled
         assert(UserConfigParams::m_internet_status ==
                RequestManager::IPERM_ALLOWED);
+
         init();
         m_filename = file_manager->getAddonsFile(filename);
     }   // HTTPRequest(filename ...)
@@ -100,20 +100,20 @@ namespace Online
      */
     void HTTPRequest::setServerURL(const std::string& path)
     {
-        setURL((std::string)UserConfigParams::m_server_multiplayer+path);
+        setURL((std::string)UserConfigParams::m_server_multiplayer + path);
     }   // setServerURL
 
     // ------------------------------------------------------------------------
     /** A handy shortcut that appends the given path to the URL of the addons
      *  server.
-     *  \param path The path to add to the server.
+     *  \param path The path to add to the server, without the trailing slash
      */
      void HTTPRequest::setAddonsURL(const std::string& path)
      {
-        setURL((std::string)UserConfigParams::m_server_addons
-                 + "/" + path);
+        setURL((std::string)UserConfigParams::m_server_addons + "/" + path);
      }   // set AddonsURL
-    // ------------------------------------------------------------------------
+
+     // ------------------------------------------------------------------------
     /** Checks the request if it has enough (correct) information to be
      *  executed (and thus allowed to add to the queue).
      */
@@ -128,7 +128,7 @@ namespace Online
     void HTTPRequest::prepareOperation()
     {
         m_curl_session = curl_easy_init();
-        if(!m_curl_session)
+        if (!m_curl_session)
         {
             Log::error("HTTPRequest::prepareOperation",
                        "LibCurl session not initialized.");
@@ -145,9 +145,9 @@ namespace Online
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_LIMIT, 10);
         curl_easy_setopt(m_curl_session, CURLOPT_LOW_SPEED_TIME, 20);
         //curl_easy_setopt(m_curl_session, CURLOPT_VERBOSE, 1L);
-        if(m_filename.size()==0)
+        if (m_filename.size() == 0)
         {
-            //https
+            // https, load certificate info
             struct curl_slist *chunk = NULL;
             chunk = curl_slist_append(chunk, "Host: api.stkaddons.net");
             curl_easy_setopt(m_curl_session, CURLOPT_HTTPHEADER, chunk);
@@ -163,15 +163,15 @@ namespace Online
      */
     void HTTPRequest::operation()
     {
-        if(!m_curl_session)
+        if (!m_curl_session)
             return;
 
         FILE *fout = NULL;
-        if(m_filename.size()>0)
+        if (m_filename.size() > 0)
         {
             fout = fopen((m_filename+".part").c_str(), "wb");
 
-            if(!fout)
+            if (!fout)
             {
                 Log::error("HTTPRequest",
                            "Can't open '%s' for writing, ignored.",
@@ -190,23 +190,26 @@ namespace Online
         }
 
         // All parameters added have a '&' added
-        if(m_parameters.size()>0)
+        if (m_parameters.size() > 0)
         {
             m_parameters.erase(m_parameters.size()-1);
         }
 
-        if(m_parameters.size()==0)
+        if (m_parameters.size() == 0)
+        {
             Log::info("HTTPRequest", "Downloading %s", m_url.c_str());
-        else if (Log::getLogLevel()<=Log::LL_INFO)
+        }
+        else if (Log::getLogLevel() <= Log::LL_INFO)
         {
             // Avoid printing the password or token, just replace them with *s
             std::string param = m_parameters;
+
             // List of strings whose values should not be printed. "" is the
             // end indicator.
             static std::string dont_print[] = { "&password=", "&token=", "&current=",
                                                 "&new1=", "&new2=", ""};
             unsigned int j = 0;
-            while (dont_print[j].size()>0)
+            while (dont_print[j].size() > 0)
             {
                 // Get the string that should be replaced.
                 std::size_t pos = param.find(dont_print[j]);
@@ -221,11 +224,11 @@ namespace Online
                 }   // if string found
                 j++;
             }   // while dont_print[j].size()>0
-            Log::info("HTTPRequest", "Sending %s to %s",
-                      param.c_str(), m_url.c_str());
-        }
-        curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS,
-                         m_parameters.c_str());
+
+            Log::info("HTTPRequest", "Sending %s to %s", param.c_str(), m_url.c_str());
+        } // end log http request
+
+        curl_easy_setopt(m_curl_session, CURLOPT_POSTFIELDS, m_parameters.c_str());
         std::string uagent( std::string("SuperTuxKart/") + STK_VERSION );
             #ifdef WIN32
                     uagent += (std::string)" (Windows)";
@@ -243,17 +246,18 @@ namespace Online
         m_curl_code = curl_easy_perform(m_curl_session);
         Request::operation();
 
-        if(fout)
+        if (fout)
         {
             fclose(fout);
-            if(m_curl_code==CURLE_OK)
+            if (m_curl_code == CURLE_OK)
             {
                 if(UserConfigParams::logAddons())
                     Log::info("HTTPRequest", "Download successful.");
+
                 // The behaviour of rename is unspecified if the target
                 // file should already exist - so remove it.
                 bool ok = file_manager->removeFile(m_filename);
-                if(!ok)
+                if (!ok)
                 {
                     Log::error("addons",
                                "Could not removed existing addons.xml file.");
@@ -261,8 +265,9 @@ namespace Online
                 }
                 int ret = rename((m_filename+".part").c_str(),
                                  m_filename.c_str()           );
+
                 // In case of an error, set the status to indicate this
-                if(ret!=0)
+                if (ret != 0)
                 {
                     Log::error("addons",
                                "Could not rename downloaded addons.xml file!");
@@ -279,10 +284,11 @@ namespace Online
      */
     void HTTPRequest::afterOperation()
     {
-        if(m_curl_code == CURLE_OK)
+        if (m_curl_code == CURLE_OK)
             setProgress(1.0f);
         else
             setProgress(-1.0f);
+
         Request::afterOperation();
         curl_easy_cleanup(m_curl_session);
     }   // afterOperation
@@ -322,7 +328,7 @@ namespace Online
 
         // Check if we are asked to abort the download. If so, signal this
         // back to libcurl by returning a non-zero status.
-        if( (request_manager->getAbort() || request->isCancelled()) &&
+        if ((request_manager->getAbort() || request->isCancelled()) &&
              request->isAbortable()                                     )
         {
             // Indicates to abort the current download, which means that this
@@ -331,23 +337,24 @@ namespace Online
         }
 
         float f;
-        if(download_now < download_total)
+        if (download_now < download_total)
         {
             f = (float)download_now / (float)download_total;
+
             // In case of floating point rouding errors make sure that
             // 1.0 is only reached when downloadFileInternal is finished
-            if (f>=1.0f) f=0.99f;
+            if (f >= 1.0f)
+                f = 0.99f;
         }
         else
         {
             // Don't set progress to 1.0f; this is done in afterOperation()
             // after checking curls return code!
-            f= download_total==0 ? 0 : 0.99f;
+            f = (download_total == 0) ? 0 : 0.99f;
         }
         request->setProgress(f);
+
         return 0;
     }   // progressDownload
-
-
 
 } // namespace Online

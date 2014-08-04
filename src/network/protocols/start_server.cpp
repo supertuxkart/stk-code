@@ -42,8 +42,7 @@ void StartServer::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "start-server",
-                                     "address-management.php");
+        PlayerManager::setUserDetails(m_request, "start-server", API_ADDRESS_PATH);
         m_request->addParameter("address",addr.ip);
         m_request->addParameter("port",addr.port);
         m_request->addParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());

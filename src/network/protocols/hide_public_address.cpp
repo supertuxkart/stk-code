@@ -42,8 +42,7 @@ void HidePublicAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "unset",
-                                      "address-management.php");
+        PlayerManager::setUserDetails(m_request, "unset", API_ADDRESS_PATH);
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
