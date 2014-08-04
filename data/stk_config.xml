@@ -341,7 +341,7 @@
          exp-string-response: dampen the suspension spring reaction 
             exponentially.
          max-force: Maximum suspension force -->
-    <suspension stiffness="248" rest="0.2" travel-cm="19"
+    <suspension stiffness="140" rest="0.3" travel-cm="29"
          exp-spring-response="false" max-force="12000"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
@@ -350,7 +350,7 @@
          position of the physics raycast wheels relative to the center of
          gravity. Default is to use the corners of the chassis to attach 
          the wheels to. -->
-    <wheels damping-relaxation="20"  damping-compression="4.4" radius="0.25">
+    <wheels damping-relaxation="35"  damping-compression="5" radius="0.25">
       <front-right position="0.38 0 0.6"  />
       <front-left  position="-0.38 0 0.6" />
       <rear-right  position="0.38 0 -0.6" />
@@ -374,7 +374,7 @@
            the ground if its off ground. Reduces the affect if a kart loses
            contact with the ground (i.e. it then can't steer or accelerate
            anymore). -->
-    <stability roll-influence="0.03"
+    <stability roll-influence="0.3"
                chassis-linear-damping="0.2"
                chassis-angular-damping="0"
                downward-impulse-factor="0"

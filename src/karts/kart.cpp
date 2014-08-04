@@ -2551,6 +2551,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
+    center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() + lean_height, 0);
+    center_shift = getTrans().getBasis() * center_shift;
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
 
