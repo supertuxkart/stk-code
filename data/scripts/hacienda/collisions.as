@@ -3,7 +3,7 @@ void onKartObjectCollision()
     if (getCollidingID()=="stklib_fitchBarrelTestDestroyed_a"){
 int kart_id = getCollidingKart1();
 Vec3 location = getKartLocation(kart_id);
-createExplosion(location);
+//createExplosion(location);
 disableAnimation("stklib_fitchBarreltest_a_main");
 }
 else {
