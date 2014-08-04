@@ -598,6 +598,11 @@ void glUniform1fWrapper(GLuint a, float b)
     glUniform1f(a, b);
 }
 
+bool needsUBO()
+{
+    return irr_driver->needUBOWorkaround();
+}
+
 namespace MeshShader
 {
     // Solid Normal and depth pass shaders

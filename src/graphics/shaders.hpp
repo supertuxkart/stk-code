@@ -53,6 +53,7 @@ void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
 void glUniform3fWraper(GLuint, float, float, float);
 void glUniform2fWraper(GLuint a, float b, float c);
 void glUniform1fWrapper(GLuint, float);
+bool needsUBO();
 
 struct UniformHelper
 {
@@ -128,7 +129,7 @@ public:
 
     void setUniforms(const Args & ... args) const
     {
-        if (irr_driver->needUBOWorkaround())
+        if (needsUBO())
             bypassUBO(Program);
         UniformHelper::setUniformsHelper(uniforms, args...);
     }
@@ -158,7 +159,7 @@ public:
 
     void setUniforms(const Args & ... args) const
     {
-        if (irr_driver->needUBOWorkaround())
+        if (needsUBO())
             bypassUBO(Program);
         UniformHelper::setUniformsHelper(uniforms, args...);
     }
