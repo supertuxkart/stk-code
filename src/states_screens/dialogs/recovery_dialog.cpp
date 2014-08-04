@@ -125,7 +125,9 @@ void RecoveryDialog::processInput()
     {
         m_info_widget->setDefaultColor();
         m_options_widget->setDeactivated();
+
         m_recovery_request = new XMLRequest();
+
         // This function also works when the current user is not logged in
         PlayerManager::setUserDetails(m_recovery_request, "recovery");
         m_recovery_request->addParameter("username", username);

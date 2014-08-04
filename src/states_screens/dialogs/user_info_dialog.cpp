@@ -144,9 +144,10 @@ void UserInfoDialog::sendFriendRequest()
          */
         virtual void callback()
         {
+            core::stringw info_text("");
             uint32_t id(0);
             getXMLData()->get("friendid", &id);
-            core::stringw info_text("");
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->addFriend(id);
@@ -158,7 +159,10 @@ void UserInfoDialog::sendFriendRequest()
                 info_text = _("Friend request send!");
             }
             else
+            {
                 info_text = getInfo();
+            }
+
             UserInfoDialog *dialog = new UserInfoDialog(id, info_text,
                                                        !isSuccess(), true);
             GUIEngine::DialogQueue::get()->pushDialog(dialog, true);
@@ -196,8 +200,9 @@ void UserInfoDialog::acceptFriendRequest()
         virtual void callback()
         {
             uint32_t id(0);
-            getXMLData()->get("friendid", &id);
             core::stringw info_text("");
+            getXMLData()->get("friendid", &id);
+
             if (isSuccess())
             {
                 OnlineProfile * profile =
@@ -211,7 +216,10 @@ void UserInfoDialog::acceptFriendRequest()
                 info_text = _("Friend request accepted!");
             }
             else
+            {
                 info_text = getInfo();
+            }
+
             GUIEngine::DialogQueue::get()->pushDialog(
                 new UserInfoDialog(id, info_text, !isSuccess(), true), true);
 
@@ -225,6 +233,7 @@ void UserInfoDialog::acceptFriendRequest()
     PlayerManager::setUserDetails(request, "accept-friend-request");
     request->addParameter("friendid", m_online_profile->getID());
     request->queue();
+
     m_processing = true;
     m_options_widget->setDeactivated();
 }   // acceptFriendRequest
@@ -246,8 +255,9 @@ void UserInfoDialog::declineFriendRequest()
         virtual void callback()
         {
             uint32_t id(0);
-            getXMLData()->get("friendid", &id);
             core::stringw info_text("");
+            getXMLData()->get("friendid", &id);
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->removeFriend(id);
@@ -258,7 +268,10 @@ void UserInfoDialog::declineFriendRequest()
                 info_text = _("Friend request declined!");
             }
             else
+            {
                 info_text = getInfo();
+            }
+
             GUIEngine::DialogQueue::get()->pushDialog(
                                 new UserInfoDialog(id, info_text, !isSuccess(),
                                                    true), true);
@@ -286,9 +299,11 @@ void UserInfoDialog::removeExistingFriend()
     class RemoveFriendRequest : public XMLRequest
     {
         unsigned int m_id;
+
         virtual void callback()
         {
             core::stringw info_text("");
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->removeFriend(m_id);
@@ -299,7 +314,9 @@ void UserInfoDialog::removeExistingFriend()
                 info_text = _("Friend removed!");
             }
             else
+            {
                 info_text = getInfo();
+            }
 
             UserInfoDialog *info = new UserInfoDialog(m_id, info_text,
                                                       !isSuccess(), true);
@@ -335,8 +352,9 @@ void UserInfoDialog::removePendingFriend()
         virtual void callback()
         {
             uint32_t id(0);
-            getXMLData()->get("friendid", &id);
             core::stringw info_text("");
+            getXMLData()->get("friendid", &id);
+
             if (isSuccess())
             {
                 PlayerManager::getCurrentOnlineProfile()->removeFriend(id);
@@ -347,8 +365,9 @@ void UserInfoDialog::removePendingFriend()
                 info_text = _("Friend request cancelled!");
             }
             else
+            {
                 info_text = getInfo();
-
+            }
             UserInfoDialog *dia = new UserInfoDialog(id, info_text,
                                                      !isSuccess(), true);
             GUIEngine::DialogQueue::get()->pushDialog(dia, true);

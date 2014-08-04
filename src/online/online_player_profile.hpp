@@ -78,7 +78,7 @@ namespace Online
         virtual uint32_t getOnlineId() const;
         virtual void setUserDetails(Online::HTTPRequest *request,
                                     const std::string &action,
-                                    const std::string &php_script = "") const;
+                                    const std::string &url_path = "") const;
 
         virtual void requestPoll() const;
 

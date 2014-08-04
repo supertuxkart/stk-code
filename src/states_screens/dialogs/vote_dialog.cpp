@@ -48,12 +48,15 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
     m_rating_widget = getWidget<RatingBarWidget>("rating");
     assert(m_rating_widget != NULL);
+
     m_rating_widget->setRating(0);
     m_rating_widget->allowVoting();
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
+
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
 
@@ -102,8 +105,9 @@ void VoteDialog::sendVote()
             if (isSuccess())
             {
                 std::string addon_id;
-                getXMLData()->get("addon-id", &addon_id);
                 float average;
+
+                getXMLData()->get("addon-id", &addon_id);
                 getXMLData()->get("new-average", &average);
                 addons_manager->getAddon(Addon::createAddonId(addon_id))
                               ->setRating(average);
@@ -112,9 +116,7 @@ void VoteDialog::sendVote()
     public:
         SetAddonVoteRequest() : XMLRequest() {}
     };   // SetAddonVoteRequest
-
     // ------------------------------------------------------------------------
-
 
     m_perform_vote_request = new SetAddonVoteRequest();
     PlayerManager::setUserDetails(m_perform_vote_request, "set-addon-vote");

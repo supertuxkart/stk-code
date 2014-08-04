@@ -30,6 +30,10 @@
 
 namespace Online
 {
+    const std::string API::VERSION = "v2";
+    const std::string API::USER_PATH = "user/";
+    const std::string API::SERVER_PATH = "server/";
+
     /** Creates a HTTP(S) request that will have a raw string as result. (Can
      *  of course be used if the result doesn't matter.)
      *  \param manage_memory whether or not the RequestManager should take care of
@@ -96,11 +100,17 @@ namespace Online
     // ------------------------------------------------------------------------
     /** A handy shortcut that appends the given path to the URL of the
      *  mutiplayer server.
-     *  \param path The path to add to the server.
+     *  \param path The path to add to the server.(see API::USER_*)
+     *  \param action The action to perform. eg: connect, pool
      */
-    void HTTPRequest::setServerURL(const std::string& path)
+    void HTTPRequest::setApiURL(const std::string& path, const std::string &action)
     {
-        setURL((std::string)UserConfigParams::m_server_multiplayer + path);
+        setURL(
+            (std::string)UserConfigParams::m_server_multiplayer +
+            API::VERSION + "/" + // eg: v1, v2, etc
+            path +               // eg: user/, server/
+            action + "/"         // eg: connect/, pool/, get-server-list/
+        );
     }   // setServerURL
 
     // ------------------------------------------------------------------------

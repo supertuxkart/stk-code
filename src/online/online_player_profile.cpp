@@ -48,27 +48,25 @@ namespace Online
     /** Adds the login credential to a http request. It sets the name of
      *  the script to invokce, token, and user id.
      *  \param request The http request.
-     *  \param action If not empty, the action to be set.
+     *  \param action the action performed
      */
     void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
                                              const std::string &action,
-                                             const std::string &php_script) const
+                                             const std::string &url_path) const
     {
-        if (php_script.size() > 0)
+        if (url_path.size())
         {
-            request->setServerURL(php_script);
+            request->setApiURL(url_path, action);
         }
         else // default path
         {
-            request->setServerURL(API_USER_PATH);
+            request->setApiURL(API::USER_PATH, action);
         }
 
         if (m_profile)
             request->addParameter("userid", m_profile->getID());
         if (m_online_state == OS_SIGNED_IN)
             request->addParameter("token", m_token);
-        if (action.size() > 0)
-            request->addParameter("action", action);
     }   // setUserDetails
 
     // ========================================================================
@@ -125,8 +123,7 @@ namespace Online
         SignInRequest * request = new SignInRequest(false);
 
         // We can't use setUserDetail here, since there is no token yet
-        request->setServerURL(API_USER_PATH);
-        request->addParameter("action", "connect");
+        request->setApiURL(API::USER_PATH, "connect");
         request->addParameter("username", username);
         request->addParameter("password", password);
         request->addParameter("save-session",
@@ -306,7 +303,7 @@ namespace Online
     {
         assert(m_online_state == OS_SIGNED_IN);
 
-        OnlinePlayerProfile::PollRequest * request = new OnlinePlayerProfile::PollRequest();
+        OnlinePlayerProfile::PollRequest *request = new OnlinePlayerProfile::PollRequest();
         setUserDetails(request, "poll");
         request->queue();
     }   // requestPoll()

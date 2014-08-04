@@ -138,6 +138,7 @@ void* NewsManager::downloadNews(void *obj)
 
         HTTPRequest *download_req = new HTTPRequest("news.xml");
         download_req->setAddonsURL("news.xml");
+
         // Initialise the online portion of the addons manager.
         if(UserConfigParams::logAddons())
             Log::info("addons", "Downloading news.");
@@ -150,10 +151,12 @@ void* NewsManager::downloadNews(void *obj)
             // that a redirect went wrong, or a wrong/incorrect
             // address somehow made its way into the config file.
             delete download_req;
+
             // We need a new object, since the state of the old
             // download request is now done.
             download_req = new HTTPRequest("news.xml");
             UserConfigParams::m_server_addons.revertToDefaults();
+
             // make sure the new server address is actually used
             download_req->setAddonsURL("news.xml");
             download_req->executeNow();

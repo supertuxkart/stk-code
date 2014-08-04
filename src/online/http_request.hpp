@@ -32,12 +32,16 @@
 #include <assert.h>
 #include <string>
 
-#define API_VERSION "v2"
-#define API_USER_PATH "client-user.php"
-#define API_ADDRESS_PATH "address-management.php"
-
 namespace Online
 {
+    class API
+    {
+    public:
+        static const std::string VERSION;
+        static const std::string USER_PATH;
+        static const std::string SERVER_PATH;
+    };
+
     /** A http request.
      */
     class HTTPRequest : public Request
@@ -89,7 +93,7 @@ namespace Online
                     int priority = 1);
         virtual           ~HTTPRequest() {}
         virtual bool       isAllowedToAdd() const OVERRIDE;
-        void               setServerURL(const std::string& url);
+        void               setApiURL(const std::string& url, const std::string &action);
         void               setAddonsURL(const std::string& path);
 
         // ------------------------------------------------------------------------
@@ -127,7 +131,7 @@ namespace Online
 
         // --------------------------------------------------------------------
         /** Sets a parameter to 'value' (stringw). */
-        void addParameter(const std::string & name,
+        void addParameter(const std::string &name,
                           const irr::core::stringw &value)
         {
             core::stringc s = core::stringc(value.c_str());
@@ -139,7 +143,7 @@ namespace Online
         // --------------------------------------------------------------------
         /** Sets a parameter to 'value' (arbitrary types). */
         template <typename T>
-        void addParameter(const std::string & name, const T& value)
+        void addParameter(const std::string &name, const T& value)
         {
             assert(isPreparing());
             std::string s = StringUtils::toString(value);

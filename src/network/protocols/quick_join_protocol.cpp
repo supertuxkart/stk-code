@@ -44,8 +44,7 @@ void QuickJoinProtocol::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "quick-join");
-        m_request->setServerURL(API_ADDRESS_PATH);
+        PlayerManager::setUserDetails(m_request, "quick-join", Online::API::SERVER_PATH);
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;

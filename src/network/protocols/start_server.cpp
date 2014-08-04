@@ -42,11 +42,13 @@ void StartServer::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "start-server", API_ADDRESS_PATH);
-        m_request->addParameter("address",addr.ip);
-        m_request->addParameter("port",addr.port);
-        m_request->addParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
-        m_request->addParameter("max_players",UserConfigParams::m_server_max_players);
+        PlayerManager::setUserDetails(m_request, "start-server", Online::API::SERVER_PATH);
+
+        m_request->addParameter("address", addr.ip);
+        m_request->addParameter("port", addr.port);
+        m_request->addParameter("private_port", NetworkManager::getInstance()->getHost()->getPort());
+        m_request->addParameter("max_players", UserConfigParams::m_server_max_players);
+
         Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
 
         Online::RequestManager::get()->addRequest(m_request);

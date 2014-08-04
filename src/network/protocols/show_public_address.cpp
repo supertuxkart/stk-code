@@ -43,10 +43,12 @@ void ShowPublicAddress::asynchronousUpdate()
     {
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "set", API_ADDRESS_PATH);
-        m_request->addParameter("address",addr.ip);
-        m_request->addParameter("port",addr.port);
-        m_request->addParameter("private_port",NetworkManager::getInstance()->getHost()->getPort());
+        PlayerManager::setUserDetails(m_request, "set", Online::API::SERVER_PATH);
+
+        m_request->addParameter("address", addr.ip);
+        m_request->addParameter("port", addr.port);
+        m_request->addParameter("private_port", NetworkManager::getInstance()->getHost()->getPort());
+
         Log::info("ShowPublicAddress", "Showing addr %u and port %d", addr.ip, addr.port);
 
         Online::RequestManager::get()->addRequest(m_request);

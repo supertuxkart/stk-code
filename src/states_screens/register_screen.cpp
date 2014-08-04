@@ -268,8 +268,7 @@ void RegisterScreen::acceptTerms()
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 
     m_signup_request = new XMLRequest();
-    m_signup_request->setServerURL(API_USER_PATH);
-    m_signup_request->addParameter("action",           "register"      );
+    m_signup_request->setApiURL(API::USER_PATH, "register");
     m_signup_request->addParameter("username",         username        );
     m_signup_request->addParameter("password",         password        );
     m_signup_request->addParameter("password_confirm", password_confirm);

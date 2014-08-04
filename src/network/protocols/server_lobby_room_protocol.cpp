@@ -183,9 +183,10 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
         last_poll_time = StkTime::getRealTime();
         TransportAddress addr = NetworkManager::getInstance()->getPublicAddress();
         Online::XMLRequest* request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(request, "poll-connection-requests", API_ADDRESS_PATH);
-        request->addParameter("address",addr.ip);
-        request->addParameter("port",addr.port);
+        PlayerManager::setUserDetails(request, "poll-connection-requests", Online::API::SERVER_PATH);
+
+        request->addParameter("address", addr.ip);
+        request->addParameter("port", addr.port);
 
         request->executeNow();
         assert(request->isDone());

@@ -77,8 +77,7 @@ namespace Online
         if(StkTime::getRealTime() - m_last_load_time.getAtomic() > SERVER_REFRESH_INTERVAL)
         {
             request = new RefreshRequest();
-            request->setServerURL(API_USER_PATH);
-            request->addParameter("action", "get_server_list");
+            request->setApiURL(API::USER_PATH, "get_server_list");
 
             if (request_now)
                 RequestManager::get()->addRequest(request);
