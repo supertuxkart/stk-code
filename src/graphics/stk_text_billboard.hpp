@@ -62,6 +62,8 @@ public:
         const irr::core::rect<irr::s32>& destRect,
         const irr::core::rect<irr::s32>& sourceRect,
         const irr::video::SColor* const colors);
+
+    virtual void updateAbsolutePosition() OVERRIDE;
 };
 
 #endif
