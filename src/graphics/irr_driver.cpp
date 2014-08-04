@@ -338,12 +338,22 @@ void IrrDriver::initDevice()
             UserConfigParams::m_width = (int)ssize.Width;
             UserConfigParams::m_height = (int)ssize.Height;
         }
-        
+
         core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height);
         res = m_device->getVideoModeList()->getVideoModeResolution(res, res);
-        
-        UserConfigParams::m_width = res.Width;
-        UserConfigParams::m_height = res.Height;
+
+        if (res.Width > 0 && res.Height > 0)
+        {
+            UserConfigParams::m_width = res.Width;
+            UserConfigParams::m_height = res.Height;
+        }
+        else
+        {
+            Log::verbose("irr_driver", "Cannot get information about "
+                         "resolutions. Try to use the default one.");
+            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
+        }
 
         m_device->closeDevice();
         m_video_driver  = NULL;
@@ -414,8 +424,8 @@ void IrrDriver::initDevice()
         // size is the problem
         if(!m_device)
         {
-            UserConfigParams::m_width  = (int)ssize.Width;
-            UserConfigParams::m_height = (int)ssize.Height;
+            UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
 
             m_device = createDevice(video::EDT_OPENGL,
                         core::dimension2du(UserConfigParams::m_width,
@@ -883,7 +893,7 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
         if(t) material_manager->setAllMaterialFlags(t, mb);
 
         // special case : for splatting, the main material is on layer 1.
-        // it was done this way to provide a fallback for computers 
+        // it was done this way to provide a fallback for computers
         // where shaders are not supported
         t = irr_material.getTexture(1);
         if (t)
@@ -1703,7 +1713,7 @@ void IrrDriver::displayFPS()
     core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-    
+
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
@@ -2331,7 +2341,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     //    viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
     //    mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
     //}
-    
+
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);
