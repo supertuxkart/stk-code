@@ -109,11 +109,11 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_dof =
             advanced_pipeline && getWidget<CheckBoxWidget>("dof")->getState();
-        
+
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
-        
-        if (advanced_pipeline && getWidget<CheckBoxWidget>("ubo")->getState())
+
+        if (advanced_pipeline)
         {
             UserConfigParams::m_shadows =
                 getWidget<SpinnerWidget>("shadows")->getValue();
