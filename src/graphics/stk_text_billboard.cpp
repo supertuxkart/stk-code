@@ -33,6 +33,18 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     updateAbsolutePosition();
 }
 
+void STKTextBillboard::updateAbsolutePosition()
+{
+    if (Parent)
+    {
+        // Override to not use the parent's rotation
+        AbsoluteTransformation = getRelativeTransformation();
+        AbsoluteTransformation.setTranslation(AbsoluteTransformation.getTranslation() + Parent->getAbsolutePosition());
+    }
+    else
+        AbsoluteTransformation = getRelativeTransformation();
+}
+
 scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFont* font)
 {
     font->doDraw(text, core::rect<s32>(0, 0, 1000, 1000), video::SColor(255,255,255,255),
