@@ -129,6 +129,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
         getWidget<LabelWidget>("label_online")->setVisible(false);
         online = false;
     }
+
     getWidget<TextBoxWidget>("username")->setVisible(online);
     getWidget<LabelWidget  >("label_username")->setVisible(online);
     getWidget<TextBoxWidget>("password")->setVisible(online);

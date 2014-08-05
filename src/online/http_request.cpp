@@ -217,7 +217,7 @@ namespace Online
             // List of strings whose values should not be printed. "" is the
             // end indicator.
             static std::string dont_print[] = { "&password=", "&token=", "&current=",
-                                                "&new1=", "&new2=", ""};
+                                                "&new1=", "&new2=", "&password_confirm=", ""};
             unsigned int j = 0;
             while (dont_print[j].size() > 0)
             {

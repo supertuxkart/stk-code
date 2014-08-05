@@ -78,6 +78,7 @@ EventPropagation RegistrationDialog::processEvent(const std::string& event_sourc
             assert(r);
             r->acceptTerms();
         }
+
         // If it's not accept, it's cancel - anyway, close dialog
         ModalDialog::dismiss();
         return EVENT_BLOCK;
