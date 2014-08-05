@@ -6,7 +6,7 @@ void haybail()
 
 */
     displayMessage("Haybail deactivated");
-    //disableAnimation("hayBail.b3d");
+    //disable("hayBail.b3d");
 	TrackObject @t_obj = getTrackObject("hayBail.b3d");
      //t_obj.setEnable(false);
      PhysicalObject @haybail = t_obj.getPhysicalObject();
@@ -28,7 +28,7 @@ void haybail_deactivate()
 
 */
      displayMessage("Haybail reactivated");
-     //enableAnimation("hayBail.b3d");
+     //enable("hayBail.b3d");
      squashKart(0,35.0); //id of kart,time to squash
      TrackObject @t_obj = getTrackObject("hayBail.b3d");
      Animator @haybailAnimator = t_obj.getAnimator();
