@@ -83,6 +83,7 @@ void RequestConnection::asynchronousUpdate()
         {
             if (!m_request->isDone())
                 return;
+
             const XMLNode * result = m_request->getXMLData();
             std::string rec_success;
 

@@ -193,6 +193,7 @@ void ServerLobbyRoomProtocol::checkIncomingConnectionRequests()
 
         const XMLNode * result = request->getXMLData();
         std::string rec_success;
+
         if(result->get("success", &rec_success))
         {
             if(rec_success == "yes")

@@ -98,7 +98,7 @@ namespace Online
 
         // ------------------------------------------------------------------------
         /** Returns true if there was an error downloading the file. */
-        bool hadDownloadError() const { return m_curl_code!=CURLE_OK; }
+        bool hadDownloadError() const { return m_curl_code != CURLE_OK; }
 
         // ------------------------------------------------------------------------
         /** Returns the curl error message if an error has occurred.

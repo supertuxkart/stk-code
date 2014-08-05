@@ -59,7 +59,6 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
     m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
-
     m_fetch_vote_request = new XMLRequest();
     PlayerManager::setUserDetails(m_fetch_vote_request, "get-addon-vote");
     m_fetch_vote_request->addParameter("addonid", addon_id.substr(6));
@@ -146,12 +145,15 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& event)
     {
         const std::string& selection =
             m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
+
             return GUIEngine::EVENT_BLOCK;
         }
     }
+
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
@@ -165,16 +167,21 @@ void VoteDialog::updateFetchVote()
     if (!m_fetch_vote_request->isDone())
     {
         // request still pending
-        m_info_widget->setText(StringUtils::loadingDots(_("Fetching last vote")),
-                               false                                          );
+        m_info_widget->setText(
+            StringUtils::loadingDots(_("Fetching last vote")),
+            false
+        );
+
         return;
     }   // !isDone
 
     if (m_fetch_vote_request->isSuccess())
     {
-        m_info_widget->setDefaultColor();
         std::string voted("");
+
+        m_info_widget->setDefaultColor();
         m_fetch_vote_request->getXMLData()->get("voted", &voted);
+
         if (voted == "yes")
         {
             float rating;

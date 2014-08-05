@@ -129,7 +129,7 @@ void RecoveryDialog::processInput()
         m_recovery_request = new XMLRequest();
 
         // This function also works when the current user is not logged in
-        PlayerManager::setUserDetails(m_recovery_request, "recovery");
+        PlayerManager::setUserDetails(m_recovery_request, "recover");
         m_recovery_request->addParameter("username", username);
         m_recovery_request->addParameter("email",    email   );
         m_recovery_request->queue();
@@ -144,10 +144,13 @@ GUIEngine::EventPropagation
 {
     std::string selection;
     if (eventSource == m_options_widget->m_properties[PROP_ID])
-        selection =
-                 m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    {
+        selection = m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+    }
     else
+    {
         selection = eventSource;
+    }
 
     if (selection == m_cancel_widget->m_properties[PROP_ID])
     {
@@ -167,9 +170,9 @@ GUIEngine::EventPropagation
  */
 void RecoveryDialog::onEnterPressedInternal()
 {
-
     if (GUIEngine::isFocusedForPlayer(m_options_widget, PLAYER_ID_GAME_MASTER))
         return;
+
     if (m_submit_widget->isActivated())
         processInput();
 }
@@ -196,15 +199,19 @@ void RecoveryDialog::onUpdate(float dt)
                 m_info_widget->setText(m_recovery_request->getInfo(), false);
                 m_options_widget->setActivated();
             }
+
             delete m_recovery_request;
             m_recovery_request = NULL;
         }
         else
         {
-            m_info_widget->setText(StringUtils::loadingDots(_("Validating info")),
-                                   false);
+            m_info_widget->setText(
+                StringUtils::loadingDots(_("Validating info")),
+                false
+            );
         }
     }
+
     // It's unsafe to delete from inside the event handler so we do it here
     if (m_self_destroy)
         ModalDialog::dismiss();
