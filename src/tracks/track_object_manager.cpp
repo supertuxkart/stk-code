@@ -117,6 +117,7 @@ void TrackObjectManager::enable(std::string name)
 				curr->setEnable(true);
                 if (curr->getType() == "mesh")
                 {
+                    if (curr->getPhysicalObject() != NULL)
                     curr->getPhysicalObject()->addBody();
                 }
             
