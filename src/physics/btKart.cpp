@@ -394,8 +394,8 @@ void btKart::updateVehicle( btScalar step )
         btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
         btVector3 terrain_up(0,1,0);
         btVector3 axis = kart_up.cross(terrain_up);
-        // Times 10 gives a nicely balanced feeling.
-        m_chassisBody->applyTorqueImpulse(axis * 10);
+        // Give a nicely balanced feeling for rebalancing the kart
+        m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getSmoothFlyingImpulse());
     }
 
     // Work around: make sure that either both wheels on one axis

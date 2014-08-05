@@ -130,11 +130,18 @@ private:
     /** Braking factor * engine_power braking force. */
     float m_brake_factor;
 
+    /** Brake_time * m_brake_time_increase will increase the break time
+     * over time. */
+    float m_brake_time_increase;
+
     /** Time for player karts to reach full steer angle. */
     InterpolationArray m_time_full_steer;
 
     /** Time for steering to go back to zero from full steer. */
     float m_time_reset_steer;
+
+    /** A torque impulse applied to keep the kart parallel to the ground. */
+    float m_smooth_flying_impulse;;
 
     /** The turn angle depending on speed. */
     InterpolationArray m_turn_angle_at_speed;
@@ -502,9 +509,20 @@ public:
     float getBrakeFactor            () const {return m_brake_factor;          }
 
     // ------------------------------------------------------------------------
+    /** Returns the additional brake factor which depends on time. */
+    float getBrakeTimeIncrease() const { return m_brake_time_increase; }
+
+    // ------------------------------------------------------------------------
+    /** Returns the torque scaling factor used to keep the karts parallel to
+     *  the ground when flying. */
+    float getSmoothFlyingImpulse() const 
+    {
+        return m_smooth_flying_impulse;
+    }   // getSmoothFlyingImpulse
+
+    // ------------------------------------------------------------------------
     /** Get maximum reverse speed ratio. */
-    float getMaxSpeedReverseRatio   () const
-                                          {return m_max_speed_reverse_ratio;  }
+    float getMaxSpeedReverseRatio() const {return m_max_speed_reverse_ratio;  }
 
     // ------------------------------------------------------------------------
     /** Returns the engine type (used to change sfx depending on kart size). */

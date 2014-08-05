@@ -343,6 +343,7 @@ void Kart::reset()
     m_has_started          = false;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
+    m_brake_time           = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
     m_current_lean         = 0.0f;
@@ -2150,6 +2151,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         if(m_vehicle->getWheelInfo(0).m_brake &&
             !World::getWorld()->isStartPhase())
             m_vehicle->setAllBrakes(0);
+        m_brake_time = 0;
     }
     else
     {   // not accelerating
@@ -2159,9 +2161,11 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             if(m_speed > 0.0f)
             {   // Still going forward while braking
                 applyEngineForce(0.f);
-
-                //apply the brakes
-                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor());
+                m_brake_time += dt;
+                // Apply the brakes - include the time dependent brake increase
+                float f = 1 + m_brake_time
+                            * getKartProperties()->getBrakeTimeIncrease();
+                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor()*f);
             }
             else   // m_speed < 0
             {
@@ -2185,6 +2189,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         }
         else   // !m_brake
         {
+            m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
             assert(!isnan(m_controls.m_accel));
             assert(!isnan(engine_power));

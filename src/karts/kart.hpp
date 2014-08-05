@@ -116,8 +116,12 @@ private:
      *  determine startup boost. */
     bool         m_has_started;
 
-    /**<Maximum engine rpm's for the current gear*/
+    /** Maximum engine rpm's for the current gear. */
     float        m_max_gear_rpm;
+
+    /** How long the brake key has been pressed - the longer the harder
+     *  the kart will brake. */
+    float        m_brake_time;
 
     /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
