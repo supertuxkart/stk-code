@@ -132,13 +132,60 @@ namespace Scripting
             TrackObject* t_obj = World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*name);
             return t_obj;
         }*/
+
+
+        // Displays the message specified in displayMessage( string message ) within the script
+        void displayMessage(asIScriptGeneric *gen)
+        {
+            std::string *input = (std::string*)gen->GetArgAddress(0);
+            irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
+            new TutorialMessageDialog((out), true);
+        }
+        void disableTrackObject(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+        }
+        void enableTrackObject(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
+        }
+        void disableTrigger(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
+        }
+        void enableTrigger(asIScriptGeneric *gen)
+        {
+            std::string *str = (std::string*)gen->GetArgAddress(0);
+            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
+        }
+        void createTrigger(asIScriptGeneric *gen)
+        {
+            std::string *script_name = (std::string*)gen->GetArgAddress(0);
+            Vec3 *creation_loc = (Vec3*)gen->GetArgAddress(1);
+            float x = creation_loc->getX();
+            float y = creation_loc->getY();
+            float z = creation_loc->getZ();
+            float distance = gen->GetArgFloat(2); //triggering distance
+            core::vector3df posi(x, y, z);
+            core::vector3df hpr(0, 0, 0);
+            core::vector3df scale(1.0f, 1.0f, 1.0f);
+            TrackObjectPresentationActionTrigger* newtrigger =
+                new TrackObjectPresentationActionTrigger(posi, *script_name, distance);
+            TrackObject* tobj = new TrackObject(posi, hpr, scale,
+                "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
+            World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
+        }
+
         void registerScriptFunctions(asIScriptEngine *engine)
         {
             int r;
 
             r = engine->RegisterGlobalFunction("void displayMessage(string &in)", asFUNCTION(displayMessage), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void disableAnimation(string &in)", asFUNCTION(disableAnimation), asCALL_GENERIC); assert(r >= 0);
-            r = engine->RegisterGlobalFunction("void enableAnimation(string &in)", asFUNCTION(enableAnimation), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void disable(string &in)", asFUNCTION(disableTrackObject), asCALL_GENERIC); assert(r >= 0);
+            r = engine->RegisterGlobalFunction("void enable(string &in)", asFUNCTION(enableTrackObject), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void enableTrigger(string &in)", asFUNCTION(enableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void disableTrigger(string &in)", asFUNCTION(disableTrigger), asCALL_GENERIC); assert(r >= 0);
             r = engine->RegisterGlobalFunction("void createTrigger(string &in,Vec3 &in, float distance)",
@@ -231,51 +278,6 @@ namespace Scripting
 
 
 
-
-        // Displays the message specified in displayMessage( string message ) within the script
-        void displayMessage(asIScriptGeneric *gen)
-        {
-            std::string *input = (std::string*)gen->GetArgAddress(0);
-            irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
-            new TutorialMessageDialog((out), true);
-        }
-        void disableAnimation(asIScriptGeneric *gen)
-        {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
-        }
-        void enableAnimation(asIScriptGeneric *gen)
-        {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
-        }
-        void disableTrigger(asIScriptGeneric *gen)
-        {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
-        }
-        void enableTrigger(asIScriptGeneric *gen)
-        {
-            std::string *str = (std::string*)gen->GetArgAddress(0);
-            World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
-        }
-        void createTrigger(asIScriptGeneric *gen)
-        {
-            std::string *script_name = (std::string*)gen->GetArgAddress(0);
-            Vec3 *creation_loc = (Vec3*)gen->GetArgAddress(1);
-            float x = creation_loc->getX();
-            float y = creation_loc->getY();
-            float z = creation_loc->getZ();
-            float distance = gen->GetArgFloat(2); //triggering distance
-            core::vector3df posi(x, y, z);
-            core::vector3df hpr(0, 0, 0);
-            core::vector3df scale(1.0f, 1.0f, 1.0f);
-            TrackObjectPresentationActionTrigger* newtrigger =
-                new TrackObjectPresentationActionTrigger(posi, *script_name, distance);
-            TrackObject* tobj = new TrackObject(posi, hpr, scale,
-                "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
-            World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
-        }
 
 
     }
