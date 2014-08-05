@@ -2315,12 +2315,20 @@ void Track::itemCommand(const XMLNode *node)
     }
 
     // Tilt the items according to the track
-    int road_sector = QuadGraph::UNKNOWN_SECTOR;
-    QuadGraph::get()->findRoadSector(xyz, &road_sector);
-    // If a valid road_sector is not found
-    if (road_sector == QuadGraph::UNKNOWN_SECTOR) 
-        road_sector=QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
-    Vec3 normal = QuadGraph::get()->getQuadOfNode(road_sector).getNormal();
+    Vec3 normal(0,1,0);
+    if (QuadGraph::get())
+    {
+        int road_sector = QuadGraph::UNKNOWN_SECTOR;
+        QuadGraph::get()->findRoadSector(xyz, &road_sector);
+        // If a valid road_sector is not found
+        if (road_sector == QuadGraph::UNKNOWN_SECTOR)
+            road_sector = QuadGraph::get()->findOutOfRoadSector(xyz, road_sector);
+        Vec3 quadnormal = QuadGraph::get()->getQuadOfNode(road_sector).getNormal();
+        
+        const Material *m;
+        Vec3 hit_point;
+        m_track_mesh->castRay(loc, loc + -1.0f*quadnormal, &hit_point, &m, &normal);
+    }
     ItemManager::get()->newItem(type, loc, normal);
 }   // itemCommand
 
@@ -2403,11 +2411,16 @@ const core::vector3df& Track::getSunRotation()
 bool Track::findGround(AbstractKart *kart)
 {
     btVector3 to(kart->getXYZ());
-    unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
     Vec3 quadNormal;
-    if (sector != QuadGraph::UNKNOWN_SECTOR)
-       quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
-    else quadNormal = Vec3(0, 1, 0);
+    if (QuadGraph::get())
+    {
+        unsigned int sector = ((LinearWorld*)World::getWorld())->getTrackSector(kart->getWorldKartId()).getCurrentGraphNode();
+        if (sector != QuadGraph::UNKNOWN_SECTOR)
+            quadNormal = QuadGraph::get()->getQuadOfNode(sector).getNormal();
+    }
+    else 
+        quadNormal = Vec3(0, 1, 0);
+
     to = to + -1000.0f*quadNormal;
 
     // Material and hit point are not needed;

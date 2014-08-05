@@ -388,7 +388,7 @@ bool Flyable::updateAndDelete(float dt)
         // Add the position offset so that the flyable can adjust its position
         // (usually to do the raycast from a slightly higher position to avoid
         // problems finding the terrain in steep uphill sections).
-        // towards is a unit vector. so we can multiply -towards to offset the position
+        // Towards is a unit vector. so we can multiply -towards to offset the position
         // by one unit.
         TerrainInfo::update(xyz + m_position_offset*(-towards), towards);
         if (race_manager->getMinorMode() != RaceManager::MINOR_MODE_3_STRIKES &&
