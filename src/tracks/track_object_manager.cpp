@@ -88,6 +88,9 @@ void TrackObjectManager::reset()
 }   // reset
 
 // ----------------------------------------------------------------------------
+/** disables all track objects with a particular ID
+ *  \param name Name or ID for disabling
+ */
 void TrackObjectManager::disable(std::string name)
 {
      TrackObject* curr;
@@ -105,6 +108,10 @@ void TrackObjectManager::disable(std::string name)
             }
      }
 }
+// ----------------------------------------------------------------------------
+/** enables all track objects with a particular ID
+ *  \param name Name or ID for enabling
+ */
 void TrackObjectManager::enable(std::string name)
 {
      TrackObject* curr;
@@ -124,6 +131,11 @@ void TrackObjectManager::enable(std::string name)
             }
      }
 }
+// ----------------------------------------------------------------------------
+/**  returns activation status for all track objects
+ *   with a particular ID
+ *   \param name Name or ID of track object
+ */
 bool TrackObjectManager::getStatus(std::string name)
 {
      TrackObject* curr;
@@ -138,7 +150,11 @@ bool TrackObjectManager::getStatus(std::string name)
      //object not found
      return false;
 }
-
+// ----------------------------------------------------------------------------
+/** returns a reference to the track object
+ *  with a particular ID
+ *  \param name Name or ID of track object
+ */
 TrackObject* TrackObjectManager::getTrackObject(std::string name)
 {
     TrackObject* curr;
