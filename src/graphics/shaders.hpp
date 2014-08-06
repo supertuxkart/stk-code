@@ -97,7 +97,7 @@ struct UniformHelper
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::dimension2df &v, Args... arg)
     {
-        glUniform2fWraper(uniforms[N], v.X, v.Y);
+        glUniform2fWraper(uniforms[N], v.Width, v.Height);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
