@@ -106,35 +106,6 @@ struct UniformHelper
 void bypassUBO(GLuint Program);
 GLuint getUniformLocation(GLuint program, const char* name);
 
-template<typename... Args>
-class ShaderHelper
-{
-protected:
-    std::vector<GLuint> uniforms;
-
-    void AssignUniforms(const char* name)
-    {
-        uniforms.push_back(getUniformLocation(Program, name));
-    }
-
-    template<typename... T>
-    void AssignUniforms(const char* name, T... rest)
-    {
-        uniforms.push_back(getUniformLocation(Program, name));
-        AssignUniforms(rest...);
-    }
-
-public:
-    GLuint Program;
-
-    void setUniforms(const Args & ... args) const
-    {
-        if (needsUBO())
-            bypassUBO(Program);
-        UniformHelper::setUniformsHelper(uniforms, args...);
-    }
-};
-
 template<typename T, typename... Args>
 class ShaderHelperSingleton : public Singleton<T>
 {
@@ -348,13 +319,11 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b);
 };
 
-class ShadowShader : public ShaderHelper<core::matrix4>
+class ShadowShader : public ShaderHelperSingleton<ShadowShader, core::matrix4>
 {
 public:
     ShadowShader();
 };
-
-extern ShadowShader *ShadowShaderInstance;
 
 class RSMShader
 {
@@ -367,69 +336,53 @@ public:
     static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix);
 };
 
-class InstancedShadowShader : public ShaderHelper<>
+class InstancedShadowShader : public ShaderHelperSingleton<InstancedShadowShader>
 {
 public:
     InstancedShadowShader();
 };
 
-extern InstancedShadowShader *InstancedShadowShaderInstance;
-
-class RefShadowShader : public ShaderHelper<core::matrix4>
+class RefShadowShader : public ShaderHelperSingleton<RefShadowShader, core::matrix4>
 {
 public:
     GLuint TU_tex;
-
     RefShadowShader();
 };
 
-extern RefShadowShader *RefShadowShaderInstance;
-
-class InstancedRefShadowShader : public ShaderHelper<>
+class InstancedRefShadowShader : public ShaderHelperSingleton<InstancedRefShadowShader>
 {
 public:
     GLuint TU_tex;
-
     InstancedRefShadowShader();
 };
 
-extern InstancedRefShadowShader *InstancedRefShadowShaderInstance;
-
-class GrassShadowShader : public ShaderHelper<core::matrix4, core::vector3df>
+class GrassShadowShader : public ShaderHelperSingleton<GrassShadowShader, core::matrix4, core::vector3df>
 {
 public:
     GLuint TU_tex;
     GrassShadowShader();
 };
 
-extern GrassShadowShader *GrassShadowShaderInstance;
-
-class InstancedGrassShadowShader : public ShaderHelper<core::vector3df>
+class InstancedGrassShadowShader : public ShaderHelperSingleton<InstancedGrassShadowShader, core::vector3df>
 {
 public:
     GLuint TU_tex;
     InstancedGrassShadowShader();
 };
 
-extern InstancedGrassShadowShader *InstancedGrassShadowShaderInstance;
-
-class DisplaceMaskShader : public ShaderHelper<core::matrix4>
+class DisplaceMaskShader : public ShaderHelperSingleton<DisplaceMaskShader, core::matrix4>
 {
 public:
     DisplaceMaskShader();
 };
 
-extern DisplaceMaskShader *DisplaceMaskShaderInstance;
-
-class DisplaceShader : public ShaderHelper<core::matrix4, core::vector2df, core::vector2df>
+class DisplaceShader : public ShaderHelperSingleton<DisplaceShader, core::matrix4, core::vector2df, core::vector2df>
 {
 public:
     GLuint TU_displacement_tex, TU_mask_tex, TU_color_tex, TU_tex;
 
     DisplaceShader();
 };
-
-extern DisplaceShader *DisplaceShaderInstance;
 
 class SkyboxShader
 {

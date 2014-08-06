@@ -408,15 +408,7 @@ void Shaders::loadShaders()
     MeshShader::BubbleShader::init();
     MeshShader::BillboardShader::init();
     LightShader::PointLightShader::init();
-    MeshShader::DisplaceShaderInstance = new MeshShader::DisplaceShader();
-    MeshShader::DisplaceMaskShaderInstance = new MeshShader::DisplaceMaskShader();
-    MeshShader::ShadowShaderInstance = new MeshShader::ShadowShader();
     MeshShader::RSMShader::init();
-    MeshShader::InstancedShadowShaderInstance = new MeshShader::InstancedShadowShader();
-    MeshShader::RefShadowShaderInstance = new MeshShader::RefShadowShader();
-    MeshShader::InstancedRefShadowShaderInstance = new MeshShader::InstancedRefShadowShader();
-    MeshShader::GrassShadowShaderInstance = new MeshShader::GrassShadowShader();
-    MeshShader::InstancedGrassShadowShaderInstance = new MeshShader::InstancedGrassShadowShader();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     ParticleShader::FlipParticleRender::init();
@@ -1051,8 +1043,6 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    ShadowShader *ShadowShaderInstance;
-
     GLuint RSMShader::Program;
     GLuint RSMShader::uniform_MM;
     GLuint RSMShader::uniform_RSMMatrix;
@@ -1100,8 +1090,6 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    InstancedShadowShader *InstancedShadowShaderInstance;
-
     RefShadowShader::RefShadowShader()
     {
         // Geometry shader needed
@@ -1127,8 +1115,6 @@ namespace MeshShader
 
         AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
-
-    RefShadowShader *RefShadowShaderInstance;
 
     InstancedRefShadowShader::InstancedRefShadowShader()
     {
@@ -1156,8 +1142,6 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    InstancedRefShadowShader *InstancedRefShadowShaderInstance;
-
     GrassShadowShader::GrassShadowShader()
     {
         // Geometry shader needed
@@ -1183,8 +1167,6 @@ namespace MeshShader
 
         AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
     }
-
-    GrassShadowShader *GrassShadowShaderInstance;
 
     InstancedGrassShadowShader::InstancedGrassShadowShader()
     {
@@ -1214,8 +1196,6 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    InstancedGrassShadowShader *InstancedGrassShadowShaderInstance;
-
     DisplaceMaskShader::DisplaceMaskShader()
     {
         Program = LoadProgram(
@@ -1226,8 +1206,6 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
-
-    DisplaceMaskShader *DisplaceMaskShaderInstance;
 
 
     DisplaceShader::DisplaceShader()
@@ -1249,8 +1227,6 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
-
-    DisplaceShader *DisplaceShaderInstance;
 
     GLuint SkyboxShader::Program;
     GLuint SkyboxShader::attrib_position;

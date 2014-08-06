@@ -156,7 +156,7 @@ static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    MeshShader::InstancedShadowShaderInstance->setUniforms();
+    MeshShader::InstancedShadowShader::getInstance()->setUniforms();
 
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
@@ -185,8 +185,8 @@ static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::InstancedRefShadowShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedRefShadowShaderInstance->setUniforms();
+    setTexture(MeshShader::InstancedRefShadowShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedRefShadowShader::getInstance()->setUniforms();
 
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
@@ -200,8 +200,8 @@ static void drawShadowGrass(GLMesh &mesh, const core::vector3df &windDir, size_t
     size_t count = mesh.IndexCount;
 
     compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::InstancedGrassShadowShaderInstance->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedGrassShadowShaderInstance->setUniforms(windDir);
+    setTexture(MeshShader::InstancedGrassShadowShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedGrassShadowShader::getInstance()->setUniforms(windDir);
 
     glBindVertexArray(mesh.vao_shadow_pass);
     glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
@@ -356,17 +356,17 @@ void STKInstancedSceneNode::render()
     if (irr_driver->getPhase() == SHADOW_PASS)
     {
         if (!MeshSolidMaterial[MAT_DEFAULT].empty())
-            glUseProgram(MeshShader::InstancedShadowShaderInstance->Program);
+            glUseProgram(MeshShader::InstancedShadowShader::getInstance()->Program);
         for (unsigned i = 0; i < MeshSolidMaterial[MAT_DEFAULT].size(); i++)
             drawShadowDefault(*MeshSolidMaterial[MAT_DEFAULT][i], instance_pos.size() / 9);
 
         if (!MeshSolidMaterial[MAT_ALPHA_REF].empty())
-            glUseProgram(MeshShader::InstancedRefShadowShaderInstance->Program);
+            glUseProgram(MeshShader::InstancedRefShadowShader::getInstance()->Program);
         for (unsigned i = 0; i < MeshSolidMaterial[MAT_ALPHA_REF].size(); i++)
             drawShadowAlphaRefTexture(*MeshSolidMaterial[MAT_ALPHA_REF][i], instance_pos.size() / 9);
 
         if (!MeshSolidMaterial[MAT_GRASS].empty())
-            glUseProgram(MeshShader::InstancedGrassShadowShaderInstance->Program);
+            glUseProgram(MeshShader::InstancedGrassShadowShader::getInstance()->Program);
         for (unsigned i = 0; i < MeshSolidMaterial[MAT_GRASS].size(); i++)
             drawShadowGrass(*MeshSolidMaterial[MAT_GRASS][i], windDir, instance_pos.size() / 9);
         return;
