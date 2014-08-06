@@ -5,7 +5,7 @@
 #include <ICameraSceneNode.h>
 #include <IParticleSystemSceneNode.h>
 #include "guiengine/engine.hpp"
-
+#include "graphics/particle_emitter.hpp"
 #define COMPONENTCOUNT 8
 
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
@@ -185,7 +185,10 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 
     const core::vector3df& extent = emitter->getBox().getExtent();
 
-    for (unsigned i = 0; i < count; i++) {
+    bool randomize_initial_y = ((ParticleEmitter*)emitter)->randomizeInitialY();
+
+    for (unsigned i = 0; i < count; i++)
+    {
         particles[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
         particles[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
         particles[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
@@ -196,6 +199,9 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
         generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
             initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
         memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+
+        if (randomize_initial_y)
+            particles[i].PositionY = os::Randomizer::frand()*50.0f; // -100.0f;
     }
     glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
     glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);

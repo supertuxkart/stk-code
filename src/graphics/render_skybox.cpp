@@ -370,6 +370,11 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
         delete[] Y1minus1[face];
         delete[] Y10[face];
         delete[] Y11[face];
+        delete[] Y2minus2[face];
+        delete[] Y2minus1[face];
+        delete[] Y20[face];
+        delete[] Y21[face];
+        delete[] Y22[face];
     }
 }
 
@@ -433,6 +438,13 @@ void IrrDriver::generateSkyboxCubemap()
 
     assert(SkyboxTextures.size() == 6);
     SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
+}
+
+void IrrDriver::generateDiffuseCoefficients()
+{
+    if (!m_SH_dirty)
+        return;
+    m_SH_dirty = false;
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
 
     if (SphericalHarmonicsTextures.size() == 6)
@@ -460,7 +472,7 @@ void IrrDriver::generateSkyboxCubemap()
             SphericalHarmonicsTextures[idx]->unlock();
 
             image->copyToScaling(sh_rgba[i], sh_w, sh_h);
-            image->drop();
+            delete image;
         }
 
         testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
@@ -503,6 +515,7 @@ void IrrDriver::generateSkyboxCubemap()
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
+
 }
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)

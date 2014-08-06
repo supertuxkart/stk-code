@@ -196,6 +196,7 @@ class IrrDriver : public IEventReceiver, public NoCopy
 private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
+    bool m_need_ubo_workaround;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -233,6 +234,7 @@ private:
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
+    bool m_SH_dirty;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];
@@ -276,6 +278,11 @@ public:
             return 100 + (GLMinorVersion + 3) * 10;
         else
             return 120;
+    }
+
+    bool needUBOWorkaround() const
+    {
+        return m_need_ubo_workaround;
     }
 
     bool hasVSLayerExtension() const
@@ -385,6 +392,7 @@ public:
     void initDevice();
     void reset();
     void generateSkyboxCubemap();
+    void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;

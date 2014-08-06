@@ -37,6 +37,7 @@
 #include "graphics/particle_emitter.hpp"
 #include "graphics/particle_kind.hpp"
 #include "graphics/particle_kind_manager.hpp"
+#include "graphics/stk_text_billboard.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
@@ -1102,19 +1103,33 @@ bool Track::loadMainTrack(const XMLNode &root)
 
             assert(GUIEngine::getHighresDigitFont() != NULL);
 
-            // TODO: Add support in the engine for BillboardText or find a replacement
-/*          scene::ISceneManager* sm = irr_driver->getSceneManager();
-            scene::ISceneNode* sn =
-                sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
-                                              msg.c_str(),
-                                              NULL,
-                                              core::dimension2df(textsize.Width/45.0f,
-                                                                 textsize.Height/45.0f),
-                                              xyz,
-                                              -1, // id
-                                              video::SColor(255, 255, 225, 0),
-                                              video::SColor(255, 255, 89, 0));
-            m_all_nodes.push_back(sn);*/
+            if (irr_driver->isGLSL())
+            {
+                gui::ScalableFont* font = GUIEngine::getHighresDigitFont();
+                STKTextBillboard* tb = new STKTextBillboard(msg.c_str(), font,
+                    video::SColor(255, 255, 225, 0),
+                    video::SColor(255, 255, 89, 0),
+                    irr_driver->getSceneManager()->getRootSceneNode(),
+                    irr_driver->getSceneManager(), -1, xyz,
+                    core::vector3df(1.5f, 1.5f, 1.5f));
+                m_all_nodes.push_back(tb);
+            }
+            else
+            {
+                scene::ISceneManager* sm = irr_driver->getSceneManager();
+                scene::ISceneNode* sn =
+                    sm->addBillboardTextSceneNode(GUIEngine::getHighresDigitFont(),
+                    msg.c_str(),
+                    NULL,
+                    core::dimension2df(textsize.Width / 35.0f,
+                    textsize.Height / 35.0f),
+                    xyz,
+                    -1, // id
+                    video::SColor(255, 255, 225, 0),
+                    video::SColor(255, 255, 89, 0));
+                m_all_nodes.push_back(sn);
+            }
+
             if (!shown) continue;
         }
         else if (condition == "allchallenges")
