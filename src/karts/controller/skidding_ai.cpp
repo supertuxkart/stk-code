@@ -33,7 +33,7 @@
    // Shows line from kart to its aim point
 #  undef AI_DEBUG_KART_AIM
 #endif
-#define AI_DEBUG
+
 #include "karts/controller/skidding_ai.hpp"
 
 #ifdef AI_DEBUG
