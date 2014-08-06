@@ -265,7 +265,7 @@ void STKMeshSceneNode::render()
             pushVector(ListMatGrass::Arguments, mesh, AbsoluteTransformation, invmodel, windDir);
 
         for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
-            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
+            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
             pushVector(ListMatSplatting::Arguments, mesh, AbsoluteTransformation, invmodel);
