@@ -29,7 +29,6 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     createGLMeshes();
     Mesh->drop();
     //setAutomaticCulling(0);
-    setReloadEachFrame(true); // FIXME: should not need that!!
     updateAbsolutePosition();
 }
 
@@ -157,13 +156,14 @@ void STKTextBillboard::OnRegisterSceneNode()
 {
     if (IsVisible)
     {
-        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+        SceneManager->registerNodeForRendering(this, scene::ESNRP_SOLID);
 
         scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
         core::vector3df cam_pos = curr_cam->getPosition();
         core::vector3df text_pos = this->getAbsolutePosition();
         float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
         this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
+        updateAbsolutePosition();
     }
 
     ISceneNode::OnRegisterSceneNode();
