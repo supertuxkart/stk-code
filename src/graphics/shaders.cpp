@@ -406,7 +406,6 @@ void Shaders::loadShaders()
     FullScreenShader::MLAAGatherSHader::init();
     MeshShader::ColorizeShader::init();
     MeshShader::BubbleShader::init();
-    MeshShader::BillboardShader::init();
     LightShader::PointLightShader::init();
     MeshShader::RSMShader::init();
     MeshShader::SkyboxShader::init();
@@ -960,40 +959,19 @@ namespace MeshShader
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
 
-    GLuint BillboardShader::Program;
-    GLuint BillboardShader::attrib_corner;
-    GLuint BillboardShader::attrib_texcoord;
-    GLuint BillboardShader::uniform_MV;
-    GLuint BillboardShader::uniform_P;
-    GLuint BillboardShader::uniform_tex;
-    GLuint BillboardShader::uniform_Position;
-    GLuint BillboardShader::uniform_Size;
-
-    void BillboardShader::init()
+    BillboardShader::BillboardShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/billboard.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/billboard.frag").c_str());
-        attrib_corner = glGetAttribLocation(Program, "Corner");
-        attrib_texcoord = glGetAttribLocation(Program, "Texcoord");
-        uniform_MV = glGetUniformLocation(Program, "ModelViewMatrix");
-        uniform_P = glGetUniformLocation(Program, "ProjectionMatrix");
-        uniform_Position = glGetUniformLocation(Program, "Position");
-        uniform_Size = glGetUniformLocation(Program, "Size");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-    }
 
-    void BillboardShader::setUniforms(const core::matrix4 &ModelViewMatrix,
-                                      const core::matrix4 &ProjectionMatrix,
-                                      const core::vector3df &Position,
-                                      const core::dimension2d<float> &size,
-                                      unsigned TU_tex)
-    {
-        glUniformMatrix4fv(uniform_MV, 1, GL_FALSE, ModelViewMatrix.pointer());
-        glUniformMatrix4fv(uniform_P, 1, GL_FALSE, ProjectionMatrix.pointer());
-        glUniform3f(uniform_Position, Position.X, Position.Y, Position.Z);
-        glUniform2f(uniform_Size, size.Width, size.Height);
-        glUniform1i(uniform_tex, TU_tex);
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+        AssignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
+
+        TU_tex = 0;
+
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
 
     GLuint ColorizeShader::Program;

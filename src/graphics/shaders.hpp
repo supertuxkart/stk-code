@@ -95,6 +95,13 @@ struct UniformHelper
     }
 
     template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::dimension2df &v, Args... arg)
+    {
+        glUniform2fWraper(uniforms[N], v.X, v.Y);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
+    template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
     {
         glUniform1fWrapper(uniforms[N], f);
@@ -297,15 +304,12 @@ public:
     TransparentFogShader();
 };
 
-class BillboardShader
+class BillboardShader : public ShaderHelperSingleton<BillboardShader, core::matrix4, core::matrix4, core::vector3df, core::dimension2df>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_corner, attrib_texcoord;
-    static GLuint uniform_MV, uniform_P, uniform_tex, uniform_Position, uniform_Size;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelViewMatrix, const core::matrix4 &ProjectionMatrix, const core::vector3df &Position, const core::dimension2d<float> &size, unsigned TU_tex);
+    BillboardShader();
 };
 
 
