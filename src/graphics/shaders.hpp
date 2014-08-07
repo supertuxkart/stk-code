@@ -119,16 +119,22 @@ class ShaderHelperSingleton : public Singleton<T>
 protected:
     std::vector<GLuint> uniforms;
     
-    void AssignUniforms(const char* name)
+    void AssignUniforms_impl()
     {
-        uniforms.push_back(getUniformLocation(Program, name));
     }
 
     template<typename... U>
-    void AssignUniforms(const char* name, U... rest)
+    void AssignUniforms_impl(const char* name, U... rest)
     {
         uniforms.push_back(getUniformLocation(Program, name));
-        AssignUniforms(rest...);
+        AssignUniforms_impl(rest...);
+    }
+
+    template<typename... U>
+    void AssignUniforms(U... rest)
+    {
+        static_assert(sizeof...(rest) == sizeof...(Args), "Count of Uniform's name mismatch");
+        AssignUniforms_impl(rest...);
     }
 
 public:
@@ -313,14 +319,10 @@ public:
 };
 
 
-class ColorizeShader
+class ColorizeShader : public ShaderHelperSingleton<ColorizeShader, core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_col;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b);
+    ColorizeShader();
 };
 
 class ShadowShader : public ShaderHelperSingleton<ShadowShader, core::matrix4>
