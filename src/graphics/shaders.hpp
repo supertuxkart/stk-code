@@ -339,6 +339,14 @@ public:
     RSMShader();
 };
 
+class SplattingRSMShader : public ShaderHelperSingleton<SplattingRSMShader, core::matrix4, core::matrix4>
+{
+public:
+    GLuint TU_layout, TU_detail0, TU_detail1, TU_detail2, TU_detail3;
+
+    SplattingRSMShader();
+};
+
 class InstancedShadowShader : public ShaderHelperSingleton<InstancedShadowShader>
 {
 public:

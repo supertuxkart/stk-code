@@ -534,10 +534,10 @@ struct rsm_custom_unroll_args<N, List...>
 
 
 
-template<enum E_VERTEX_TYPE VertexType, int... Selector, typename... Args>
+template<typename T, enum E_VERTEX_TYPE VertexType, int... Selector, typename... Args>
 void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, Args...> >&t)
 {
-    glUseProgram(MeshShader::RSMShader::getInstance()->Program);
+    glUseProgram(T::getInstance()->Program);
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t.size(); i++)
     {
@@ -549,7 +549,7 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> Texture
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
-        rsm_custom_unroll_args<Selector...>::template exec<MeshShader::RSMShader>(rsm_matrix, t[i]);
+        rsm_custom_unroll_args<Selector...>::template exec<T>(rsm_matrix, t[i]);
     }
 }
 
@@ -595,10 +595,18 @@ void IrrDriver::renderShadows()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawRSM<EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatDefault::Arguments);
-//    drawRSM<EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatAlphaRef::Arguments);
+    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatDefault::Arguments);
+    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatAlphaRef::Arguments);
 //    drawRSM<EVT_STANDARD, 2, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatSphereMap::Arguments);
-    drawRSM<EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatUnlit::Arguments);
-    drawRSM<EVT_2TCOORDS, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatDetails::Arguments);
-    drawRSM<EVT_2TCOORDS, 2, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatSplatting::Arguments);
+    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatUnlit::Arguments);
+    drawRSM<MeshShader::RSMShader, EVT_2TCOORDS, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatDetails::Arguments);
+    drawRSM<MeshShader::SplattingRSMShader, EVT_2TCOORDS, 1>(rsm_matrix,
+        std::vector<GLuint>{
+            8,
+            MeshShader::SplattingRSMShader::getInstance()->TU_layout,
+            MeshShader::SplattingRSMShader::getInstance()->TU_detail0,
+            MeshShader::SplattingRSMShader::getInstance()->TU_detail1,
+            MeshShader::SplattingRSMShader::getInstance()->TU_detail2,
+            MeshShader::SplattingRSMShader::getInstance()->TU_detail3},
+        ListMatSplatting::Arguments);
 }
