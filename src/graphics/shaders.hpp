@@ -134,6 +134,7 @@ protected:
     void AssignUniforms(U... rest)
     {
         static_assert(sizeof...(rest) == sizeof...(Args), "Count of Uniform's name mismatch");
+        AssignUniforms_impl(rest);
     }
 
 public:
