@@ -390,10 +390,7 @@ void Shaders::loadShaders()
     FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::LinearizeDepthShader::init();
     FullScreenShader::SSAOShader::init();
-    FullScreenShader::SunLightShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
-    FullScreenShader::ShadowedSunLightShader::init();
-    FullScreenShader::ShadowedSunLightDebugShader::init();
     FullScreenShader::RadianceHintsConstructionShader::init();
     FullScreenShader::RHDebug::init();
     FullScreenShader::GlobalIlluminationReconstructionShader::init();
@@ -1623,14 +1620,7 @@ namespace FullScreenShader
         glUniform1i(uniform_depth, TU_dtex);
     }
 
-    GLuint SunLightShader::Program;
-    GLuint SunLightShader::uniform_ntex;
-    GLuint SunLightShader::uniform_dtex;
-    GLuint SunLightShader::uniform_direction;
-    GLuint SunLightShader::uniform_col;
-    GLuint SunLightShader::vao;
-
-    void SunLightShader::init()
+    SunLightShader::SunLightShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
@@ -1638,24 +1628,14 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_direction = glGetUniformLocation(Program, "direction");
-        uniform_col = glGetUniformLocation(Program, "col");
+        TU_ntex = 0;
+        TU_dtex = 1;
+        AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
+        AssignUniforms("direction", "col");
         vao = createFullScreenVAO(Program);
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-    }
-
-    void SunLightShader::setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
-        glUniform3f(uniform_col, r, g, b);
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1i(uniform_dtex, TU_dtex);
     }
 
     GLuint DiffuseEnvMapShader::Program;
@@ -1689,15 +1669,7 @@ namespace FullScreenShader
         glUniform1fv(uniform_redLmn, 9, redSHCoeff);
     }
 
-    GLuint ShadowedSunLightShader::Program;
-    GLuint ShadowedSunLightShader::uniform_ntex;
-    GLuint ShadowedSunLightShader::uniform_dtex;
-    GLuint ShadowedSunLightShader::uniform_shadowtex;
-    GLuint ShadowedSunLightShader::uniform_direction;
-    GLuint ShadowedSunLightShader::uniform_col;
-    GLuint ShadowedSunLightShader::vao;
-
-    void ShadowedSunLightShader::init()
+    ShadowedSunLightShader::ShadowedSunLightShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
@@ -1705,63 +1677,15 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
-        uniform_direction = glGetUniformLocation(Program, "direction");
-        uniform_col = glGetUniformLocation(Program, "col");
+        TU_ntex = 0;
+        TU_dtex = 1;
+        TU_shadowtex = 2;
+        AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"), TexUnit(TU_shadowtex, "shadowtex"));
+        AssignUniforms("direction", "col");
         vao = createFullScreenVAO(Program);
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-    }
-
-    void ShadowedSunLightShader::setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
-        glUniform3f(uniform_col, r, g, b);
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1i(uniform_dtex, TU_dtex);
-        glUniform1i(uniform_shadowtex, TU_shadowtex);
-    }
-
-    GLuint ShadowedSunLightDebugShader::Program;
-    GLuint ShadowedSunLightDebugShader::uniform_ntex;
-    GLuint ShadowedSunLightDebugShader::uniform_dtex;
-    GLuint ShadowedSunLightDebugShader::uniform_shadowtex;
-    GLuint ShadowedSunLightDebugShader::uniform_direction;
-    GLuint ShadowedSunLightDebugShader::uniform_col;
-    GLuint ShadowedSunLightDebugShader::vao;
-
-    void ShadowedSunLightDebugShader::init()
-    {
-        Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadowdebug.frag").c_str());
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_shadowtex = glGetUniformLocation(Program, "shadowtex");
-        uniform_direction = glGetUniformLocation(Program, "direction");
-        uniform_col = glGetUniformLocation(Program, "col");
-        vao = createVAO(Program);
-
-        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
-        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-    }
-
-    void ShadowedSunLightDebugShader::setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform3f(uniform_direction, direction.X, direction.Y, direction.Z);
-        glUniform3f(uniform_col, r, g, b);
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1i(uniform_dtex, TU_dtex);
-        glUniform1i(uniform_shadowtex, TU_shadowtex);
     }
 
     GLuint RadianceHintsConstructionShader::Program;

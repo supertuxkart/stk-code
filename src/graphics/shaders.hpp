@@ -543,15 +543,13 @@ public:
     static void setUniforms(unsigned TU_tex, unsigned TU_depth);
 };
 
-class SunLightShader
+class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_direction, uniform_col;
-    static GLuint vao;
+    GLuint TU_ntex, TU_dtex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex);
+    SunLightShader();
 };
 
 class DiffuseEnvMapShader
@@ -565,26 +563,13 @@ public:
     static void setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
 };
 
-class ShadowedSunLightShader
+class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, core::vector3df, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_direction, uniform_col;
-    static GLuint vao;
+    GLuint TU_ntex, TU_dtex, TU_shadowtex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
-};
-
-class ShadowedSunLightDebugShader
-{
-public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_shadowtex, uniform_direction, uniform_col;
-    static GLuint vao;
-
-    static void init();
-    static void setUniforms(const core::vector3df &direction, float r, float g, float b, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_shadowtex);
+    ShadowedSunLightShader();
 };
 
 class RadianceHintsConstructionShader
