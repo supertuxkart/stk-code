@@ -383,6 +383,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     if (!UserConfigParams::m_dynamic_lights && !forceRTT)
     {
         glDisable(GL_FRAMEBUFFER_SRGB);
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
         return;
     }
 
