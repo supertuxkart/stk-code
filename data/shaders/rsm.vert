@@ -1,5 +1,4 @@
 uniform mat4 ModelMatrix;
-uniform mat4 InverseModelMatrix;
 uniform mat4 RSMMatrix;
 
 uniform mat4 TextureMatrix;
@@ -24,9 +23,9 @@ out vec4 color;
 void main(void)
 {
     mat4 ModelViewProjectionMatrix = RSMMatrix * ModelMatrix;
-    mat4 TransposeInverseModel = transpose(InverseModelMatrix);
+    mat4 TransposeInverseModel = transpose(inverse(ModelMatrix));
     gl_Position = ModelViewProjectionMatrix * vec4(Position, 1.);
-    nor = (vec4(Normal, 0.)).xyz;
+    nor = (TransposeInverseModel * vec4(Normal, 0.)).xyz;
     uv = (TextureMatrix * vec4(Texcoord, 1., 1.)).xy;
     color = Color.zyxw;
 }
