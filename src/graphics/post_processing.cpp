@@ -645,11 +645,10 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 static void toneMap(FrameBuffer &fbo, GLuint rtt)
 {
     fbo.Bind();
-    glUseProgram(FullScreenShader::ToneMapShader::Program);
-    glBindVertexArray(FullScreenShader::ToneMapShader::vao);
-    setTexture(0, rtt, GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
-    FullScreenShader::ToneMapShader::setUniforms(irr_driver->getExposure(), irr_driver->getLwhite(), 0, 1);
+    glUseProgram(FullScreenShader::ToneMapShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::ToneMapShader::getInstance()->vao);
+    setTexture(FullScreenShader::ToneMapShader::getInstance()->TU_tex, rtt, GL_NEAREST, GL_NEAREST);
+    FullScreenShader::ToneMapShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

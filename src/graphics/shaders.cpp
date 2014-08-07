@@ -400,7 +400,6 @@ void Shaders::loadShaders()
     FullScreenShader::MotionBlurShader::init();
     FullScreenShader::GodFadeShader::init();
     FullScreenShader::GodRayShader::init();
-    FullScreenShader::ToneMapShader::init();
     FullScreenShader::MLAAColorEdgeDetectionSHader::init();
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
@@ -1588,33 +1587,17 @@ namespace FullScreenShader
         glUniform1i(uniform_tex_512, TU_tex_512);
     }
 
-    GLuint ToneMapShader::Program;
-    GLuint ToneMapShader::uniform_tex;
-    GLuint ToneMapShader::uniform_logluminancetex;
-    GLuint ToneMapShader::uniform_exposure;
-    GLuint ToneMapShader::uniform_lwhite;
-    GLuint ToneMapShader::vao;
-
-    void ToneMapShader::init()
+    ToneMapShader::ToneMapShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getRGBfromCIEXxy.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/tonemap.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_logluminancetex = glGetUniformLocation(Program, "logluminancetex");
-        uniform_exposure = glGetUniformLocation(Program, "exposure");
-        uniform_lwhite = glGetUniformLocation(Program, "Lwhite");
+        AssignUniforms();
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "text"));
         vao = createFullScreenVAO(Program);
-    }
-
-    void ToneMapShader::setUniforms(float exposure, float Lwhite, unsigned TU_tex, unsigned TU_loglum)
-    {
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1i(uniform_logluminancetex, TU_loglum);
-        glUniform1f(uniform_exposure, exposure);
-        glUniform1f(uniform_lwhite, Lwhite);
     }
 
     GLuint DepthOfFieldShader::Program;
