@@ -237,7 +237,7 @@ void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, uns
 
     result->setZ(QuadGraph::get()->getNode((m_node_index + quad_idx)%QuadGraph::get()->getNumNodes()).getDistanceFromStart()
                     + (xyz - lower_center).length());
-}
+}   // getDistancesUnrolled
 
 // ----------------------------------------------------------------------------
 /** Returns the square of the distance between the given point and any point
@@ -271,7 +271,7 @@ const Vec3 GraphNode::getPointTransformedToFlatQuad(Vec3 xyz)
     m.rotateVect(result, (xyz - thisQuad.getCenter()).toIrrVector());
 
     return (Vec3)result;
-}
+} 
 
 // ----------------------------------------------------------------------------
 /** This functions builds unrolled quads for this node. This takes into account
@@ -310,7 +310,7 @@ void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
         GraphNode& next = QuadGraph::get()->getNode(getSuccessor(i%getNumberOfSuccessors()));
         addUnrolledQuad(next , i , unroll_quad_count);
     }
-}
+}   // buildUnrolledQuads
 
 // ----------------------------------------------------------------------------
 /** This function is called recursively to build one set of unrolled quads. Each
@@ -377,4 +377,4 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int fork_number, int
     // Recurisvely build the vector of unrolled quads till k reduces to 0
     GraphNode& next = QuadGraph::get()->getNode(next_node.getSuccessor(fork_number%next_node.getNumberOfSuccessors()));
     addUnrolledQuad(next, fork_number, k);
-}
+}   // addUnrolledQuad

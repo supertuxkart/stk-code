@@ -582,15 +582,12 @@ float RubberBall::updateHeight()
 }   // updateHeight
 
 // ----------------------------------------------------------------------------
-/** Returns the maximum height of the terrain at the current point. While
- *  generall the height is arbitrary (a skybox is not part of the physics and
- *  will therefore not be detected), it is important that a rubber ball does
- *  not end up on top of a tunnel.
+/** When the ball is in a tunnel, this will return the tunnel height.
+ *  NOTE: When this function is called next_xyz is usually the interpolated point 
+ *  on the track and not the ball's current location. Look at updateAndDelete().
+ *  
  *  \param vertical_offset A vertical offset which is added to the current
- *         position of the kart in order to avoid tunneling effects (it could
- *         happen that the raycast down find the track since it uses the
- *         vertical offset, while the raycast up would hit under the track
- *         if the vertical offset is not used).
+ *         position in order to avoid hitting the track when doing a raycast up.
  *  \returns The distance to the terrain element found by raycast in the up
               direction. If no terrain found, it returns 99990
  */
@@ -604,7 +601,7 @@ float RubberBall::getTunnelHeight(const Vec3 &next_xyz, const float vertical_off
     tm.castRay(from, to, &hit_point, &material);
 
     return (material) ? (hit_point - next_xyz).length() : 99999.f;
-}   // getMaxTerrainHeight
+}   // getTunnelHeight
 
 // ----------------------------------------------------------------------------
 /** Determines the distance to the target kart. If the target is close, the

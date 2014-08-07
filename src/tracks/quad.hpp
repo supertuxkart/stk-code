@@ -61,8 +61,10 @@ private:
     /** Set if this quad should not be used by the AI. */
     bool  m_ai_ignore;
 
+    /** For each quad, construct a 3D box to check if a point lies inside it. */
     Vec3 m_box_faces[6][4];
 
+    /** Find the normal of this quad */
     void findNormal();
         
 public:
@@ -88,9 +90,11 @@ public:
     // ------------------------------------------------------------------------
     /** True if this quad should be ignored by the AI. */
     bool        letAIIgnore() const { return m_ai_ignore; }
-
+    // ------------------------------------------------------------------------
+    /** Returns the normal of this quad */
     const Vec3& getNormal() const   { return m_normal; }
-
+    // ------------------------------------------------------------------------
+    /** Return a flattened version of this quad */
     Quad  getFlattenedQuad();
 
 };   // class Quad

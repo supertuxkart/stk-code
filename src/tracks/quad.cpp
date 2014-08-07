@@ -134,6 +134,8 @@ bool Quad::pointInQuad(const Vec3& p) const
     }
 }   // pointInQuad
 
+// ----------------------------------------------------------------------------
+/** Checks if a given point p lies in the bounding box of this quad */
 bool Quad::pointInQuad3D(const Vec3& p) const
 {
     float side = p.sideofPlane(m_box_faces[0][0], m_box_faces[0][1], m_box_faces[0][2]);
@@ -142,7 +144,7 @@ bool Quad::pointInQuad3D(const Vec3& p) const
         if (side*p.sideofPlane(m_box_faces[i][0], m_box_faces[i][1], m_box_faces[i][2]) < 0) return false;
     }
     return true;
-}
+}   // pointInQuad3D
     
 
 // ----------------------------------------------------------------------------
@@ -178,7 +180,8 @@ void Quad::findNormal()
     Vec3 normal2 = tri2.getNormal();
     m_normal = -0.5f*(normal1 + normal2);
     m_normal.normalize();
-}
+
+}   // findNormal
 
 // ----------------------------------------------------------------------------
 /** Return a flattened version of this quad. */
@@ -195,4 +198,5 @@ Quad Quad::getFlattenedQuad()
     }
      
     return Quad(m_p_flat[0], m_p_flat[1], m_p_flat[2], m_p_flat[3]);
-}
+
+}   // getFlattenedQuad
