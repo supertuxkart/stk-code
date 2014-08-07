@@ -29,7 +29,6 @@ STKTextBillboard::STKTextBillboard(core::stringw text, gui::ScalableFont* font,
     createGLMeshes();
     Mesh->drop();
     //setAutomaticCulling(0);
-    setReloadEachFrame(true); // FIXME: should not need that!!
     updateAbsolutePosition();
 }
 
@@ -93,7 +92,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
         {
             buffer = new scene::SMeshBuffer();
             buffer->getMaterial().setTexture(0, m_chars[i].m_texture);
-            buffer->getMaterial().MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+            buffer->getMaterial().MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
             buffers[m_chars[i].m_texture] = buffer;
         }
         else
@@ -148,7 +147,7 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
         map_itr->second->drop();
     }
 
-    getMaterial(0).MaterialType = video::EMT_TRANSPARENT_ALPHA_CHANNEL_REF;
+    getMaterial(0).MaterialType = irr_driver->getShader(ES_OBJECT_UNLIT);
 
     return Mesh;
 }
@@ -157,13 +156,14 @@ void STKTextBillboard::OnRegisterSceneNode()
 {
     if (IsVisible)
     {
-        SceneManager->registerNodeForRendering(this, scene::ESNRP_TRANSPARENT);
+        SceneManager->registerNodeForRendering(this, scene::ESNRP_SOLID);
 
         scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
         core::vector3df cam_pos = curr_cam->getPosition();
         core::vector3df text_pos = this->getAbsolutePosition();
         float angle = atan2(text_pos.X - cam_pos.X, text_pos.Z - cam_pos.Z);
         this->setRotation(core::vector3df(0.0f, angle * 180.0f / M_PI, 0.0f));
+        updateAbsolutePosition();
     }
 
     ISceneNode::OnRegisterSceneNode();

@@ -13,10 +13,10 @@ static void createbillboardvao()
     glGenVertexArrays(1, &billboardvao);
     glBindVertexArray(billboardvao);
     glBindBuffer(GL_ARRAY_BUFFER, SharedObject::billboardvbo);
-    glEnableVertexAttribArray(MeshShader::BillboardShader::attrib_corner);
-    glEnableVertexAttribArray(MeshShader::BillboardShader::attrib_texcoord);
-    glVertexAttribPointer(MeshShader::BillboardShader::attrib_corner, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(MeshShader::BillboardShader::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*) (2 * sizeof(float)));
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid*) (2 * sizeof(float)));
     glBindVertexArray(0);
 }
 
@@ -50,8 +50,8 @@ void STKBillboard::render()
     compressTexture(tex, true, true);
     GLuint texid = getTextureGLuint(tex);
     setTexture(0, texid, GL_LINEAR, GL_LINEAR);
-    glUseProgram(MeshShader::BillboardShader::Program);
-    MeshShader::BillboardShader::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), pos, Size, 0);
+    glUseProgram(MeshShader::BillboardShader::getInstance()->Program);
+    MeshShader::BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), pos, Size);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
     return;

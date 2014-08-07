@@ -142,7 +142,7 @@ void STKMeshSceneNode::drawGlow(const GLMesh &mesh)
     GLenum itype = mesh.IndexType;
     size_t count = mesh.IndexCount;
 
-    MeshShader::ColorizeShader::setUniforms(AbsoluteTransformation, cb->getRed(), cb->getGreen(), cb->getBlue());
+    MeshShader::ColorizeShader::getInstance()->setUniforms(AbsoluteTransformation, video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh.vaoOffset, mesh.vaoBaseVertex);
 }
 
@@ -265,7 +265,7 @@ void STKMeshSceneNode::render()
             pushVector(ListMatGrass::Arguments, mesh, AbsoluteTransformation, invmodel, windDir);
 
         for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
-            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY);
+            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
             pushVector(ListMatSplatting::Arguments, mesh, AbsoluteTransformation, invmodel);
@@ -312,7 +312,7 @@ void STKMeshSceneNode::render()
 
     if (irr_driver->getPhase() == GLOW_PASS)
     {
-        glUseProgram(MeshShader::ColorizeShader::Program);
+        glUseProgram(MeshShader::ColorizeShader::getInstance()->Program);
         for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
         {
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);

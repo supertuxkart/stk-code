@@ -504,6 +504,14 @@ void IrrDriver::generateDiffuseCoefficients()
 
         testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
 
+        // Diffuse env map is x 0.25, compensate
+        for (unsigned i = 0; i < 9; i++)
+        {
+            blueSHCoeff[i] *= 4;
+            greenSHCoeff[i] *= 4;
+            redSHCoeff[i] *= 4;
+        }
+
         for (unsigned i = 0; i < 6; i++)
             delete[] sh_rgba[i];
     }
