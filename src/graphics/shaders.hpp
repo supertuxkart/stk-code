@@ -313,14 +313,10 @@ public:
 };
 
 
-class ColorizeShader
+class ColorizeShader : public ShaderHelperSingleton<ColorizeShader, core::matrix4, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_col;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b);
+    ColorizeShader();
 };
 
 class ShadowShader : public ShaderHelperSingleton<ShadowShader, core::matrix4>

@@ -404,7 +404,6 @@ void Shaders::loadShaders()
     FullScreenShader::MLAAColorEdgeDetectionSHader::init();
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
-    MeshShader::ColorizeShader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
     MeshShader::RSMShader::init();
@@ -974,28 +973,15 @@ namespace MeshShader
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
 
-    GLuint ColorizeShader::Program;
-    GLuint ColorizeShader::uniform_MM;
-    GLuint ColorizeShader::uniform_col;
-
-    void ColorizeShader::init()
+    ColorizeShader::ColorizeShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colorize.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_col = glGetUniformLocation(Program, "col");
+        AssignUniforms("ModelMatrix", "col");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-    }
-
-    void ColorizeShader::setUniforms(const core::matrix4 &ModelMatrix, float r, float g, float b)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
-        glUniform3f(uniform_col, r, g, b);
     }
 
     ShadowShader::ShadowShader()
