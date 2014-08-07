@@ -60,7 +60,7 @@ void main(void)
         vec2 uv = RHuv + offset * 0.01;
 
         // Get world position and normal from the RSM sample
-        float depth = texture(dtex, uv).z;
+        float depth = texture(dtex, uv).x;
         vec4 RSMPos = inverse(RSMMatrix) * (2. * vec4(uv, depth, 1.) - 1.);
         RSMPos /= RSMPos.w;
         vec3 RSMAlbedo = texture(ctex, uv).xyz;
@@ -74,7 +74,7 @@ void main(void)
         float dist = distance(SamplePos, RSMPos.xyz) / R_wcs;
         // Determine the incident direction.
         // Avoid very close samples (and numerical instability problems)
-        vec3 RSM_to_RH_dir = (dist <= 0.00) ? vec3(0.) : normalize(SamplePos - RSMPos.xyz);
+        vec3 RSM_to_RH_dir = (dist <= 0.1) ? vec3(0.) : normalize(SamplePos - RSMPos.xyz);
         float dotprod = max(dot(RSM_to_RH_dir, normal.xyz), 0.);
         float factor = dotprod / (0.1 + dist * dist);
 
