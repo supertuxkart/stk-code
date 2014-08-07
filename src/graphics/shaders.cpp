@@ -1008,7 +1008,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
         TU_tex = 0;
-        AssignUniforms("ModelMatrix", "RSMMatrix", "TextureMatrix");
+        AssignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1025,7 +1025,7 @@ namespace MeshShader
         TU_detail1 = 2;
         TU_detail2 = 3;
         TU_detail3 = 4;
-        AssignUniforms("ModelMatrix", "RSMMatrix");
+        AssignUniforms("RSMMatrix", "ModelMatrix");
         AssignTextureUnit(Program, TexUnit(TU_layout, "tex_layout"), TexUnit(TU_detail0, "tex_detail0"), TexUnit(TU_detail1, "tex_detail1"), TexUnit(TU_detail2, "tex_detail2"), TexUnit(TU_detail3, "tex_detail3"));
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
