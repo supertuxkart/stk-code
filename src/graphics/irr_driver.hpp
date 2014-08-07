@@ -221,6 +221,7 @@ private:
     core::vector3df    rh_extend;
     core::matrix4      rh_matrix;
     core::matrix4      rsm_matrix;
+    core::vector2df    m_current_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -696,6 +697,7 @@ public:
     const core::matrix4 & getPreviousPVMatrix() { return m_previousProjViewMatrix; }
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
+    const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }

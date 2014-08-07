@@ -457,7 +457,7 @@ void bypassUBO(GLuint Program)
     GLint IPM = glGetUniformLocation(Program, "InverseProjectionMatrix");
     glUniformMatrix4fv(IPM, 1, GL_FALSE, irr_driver->getInvProjMatrix().pointer());
     GLint Screen = glGetUniformLocation(Program, "screen");
-    glUniform2f(Screen, UserConfigParams::m_width, UserConfigParams::m_height);
+    glUniform2f(Screen, irr_driver->getCurrentScreenSize().X, irr_driver->getCurrentScreenSize().Y);
 }
 
 namespace UtilShader

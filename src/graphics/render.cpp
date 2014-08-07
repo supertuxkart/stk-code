@@ -563,6 +563,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
 
+    m_current_screen_size = core::vector2df(float(width), float(height));
+
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();
     float FarValues[] =
