@@ -549,7 +549,7 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> Texture
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
-        rsm_custom_unroll_args<Selector...>::exec<MeshShader::RSMShader>(rsm_matrix, t[i]);
+        rsm_custom_unroll_args<Selector...>::template exec<MeshShader::RSMShader>(rsm_matrix, t[i]);
     }
 }
 
