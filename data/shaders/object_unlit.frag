@@ -8,6 +8,6 @@ void main(void)
 {
     vec4 col = texture(tex, uv);
     col.xyz *= pow(color.xyz, vec3(2.2));
-    if (col.a * color.a < 0.5) discard;
+    if (col.a < 0.5) discard;
     FragColor = vec4(col.xyz, 1.);
 }
