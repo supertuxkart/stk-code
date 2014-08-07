@@ -331,15 +331,12 @@ public:
     ShadowShader();
 };
 
-class RSMShader
+class RSMShader : public ShaderHelperSingleton<RSMShader, core::matrix4, core::matrix4, core::matrix4>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_MM, uniform_RSMMatrix;
-    static GLuint TU_tex;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix);
+    RSMShader();
 };
 
 class InstancedShadowShader : public ShaderHelperSingleton<InstancedShadowShader>

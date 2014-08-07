@@ -2,11 +2,7 @@ uniform mat4 ModelMatrix;
 uniform mat4 InverseModelMatrix;
 uniform mat4 RSMMatrix;
 
-uniform mat4 TextureMatrix =
-    mat4(1., 0., 0., 0.,
-         0., 1., 0., 0.,
-         0., 0., 1., 0.,
-         0., 0., 0., 1.);
+uniform mat4 TextureMatrix;
 
 #if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;

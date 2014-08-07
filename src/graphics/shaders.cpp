@@ -402,7 +402,6 @@ void Shaders::loadShaders()
     FullScreenShader::MLAAGatherSHader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
-    MeshShader::RSMShader::init();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     ParticleShader::FlipParticleRender::init();
@@ -1003,27 +1002,17 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    GLuint RSMShader::Program;
-    GLuint RSMShader::uniform_MM;
-    GLuint RSMShader::uniform_RSMMatrix;
-    GLuint RSMShader::TU_tex;
-
-    void RSMShader::init()
+    RSMShader::RSMShader()
     {
-        if (irr_driver->getGLSLVersion() < 150)
-            return;
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
-        uniform_MM = glGetUniformLocation(Program, "ModelMatrix");
-        uniform_RSMMatrix = glGetUniformLocation(Program, "RSMMatrix");
-        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
-    }
+        TU_tex = 0;
+        AssignUniforms("ModelMatrix", "RSMMatrix", "TextureMatrix");
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
 
-    void RSMShader::setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &ModelMatrix)
-    {
-        glUniformMatrix4fv(uniform_RSMMatrix, 1, GL_FALSE, RSMMatrix.pointer());
-        glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     InstancedShadowShader::InstancedShadowShader()
