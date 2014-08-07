@@ -186,7 +186,7 @@ void GraphNode::setDirectionData(unsigned int successor, DirectionType dir,
 /** Returns the distance a point has from this quad in forward and sidewards
  *  direction, i.e. how far forwards the point is from the beginning of the
  *  quad, and how far to the side from the line connecting the center points
- *  is it. All these computations are done in 2D only.
+ *  is it. 
  *  \param xyz The coordinates of the point.
  *  \param result The X coordinate contains the sidewards distance, the
  *                Z coordinate the forward distance.
@@ -205,6 +205,17 @@ void GraphNode::getDistances(const Vec3 &xyz, Vec3 *result)
                   (closest-m_lower_center.toIrrVector()).getLength());
 }   // getDistances
 
+// ----------------------------------------------------------------------------
+/** Returns the distance a point has from an unrolled quad in forward and sidewards
+ * direction, i.e. how far forwards the point is from the beginning of the
+ * quad, and how far to the side from the line connecting the center points
+ * is it. 
+ * \param xyz The coordinates of the point.
+ * \param fork_number The fork on which the unrolled quad lies. 
+ * \param quad_idx The index of the unrolled quad to find distances from.
+ * \param result The X coordinate contains the sidewards distance, the
+ *               Z coordinate the forward distance.
+ */
 void GraphNode::getDistancesUnrolled(const Vec3 &xyz, const int fork_number, unsigned int quad_idx, Vec3 *result)
 {
     
@@ -262,7 +273,12 @@ const Vec3 GraphNode::getPointTransformedToFlatQuad(Vec3 xyz)
     return (Vec3)result;
 }
 
-
+// ----------------------------------------------------------------------------
+/** This functions builds unrolled quads for this node. This takes into account
+ *  if there is a fork in coming up. In this case there will be two sets of 
+ *  unrolled quads for this node. One for each fork.
+ *  \param unroll_quad_count The length of the unrolled set of quads per node.
+ */
 void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
 {
     m_unrolled_quads.clear();
@@ -296,7 +312,11 @@ void GraphNode::buildUnrolledQuads(unsigned int unroll_quad_count)
     }
 }
 
-
+// ----------------------------------------------------------------------------
+/** This function is called recursively to build one set of unrolled quads. Each
+ *  call adds one unrolled quad to the existing set.
+ *  \param unroll_quad_count The length of the unrolled set of quads per node.
+ */
 void GraphNode::addUnrolledQuad(const GraphNode& next_node, int fork_number, int k)
 {
     if (k == 0) return;
@@ -313,11 +333,7 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int fork_number, int
     // in the vector of unrolled quads
     m.buildRotateFromTo(next_quad_to_push.getNormal().toIrrVector(),
                         last_pushed_quad.getNormal().toIrrVector());
-
-  
-    //m.setRotationCenter(next_quad_to_push.getCenter().toIrrVector(),
-    //    ((next_quad_to_push.getCenter() - 0.5f*(next_quad_to_push[0] + next_quad_to_push[1])) + 0.5f*(last_pushed_quad[2] + last_pushed_quad[3)));
-    
+      
     for (unsigned int i = 0; i < 4; i++)
         m.rotateVect(new_points[i], next_quad_to_push[i].toIrrVector());
     
@@ -337,8 +353,6 @@ void GraphNode::addUnrolledQuad(const GraphNode& next_node, int fork_number, int
     for (unsigned int i = 0; i < 4; i++) 
         m.rotateVect(new_points[i]);
     
-
-
     // Next translate the new quad to be pushed to the correct position infront
     // of the last quad in the vector of unrolled quads
     Vec3 lower_center, upper_center;

@@ -78,7 +78,8 @@ private:
 
     /** Wether the graph should be reverted or not */
     bool                     m_reverse;
-
+    
+    /** Number of unrolled quads to compute per quad */
     unsigned int             m_unroll_quad_count;
 
     void setDefaultSuccessors();
@@ -202,10 +203,13 @@ public:
     // ----------------------------------------------------------------------
     /** Returns true if the graph is to be reversed. */
     bool         isReverse() const {return m_reverse; }
-
-    const Quad&  getUnrolledQuadOfNode(unsigned int node, unsigned int fork_number, unsigned int quad_number)
+    // ----------------------------------------------------------------------
+    /** Returns a unrolled quad of a node. */
+    const Quad&  getUnrolledQuadOfNode(unsigned int node, 
+                                       unsigned int fork_number, 
+                                       unsigned int quad_number)
                        { return getNode(node).getUnrolledQuad(fork_number,quad_number); }
-    
+    // ----------------------------------------------------------------------
     /** Returns the number of forward quads that are unrolled for each quad **/
     int          getNumberOfUnrolledQuads() const { return m_unroll_quad_count; }
 

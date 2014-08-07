@@ -30,22 +30,9 @@
 Quad::Quad(const Vec3 &p0, const Vec3 &p1, const Vec3 &p2, const Vec3 &p3,
            bool invisible, bool ai_ignore)
  {
+         
+     m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
      
-    /*This check must be skipped because inverted quads may appear to have 
-     incorrect oritentation. 
-    if(p1.sideOfLine2D(p0, p2)>0 ||
-         p3.sideOfLine2D(p0, p2)<0)
-     {
-         Log::warn("Quad", "Quad has wrong orientation: p0=%f %f %f p1=%f %f %f",
-                   p0.getX(), p0.getY(), p0.getZ(),p1.getX(), p1.getY(), p1.getZ());
-         Log::warn("Quad", "The quad will be swapped, nevertheless test for correctness -");
-         Log::warn("Quad", "quads must be counter-clockwise oriented.");
-         m_p[0]=p1; m_p[1]=p0; m_p[2]=p3; m_p[3]=p2;
-     }
-     else
-     {*/
-        m_p[0]=p0; m_p[1]=p1; m_p[2]=p2; m_p[3]=p3;
-     //}
      m_center = 0.25f*(p0+p1+p2+p3);
      m_min_height = std::min ( std::min(p0.getY(), p1.getY()),
                                std::min(p2.getY(), p3.getY())  );
@@ -179,6 +166,10 @@ void Quad::transform(const btTransform &t, Quad *result) const
                                                result->m_p[3].getY())  );
 }   // transform
 
+// ----------------------------------------------------------------------------
+/** Find the normal of this quad by computing the normal of two triangles and taking
+ *  their average.
+ */
 void Quad::findNormal()
 {
     core::triangle3df tri1(m_p[0].toIrrVector(), m_p[1].toIrrVector(), m_p[2].toIrrVector());
@@ -189,6 +180,8 @@ void Quad::findNormal()
     m_normal.normalize();
 }
 
+// ----------------------------------------------------------------------------
+/** Return a flattened version of this quad. */
 Quad Quad::getFlattenedQuad()
 {
     core::CMatrix4<float> m;
@@ -196,10 +189,6 @@ Quad Quad::getFlattenedQuad()
     Vec3 m_p_flat[4];
     for (unsigned int i = 0; i < 4; i++)
     {
-        // Translate to origin
-        //m_p_flat[i] = m_p[i] - m_center;
-
-        // rotateVect(out,in)
         m.rotateVect(m_p_flat[i], (m_p[i] - m_center).toIrrVector());
 
         m_p_flat[i].setY(0);
