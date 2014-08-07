@@ -119,16 +119,21 @@ class ShaderHelperSingleton : public Singleton<T>
 protected:
     std::vector<GLuint> uniforms;
     
-    void AssignUniforms(const char* name)
+    void AssignUniforms_impl()
     {
-        uniforms.push_back(getUniformLocation(Program, name));
     }
 
     template<typename... U>
-    void AssignUniforms(const char* name, U... rest)
+    void AssignUniforms_impl(const char* name, U... rest)
     {
         uniforms.push_back(getUniformLocation(Program, name));
-        AssignUniforms(rest...);
+        AssignUniforms_impl(rest...);
+    }
+
+    template<typename... U>
+    void AssignUniforms(U... rest)
+    {
+        static_assert(sizeof...(rest) == sizeof...(Args), "Count of Uniform's name mismatch");
     }
 
 public:
