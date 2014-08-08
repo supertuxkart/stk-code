@@ -1,17 +1,13 @@
 uniform sampler2D tex;
 
-#if __VERSION__ >= 130
 in vec2 uv;
+in vec4 color;
 out vec4 FragColor;
-#else
-varying vec2 uv;
-#define FragColor gl_FragColor
-#endif
-
 
 void main(void)
 {
-    vec4 color = texture(tex, uv);
-    if (color.a < 0.5) discard;
-    FragColor = vec4(color.xyz, 1.);
+    vec4 col = texture(tex, uv);
+    col.xyz *= pow(color.xyz, vec3(2.2));
+    if (col.a < 0.5) discard;
+    FragColor = vec4(col.xyz, 1.);
 }

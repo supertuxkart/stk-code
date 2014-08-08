@@ -335,8 +335,24 @@ void IrrDriver::initDevice()
         {
             Log::warn("irr_driver", "The window size specified in "
                       "user config is larger than your screen!");
-            UserConfigParams::m_width = 800;
-            UserConfigParams::m_height = 600;
+            UserConfigParams::m_width = (int)ssize.Width;
+            UserConfigParams::m_height = (int)ssize.Height;
+        }
+
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height);
+        res = m_device->getVideoModeList()->getVideoModeResolution(res, res);
+
+        if (res.Width > 0 && res.Height > 0)
+        {
+            UserConfigParams::m_width = res.Width;
+            UserConfigParams::m_height = res.Height;
+        }
+        else
+        {
+            Log::verbose("irr_driver", "Cannot get information about "
+                         "resolutions. Try to use the default one.");
+            UserConfigParams::m_width = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
         }
 
         m_device->closeDevice();
@@ -398,17 +414,18 @@ void IrrDriver::initDevice()
             }
             */
             m_device = createDeviceEx(params);
+
             if(m_device)
                 break;
         }   // for bits=32, 24, 16
 
 
-        // if still no device, try with a standard 800x600 window size, maybe
+        // if still no device, try with a default screen size, maybe
         // size is the problem
         if(!m_device)
         {
-            UserConfigParams::m_width  = 800;
-            UserConfigParams::m_height = 600;
+            UserConfigParams::m_width  = MIN_SUPPORTED_WIDTH;
+            UserConfigParams::m_height = MIN_SUPPORTED_HEIGHT;
 
             m_device = createDevice(video::EDT_OPENGL,
                         core::dimension2du(UserConfigParams::m_width,
@@ -447,6 +464,13 @@ void IrrDriver::initDevice()
         Log::info("IrrDriver", "OpenGL vendor: %s", glGetString(GL_VENDOR));
         Log::info("IrrDriver", "OpenGL renderer: %s", glGetString(GL_RENDERER));
         Log::info("IrrDriver", "OpenGL version string: %s", glGetString(GL_VERSION));
+
+        m_need_ubo_workaround = false;
+#ifdef WIN32
+        // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != nullptr && (GLMajorVersion == 3 && GLMinorVersion == 1))
+            m_need_ubo_workaround = true;
+#endif
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 
@@ -865,12 +889,20 @@ void IrrDriver::setAllMaterialFlags(scene::IMesh *mesh) const
     {
         scene::IMeshBuffer *mb = mesh->getMeshBuffer(i);
         video::SMaterial &irr_material=mb->getMaterial();
-        for(unsigned int j=0; j<video::MATERIAL_MAX_TEXTURES; j++)
-        {
-            video::ITexture* t=irr_material.getTexture(j);
-            if(t) material_manager->setAllMaterialFlags(t, mb);
+        video::ITexture* t=irr_material.getTexture(0);
+        if(t) material_manager->setAllMaterialFlags(t, mb);
 
-        }   // for j<MATERIAL_MAX_TEXTURES
+        // special case : for splatting, the main material is on layer 1.
+        // it was done this way to provide a fallback for computers
+        // where shaders are not supported
+        t = irr_material.getTexture(1);
+        if (t)
+        {
+            Material* mat = material_manager->getMaterialFor(t, mb);
+            if (mat != NULL && mat->getShaderType() == Material::SHADERTYPE_SPLATTING)
+                material_manager->setAllMaterialFlags(t, mb);
+        }
+
         material_manager->setAllUntexturedMaterialFlags(mb);
     }  // for i<getMeshBufferCount()
 }   // setAllMaterialFlags
@@ -1201,6 +1233,7 @@ scene::ISceneNode *IrrDriver::addSkyBox(const std::vector<video::ITexture*> &tex
     SkyboxTextures = texture;
     SphericalHarmonicsTextures = sphericalHarmonics;
     SkyboxCubeMap = 0;
+    m_SH_dirty = true;
     return m_scene_manager->addSkyBoxSceneNode(texture[0], texture[1],
                                                texture[2], texture[3],
                                                texture[4], texture[5]);
@@ -1210,6 +1243,7 @@ void IrrDriver::suppressSkyBox()
 {
     SkyboxTextures.clear();
     SphericalHarmonicsTextures.clear();
+    m_SH_dirty = true;
     if ((SkyboxCubeMap) && (!ProfileWorld::isNoGraphics()))
         glDeleteTextures(1, &SkyboxCubeMap);
     SkyboxCubeMap = 0;
@@ -1679,7 +1713,7 @@ void IrrDriver::displayFPS()
     core::stringw fpsString = buffer;
 
     static video::SColor fpsColor = video::SColor(255, 0, 0, 0);
-    
+
     font->draw( fpsString.c_str(), core::rect< s32 >(100,0,400,50), fpsColor, false );
 }   // updateFPS
 
@@ -2307,7 +2341,7 @@ void IrrDriver::applyObjectPassShader(scene::ISceneNode * const node, bool rimli
     //    viamb = (dynamic_cast<scene::IMeshSceneNode*>(node))->isReadOnlyMaterials();
     //    mesh = (dynamic_cast<scene::IMeshSceneNode*>(node))->getMesh();
     //}
-    
+
     for (i = 0; i < mcount; i++)
     {
         video::SMaterial &nodemat = node->getMaterial(i);

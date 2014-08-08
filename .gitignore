@@ -1,8 +1,5 @@
 bld*/
-build/
-build-32/
-build-64/
-build-win/
+build*/
 cmake_build/
 dependencies/
 CMakeFiles/

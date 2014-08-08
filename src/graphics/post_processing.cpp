@@ -278,11 +278,11 @@ void PostProcessing::renderSunlight()
   glBlendFunc(GL_ONE, GL_ONE);
   glBlendEquation(GL_FUNC_ADD);
 
-  glUseProgram(FullScreenShader::SunLightShader::Program);
-  glBindVertexArray(FullScreenShader::SunLightShader::vao);
-  setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-  setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-  FullScreenShader::SunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1);
+  glUseProgram(FullScreenShader::SunLightShader::getInstance()->Program);
+  glBindVertexArray(FullScreenShader::SunLightShader::getInstance()->vao);
+  setTexture(FullScreenShader::SunLightShader::getInstance()->TU_ntex, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+  setTexture(FullScreenShader::SunLightShader::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::getInstance()->setUniforms(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
   glDrawArrays(GL_TRIANGLES, 0, 3);
   glBindVertexArray(0);
 }
@@ -296,9 +296,9 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glBlendFunc(GL_ONE, GL_ONE);
     glBlendEquation(GL_FUNC_ADD);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    glActiveTexture(GL_TEXTURE2);
+    setTexture(FullScreenShader::ShadowedSunLightShader::getInstance()->TU_ntex, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    setTexture(FullScreenShader::ShadowedSunLightShader::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::ShadowedSunLightShader::getInstance()->TU_shadowtex);
     glBindTexture(GL_TEXTURE_2D_ARRAY, depthtex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -307,19 +307,10 @@ void PostProcessing::renderShadowedSunlight(const std::vector<core::matrix4> &su
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
 
-    if (irr_driver->getShadowViz())
-    {
-        glUseProgram(FullScreenShader::ShadowedSunLightDebugShader::Program);
-        glBindVertexArray(FullScreenShader::ShadowedSunLightDebugShader::vao);
-        FullScreenShader::ShadowedSunLightDebugShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
+    glUseProgram(FullScreenShader::ShadowedSunLightShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::ShadowedSunLightShader::getInstance()->vao);
+    FullScreenShader::ShadowedSunLightShader::getInstance()->setUniforms(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
 
-    }
-    else
-    {
-        glUseProgram(FullScreenShader::ShadowedSunLightShader::Program);
-        glBindVertexArray(FullScreenShader::ShadowedSunLightShader::vao);
-        FullScreenShader::ShadowedSunLightShader::setUniforms(cb->getPosition(), cb->getRed(), cb->getGreen(), cb->getBlue(), 0, 1, 2);
-    }
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
 }
@@ -645,11 +636,10 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 static void toneMap(FrameBuffer &fbo, GLuint rtt)
 {
     fbo.Bind();
-    glUseProgram(FullScreenShader::ToneMapShader::Program);
-    glBindVertexArray(FullScreenShader::ToneMapShader::vao);
-    setTexture(0, rtt, GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_LOG_LUMINANCE), GL_NEAREST, GL_NEAREST_MIPMAP_NEAREST);
-    FullScreenShader::ToneMapShader::setUniforms(irr_driver->getExposure(), irr_driver->getLwhite(), 0, 1);
+    glUseProgram(FullScreenShader::ToneMapShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::ToneMapShader::getInstance()->vao);
+    setTexture(FullScreenShader::ToneMapShader::getInstance()->TU_tex, rtt, GL_NEAREST, GL_NEAREST);
+    FullScreenShader::ToneMapShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

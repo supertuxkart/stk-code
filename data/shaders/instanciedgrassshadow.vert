@@ -1,11 +1,3 @@
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-};
 uniform vec3 windDir;
 #if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;

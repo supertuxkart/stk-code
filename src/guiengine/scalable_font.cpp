@@ -464,6 +464,14 @@ core::dimension2d<u32> ScalableFont::getDimension(const wchar_t* text) const
 }
 
 void ScalableFont::draw(const core::stringw& text,
+    const core::rect<s32>& position, video::SColor color,
+    bool hcenter, bool vcenter,
+    const core::rect<s32>* clip)
+{
+    doDraw(text, position, color, hcenter, vcenter, clip, NULL);
+}
+
+void ScalableFont::draw(const core::stringw& text,
                         const core::rect<s32>& position, video::SColor color,
                         bool hcenter, bool vcenter,
                         const core::rect<s32>* clip, bool ignoreRTL)
@@ -471,16 +479,17 @@ void ScalableFont::draw(const core::stringw& text,
     bool previousRTL = m_rtl;
     if (ignoreRTL) m_rtl = false;
 
-    draw(text, position, color, hcenter, vcenter, clip);
+    doDraw(text, position, color, hcenter, vcenter, clip, NULL);
 
     if (ignoreRTL) m_rtl = previousRTL;
 }
 
 //! draws some text and clips it to the specified rectangle if wanted
-void ScalableFont::draw(const core::stringw& text,
-                        const core::rect<s32>& position, video::SColor color,
-                        bool hcenter, bool vcenter,
-                        const core::rect<s32>* clip)
+void ScalableFont::doDraw(const core::stringw& text,
+                          const core::rect<s32>& position, video::SColor color,
+                          bool hcenter, bool vcenter,
+                          const core::rect<s32>* clip,
+                          FontCharCollector* charCollector)
 {
     if (!Driver) return;
 
@@ -637,7 +646,7 @@ void ScalableFont::draw(const core::stringw& text,
             }
         }
 
-        if (m_black_border)
+        if (m_black_border && charCollector == NULL)
         {
             // draw black border
             video::SColor black(color.getAlpha(),0,0,0);
@@ -658,23 +667,45 @@ void ScalableFont::draw(const core::stringw& text,
 
         if (fallback[n])
         {
-            // draw text over
+            // TODO: don't hardcode colors?
             static video::SColor orange(color.getAlpha(), 255, 100, 0);
             static video::SColor yellow(color.getAlpha(), 255, 220, 15);
             video::SColor title_colors[] = {yellow, orange, orange, yellow};
-            draw2DImage(texture,
-                        dest,
-                        source,
-                        clip,
-                        title_colors, true);
+
+            if (charCollector != NULL)
+            {
+                charCollector->collectChar(texture,
+                    dest,
+                    source,
+                    title_colors);
+            }
+            else
+            {
+                draw2DImage(texture,
+                    dest,
+                    source,
+                    clip,
+                    title_colors, true);
+            }
         }
         else
         {
-            draw2DImage(texture,
-                        dest,
-                        source,
-                        clip,
-                        color, true);
+            if (charCollector != NULL)
+            {
+                video::SColor colors[] = { color, color, color, color };
+                charCollector->collectChar(texture,
+                    dest,
+                    source,
+                    colors);
+            }
+            else
+            {
+                draw2DImage(texture,
+                    dest,
+                    source,
+                    clip,
+                    color, true);
+            }
 #ifdef FONT_DEBUG
             driver->draw2DLine(core::position2d<s32>(dest.UpperLeftCorner.X,  dest.UpperLeftCorner.Y),
                                core::position2d<s32>(dest.UpperLeftCorner.X,  dest.LowerRightCorner.Y),

@@ -144,6 +144,9 @@ void IrrDriver::renderGLSL(float dt)
         if (World::getWorld() && World::getWorld()->getTrack()->hasShadows() && !SphericalHarmonicsTextures.empty())
             irr_driver->getSceneManager()->setAmbientLight(SColor(0, 0, 0, 0));
 
+        // TODO: put this outside of the rendering loop
+        generateDiffuseCoefficients();
+
         unsigned plc = UpdateLightsInfo(camnode, dt);
         computeCameraMatrix(camnode, viewport.LowerRightCorner.X - viewport.UpperLeftCorner.X, viewport.LowerRightCorner.Y - viewport.UpperLeftCorner.Y);
         renderScene(camnode, plc, glows, dt, track->hasShadows(), false);
@@ -276,7 +279,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         // To avoid wrong culling, use the largest view possible
         m_scene_manager->setActiveCamera(m_suncam);
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
-            UserConfigParams::m_shadows && hasShadow)
+            UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
             renderShadows();
         m_scene_manager->setActiveCamera(camnode);
         PROFILER_POP_CPU_MARKER();
@@ -380,6 +383,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     if (!UserConfigParams::m_dynamic_lights && !forceRTT)
     {
         glDisable(GL_FRAMEBUFFER_SRGB);
+        glDisable(GL_DEPTH_TEST);
+        glDepthMask(GL_FALSE);
         return;
     }
 
@@ -557,6 +562,8 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
     irr_driver->setProjMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_PROJECTION));
     irr_driver->setViewMatrix(irr_driver->getVideoDriver()->getTransform(video::ETS_VIEW));
     irr_driver->genProjViewMatrix();
+
+    m_current_screen_size = core::vector2df(float(width), float(height));
 
     const float oldfar = camnode->getFarValue();
     const float oldnear = camnode->getNearValue();

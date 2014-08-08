@@ -6,16 +6,6 @@ uniform float exposure = .09;
 uniform float Lwhite = 1.;
 uniform float vignette_weight = 0.;
 
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
 out vec4 FragColor;
 
 vec3 getCIEYxy(vec3 rgbColor);

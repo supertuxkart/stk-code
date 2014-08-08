@@ -98,7 +98,7 @@ public:
 class ListMatUnlit
 {
 public:
-    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
+    static std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > Arguments;
 };
 
 class ListMatDetails

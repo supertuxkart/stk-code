@@ -26,12 +26,21 @@ namespace video
 {
     class IVideoDriver;
     class IImage;
+    class ITexture;
 }
 
 namespace gui
 {
 
     class IGUIEnvironment;
+
+class FontCharCollector
+{
+public:
+
+    virtual void collectChar(video::ITexture* texture, const core::rect<s32>& destRect,
+        const core::rect<s32>& sourceRect, const video::SColor* const colors) = 0;
+};
 
 class ScalableFont : public IGUIFontBitmap
 {
@@ -101,12 +110,17 @@ public:
 
     //! draws an text and clips it to the specified rectangle if wanted
     virtual void draw(const core::stringw& text, const core::rect<s32>& position,
-            video::SColor color, bool hcenter=false,
-            bool vcenter=false, const core::rect<s32>* clip=0);
+        video::SColor color, bool hcenter = false,
+        bool vcenter = false, const core::rect<s32>* clip = 0);
 
-    virtual void draw(const core::stringw& text, const core::rect<s32>& position,
-                      video::SColor color, bool hcenter,
-                      bool vcenter, const core::rect<s32>* clip, bool ignoreRTL);
+    void draw(const core::stringw& text, const core::rect<s32>& position,
+        video::SColor color, bool hcenter,
+        bool vcenter, const core::rect<s32>* clip, bool ignoreRTL);
+
+    void doDraw(const core::stringw& text, const core::rect<s32>& position,
+              video::SColor color, bool hcenter,
+              bool vcenter, const core::rect<s32>* clip,
+              FontCharCollector* charCollector = NULL);
 
     //! returns the dimension of a text
     virtual core::dimension2d<u32> getDimension(const wchar_t* text) const;
