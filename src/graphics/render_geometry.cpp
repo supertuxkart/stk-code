@@ -31,6 +31,7 @@
 #include "utils/tuple.hpp"
 
 #include <algorithm>
+#include <functional>
 
 namespace RenderGeometry
 {
@@ -77,19 +78,6 @@ namespace RenderGeometry
     }
 }
 using namespace RenderGeometry;
-
-template<typename Shader, typename...uniforms>
-void draw(const GLMesh *mesh, uniforms... Args)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh->PrimitiveType;
-    GLenum itype = mesh->IndexType;
-    size_t count = mesh->IndexCount;
-
-    Shader::setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
-}
-
 
 template<typename T, typename...uniforms>
 void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
@@ -508,34 +496,94 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
 }
 
 
-template<int...List>
+
+/*template<int...List>
 struct rsm_custom_unroll_args;
 
 template<>
 struct rsm_custom_unroll_args<>
 {
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const core::matrix4 &rsm_matrix, const STK::Tuple<TupleTypes...> &t, Args... args)
+
+    template<typename ...TupleTypes, typename ...Args>
+    static void exec(Type<Args...>::FuncType draw_func, const std::tuple<TupleTypes...> &t, Args... args)
     {
-        draw<T>(T::getInstance(), STK::tuple_get<0>(t), rsm_matrix, args...);
+        draw_func(args...);
     }
 };
 
 template<int N, int...List>
 struct rsm_custom_unroll_args<N, List...>
 {
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const core::matrix4 &rsm_matrix, const STK::Tuple<TupleTypes...> &t, Args... args)
+    template<typename ...TupleTypes, typename ...Args>
+    static void exec(std::function<void (Args...)> draw_func, const std::tuple<TupleTypes...> &t, Args... args)
     {
-        rsm_custom_unroll_args<List...>::template exec<T>(rsm_matrix, t, STK::tuple_get<N>(t), args...);
+        rsm_custom_unroll_args<List...>::exec(draw_func, t, std::get<N>(t), args...);
+    }
+};*/
+
+template<int N>
+struct unroll_args;
+
+template<>
+struct unroll_args<0>
+{
+    template<typename ...TupleTypes>
+    static void exec(std::function<void(TupleTypes...)> draw_func, const STK::Tuple<TupleTypes...> &t, TupleTypes... args)
+    {
+        draw_func(args...);
     }
 };
 
+template<int N>
+struct unroll_args
+{
+    template<typename ...TupleTypes, typename ...Args>
+    static void exec(std::function<void(TupleTypes...)> draw_func, const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        unroll_args<N - 1>::template exec(draw_func, t, STK::tuple_get<N - 1>(t), args...);
+    }
+};
 
+template<int...List>
+struct remap_tuple;
 
+template<>
+struct remap_tuple<>
+{
+    template<typename ...TupleTypes, typename ...Args>
+    static STK::Tuple<Args...> remap(const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        return STK::make_tuple(args...);
+    }
+};
+
+template<int N, int...List>
+struct remap_tuple<N, List...>
+{
+    template<typename ...TupleTypes, typename ...Args>
+    static auto remap(const STK::Tuple<TupleTypes...> &t, Args... args) -> decltype(remap_tuple<List...>::template remap(t, STK::tuple_get<N>(t), args...))
+    {
+        return remap_tuple<List...>::template remap(t, STK::tuple_get<N>(t), args...);
+    }
+};
+
+template <typename T>
+struct Lambda
+{
+    GLMesh *mesh;
+    core::matrix4 rsm_mat;
+
+    Lambda(GLMesh *m, const core::matrix4 &mat) : mesh(m), rsm_mat(mat) {}
+
+    template<typename... Args>
+    std::function<void(Args...)> getLambda(STK::Tuple<Args...>)
+    {
+        return [=](Args... args){ draw<T>(T::getInstance(), mesh, rsm_mat, args...); };
+    };
+};
 
 template<typename T, enum E_VERTEX_TYPE VertexType, int... Selector, typename... Args>
-void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<GLMesh *, core::matrix4, Args...> >&t)
+void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<Args...> >&t)
 {
     glUseProgram(T::getInstance()->Program);
     glBindVertexArray(getVAO(VertexType));
@@ -549,7 +597,10 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> Texture
             compressTexture(mesh->textures[j], true);
             setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
         }
-        rsm_custom_unroll_args<Selector...>::template exec<T>(rsm_matrix, t[i]);
+//        auto remappedtuple = STK::tuple_cat(std::make_tuple(STK::tuple_get<0>(t[i]), rsm_matrix), remap_tuple<Selector...>::template remap(t[i]));
+        auto remappedtuple = remap_tuple<Selector...>::template remap(t[i]);
+        typedef decltype(remappedtuple) RemappedTypleType;
+        unroll_args<STK::TupleSize<RemappedTypleType>::value >::template exec(Lambda<T>(STK::tuple_get<0>(t[i]), rsm_matrix).getLambda(remappedtuple), remappedtuple);
     }
 }
 
