@@ -1624,7 +1624,13 @@ void IrrDriver::onUnloadWorld()
 void IrrDriver::setAmbientLight(const video::SColor &light)
 {
     m_scene_manager->setAmbientLight(light);
+    m_SH_dirty = true;
 }   // setAmbientLight
+
+video::SColorf IrrDriver::getAmbientLight() const
+{
+    return m_scene_manager->getAmbientLight();
+}
 
 // ----------------------------------------------------------------------------
 /** Displays the FPS on the screen.

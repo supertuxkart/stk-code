@@ -213,8 +213,6 @@ private:
     Shaders              *m_shaders;
     /** Wind. */
     Wind                 *m_wind;
-    float                m_exposure;
-    float                m_lwhite;
     /** RTTs. */
     RTT                *m_rtts;
     std::vector<core::matrix4> sun_ortho_matrix;
@@ -291,25 +289,7 @@ public:
         return hasVSLayer;
     }
 
-    float getExposure() const
-    {
-        return m_exposure;
-    }
-
-    void setExposure(float v)
-    {
-        m_exposure = v;
-    }
-
-    float getLwhite() const
-    {
-      return m_lwhite;
-    }
-
-    void setLwhite(float v)
-    {
-        m_lwhite = v;
-    }
+    video::SColorf getAmbientLight() const;
 
     struct GlowData {
         scene::ISceneNode * node;
