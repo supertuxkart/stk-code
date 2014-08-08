@@ -32,8 +32,8 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg) :
-    ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM)
+DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg, std::function<int()> G, std::function<void(int)> S) :
+    ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM), Getter(G), Setter(S)
 {
     //if (StateManager::get()->getGameState() == GUIEngine::GAME)
     //{
@@ -45,17 +45,10 @@ DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg) :
 
     loadFromFile("debug_slider.stkgui");
 
-
     LabelWidget* message = getWidget<LabelWidget>("title");
     message->setText( msg.c_str(), false );
 
-    float val;
-    if (m_id == "lwhite")
-      val = irr_driver->getLwhite() * 10.f;
-    if (m_id == "exposure")
-      val = irr_driver->getExposure() * 100.f;
-
-    getWidget<SpinnerWidget>("value_slider")->setValue(int(val));
+    getWidget<SpinnerWidget>("value_slider")->setValue(Getter());
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -82,10 +75,7 @@ GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& e
     {
         int value = getWidget<SpinnerWidget>("value_slider")->getValue();
         Log::info("DebugSlider", "Value for <%s> : %i", m_id.c_str(), value);
-        if (m_id == "lwhite")
-            irr_driver->setLwhite(value / 10.f);
-        if (m_id == "exposure")
-            irr_driver->setExposure(value / 100.f);
+        Setter(value);
         return GUIEngine::EVENT_BLOCK;
     }
 

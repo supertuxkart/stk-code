@@ -440,11 +440,11 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_TWEAK_SHADER_EXPOSURE)
                 {
-                    new DebugSliderDialog("exposure", "Exposure");
+                    new DebugSliderDialog("exposure", "Exposure", [](){ return irr_driver->getExposure() * 100.f; }, [](int v){irr_driver->setExposure(v / 100.f); });
                 }
                 else if (cmdID == DEBUG_TWEAK_SHADER_LWHITE)
                 {
-                    new DebugSliderDialog("lwhite", "LWhite");
+                    new DebugSliderDialog("lwhite", "LWhite", [](){ return irr_driver->getLwhite() * 10.f; }, [](int v){irr_driver->setLwhite(v / 10.f); });
                 }
             }
 
