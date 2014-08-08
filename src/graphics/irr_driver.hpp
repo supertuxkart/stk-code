@@ -341,6 +341,7 @@ private:
     std::vector<BloomData> m_forcedbloom;
 
     std::vector<scene::ISceneNode *> m_background;
+    video::SColorf m_ambient;
 
     STKRenderingPass m_phase;
 
@@ -391,7 +392,7 @@ public:
                                     const std::string& mask_path);
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
-    void                  setAmbientLight(const video::SColor &light);
+    void                  setAmbientLight(const video::SColorf &light);
     std::string           generateSmallerTextures(const std::string& dir);
     std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,

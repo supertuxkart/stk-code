@@ -444,8 +444,8 @@ bool onEvent(const SEvent &event)
                 {
                     new DebugSliderDialog("Red", "Red", [](){ return irr_driver->getAmbientLight().r * 255.; },
                         [](int v){
-                            video::SColor ambient = irr_driver->getAmbientLight().toSColor();
-                            ambient.setRed(v);
+                            video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(0, v / 255.);
                             irr_driver->setAmbientLight(ambient); }
                     );
                 }
@@ -453,8 +453,8 @@ bool onEvent(const SEvent &event)
                 {
                     new DebugSliderDialog("Green", "Green", [](){ return irr_driver->getAmbientLight().g * 255.; },
                         [](int v){
-                            video::SColor ambient = irr_driver->getAmbientLight().toSColor();
-                            ambient.setGreen(v);
+                            video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(1, v / 255.);
                             irr_driver->setAmbientLight(ambient); }
                         );
                 }
@@ -462,8 +462,8 @@ bool onEvent(const SEvent &event)
                 {
                     new DebugSliderDialog("Blue", "Blue", [](){ return irr_driver->getAmbientLight().b * 255.; },
                         [](int v){
-                            video::SColor ambient = irr_driver->getAmbientLight().toSColor();
-                            ambient.setBlue(v);
+                        video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(2, v / 255.);
                             irr_driver->setAmbientLight(ambient); }
                     );
                 }

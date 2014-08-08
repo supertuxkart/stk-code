@@ -1621,15 +1621,17 @@ void IrrDriver::onUnloadWorld()
 /** Sets the ambient light.
  *  \param light The colour of the light to set.
  */
-void IrrDriver::setAmbientLight(const video::SColor &light)
+void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
+    printf("redval %f\n", light.getRed());
     m_scene_manager->setAmbientLight(light);
+    m_ambient = light;
     m_SH_dirty = true;
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const
 {
-    return m_scene_manager->getAmbientLight();
+    return m_ambient;
 }
 
 // ----------------------------------------------------------------------------
