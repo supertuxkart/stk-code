@@ -1623,15 +1623,13 @@ void IrrDriver::onUnloadWorld()
  */
 void IrrDriver::setAmbientLight(const video::SColorf &light)
 {
-    printf("redval %f\n", light.getRed());
     m_scene_manager->setAmbientLight(light);
-    m_ambient = light;
     m_SH_dirty = true;
 }   // setAmbientLight
 
 video::SColorf IrrDriver::getAmbientLight() const
 {
-    return m_ambient;
+    return m_scene_manager->getAmbientLight();
 }
 
 // ----------------------------------------------------------------------------

@@ -341,7 +341,6 @@ private:
     std::vector<BloomData> m_forcedbloom;
 
     std::vector<scene::ISceneNode *> m_background;
-    video::SColorf m_ambient;
 
     STKRenderingPass m_phase;
 

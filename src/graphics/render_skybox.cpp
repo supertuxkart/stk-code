@@ -485,7 +485,7 @@ void IrrDriver::generateDiffuseCoefficients()
         int sh_w = 16;
         int sh_h = 16;
 
-        video::SColor ambient = m_ambient.toSColor();
+        video::SColor ambient = m_scene_manager->getAmbientLight().toSColor();
 
         unsigned char *sh_rgba[6];
         for (unsigned i = 0; i < 6; i++)
