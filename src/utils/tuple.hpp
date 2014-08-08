@@ -78,13 +78,14 @@ namespace STK {
     //    return sizeof...(T);
     //}
 
-    template<typename T>
-    struct TupleSize;
-
     template<typename... T>
-    struct TupleSize<Tuple<T...> >
+    struct TupleSize
     {
-        static const int value = sizeof...(T);
+        int value;
+        TupleSize()
+        {
+            value = sizeof...(T);
+        }
     };
 }
 
