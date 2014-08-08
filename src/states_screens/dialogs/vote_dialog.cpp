@@ -48,14 +48,16 @@ VoteDialog::VoteDialog(const std::string & addon_id)
 
     m_rating_widget = getWidget<RatingBarWidget>("rating");
     assert(m_rating_widget != NULL);
+
     m_rating_widget->setRating(0);
     m_rating_widget->allowVoting();
     m_options_widget = getWidget<RibbonWidget>("options");
     assert(m_options_widget != NULL);
+
     m_cancel_widget = getWidget<IconButtonWidget>("cancel");
     assert(m_cancel_widget != NULL);
-    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
+    m_options_widget->setFocusForPlayer(PLAYER_ID_GAME_MASTER);
 
     m_fetch_vote_request = new XMLRequest();
     PlayerManager::setUserDetails(m_fetch_vote_request, "get-addon-vote");
@@ -102,8 +104,9 @@ void VoteDialog::sendVote()
             if (isSuccess())
             {
                 std::string addon_id;
-                getXMLData()->get("addon-id", &addon_id);
                 float average;
+
+                getXMLData()->get("addon-id", &addon_id);
                 getXMLData()->get("new-average", &average);
                 addons_manager->getAddon(Addon::createAddonId(addon_id))
                               ->setRating(average);
@@ -112,9 +115,7 @@ void VoteDialog::sendVote()
     public:
         SetAddonVoteRequest() : XMLRequest() {}
     };   // SetAddonVoteRequest
-
     // ------------------------------------------------------------------------
-
 
     m_perform_vote_request = new SetAddonVoteRequest();
     PlayerManager::setUserDetails(m_perform_vote_request, "set-addon-vote");
@@ -144,12 +145,15 @@ GUIEngine::EventPropagation VoteDialog::processEvent(const std::string& event)
     {
         const std::string& selection =
             m_options_widget->getSelectionIDString(PLAYER_ID_GAME_MASTER);
+
         if (selection == m_cancel_widget->m_properties[PROP_ID])
         {
             m_self_destroy = true;
+
             return GUIEngine::EVENT_BLOCK;
         }
     }
+
     return GUIEngine::EVENT_LET;
 }   // processEvent
 
@@ -163,16 +167,21 @@ void VoteDialog::updateFetchVote()
     if (!m_fetch_vote_request->isDone())
     {
         // request still pending
-        m_info_widget->setText(StringUtils::loadingDots(_("Fetching last vote")),
-                               false                                          );
+        m_info_widget->setText(
+            StringUtils::loadingDots(_("Fetching last vote")),
+            false
+        );
+
         return;
     }   // !isDone
 
     if (m_fetch_vote_request->isSuccess())
     {
-        m_info_widget->setDefaultColor();
         std::string voted("");
+
+        m_info_widget->setDefaultColor();
         m_fetch_vote_request->getXMLData()->get("voted", &voted);
+
         if (voted == "yes")
         {
             float rating;

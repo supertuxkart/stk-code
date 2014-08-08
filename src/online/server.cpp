@@ -24,12 +24,14 @@
 #include "utils/constants.hpp"
 #include "utils/string_utils.hpp"
 
-namespace Online{
-    Server::SortOrder Server::m_sort_order=Server::SO_NAME; //FIXME change to some other default
+namespace Online
+{
+    Server::SortOrder Server::m_sort_order = Server::SO_NAME;
 
     Server::Server(const XMLNode & xml)
     {
         assert(xml.getName() == "server");
+
         m_name                      = "";
         m_satisfaction_score        = 0;
         m_server_id                 = 0;
@@ -45,7 +47,7 @@ namespace Online{
         xml.get("max_players",      &m_max_players);
         xml.get("current_players",  &m_current_players);
 
-    };   // Server(const XML&)
+    } // Server(const XML&)
 
     // ----------------------------------------------------------------------------
     /**

@@ -2,16 +2,15 @@ uniform mat4 ModelViewMatrix;
 uniform vec3 Position;
 uniform vec2 Size;
 
-#if __VERSION__ >= 130
+#if __VERSION__ >= 330
+layout(location = 0) in vec2 Corner;
+layout(location = 3) in vec2 Texcoord;
+#else
 in vec2 Corner;
 in vec2 Texcoord;
-out vec2 uv;
-#else
-attribute vec2 Corner;
-attribute vec2 Texcoord;
-varying vec2 uv;
 #endif
 
+out vec2 uv;
 
 void main(void)
 {

@@ -127,7 +127,7 @@ public:
     /** Abstract virtual classes, to be implemented by the OnlinePlayer. */
     virtual void setUserDetails(Online::HTTPRequest *request,
                                 const std::string &action,
-                                const std::string &php_script = "") const = 0;
+                                const std::string &url_path = "") const = 0;
     virtual uint32_t getOnlineId() const = 0;
     virtual PlayerProfile::OnlineState getOnlineState() const = 0;
     virtual Online::OnlineProfile* getProfile() const = 0;

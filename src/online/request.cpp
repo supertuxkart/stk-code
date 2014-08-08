@@ -25,10 +25,8 @@
 
 #include <assert.h>
 
-
 namespace Online
 {
-
     // ========================================================================
     /**
      *  Creates a request that can be handled by the RequestManager
@@ -67,6 +65,7 @@ namespace Online
         setExecuted();
         afterOperation();
     }   // execute
+
     // ------------------------------------------------------------------------
     /** Executes the request now, i.e. in the main thread and without involving
      *  the manager thread.. This calles prepareOperation, operation, and
@@ -80,6 +79,5 @@ namespace Online
         callback();
         setDone();
     }   // executeNow
-
 
 } // namespace Online

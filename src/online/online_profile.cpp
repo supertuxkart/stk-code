@@ -16,7 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 #include "online/online_profile.hpp"
 
 #include "config/player_manager.hpp"
@@ -39,10 +38,10 @@ OnlineProfile::RelationInfo::RelationInfo(const irr::core::stringw & date,
                                     bool is_online, bool is_pending,
                                     bool is_asker)
 {
-    m_date = date;
-    m_is_online = is_online;
-    m_is_pending = is_pending;
-    m_is_asker = is_asker;
+    m_date          = date;
+    m_is_online     = is_online;
+    m_is_pending    = is_pending;
+    m_is_asker      = is_asker;
 }   // RelationInfo::RelationInfo
 
 // ----------------------------------------------------------------------------
@@ -91,12 +90,11 @@ OnlineProfile::OnlineProfile(const XMLNode * xml, ConstructorType type)
     if (type == C_RELATION_INFO)
     {
         irr::core::stringw date("");
+        bool is_pending = false, is_asker = false, is_online = false;
+
         xml->get("date", &date);
-        std::string is_pending_string("");
-        bool is_pending = false;
         xml->get("is_pending", &is_pending);
-        bool is_asker  = false;
-        bool is_online = false;
+
         if (is_pending)
         {
             xml->get("is_asker", &is_asker);
@@ -113,7 +111,7 @@ OnlineProfile::OnlineProfile(const XMLNode * xml, ConstructorType type)
 
     xml->get("id",        &m_id      );
     xml->get("user_name", &m_username);
-    m_is_current_user          = (m_id == PlayerManager::getCurrentOnlineId());
+    m_is_current_user = (m_id == PlayerManager::getCurrentOnlineId());
     m_state = S_READY;
 }   // OnlineProfile(XMLNode)
 
@@ -133,6 +131,7 @@ void OnlineProfile::fetchAchievements()
     assert(PlayerManager::isCurrentLoggedIn());
     if (m_has_fetched_achievements || m_is_current_user)
         return;
+
     m_state = S_FETCHING;
 
     // ------------------------------------------------------------------------
@@ -187,6 +186,7 @@ void OnlineProfile::fetchFriends()
     assert(PlayerManager::isCurrentLoggedIn());
     if (m_has_fetched_friends)
         return;
+
     m_state = S_FETCHING;
 
     // ------------------------------------------------------------------------
@@ -258,9 +258,11 @@ void OnlineProfile::removeFriend(const uint32_t id)
             break;
         }
         else
+        {
             ++iter;
-    }
-}   // removeFriend
+        }
+    } // for friend in friends
+} // removeFriend
 
 // ----------------------------------------------------------------------------
 /** Adds a friend to the friend list.
@@ -269,9 +271,14 @@ void OnlineProfile::removeFriend(const uint32_t id)
 void OnlineProfile::addFriend(const uint32_t id)
 {
     assert(m_has_fetched_friends);
+
+    // find if friend id is is already in the user list
     for (unsigned int i = 0; i < m_friends.size(); i++)
-    if (m_friends[i] == id)
-        return;
+    {
+        if (m_friends[i] == id)
+            return;
+    }
+
     m_friends.push_back(id);
 }   // addFriend
 
@@ -310,18 +317,25 @@ const OnlineProfile::IDList& OnlineProfile::getAchievements()
 void OnlineProfile::merge(OnlineProfile *profile)
 {
     assert(profile != NULL);
-    if (!this->m_has_fetched_friends && profile->m_has_fetched_friends)
-        this->m_friends = profile->m_friends;
-    if (!this->m_has_fetched_achievements && profile->m_has_fetched_achievements)
-        this->m_achievements = profile->m_achievements;
-    if (this->m_relation_info == NULL && profile->m_relation_info != NULL)
+
+    // profile has fetched friends, use that instead
+    if (!m_has_fetched_friends && profile->m_has_fetched_friends)
+        m_friends = profile->m_friends;
+
+    // profile has fetched achievements, use that instead
+    if (!m_has_fetched_achievements && profile->m_has_fetched_achievements)
+        m_achievements = profile->m_achievements;
+
+    // current relation is not set, use the profile one
+    if (m_relation_info == NULL && profile->m_relation_info != NULL)
     {
-        this->m_relation_info = profile->m_relation_info;
+        m_relation_info = profile->m_relation_info;
+
         // We don't want the destructor of the profile instance to destroy
         // the relation info
         profile->m_relation_info = NULL;
     }
-    delete profile;
-}   // merge
 
+    delete profile;
+} // merge
 } // namespace Online
