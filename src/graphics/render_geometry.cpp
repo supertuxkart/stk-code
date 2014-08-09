@@ -357,7 +357,7 @@ void IrrDriver::renderNormalsVisualisation()
     renderMeshNormals<video::EVT_STANDARD>(ListMatDefault::Arguments);
     renderMeshNormals<video::EVT_STANDARD>(ListMatAlphaRef::Arguments);
     renderMeshNormals<video::EVT_STANDARD>(ListMatSphereMap::Arguments);
-    renderMeshNormals<video::EVT_STANDARD>(ListMatGrass::Arguments);
+//    renderMeshNormals<video::EVT_STANDARD>(ListMatGrass::Arguments);
     renderMeshNormals<video::EVT_2TCOORDS>(ListMatDetails::Arguments);
     renderMeshNormals<video::EVT_STANDARD>(ListMatUnlit::Arguments);
     renderMeshNormals<video::EVT_2TCOORDS>(ListMatSplatting::Arguments);
