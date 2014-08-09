@@ -33,15 +33,14 @@ class DebugSliderDialog : public GUIEngine::ModalDialog
 private:
 
     std::string m_id;
-    std::function<int()> Getter;
-    std::function<void(int)> Setter;
+    std::map<std::string, std::function<void(int)> >Setters;
 
 public:
-
-
-    DebugSliderDialog(std::string id, ::core::stringw msg, std::function<int()> G, std::function<void(int)> S);
+    DebugSliderDialog();
 
     ~DebugSliderDialog();
+
+    void setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S);
 
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;

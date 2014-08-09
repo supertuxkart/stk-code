@@ -83,9 +83,7 @@ enum DebugMenuCommand
     DEBUG_TOGGLE_GUI,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
-    DEBUG_CHANGE_AMBIENT_RED,
-    DEBUG_CHANGE_AMBIENT_GREEN,
-    DEBUG_CHANGE_AMBIENT_BLUE,
+    DEBUG_VISUAL_VALUES,
 };
 
 // -----------------------------------------------------------------------------
@@ -189,11 +187,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
 
-            mnu->addItem(L"Adjust Ambient >", -1, true, true);
-            sub = mnu->getSubMenu(3);
-            sub->addItem(L"Red ", DEBUG_CHANGE_AMBIENT_RED);
-            sub->addItem(L"Green", DEBUG_CHANGE_AMBIENT_GREEN);
-            sub->addItem(L"Blue", DEBUG_CHANGE_AMBIENT_BLUE);
+            mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
@@ -440,31 +434,35 @@ bool onEvent(const SEvent &event)
                             kart->getNode()->setVisible(false);
                     }
                 }
-                else if (cmdID == DEBUG_CHANGE_AMBIENT_RED)
+                else if (cmdID == DEBUG_VISUAL_VALUES)
                 {
-                    new DebugSliderDialog("Red", "Red", [](){ return irr_driver->getAmbientLight().r * 255.; },
+                    DebugSliderDialog *dsd = new DebugSliderDialog();
+                    dsd->setSliderHook( "red_slider", 0, 255, [](){ return irr_driver->getAmbientLight().r * 255.; },
                         [](int v){
                             video::SColorf ambient = irr_driver->getAmbientLight();
                             ambient.setColorComponentValue(0, v / 255.);
                             irr_driver->setAmbientLight(ambient); }
                     );
-                }
-                else if (cmdID == DEBUG_CHANGE_AMBIENT_GREEN)
-                {
-                    new DebugSliderDialog("Green", "Green", [](){ return irr_driver->getAmbientLight().g * 255.; },
-                        [](int v){
-                            video::SColorf ambient = irr_driver->getAmbientLight();
-                            ambient.setColorComponentValue(1, v / 255.);
-                            irr_driver->setAmbientLight(ambient); }
-                        );
-                }
-                else if (cmdID == DEBUG_CHANGE_AMBIENT_BLUE)
-                {
-                    new DebugSliderDialog("Blue", "Blue", [](){ return irr_driver->getAmbientLight().b * 255.; },
+                    dsd->setSliderHook("green_slider", 0, 255, [](){ return irr_driver->getAmbientLight().g * 255.; },
                         [](int v){
                         video::SColorf ambient = irr_driver->getAmbientLight();
-                            ambient.setColorComponentValue(2, v / 255.);
-                            irr_driver->setAmbientLight(ambient); }
+                        ambient.setColorComponentValue(1, v / 255.);
+                        irr_driver->setAmbientLight(ambient); }
+                    );
+                    dsd->setSliderHook("blue_slider", 0, 255, [](){ return irr_driver->getAmbientLight().b * 255.; },
+                        [](int v){
+                        video::SColorf ambient = irr_driver->getAmbientLight();
+                        ambient.setColorComponentValue(2, v / 255.);
+                        irr_driver->setAmbientLight(ambient); }
+                    );
+                    dsd->setSliderHook("ssao_radius", 0, 100, [](){ return irr_driver->getSSAORadius() * 10; },
+                        [](int v){irr_driver->setSSAORadius(v / 10.); }
+                    );
+                    dsd->setSliderHook("ssao_k", 0, 100, [](){ return irr_driver->getSSAOK() * 10; },
+                        [](int v){irr_driver->setSSAOK(v / 10.); }
+                    );
+                    dsd->setSliderHook("ssao_sigma", 0, 100, [](){ return irr_driver->getSSAOSigma() * 10; },
+                        [](int v){irr_driver->setSSAOSigma(v / 10.); }
                     );
                 }
             }

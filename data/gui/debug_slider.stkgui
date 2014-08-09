@@ -1,7 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
     <div x="2%" y="10%" width="96%" height="80%" layout="vertical-row" >
-        <label id="title" width="100%"/>
-        <gauge id="value_slider" min_value="0" max_value="100" width="100%" />
+        <label id="Red" width="100%"/>
+        <gauge id="red_slider" min_value="0" max_value="100" width="100%" />
+        <label id="Green" width="100%"/>
+        <gauge id="green_slider" min_value="0" max_value="100" width="100%" />
+        <label id="Blue" width="100%"/>
+        <gauge id="blue_slider" min_value="0" max_value="100" width="100%" />
+        <label id="SSAO radius" width="100%"/>
+        <gauge id="ssao_radius" min_value="0" max_value="100" width="100%" />
+        <label id="SSAO k" width="100%"/>
+        <gauge id="ssao_k" min_value="0" max_value="100" width="100%" />
+        <label id="SSAO Sigma" width="100%"/>
+        <gauge id="ssao_sigma" min_value="0" max_value="100" width="100%" />
     </div>
 </stkgui>

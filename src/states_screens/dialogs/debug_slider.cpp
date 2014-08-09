@@ -32,23 +32,19 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::DebugSliderDialog(std::string id, irr::core::stringw msg, std::function<int()> G, std::function<void(int)> S) :
-    ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM), Getter(G), Setter(S)
+DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_CENTER)
 {
-    //if (StateManager::get()->getGameState() == GUIEngine::GAME)
-    //{
-    //    World::getWorld()->schedulePause(World::IN_GAME_MENU_PHASE);
-    //}
-
-    m_id = id;
     m_fade_background = false;
 
     loadFromFile("debug_slider.stkgui");
+}
 
-    LabelWidget* message = getWidget<LabelWidget>("title");
-    message->setText( msg.c_str(), false );
-
-    getWidget<SpinnerWidget>("value_slider")->setValue(Getter());
+void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S)
+{
+    getWidget<SpinnerWidget>(id.c_str())->setValue(G());
+    getWidget<SpinnerWidget>(id.c_str())->setMin(min);
+    getWidget<SpinnerWidget>(id.c_str())->setMax(max);
+    Setters[id] = S;
 }
 
 // ------------------------------------------------------------------------------------------------------
@@ -71,15 +67,12 @@ void DebugSliderDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& eventSource)
 {
-    if (eventSource == "value_slider")
-    {
-        int value = getWidget<SpinnerWidget>("value_slider")->getValue();
-        Log::info("DebugSlider", "Value for <%s> : %i", m_id.c_str(), value);
-        Setter(value);
-        return GUIEngine::EVENT_BLOCK;
-    }
-
-    return GUIEngine::EVENT_LET;
+    if (Setters.find(eventSource) == Setters.end())
+        return GUIEngine::EVENT_LET;
+    int value = getWidget<SpinnerWidget>(eventSource.c_str())->getValue();
+    Log::info("DebugSlider", "Value for <%s> : %i", eventSource.c_str(), value);
+    Setters[eventSource](value);
+    return GUIEngine::EVENT_BLOCK;
 }
 
 // ------------------------------------------------------------------------------------------------------
