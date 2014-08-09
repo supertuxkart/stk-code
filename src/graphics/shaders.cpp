@@ -878,6 +878,7 @@ namespace MeshShader
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
         AssignUniforms("ModelMatrix");
         TU_tex_layout = 3;
