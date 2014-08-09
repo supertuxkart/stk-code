@@ -83,8 +83,9 @@ enum DebugMenuCommand
     DEBUG_TOGGLE_GUI,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
-    DEBUG_TWEAK_SHADER_EXPOSURE,
-    DEBUG_TWEAK_SHADER_LWHITE
+    DEBUG_CHANGE_AMBIENT_RED,
+    DEBUG_CHANGE_AMBIENT_GREEN,
+    DEBUG_CHANGE_AMBIENT_BLUE,
 };
 
 // -----------------------------------------------------------------------------
@@ -188,10 +189,11 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
 
-            //mnu->addItem(L"Adjust shaders >", -1, true, true);
-            //sub = mnu->getSubMenu(3);
-            //sub->addItem(L"Exposure", DEBUG_TWEAK_SHADER_EXPOSURE);
-            //sub->addItem(L"LWhite", DEBUG_TWEAK_SHADER_LWHITE);
+            mnu->addItem(L"Adjust Ambient >", -1, true, true);
+            sub = mnu->getSubMenu(3);
+            sub->addItem(L"Red ", DEBUG_CHANGE_AMBIENT_RED);
+            sub->addItem(L"Green", DEBUG_CHANGE_AMBIENT_GREEN);
+            sub->addItem(L"Blue", DEBUG_CHANGE_AMBIENT_BLUE);
 
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
@@ -438,13 +440,32 @@ bool onEvent(const SEvent &event)
                             kart->getNode()->setVisible(false);
                     }
                 }
-                else if (cmdID == DEBUG_TWEAK_SHADER_EXPOSURE)
+                else if (cmdID == DEBUG_CHANGE_AMBIENT_RED)
                 {
-                    new DebugSliderDialog("exposure", "Exposure");
+                    new DebugSliderDialog("Red", "Red", [](){ return irr_driver->getAmbientLight().r * 255.; },
+                        [](int v){
+                            video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(0, v / 255.);
+                            irr_driver->setAmbientLight(ambient); }
+                    );
                 }
-                else if (cmdID == DEBUG_TWEAK_SHADER_LWHITE)
+                else if (cmdID == DEBUG_CHANGE_AMBIENT_GREEN)
                 {
-                    new DebugSliderDialog("lwhite", "LWhite");
+                    new DebugSliderDialog("Green", "Green", [](){ return irr_driver->getAmbientLight().g * 255.; },
+                        [](int v){
+                            video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(1, v / 255.);
+                            irr_driver->setAmbientLight(ambient); }
+                        );
+                }
+                else if (cmdID == DEBUG_CHANGE_AMBIENT_BLUE)
+                {
+                    new DebugSliderDialog("Blue", "Blue", [](){ return irr_driver->getAmbientLight().b * 255.; },
+                        [](int v){
+                        video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(2, v / 255.);
+                            irr_driver->setAmbientLight(ambient); }
+                    );
                 }
             }
 

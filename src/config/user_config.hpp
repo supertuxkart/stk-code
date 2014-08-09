@@ -446,9 +446,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_high_definition_textures
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_high_definition_textures",
         &m_video_group, "Enable high definition textures"));
-    PARAM_PREFIX BoolUserConfigParam        m_ubo_disabled
-        PARAM_DEFAULT(BoolUserConfigParam(false, "disable_ubo_support",
-        &m_video_group, "Disable UBO support"));
     PARAM_PREFIX BoolUserConfigParam        m_glow
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
         &m_video_group, "Enable Glow"));

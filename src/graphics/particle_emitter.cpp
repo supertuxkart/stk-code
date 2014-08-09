@@ -287,7 +287,8 @@ public:
 
 ParticleEmitter::ParticleEmitter(const ParticleKind* type,
                                  const Vec3 &position,
-                                 scene::ISceneNode* parent)
+                                 scene::ISceneNode* parent,
+                                 bool randomize_initial_y)
                : m_position(position)
 {
     assert(type != NULL);
@@ -298,6 +299,7 @@ ParticleEmitter::ParticleEmitter(const ParticleKind* type,
     m_parent              = parent;
     m_emission_decay_rate = 0;
     m_is_glsl = irr_driver->isGLSL();
+    m_randomize_initial_y = randomize_initial_y;
 
 
     setParticleType(type);

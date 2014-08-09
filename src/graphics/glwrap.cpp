@@ -96,6 +96,10 @@ CALLBACK
 debugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length,
               const GLchar* msg, const void *userparam)
 {
+    // ignore minor notifications sent by some drivers (notably the nvidia one)
+    if (severity == GL_DEBUG_SEVERITY_NOTIFICATION)
+        return;
+
     switch(source)
     {
     case GL_DEBUG_SOURCE_API_ARB:
@@ -245,6 +249,22 @@ void initGL()
 #endif
 }
 
+static std::string LoadHeader()
+{
+    std::string result;
+    std::ifstream Stream(file_manager->getAsset("shaders/header.txt").c_str(), std::ios::in);
+
+    if (Stream.is_open())
+    {
+        std::string Line = "";
+        while (getline(Stream, Line))
+            result += "\n" + Line;
+        Stream.close();
+    }
+
+    return result;
+}
+
 // Mostly from shader tutorial
 GLuint LoadShader(const char * file, unsigned type)
 {
@@ -254,10 +274,11 @@ GLuint LoadShader(const char * file, unsigned type)
     std::string Code = versionString;
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
-    if (UserConfigParams::m_ubo_disabled)
+    if (irr_driver->needUBOWorkaround())
         Code += "#define UBO_DISABLED\n";
     if (irr_driver->hasVSLayerExtension())
         Code += "#define VSLayer\n";
+    Code += LoadHeader();
     if (Stream.is_open())
     {
         std::string Line = "";
