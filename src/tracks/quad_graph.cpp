@@ -534,7 +534,9 @@ void QuadGraph::createMesh(bool show_invisible,
 }   // createMesh
 
 // -----------------------------------------------------------------------------
-/** Creates the actual mesh that is used by createDebugMesh() */
+/** This is used to draw one set of unrolled quads. This function is mostly a 
+    a copy of createMesh used to draw the entire driveline.
+    FIXME: Either remove this function or name it appropirately*/
 void QuadGraph::createMesh2()
 {
     // The debug track will not be lighted or culled.
@@ -610,7 +612,7 @@ void QuadGraph::createMesh2()
     m_mesh_buffer->recalculateBoundingBox();
     m_mesh->setBoundingBox(m_mesh_buffer->getBoundingBox());
 
-}   // createMesh
+}   // createMesh2
 
 
 
