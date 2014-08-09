@@ -525,16 +525,13 @@ void PostProcessing::renderSSAO()
     if (!noise_tex)
         noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 
-    glUseProgram(FullScreenShader::SSAOShader::Program);
-    glBindVertexArray(FullScreenShader::SSAOShader::vao);
+    glUseProgram(FullScreenShader::SSAOShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::SSAOShader::getInstance()->vao);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
+    setTexture(FullScreenShader::SSAOShader::getInstance()->TU_dtex, irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH), GL_LINEAR, GL_LINEAR_MIPMAP_NEAREST);
     glGenerateMipmap(GL_TEXTURE_2D);
-    setTexture(1, getTextureGLuint(noise_tex), GL_LINEAR, GL_LINEAR);
 
-    FullScreenShader::SSAOShader::setUniforms(core::vector2df(float(UserConfigParams::m_width),
-                                                              float(UserConfigParams::m_height)),
-                                              0, 1);
+    FullScreenShader::SSAOShader::getInstance()->setUniforms(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }

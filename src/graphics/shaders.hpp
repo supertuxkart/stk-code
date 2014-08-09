@@ -729,16 +729,13 @@ public:
     static void init();
 };
 
-class SSAOShader
+class SSAOShader : public ShaderHelperSingleton<SSAOShader, float, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints;
-    static GLuint vao;
-    static float SSAOSamples[64];
-    
-    static void init();
-    static void setUniforms(const core::vector2df &screen, unsigned TU_dtex, unsigned TU_noise);
+    GLuint TU_dtex;
+    GLuint vao;
+
+    SSAOShader();
 };
 
 class FogShader
