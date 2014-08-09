@@ -572,6 +572,11 @@ void glUniform3fWraper(GLuint a, float b, float c, float d)
     glUniform3f(a, b, c, d);
 }
 
+void glUniform4iWraper(GLuint a, int b, int c, int d, int e)
+{
+    glUniform4i(a, b, c, d, e);
+}
+
 void glUniform2fWraper(GLuint a, float b, float c)
 {
     glUniform2f(a, b, c);
@@ -1227,6 +1232,18 @@ namespace MeshShader
             bypassUBO(Program);
         glUniformMatrix4fv(uniform_MM, 1, GL_FALSE, ModelMatrix.pointer());
         glUniform1i(uniform_tex, TU_tex);
+    }
+
+    NormalVisualizer::NormalVisualizer()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
+            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/normal_visualizer.geom").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
+        AssignUniforms("ModelMatrix", "InverseModelMatrix", "color");
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
     GLuint ViewFrustrumShader::Program;

@@ -318,6 +318,13 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
+    if (getNormals())
+    {
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        renderNormalsVisualisation();
+        m_rtts->getFBO(FBO_COLORS).Bind();
+    }
+
     if (UserConfigParams::m_dynamic_lights && World::getWorld() != NULL &&
         World::getWorld()->isFogEnabled())
     {

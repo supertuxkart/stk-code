@@ -362,6 +362,7 @@ private:
     void renderGLSL(float dt);
     void renderSolidFirstPass();
     void renderSolidSecondPass();
+    void renderNormalsVisualisation();
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
