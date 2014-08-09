@@ -11,7 +11,7 @@ void main()
         gl_Position = pos;
         EmitVertex();
 
-        vec3 normal = nor[i];
+        vec3 normal = normalize(nor[i]);
         pos = inverse(ProjectionMatrix) * pos;
         pos /= pos.w;
         gl_Position = ProjectionMatrix * (pos + .2 * vec4(normal, 0.));
