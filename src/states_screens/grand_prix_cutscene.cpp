@@ -44,7 +44,7 @@ void GrandPrixCutscene::saveGPButton()
  *  createNewGP(). */
 void GrandPrixCutscene::onNewGPWithName(const irr::core::stringw& name)
 {
-    // Create a new gp with the corre
+    // create a new GP with the correct filename and a unique id
     GrandPrixData* gp = grand_prix_manager->createNewGP(name);
     const GrandPrixData current_gp = race_manager->getGrandPrix();
     std::vector<std::string> tracks  = current_gp.getTrackNames();
@@ -54,7 +54,7 @@ void GrandPrixCutscene::onNewGPWithName(const irr::core::stringw& name)
         gp->addTrack(track_manager->getTrack(tracks[i]), laps[i], reverse[i]);
     gp->writeToFile();
 
-    // Avoid double-save
+    // Avoid double-save which can have bad side-effects
     getWidget<Button>("save")->setVisible(false);
 }   // onNewGPWithName
 
