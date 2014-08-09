@@ -1262,7 +1262,7 @@ void Kart::update(float dt)
             Vec3 gravity(0.0f, -g, 0.0f);
             btRigidBody *body = getVehicle()->getRigidBody();
             // If the material should overwrite the gravity,
-            if (material->hasGravity() || 1)
+            if (material->hasGravity())
             {
                 Vec3 normal = m_terrain_info->getNormal();
                 gravity = normal * -g;
