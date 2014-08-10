@@ -28,6 +28,10 @@ public:
     virtual void render();
     void addInstance(const core::vector3df &origin, const core::vector3df &orientation, const core::vector3df &scale);
 
+    int getInstanceCount() const { return instance_pos.size() / 9; }
+
+    core::matrix4 getInstanceTransform(int id);
+
     void instanceGrab() { m_ref_count++; }
     void instanceDrop()
     {
