@@ -107,7 +107,6 @@ KartModel::KartModel(bool is_master)
     for(unsigned int i=0; i<4; i++)
     {
         m_wheel_graphics_position[i] = Vec3(UNDEFINED);
-        m_wheel_physics_position[i]  = Vec3(UNDEFINED);
         m_wheel_graphics_radius[i]   = 0.0f;   // for kart without separate wheels
         m_wheel_model[i]             = NULL;
         m_wheel_node[i]              = NULL;
@@ -299,7 +298,6 @@ KartModel* KartModel::makeCopy()
         assert(!m_wheel_node[i]);
         km->m_wheel_filename[i]             = m_wheel_filename[i];
         km->m_wheel_graphics_position[i]    = m_wheel_graphics_position[i];
-        km->m_wheel_physics_position[i]     = m_wheel_physics_position[i];
         km->m_wheel_graphics_radius[i]      = m_wheel_graphics_radius[i];
         km->m_min_suspension[i]             = m_min_suspension[i];
         km->m_max_suspension[i]             = m_max_suspension[i];
@@ -626,42 +624,9 @@ void KartModel::loadWheelInfo(const XMLNode &node,
     }
     wheel_node->get("model",            &m_wheel_filename[index]         );
     wheel_node->get("position",         &m_wheel_graphics_position[index]);
-    wheel_node->get("physics-position", &m_wheel_physics_position[index] );
     wheel_node->get("min-suspension",   &m_min_suspension[index]         );
     wheel_node->get("max-suspension",   &m_max_suspension[index]         );
 }   // loadWheelInfo
-
-// ----------------------------------------------------------------------------
-/** Sets the default position for the physical wheels if they are not defined
- *  in the data file. The default position is to have the wheels at the corner
- *  of the chassis. But since the position is relative to the center of mass,
- *  this must be specified.
- *  \param center_shift Amount the kart chassis is moved relative to the center
- *                      of mass.
- *  \param wheel_radius Radius of the physics wheels.
- */
-void  KartModel::setDefaultPhysicsPosition(const Vec3 &center_shift,
-                                           float wheel_radius)
-{
-    for(unsigned int i=0; i<4; i++)
-    {
-        if(m_wheel_physics_position[i].getX()==UNDEFINED)
-        {
-            m_wheel_physics_position[i].setX( ( i==1||i==3)
-                                               ? -0.5f*m_kart_width
-                                               :  0.5f*m_kart_width
-                                               +center_shift.getX(  ));
-            // Set the connection point so that a maximum compressed wheel
-            // (susp. length=0) will still poke a little bit out under the
-            // kart
-            m_wheel_physics_position[i].setY(wheel_radius-0.05f);
-            m_wheel_physics_position[i].setZ( (0.5f*m_kart_length-wheel_radius)
-                                              * ( (i<2) ? 1 : -1)
-                                               +center_shift.getZ());
-        }   // if physics position is not defined
-    }
-
-}   // setDefaultPhysicsPosition
 
 // ----------------------------------------------------------------------------
 /** Resets the kart model. It stops animation from being played and resets

@@ -157,10 +157,6 @@ private:
     /** The position of all four wheels in the 3d model. */
     Vec3          m_wheel_graphics_position[4];
 
-    /** The position of the wheels for the physics, which can be different
-     *  from the graphical position. */
-    Vec3          m_wheel_physics_position[4];
-
     /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
     
@@ -233,8 +229,6 @@ public:
     bool          loadModels(const KartProperties &kart_properties);
     void          update(float dt, float rotation_dt, float steer,
                          const float height_abve_terrain[4], float speed);
-    void          setDefaultPhysicsPosition(const Vec3 &center_shift,
-                                            float wheel_radius);
     void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
@@ -262,14 +256,6 @@ public:
      */
     const Vec3* getWheelsGraphicsPosition() const
                 {return m_wheel_graphics_position;}
-    // ------------------------------------------------------------------------
-    /** Returns the position of a wheel relative to the kart for the physics.
-     *  The physics wheels can be attached at a different place to make the
-     *  karts more stable.
-     *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
-     *           right, 3 = rear left.  */
-    const Vec3& getWheelPhysicsPosition(unsigned int i) const
-                {assert(i<4); return m_wheel_physics_position[i];}
     // ------------------------------------------------------------------------
     /** Returns the radius of the graphical wheels.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear

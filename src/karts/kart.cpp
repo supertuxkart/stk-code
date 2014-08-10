@@ -583,39 +583,40 @@ void Kart::createPhysics()
 
     btCollisionShape *shape;
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
-    if(bevel.getX() || bevel.getY() || bevel.getZ())
+    Vec3 wheel_pos[4];
+    assert(bevel.getX() || bevel.getY() || bevel.getZ());
+    
+    Vec3 orig_factor(1, 1, 1 - bevel.getZ());
+    Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
+    btConvexHullShape *hull = new btConvexHullShape();
+    for (int y = -1; y <= 1; y += 2)
     {
-        Vec3 orig_factor(1, 1, 1-bevel.getZ());
-        Vec3 bevel_factor(1.0f-bevel.getX(),
-                          1.0f-bevel.getY(),
-                          1.0f               );
-        btConvexHullShape *hull = new btConvexHullShape();
-        for(int x=-1; x<=1; x+=2)
+        for (int z = -1; z <= 1; z += 2)
         {
-            for(int y=-1; y<=1; y+=2)
+            for (int x = -1; x <= 1; x += 2)
             {
-                for(int z=-1; z<=1; z+=2)
+                Vec3 p(x*getKartModel()->getWidth() *0.5f,
+                       y*getKartModel()->getHeight()*0.5f,
+                       z*getKartModel()->getLength()*0.5f);
+
+                hull->addPoint(p*orig_factor);
+                hull->addPoint(p*bevel_factor);
+                // Store the x/z position for the wheels as a weighted average
+                // of the two bevelled points.
+                if (y == -1)
                 {
-                    Vec3 p(x*getKartModel()->getWidth()*0.5f,
-                          y*getKartModel()->getHeight()*0.5f,
-                          z*getKartModel()->getLength()*0.5f);
+                    int index = (x + 1) / 2 + 1 - z;  // get index of wheel
+                    float f = getKartProperties()->getPhysicalWheelPosition();
+                    wheel_pos[index] = p*(orig_factor*(1.0f-f) + bevel_factor*f);
+                    wheel_pos[index].setY(0);
+                }  // if z==-1
+            }   // for x
+        }   // for z
+    }   // for y
 
-                    hull->addPoint(p*orig_factor);
-                    hull->addPoint(p*bevel_factor);
-                }   // for z
-            }   // for y
-        }   // for x
-
-        // This especially enables proper drawing of the point cloud
-        hull->initializePolyhedralFeatures();
-        shape = hull;
-    }   // bevel.getX()!=0
-    else
-    {
-        shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                         0.5f*kart_height,
-                                         0.5f*kart_length));
-    }
+    // This especially enables proper drawing of the point cloud
+    hull->initializePolyhedralFeatures();
+    shape = hull;
 
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
@@ -672,7 +673,7 @@ void Kart::createPhysics()
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
-                            m_kart_model->getWheelPhysicsPosition(i),
+                            wheel_pos[i],
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();

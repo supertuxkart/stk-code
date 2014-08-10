@@ -150,6 +150,11 @@ private:
      *  collision shape. */
     Vec3  m_bevel_factor;
 
+    /** The position of the physical wheel is a weighted average of the
+     *  two ends of the beveled shape. This determines the weight: 0 = 
+     *  a the widest end, 1 = at the narrowest front end. */
+    float m_physical_wheel_position;
+
     /** Time a kart is moved upwards after when it is rescued. */
     float m_rescue_time;
 
@@ -908,6 +913,14 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the bevel factor (!=0 indicates to use a bevelled box). */
     const Vec3 &getBevelFactor() const { return m_bevel_factor; }
+    // ------------------------------------------------------------------------
+    /** Returns position of the physical wheel is a weighted average of the
+     *  two ends of the beveled shape. This determines the weight: 0 = 
+     *  a the widest end, 1 = at the narrowest, front end. */
+    const float getPhysicalWheelPosition() const 
+    {
+        return m_physical_wheel_position; 
+    }   // getPhysicalWheelPosition
 };   // KartProperties
 
 #endif
