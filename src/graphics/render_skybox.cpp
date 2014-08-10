@@ -378,6 +378,14 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
     }
 }
 
+static void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i, unsigned old_j, unsigned new_i, unsigned new_j)
+{
+    new_img[4 * (stride * new_i + new_j)] = old_img[4 * (stride * old_i + old_j)];
+    new_img[4 * (stride * new_i + new_j) + 1] = old_img[4 * (stride * old_i + old_j) + 1];
+    new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
+    new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
+}
+
 /** Generate an opengl cubemap texture from 6 2d textures.
 Out of legacy the sequence of textures maps to :
 - 1st texture maps to GL_TEXTURE_CUBE_MAP_POSITIVE_Y
@@ -420,6 +428,19 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
 
         image->copyToScaling(rgba[i], w, h);
         image->drop();
+
+        if (i == 2 || i == 3)
+        {
+            char *tmp = new char[w * h * 4];
+            memcpy(tmp, rgba[i], w * h * 4);
+            for (unsigned x = 0; x < w; x++)
+            {
+                for (unsigned y = 0; y < h; y++)
+                {
+                    swapPixels(tmp, rgba[i], h, x, y, (w - y - 1), x);
+                }
+            }
+        }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
         if (UserConfigParams::m_texture_compression)
