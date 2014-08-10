@@ -551,15 +551,13 @@ public:
     ToneMapShader();
 };
 
-class DepthOfFieldShader
+class DepthOfFieldShader : public ShaderHelperSingleton<DepthOfFieldShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_depth;
-    static GLuint vao;
+    GLuint TU_tex, TU_depth;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex, unsigned TU_depth);
+    DepthOfFieldShader();
 };
 
 class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>

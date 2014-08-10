@@ -375,7 +375,6 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
-    FullScreenShader::DepthOfFieldShader::init();
     FullScreenShader::FogShader::init();
     FullScreenShader::Gaussian17TapHShader::init();
     FullScreenShader::ComputeGaussian17TapHShader::init();
@@ -1620,27 +1619,18 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint DepthOfFieldShader::Program;
-    GLuint DepthOfFieldShader::uniform_tex;
-    GLuint DepthOfFieldShader::uniform_depth;
-    GLuint DepthOfFieldShader::vao;
-
-    void DepthOfFieldShader::init()
+    DepthOfFieldShader::DepthOfFieldShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/dof.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_depth = glGetUniformLocation(Program, "dtex");
+        TU_tex = 0;
+        TU_depth = 1;
+        AssignUniforms();
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "dtex"));
         vao = createFullScreenVAO(Program);
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-    }
-
-    void DepthOfFieldShader::setUniforms(unsigned TU_tex, unsigned TU_dtex)
-    {
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1i(uniform_depth, TU_dtex);
     }
 
     SunLightShader::SunLightShader()

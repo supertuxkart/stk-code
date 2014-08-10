@@ -644,11 +644,11 @@ static void toneMap(FrameBuffer &fbo, GLuint rtt)
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
 {
     fbo.Bind();
-    glUseProgram(FullScreenShader::DepthOfFieldShader::Program);
-    glBindVertexArray(FullScreenShader::DepthOfFieldShader::vao);
-    setTexture(0, rtt, GL_LINEAR, GL_LINEAR);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::DepthOfFieldShader::setUniforms(0, 1);
+    glUseProgram(FullScreenShader::DepthOfFieldShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::DepthOfFieldShader::getInstance()->vao);
+    setTexture(FullScreenShader::DepthOfFieldShader::getInstance()->TU_tex, rtt, GL_LINEAR, GL_LINEAR);
+    setTexture(FullScreenShader::DepthOfFieldShader::getInstance()->TU_depth, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::DepthOfFieldShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
