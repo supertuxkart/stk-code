@@ -119,6 +119,27 @@ void STKInstancedSceneNode::addInstance(const core::vector3df &origin, const cor
     instance_pos.push_back(scale.Z);
 }
 
+core::matrix4 STKInstancedSceneNode::getInstanceTransform(int id)
+{
+    core::matrix4 mat;
+
+    int offset = id * 9;
+    mat.setTranslation(core::vector3df(
+        instance_pos[offset],
+        instance_pos[offset + 1],
+        instance_pos[offset + 2]));
+    mat.setRotationDegrees(core::vector3df(
+        instance_pos[offset + 3],
+        instance_pos[offset + 4],
+        instance_pos[offset + 5]));
+    mat.setScale(core::vector3df(
+        instance_pos[offset + 6],
+        instance_pos[offset + 7],
+        instance_pos[offset + 8]));
+
+    return mat;
+}
+
 static void drawFSPMDefault(GLMesh &mesh, size_t instance_count)
 {
   irr_driver->IncreaseObjectCount();

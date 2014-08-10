@@ -2,15 +2,14 @@
 // and improvements here http://graphics.cs.williams.edu/papers/SAOHPG12/
 
 uniform sampler2D dtex;
-uniform vec4 samplePoints[16];
+uniform float radius = 1.;
+uniform float k = 1.5;
+uniform float sigma = 1.;
 out float AO;
 
-const float sigma = 1.;
 const float tau = 7.;
 const float beta = 0.002;
 const float epsilon = .00001;
-const float radius = 1.;
-const float k = 1.5;
 
 #define SAMPLES 16
 
