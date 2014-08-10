@@ -32,7 +32,7 @@ using namespace GUIEngine;
 
 // ------------------------------------------------------------------------------------------------------
 
-DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_CENTER)
+DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.25f, MODAL_DIALOG_LOCATION_BOTTOM)
 {
     m_fade_background = false;
 
