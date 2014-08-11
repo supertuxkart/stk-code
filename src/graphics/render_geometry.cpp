@@ -31,6 +31,7 @@
 #include "utils/tuple.hpp"
 
 #include <algorithm>
+#include <functional>
 
 namespace RenderGeometry
 {
@@ -529,6 +530,11 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
     }
 }
 
+template<typename T, typename... Args>
+std::function<void(Args...)> getLambda()
+{
+    return [](Args...args) {draw<T>(T::getInstance(), args...); };
+}
 
 template<int N>
 struct rsm_unroll_args_impl;
@@ -539,7 +545,8 @@ struct rsm_unroll_args_impl<0>
     template<typename T, typename ...Args>
     static void exec(const core::matrix4 &rsm_matrix, const GLMesh *mesh, const STK::Tuple<Args...> &t, Args... args)
     {
-        draw<T>(T::getInstance(), mesh, rsm_matrix, args...);
+        auto draw_func = getLambda<T, const GLMesh*, core::matrix4, Args...>();
+        draw_func(mesh, rsm_matrix, args...);
     }
 };
 
