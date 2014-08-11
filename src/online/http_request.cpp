@@ -99,18 +99,30 @@ namespace Online
 
     // ------------------------------------------------------------------------
     /** A handy shortcut that appends the given path to the URL of the
-     *  mutiplayer server.
+     *  mutiplayer server. It also supports the old (version 1) api,
+     *  where a 'action' parameter was sent to 'client-user.php'.
      *  \param path The path to add to the server.(see API::USER_*)
      *  \param action The action to perform. eg: connect, pool
      */
-    void HTTPRequest::setApiURL(const std::string& path, const std::string &action)
+    void HTTPRequest::setApiURL(const std::string& path, 
+                                const std::string &action)
     {
-        setURL(
-            (std::string)UserConfigParams::m_server_multiplayer +
-            API::VERSION + "/" + // eg: v1, v2, etc
-            path +               // eg: user/, server/
-            action + "/"         // eg: connect/, pool/, get-server-list/
-        );
+        // Old (0.8.1) API: send to client-user.php, and add action as a parameter
+        if(UserConfigParams::m_server_version==1)
+        {
+            setURL( (std::string)UserConfigParams::m_server_multiplayer + 
+                    "client-user.php"                                      );
+            addParameter("action", action);
+        }
+        else
+        {
+            setURL(
+                   (std::string)UserConfigParams::m_server_multiplayer +
+                   API::VERSION + "/" + // eg: v1, v2, etc
+                   path +               // eg: user/, server/
+                   action + "/"         // eg: connect/, pool/, get-server-list/
+                   );
+        }
     }   // setServerURL
 
     // ------------------------------------------------------------------------
