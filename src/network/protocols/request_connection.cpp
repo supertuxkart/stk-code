@@ -72,9 +72,9 @@ void RequestConnection::asynchronousUpdate()
         case NONE:
         {
             m_request = new ServerJoinRequest();
-            PlayerManager::setUserDetails(m_request, "request-connection",
-                                          "address-management.php");
-            m_request->addParameter("server_id",m_server_id);
+            PlayerManager::setUserDetails(m_request, "request-connection", Online::API::SERVER_PATH);
+
+            m_request->addParameter("server_id", m_server_id);
             m_request->queue();
             m_state = REQUEST_PENDING;
             break;
@@ -83,6 +83,7 @@ void RequestConnection::asynchronousUpdate()
         {
             if (!m_request->isDone())
                 return;
+
             const XMLNode * result = m_request->getXMLData();
             std::string rec_success;
 

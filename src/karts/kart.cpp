@@ -343,6 +343,7 @@ void Kart::reset()
     m_has_started          = false;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
+    m_brake_time           = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
     m_current_lean         = 0.0f;
@@ -1098,7 +1099,7 @@ void Kart::update(float dt)
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
-    // straight after jumping, but still allowing some "boat shake" (roll and pitch).
+    // straight after jumping, but still allowing some "boat shake" (roIll and pitch).
     // Otherwise many non perfect jumps end in a total roll over or a serious change of
     // direction, sometimes 90 or even full U turn (real but less fun for a karting game).
     // As side effect steering becames a bit less responsive (any wheel on air), but not too bad.
@@ -2023,30 +2024,6 @@ void Kart::updatePhysics(float dt)
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
 
-    // If the kart is flying, keep its up-axis aligned to gravity (which in
-    // turn typically means the kart is parallel to the ground). This avoids
-    // that the kart rotates in mid-air and lands on its side.
-    if(m_vehicle->getNumWheelsOnGround()==0)
-    {
-        btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
-        btVector3 terrain_up = m_body->getGravity();
-        float g = World::getWorld()->getTrack()->getGravity();
-        // Normalize the gravity, g is the length of the vector
-        btVector3 new_up = 0.9f * kart_up + 0.1f * terrain_up/-g;
-        // Get the rotation (hpr) based on current heading.
-        Vec3 rotation(getHeading(), new_up);
-        btMatrix3x3 m;
-        m.setEulerZYX(rotation.getX(), rotation.getY(), rotation.getZ());
-        // We can't use getXYZ() for the position here, since the position is
-        // based on interpolation, while the actual center-of-mass-transform
-        // is based on the actual value every 1/60 of a second (using getXYZ()
-        // would result in the kart being pushed ahead a bit, making it jump
-        // much further, depending on fps)
-        btTransform new_trans(m, m_body->getCenterOfMassTransform().getOrigin());
-        //setTrans(new_trans);
-        m_body->setCenterOfMassTransform(new_trans);
-    }
-
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
     // is larger than the maximum suspension travel (per frame), since then
@@ -2174,6 +2151,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         if(m_vehicle->getWheelInfo(0).m_brake &&
             !World::getWorld()->isStartPhase())
             m_vehicle->setAllBrakes(0);
+        m_brake_time = 0;
     }
     else
     {   // not accelerating
@@ -2183,9 +2161,11 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             if(m_speed > 0.0f)
             {   // Still going forward while braking
                 applyEngineForce(0.f);
-
-                //apply the brakes
-                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor());
+                m_brake_time += dt;
+                // Apply the brakes - include the time dependent brake increase
+                float f = 1 + m_brake_time
+                            * getKartProperties()->getBrakeTimeIncrease();
+                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor()*f);
             }
             else   // m_speed < 0
             {
@@ -2209,6 +2189,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         }
         else   // !m_brake
         {
+            m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
             assert(!isnan(m_controls.m_accel));
             assert(!isnan(engine_power));
@@ -2551,6 +2532,8 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     center_shift = getTrans().getBasis() * center_shift;
 
     float heading = m_skidding->getVisualSkidRotation();
+    center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() + lean_height, 0);
+    center_shift = getTrans().getBasis() * center_shift;
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
 

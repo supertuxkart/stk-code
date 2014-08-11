@@ -136,12 +136,12 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
-        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
-        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
-        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
-        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
-        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
-        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::getInstance()->Program);
+        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::getInstance()->vao);
+        setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_ctex, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+        setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_ntex, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+        setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_dtex, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+        FullScreenShader::RadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
     }
 

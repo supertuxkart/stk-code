@@ -24,15 +24,12 @@
 #ifdef WIN32
 #  include <winsock2.h>
 #endif
-
 #include <curl/curl.h>
 
 #include <assert.h>
 
-
 namespace Online
 {
-
     /** Creates a HTTP(S) request that will automatically parse the answer into
      *  a XML structure.
      *  \param manage_memory whether or not the RequestManager should take care of
@@ -61,22 +58,26 @@ namespace Online
     void XMLRequest::afterOperation()
     {
         m_xml_data = file_manager->createXMLTreeFromString(getData());
-        if(hadDownloadError())
+        if (hadDownloadError())
+        {
             Log::error("XMLRequest::afterOperation",
                        "curl_easy_perform() failed: %s",
                        getDownloadErrorMessage());
+        }
+
         m_success = false;
         std::string rec_success;
-        if(m_xml_data->get("success", &rec_success))
+        if (m_xml_data->get("success", &rec_success))
         {
-            m_success = rec_success =="yes";
+            m_success = (rec_success == "yes");
             m_xml_data->get("info", &m_info);
         }
         else
+        {
             m_info = _("Unable to connect to the server. Check your internet "
                        "connection or try again later.");
+        }
         HTTPRequest::afterOperation();
     }   // afterOperation
-
 
 } // namespace Online

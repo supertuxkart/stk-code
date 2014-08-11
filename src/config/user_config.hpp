@@ -694,6 +694,12 @@ namespace UserConfigParams
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
 
+    PARAM_PREFIX IntUserConfigParam        m_server_version
+            PARAM_DEFAULT( IntUserConfigParam(   1,
+                                                 "server-version",
+                                                 &m_online_group,
+                                                    "Version of the server API to use."));
+
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group
             PARAM_DEFAULT( GroupUserConfigParam("AddonAndNews",
