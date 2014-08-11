@@ -139,7 +139,7 @@ void CreateServerScreen::serverCreationRequest()
     {
 
         m_server_creation_request = new ServerCreationRequest();
-        PlayerManager::setUserDetails(m_server_creation_request,"create_server");
+        PlayerManager::setUserDetails(m_server_creation_request, "create", Online::API::SERVER_PATH);
         m_server_creation_request->addParameter("name", name);
         m_server_creation_request->addParameter("max_players", max_players);
         m_server_creation_request->queue();

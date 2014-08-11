@@ -31,7 +31,8 @@
 
 class XMLNode;
 
-namespace Online{
+namespace Online
+{
     /**
       * \ingroup online
       */
@@ -40,54 +41,64 @@ namespace Online{
     public:
 
         /** Set the sort order used in the comparison function. */
-        enum SortOrder { SO_SCORE   = 1,    // Sorted on satisfaction score
-                         SO_NAME    = 2,    // Sorted alphabetically by name
-                         SO_PLAYERS = 4
+        enum SortOrder
+        {
+            SO_SCORE   = 1,    // Sorted on satisfaction score
+            SO_NAME    = 2,    // Sorted alphabetically by name
+            SO_PLAYERS = 4
         };
 
     protected:
-        /** The name to be displayed. */
+        /** The server name to be displayed. */
         irr::core::stringw m_name;
-        std::string m_lower_case_name; //Used for comparison
+        std::string m_lower_case_name; // Used for comparison
 
         uint32_t m_server_id;
         uint32_t m_host_id;
 
+        /** The maximum number of players that the server supports */
         int m_max_players;
 
+        /** The number of players currently on the server */
         int m_current_players;
 
+        /** The score/rating given */
         float m_satisfaction_score;
 
         /** The sort order to be used in the comparison. */
         static SortOrder m_sort_order;
 
-        Server() {};
+        Server() {}
 
     public:
 
          /** Initialises the object from an XML node. */
          Server(const XMLNode & xml);
-        // ------------------------------------------------------------------------
+
+         // ------------------------------------------------------------------------
         /** Sets the sort order used in the comparison function. It is static, so
          *  that each instance can access the sort order. */
         static void setSortOrder(SortOrder so) { m_sort_order = so; }
+
         // ------------------------------------------------------------------------
         /** Returns the name of the server. */
         const irr::core::stringw& getName() const { return m_name; }
         const std::string & getLowerCaseName() const { return m_lower_case_name; }
+
         // ------------------------------------------------------------------------
         const float getScore() const { return m_satisfaction_score; }
+
         // ------------------------------------------------------------------------
         /** Returns the ID of this server. */
         const uint32_t getServerId() const { return m_server_id; }
         const uint32_t getHostId() const { return m_host_id; }
         const int getMaxPlayers() const { return m_max_players; }
         const int getCurrentPlayers() const { return m_current_players; }
+
         // ------------------------------------------------------------------------
         bool filterByWords(const irr::core::stringw words) const;
-        // ------------------------------------------------------------------------
 
+        // ------------------------------------------------------------------------
         /** Compares two servers according to the sort order currently defined.
          *  \param a The addon to compare this addon to.
          */
@@ -106,10 +117,10 @@ namespace Online{
                     return m_current_players < server.getCurrentPlayers();
                     break;
             }   // switch
+
             return true;
         }   // operator<
 
     };   // Server
 } // namespace Online
-
-#endif
+#endif // HEADER_SERVER_HPP
