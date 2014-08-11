@@ -41,6 +41,7 @@
 #include "items/item_manager.hpp"
 #include "modes/world.hpp"
 #include "physics/physics.hpp"
+#include "physics/triangle_mesh.hpp"
 #include "tracks/track.hpp"
 #include "utils/constants.hpp"
 #include "utils/helpers.hpp"
@@ -318,6 +319,13 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     renderSolidSecondPass();
     PROFILER_POP_CPU_MARKER();
 
+    if (getNormals())
+    {
+        m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
+        renderNormalsVisualisation();
+        m_rtts->getFBO(FBO_COLORS).Bind();
+    }
+
     if (UserConfigParams::m_dynamic_lights && World::getWorld() != NULL &&
         World::getWorld()->isFogEnabled())
     {
@@ -594,8 +602,12 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
 
     if (World::getWorld() && World::getWorld()->getTrack())
     {
-        const Vec3 *vmin, *vmax;
-        World::getWorld()->getTrack()->getAABB(&vmin, &vmax);
+        btVector3 btmin, btmax;
+        if (World::getWorld()->getTrack()->getPtrTriangleMesh())
+        {
+            World::getWorld()->getTrack()->getTriangleMesh().getCollisionShape().getAabb(btTransform::getIdentity(), btmin, btmax);
+        }
+        const Vec3 vmin = btmin , vmax = btmax;
 
         // Build the 3 ortho projection (for the 3 shadow resolution levels)
         for (unsigned i = 0; i < 4; i++)
@@ -633,7 +645,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
             memcpy(m_shadows_cam[i], tmp, 24 * sizeof(float));
             const core::aabbox3df smallcambox = camnode->
                 getViewFrustum()->getBoundingBox();
-            core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+            core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
                 core::vector3df(0, 30, 0));
 
             // Set up a nice ortho projection that contains our camera frustum
@@ -670,7 +682,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         }
 
         {
-            core::aabbox3df trackbox(vmin->toIrrVector(), vmax->toIrrVector() -
+            core::aabbox3df trackbox(vmin.toIrrVector(), vmax.toIrrVector() -
                 core::vector3df(0, 30, 0));
             if (trackbox.MinEdge.X != trackbox.MaxEdge.X &&
                 trackbox.MinEdge.Y != trackbox.MaxEdge.Y &&

@@ -332,6 +332,41 @@ void IrrDriver::renderSolidSecondPass()
     }
 }
 
+template<enum E_VERTEX_TYPE VertexType, typename... TupleType>
+static void renderMeshNormals(std::vector<STK::Tuple<TupleType...> > &meshes)
+{
+    glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
+    glBindVertexArray(getVAO(VertexType));
+    for (unsigned i = 0; i < meshes.size(); i++)
+    {
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes[i]));
+
+        if (mesh.VAOType != VertexType)
+        {
+#ifdef DEBUG
+            Log::error("Materials", "Wrong vertex Type associed to pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
+#endif
+            continue;
+        }
+        draw(MeshShader::NormalVisualizer::getInstance(), STK::tuple_get<0>(meshes[i]), STK::tuple_get<1>(meshes[i]), STK::tuple_get<2>(meshes[i]), video::SColor(255, 0, 255, 0));
+    }
+}
+
+void IrrDriver::renderNormalsVisualisation()
+{
+    renderMeshNormals<video::EVT_STANDARD>(ListMatDefault::Arguments);
+    renderMeshNormals<video::EVT_STANDARD>(ListMatAlphaRef::Arguments);
+    renderMeshNormals<video::EVT_STANDARD>(ListMatSphereMap::Arguments);
+//    renderMeshNormals<video::EVT_STANDARD>(ListMatGrass::Arguments);
+    renderMeshNormals<video::EVT_2TCOORDS>(ListMatDetails::Arguments);
+    renderMeshNormals<video::EVT_STANDARD>(ListMatUnlit::Arguments);
+    renderMeshNormals<video::EVT_2TCOORDS>(ListMatSplatting::Arguments);
+    renderMeshNormals<video::EVT_TANGENTS>(ListMatNormalMap::Arguments);
+
+}
+
+
+
 static video::ITexture *displaceTex = 0;
 
 void IrrDriver::renderTransparent()

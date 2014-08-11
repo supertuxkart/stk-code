@@ -51,6 +51,7 @@ public:
 
 void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
 void glUniform3fWraper(GLuint, float, float, float);
+void glUniform4iWraper(GLuint, int, int, int, int);
 void glUniform2fWraper(GLuint a, float b, float c);
 void glUniform1fWrapper(GLuint, float);
 bool needsUBO();
@@ -76,6 +77,13 @@ struct UniformHelper
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf &col, Args... arg)
     {
         glUniform3fWraper(uniforms[N], col.r, col.g, col.b);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColor &col, Args... arg)
+    {
+        glUniform4iWraper(uniforms[N], col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
@@ -407,6 +415,12 @@ public:
     static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &screen, unsigned TU_tex);
 };
 
+class NormalVisualizer : public ShaderHelperSingleton<NormalVisualizer, core::matrix4, core::matrix4, video::SColor>
+{
+public:
+    NormalVisualizer();
+};
+
 class ViewFrustrumShader
 {
 public:
@@ -537,15 +551,13 @@ public:
     ToneMapShader();
 };
 
-class DepthOfFieldShader
+class DepthOfFieldShader : public ShaderHelperSingleton<DepthOfFieldShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_depth;
-    static GLuint vao;
+    GLuint TU_tex, TU_depth;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex, unsigned TU_depth);
+    DepthOfFieldShader();
 };
 
 class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>
@@ -729,16 +741,13 @@ public:
     static void init();
 };
 
-class SSAOShader
+class SSAOShader : public ShaderHelperSingleton<SSAOShader, float, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_noise_texture, uniform_samplePoints;
-    static GLuint vao;
-    static float SSAOSamples[64];
-    
-    static void init();
-    static void setUniforms(const core::vector2df &screen, unsigned TU_dtex, unsigned TU_noise);
+    GLuint TU_dtex;
+    GLuint vao;
+
+    SSAOShader();
 };
 
 class FogShader

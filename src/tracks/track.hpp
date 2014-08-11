@@ -548,6 +548,7 @@ public:
     float  getCameraFar() const { return m_camera_far; }
     // ------------------------------------------------------------------------
     /** Returns the triangle mesh for this track. */
+    const TriangleMesh *getPtrTriangleMesh() const { return m_track_mesh; }
     const TriangleMesh& getTriangleMesh() const {return *m_track_mesh; }
     // ------------------------------------------------------------------------
     /** Returns the graphical effect mesh for this track. */

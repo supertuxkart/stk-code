@@ -213,8 +213,6 @@ private:
     Shaders              *m_shaders;
     /** Wind. */
     Wind                 *m_wind;
-    float                m_exposure;
-    float                m_lwhite;
     /** RTTs. */
     RTT                *m_rtts;
     std::vector<core::matrix4> sun_ortho_matrix;
@@ -291,25 +289,7 @@ public:
         return hasVSLayer;
     }
 
-    float getExposure() const
-    {
-        return m_exposure;
-    }
-
-    void setExposure(float v)
-    {
-        m_exposure = v;
-    }
-
-    float getLwhite() const
-    {
-      return m_lwhite;
-    }
-
-    void setLwhite(float v)
-    {
-        m_lwhite = v;
-    }
+    video::SColorf getAmbientLight() const;
 
     struct GlowData {
         scene::ISceneNode * node;
@@ -364,6 +344,10 @@ private:
 
     STKRenderingPass m_phase;
 
+    float m_ssao_radius;
+    float m_ssao_k;
+    float m_ssao_sigma;
+
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
@@ -378,6 +362,7 @@ private:
     void renderGLSL(float dt);
     void renderSolidFirstPass();
     void renderSolidSecondPass();
+    void renderNormalsVisualisation();
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
@@ -411,7 +396,7 @@ public:
                                     const std::string& mask_path);
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
-    void                  setAmbientLight(const video::SColor &light);
+    void                  setAmbientLight(const video::SColorf &light);
     std::string           generateSmallerTextures(const std::string& dir);
     std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
@@ -698,6 +683,36 @@ public:
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
     const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
+    // ------------------------------------------------------------------------
+    float getSSAORadius() const
+    {
+        return m_ssao_radius;
+    }
+
+    void setSSAORadius(float v)
+    {
+        m_ssao_radius = v;
+    }
+
+    float getSSAOK() const
+    {
+        return m_ssao_k;
+    }
+
+    void setSSAOK(float v)
+    {
+        m_ssao_k = v;
+    }
+
+    float getSSAOSigma() const
+    {
+        return m_ssao_sigma;
+    }
+
+    void setSSAOSigma(float v)
+    {
+        m_ssao_sigma = v;
+    }
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }
