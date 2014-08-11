@@ -243,29 +243,29 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     core::matrix4 InvRHMatrix;
     RHMatrix.getInverse(InvRHMatrix);
     glDisable(GL_DEPTH_TEST);
-    glUseProgram(FullScreenShader::GlobalIlluminationReconstructionShader::Program);
-    glBindVertexArray(FullScreenShader::GlobalIlluminationReconstructionShader::vao);
-    glActiveTexture(GL_TEXTURE0);
+    glUseProgram(FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->vao);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->TU_SHR);
     glBindTexture(GL_TEXTURE_3D, shr);
     {
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->TU_SHG);
     glBindTexture(GL_TEXTURE_3D, shg);
     {
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->TU_SHB);
     glBindTexture(GL_TEXTURE_3D, shb);
     {
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     }
-    setTexture(3, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-    setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::GlobalIlluminationReconstructionShader::setUniforms(RHMatrix, InvRHMatrix, rh_extend, 3, 4, 0, 1, 2);
+    setTexture(FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->TU_ntex, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    setTexture(FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->setUniforms(RHMatrix, InvRHMatrix, rh_extend);
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
 
@@ -515,10 +515,10 @@ void PostProcessing::renderSSAO()
 
     // Generate linear depth buffer
     irr_driver->getFBO(FBO_LINEAR_DEPTH).Bind();
-    glUseProgram(FullScreenShader::LinearizeDepthShader::Program);
-    glBindVertexArray(FullScreenShader::LinearizeDepthShader::vao);
-    setTexture(0, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
-    FullScreenShader::LinearizeDepthShader::setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue(), 0);
+    glUseProgram(FullScreenShader::LinearizeDepthShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::LinearizeDepthShader::getInstance()->vao);
+    setTexture(FullScreenShader::LinearizeDepthShader::getInstance()->TU_tex, irr_driver->getDepthStencilTexture(), GL_LINEAR, GL_LINEAR);
+    FullScreenShader::LinearizeDepthShader::getInstance()->setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue());
     glDrawArrays(GL_TRIANGLES, 0, 3);
     irr_driver->getFBO(FBO_SSAO).Bind();
 
@@ -557,11 +557,11 @@ void PostProcessing::renderFog()
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    glUseProgram(FullScreenShader::FogShader::Program);
-    glBindVertexArray(FullScreenShader::FogShader::vao);
+    glUseProgram(FullScreenShader::FogShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::FogShader::getInstance()->vao);
 
-    setTexture(0, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::FogShader::setUniforms(fogmax, startH, endH, start, end, col, 0);
+    setTexture(FullScreenShader::FogShader::getInstance()->TU_tex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::FogShader::getInstance()->setUniforms(fogmax, startH, endH, start, end, col);
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);

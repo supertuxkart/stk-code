@@ -589,15 +589,13 @@ public:
     ShadowedSunLightShader();
 };
 
-class RadianceHintsConstructionShader
+class RadianceHintsConstructionShader : public ShaderHelperSingleton<RadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ctex, uniform_ntex, uniform_dtex, uniform_extents, uniform_RHMatrix, uniform_RSMMatrix;
-    static GLuint vao;
+    GLuint TU_ctex, TU_ntex, TU_dtex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &RSMMatrix, const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_ctex, unsigned TU_ntex, unsigned TU_dtex);
+    RadianceHintsConstructionShader();
 };
 
 class RHDebug
@@ -610,15 +608,13 @@ public:
     static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
 };
 
-class GlobalIlluminationReconstructionShader
+class GlobalIlluminationReconstructionShader : public ShaderHelperSingleton<GlobalIlluminationReconstructionShader, core::matrix4, core::matrix4, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_dtex, uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix, uniform_InvRHMatrix;
+    static GLuint TU_ntex, TU_dtex, TU_SHR, TU_SHG, TU_SHB, uniform_RHMatrix;
     static GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &RHMatrix, const core::matrix4 &InvRHMatrix, const core::vector3df &extents, unsigned TU_ntex, unsigned TU_dtex, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
+    GlobalIlluminationReconstructionShader();
 };
 
 class Gaussian17TapHShader
@@ -720,15 +716,13 @@ public:
     static void init();
 };
 
-class LinearizeDepthShader
+class LinearizeDepthShader : public ShaderHelperSingleton<LinearizeDepthShader, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_zn, uniform_zf, uniform_texture;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(float zn, float zf, unsigned TU_tex);
+    LinearizeDepthShader();
 };
 
 class GlowShader
@@ -750,15 +744,13 @@ public:
     SSAOShader();
 };
 
-class FogShader
+class FogShader : public ShaderHelperSingleton<FogShader, float, float, float, float, float, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_fogmax, uniform_startH, uniform_endH, uniform_start, uniform_end, uniform_col;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(float fogmax, float startH, float endH, float start, float end, const core::vector3df &col, unsigned TU_ntex);
+    FogShader();
 };
 
 class MotionBlurShader
