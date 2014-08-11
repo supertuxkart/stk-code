@@ -1715,7 +1715,7 @@ namespace FullScreenShader
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
         }
 
-        AssignUniforms("extents", "RHMatrix", "RSMMatrix");
+        AssignUniforms("RSMMatrix", "RHMatrix", "extents");
         TU_ctex = 0;
         TU_ntex = 1;
         TU_dtex = 2;
@@ -1926,7 +1926,7 @@ namespace FullScreenShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/linearizedepth.frag").c_str());
-        AssignUniforms("zf", "zn");
+        AssignUniforms("zn", "zf");
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "texture"));
         vao = createFullScreenVAO(Program);
