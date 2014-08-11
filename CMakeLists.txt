@@ -161,6 +161,7 @@ else()
     # compile flags can be simplye be added
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         add_definitions(-DDEBUG)
+        add_definitions("-fsanitize=address")
     else()
         add_definitions(-DNDEBUG)
     endif()
