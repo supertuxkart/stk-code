@@ -37,7 +37,6 @@ namespace Online
     class API
     {
     public:
-        static const std::string VERSION;
         static const std::string USER_PATH;
         static const std::string SERVER_PATH;
     };

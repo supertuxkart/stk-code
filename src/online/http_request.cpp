@@ -30,7 +30,6 @@
 
 namespace Online
 {
-    const std::string API::VERSION = "v2";
     const std::string API::USER_PATH = "user/";
     const std::string API::SERVER_PATH = "server/";
 
@@ -112,14 +111,19 @@ namespace Online
         {
             setURL( (std::string)UserConfigParams::m_server_multiplayer + 
                     "client-user.php"                                      );
-            addParameter("action", action);
+            if(action=="change-password")
+                addParameter("action", "change_password");
+            else if(action=="recover")
+                addParameter("action", "recovery");
+            else
+                addParameter("action", action);
         }
         else
         {
             setURL(
                    (std::string)UserConfigParams::m_server_multiplayer +
-                   API::VERSION + "/" + // eg: v1, v2, etc
-                   path +               // eg: user/, server/
+                   +"v"+StringUtils::toString(UserConfigParams::m_server_version)
+                   + "/" + path +               // eg: /user/, /server/
                    action + "/"         // eg: connect/, pool/, get-server-list/
                    );
         }
