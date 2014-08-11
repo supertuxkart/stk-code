@@ -611,8 +611,8 @@ public:
 class GlobalIlluminationReconstructionShader : public ShaderHelperSingleton<GlobalIlluminationReconstructionShader, core::matrix4, core::matrix4, core::vector3df>
 {
 public:
-    static GLuint TU_ntex, TU_dtex, TU_SHR, TU_SHG, TU_SHB, uniform_RHMatrix;
-    static GLuint vao;
+    GLuint TU_ntex, TU_dtex, TU_SHR, TU_SHG, TU_SHB, uniform_RHMatrix;
+    GLuint vao;
 
     GlobalIlluminationReconstructionShader();
 };
