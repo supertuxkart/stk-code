@@ -27,14 +27,14 @@ script:
   # First a debug build: 
   - mkdir build-debug
   - cd build-debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off -CMAKE_CXX_COMPILER=/usr/bin/g++-4.8 -CMAKE_C_COMPILER=/usr/bin/gcc-4.8
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off -DCMAKE_CXX_COMPILER=/usr/bin/g++-4.8 -DCMAKE_C_COMPILER=/usr/bin/gcc-4.8
   - make VERBOSE=1 -j 4 
 
   # Then a release build: 
   - cd ..
   - mkdir build-release
   - cd build-release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off  -CMAKE_CXX_COMPILER=/usr/bin/g++-4.8 -CMAKE_C_COMPILER=/usr/bin/gcc-4.8
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off  -DCMAKE_CXX_COMPILER=/usr/bin/g++-4.8 -DCMAKE_C_COMPILER=/usr/bin/gcc-4.8
   - make VERBOSE=1 -j 4 
 
 notifications:
