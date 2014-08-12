@@ -14,27 +14,25 @@ before_install:
   # Update repos
   - sudo apt-get update -qq
   # Install dependencies
-  - sudo apt-get install build-essential cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
+  - sudo apt-get install cmake libogg-dev libvorbis-dev libopenal-dev libxxf86vm-dev libcurl4-openssl-dev libfribidi-dev libbluetooth-dev
   # Install mesa from an other repo (a newer version is required). Quantal is not supported anymore, saucy is only supported till July 2014,
   # so we try to use trusty (precise which is what traiv uses a too old mesa version which doesn't link)
   - sudo apt-add-repository "deb http://archive.ubuntu.com/ubuntu trusty main restricted"
   - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 3B4FE6ACC0B21F32
-  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get update -qq
-  - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev
-  - sudo apt-get -qq install g++-4.8
+  - sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev build-essential
 script:
   # First a debug build: 
   - mkdir build-debug
   - cd build-debug
-  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off -CMAKE_CXX_COMPILER=/usr/bin/g++-4.8 -CMAKE_C_COMPILER=/usr/bin/gcc-4.8
+  - cmake .. -DCMAKE_BUILD_TYPE=Debug -DCHECK_ASSETS=off
   - make VERBOSE=1 -j 4 
 
   # Then a release build: 
   - cd ..
   - mkdir build-release
   - cd build-release
-  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off  -CMAKE_CXX_COMPILER=/usr/bin/g++-4.8 -CMAKE_C_COMPILER=/usr/bin/gcc-4.8
+  - cmake .. -DCMAKE_BUILD_TYPE=Release -DCHECK_ASSETS=off
   - make VERBOSE=1 -j 4 
 
 notifications:
