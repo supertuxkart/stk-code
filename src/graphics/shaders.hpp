@@ -616,43 +616,38 @@ public:
     GlobalIlluminationReconstructionShader();
 };
 
-class Gaussian17TapHShader
+class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_depth, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex, TU_depth;
+    GLuint vao;
 
-    static void init();
+    Gaussian17TapHShader();
 };
 
-class ComputeGaussian17TapHShader
+class ComputeGaussian17TapHShader : public ShaderHelperSingleton<ComputeGaussian17TapHShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_source, uniform_depth, uniform_dest;
-
-    static void init();
+    GLuint TU_source, TU_dest, TU_depth;
+    ComputeGaussian17TapHShader();
 };
 
-class Gaussian6HBlurShader
+class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    Gaussian6HBlurShader();
 };
 
-class Gaussian3HBlurShader
+class Gaussian3HBlurShader : public ShaderHelperSingleton<Gaussian3HBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    Gaussian3HBlurShader();
 };
 
 class Gaussian17TapVShader
@@ -752,15 +747,13 @@ public:
     FogShader();
 };
 
-class MotionBlurShader
+class MotionBlurShader : public ShaderHelperSingleton<MotionBlurShader, core::matrix4, core::vector2df, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_boost_amount, uniform_color_buffer, uniform_dtex, uniform_previous_viewproj, uniform_center, uniform_mask_radius;
-    static GLuint vao;
+    GLuint TU_cb, TU_dtex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center,  float mask_radius, unsigned TU_cb, unsigned TU_dtex);
+    MotionBlurShader();
 };
 
 class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>

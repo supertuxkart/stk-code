@@ -375,20 +375,15 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
-    FullScreenShader::Gaussian17TapHShader::init();
-    FullScreenShader::ComputeGaussian17TapHShader::init();
-    FullScreenShader::Gaussian3HBlurShader::init();
     FullScreenShader::Gaussian3VBlurShader::init();
     FullScreenShader::Gaussian17TapVShader::init();
     FullScreenShader::ComputeGaussian17TapVShader::init();
-    FullScreenShader::Gaussian6HBlurShader::init();
     FullScreenShader::Gaussian6VBlurShader::init();
     FullScreenShader::GlowShader::init();
     FullScreenShader::PassThroughShader::init();
     FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::RHDebug::init();
-    FullScreenShader::MotionBlurShader::init();
     FullScreenShader::MLAAColorEdgeDetectionSHader::init();
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
@@ -1771,64 +1766,52 @@ namespace FullScreenShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    GLuint Gaussian17TapHShader::Program;
-    GLuint Gaussian17TapHShader::uniform_tex;
-    GLuint Gaussian17TapHShader::uniform_depth;
-    GLuint Gaussian17TapHShader::uniform_pixel;
-    GLuint Gaussian17TapHShader::vao;
-    void Gaussian17TapHShader::init()
+    Gaussian17TapHShader::Gaussian17TapHShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_pixel = glGetUniformLocation(Program, "pixel");
-        uniform_depth = glGetUniformLocation(Program, "depth");
+        AssignUniforms("pixel");
+        TU_tex = 0;
+        TU_depth = 1;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint ComputeGaussian17TapHShader::Program;
-    GLuint ComputeGaussian17TapHShader::uniform_source;
-    GLuint ComputeGaussian17TapHShader::uniform_depth;
-    GLuint ComputeGaussian17TapHShader::uniform_dest;
-    void ComputeGaussian17TapHShader::init()
+    ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
     {
 #if WIN32
         if (irr_driver->getGLSLVersion() < 420)
             return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralH.comp").c_str());
-        uniform_source = glGetUniformLocation(Program, "source");
-        uniform_depth = glGetUniformLocation(Program, "depth");
-        uniform_dest = glGetUniformLocation(Program, "dest");
+        TU_source = 0;
+        TU_depth = 1;
+        TU_dest = 2;
+        AssignUniforms();
+        AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
 #endif
     }
 
-    GLuint Gaussian6HBlurShader::Program;
-    GLuint Gaussian6HBlurShader::uniform_tex;
-    GLuint Gaussian6HBlurShader::uniform_pixel;
-    GLuint Gaussian6HBlurShader::vao;
-    void Gaussian6HBlurShader::init()
+    Gaussian6HBlurShader::Gaussian6HBlurShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_pixel = glGetUniformLocation(Program, "pixel");
+        AssignUniforms("pixel");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint Gaussian3HBlurShader::Program;
-    GLuint Gaussian3HBlurShader::uniform_tex;
-    GLuint Gaussian3HBlurShader::uniform_pixel;
-    GLuint Gaussian3HBlurShader::vao;
-    void Gaussian3HBlurShader::init()
+    Gaussian3HBlurShader::Gaussian3HBlurShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3h.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_pixel = glGetUniformLocation(Program, "pixel");
+        AssignUniforms("pixel");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createFullScreenVAO(Program);
     }
 
@@ -1973,38 +1956,17 @@ namespace FullScreenShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    GLuint MotionBlurShader::Program;
-    GLuint MotionBlurShader::uniform_boost_amount;
-    GLuint MotionBlurShader::uniform_center;
-    GLuint MotionBlurShader::uniform_color_buffer;
-    GLuint MotionBlurShader::uniform_dtex;
-    GLuint MotionBlurShader::uniform_previous_viewproj;
-    GLuint MotionBlurShader::uniform_mask_radius;
-    GLuint MotionBlurShader::vao;
-
-    void MotionBlurShader::init()
+    MotionBlurShader::MotionBlurShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
-        uniform_boost_amount = glGetUniformLocation(Program, "boost_amount");
-        uniform_center = glGetUniformLocation(Program, "center");
-        uniform_color_buffer = glGetUniformLocation(Program, "color_buffer");
-        uniform_mask_radius = glGetUniformLocation(Program, "mask_radius");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_previous_viewproj = glGetUniformLocation(Program, "previous_viewproj");
+        AssignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
+        TU_cb = 0;
+        TU_dtex = 1;
+        AssignTextureUnit(Program, TexUnit(TU_dtex, "dtex"), TexUnit(TU_cb, "color_buffer"));
         vao = createFullScreenVAO(Program);
-    }
-
-    void MotionBlurShader::setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center, float mask_radius, unsigned TU_cb, unsigned TU_dtex)
-    {
-        glUniformMatrix4fv(uniform_previous_viewproj, 1, GL_FALSE, previousVP.pointer());
-        glUniform1f(uniform_boost_amount, boost_amount);
-        glUniform2f(uniform_center, center.X, center.Y);
-        glUniform1f(uniform_mask_radius, mask_radius);
-        glUniform1i(uniform_color_buffer, TU_cb);
-        glUniform1i(uniform_dtex, TU_dtex);
     }
 
     GodFadeShader::GodFadeShader()
