@@ -650,44 +650,40 @@ public:
     Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader
+class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_depth, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex, TU_depth;
+    GLuint vao;
 
-    static void init();
+    Gaussian17TapVShader();
 };
 
 class ComputeGaussian17TapVShader
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_source, uniform_depth, uniform_dest;
+    GLuint TU_source, TU_depth, TU_dest;
 
-    static void init();
+    ComputeGaussian17TapVShader();
 };
 
 
-class Gaussian6VBlurShader
+class Gaussian6VBlurShader : public ShaderHelperSingleton<Gaussian6VBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    Gaussian6VBlurShader();
 };
 
-class Gaussian3VBlurShader
+class Gaussian3VBlurShader : public ShaderHelperSingleton<Gaussian3VBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    Gaussian3VBlurShader();
 };
 
 class PassThroughShader

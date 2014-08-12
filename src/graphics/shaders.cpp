@@ -375,10 +375,6 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     FullScreenShader::BloomBlendShader::init();
     FullScreenShader::BloomShader::init();
-    FullScreenShader::Gaussian3VBlurShader::init();
-    FullScreenShader::Gaussian17TapVShader::init();
-    FullScreenShader::ComputeGaussian17TapVShader::init();
-    FullScreenShader::Gaussian6VBlurShader::init();
     FullScreenShader::GlowShader::init();
     FullScreenShader::PassThroughShader::init();
     FullScreenShader::LayerPassThroughShader::init();
@@ -1815,64 +1811,51 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint Gaussian17TapVShader::Program;
-    GLuint Gaussian17TapVShader::uniform_tex;
-    GLuint Gaussian17TapVShader::uniform_depth;
-    GLuint Gaussian17TapVShader::uniform_pixel;
-    GLuint Gaussian17TapVShader::vao;
-    void Gaussian17TapVShader::init()
+    Gaussian17TapVShader::Gaussian17TapVShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralV.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_pixel = glGetUniformLocation(Program, "pixel");
-        uniform_depth = glGetUniformLocation(Program, "depth");
+        AssignUniforms("pixel");
+        TU_tex = 0;
+        TU_depth = 1;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint ComputeGaussian17TapVShader::Program;
-    GLuint ComputeGaussian17TapVShader::uniform_source;
-    GLuint ComputeGaussian17TapVShader::uniform_depth;
-    GLuint ComputeGaussian17TapVShader::uniform_dest;
-    void ComputeGaussian17TapVShader::init()
+    ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
     {
 #if WIN32
         if (irr_driver->getGLSLVersion() < 420)
             return;
         Program = LoadProgram(
             GL_COMPUTE_SHADER, file_manager->getAsset("shaders/bilateralV.comp").c_str());
-        uniform_source = glGetUniformLocation(Program, "source");
-        uniform_depth = glGetUniformLocation(Program, "depth");
-        uniform_dest = glGetUniformLocation(Program, "dest");
+        TU_source = 0;
+        TU_depth = 1;
+        TU_dest = 2;
+        AssignTextureUnit(Program, TexUnit(TU_source, "source"), TexUnit(TU_depth, "depth"), TexUnit(TU_dest, "dest"));
 #endif
     }
 
-    GLuint Gaussian6VBlurShader::Program;
-    GLuint Gaussian6VBlurShader::uniform_tex;
-    GLuint Gaussian6VBlurShader::uniform_pixel;
-    GLuint Gaussian6VBlurShader::vao;
-    void Gaussian6VBlurShader::init()
+    Gaussian6VBlurShader::Gaussian6VBlurShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6v.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_pixel = glGetUniformLocation(Program, "pixel");
+        AssignUniforms("pixel");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint Gaussian3VBlurShader::Program;
-    GLuint Gaussian3VBlurShader::uniform_tex;
-    GLuint Gaussian3VBlurShader::uniform_pixel;
-    GLuint Gaussian3VBlurShader::vao;
-    void Gaussian3VBlurShader::init()
+    Gaussian3VBlurShader::Gaussian3VBlurShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3v.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_pixel = glGetUniformLocation(Program, "pixel");
+        AssignUniforms("pixel");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createFullScreenVAO(Program);
     }
 
