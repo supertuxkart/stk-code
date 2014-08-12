@@ -146,7 +146,6 @@ protected:
     }
 
 public:
-    friend class Singleton<class ObjectPass1Shader>;
     GLuint Program;
 
     void setUniforms(const Args & ... args) const
@@ -764,26 +763,22 @@ public:
     static void setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center,  float mask_radius, unsigned TU_cb, unsigned TU_dtex);
 };
 
-class GodFadeShader
+class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_col;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const video::SColor &col, unsigned TU_tex);
+    GodFadeShader();
 };
 
-class GodRayShader
+class GodRayShader : public ShaderHelperSingleton<GodRayShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_sunpos;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
+    GodRayShader();
 };
 
 class MLAAColorEdgeDetectionSHader

@@ -612,20 +612,20 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
 
 static void renderGodFade(GLuint tex, const SColor &col)
 {
-    glUseProgram(FullScreenShader::GodFadeShader::Program);
-    glBindVertexArray(FullScreenShader::GodFadeShader::vao);
-    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
-    FullScreenShader::GodFadeShader::setUniforms(col, 0);
+    glUseProgram(FullScreenShader::GodFadeShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::GodFadeShader::getInstance()->vao);
+    setTexture(FullScreenShader::GodFadeShader::getInstance()->TU_tex, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodFadeShader::getInstance()->setUniforms(col);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 
 static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 {
-    glUseProgram(FullScreenShader::GodRayShader::Program);
-    glBindVertexArray(FullScreenShader::GodRayShader::vao);
-    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
-    FullScreenShader::GodRayShader::setUniforms(sunpos, 0);
+    glUseProgram(FullScreenShader::GodRayShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::GodRayShader::getInstance()->vao);
+    setTexture(FullScreenShader::GodRayShader::getInstance()->TU_tex, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GodRayShader::getInstance()->setUniforms(sunpos);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

@@ -389,8 +389,6 @@ void Shaders::loadShaders()
     FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::RHDebug::init();
     FullScreenShader::MotionBlurShader::init();
-    FullScreenShader::GodFadeShader::init();
-    FullScreenShader::GodRayShader::init();
     FullScreenShader::MLAAColorEdgeDetectionSHader::init();
     FullScreenShader::MLAABlendWeightSHader::init();
     FullScreenShader::MLAAGatherSHader::init();
@@ -2009,46 +2007,26 @@ namespace FullScreenShader
         glUniform1i(uniform_dtex, TU_dtex);
     }
 
-    GLuint GodFadeShader::Program;
-    GLuint GodFadeShader::uniform_tex;
-    GLuint GodFadeShader::uniform_col;
-    GLuint GodFadeShader::vao;
-
-    void GodFadeShader::init()
+    GodFadeShader::GodFadeShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godfade.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_col = glGetUniformLocation(Program, "col");
+        AssignUniforms("col");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createVAO(Program);
     }
 
-    void GodFadeShader::setUniforms(const SColor &col, unsigned TU_tex)
-    {
-        glUniform3f(uniform_col, col.getRed() / 255.f, col.getGreen() / 255.f, col.getBlue() / 255.f);
-        glUniform1i(uniform_tex, TU_tex);
-    }
-
-    GLuint GodRayShader::Program;
-    GLuint GodRayShader::uniform_tex;
-    GLuint GodRayShader::uniform_sunpos;
-    GLuint GodRayShader::vao;
-
-    void GodRayShader::init()
+    GodRayShader::GodRayShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godray.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_sunpos = glGetUniformLocation(Program, "sunpos");
+        TU_tex = 0;
+        AssignUniforms("sunpos");
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createVAO(Program);
-    }
-
-    void GodRayShader::setUniforms(const core::vector2df &sunpos, unsigned TU_tex)
-    {
-        glUniform2f(uniform_sunpos, sunpos.X, sunpos.Y);
-        glUniform1i(uniform_tex, TU_tex);
     }
 
     GLuint MLAAColorEdgeDetectionSHader::Program;
