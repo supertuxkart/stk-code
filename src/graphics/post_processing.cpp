@@ -207,11 +207,11 @@ void PostProcessing::update(float dt)
 static
 void renderBloom(GLuint in)
 {
-    glUseProgram(FullScreenShader::BloomShader::Program);
-    glBindVertexArray(FullScreenShader::BloomShader::vao);
+    glUseProgram(FullScreenShader::BloomShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::BloomShader::getInstance()->vao);
 
-    setTexture(0, in, GL_NEAREST, GL_NEAREST);
-    FullScreenShader::BloomShader::setUniforms(0);
+    setTexture(FullScreenShader::BloomShader::getInstance()->TU_tex, in, GL_NEAREST, GL_NEAREST);
+    FullScreenShader::BloomShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
 }
@@ -814,12 +814,12 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            setTexture(0, irr_driver->getRenderTargetTexture(RTT_BLOOM_128), GL_LINEAR, GL_LINEAR);
-            setTexture(1, irr_driver->getRenderTargetTexture(RTT_BLOOM_256), GL_LINEAR, GL_LINEAR);
-            setTexture(2, irr_driver->getRenderTargetTexture(RTT_BLOOM_512), GL_LINEAR, GL_LINEAR);
-            glUseProgram(FullScreenShader::BloomBlendShader::Program);
-            FullScreenShader::BloomBlendShader::setUniforms(0, 1, 2);
-            glBindVertexArray(FullScreenShader::BloomBlendShader::vao);
+            setTexture(FullScreenShader::BloomBlendShader::getInstance()->TU_tex_128, irr_driver->getRenderTargetTexture(RTT_BLOOM_128), GL_LINEAR, GL_LINEAR);
+            setTexture(FullScreenShader::BloomBlendShader::getInstance()->TU_tex_256, irr_driver->getRenderTargetTexture(RTT_BLOOM_256), GL_LINEAR, GL_LINEAR);
+            setTexture(FullScreenShader::BloomBlendShader::getInstance()->TU_tex_512, irr_driver->getRenderTargetTexture(RTT_BLOOM_512), GL_LINEAR, GL_LINEAR);
+            glUseProgram(FullScreenShader::BloomBlendShader::getInstance()->Program);
+            FullScreenShader::BloomBlendShader::getInstance()->setUniforms();
+            glBindVertexArray(FullScreenShader::BloomBlendShader::getInstance()->vao);
             glDrawArrays(GL_TRIANGLES, 0, 3);
 
             glDisable(GL_BLEND);

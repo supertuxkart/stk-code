@@ -373,8 +373,6 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
-    FullScreenShader::BloomBlendShader::init();
-    FullScreenShader::BloomShader::init();
     FullScreenShader::GlowShader::init();
     FullScreenShader::PassThroughShader::init();
     FullScreenShader::LayerPassThroughShader::init();
@@ -1549,46 +1547,29 @@ static GLuint createVAO(GLuint Program)
 
 namespace FullScreenShader
 {
-    GLuint BloomShader::Program;
-    GLuint BloomShader::uniform_texture;
-    GLuint BloomShader::vao;
-    void BloomShader::init()
+    BloomShader::BloomShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloom.frag").c_str());
-        uniform_texture = glGetUniformLocation(Program, "tex");
+        AssignUniforms();
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createFullScreenVAO(Program);
     }
 
-    void BloomShader::setUniforms(unsigned TU_tex)
-    {
-        glUniform1i(FullScreenShader::BloomShader::uniform_texture, TU_tex);
-    }
-
-    GLuint BloomBlendShader::Program;
-    GLuint BloomBlendShader::uniform_tex_128;
-    GLuint BloomBlendShader::uniform_tex_256;
-    GLuint BloomBlendShader::uniform_tex_512;
-    GLuint BloomBlendShader::vao;
-
-    void BloomBlendShader::init()
+    BloomBlendShader::BloomBlendShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
-        uniform_tex_128 = glGetUniformLocation(Program, "tex_128");
-        uniform_tex_256 = glGetUniformLocation(Program, "tex_256");
-        uniform_tex_512 = glGetUniformLocation(Program, "tex_512");
+        AssignUniforms();
+        TU_tex_128 = 0;
+        TU_tex_256 = 1;
+        TU_tex_512 = 2;
+        AssignTextureUnit(Program, TexUnit(TU_tex_128, "tex_128"), TexUnit(TU_tex_256, "tex_256"), TexUnit(TU_tex_512, "tex_512"));
         vao = createFullScreenVAO(Program);
-    }
-
-    void BloomBlendShader::setUniforms(unsigned TU_tex_128, unsigned TU_tex_256, unsigned TU_tex_512)
-    {
-        glUniform1i(uniform_tex_128, TU_tex_128);
-        glUniform1i(uniform_tex_256, TU_tex_256);
-        glUniform1i(uniform_tex_512, TU_tex_512);
     }
 
     ToneMapShader::ToneMapShader()

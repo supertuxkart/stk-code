@@ -519,26 +519,22 @@ public:
 namespace FullScreenShader
 {
 
-class BloomShader
+class BloomShader : public ShaderHelperSingleton<BloomShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_texture;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    BloomShader();
 };
 
-class BloomBlendShader
+class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex_128, uniform_tex_256, uniform_tex_512;
-    static GLuint vao;
+    GLuint TU_tex_128, TU_tex_256, TU_tex_512;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex_128, unsigned TU_tex_256, unsigned TU_tex_512);
+    BloomBlendShader();
 };
 
 class ToneMapShader : public ShaderHelperSingleton<ToneMapShader>
