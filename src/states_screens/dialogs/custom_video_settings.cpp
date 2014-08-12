@@ -83,7 +83,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel( _("Disabled") );   // 0
     shadows->addLabel( _("low") );        // 1
     shadows->addLabel( _("high") );       // 2
-    if (irr_driver->needUBOWorkaround())
+    if (!irr_driver->needUBOWorkaround())
         shadows->setValue(UserConfigParams::m_shadows);
     else
         shadows->setValue(0);
