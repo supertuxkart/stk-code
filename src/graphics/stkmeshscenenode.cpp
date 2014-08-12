@@ -249,29 +249,29 @@ void STKMeshSceneNode::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterials[MAT_DEFAULT])
-            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_ALPHA_REF])
-            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPHEREMAP])
-            pushVector(ListMatSphereMap::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatSphereMap::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_DETAIL])
-            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         windDir = getWind();
         for_in(mesh, MeshSolidMaterials[MAT_GRASS])
-            pushVector(ListMatGrass::Arguments, mesh, AbsoluteTransformation, invmodel, windDir);
+            pushVector(ListMatGrass::getInstance(), mesh, AbsoluteTransformation, invmodel, windDir);
 
         for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
-            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
+            pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
-            pushVector(ListMatSplatting::Arguments, mesh, AbsoluteTransformation, invmodel);
+            pushVector(ListMatSplatting::getInstance(), mesh, AbsoluteTransformation, invmodel);
 
         for_in(mesh, MeshSolidMaterials[MAT_NORMAL_MAP])
-            pushVector( ListMatNormalMap::Arguments, mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY);
+            pushVector(ListMatNormalMap::getInstance(), mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY);
 
         return;
     }
@@ -411,23 +411,23 @@ void STKMeshSceneNode::render()
                 tmpcol.getBlue() / 255.0f);
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                pushVector(ListBlendTransparentFog::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                pushVector(ListBlendTransparentFog::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                                                 fogmax, startH, endH, start, end, col);
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                pushVector(ListAdditiveTransparentFog::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix,
+                pushVector(ListAdditiveTransparentFog::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                                                    fogmax, startH, endH, start, end, col);
         }
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                pushVector(ListBlendTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListBlendTransparent::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix);
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                pushVector(ListAdditiveTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListAdditiveTransparent::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
 
         for_in(mesh, TransparentMesh[TM_DISPLACEMENT])
-            pushVector(ListDisplacement::Arguments, mesh, AbsoluteTransformation);
+            pushVector(ListDisplacement::getInstance(), mesh, AbsoluteTransformation);
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);

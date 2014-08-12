@@ -142,16 +142,16 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
-            pushVector(ListMatDefault::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
-            pushVector(ListMatAlphaRef::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
-            pushVector(ListMatDetails::Arguments, mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(ListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
-            pushVector(ListMatUnlit::Arguments, mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
+            pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         return;
     }
@@ -181,21 +181,21 @@ void STKAnimatedMesh::render()
                 tmpcol.getBlue() / 255.0f);
 
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                ListBlendTransparentFog::Arguments.push_back(
+                ListBlendTransparentFog::getInstance()->push_back(
                     STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                ListAdditiveTransparentFog::Arguments.push_back(
+                ListAdditiveTransparentFog::getInstance()->push_back(
                 STK::make_tuple(mesh, AbsoluteTransformation, mesh->TextureMatrix,
                                     fogmax, startH, endH, start, end, col));
         }
         else
         {
             for_in(mesh, TransparentMesh[TM_DEFAULT])
-                pushVector(ListBlendTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListBlendTransparent::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix);
 
             for_in(mesh, TransparentMesh[TM_ADDITIVE])
-                pushVector(ListAdditiveTransparent::Arguments, mesh, AbsoluteTransformation, mesh->TextureMatrix);
+                pushVector(ListAdditiveTransparent::getInstance(), mesh, AbsoluteTransformation, mesh->TextureMatrix);
         }
         return;
     }
