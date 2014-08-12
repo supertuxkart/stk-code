@@ -446,15 +446,11 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
 
 void PostProcessing::renderPassThrough(GLuint tex)
 {
+    glUseProgram(FullScreenShader::PassThroughShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::PassThroughShader::getInstance()->vao);
 
-    glUseProgram(FullScreenShader::PassThroughShader::Program);
-    glBindVertexArray(FullScreenShader::PassThroughShader::vao);
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glUniform1i(FullScreenShader::PassThroughShader::uniform_texture, 0);
+    setTexture(FullScreenShader::PassThroughShader::getInstance()->TU_tex, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::PassThroughShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
@@ -476,17 +472,14 @@ void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 
 void PostProcessing::renderGlow(unsigned tex)
 {
+    glUseProgram(FullScreenShader::GlowShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::GlowShader::getInstance()->vao);
 
-    glUseProgram(FullScreenShader::GlowShader::Program);
-    glBindVertexArray(FullScreenShader::GlowShader::vao);
-
-    setTexture(0, tex, GL_LINEAR, GL_LINEAR);
-    glUniform1i(FullScreenShader::GlowShader::uniform_tex, 0);
+    setTexture(FullScreenShader::GlowShader::getInstance()->TU_tex, tex, GL_LINEAR, GL_LINEAR);
+    FullScreenShader::GlowShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
-
-ITexture *noise_tex = 0;
 
 void PostProcessing::renderSSAO()
 {
@@ -502,9 +495,6 @@ void PostProcessing::renderSSAO()
     FullScreenShader::LinearizeDepthShader::getInstance()->setUniforms(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue());
     glDrawArrays(GL_TRIANGLES, 0, 3);
     irr_driver->getFBO(FBO_SSAO).Bind();
-
-    if (!noise_tex)
-        noise_tex = irr_driver->getTexture(file_manager->getAsset("textures/noise.png").c_str());
 
     glUseProgram(FullScreenShader::SSAOShader::getInstance()->Program);
     glBindVertexArray(FullScreenShader::SSAOShader::getInstance()->vao);
@@ -632,13 +622,6 @@ static void renderDoF(FrameBuffer &fbo, GLuint rtt)
     FullScreenShader::DepthOfFieldShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
-}
-
-static void averageTexture(GLuint tex)
-{
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, tex);
-    glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 void PostProcessing::applyMLAA()

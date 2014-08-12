@@ -682,14 +682,13 @@ public:
     Gaussian3VBlurShader();
 };
 
-class PassThroughShader
+class PassThroughShader : public ShaderHelperSingleton<PassThroughShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_texture;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    PassThroughShader();
 };
 
 class LayerPassThroughShader
@@ -711,14 +710,13 @@ public:
     LinearizeDepthShader();
 };
 
-class GlowShader
+class GlowShader : public ShaderHelperSingleton<GlowShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    GlowShader();
 };
 
 class SSAOShader : public ShaderHelperSingleton<SSAOShader, float, float, float>

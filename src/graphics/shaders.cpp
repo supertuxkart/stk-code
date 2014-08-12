@@ -373,8 +373,6 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
-    FullScreenShader::GlowShader::init();
-    FullScreenShader::PassThroughShader::init();
     FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::RHDebug::init();
@@ -1840,15 +1838,14 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint PassThroughShader::Program;
-    GLuint PassThroughShader::uniform_texture;
-    GLuint PassThroughShader::vao;
-    void PassThroughShader::init()
+    PassThroughShader::PassThroughShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
-        uniform_texture = glGetUniformLocation(Program, "texture");
+        TU_tex = 0;
+        AssignUniforms();
+        AssignTextureUnit(Program, TexUnit(TU_tex, "texture"));
         vao = createVAO(Program);
     }
 
@@ -1877,15 +1874,14 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint GlowShader::Program;
-    GLuint GlowShader::uniform_tex;
-    GLuint GlowShader::vao;
-    void GlowShader::init()
+    GlowShader::GlowShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow.frag").c_str());
-        uniform_tex = glGetUniformLocation(Program, "tex");
+        AssignUniforms();
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
         vao = createVAO(Program);
     }
 
