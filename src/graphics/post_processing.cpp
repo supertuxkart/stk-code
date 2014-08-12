@@ -457,15 +457,14 @@ void PostProcessing::renderPassThrough(GLuint tex)
 
 void PostProcessing::renderTextureLayer(unsigned tex, unsigned layer)
 {
-    glUseProgram(FullScreenShader::LayerPassThroughShader::Program);
-    glBindVertexArray(FullScreenShader::LayerPassThroughShader::vao);
+    glUseProgram(FullScreenShader::LayerPassThroughShader::getInstance()->Program);
+    glBindVertexArray(FullScreenShader::LayerPassThroughShader::getInstance()->vao);
 
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::LayerPassThroughShader::getInstance()->TU_texture);
     glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glUniform1i(FullScreenShader::LayerPassThroughShader::uniform_texture, 0);
-    glUniform1i(FullScreenShader::LayerPassThroughShader::uniform_layer, layer);
+    FullScreenShader::LayerPassThroughShader::getInstance()->setUniforms(layer);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }

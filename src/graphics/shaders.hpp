@@ -54,6 +54,7 @@ void glUniform3fWraper(GLuint, float, float, float);
 void glUniform4iWraper(GLuint, int, int, int, int);
 void glUniform2fWraper(GLuint a, float b, float c);
 void glUniform1fWrapper(GLuint, float);
+void glUniform1iWrapper(GLuint, int);
 bool needsUBO();
 
 struct UniformHelper
@@ -113,6 +114,13 @@ struct UniformHelper
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
     {
         glUniform1fWrapper(uniforms[N], f);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, int f, Args... arg)
+    {
+        glUniform1iWrapper(uniforms[N], f);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
@@ -593,14 +601,12 @@ public:
     RadianceHintsConstructionShader();
 };
 
-class RHDebug
+class RHDebug : public ShaderHelperSingleton<RHDebug, core::matrix4, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix;
+    GLuint TU_SHR, TU_SHG, TU_SHB;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
+    RHDebug();
 };
 
 class GlobalIlluminationReconstructionShader : public ShaderHelperSingleton<GlobalIlluminationReconstructionShader, core::matrix4, core::matrix4, core::vector3df>
@@ -691,14 +697,13 @@ public:
     PassThroughShader();
 };
 
-class LayerPassThroughShader
+class LayerPassThroughShader : public ShaderHelperSingleton<LayerPassThroughShader, int>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_layer, uniform_texture;
-    static GLuint vao;
+    GLuint TU_texture;
+    GLuint vao;
 
-    static void init();
+    LayerPassThroughShader();
 };
 
 class LinearizeDepthShader : public ShaderHelperSingleton<LinearizeDepthShader, float, float>

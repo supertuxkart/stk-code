@@ -373,9 +373,7 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
-    FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
-    FullScreenShader::RHDebug::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
@@ -562,6 +560,11 @@ void glUniform2fWraper(GLuint a, float b, float c)
 void glUniform1fWrapper(GLuint a, float b)
 {
     glUniform1f(a, b);
+}
+
+void glUniform1iWrapper(GLuint a, int b)
+{
+    glUniform1i(a, b);
 }
 
 bool needsUBO()
@@ -1688,34 +1691,18 @@ namespace FullScreenShader
         vao = createFullScreenVAO(Program);
     }
 
-    GLuint RHDebug::Program;
-    GLuint RHDebug::uniform_extents;
-    GLuint RHDebug::uniform_SHR;
-    GLuint RHDebug::uniform_SHG;
-    GLuint RHDebug::uniform_SHB;
-    GLuint RHDebug::uniform_RHMatrix;
-
-    void RHDebug::init()
+    RHDebug::RHDebug()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rhdebug.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rhdebug.frag").c_str());
-        uniform_extents = glGetUniformLocation(Program, "extents");
-        uniform_SHR = glGetUniformLocation(Program, "SHR");
-        uniform_SHG = glGetUniformLocation(Program, "SHG");
-        uniform_SHB = glGetUniformLocation(Program, "SHB");
-        uniform_RHMatrix = glGetUniformLocation(Program, "RHMatrix");
+        AssignUniforms("RHMatrix", "extents");
+        TU_SHR = 0;
+        TU_SHG = 1;
+        TU_SHB = 2;
+        AssignTextureUnit(Program, TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-    }
-
-    void RHDebug::setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB)
-    {
-        glUniformMatrix4fv(uniform_RHMatrix, 1, GL_FALSE, RHMatrix.pointer());
-        glUniform3f(uniform_extents, extents.X, extents.Y, extents.Z);
-        glUniform1i(uniform_SHR, TU_SHR);
-        glUniform1i(uniform_SHG, TU_SHG);
-        glUniform1i(uniform_SHB, TU_SHB);
     }
 
     GlobalIlluminationReconstructionShader::GlobalIlluminationReconstructionShader()
@@ -1846,17 +1833,14 @@ namespace FullScreenShader
         vao = createVAO(Program);
     }
 
-    GLuint LayerPassThroughShader::Program;
-    GLuint LayerPassThroughShader::uniform_texture;
-    GLuint LayerPassThroughShader::uniform_layer;
-    GLuint LayerPassThroughShader::vao;
-    void LayerPassThroughShader::init()
+    LayerPassThroughShader::LayerPassThroughShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/layertexturequad.frag").c_str());
-        uniform_texture = glGetUniformLocation(Program, "tex");
-        uniform_layer = glGetUniformLocation(Program, "layer");
+        TU_texture = 0;
+        AssignUniforms("layer");
+        AssignTextureUnit(Program, TexUnit(TU_texture, "tex"));
         vao = createVAO(Program);
     }
 
