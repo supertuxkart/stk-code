@@ -238,6 +238,22 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     glDisable(GL_BLEND);
 }
 
+
+void PostProcessing::renderRHDebug(unsigned SHR, unsigned SHG, unsigned SHB, const core::matrix4 &rh_matrix, const core::vector3df &rh_extend)
+{
+    glEnable(GL_PROGRAM_POINT_SIZE);
+    glUseProgram(FullScreenShader::RHDebug::getInstance()->Program);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHR);
+    glBindTexture(GL_TEXTURE_3D, SHR);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHG);
+    glBindTexture(GL_TEXTURE_3D, SHG);
+    glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHB);
+    glBindTexture(GL_TEXTURE_3D, SHB);
+    FullScreenShader::RHDebug::getInstance()->setUniforms(rh_matrix, rh_extend);
+    glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
+    glDisable(GL_PROGRAM_POINT_SIZE);
+}
+
 void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3df &rh_extend, GLuint shr, GLuint shg, GLuint shb)
 {
     core::matrix4 InvRHMatrix;

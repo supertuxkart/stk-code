@@ -340,18 +340,8 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
 
     if (getRH())
     {
-        glEnable(GL_PROGRAM_POINT_SIZE);
         m_rtts->getFBO(FBO_COLORS).Bind();
-        glUseProgram(FullScreenShader::RHDebug::getInstance()->Program);
-        glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHR);
-        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[0]);
-        glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHG);
-        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[1]);
-        glActiveTexture(GL_TEXTURE0 + FullScreenShader::RHDebug::getInstance()->TU_SHB);
-        glBindTexture(GL_TEXTURE_3D, m_rtts->getRH().getRTT()[2]);
-        FullScreenShader::RHDebug::getInstance()->setUniforms(rh_matrix, rh_extend);
-        glDrawArrays(GL_POINTS, 0, 32 * 16 * 32);
-        glDisable(GL_PROGRAM_POINT_SIZE);
+        m_post_processing->renderRHDebug(m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2], rh_matrix, rh_extend);
     }
 
     if (getGI())
