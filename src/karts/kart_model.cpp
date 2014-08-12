@@ -769,7 +769,8 @@ void KartModel::update(float dt, float rotation_dt, float steer,
         }
 #endif
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y = m_kart_lowest_point -  height_above_terrain[i]
+        // 
+        pos.Y = -  height_above_terrain[i] + m_kart_lowest_point
               + m_wheel_graphics_radius[i];
         m_wheel_node[i]->setPosition(pos);
 

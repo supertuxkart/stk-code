@@ -2501,40 +2501,29 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        height_above_terrain[i] =
-            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
-             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
-            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
+        const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
+        height_above_terrain[i] = wi.m_raycastInfo.m_suspensionLength;
         if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
     }
+    float kart_hat = m_kart_model->getLowestPoint();
 
-    float chassis_delta = 0;
-    // Check if the chassis needs to be moved down so that the wheels look
-    // like they are in the rest state, i.e. the wheels are not too far down.
-    if(min_hat > m_kart_model->getLowestPoint())
+    if(min_hat >= kart_hat)
     {
-        chassis_delta = min_hat - m_kart_model->getLowestPoint();
         for(unsigned int i=0; i<4; i++)
-            height_above_terrain[i] -= chassis_delta;
+            height_above_terrain[i] = kart_hat;
     }
-
     m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(),
-                        height_above_terrain, m_speed);
-
+                         height_above_terrain, m_speed);
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
-    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
-
-    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height
-                       - m_kart_model->getLowestPoint() -chassis_delta    );
-    center_shift = getTrans().getBasis() * center_shift;
-
     float heading = m_skidding->getVisualSkidRotation();
-    center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() + lean_height, 0);
+    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() - kart_hat
+                              + lean_height-m_kart_model->getLowestPoint(), 0);
     center_shift = getTrans().getBasis() * center_shift;
+
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
 
