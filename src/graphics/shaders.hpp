@@ -655,7 +655,7 @@ public:
     Gaussian17TapVShader();
 };
 
-class ComputeGaussian17TapVShader
+class ComputeGaussian17TapVShader : public ShaderHelperSingleton<ComputeGaussian17TapVShader>
 {
 public:
     GLuint TU_source, TU_depth, TU_dest;

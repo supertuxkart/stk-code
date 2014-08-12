@@ -403,7 +403,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         {
 
             glUseProgram(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->Program);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_tex, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
+            glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_source, in_fbo.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_depth, irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0], 1, false, 0, GL_READ_ONLY, GL_R32F);
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapHShader::getInstance()->TU_dest, auxiliary.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             FullScreenShader::ComputeGaussian17TapHShader::getInstance()->setUniforms();
@@ -434,7 +434,7 @@ void PostProcessing::renderGaussian17TapBlur(FrameBuffer &in_fbo, FrameBuffer &a
         else
         {
             glUseProgram(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->Program);
-            glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_tex, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
+            glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_source, auxiliary.getRTT()[0], 0, false, 0, GL_READ_ONLY, GL_R16F);
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_depth, irr_driver->getFBO(FBO_LINEAR_DEPTH).getRTT()[0], 1, false, 0, GL_READ_ONLY, GL_R32F);
             glBindImageTexture(FullScreenShader::ComputeGaussian17TapVShader::getInstance()->TU_dest, in_fbo.getRTT()[0], 0, false, 0, GL_WRITE_ONLY, GL_R16F);
             FullScreenShader::ComputeGaussian17TapVShader::getInstance()->setUniforms();
