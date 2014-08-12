@@ -764,39 +764,31 @@ public:
     GodRayShader();
 };
 
-class MLAAColorEdgeDetectionSHader
+class MLAAColorEdgeDetectionSHader : public ShaderHelperSingleton<MLAAColorEdgeDetectionSHader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_colorMapG, uniform_PIXEL_SIZE;
-    static GLuint vao;
+    GLuint TU_colorMapG;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colorMapG);
+    MLAAColorEdgeDetectionSHader();
 };
 
-class MLAABlendWeightSHader
+class MLAABlendWeightSHader : public ShaderHelperSingleton<MLAABlendWeightSHader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_PIXEL_SIZE, uniform_edgesMap, uniform_areaMap;
+    GLuint TU_edgesMap, TU_areaMap;
+    GLuint vao;
 
-    static GLuint vao;
-
-    static void init();
-    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_edgesMap, unsigned TU_areaMap);
-
+    MLAABlendWeightSHader();
 };
 
-class MLAAGatherSHader
+class MLAAGatherSHader : public ShaderHelperSingleton<MLAAGatherSHader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_PIXEL_SIZE, uniform_colorMap, uniform_blendMap;
-    static GLuint vao;
+    GLuint TU_colorMap, TU_blendMap;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colormap, unsigned TU_blendmap);
+    MLAAGatherSHader();
 };
 
 }

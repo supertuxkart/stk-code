@@ -376,9 +376,6 @@ void Shaders::loadShaders()
     FullScreenShader::LayerPassThroughShader::init();
     FullScreenShader::DiffuseEnvMapShader::init();
     FullScreenShader::RHDebug::init();
-    FullScreenShader::MLAAColorEdgeDetectionSHader::init();
-    FullScreenShader::MLAABlendWeightSHader::init();
-    FullScreenShader::MLAAGatherSHader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
@@ -1951,73 +1948,39 @@ namespace FullScreenShader
         vao = createVAO(Program);
     }
 
-    GLuint MLAAColorEdgeDetectionSHader::Program;
-    GLuint MLAAColorEdgeDetectionSHader::uniform_colorMapG;
-    GLuint MLAAColorEdgeDetectionSHader::uniform_PIXEL_SIZE;
-    GLuint MLAAColorEdgeDetectionSHader::vao;
-
-    void MLAAColorEdgeDetectionSHader::init()
+    MLAAColorEdgeDetectionSHader::MLAAColorEdgeDetectionSHader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
-        uniform_colorMapG = glGetUniformLocation(Program, "colorMapG");
-        uniform_PIXEL_SIZE = glGetUniformLocation(Program, "PIXEL_SIZE");
+        AssignUniforms("PIXEL_SIZE");
+        TU_colorMapG = 0;
+        AssignTextureUnit(Program, TexUnit(TU_colorMapG, "colorMapG"));
         vao = createVAO(Program);
     }
 
-    void MLAAColorEdgeDetectionSHader::setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colorMapG)
-    {
-        glUniform1i(uniform_colorMapG, TU_colorMapG);
-        glUniform2f(uniform_PIXEL_SIZE, PIXEL_SIZE.X, PIXEL_SIZE.Y);
-    }
-
-    GLuint MLAABlendWeightSHader::Program;
-    GLuint MLAABlendWeightSHader::uniform_edgesMap;
-    GLuint MLAABlendWeightSHader::uniform_areaMap;
-    GLuint MLAABlendWeightSHader::uniform_PIXEL_SIZE;
-    GLuint MLAABlendWeightSHader::vao;
-
-    void MLAABlendWeightSHader::init()
+    MLAABlendWeightSHader::MLAABlendWeightSHader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_blend2.frag").c_str());
-        uniform_edgesMap = glGetUniformLocation(Program, "edgesMap");
-        uniform_areaMap = glGetUniformLocation(Program, "areaMap");
-        uniform_PIXEL_SIZE = glGetUniformLocation(Program, "PIXEL_SIZE");
+        AssignUniforms("PIXEL_SIZE");
+        TU_edgesMap = 0;
+        TU_areaMap = 1;
+        AssignTextureUnit(Program, TexUnit(TU_edgesMap, "edgesMap"), TexUnit(TU_areaMap, "areaMap"));
         vao = createVAO(Program);
     }
 
-    void MLAABlendWeightSHader::setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_edgesMap, unsigned TU_areaMap)
-    {
-        glUniform1i(uniform_edgesMap, TU_edgesMap);
-        glUniform1i(uniform_areaMap, TU_areaMap);
-        glUniform2f(uniform_PIXEL_SIZE, PIXEL_SIZE.X, PIXEL_SIZE.Y);
-    }
-
-    GLuint MLAAGatherSHader::Program;
-    GLuint MLAAGatherSHader::uniform_colorMap;
-    GLuint MLAAGatherSHader::uniform_blendMap;
-    GLuint MLAAGatherSHader::uniform_PIXEL_SIZE;
-    GLuint MLAAGatherSHader::vao;
-
-    void MLAAGatherSHader::init()
+    MLAAGatherSHader::MLAAGatherSHader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_neigh3.frag").c_str());
-        uniform_colorMap = glGetUniformLocation(Program, "colorMap");
-        uniform_blendMap = glGetUniformLocation(Program, "blendMap");
-        uniform_PIXEL_SIZE = glGetUniformLocation(Program, "PIXEL_SIZE");
+        AssignUniforms("PIXEL_SIZE");
+        TU_blendMap = 0;
+        TU_colorMap = 1;
+        AssignTextureUnit(Program, TexUnit(TU_blendMap, "blendMap"), TexUnit(TU_colorMap, "colorMap"));
         vao = createVAO(Program);
-    }
-
-    void MLAAGatherSHader::setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colormap, unsigned TU_blendmap)
-    {
-        glUniform1i(uniform_colorMap, TU_colormap);
-        glUniform1i(uniform_blendMap, TU_blendmap);
-        glUniform2f(uniform_PIXEL_SIZE, PIXEL_SIZE.X, PIXEL_SIZE.Y);
     }
 }
 

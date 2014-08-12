@@ -636,11 +636,11 @@ void PostProcessing::applyMLAA()
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     // Pass 1: color edge detection
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS), GL_NEAREST, GL_NEAREST);
-    glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::Program);
-    FullScreenShader::MLAAColorEdgeDetectionSHader::setUniforms(PIXEL_SIZE, 0);
+    setTexture(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->TU_colorMapG, irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS), GL_NEAREST, GL_NEAREST);
+    glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->Program);
+    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->setUniforms(PIXEL_SIZE);
 
-    glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::vao);
+    glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glStencilFunc(GL_EQUAL, 1, ~0);
@@ -650,12 +650,12 @@ void PostProcessing::applyMLAA()
     irr_driver->getFBO(FBO_MLAA_BLEND).Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(FullScreenShader::MLAABlendWeightSHader::Program);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_LINEAR, GL_LINEAR);
-    setTexture(1, getTextureGLuint(m_areamap), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::MLAABlendWeightSHader::setUniforms(PIXEL_SIZE, 0, 1);
+    glUseProgram(FullScreenShader::MLAABlendWeightSHader::getInstance()->Program);
+    setTexture(FullScreenShader::MLAABlendWeightSHader::getInstance()->TU_edgesMap, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_LINEAR, GL_LINEAR);
+    setTexture(FullScreenShader::MLAABlendWeightSHader::getInstance()->TU_areaMap, getTextureGLuint(m_areamap), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MLAABlendWeightSHader::getInstance()->setUniforms(PIXEL_SIZE);
 
-    glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::vao);
+    glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::getInstance()->vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Blit in to tmp1
@@ -664,12 +664,12 @@ void PostProcessing::applyMLAA()
     // Pass 3: gather
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
 
-    glUseProgram(FullScreenShader::MLAAGatherSHader::Program);
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), GL_NEAREST, GL_NEAREST);
-    FullScreenShader::MLAAGatherSHader::setUniforms(PIXEL_SIZE, 0, 1);
+    glUseProgram(FullScreenShader::MLAAGatherSHader::getInstance()->Program);
+    setTexture(FullScreenShader::MLAAGatherSHader::getInstance()->TU_colorMap, irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), GL_NEAREST, GL_NEAREST);
+    setTexture(FullScreenShader::MLAAGatherSHader::getInstance()->TU_blendMap, irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::MLAAGatherSHader::getInstance()->setUniforms(PIXEL_SIZE);
 
-    glBindVertexArray(FullScreenShader::MLAAGatherSHader::vao);
+    glBindVertexArray(FullScreenShader::MLAAGatherSHader::getInstance()->vao);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     // Done.
