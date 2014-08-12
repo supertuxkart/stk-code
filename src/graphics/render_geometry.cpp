@@ -78,18 +78,6 @@ namespace RenderGeometry
 }
 using namespace RenderGeometry;
 
-template<typename Shader, typename...uniforms>
-void draw(const GLMesh *mesh, uniforms... Args)
-{
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh->PrimitiveType;
-    GLenum itype = mesh->IndexType;
-    size_t count = mesh->IndexCount;
-
-    Shader::setUniforms(Args...);
-    glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
-}
-
 
 template<typename T, typename...uniforms>
 void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
@@ -101,33 +89,6 @@ void draw(const T *Shader, const GLMesh *mesh, uniforms... Args)
 
     Shader->setUniforms(Args...);
     glDrawElementsBaseVertex(ptype, count, itype, (GLvoid *)mesh->vaoOffset, mesh->vaoBaseVertex);
-}
-
-template<unsigned N>
-struct unroll_args_instance
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        unroll_args_instance<N - 1>::template exec<T>(Shader, t, STK::tuple_get<N - 1>(t), args...);
-    }
-};
-
-template<>
-struct unroll_args_instance<0>
-{
-    template<typename T, typename ...TupleTypes, typename ...Args>
-    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
-    {
-        draw<T>(Shader, args...);
-    }
-};
-
-template<typename T, typename... TupleType>
-void apply_instance(const T *Shader, const STK::Tuple<TupleType...> &arg)
-{
-    unroll_args_instance<sizeof...(TupleType)>::template exec<T>(Shader, arg);
-    //unroll_args_instance<STK::TupleSize<STK::Tuple<TupleType...> >::value >::template exec<T>(Shader, arg);
 }
 
 template<int...List>
@@ -541,7 +502,6 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
         shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t[i]);
     }
 }
-
 
 template<int...List>
 struct rsm_custom_unroll_args;
