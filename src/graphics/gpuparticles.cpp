@@ -286,43 +286,28 @@ void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
     glVertexAttribDivisor(6, 1);
 }
 
-template<typename T>
-void setSimulationBind(GLuint position_vbo, GLuint initialValues_vbo)
+void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo)
 {
     glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
-    glEnableVertexAttribArray(T::attrib_position);
-    glVertexAttribPointer(T::attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
-    glEnableVertexAttribArray(T::attrib_lifetime);
-    glVertexAttribPointer(T::attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(T::attrib_velocity);
-    glVertexAttribPointer(T::attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
-    if (T::attrib_size < 30)
-    {
-        glEnableVertexAttribArray(T::attrib_size);
-        glVertexAttribPointer(T::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
-    }
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 
     glBindBuffer(GL_ARRAY_BUFFER, initialValues_vbo);
-    glEnableVertexAttribArray(T::attrib_initial_position);
-    glVertexAttribPointer(T::attrib_initial_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
-    glEnableVertexAttribArray(T::attrib_initial_lifetime);
-    glVertexAttribPointer(T::attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(T::attrib_initial_velocity);
-    glVertexAttribPointer(T::attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
-    glEnableVertexAttribArray(T::attrib_initial_size);
-    glVertexAttribPointer(T::attrib_initial_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 }
-
-void ParticleSystemProxy::SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer)
-{
-    setSimulationBind<ParticleShader::SimpleSimulationShader>(PositionBuffer, InitialValuesBuffer);
-}
-
-void ParticleSystemProxy::HeightmapSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer)
-{
-    setSimulationBind<ParticleShader::HeightmapSimulationShader>(PositionBuffer, InitialValuesBuffer);
-}
-
 
 void ParticleSystemProxy::simulateHeightmap()
 {
@@ -453,15 +438,9 @@ void ParticleSystemProxy::generateVAOs()
     glGenVertexArrays(1, &non_current_simulation_vao);
 
     glBindVertexArray(current_simulation_vao);
-    if (has_height_map)
-        HeightmapSimulationBind(tfb_buffers[0], initial_values_buffer);
-    else
-        SimpleSimulationBind(tfb_buffers[0], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[0], initial_values_buffer);
     glBindVertexArray(non_current_simulation_vao);
-    if (has_height_map)
-        HeightmapSimulationBind(tfb_buffers[1], initial_values_buffer);
-    else
-        SimpleSimulationBind(tfb_buffers[1], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[1], initial_values_buffer);
 
     float *quaternions = new float[4 * count];
     glBindVertexArray(0);

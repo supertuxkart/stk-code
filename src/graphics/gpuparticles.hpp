@@ -25,8 +25,7 @@ protected:
     unsigned count;
     static void CommonRenderingVAO(GLuint PositionBuffer);
     static void AppendQuaternionRenderingVAO(GLuint QuaternionBuffer);
-    static void SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
-    static void HeightmapSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
+    static void CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo);
 
     void generateVAOs();
     void cleanGL();
