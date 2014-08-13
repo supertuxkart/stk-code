@@ -415,7 +415,6 @@ void Shaders::loadShaders()
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     ParticleShader::HeightmapSimulationShader::init();
-    ParticleShader::SimpleSimulationShader::init();
     UtilShader::ColoredLine::init();
 }
 
@@ -1377,21 +1376,7 @@ namespace LightShader
 
 namespace ParticleShader
 {
-    GLuint SimpleSimulationShader::Program;
-    GLuint SimpleSimulationShader::attrib_position;
-    GLuint SimpleSimulationShader::attrib_velocity;
-    GLuint SimpleSimulationShader::attrib_lifetime;
-    GLuint SimpleSimulationShader::attrib_initial_position;
-    GLuint SimpleSimulationShader::attrib_initial_velocity;
-    GLuint SimpleSimulationShader::attrib_initial_lifetime;
-    GLuint SimpleSimulationShader::attrib_size;
-    GLuint SimpleSimulationShader::attrib_initial_size;
-    GLuint SimpleSimulationShader::uniform_sourcematrix;
-    GLuint SimpleSimulationShader::uniform_dt;
-    GLuint SimpleSimulationShader::uniform_level;
-    GLuint SimpleSimulationShader::uniform_size_increase_factor;
-
-    void SimpleSimulationShader::init()
+    SimpleSimulationShader::SimpleSimulationShader()
     {
         const char *varyings[] = {
             "new_particle_position",
@@ -1400,20 +1385,7 @@ namespace ParticleShader
             "new_size",
         };
         Program = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 4);
-
-        uniform_dt = glGetUniformLocation(Program, "dt");
-        uniform_sourcematrix = glGetUniformLocation(Program, "sourcematrix");
-        uniform_level = glGetUniformLocation(Program, "level");
-        uniform_size_increase_factor = glGetUniformLocation(Program, "size_increase_factor");
-
-        attrib_position = glGetAttribLocation(Program, "particle_position");
-        attrib_lifetime = glGetAttribLocation(Program, "lifetime");
-        attrib_velocity = glGetAttribLocation(Program, "particle_velocity");
-        attrib_size = glGetAttribLocation(Program, "size");
-        attrib_initial_position = glGetAttribLocation(Program, "particle_position_initial");
-        attrib_initial_lifetime = glGetAttribLocation(Program, "lifetime_initial");
-        attrib_initial_velocity = glGetAttribLocation(Program, "particle_velocity_initial");
-        attrib_initial_size = glGetAttribLocation(Program, "size_initial");
+        AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
     }
 
     GLuint HeightmapSimulationShader::Program;

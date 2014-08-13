@@ -486,14 +486,10 @@ namespace LightShader
 namespace ParticleShader
 {
 
-class SimpleSimulationShader
+class SimpleSimulationShader : public ShaderHelperSingleton<SimpleSimulationShader, core::matrix4, int, int, float>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-    static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
-
-    static void init();
+    SimpleSimulationShader();
 };
 
 

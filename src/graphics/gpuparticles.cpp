@@ -348,13 +348,10 @@ void ParticleSystemProxy::simulateNoHeightmap()
     int timediff = int(GUIEngine::getLatestDt() * 1000.f);
     int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
     core::matrix4 matrix = getAbsoluteTransformation();
-    glUseProgram(ParticleShader::SimpleSimulationShader::Program);
+    glUseProgram(ParticleShader::SimpleSimulationShader::getInstance()->Program);
     glEnable(GL_RASTERIZER_DISCARD);
 
-    glUniform1i(ParticleShader::SimpleSimulationShader::uniform_dt, timediff);
-    glUniform1i(ParticleShader::SimpleSimulationShader::uniform_level, active_count);
-    glUniformMatrix4fv(ParticleShader::SimpleSimulationShader::uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
-    glUniform1f(ParticleShader::SimpleSimulationShader::uniform_size_increase_factor, size_increase_factor);
+    ParticleShader::SimpleSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
 
     glBindVertexArray(current_simulation_vao);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
