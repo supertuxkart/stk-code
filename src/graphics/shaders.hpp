@@ -33,6 +33,7 @@ public:
     static GLuint billboardvbo;
     static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes;
     static GLuint ViewProjectionMatrixesUBO;
+    static GLuint FullScreenQuadVAO;
 };
 
 namespace UtilShader
@@ -531,7 +532,6 @@ class BloomShader : public ShaderHelperSingleton<BloomShader>
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     BloomShader();
 };
@@ -540,7 +540,6 @@ class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>
 {
 public:
     GLuint TU_tex_128, TU_tex_256, TU_tex_512;
-    GLuint vao;
 
     BloomBlendShader();
 };
@@ -549,7 +548,6 @@ class ToneMapShader : public ShaderHelperSingleton<ToneMapShader>
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     ToneMapShader();
 };
@@ -558,7 +556,6 @@ class DepthOfFieldShader : public ShaderHelperSingleton<DepthOfFieldShader>
 {
 public:
     GLuint TU_tex, TU_depth;
-    GLuint vao;
 
     DepthOfFieldShader();
 };
@@ -567,7 +564,6 @@ class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector
 {
 public:
     GLuint TU_ntex, TU_dtex;
-    GLuint vao;
 
     SunLightShader();
 };
@@ -577,7 +573,6 @@ class DiffuseEnvMapShader
 public:
     static GLuint Program;
     static GLuint uniform_ntex, uniform_TVM, uniform_blueLmn, uniform_greenLmn, uniform_redLmn;
-    static GLuint vao;
 
     static void init();
     static void setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
@@ -587,7 +582,6 @@ class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShad
 {
 public:
     GLuint TU_ntex, TU_dtex, TU_shadowtex;
-    GLuint vao;
 
     ShadowedSunLightShader();
 };
@@ -596,7 +590,6 @@ class RadianceHintsConstructionShader : public ShaderHelperSingleton<RadianceHin
 {
 public:
     GLuint TU_ctex, TU_ntex, TU_dtex;
-    GLuint vao;
 
     RadianceHintsConstructionShader();
 };
@@ -613,7 +606,6 @@ class GlobalIlluminationReconstructionShader : public ShaderHelperSingleton<Glob
 {
 public:
     GLuint TU_ntex, TU_dtex, TU_SHR, TU_SHG, TU_SHB, uniform_RHMatrix;
-    GLuint vao;
 
     GlobalIlluminationReconstructionShader();
 };
@@ -622,7 +614,6 @@ class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, 
 {
 public:
     GLuint TU_tex, TU_depth;
-    GLuint vao;
 
     Gaussian17TapHShader();
 };
@@ -638,7 +629,6 @@ class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, 
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     Gaussian6HBlurShader();
 };
@@ -647,7 +637,6 @@ class Gaussian3HBlurShader : public ShaderHelperSingleton<Gaussian3HBlurShader, 
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     Gaussian3HBlurShader();
 };
@@ -656,7 +645,6 @@ class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, 
 {
 public:
     GLuint TU_tex, TU_depth;
-    GLuint vao;
 
     Gaussian17TapVShader();
 };
@@ -674,7 +662,6 @@ class Gaussian6VBlurShader : public ShaderHelperSingleton<Gaussian6VBlurShader, 
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     Gaussian6VBlurShader();
 };
@@ -683,7 +670,6 @@ class Gaussian3VBlurShader : public ShaderHelperSingleton<Gaussian3VBlurShader, 
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     Gaussian3VBlurShader();
 };
@@ -710,7 +696,6 @@ class LinearizeDepthShader : public ShaderHelperSingleton<LinearizeDepthShader, 
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     LinearizeDepthShader();
 };
@@ -728,7 +713,6 @@ class SSAOShader : public ShaderHelperSingleton<SSAOShader, float, float, float>
 {
 public:
     GLuint TU_dtex;
-    GLuint vao;
 
     SSAOShader();
 };
@@ -737,7 +721,6 @@ class FogShader : public ShaderHelperSingleton<FogShader, float, float, float, f
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     FogShader();
 };
@@ -746,7 +729,6 @@ class MotionBlurShader : public ShaderHelperSingleton<MotionBlurShader, core::ma
 {
 public:
     GLuint TU_cb, TU_dtex;
-    GLuint vao;
 
     MotionBlurShader();
 };

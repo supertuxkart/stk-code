@@ -132,6 +132,8 @@ Shaders::Shaders()
 
 GLuint quad_vbo, tri_vbo;
 
+GLuint SharedObject::FullScreenQuadVAO = 0;
+
 static void initQuadVBO()
 {
     const float quad_vertex[] = {
@@ -154,6 +156,13 @@ static void initQuadVBO()
     glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
     glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(float), tri_vertex, GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glGenVertexArrays(1, &SharedObject::FullScreenQuadVAO);
+    glBindVertexArray(SharedObject::FullScreenQuadVAO);
+    glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
+    glBindVertexArray(0);
 }
 
 // It should be possible to merge it with previous one...
@@ -1514,19 +1523,6 @@ namespace ParticleShader
     }
 }
 
-static GLuint createFullScreenVAO(GLuint Program)
-{
-    GLuint vao;
-    glGenVertexArrays(1, &vao);
-    glBindVertexArray(vao);
-    GLuint attrib_position = glGetAttribLocation(Program, "Position");
-    glBindBuffer(GL_ARRAY_BUFFER, tri_vbo);
-    glEnableVertexAttribArray(attrib_position);
-    glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
-    glBindVertexArray(0);
-    return vao;
-}
-
 static GLuint createVAO(GLuint Program)
 {
     GLuint vao;
@@ -1554,7 +1550,6 @@ namespace FullScreenShader
         AssignUniforms();
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
-        vao = createFullScreenVAO(Program);
     }
 
     BloomBlendShader::BloomBlendShader()
@@ -1567,7 +1562,6 @@ namespace FullScreenShader
         TU_tex_256 = 1;
         TU_tex_512 = 2;
         AssignTextureUnit(Program, TexUnit(TU_tex_128, "tex_128"), TexUnit(TU_tex_256, "tex_256"), TexUnit(TU_tex_512, "tex_512"));
-        vao = createFullScreenVAO(Program);
     }
 
     ToneMapShader::ToneMapShader()
@@ -1580,7 +1574,6 @@ namespace FullScreenShader
         AssignUniforms();
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "text"));
-        vao = createFullScreenVAO(Program);
     }
 
     DepthOfFieldShader::DepthOfFieldShader()
@@ -1592,7 +1585,7 @@ namespace FullScreenShader
         TU_depth = 1;
         AssignUniforms();
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "dtex"));
-        vao = createFullScreenVAO(Program);
+
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -1609,7 +1602,6 @@ namespace FullScreenShader
         TU_dtex = 1;
         AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
         AssignUniforms("direction", "col");
-        vao = createFullScreenVAO(Program);
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1621,7 +1613,6 @@ namespace FullScreenShader
     GLuint DiffuseEnvMapShader::uniform_greenLmn;
     GLuint DiffuseEnvMapShader::uniform_redLmn;
     GLuint DiffuseEnvMapShader::uniform_TVM;
-    GLuint DiffuseEnvMapShader::vao;
 
     void DiffuseEnvMapShader::init()
     {
@@ -1634,7 +1625,6 @@ namespace FullScreenShader
         uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
         uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
         uniform_TVM = glGetUniformLocation(Program, "TransposeViewMatrix");
-        vao = createFullScreenVAO(Program);
     }
 
     void DiffuseEnvMapShader::setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
@@ -1659,7 +1649,6 @@ namespace FullScreenShader
         TU_shadowtex = 2;
         AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"), TexUnit(TU_shadowtex, "shadowtex"));
         AssignUniforms("direction", "col");
-        vao = createFullScreenVAO(Program);
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1688,7 +1677,6 @@ namespace FullScreenShader
         TU_ntex = 1;
         TU_dtex = 2;
         AssignTextureUnit(Program, TexUnit(TU_ctex, "ctex"), TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
-        vao = createFullScreenVAO(Program);
     }
 
     RHDebug::RHDebug()
@@ -1720,7 +1708,6 @@ namespace FullScreenShader
         TU_SHG = 3;
         TU_SHB = 4;
         AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"), TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
-        vao = createFullScreenVAO(Program);
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -1734,7 +1721,6 @@ namespace FullScreenShader
         TU_tex = 0;
         TU_depth = 1;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
-        vao = createFullScreenVAO(Program);
     }
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
@@ -1760,7 +1746,6 @@ namespace FullScreenShader
         AssignUniforms("pixel");
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
-        vao = createFullScreenVAO(Program);
     }
 
     Gaussian3HBlurShader::Gaussian3HBlurShader()
@@ -1771,7 +1756,6 @@ namespace FullScreenShader
         AssignUniforms("pixel");
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
-        vao = createFullScreenVAO(Program);
     }
 
     Gaussian17TapVShader::Gaussian17TapVShader()
@@ -1783,7 +1767,6 @@ namespace FullScreenShader
         TU_tex = 0;
         TU_depth = 1;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
-        vao = createFullScreenVAO(Program);
     }
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
@@ -1808,7 +1791,6 @@ namespace FullScreenShader
         AssignUniforms("pixel");
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
-        vao = createFullScreenVAO(Program);
     }
 
     Gaussian3VBlurShader::Gaussian3VBlurShader()
@@ -1819,7 +1801,6 @@ namespace FullScreenShader
         AssignUniforms("pixel");
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
-        vao = createFullScreenVAO(Program);
     }
 
     PassThroughShader::PassThroughShader()
@@ -1852,7 +1833,6 @@ namespace FullScreenShader
         AssignUniforms("zn", "zf");
         TU_tex = 0;
         AssignTextureUnit(Program, TexUnit(TU_tex, "texture"));
-        vao = createFullScreenVAO(Program);
     }
 
     GlowShader::GlowShader()
@@ -1876,7 +1856,6 @@ namespace FullScreenShader
         TU_dtex = 0;
         AssignTextureUnit(Program, TexUnit(TU_dtex, "dtex"));
         AssignUniforms("radius", "k", "sigma");
-        vao = createFullScreenVAO(Program);
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1891,7 +1870,6 @@ namespace FullScreenShader
         TU_tex = 0;
         AssignUniforms("fogmax", "startH", "endH", "start", "end", "col");
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
-        vao = createFullScreenVAO(Program);
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1907,7 +1885,6 @@ namespace FullScreenShader
         TU_cb = 0;
         TU_dtex = 1;
         AssignTextureUnit(Program, TexUnit(TU_dtex, "dtex"), TexUnit(TU_cb, "color_buffer"));
-        vao = createFullScreenVAO(Program);
     }
 
     GodFadeShader::GodFadeShader()
