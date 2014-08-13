@@ -292,18 +292,3 @@ bool isObject(video::E_MATERIAL_TYPE type)
         return true;
     return false;
 }
-
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListMatDefault::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListMatAlphaRef::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListMatSphereMap::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListMatDetails::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df> > ListMatGrass::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListMatUnlit::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListMatSplatting::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4> > ListMatNormalMap::Arguments;
-
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
-std::vector<STK::Tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;

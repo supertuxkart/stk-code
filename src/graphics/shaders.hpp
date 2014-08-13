@@ -33,6 +33,7 @@ public:
     static GLuint billboardvbo;
     static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes;
     static GLuint ViewProjectionMatrixesUBO;
+    static GLuint FullScreenQuadVAO;
 };
 
 namespace UtilShader
@@ -54,6 +55,7 @@ void glUniform3fWraper(GLuint, float, float, float);
 void glUniform4iWraper(GLuint, int, int, int, int);
 void glUniform2fWraper(GLuint a, float b, float c);
 void glUniform1fWrapper(GLuint, float);
+void glUniform1iWrapper(GLuint, int);
 bool needsUBO();
 
 struct UniformHelper
@@ -116,6 +118,13 @@ struct UniformHelper
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, int f, Args... arg)
+    {
+        glUniform1iWrapper(uniforms[N], f);
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
 };
 
 void bypassUBO(GLuint Program);
@@ -146,7 +155,6 @@ protected:
     }
 
 public:
-    friend class Singleton<class ObjectPass1Shader>;
     GLuint Program;
 
     void setUniforms(const Args & ... args) const
@@ -520,33 +528,26 @@ public:
 namespace FullScreenShader
 {
 
-class BloomShader
+class BloomShader : public ShaderHelperSingleton<BloomShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_texture;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex);
+    BloomShader();
 };
 
-class BloomBlendShader
+class BloomBlendShader : public ShaderHelperSingleton<BloomBlendShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex_128, uniform_tex_256, uniform_tex_512;
-    static GLuint vao;
+    GLuint TU_tex_128, TU_tex_256, TU_tex_512;
 
-    static void init();
-    static void setUniforms(unsigned TU_tex_128, unsigned TU_tex_256, unsigned TU_tex_512);
+    BloomBlendShader();
 };
 
 class ToneMapShader : public ShaderHelperSingleton<ToneMapShader>
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     ToneMapShader();
 };
@@ -555,7 +556,6 @@ class DepthOfFieldShader : public ShaderHelperSingleton<DepthOfFieldShader>
 {
 public:
     GLuint TU_tex, TU_depth;
-    GLuint vao;
 
     DepthOfFieldShader();
 };
@@ -564,7 +564,6 @@ class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector
 {
 public:
     GLuint TU_ntex, TU_dtex;
-    GLuint vao;
 
     SunLightShader();
 };
@@ -574,7 +573,6 @@ class DiffuseEnvMapShader
 public:
     static GLuint Program;
     static GLuint uniform_ntex, uniform_TVM, uniform_blueLmn, uniform_greenLmn, uniform_redLmn;
-    static GLuint vao;
 
     static void init();
     static void setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
@@ -584,7 +582,6 @@ class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShad
 {
 public:
     GLuint TU_ntex, TU_dtex, TU_shadowtex;
-    GLuint vao;
 
     ShadowedSunLightShader();
 };
@@ -593,153 +590,129 @@ class RadianceHintsConstructionShader : public ShaderHelperSingleton<RadianceHin
 {
 public:
     GLuint TU_ctex, TU_ntex, TU_dtex;
-    GLuint vao;
 
     RadianceHintsConstructionShader();
 };
 
-class RHDebug
+class RHDebug : public ShaderHelperSingleton<RHDebug, core::matrix4, core::vector3df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_extents, uniform_SHR, uniform_SHG, uniform_SHB, uniform_RHMatrix;
+    GLuint TU_SHR, TU_SHG, TU_SHB;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &RHMatrix, const core::vector3df &extents, unsigned TU_SHR, unsigned TU_SHG, unsigned TU_SHB);
+    RHDebug();
 };
 
 class GlobalIlluminationReconstructionShader : public ShaderHelperSingleton<GlobalIlluminationReconstructionShader, core::matrix4, core::matrix4, core::vector3df>
 {
 public:
     GLuint TU_ntex, TU_dtex, TU_SHR, TU_SHG, TU_SHB, uniform_RHMatrix;
-    GLuint vao;
 
     GlobalIlluminationReconstructionShader();
 };
 
-class Gaussian17TapHShader
+class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_depth, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex, TU_depth;
 
-    static void init();
+    Gaussian17TapHShader();
 };
 
-class ComputeGaussian17TapHShader
+class ComputeGaussian17TapHShader : public ShaderHelperSingleton<ComputeGaussian17TapHShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_source, uniform_depth, uniform_dest;
-
-    static void init();
+    GLuint TU_source, TU_dest, TU_depth;
+    ComputeGaussian17TapHShader();
 };
 
-class Gaussian6HBlurShader
+class Gaussian6HBlurShader : public ShaderHelperSingleton<Gaussian6HBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
+    Gaussian6HBlurShader();
 };
 
-class Gaussian3HBlurShader
+class Gaussian3HBlurShader : public ShaderHelperSingleton<Gaussian3HBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
+    Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader
+class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_depth, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex, TU_depth;
 
-    static void init();
+    Gaussian17TapVShader();
 };
 
-class ComputeGaussian17TapVShader
+class ComputeGaussian17TapVShader : public ShaderHelperSingleton<ComputeGaussian17TapVShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_source, uniform_depth, uniform_dest;
+    GLuint TU_source, TU_depth, TU_dest;
 
-    static void init();
+    ComputeGaussian17TapVShader();
 };
 
 
-class Gaussian6VBlurShader
+class Gaussian6VBlurShader : public ShaderHelperSingleton<Gaussian6VBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
+    Gaussian6VBlurShader();
 };
 
-class Gaussian3VBlurShader
+class Gaussian3VBlurShader : public ShaderHelperSingleton<Gaussian3VBlurShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_pixel;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
+    Gaussian3VBlurShader();
 };
 
-class PassThroughShader
+class PassThroughShader : public ShaderHelperSingleton<PassThroughShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_texture;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    PassThroughShader();
 };
 
-class LayerPassThroughShader
+class LayerPassThroughShader : public ShaderHelperSingleton<LayerPassThroughShader, int>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_layer, uniform_texture;
-    static GLuint vao;
+    GLuint TU_texture;
+    GLuint vao;
 
-    static void init();
+    LayerPassThroughShader();
 };
 
 class LinearizeDepthShader : public ShaderHelperSingleton<LinearizeDepthShader, float, float>
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     LinearizeDepthShader();
 };
 
-class GlowShader
+class GlowShader : public ShaderHelperSingleton<GlowShader>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
+    GlowShader();
 };
 
 class SSAOShader : public ShaderHelperSingleton<SSAOShader, float, float, float>
 {
 public:
     GLuint TU_dtex;
-    GLuint vao;
 
     SSAOShader();
 };
@@ -748,77 +721,61 @@ class FogShader : public ShaderHelperSingleton<FogShader, float, float, float, f
 {
 public:
     GLuint TU_tex;
-    GLuint vao;
 
     FogShader();
 };
 
-class MotionBlurShader
+class MotionBlurShader : public ShaderHelperSingleton<MotionBlurShader, core::matrix4, core::vector2df, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_boost_amount, uniform_color_buffer, uniform_dtex, uniform_previous_viewproj, uniform_center, uniform_mask_radius;
-    static GLuint vao;
+    GLuint TU_cb, TU_dtex;
 
-    static void init();
-    static void setUniforms(float boost_amount, const core::matrix4 &previousVP, const core::vector2df &center,  float mask_radius, unsigned TU_cb, unsigned TU_dtex);
+    MotionBlurShader();
 };
 
-class GodFadeShader
+class GodFadeShader : public ShaderHelperSingleton<GodFadeShader, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_col;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const video::SColor &col, unsigned TU_tex);
+    GodFadeShader();
 };
 
-class GodRayShader
+class GodRayShader : public ShaderHelperSingleton<GodRayShader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_tex, uniform_sunpos;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector2df &sunpos, unsigned TU_tex);
+    GodRayShader();
 };
 
-class MLAAColorEdgeDetectionSHader
+class MLAAColorEdgeDetectionSHader : public ShaderHelperSingleton<MLAAColorEdgeDetectionSHader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_colorMapG, uniform_PIXEL_SIZE;
-    static GLuint vao;
+    GLuint TU_colorMapG;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colorMapG);
+    MLAAColorEdgeDetectionSHader();
 };
 
-class MLAABlendWeightSHader
+class MLAABlendWeightSHader : public ShaderHelperSingleton<MLAABlendWeightSHader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_PIXEL_SIZE, uniform_edgesMap, uniform_areaMap;
+    GLuint TU_edgesMap, TU_areaMap;
+    GLuint vao;
 
-    static GLuint vao;
-
-    static void init();
-    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_edgesMap, unsigned TU_areaMap);
-
+    MLAABlendWeightSHader();
 };
 
-class MLAAGatherSHader
+class MLAAGatherSHader : public ShaderHelperSingleton<MLAAGatherSHader, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_PIXEL_SIZE, uniform_colorMap, uniform_blendMap;
-    static GLuint vao;
+    GLuint TU_colorMap, TU_blendMap;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(const core::vector2df &PIXEL_SIZE, unsigned TU_colormap, unsigned TU_blendmap);
+    MLAAGatherSHader();
 };
 
 }

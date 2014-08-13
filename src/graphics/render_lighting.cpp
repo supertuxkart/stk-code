@@ -137,7 +137,7 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
         glUseProgram(FullScreenShader::RadianceHintsConstructionShader::getInstance()->Program);
-        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::getInstance()->vao);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
         setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_ctex, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
         setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_ntex, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
         setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_dtex, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
