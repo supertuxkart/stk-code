@@ -314,20 +314,13 @@ void ParticleSystemProxy::simulateHeightmap()
     int timediff = int(GUIEngine::getLatestDt() * 1000.f);
     int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
     core::matrix4 matrix = getAbsoluteTransformation();
-    glUseProgram(ParticleShader::HeightmapSimulationShader::Program);
+    glUseProgram(ParticleShader::HeightmapSimulationShader::getInstance()->Program);
     glEnable(GL_RASTERIZER_DISCARD);
 
-    glUniform1i(ParticleShader::HeightmapSimulationShader::uniform_dt, timediff);
-    glUniform1i(ParticleShader::HeightmapSimulationShader::uniform_level, active_count);
-    glUniformMatrix4fv(ParticleShader::HeightmapSimulationShader::uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_size_increase_factor, size_increase_factor);
-    glActiveTexture(GL_TEXTURE2);
+    glActiveTexture(GL_TEXTURE0 + ParticleShader::HeightmapSimulationShader::getInstance()->TU_heightmap);
     glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-    glUniform1i(ParticleShader::HeightmapSimulationShader::uniform_heightmap, 2);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_x, track_x);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_z, track_z);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_x_len, track_x_len);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_z_len, track_z_len);
+
+    ParticleShader::HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
 
     glBindVertexArray(current_simulation_vao);
     glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);

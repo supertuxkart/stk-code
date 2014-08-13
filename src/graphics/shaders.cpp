@@ -414,7 +414,6 @@ void Shaders::loadShaders()
     LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
-    ParticleShader::HeightmapSimulationShader::init();
     UtilShader::ColoredLine::init();
 }
 
@@ -1388,26 +1387,7 @@ namespace ParticleShader
         AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
     }
 
-    GLuint HeightmapSimulationShader::Program;
-    GLuint HeightmapSimulationShader::attrib_position;
-    GLuint HeightmapSimulationShader::attrib_velocity;
-    GLuint HeightmapSimulationShader::attrib_lifetime;
-    GLuint HeightmapSimulationShader::attrib_initial_position;
-    GLuint HeightmapSimulationShader::attrib_initial_velocity;
-    GLuint HeightmapSimulationShader::attrib_initial_lifetime;
-    GLuint HeightmapSimulationShader::attrib_size;
-    GLuint HeightmapSimulationShader::attrib_initial_size;
-    GLuint HeightmapSimulationShader::uniform_sourcematrix;
-    GLuint HeightmapSimulationShader::uniform_dt;
-    GLuint HeightmapSimulationShader::uniform_level;
-    GLuint HeightmapSimulationShader::uniform_size_increase_factor;
-    GLuint HeightmapSimulationShader::uniform_track_x;
-    GLuint HeightmapSimulationShader::uniform_track_z;
-    GLuint HeightmapSimulationShader::uniform_track_x_len;
-    GLuint HeightmapSimulationShader::uniform_track_z_len;
-    GLuint HeightmapSimulationShader::uniform_heightmap;
-
-    void HeightmapSimulationShader::init()
+    HeightmapSimulationShader::HeightmapSimulationShader()
     {
         const char *varyings[] = {
             "new_particle_position",
@@ -1416,26 +1396,9 @@ namespace ParticleShader
             "new_size",
         };
         Program = LoadTFBProgram(file_manager->getAsset("shaders/particlesimheightmap.vert").c_str(), varyings, 4);
-
-        uniform_dt = glGetUniformLocation(Program, "dt");
-        uniform_sourcematrix = glGetUniformLocation(Program, "sourcematrix");
-        uniform_level = glGetUniformLocation(Program, "level");
-        uniform_size_increase_factor = glGetUniformLocation(Program, "size_increase_factor");
-
-        attrib_position = glGetAttribLocation(Program, "particle_position");
-        attrib_lifetime = glGetAttribLocation(Program, "lifetime");
-        attrib_velocity = glGetAttribLocation(Program, "particle_velocity");
-        attrib_size = glGetAttribLocation(Program, "size");
-        attrib_initial_position = glGetAttribLocation(Program, "particle_position_initial");
-        attrib_initial_lifetime = glGetAttribLocation(Program, "lifetime_initial");
-        attrib_initial_velocity = glGetAttribLocation(Program, "particle_velocity_initial");
-        attrib_initial_size = glGetAttribLocation(Program, "size_initial");
-
-        uniform_heightmap = glGetUniformLocation(Program, "heightmap");
-        uniform_track_x = glGetUniformLocation(Program, "track_x");
-        uniform_track_x_len = glGetUniformLocation(Program, "track_x_len");
-        uniform_track_z = glGetUniformLocation(Program, "track_z");
-        uniform_track_z_len = glGetUniformLocation(Program, "track_z_len");
+        TU_heightmap = 2;
+        AssignTextureUnit(Program, TexUnit(TU_heightmap, "heightmap"));
+        AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
     }
 
     SimpleParticleRender::SimpleParticleRender()

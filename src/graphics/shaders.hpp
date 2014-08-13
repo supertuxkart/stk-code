@@ -494,15 +494,12 @@ public:
 
 
 
-class HeightmapSimulationShader
+class HeightmapSimulationShader : public ShaderHelperSingleton<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-    static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
-    static GLuint uniform_track_x, uniform_track_z, uniform_track_x_len, uniform_track_z_len, uniform_heightmap;
+    GLuint TU_heightmap;
 
-    static void init();
+    HeightmapSimulationShader();
 };
 
 class SimpleParticleRender : public ShaderHelperSingleton<SimpleParticleRender, video::SColorf, video::SColorf>
