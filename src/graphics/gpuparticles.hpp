@@ -30,8 +30,6 @@ protected:
     void generateVAOs();
     void cleanGL();
 
-    void simulateHeightmap();
-    void simulateNoHeightmap();
     void drawFlip();
     void drawNotFlip();
     virtual void simulate();

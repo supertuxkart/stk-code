@@ -309,63 +309,38 @@ void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initia
     glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 }
 
-void ParticleSystemProxy::simulateHeightmap()
-{
-    int timediff = int(GUIEngine::getLatestDt() * 1000.f);
-    int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
-    core::matrix4 matrix = getAbsoluteTransformation();
-    glUseProgram(ParticleShader::HeightmapSimulationShader::getInstance()->Program);
-    glEnable(GL_RASTERIZER_DISCARD);
-
-    glActiveTexture(GL_TEXTURE0 + ParticleShader::HeightmapSimulationShader::getInstance()->TU_heightmap);
-    glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-
-    ParticleShader::HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
-
-    glBindVertexArray(current_simulation_vao);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
-
-    glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, count);
-    glEndTransformFeedback();
-    glBindVertexArray(0);
-
-    glDisable(GL_RASTERIZER_DISCARD);
-    std::swap(tfb_buffers[0], tfb_buffers[1]);
-    std::swap(current_rendering_vao, non_current_rendering_vao);
-    std::swap(current_simulation_vao, non_current_simulation_vao);
-}
-
-void ParticleSystemProxy::simulateNoHeightmap()
-{
-    int timediff = int(GUIEngine::getLatestDt() * 1000.f);
-    int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
-    core::matrix4 matrix = getAbsoluteTransformation();
-    glUseProgram(ParticleShader::SimpleSimulationShader::getInstance()->Program);
-    glEnable(GL_RASTERIZER_DISCARD);
-
-    ParticleShader::SimpleSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
-
-    glBindVertexArray(current_simulation_vao);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
-
-    glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, count);
-    glEndTransformFeedback();
-    glBindVertexArray(0);
-
-    glDisable(GL_RASTERIZER_DISCARD);
-    std::swap(tfb_buffers[0], tfb_buffers[1]);
-    std::swap(current_rendering_vao, non_current_rendering_vao);
-    std::swap(current_simulation_vao, non_current_simulation_vao);
-}
-
 void ParticleSystemProxy::simulate()
 {
+    int timediff = int(GUIEngine::getLatestDt() * 1000.f);
+    int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
+    core::matrix4 matrix = getAbsoluteTransformation();
+
+    glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
-        simulateHeightmap();
+    {
+        glUseProgram(ParticleShader::HeightmapSimulationShader::getInstance()->Program);
+        glActiveTexture(GL_TEXTURE0 + ParticleShader::HeightmapSimulationShader::getInstance()->TU_heightmap);
+        glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+        ParticleShader::HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
+    }
     else
-        simulateNoHeightmap();
+    {
+        glUseProgram(ParticleShader::SimpleSimulationShader::getInstance()->Program);
+        ParticleShader::SimpleSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
+    }
+
+    glBindVertexArray(current_simulation_vao);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
+
+    glBeginTransformFeedback(GL_POINTS);
+    glDrawArrays(GL_POINTS, 0, count);
+    glEndTransformFeedback();
+    glBindVertexArray(0);
+
+    glDisable(GL_RASTERIZER_DISCARD);
+    std::swap(tfb_buffers[0], tfb_buffers[1]);
+    std::swap(current_rendering_vao, non_current_rendering_vao);
+    std::swap(current_simulation_vao, non_current_simulation_vao);
 }
 
 void ParticleSystemProxy::drawFlip()
