@@ -111,6 +111,7 @@ namespace Online
         pthread_attr_t  attr;
         pthread_attr_init(&attr);
         pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
+
         // Should be the default, but just in case:
         pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
         //pthread_setcanceltype(PTHREAD_CANCEL_ASYNCHRONOUS, NULL);
@@ -118,7 +119,7 @@ namespace Online
         m_thread_id.setAtomic(new pthread_t());
         int error = pthread_create(m_thread_id.getData(), &attr,
                                    &RequestManager::mainLoop, this);
-        if(error)
+        if (error)
         {
             m_thread_id.lock();
             delete m_thread_id.getData();
@@ -128,10 +129,11 @@ namespace Online
                        errno);
         }
         pthread_attr_destroy(&attr);
+
         // In case that login id was not saved (or first start of stk),
         // current player would not be defined at this stage.
         PlayerProfile *player = PlayerManager::getCurrentPlayer();
-        if(player && player->wasOnlineLastTime() &&
+        if (player && player->wasOnlineLastTime() &&
             !UserConfigParams::m_always_show_login_screen)
         {
             PlayerManager::resumeSavedSession();
@@ -178,6 +180,7 @@ namespace Online
         request->setBusy();
         m_request_queue.lock();
         m_request_queue.getData().push(request);
+
         // Wake up the network http thread
         pthread_cond_signal(&m_cond_request);
         m_request_queue.unlock();
@@ -197,27 +200,30 @@ namespace Online
 
         me->m_current_request = NULL;
         me->m_request_queue.lock();
-        while( me->m_request_queue.getData().empty() ||
+        while (me->m_request_queue.getData().empty() ||
                me->m_request_queue.getData().top()->getType() != Request::RT_QUIT)
         {
             bool empty = me->m_request_queue.getData().empty();
+
             // Wait in cond_wait for a request to arrive. The 'while' is necessary
             // since "spurious wakeups from the pthread_cond_wait ... may occur"
             // (pthread_cond_wait man page)!
-            while(empty)
+            while (empty)
             {
                 pthread_cond_wait(&me->m_cond_request, me->m_request_queue.getMutex());
                 empty = me->m_request_queue.getData().empty();
             }
             me->m_current_request = me->m_request_queue.getData().top();
             me->m_request_queue.getData().pop();
-            if(me->m_current_request->getType()==Request::RT_QUIT)
+
+            if (me->m_current_request->getType() == Request::RT_QUIT)
                 break;
+
             me->m_request_queue.unlock();
             me->m_current_request->execute();
             me->addResult(me->m_current_request);
             me->m_request_queue.lock();
-        }   // while
+        } // while handle all requests
 
         // Signal that the request manager can now be deleted.
         // We signal this even before cleaning up memory, since there's no
@@ -225,16 +231,18 @@ namespace Online
         me->setCanBeDeleted();
 
         // At this stage we have the lock for m_request_queue
-        while(!me->m_request_queue.getData().empty())
+        while (!me->m_request_queue.getData().empty())
         {
-            Online::Request * request = me->m_request_queue.getData().top();
+            Online::Request *request = me->m_request_queue.getData().top();
             me->m_request_queue.getData().pop();
+
             // Manage memory can be ignored here, all requests
             // need to be freed.
             delete request;
         }
         me->m_request_queue.unlock();
         pthread_exit(NULL);
+
         return 0;
     }   // mainLoop
 
@@ -259,13 +267,13 @@ namespace Online
     {
         Request * request = NULL;
         m_result_queue.lock();
-        if(!m_result_queue.getData().empty())
+        if (!m_result_queue.getData().empty())
         {
             request = m_result_queue.getData().front();
             m_result_queue.getData().pop();
         }
         m_result_queue.unlock();
-        if(request != NULL)
+        if (request != NULL)
         {
             request->callback();
             if(request->manageMemory())
@@ -298,7 +306,8 @@ namespace Online
         float interval = GAME_POLLING_INTERVAL;
         if (StateManager::get()->getGameState() == GUIEngine::MENU)
                 interval = MENU_POLLING_INTERVAL;
-        if(m_time_since_poll > interval)
+
+        if (m_time_since_poll > interval)
         {
             m_time_since_poll = 0;
             PlayerManager::requestOnlinePoll();
@@ -306,7 +315,3 @@ namespace Online
 
     }   // update
 } // namespace Online
-
-
-
-

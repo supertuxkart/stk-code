@@ -341,7 +341,7 @@
          exp-string-response: dampen the suspension spring reaction 
             exponentially.
          max-force: Maximum suspension force -->
-    <suspension stiffness="248" rest="0.2" travel-cm="19"
+    <suspension stiffness="140" rest="0.3" travel-cm="29"
          exp-spring-response="false" max-force="12000"/>
 
     <!-- Wheel related parameters: damping-relaxation/compression: for
@@ -350,7 +350,7 @@
          position of the physics raycast wheels relative to the center of
          gravity. Default is to use the corners of the chassis to attach 
          the wheels to. -->
-    <wheels damping-relaxation="20"  damping-compression="4.4" radius="0.25">
+    <wheels damping-relaxation="35"  damping-compression="5" radius="0.25">
       <front-right position="0.38 0 0.6"  />
       <front-left  position="-0.38 0 0.6" />
       <rear-right  position="0.38 0 -0.6" />
@@ -373,12 +373,15 @@
          track-connection-accel: An artificial force that pulls a wheel to
            the ground if its off ground. Reduces the affect if a kart loses
            contact with the ground (i.e. it then can't steer or accelerate
-           anymore). -->
-    <stability roll-influence="0.03"
+           anymore). 
+         smooth-flying-impulse: apply a torque impulse to flying kart to keep
+           them parallel to the ground.-->
+    <stability roll-influence="0.3"
                chassis-linear-damping="0.2"
                chassis-angular-damping="0"
                downward-impulse-factor="0"
-               track-connection-accel="2"/>
+               track-connection-accel="2"
+               smooth-flying-impulse="25"/>
 
     <!-- collision
          impulse-type: STK can apply an additional impulse in case of
@@ -408,10 +411,15 @@
            (1-bevelY).  A value of 0 for all bevel coordinates disables
            bevelling, and uses a simple box shape.
            As an example, a value of 1 for x and z will result in a 
-           sharp 'arrow' like shape.  -->
+           sharp 'arrow' like shape.
+         physical-wheel-position: Defines where the 'physical' (raycast)
+           wheel will be located. It's a weight factor with 0 = being
+           at the widest side of the bevel, 1 = at the front and
+           narrowest part of the kart.  -->
     <collision impulse-type="normal" 
                impulse="3000" impulse-time="0.1" terrain-impulse="8000"
-               restitution="1.0" bevel-factor="0.5 0.0 0.5" />
+               restitution="1.0" bevel-factor="0.5 0.0 0.7"
+               physical-wheel-position="0.5" />
 			 
      <!-- If a kart starts within the specified time after 'go',
           it receives the corresponding bonus from 'boost'. Those
@@ -568,9 +576,14 @@
 		 
      <!-- Speed and acceleration related values: power and max-speed (in m/s) 
           have 3 values, one for low, medium, and hard.
-          brake-factor: Value used when braking. max-speed-reverse-ratio is
-          the percentage of max speed for reverse gear. -->
+          brake-factor: Value used when braking. 
+          brake-time-increase: The brake force is multiplied by 
+            (1+brake_time*brake_time_increase - i.e. the longer the brake was
+            pressed, the harder the kart will brake.
+          max-speed-reverse-ratio is the percentage of max speed for reverse gear.
+      -->
      <engine power="450 475 500 510"  max-speed="17 21 23 25" brake-factor="11.0"
+             brake-time-increase="6"
 	     max-speed-reverse-ratio="0.3"/>
 	 
      <!-- Simulated gears: switch-ratio defines at what ratio of the maximum

@@ -345,6 +345,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		float refresh_rate, refresh_rate_new;
+		unsigned int mode0_width = -1, mode0_height = -1;
 
 		for (int i = 0; i < res->nmode; i++)
 		{
@@ -360,6 +361,12 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 			{
 				w = mode->width;
 				h = mode->height;
+			}
+			
+			if (bestMode == -1 && mode->id == output->modes[0])
+			{
+				mode0_width = w;
+				mode0_height = h;
 			}
 
 			if (bestMode == -1 && w == Width && h == Height)
@@ -397,6 +404,8 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		if (bestMode == -1)
 		{
 			bestMode = 0;
+			Width = mode0_width;
+			Height = mode0_height;
 		}
 
 		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,

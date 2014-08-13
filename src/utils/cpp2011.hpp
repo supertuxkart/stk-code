@@ -19,12 +19,12 @@
 
 
 template<typename T, typename... Args>
-void pushVector(std::vector<T> &vec, Args ...args)
+void pushVector(std::vector<T> *vec, Args ...args)
 {
 #ifdef STDCPP2003
-    vec.push_back(T(args...));
+    vec->push_back(T(args...));
 #else
-    vec.emplace_back(args...);
+    vec->emplace_back(args...);
 #endif
 }
 #endif

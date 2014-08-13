@@ -22,6 +22,7 @@
 #include "guiengine/modaldialog.hpp"
 #include "utils/cpp2011.hpp"
 #include "utils/leak_check.hpp"
+#include <functional>
 
 /**
  * \brief For internal value tweaking
@@ -32,18 +33,18 @@ class DebugSliderDialog : public GUIEngine::ModalDialog
 private:
 
     std::string m_id;
+    std::map<std::string, std::function<void(int)> >Setters;
 
 public:
+    DebugSliderDialog();
 
-
-    DebugSliderDialog(std::string id, ::core::stringw msg);
-    
     ~DebugSliderDialog();
-    
+
+    void setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S);
+
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;
 
-    
     GUIEngine::EventPropagation processEvent(const std::string& eventSource);
 };
 

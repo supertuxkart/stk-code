@@ -4,6 +4,15 @@
 #include "stkmesh.hpp"
 #include "utils/leak_check.hpp"
 
+class ListInstancedMatDefault : public MeshList<ListInstancedMatDefault, GLMesh *, size_t>
+{};
+
+class ListInstancedMatAlphaRef : public MeshList<ListInstancedMatAlphaRef, GLMesh *, size_t>
+{};
+
+class ListInstancedMatGrass : public MeshList<ListInstancedMatGrass, GLMesh *, size_t, core::vector3df, core::vector3df>
+{};
+
 class STKInstancedSceneNode : public irr::scene::CMeshSceneNode
 {
 protected:
@@ -27,6 +36,10 @@ public:
     ~STKInstancedSceneNode();
     virtual void render();
     void addInstance(const core::vector3df &origin, const core::vector3df &orientation, const core::vector3df &scale);
+
+    int getInstanceCount() const { return instance_pos.size() / 9; }
+
+    core::matrix4 getInstanceTransform(int id);
 
     void instanceGrab() { m_ref_count++; }
     void instanceDrop()

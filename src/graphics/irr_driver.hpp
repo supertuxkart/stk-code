@@ -196,6 +196,7 @@ class IrrDriver : public IEventReceiver, public NoCopy
 private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
+    bool m_need_ubo_workaround;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -212,14 +213,13 @@ private:
     Shaders              *m_shaders;
     /** Wind. */
     Wind                 *m_wind;
-    float                m_exposure;
-    float                m_lwhite;
     /** RTTs. */
     RTT                *m_rtts;
     std::vector<core::matrix4> sun_ortho_matrix;
     core::vector3df    rh_extend;
     core::matrix4      rh_matrix;
     core::matrix4      rsm_matrix;
+    core::vector2df    m_current_screen_size;
 
     /** Additional details to be shown in case that a texture is not found.
      *  This is used to specify details like: "while loading kart '...'" */
@@ -233,6 +233,7 @@ private:
 
     std::vector<video::ITexture *> SkyboxTextures;
     std::vector<video::ITexture *> SphericalHarmonicsTextures;
+    bool m_SH_dirty;
 
     float blueSHCoeff[9];
     float greenSHCoeff[9];
@@ -278,30 +279,17 @@ public:
             return 120;
     }
 
+    bool needUBOWorkaround() const
+    {
+        return m_need_ubo_workaround;
+    }
+
     bool hasVSLayerExtension() const
     {
         return hasVSLayer;
     }
 
-    float getExposure() const
-    {
-        return m_exposure;
-    }
-
-    void setExposure(float v)
-    {
-        m_exposure = v;
-    }
-
-    float getLwhite() const
-    {
-      return m_lwhite;
-    }
-
-    void setLwhite(float v)
-    {
-        m_lwhite = v;
-    }
+    video::SColorf getAmbientLight() const;
 
     struct GlowData {
         scene::ISceneNode * node;
@@ -356,6 +344,10 @@ private:
 
     STKRenderingPass m_phase;
 
+    float m_ssao_radius;
+    float m_ssao_k;
+    float m_ssao_sigma;
+
 #ifdef DEBUG
     /** Used to visualise skeletons. */
     std::vector<irr::scene::IAnimatedMeshSceneNode*> m_debug_meshes;
@@ -370,6 +362,7 @@ private:
     void renderGLSL(float dt);
     void renderSolidFirstPass();
     void renderSolidSecondPass();
+    void renderNormalsVisualisation();
     void renderTransparent();
     void renderParticles();
     void computeSunVisibility();
@@ -385,6 +378,7 @@ public:
     void initDevice();
     void reset();
     void generateSkyboxCubemap();
+    void generateDiffuseCoefficients();
     void renderSkybox(const scene::ICameraSceneNode *camera);
     void setPhase(STKRenderingPass);
     STKRenderingPass getPhase() const;
@@ -402,7 +396,7 @@ public:
                                     const std::string& mask_path);
     void displayFPS();
     bool                  OnEvent(const irr::SEvent &event);
-    void                  setAmbientLight(const video::SColor &light);
+    void                  setAmbientLight(const video::SColorf &light);
     std::string           generateSmallerTextures(const std::string& dir);
     std::string           getSmallerTexture(const std::string& texture);
     video::ITexture      *getTexture(FileManager::AssetType type,
@@ -688,6 +682,37 @@ public:
     const core::matrix4 & getPreviousPVMatrix() { return m_previousProjViewMatrix; }
     const core::matrix4 &getProjViewMatrix() const { return m_ProjViewMatrix; }
     const core::matrix4 &getInvProjViewMatrix() const { return m_InvProjViewMatrix; }
+    const core::vector2df &getCurrentScreenSize() const { return m_current_screen_size; }
+    // ------------------------------------------------------------------------
+    float getSSAORadius() const
+    {
+        return m_ssao_radius;
+    }
+
+    void setSSAORadius(float v)
+    {
+        m_ssao_radius = v;
+    }
+
+    float getSSAOK() const
+    {
+        return m_ssao_k;
+    }
+
+    void setSSAOK(float v)
+    {
+        m_ssao_k = v;
+    }
+
+    float getSSAOSigma() const
+    {
+        return m_ssao_sigma;
+    }
+
+    void setSSAOSigma(float v)
+    {
+        m_ssao_sigma = v;
+    }
 #ifdef DEBUG
     /** Removes debug meshes. */
     void clearDebugMesh() { m_debug_meshes.clear(); }

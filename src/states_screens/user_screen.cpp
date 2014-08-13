@@ -27,6 +27,7 @@
 #include "guiengine/widgets/list_widget.hpp"
 #include "guiengine/widgets/text_box_widget.hpp"
 #include "states_screens/dialogs/message_dialog.hpp"
+#include "states_screens/dialogs/recovery_dialog.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/options_screen_audio.hpp"
 #include "states_screens/options_screen_input.hpp"
@@ -278,6 +279,10 @@ void BaseUserScreen::eventCallback(Widget* widget,
         {
             StateManager::get()->popMenu();
             onEscapePressed();
+        }
+        else if (button == "recover")
+        {
+            new RecoveryDialog();
         }
         else if (button == "rename")
         {

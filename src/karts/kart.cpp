@@ -36,6 +36,7 @@
 #include "graphics/shadow.hpp"
 #include "graphics/skid_marks.hpp"
 #include "graphics/slip_stream.hpp"
+#include "graphics/stk_text_billboard.hpp"
 #include "graphics/stars.hpp"
 #include "guiengine/scalable_font.hpp"
 #include "karts/explosion_animation.hpp"
@@ -342,6 +343,7 @@ void Kart::reset()
     m_has_started          = false;
     m_wheel_rotation       = 0;
     m_bounce_back_time     = 0.0f;
+    m_brake_time           = 0.0f;
     m_time_last_crash      = 0.0f;
     m_speed                = 0.0f;
     m_current_lean         = 0.0f;
@@ -581,39 +583,40 @@ void Kart::createPhysics()
 
     btCollisionShape *shape;
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
-    if(bevel.getX() || bevel.getY() || bevel.getZ())
+    Vec3 wheel_pos[4];
+    assert(bevel.getX() || bevel.getY() || bevel.getZ());
+    
+    Vec3 orig_factor(1, 1, 1 - bevel.getZ());
+    Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
+    btConvexHullShape *hull = new btConvexHullShape();
+    for (int y = -1; y <= 1; y += 2)
     {
-        Vec3 orig_factor(1, 1, 1-bevel.getZ());
-        Vec3 bevel_factor(1.0f-bevel.getX(),
-                          1.0f-bevel.getY(),
-                          1.0f               );
-        btConvexHullShape *hull = new btConvexHullShape();
-        for(int x=-1; x<=1; x+=2)
+        for (int z = -1; z <= 1; z += 2)
         {
-            for(int y=-1; y<=1; y+=2)
+            for (int x = -1; x <= 1; x += 2)
             {
-                for(int z=-1; z<=1; z+=2)
+                Vec3 p(x*getKartModel()->getWidth() *0.5f,
+                       y*getKartModel()->getHeight()*0.5f,
+                       z*getKartModel()->getLength()*0.5f);
+
+                hull->addPoint(p*orig_factor);
+                hull->addPoint(p*bevel_factor);
+                // Store the x/z position for the wheels as a weighted average
+                // of the two bevelled points.
+                if (y == -1)
                 {
-                    Vec3 p(x*getKartModel()->getWidth()*0.5f,
-                          y*getKartModel()->getHeight()*0.5f,
-                          z*getKartModel()->getLength()*0.5f);
+                    int index = (x + 1) / 2 + 1 - z;  // get index of wheel
+                    float f = getKartProperties()->getPhysicalWheelPosition();
+                    wheel_pos[index] = p*(orig_factor*(1.0f-f) + bevel_factor*f);
+                    wheel_pos[index].setY(0);
+                }  // if z==-1
+            }   // for x
+        }   // for z
+    }   // for y
 
-                    hull->addPoint(p*orig_factor);
-                    hull->addPoint(p*bevel_factor);
-                }   // for z
-            }   // for y
-        }   // for x
-
-        // This especially enables proper drawing of the point cloud
-        hull->initializePolyhedralFeatures();
-        shape = hull;
-    }   // bevel.getX()!=0
-    else
-    {
-        shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                         0.5f*kart_height,
-                                         0.5f*kart_length));
-    }
+    // This especially enables proper drawing of the point cloud
+    hull->initializePolyhedralFeatures();
+    shape = hull;
 
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
@@ -670,7 +673,7 @@ void Kart::createPhysics()
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
-                            m_kart_model->getWheelPhysicsPosition(i),
+                            wheel_pos[i],
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
@@ -1097,7 +1100,7 @@ void Kart::update(float dt)
 
     // TODO: hiker said this probably will be moved to btKart or so when updating bullet engine.
     // Neutralize any yaw change if the kart leaves the ground, so the kart falls more or less
-    // straight after jumping, but still allowing some "boat shake" (roll and pitch).
+    // straight after jumping, but still allowing some "boat shake" (roIll and pitch).
     // Otherwise many non perfect jumps end in a total roll over or a serious change of
     // direction, sometimes 90 or even full U turn (real but less fun for a karting game).
     // As side effect steering becames a bit less responsive (any wheel on air), but not too bad.
@@ -2022,30 +2025,6 @@ void Kart::updatePhysics(float dt)
     m_max_speed->setMinSpeed(min_speed);
     m_max_speed->update(dt);
 
-    // If the kart is flying, keep its up-axis aligned to gravity (which in
-    // turn typically means the kart is parallel to the ground). This avoids
-    // that the kart rotates in mid-air and lands on its side.
-    if(m_vehicle->getNumWheelsOnGround()==0)
-    {
-        btVector3 kart_up = getTrans().getBasis().getColumn(1);  // up vector
-        btVector3 terrain_up = m_body->getGravity();
-        float g = World::getWorld()->getTrack()->getGravity();
-        // Normalize the gravity, g is the length of the vector
-        btVector3 new_up = 0.9f * kart_up + 0.1f * terrain_up/-g;
-        // Get the rotation (hpr) based on current heading.
-        Vec3 rotation(getHeading(), new_up);
-        btMatrix3x3 m;
-        m.setEulerZYX(rotation.getX(), rotation.getY(), rotation.getZ());
-        // We can't use getXYZ() for the position here, since the position is
-        // based on interpolation, while the actual center-of-mass-transform
-        // is based on the actual value every 1/60 of a second (using getXYZ()
-        // would result in the kart being pushed ahead a bit, making it jump
-        // much further, depending on fps)
-        btTransform new_trans(m, m_body->getCenterOfMassTransform().getOrigin());
-        //setTrans(new_trans);
-        m_body->setCenterOfMassTransform(new_trans);
-    }
-
     // To avoid tunneling (which can happen on long falls), clamp the
     // velocity in Y direction. Tunneling can happen if the Y velocity
     // is larger than the maximum suspension travel (per frame), since then
@@ -2173,6 +2152,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         if(m_vehicle->getWheelInfo(0).m_brake &&
             !World::getWorld()->isStartPhase())
             m_vehicle->setAllBrakes(0);
+        m_brake_time = 0;
     }
     else
     {   // not accelerating
@@ -2182,9 +2162,11 @@ void Kart::updateEnginePowerAndBrakes(float dt)
             if(m_speed > 0.0f)
             {   // Still going forward while braking
                 applyEngineForce(0.f);
-
-                //apply the brakes
-                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor());
+                m_brake_time += dt;
+                // Apply the brakes - include the time dependent brake increase
+                float f = 1 + m_brake_time
+                            * getKartProperties()->getBrakeTimeIncrease();
+                m_vehicle->setAllBrakes(m_kart_properties->getBrakeFactor()*f);
             }
             else   // m_speed < 0
             {
@@ -2208,6 +2190,7 @@ void Kart::updateEnginePowerAndBrakes(float dt)
         }
         else   // !m_brake
         {
+            m_brake_time = 0;
             // lift the foot from throttle, brakes with 10% engine_power
             assert(!isnan(m_controls.m_accel));
             assert(!isnan(engine_power));
@@ -2518,38 +2501,29 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        height_above_terrain[i] =
-            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
-             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
-            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
+        const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
+        height_above_terrain[i] = wi.m_raycastInfo.m_suspensionLength;
         if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
     }
+    float kart_hat = m_kart_model->getLowestPoint();
 
-    float chassis_delta = 0;
-    // Check if the chassis needs to be moved down so that the wheels look
-    // like they are in the rest state, i.e. the wheels are not too far down.
-    if(min_hat > m_kart_model->getLowestPoint())
+    if(min_hat >= kart_hat)
     {
-        chassis_delta = min_hat - m_kart_model->getLowestPoint();
         for(unsigned int i=0; i<4; i++)
-            height_above_terrain[i] -= chassis_delta;
+            height_above_terrain[i] = kart_hat;
     }
-
     m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(),
-                        height_above_terrain, m_speed);
-
+                         height_above_terrain, m_speed);
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
-    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
-
-    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height
-                       - m_kart_model->getLowestPoint() -chassis_delta    );
+    float heading = m_skidding->getVisualSkidRotation();
+    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() - kart_hat
+                              + lean_height-m_kart_model->getLowestPoint(), 0);
     center_shift = getTrans().getBasis() * center_shift;
 
-    float heading = m_skidding->getVisualSkidRotation();
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
 
@@ -2598,21 +2572,36 @@ btQuaternion Kart::getVisualRotation() const
 void Kart::setOnScreenText(const wchar_t *text)
 {
     core::dimension2d<u32> textsize = GUIEngine::getFont()->getDimension(text);
+
     // FIXME: Titlefont is the only font guaranteed to be loaded if STK
     // is started without splash screen (since "Loading" is shown even in this
     // case). A smaller font would be better
-    // TODO: Add support in the engine for BillboardText or find a replacement
-    /*scene::ISceneManager* sm = irr_driver->getSceneManager();
-    sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
-                                                  : GUIEngine::getTitleFont(),
-                                  text,
-                                  getNode(),
-                                  core::dimension2df(textsize.Width/55.0f,
-                                                     textsize.Height/55.0f),
-                                  core::vector3df(0.0f, 1.5f, 0.0f),
-                                  -1, // id
-                                  video::SColor(255, 255, 225, 0),
-                                  video::SColor(255, 255, 89, 0));*/
+
+    if (irr_driver->isGLSL())
+    {
+        gui::ScalableFont* font = GUIEngine::getFont() ? GUIEngine::getFont() : GUIEngine::getTitleFont();
+        STKTextBillboard* tb = new STKTextBillboard(text, font,
+            video::SColor(255, 255, 225, 0),
+            video::SColor(255, 255, 89, 0),
+            getNode(), irr_driver->getSceneManager(), -1,
+            core::vector3df(0.0f, 1.5f, 0.0f),
+            core::vector3df(1.0f, 1.0f, 1.0f));
+    }
+    else
+    {
+        scene::ISceneManager* sm = irr_driver->getSceneManager();
+        sm->addBillboardTextSceneNode(GUIEngine::getFont() ? GUIEngine::getFont()
+            : GUIEngine::getTitleFont(),
+            text,
+            getNode(),
+            core::dimension2df(textsize.Width/55.0f,
+            textsize.Height/55.0f),
+            core::vector3df(0.0f, 1.5f, 0.0f),
+            -1, // id
+            video::SColor(255, 255, 225, 0),
+            video::SColor(255, 255, 89, 0));
+    }
+
     // No need to store the reference to the billboard scene node:
     // It has one reference to the parent, and will get deleted
     // when the parent is deleted.

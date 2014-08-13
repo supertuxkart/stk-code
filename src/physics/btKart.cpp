@@ -387,6 +387,17 @@ void btKart::updateVehicle( btScalar step )
         if(m_wheelInfo[i].m_raycastInfo.m_isInContact)
             m_num_wheels_on_ground++;
     }
+
+    // If the kart is flying, try to keep it parallel to the ground.
+    if(m_num_wheels_on_ground==0)
+    {
+        btVector3 kart_up    = getChassisWorldTransform().getBasis().getColumn(1);
+        btVector3 terrain_up(0,1,0);
+        btVector3 axis = kart_up.cross(terrain_up);
+        // Give a nicely balanced feeling for rebalancing the kart
+        m_chassisBody->applyTorqueImpulse(axis * m_kart->getKartProperties()->getSmoothFlyingImpulse());
+    }
+
     // Work around: make sure that either both wheels on one axis
     // are on ground, or none of them. This avoids the problem of
     // the kart suddenly getting additional angular velocity because

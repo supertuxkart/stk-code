@@ -16,7 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 #include "online/online_player_profile.hpp"
 
 #include "achievements/achievements_manager.hpp"
@@ -49,23 +48,25 @@ namespace Online
     /** Adds the login credential to a http request. It sets the name of
      *  the script to invokce, token, and user id.
      *  \param request The http request.
-     *  \param action If not empty, the action to be set.
+     *  \param action the action performed
      */
     void OnlinePlayerProfile::setUserDetails(HTTPRequest *request,
                                              const std::string &action,
-                                             const std::string &php_script) const
+                                             const std::string &url_path) const
     {
-        if (php_script.size()>0)
-            request->setServerURL(php_script);
-        else
-            request->setServerURL("client-user.php");
+        if (url_path.size())
+        {
+            request->setApiURL(url_path, action);
+        }
+        else // default path
+        {
+            request->setApiURL(API::USER_PATH, action);
+        }
 
         if (m_profile)
             request->addParameter("userid", m_profile->getID());
-        if(m_online_state == OS_SIGNED_IN)
+        if (m_online_state == OS_SIGNED_IN)
             request->addParameter("token", m_token);
-        if (action.size() > 0)
-            request->addParameter("action", action);
     }   // setUserDetails
 
     // ========================================================================
@@ -86,16 +87,17 @@ namespace Online
         m_profile      = NULL;
 
     }   // OnlinePlayerProfile
+
     // ------------------------------------------------------------------------
-    /** Request a login using the saved credentials of the user.
-     */
+    /** Request a login using the saved credentials of the user. */
     void OnlinePlayerProfile::requestSavedSession()
     {
-        SignInRequest * request = NULL;
+        SignInRequest *request = NULL;
         if (m_online_state == OS_SIGNED_OUT && hasSavedSession())
         {
             request = new SignInRequest(true);
             setUserDetails(request, "saved-session");
+
             // The userid must be taken from the saved data,
             // setUserDetails takes it from current data.
             request->addParameter("userid", getSavedUserId());
@@ -117,18 +119,19 @@ namespace Online
         // If the player changes the online account, there can be a
         // logout stil happening.
         assert(m_online_state == OS_SIGNED_OUT ||
-               m_online_state == OS_SIGNING_OUT   );
+               m_online_state == OS_SIGNING_OUT);
         SignInRequest * request = new SignInRequest(false);
+
         // We can't use setUserDetail here, since there is no token yet
-        request->setServerURL("client-user.php");
-        request->addParameter("action","connect");
-        request->addParameter("username",username);
-        request->addParameter("password",password);
+        request->setApiURL(API::USER_PATH, "connect");
+        request->addParameter("username", username);
+        request->addParameter("password", password);
         request->addParameter("save-session",
                               rememberPassword() ? "true"
                                                  : "false");
         request->queue();
         m_online_state = OS_SIGNING_IN;
+
         return request;
     }   // requestSignIn
 
@@ -143,13 +146,13 @@ namespace Online
 
         // If the login is successful, reset any saved session of other
         // local players using the same online account (which are now invalid)
-        if(isSuccess())
+        if (isSuccess())
         {
             PlayerProfile *current = PlayerManager::getCurrentPlayer();
-            for(unsigned int i=0; i<PlayerManager::get()->getNumPlayers(); i++)
+            for (unsigned int i = 0; i < PlayerManager::get()->getNumPlayers(); i++)
             {
                 PlayerProfile *player = PlayerManager::get()->getPlayer(i);
-                if(player!=current &&
+                if(player != current &&
                     player->hasSavedSession() &&
                     player->getLastOnlineName() == current->getLastOnlineName())
                 {
@@ -157,7 +160,8 @@ namespace Online
                 }
             }
         }
-        if(login)
+
+        if (login)
         {
             if(isSuccess())
                 login->loginSuccessful();
@@ -178,12 +182,14 @@ namespace Online
     {
         if (success)
         {
-            int token_fetched       = input->get("token", &m_token);
             core::stringw username("");
-            int username_fetched    = input->get("username", &username);
             uint32_t userid(0);
+
+            int token_fetched       = input->get("token", &m_token);
+            int username_fetched    = input->get("username", &username);
             int userid_fetched      = input->get("userid", &userid);
             setLastOnlineName(username);
+
             m_profile = new OnlineProfile(userid, username, true);
             assert(token_fetched && username_fetched && userid_fetched);
             m_online_state = OS_SIGNED_IN;
@@ -191,8 +197,10 @@ namespace Online
             {
                 saveSession(getOnlineId(), getToken());
             }
+
             ProfileManager::get()->addPersistent(m_profile);
             std::string achieved_string("");
+
             // Even if no achievements were sent, we have to call sync
             // in order to upload local achievements to the server
             input->get("achieved", &achieved_string);
@@ -260,6 +268,7 @@ namespace Online
     {
         GUIEngine::Screen *screen = GUIEngine::getCurrentScreen();
         BaseUserScreen *user_screen = dynamic_cast<BaseUserScreen*>(screen);
+
         // We can't do much of error handling here, no screen waits for
         // a logout to finish, so we can only log the message to screen,
         // and otherwise mark the player logged out internally.
@@ -269,20 +278,21 @@ namespace Online
                       "There were some connection issues while signing out. "
                       "Report a bug if this caused issues.");
             Log::warn("OnlinePlayerProfile::signOut", core::stringc(info.c_str()).c_str());
-            if(user_screen)
+            if (user_screen)
                 user_screen->logoutError(info);
         }
         else
         {
-            if(user_screen)
+            if (user_screen)
                 user_screen->logoutSuccessful();
         }
 
         ProfileManager::get()->clearPersistent();
         m_profile = NULL;
         m_online_state = OS_SIGNED_OUT;
+
         // Discard token if session should not be saved.
-        if(!rememberPassword())
+        if (!rememberPassword())
             clearSession();
     }   // signOut
 
@@ -293,7 +303,8 @@ namespace Online
     void OnlinePlayerProfile::requestPoll() const
     {
         assert(m_online_state == OS_SIGNED_IN);
-        OnlinePlayerProfile::PollRequest * request = new OnlinePlayerProfile::PollRequest();
+
+        OnlinePlayerProfile::PollRequest *request = new OnlinePlayerProfile::PollRequest();
         setUserDetails(request, "poll");
         request->queue();
     }   // requestPoll()
@@ -304,127 +315,137 @@ namespace Online
      */
     void OnlinePlayerProfile::PollRequest::callback()
     {
-        if(isSuccess())
+        // connection error
+        if (!isSuccess())
         {
-            if (!PlayerManager::getCurrentPlayer()->isLoggedIn())
-                return;
-            if (PlayerManager::getCurrentPlayer()->getProfile()->hasFetchedFriends())
+            Log::error("Online Player Profile", "Poll request failed");
+            return;
+        }
+
+        if (!PlayerManager::getCurrentPlayer()->isLoggedIn())
+            return;
+
+        if (PlayerManager::getCurrentPlayer()->getProfile()->hasFetchedFriends())
+        {
+            std::string online_friends_string("");
+            if (getXMLData()->get("online", &online_friends_string) == 1)
             {
-                std::string online_friends_string("");
-                if(getXMLData()->get("online", &online_friends_string) == 1)
+                std::vector<uint32_t> online_friends =
+                      StringUtils::splitToUInt(online_friends_string, ' ');
+
+                // flag that indicates if a current online friend went offline
+                bool went_offline = false;
+
+                // iterate over all friends and find out if they come online or not
+                // filling the notification messages
+                std::vector<uint32_t> friends =
+                    PlayerManager::getCurrentPlayer()->getProfile()->getFriends();
+                std::vector<core::stringw> to_notify;
+                for (unsigned int i = 0; i < friends.size(); ++i)
                 {
-                    std::vector<uint32_t> online_friends =
-                          StringUtils::splitToUInt(online_friends_string, ' ');
-                    bool went_offline = false;
-                    std::vector<uint32_t> friends =
-                        PlayerManager::getCurrentPlayer()->getProfile()->getFriends();
-                    std::vector<core::stringw> to_notify;
-                    for(unsigned int i = 0; i < friends.size(); ++i)
-                    {
-                         bool now_online = false;
-                         std::vector<uint32_t>::iterator iter =
-                             std::find(online_friends.begin(),
-                                       online_friends.end(), friends[i]);
-                         if (iter != online_friends.end())
-                         {
-                             now_online = true;
-                             online_friends.erase(iter);
-                         }
-                         OnlineProfile * profile =
-                             ProfileManager::get()->getProfileByID(friends[i]);
-                         OnlineProfile::RelationInfo * relation_info =
-                                                    profile->getRelationInfo();
-                         if( relation_info->isOnline() )
-                         {
-                             if (!now_online)
-                             {
-                                 relation_info->setOnline(false);
-                                 went_offline = true;
-                             }
-                         }
-                         else
-                         {
-                             if (now_online)
-                             {
-                                 //User came online
-                                 relation_info->setOnline(true);
-                                 // Do this because a user might have accepted
-                                 // a pending friend request.
-                                 profile->setFriend();
-                                 to_notify.push_back(profile->getUserName());
-                             }
-                         }
+                     bool now_online = false;
+                     std::vector<uint32_t>::iterator found_friend =
+                         std::find(online_friends.begin(),
+                                   online_friends.end(), friends[i]);
+                     if (found_friend != online_friends.end())
+                     {
+                         now_online = true;
+                         online_friends.erase(found_friend);
+                     }
 
-                    }
+                     OnlineProfile * profile =
+                         ProfileManager::get()->getProfileByID(friends[i]);
+                     OnlineProfile::RelationInfo * relation_info =
+                                                profile->getRelationInfo();
 
-                    if(to_notify.size() > 0)
-                    {
-                        core::stringw message("");
-                        if(to_notify.size() == 1)
-                        {
-                            message = _("%s is now online.", to_notify[0]);
-                        }
-                        else if(to_notify.size() == 2)
-                        {
-                            message = _("%s and %s are now online.",
-                                        to_notify[0], to_notify[1]    );
-                        }
-                        else if(to_notify.size() == 3)
-                        {
-                            message = _("%s, %s and %s are now online.",
-                                     to_notify[0], to_notify[1], to_notify[2]);
-                        }
-                        else if(to_notify.size() > 3)
-                        {
-                            message = _("%d friends are now online.",
-                                        to_notify.size());
-                        }
-                        MessageQueue::add(MessageQueue::MT_FRIEND, message);
-                    }
-                    else if(went_offline)
-                    {
-                        OnlineProfileFriends::getInstance()->refreshFriendsList();
-                    }
+                     if (relation_info->isOnline())
+                     {
+                         if (!now_online) // the friend went offline
+                         {
+                             relation_info->setOnline(false);
+                             went_offline = true;
+                         }
+                     }
+                     else
+                     {
+                         if (now_online) // friend came online
+                         {
+                             relation_info->setOnline(true);
+
+                             // Do this because a user might have accepted
+                             // a pending friend request.
+                             profile->setFriend();
+                             to_notify.push_back(profile->getUserName());
+                         }
+                     }
                 }
+
+                if (to_notify.size() > 0)
+                {
+                    core::stringw message("");
+                    if(to_notify.size() == 1)
+                    {
+                        message = _("%s is now online.", to_notify[0]);
+                    }
+                    else if(to_notify.size() == 2)
+                    {
+                        message = _("%s and %s are now online.",
+                                    to_notify[0], to_notify[1]    );
+                    }
+                    else if(to_notify.size() == 3)
+                    {
+                        message = _("%s, %s and %s are now online.",
+                                 to_notify[0], to_notify[1], to_notify[2]);
+                    }
+                    else if(to_notify.size() > 3)
+                    {
+                        message = _("%d friends are now online.",
+                                    to_notify.size());
+                    }
+                    MessageQueue::add(MessageQueue::MT_FRIEND, message);
+                }
+                else if (went_offline)
+                {
+                    OnlineProfileFriends::getInstance()->refreshFriendsList();
+                }
+            }
+        }
+        else
+        {
+            PlayerManager::getCurrentPlayer()->getProfile()->fetchFriends();
+        }
+
+        int friend_request_count = 0;
+        for (unsigned int i = 0; i < getXMLData()->getNumNodes(); i++)
+        {
+            const XMLNode * node = getXMLData()->getNode(i);
+            if (node->getName() == "new_friend_request")
+            {
+                OnlineProfile::RelationInfo * ri =
+                    new OnlineProfile::RelationInfo("New", false, true, true);
+                OnlineProfile * p = new OnlineProfile(node);
+                p->setRelationInfo(ri);
+                ProfileManager::get()->addPersistent(p);
+                friend_request_count++;
+            }
+        }
+
+        if (friend_request_count > 0)
+        {
+            core::stringw message("");
+            if (friend_request_count > 1)
+            {
+                message = _("You have %d new friend requests!",
+                            friend_request_count);
             }
             else
             {
-                PlayerManager::getCurrentPlayer()->getProfile()->fetchFriends();
+                message = _("You have a new friend request!");
             }
 
-            int friend_request_count = 0;
-            for(unsigned int i = 0; i < getXMLData()->getNumNodes(); i++)
-            {
-                const XMLNode * node = getXMLData()->getNode(i);
-                if(node->getName() == "new_friend_request")
-                {
-                    OnlineProfile::RelationInfo * ri =
-                        new OnlineProfile::RelationInfo("New", false, true, true);
-                    OnlineProfile * p = new OnlineProfile(node);
-                    p->setRelationInfo(ri);
-                    ProfileManager::get()->addPersistent(p);
-                    friend_request_count++;
-                }
-            }
-            if(friend_request_count > 0)
-            {
-                core::stringw message("");
-                if(friend_request_count > 1)
-                {
-                    message = _("You have %d new friend requests!",
-                                friend_request_count);
-                }
-                else
-                {
-                    message = _("You have a new friend request!");
-                }
-                MessageQueue::add(MessageQueue::MT_FRIEND, message);
-                OnlineProfileFriends::getInstance()->refreshFriendsList();
-            }
+            MessageQueue::add(MessageQueue::MT_FRIEND, message);
+            OnlineProfileFriends::getInstance()->refreshFriendsList();
         }
-        // FIXME show connection error??
-        // Perhaps show something after 2 misses.
-
     }   // PollRequest::callback
 
     // ------------------------------------------------------------------------
@@ -432,11 +453,12 @@ namespace Online
      */
     uint32_t OnlinePlayerProfile::getOnlineId() const
     {
-        if((m_online_state == OS_SIGNED_IN ))
+        if (m_online_state == OS_SIGNED_IN)
         {
             assert(m_profile != NULL);
             return m_profile->getID();
         }
+
         return 0;
     }   // getOnlineId
 

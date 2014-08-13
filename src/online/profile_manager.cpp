@@ -16,7 +16,6 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-
 #include "online/profile_manager.hpp"
 
 #include "online/online_profile.hpp"
@@ -50,7 +49,8 @@ ProfileManager::~ProfileManager()
 {
     clearPersistent();
     ProfilesMap::iterator it;
-    for (it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it) {
+    for (it = m_profiles_cache.begin(); it != m_profiles_cache.end(); ++it)
+    {
         delete it->second;
     }
 }   // ~ProfileManager
@@ -72,8 +72,8 @@ int  ProfileManager::guaranteeCacheSize(unsigned int min_num)
             min_num = 100;
         m_max_cache_size = min_num;
     }
-    return m_max_cache_size;
 
+    return m_max_cache_size;
 }   // guaranteeCacheSize
 
 // ------------------------------------------------------------------------
@@ -88,7 +88,8 @@ OnlineProfile* ProfileManager::getProfileByID(const uint32_t id)
         return m_profiles_persistent[id];
     if (isInCache(id))
         return m_profiles_cache[id];
-    //FIXME not able to get! Now this should actually fetch the info from the
+
+    // FIXME not able to get! Now this should actually fetch the info from the
     // server, but I haven't come up with a good asynchronous idea yet.
     return NULL;
 }   // getProfileByID
@@ -135,12 +136,14 @@ void ProfileManager::addDirectToCache(OnlineProfile* profile)
                 break;
             }
             else
+            {
                 ++iter;
-        }
+            }
+        } // for profile in cache
     }
+
     m_profiles_cache[profile->getID()] = profile;
     assert(m_profiles_cache.size() <= m_max_cache_size);
-
 }   // addDirectToCache
 
 // ------------------------------------------------------------------------
@@ -155,6 +158,7 @@ bool ProfileManager::isInCache(const uint32_t id)
         updateCacheBits(i->second);
         return true;
     }
+
     return false;
 }   // isInCache
 
@@ -180,6 +184,7 @@ void ProfileManager::updateCacheBits(OnlineProfile * profile)
             if (!iter->second->getCacheBit())
                 return;
         }
+
         // All cache bits are set! Set them all to zero except the one
         // currently being visited
         for (iter = m_profiles_cache.begin();
@@ -189,7 +194,6 @@ void ProfileManager::updateCacheBits(OnlineProfile * profile)
         }
         profile->setCacheBit(true);
     }
-
 }   // updateCacheBits
 
 // ------------------------------------------------------------------------
@@ -232,10 +236,13 @@ void ProfileManager::deleteFromPersistent(const uint32_t id)
         m_profiles_persistent.erase(id);
     }
     else
+    {
         Log::warn("ProfileManager",
                   "Tried to remove profile with id %d from persistent while "
                   "not present", id);
+    }
 }   // deleteFromPersistent
+
 
 // ------------------------------------------------------------------------
 /** Deletes all persistent profiles.
@@ -265,10 +272,11 @@ void ProfileManager::moveToCache(const uint32_t id)
         addToCache(profile);
     }
     else
+    {
         Log::warn("ProfileManager",
                   "Tried to move profile with id %d from persistent to "
                   "cache while not present", id);
+    }
 }   // moveToCache
-
 
 } // namespace Online

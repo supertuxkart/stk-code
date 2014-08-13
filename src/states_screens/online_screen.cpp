@@ -168,36 +168,36 @@ void OnlineScreen::onUpdate(float delta)
 void OnlineScreen::doQuickPlay()
 {
     // Refresh server list.
-    HTTPRequest* request = ServersManager::get()->refreshRequest(false);
-    if (request != NULL) // consider request done
+    HTTPRequest* refresh_request = ServersManager::get()->refreshRequest(false);
+    if (refresh_request != NULL) // consider request done
     {
-        request->executeNow();
-        delete request;
+        refresh_request->executeNow();
+        delete refresh_request;
     }
     else
     {
         Log::error("OnlineScreen", "Could not get the server list.");
         return;
     }
+
     // select first one
-    const Server * server = ServersManager::get()->getQuickPlay();
+    const Server *server = ServersManager::get()->getQuickPlay();
 
-
-    XMLRequest *request2 = new RequestConnection::ServerJoinRequest();
-    if (!request2)
+    // do a join request
+    XMLRequest *join_request = new RequestConnection::ServerJoinRequest();
+    if (!join_request)
     {
         sfx_manager->quickSound("anvil");
         return;
     }
 
-    PlayerManager::setUserDetails(request2, "request-connection");
-    request2->setServerURL("address-management.php");
-    request2->addParameter("server_id", server->getServerId());
+    PlayerManager::setUserDetails(join_request, "request-connection", Online::API::SERVER_PATH);
+    join_request->addParameter("server_id", server->getServerId());
 
-    request2->executeNow();
-    if (request2->isSuccess())
+    join_request->executeNow();
+    if (join_request->isSuccess())
     {
-        delete request2;
+        delete join_request;
         StateManager::get()->pushScreen(NetworkingLobby::getInstance());
         ConnectToServer *cts = new ConnectToServer(server->getServerId(),
                                                    server->getHostId());

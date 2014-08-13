@@ -39,10 +39,8 @@
 #include <queue>
 #include <pthread.h>
 
-
 namespace Online
 {
-
     /** A class to execute requests in a separate thread. Typically the
      *  requests involve a http(s) requests to be sent to the stk server, and
      *  receive an answer (e.g. to sign in; or to download an addon). The
@@ -86,11 +84,14 @@ namespace Online
         *                   grant permission
         *  IPERM_ALLOWED:   STK is allowed to access server.
         *  IPERM_NOT_ALLOWED: STK must not access external servers. */
-        enum InternetPermission {IPERM_NOT_ASKED  =0,
-                                 IPERM_ALLOWED    =1,
-                                 IPERM_NOT_ALLOWED=2 };
+        enum InternetPermission
+        {
+            IPERM_NOT_ASKED   = 0,
+            IPERM_ALLOWED     = 1,
+            IPERM_NOT_ALLOWED = 2
+        };
     protected:
-
+            /** Time passed since the last poll request. */
             float                     m_time_since_poll;
 
             /** The current requested being worked on. */
@@ -119,7 +120,7 @@ namespace Online
             void addResult(Online::Request *request);
             void handleResultQueue();
 
-            static void  *mainLoop(void *obj);
+            static void *mainLoop(void *obj);
 
             RequestManager(); //const std::string &url
             ~RequestManager();
@@ -136,12 +137,9 @@ namespace Online
             void startNetworkThread();
             void stopNetworkThread();
 
-            bool getAbort(){ return m_abort.getAtomic(); };
+            bool getAbort(){ return m_abort.getAtomic(); }
             void update(float dt);
 
     }; //class RequestManager
 } // namespace Online
-
 #endif // request_manager_HPP
-
-/*EOF*/

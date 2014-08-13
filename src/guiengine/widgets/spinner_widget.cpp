@@ -19,6 +19,7 @@
 
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
+#include "guiengine/scalable_font.hpp"
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "io/file_manager.hpp"
 #include "utils/string_utils.hpp"
@@ -161,6 +162,10 @@ void SpinnerWidget::add()
             label->setText(m_labels[m_value].c_str() );
         }
 
+        if (widget_size.getHeight() < GUIEngine::getFontHeight())
+        {
+            label->setOverrideFont(GUIEngine::getSmallFont());
+        }
     }
 
 

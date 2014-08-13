@@ -45,9 +45,8 @@ void GetPeerAddress::asynchronousUpdate()
     if (m_state == NONE)
     {
         m_request = new Online::XMLRequest();
-        PlayerManager::setUserDetails(m_request, "get",
-                                      "address-management.php");
-        m_request->addParameter("peer_id",m_peer_id);
+        PlayerManager::setUserDetails(m_request, "get", Online::API::SERVER_PATH);
+        m_request->addParameter("peer_id", m_peer_id);
 
         Online::RequestManager::get()->addRequest(m_request);
         m_state = REQUEST_PENDING;
@@ -63,10 +62,12 @@ void GetPeerAddress::asynchronousUpdate()
             {
                 TransportAddress* addr = static_cast<TransportAddress*>(m_callback_object);
                 result->get("ip", &addr->ip);
+
                 if (addr->ip == NetworkManager::getInstance()->getPublicAddress().ip)
                     result->get("private_port", &addr->port);
                 else
                     result->get("port", &addr->port);
+
                 Log::debug("GetPeerAddress", "Address gotten successfully.");
             }
             else

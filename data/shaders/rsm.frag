@@ -8,6 +8,7 @@ layout (location = 1) out vec3 RSMNormals;
 
 void main()
 {
+    if (texture(tex, uv).a < .5) discard;
     RSMColor = texture(tex, uv).xyz * color.rgb;
     RSMNormals = .5 * normalize(nor) + .5;
 }

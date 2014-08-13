@@ -30,6 +30,7 @@ endif()
 
 if(UNIX AND NOT APPLE)
     option(USE_XRANDR "Use xrandr instead of vidmode" ON)
+    option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -69,6 +70,13 @@ endif()
 # Build the angelscript library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
 include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+
+
+
+# Build the angelscript library
+add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
+include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
+
 
 
 # Set include paths
@@ -260,6 +268,11 @@ if(UNIX AND NOT APPLE)
     else()
         target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
     endif()
+    if(USE_ASAN)
+        add_definitions("-fsanitize=address")
+        add_definitions("-fno-omit-frame-pointer")
+        target_link_libraries(supertuxkart "-fsanitize=address")
+    endif()
 endif()
 
 if(APPLE)
@@ -370,3 +383,4 @@ install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)
 add_dependencies(supertuxkart supertuxkart.desktop)
+>>>>>>> 7111eb55eeced3f44df7f069652ebb627616684a

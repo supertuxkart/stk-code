@@ -22,6 +22,7 @@
 #include "guiengine/widgets/spinner_widget.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "utils/translation.hpp"
+#include "graphics/irr_driver.hpp"
 
 #include <IGUIEnvironment.h>
 
@@ -51,7 +52,6 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
 {
     getWidget<CheckBoxWidget>("anim_gfx")->setState( UserConfigParams::m_graphical_effects );
     getWidget<CheckBoxWidget>("weather_gfx")->setState( UserConfigParams::m_weather_effects );
-    getWidget<CheckBoxWidget>("ubo")->setState(!UserConfigParams::m_ubo_disabled);
     getWidget<CheckBoxWidget>("dof")->setState(UserConfigParams::m_dof);
     getWidget<CheckBoxWidget>("hd-textures")->setState(UserConfigParams::m_high_definition_textures);
 
@@ -83,7 +83,7 @@ void CustomVideoSettingsDialog::beforeAddingWidgets()
     shadows->addLabel( _("Disabled") );   // 0
     shadows->addLabel( _("low") );        // 1
     shadows->addLabel( _("high") );       // 2
-    if (!UserConfigParams::m_ubo_disabled)
+    if (!irr_driver->needUBOWorkaround())
         shadows->setValue(UserConfigParams::m_shadows);
     else
         shadows->setValue(0);
@@ -109,11 +109,11 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_dof =
             advanced_pipeline && getWidget<CheckBoxWidget>("dof")->getState();
-        
+
         UserConfigParams::m_motionblur      =
             advanced_pipeline && getWidget<CheckBoxWidget>("motionblur")->getState();
-        
-        if (advanced_pipeline && getWidget<CheckBoxWidget>("ubo")->getState())
+
+        if (advanced_pipeline)
         {
             UserConfigParams::m_shadows =
                 getWidget<SpinnerWidget>("shadows")->getValue();
@@ -149,9 +149,6 @@ GUIEngine::EventPropagation CustomVideoSettingsDialog::processEvent(const std::s
 
         UserConfigParams::m_weather_effects =
             getWidget<CheckBoxWidget>("weather_gfx")->getState();
-
-        UserConfigParams::m_ubo_disabled =
-            !getWidget<CheckBoxWidget>("ubo")->getState();
 
         UserConfigParams::m_high_definition_textures =
             getWidget<CheckBoxWidget>("hd-textures")->getState();

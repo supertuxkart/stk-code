@@ -370,7 +370,20 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
         delete[] Y1minus1[face];
         delete[] Y10[face];
         delete[] Y11[face];
+        delete[] Y2minus2[face];
+        delete[] Y2minus1[face];
+        delete[] Y20[face];
+        delete[] Y21[face];
+        delete[] Y22[face];
     }
+}
+
+static void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i, unsigned old_j, unsigned new_i, unsigned new_j)
+{
+    new_img[4 * (stride * new_i + new_j)] = old_img[4 * (stride * old_i + old_j)];
+    new_img[4 * (stride * new_i + new_j) + 1] = old_img[4 * (stride * old_i + old_j) + 1];
+    new_img[4 * (stride * new_i + new_j) + 2] = old_img[4 * (stride * old_i + old_j) + 2];
+    new_img[4 * (stride * new_i + new_j) + 3] = old_img[4 * (stride * old_i + old_j) + 3];
 }
 
 /** Generate an opengl cubemap texture from 6 2d textures.
@@ -416,6 +429,19 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
         image->copyToScaling(rgba[i], w, h);
         image->drop();
 
+        if (i == 2 || i == 3)
+        {
+            char *tmp = new char[w * h * 4];
+            memcpy(tmp, rgba[i], w * h * 4);
+            for (unsigned x = 0; x < w; x++)
+            {
+                for (unsigned y = 0; y < h; y++)
+                {
+                    swapPixels(tmp, rgba[i], h, x, y, (w - y - 1), x);
+                }
+            }
+        }
+
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
         if (UserConfigParams::m_texture_compression)
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
@@ -433,6 +459,13 @@ void IrrDriver::generateSkyboxCubemap()
 
     assert(SkyboxTextures.size() == 6);
     SkyboxCubeMap = generateCubeMapFromTextures(SkyboxTextures);
+}
+
+void IrrDriver::generateDiffuseCoefficients()
+{
+    if (!m_SH_dirty)
+        return;
+    m_SH_dirty = false;
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
 
     if (SphericalHarmonicsTextures.size() == 6)
@@ -460,7 +493,7 @@ void IrrDriver::generateSkyboxCubemap()
             SphericalHarmonicsTextures[idx]->unlock();
 
             image->copyToScaling(sh_rgba[i], sh_w, sh_h);
-            image->drop();
+            delete image;
         }
 
         testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
@@ -473,8 +506,7 @@ void IrrDriver::generateSkyboxCubemap()
         int sh_w = 16;
         int sh_h = 16;
 
-        const video::SColorf& ambientf = irr_driver->getSceneManager()->getAmbientLight();
-        video::SColor ambient = ambientf.toSColor();
+        video::SColor ambient = m_scene_manager->getAmbientLight().toSColor();
 
         unsigned char *sh_rgba[6];
         for (unsigned i = 0; i < 6; i++)
@@ -492,6 +524,14 @@ void IrrDriver::generateSkyboxCubemap()
 
         testSH(sh_rgba, sh_w, sh_h, blueSHCoeff, greenSHCoeff, redSHCoeff);
 
+        // Diffuse env map is x 0.25, compensate
+        for (unsigned i = 0; i < 9; i++)
+        {
+            blueSHCoeff[i] *= 4;
+            greenSHCoeff[i] *= 4;
+            redSHCoeff[i] *= 4;
+        }
+
         for (unsigned i = 0; i < 6; i++)
             delete[] sh_rgba[i];
     }
@@ -503,6 +543,7 @@ void IrrDriver::generateSkyboxCubemap()
     }
 
     glBindTexture(GL_TEXTURE_CUBE_MAP, 0);*/
+
 }
 
 void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)

@@ -136,12 +136,12 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_RH));
         glDisable(GL_BLEND);
         m_rtts->getRH().Bind();
-        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::Program);
-        glBindVertexArray(FullScreenShader::RadianceHintsConstructionShader::vao);
-        setTexture(0, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
-        setTexture(1, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
-        setTexture(2, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
-        FullScreenShader::RadianceHintsConstructionShader::setUniforms(rsm_matrix, rh_matrix, rh_extend, 0, 1, 2);
+        glUseProgram(FullScreenShader::RadianceHintsConstructionShader::getInstance()->Program);
+        glBindVertexArray(SharedObject::FullScreenQuadVAO);
+        setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_ctex, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
+        setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_ntex, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
+        setTexture(FullScreenShader::RadianceHintsConstructionShader::getInstance()->TU_dtex, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+        FullScreenShader::RadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
     }
 
@@ -161,18 +161,17 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         m_post_processing->renderGI(rh_matrix, rh_extend, m_rtts->getRH().getRTT()[0], m_rtts->getRH().getRTT()[1], m_rtts->getRH().getRTT()[2]);
     }
 
-    if (SkyboxCubeMap)
-    {
-        ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
-        m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
-    }
+
+    ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_ENVMAP));
+    m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
+
     m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
 
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_SUN));
-        if (World::getWorld() && UserConfigParams::m_shadows && !UserConfigParams::m_ubo_disabled)
+        if (World::getWorld() && UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround())
             m_post_processing->renderShadowedSunlight(sun_ortho_matrix, m_rtts->getShadowDepthTex());
         else
             m_post_processing->renderSunlight();
