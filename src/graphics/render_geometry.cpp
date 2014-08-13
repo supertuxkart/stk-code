@@ -609,49 +609,53 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
     }
 }
 
-static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
+template<int...List>
+struct instanced_shadow_custom_unroll_args;
+
+template<>
+struct instanced_shadow_custom_unroll_args<>
 {
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        const GLMesh *mesh = STK::tuple_get<0>(t);
+        size_t instance_count = STK::tuple_get<1>(t);
+        irr_driver->IncreaseObjectCount();
+        GLenum ptype = mesh->PrimitiveType;
+        GLenum itype = mesh->IndexType;
+        size_t count = mesh->IndexCount;
 
-    MeshShader::InstancedShadowShader::getInstance()->setUniforms();
+        Shader->setUniforms(args...);
+        glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+    }
+};
 
-    glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
-}
-
-
-
-static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
+template<int N, int...List>
+struct instanced_shadow_custom_unroll_args<N, List...>
 {
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        instanced_shadow_custom_unroll_args<List...>::template exec<T>(Shader, t, STK::tuple_get<N>(t), args...);
+    }
+};
 
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::InstancedRefShadowShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedRefShadowShader::getInstance()->setUniforms();
-
-    glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
-}
-
-static void drawShadowGrass(GLMesh &mesh, const core::vector3df &windDir, size_t instance_count)
+template<typename T, int...List, typename... Args>
+void renderInstancedShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<Args...> > *t)
 {
-    irr_driver->IncreaseObjectCount();
-    GLenum ptype = mesh.PrimitiveType;
-    GLenum itype = mesh.IndexType;
-    size_t count = mesh.IndexCount;
+    glUseProgram(T::getInstance()->Program);
+    for (unsigned i = 0; i < t->size(); i++)
+    {
+        const GLMesh *mesh = STK::tuple_get<0>(t->at(i));
+        glBindVertexArray(mesh->vao_shadow_pass);
+        for (unsigned j = 0; j < TextureUnits.size(); j++)
+        {
+            compressTexture(mesh->textures[j], true);
+            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        }
 
-    compressTexture(mesh.textures[0], true);
-    setTexture(MeshShader::InstancedGrassShadowShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
-    MeshShader::InstancedGrassShadowShader::getInstance()->setUniforms(windDir);
-
-    glBindVertexArray(mesh.vao_shadow_pass);
-    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+        instanced_shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t->at(i));
+    }
 }
 
 
@@ -722,6 +726,9 @@ void IrrDriver::renderShadows()
     ListMatNormalMap::getInstance()->clear();
     ListMatGrass::getInstance()->clear();
     ListMatSplatting::getInstance()->clear();
+    ListInstancedMatDefault::getInstance()->clear();
+    ListInstancedMatAlphaRef::getInstance()->clear();
+    ListInstancedMatGrass::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     std::vector<GLuint> noTexUnits;
@@ -733,6 +740,10 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, ListMatAlphaRef::getInstance());
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, ListMatUnlit::getInstance());
     renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(std::vector<GLuint>{ MeshShader::GrassShadowShader::getInstance()->TU_tex }, ListMatGrass::getInstance());
+
+    renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
+    renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ MeshShader::InstancedRefShadowShader::getInstance()->TU_tex }, ListInstancedMatAlphaRef::getInstance());
+    renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ MeshShader::InstancedGrassShadowShader::getInstance()->TU_tex }, ListInstancedMatGrass::getInstance());
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
