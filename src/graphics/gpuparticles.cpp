@@ -28,25 +28,19 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
     const core::vector3df& position,
     const core::vector3df& rotation,
-    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false)
+    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false), m_first_execution(true)
 {
-    glGenBuffers(1, &initial_values_buffer);
-    glGenBuffers(2, tfb_buffers);
     glGenBuffers(1, &quaternionsbuffer);
-    glGenVertexArrays(1, &current_rendering_vao);
-    glGenVertexArrays(1, &non_current_rendering_vao);
     size_increase_factor = 0.;
     ParticleParams = nullptr;
     InitialValues = nullptr;
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
-
-
+    
     // We set these later but avoid coverity report them
     heighmapbuffer = 0;
     heightmaptexture = 0;
-    current_simulation_vao = 0;
     has_height_map = false;
     flip = false;
     track_x = 0;
@@ -62,8 +56,8 @@ ParticleSystemProxy::~ParticleSystemProxy()
         delete InitialValues;
     if (ParticleParams)
         delete ParticleParams;
-    glDeleteBuffers(2, tfb_buffers);
-    glDeleteBuffers(1, &initial_values_buffer);
+    if (!m_first_execution)
+        cleanGL();
     if (quaternionsbuffer)
         glDeleteBuffers(1, &quaternionsbuffer);
     if (heighmapbuffer)
@@ -218,7 +212,49 @@ static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
     }
 }
 
-void ParticleSystemProxy::SimpleParticleVAOBind(GLuint PositionBuffer)
+void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
+{
+    CParticleSystemSceneNode::setEmitter(emitter);
+    if (!emitter || !isGPUParticleType(emitter->getType()))
+        return;
+    has_height_map = false;
+    flip = false;
+    if (!m_first_execution)
+        cleanGL();
+    m_first_execution = true;
+
+    count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
+    switch (emitter->getType())
+    {
+    case scene::EPET_POINT:
+        generateParticlesFromPointEmitter(emitter);
+        break;
+    case scene::EPET_BOX:
+        generateParticlesFromBoxEmitter(static_cast<scene::IParticleBoxEmitter *>(emitter));
+        break;
+    case scene::EPET_SPHERE:
+        generateParticlesFromSphereEmitter(static_cast<scene::IParticleSphereEmitter *>(emitter));
+        break;
+    default:
+        assert(0 && "Wrong particle type");
+    }
+
+    video::ITexture *tex = getMaterial(0).getTexture(0);
+    compressTexture(tex, true, true);
+    texture = getTextureGLuint(getMaterial(0).getTexture(0));
+}
+
+void ParticleSystemProxy::cleanGL()
+{
+    glDeleteBuffers(2, tfb_buffers);
+    glDeleteBuffers(1, &initial_values_buffer);
+    glDeleteVertexArrays(1, &current_rendering_vao);
+    glDeleteVertexArrays(1, &non_current_rendering_vao);
+    glDeleteVertexArrays(1, &current_simulation_vao);
+    glDeleteVertexArrays(1, &non_current_simulation_vao);
+}
+
+void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
 {
     glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
     glEnableVertexAttribArray(4);
@@ -238,9 +274,8 @@ void ParticleSystemProxy::SimpleParticleVAOBind(GLuint PositionBuffer)
     glVertexAttribDivisor(2, 1);
 }
 
-void ParticleSystemProxy::FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer)
+void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
 {
-    SimpleParticleVAOBind(PositionBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, QuaternionBuffer);
     glEnableVertexAttribArray(5);
 
@@ -289,43 +324,6 @@ void ParticleSystemProxy::HeightmapSimulationBind(GLuint PositionBuffer, GLuint 
     setSimulationBind<ParticleShader::HeightmapSimulationShader>(PositionBuffer, InitialValuesBuffer);
 }
 
-
-void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
-{
-    CParticleSystemSceneNode::setEmitter(emitter);
-    if (!emitter || !isGPUParticleType(emitter->getType()))
-        return;
-    has_height_map = false;
-    flip = false;
-
-    count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
-    switch (emitter->getType())
-    {
-    case scene::EPET_POINT:
-        generateParticlesFromPointEmitter(emitter);
-        break;
-    case scene::EPET_BOX:
-        generateParticlesFromBoxEmitter(static_cast<scene::IParticleBoxEmitter *>(emitter));
-        break;
-    case scene::EPET_SPHERE:
-        generateParticlesFromSphereEmitter(static_cast<scene::IParticleSphereEmitter *>(emitter));
-        break;
-    default:
-        assert(0 && "Wrong particle type");
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    video::ITexture *tex = getMaterial(0).getTexture(0);
-    compressTexture(tex, true, true);
-    texture = getTextureGLuint(getMaterial(0).getTexture(0));
-}
 
 void ParticleSystemProxy::simulateHeightmap()
 {
@@ -439,6 +437,17 @@ void ParticleSystemProxy::draw()
 
 void ParticleSystemProxy::generateVAOs()
 {
+    glBindVertexArray(0);
+    glGenBuffers(1, &initial_values_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_DRAW);
+    glGenBuffers(2, tfb_buffers);
+    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glGenVertexArrays(1, &current_rendering_vao);
     glGenVertexArrays(1, &non_current_rendering_vao);
     glGenVertexArrays(1, &current_simulation_vao);
@@ -474,16 +483,14 @@ void ParticleSystemProxy::generateVAOs()
     }
 
     glBindVertexArray(current_rendering_vao);
+    CommonRenderingVAO(tfb_buffers[0]);
     if (flip)
-        FlipParticleVAOBind(tfb_buffers[0], quaternionsbuffer);
-    else
-        SimpleParticleVAOBind(tfb_buffers[0]);
+        AppendQuaternionRenderingVAO(quaternionsbuffer);
 
     glBindVertexArray(non_current_rendering_vao);
+    CommonRenderingVAO(tfb_buffers[1]);
     if (flip)
-        FlipParticleVAOBind(tfb_buffers[1], quaternionsbuffer);
-    else
-        SimpleParticleVAOBind(tfb_buffers[1]);
+        AppendQuaternionRenderingVAO(quaternionsbuffer);
     glBindVertexArray(0);
 
     delete[] quaternions;
@@ -495,8 +502,9 @@ void ParticleSystemProxy::render() {
         CParticleSystemSceneNode::render();
         return;
     }
-    if (!current_rendering_vao || !non_current_rendering_vao || !current_simulation_vao || !non_current_simulation_vao)
+    if (m_first_execution)
         generateVAOs();
+    m_first_execution = false;
     simulate();
     draw();
 }

@@ -19,15 +19,17 @@ protected:
     float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
     float m_color_from[3];
     float m_color_to[3];
+    bool m_first_execution;
 
     GLuint texture;
     unsigned count;
-    static void SimpleParticleVAOBind(GLuint PositionBuffer);
-    static void FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer);
+    static void CommonRenderingVAO(GLuint PositionBuffer);
+    static void AppendQuaternionRenderingVAO(GLuint QuaternionBuffer);
     static void SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
     static void HeightmapSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
 
     void generateVAOs();
+    void cleanGL();
 
     void simulateHeightmap();
     void simulateNoHeightmap();
