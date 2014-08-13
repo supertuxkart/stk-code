@@ -52,9 +52,9 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 ParticleSystemProxy::~ParticleSystemProxy()
 {
     if (InitialValues)
-        delete InitialValues;
+        free(InitialValues);
     if (ParticleParams)
-        delete ParticleParams;
+        free(ParticleParams);
     if (!m_first_execution)
         cleanGL();
     if (heighmapbuffer)
