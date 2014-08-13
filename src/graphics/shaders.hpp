@@ -220,6 +220,14 @@ public:
     InstancedGrassPass1Shader();
 };
 
+class InstancedNormalMapShader : public ShaderHelperSingleton<InstancedNormalMapShader>
+{
+public:
+    GLuint TU_glossy, TU_normalmap;
+
+    InstancedNormalMapShader();
+};
+
 class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>
 {
 public:

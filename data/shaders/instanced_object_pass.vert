@@ -3,6 +3,8 @@ layout(location = 0) in vec3 Position;
 layout(location = 1) in vec3 Normal;
 layout(location = 2) in vec4 Color;
 layout(location = 3) in vec2 Texcoord;
+layout(location = 5) in vec3 Tangent;
+layout(location = 6) in vec3 Bitangent;
 
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
@@ -19,6 +21,8 @@ in vec3 Scale;
 #endif
 
 out vec3 nor;
+out vec3 tangent;
+out vec3 bitangent;
 out vec2 uv;
 out vec4 color;
 
@@ -31,6 +35,8 @@ void main(void)
     mat4 TransposeInverseModelView = transpose(getInverseWorldMatrix(Origin, Orientation, Scale) * InverseViewMatrix);
     gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
+    tangent = (TransposeInverseModelView * vec4(Tangent, 1.)).xyz;
+    bitangent = (TransposeInverseModelView * vec4(Bitangent, 1.)).xyz;
     uv = Texcoord;
     color = Color.zyxw;
 }

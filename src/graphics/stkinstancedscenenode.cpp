@@ -160,4 +160,7 @@ void STKInstancedSceneNode::render()
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
     for (auto mesh : MeshSolidMaterial[MAT_GRASS])
         ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9, windDir, cb->getPosition()));
+
+    for (auto mesh : MeshSolidMaterial[MAT_NORMAL_MAP])
+        ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9));
 }

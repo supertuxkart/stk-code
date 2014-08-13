@@ -215,6 +215,7 @@ void IrrDriver::renderSolidFirstPass()
     ListInstancedMatDefault::getInstance()->clear();
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
+    ListInstancedMatNormalMap::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -245,6 +246,9 @@ void IrrDriver::renderSolidFirstPass()
         renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, 2>(
                     TexUnits(TexUnit(MeshShader::InstancedGrassPass1Shader::getInstance()->TU_tex, true)),
                     ListInstancedMatGrass::getInstance());
+        renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader>(
+            TexUnits(TexUnit(MeshShader::InstancedNormalMapShader::getInstance()->TU_glossy, true), TexUnit(MeshShader::InstancedNormalMapShader::getInstance()->TU_normalmap, true)),
+            ListInstancedMatNormalMap::getInstance());
     }
 }
 
@@ -388,6 +392,9 @@ void IrrDriver::renderSolidSecondPass()
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
             TexUnits(TexUnit(MeshShader::InstancedObjectPass2Shader::getInstance()->TU_Albedo, true)),
             ListInstancedMatDefault::getInstance());
+        renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
+            TexUnits(TexUnit(MeshShader::InstancedObjectPass2Shader::getInstance()->TU_Albedo, true)),
+            ListInstancedMatNormalMap::getInstance());
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader>(
             TexUnits(TexUnit(MeshShader::InstancedObjectRefPass2Shader::getInstance()->TU_Albedo, true)),
             ListInstancedMatAlphaRef::getInstance());
@@ -683,6 +690,7 @@ void IrrDriver::renderShadows()
     ListInstancedMatDefault::getInstance()->clear();
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
+    ListInstancedMatNormalMap::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     std::vector<GLuint> noTexUnits;
@@ -698,6 +706,7 @@ void IrrDriver::renderShadows()
     renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
     renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ MeshShader::InstancedRefShadowShader::getInstance()->TU_tex }, ListInstancedMatAlphaRef::getInstance());
     renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ MeshShader::InstancedGrassShadowShader::getInstance()->TU_tex }, ListInstancedMatGrass::getInstance());
+    renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatNormalMap::getInstance());
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 }
