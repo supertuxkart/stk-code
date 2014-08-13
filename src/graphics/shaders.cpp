@@ -298,6 +298,22 @@ static void initShadowVPMUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+GLuint SharedObject::ParticleQuadVBO = 0;
+
+static void initParticleQuadVBO()
+{
+    static const GLfloat quad_vertex[] = {
+        -.5, -.5, 0., 0.,
+        .5, -.5, 1., 0.,
+        -.5, .5, 0., 1.,
+        .5, .5, 1., 1.,
+    };
+    glGenBuffers(1, &SharedObject::ParticleQuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -392,6 +408,7 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
+    initParticleQuadVBO();
     FullScreenShader::DiffuseEnvMapShader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();

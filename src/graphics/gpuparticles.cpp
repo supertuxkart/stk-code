@@ -24,8 +24,6 @@ scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
     return node;
 }
 
-GLuint ParticleSystemProxy::quad_vertex_buffer = 0;
-
 ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
     const core::vector3df& position,
@@ -54,19 +52,6 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     track_x_len = 0;
     track_z_len = 0;
     texture = 0;
-
-    if (quad_vertex_buffer)
-        return;
-    static const GLfloat quad_vertex[] = {
-        -.5, -.5, 0., 0.,
-        .5, -.5, 1., 0.,
-        -.5, .5, 0., 1.,
-        .5, .5, 1., 1.,
-    };
-    glGenBuffers(1, &quad_vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 ParticleSystemProxy::~ParticleSystemProxy()
@@ -263,7 +248,7 @@ static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
 
 void ParticleSystemProxy::SimpleParticleVAOBind(GLuint PositionBuffer)
 {
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
     glEnableVertexAttribArray(4);
     glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
     glEnableVertexAttribArray(3);

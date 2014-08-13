@@ -31,7 +31,7 @@ class SharedObject
 {
 public:
     static GLuint billboardvbo;
-    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes;
+    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes, ParticleQuadVBO;
     static GLuint ViewProjectionMatrixesUBO;
     static GLuint FullScreenQuadVAO;
     static GLuint UIVAO;
