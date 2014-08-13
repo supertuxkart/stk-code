@@ -353,6 +353,8 @@ public:
     virtual void onTriggerItemApproached(Item* who) OVERRIDE;
 
     virtual void reset() OVERRIDE { m_action_active = true; }
+
+    virtual void setEnable(bool status) OVERRIDE{ m_action_active = status; }
 };
 
 

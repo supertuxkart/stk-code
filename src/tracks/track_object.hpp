@@ -109,6 +109,7 @@ public:
      *  e.g. be overwritten by physical objects etc. */
     virtual void handleExplosion(const Vec3& pos, bool directHit) {};
     void         setEnable(bool mode);
+    void         setID(std::string obj_id) { m_id = obj_id; }
 
     const std::string& getLodGroup() const { return m_lod_group; }
 

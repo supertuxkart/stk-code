@@ -1,8 +1,8 @@
-void haybail()
+void haybail_activate()
 {
-/*to activate this add the following line to stk-assets/farm/scene.xml
+/*to activate this you may also add the following line to stk-assets/farm/scene.xml (instead of creating it via the start script
 
-<object type="action-trigger" action="haybail" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
+<object type="action-trigger" action="haybail_activate" distance="30.0" xyz="100.72 10.20 -26.22" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
 
 */
     displayMessage("Haybail deactivated");
@@ -24,7 +24,7 @@ void haybail_deactivate()
 {
 /*to activate this add the following line to stk-assets/farm/scene.xml
 
-<object type="action-trigger" action="haybail-activate" distance="10.0" xyz="69.97 8.08 -107.84" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
+<object type="action-trigger" action="haybail-deactivate" distance="10.0" xyz="69.97 8.08 -107.84" hpr="0.0 -0.0 0.0" scale="7.00 7.00 7.00"/>
 
 */
      displayMessage("Haybail reactivated");

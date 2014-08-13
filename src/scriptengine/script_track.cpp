@@ -180,6 +180,7 @@ namespace Scripting
                 new TrackObjectPresentationActionTrigger(posi, *script_name, distance);
             TrackObject* tobj = new TrackObject(posi, hpr, scale,
                 "none", newtrigger, false /* isDynamic */, NULL /* physics settings */);
+            tobj->setID(*script_name);
             World::getWorld()->getTrack()->getTrackObjectManager()->insertObject(tobj);
         }
 
