@@ -172,13 +172,17 @@ struct instanced_custom_unroll_args<N, List...>
     }
 };
 
-template<typename Shader, int ...List, typename... TupleType>
+template<typename Shader, enum E_VERTEX_TYPE VertexType, int ...List, typename... TupleType>
 void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
+#ifdef DEBUG
+        if (mesh.VAOType != VertexType)
+            Log::error("RenderGeometry", "Wrong instanced vertex format");
+#endif
         glBindVertexArray(mesh.vao);
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
@@ -237,16 +241,16 @@ void IrrDriver::renderSolidFirstPass()
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_normalmap, false)
         ), ListMatNormalMap::getInstance());
 
-        renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader>(
+        renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, video::EVT_STANDARD>(
                     TexUnits(TexUnit(MeshShader::InstancedObjectPass1Shader::getInstance()->TU_tex, true)),
                     ListInstancedMatDefault::getInstance());
-        renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader>(
+        renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, video::EVT_STANDARD>(
                     TexUnits(TexUnit(MeshShader::InstancedObjectRefPass1Shader::getInstance()->TU_tex, true)),
                     ListInstancedMatAlphaRef::getInstance());
-        renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, 2>(
+        renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, video::EVT_STANDARD, 2>(
                     TexUnits(TexUnit(MeshShader::InstancedGrassPass1Shader::getInstance()->TU_tex, true)),
                     ListInstancedMatGrass::getInstance());
-        renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader>(
+        renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, video::EVT_TANGENTS>(
             TexUnits(TexUnit(MeshShader::InstancedNormalMapShader::getInstance()->TU_glossy, true), TexUnit(MeshShader::InstancedNormalMapShader::getInstance()->TU_normalmap, true)),
             ListInstancedMatNormalMap::getInstance());
     }
