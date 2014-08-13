@@ -407,10 +407,11 @@ void ParticleSystemProxy::generateVAOs()
     glBindVertexArray(non_current_simulation_vao);
     CommonSimulationVAO(tfb_buffers[1], initial_values_buffer);
 
-    float *quaternions = new float[4 * count];
+
     glBindVertexArray(0);
     if (flip)
     {
+        float *quaternions = new float[4 * count];
         for (unsigned i = 0; i < count; i++)
         {
             core::vector3df rotationdir(0., 1., 0.);
@@ -423,6 +424,7 @@ void ParticleSystemProxy::generateVAOs()
         glGenBuffers(1, &quaternionsbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
         glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STATIC_DRAW);
+        delete[] quaternions;
     }
 
     glBindVertexArray(current_rendering_vao);
@@ -435,8 +437,6 @@ void ParticleSystemProxy::generateVAOs()
     if (flip)
         AppendQuaternionRenderingVAO(quaternionsbuffer);
     glBindVertexArray(0);
-
-    delete[] quaternions;
 }
 
 void ParticleSystemProxy::render() {
