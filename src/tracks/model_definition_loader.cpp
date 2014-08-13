@@ -130,6 +130,16 @@ STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vecto
         }
 
         scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
+
+        if (m_lod_groups[name][0].m_tangent && mesh->getMeshBuffer(0)->getVertexType() != video::EVT_TANGENTS)
+        {
+            scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
+            scene::IMesh* m2 = manip->createMeshWithTangents(mesh);
+            // FIXME: do we need to clean up 'a_mesh' ?
+            mesh = m2;
+            irr_driver->setAllMaterialFlags(mesh);
+        }
+
         m_instancing_nodes[name] = new STKInstancedSceneNode(mesh,
             irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
         m_track->addNode(m_instancing_nodes[name]);
