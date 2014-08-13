@@ -583,39 +583,40 @@ void Kart::createPhysics()
 
     btCollisionShape *shape;
     const Vec3 &bevel = m_kart_properties->getBevelFactor();
-    if(bevel.getX() || bevel.getY() || bevel.getZ())
+    Vec3 wheel_pos[4];
+    assert(bevel.getX() || bevel.getY() || bevel.getZ());
+    
+    Vec3 orig_factor(1, 1, 1 - bevel.getZ());
+    Vec3 bevel_factor(1.0f - bevel.getX(), 1.0f - bevel.getY(), 1.0f);
+    btConvexHullShape *hull = new btConvexHullShape();
+    for (int y = -1; y <= 1; y += 2)
     {
-        Vec3 orig_factor(1, 1, 1-bevel.getZ());
-        Vec3 bevel_factor(1.0f-bevel.getX(),
-                          1.0f-bevel.getY(),
-                          1.0f               );
-        btConvexHullShape *hull = new btConvexHullShape();
-        for(int x=-1; x<=1; x+=2)
+        for (int z = -1; z <= 1; z += 2)
         {
-            for(int y=-1; y<=1; y+=2)
+            for (int x = -1; x <= 1; x += 2)
             {
-                for(int z=-1; z<=1; z+=2)
+                Vec3 p(x*getKartModel()->getWidth() *0.5f,
+                       y*getKartModel()->getHeight()*0.5f,
+                       z*getKartModel()->getLength()*0.5f);
+
+                hull->addPoint(p*orig_factor);
+                hull->addPoint(p*bevel_factor);
+                // Store the x/z position for the wheels as a weighted average
+                // of the two bevelled points.
+                if (y == -1)
                 {
-                    Vec3 p(x*getKartModel()->getWidth()*0.5f,
-                          y*getKartModel()->getHeight()*0.5f,
-                          z*getKartModel()->getLength()*0.5f);
+                    int index = (x + 1) / 2 + 1 - z;  // get index of wheel
+                    float f = getKartProperties()->getPhysicalWheelPosition();
+                    wheel_pos[index] = p*(orig_factor*(1.0f-f) + bevel_factor*f);
+                    wheel_pos[index].setY(0);
+                }  // if z==-1
+            }   // for x
+        }   // for z
+    }   // for y
 
-                    hull->addPoint(p*orig_factor);
-                    hull->addPoint(p*bevel_factor);
-                }   // for z
-            }   // for y
-        }   // for x
-
-        // This especially enables proper drawing of the point cloud
-        hull->initializePolyhedralFeatures();
-        shape = hull;
-    }   // bevel.getX()!=0
-    else
-    {
-        shape = new btBoxShape(btVector3(0.5f*kart_width,
-                                         0.5f*kart_height,
-                                         0.5f*kart_length));
-    }
+    // This especially enables proper drawing of the point cloud
+    hull->initializePolyhedralFeatures();
+    shape = hull;
 
     btTransform shiftCenterOfGravity;
     shiftCenterOfGravity.setIdentity();
@@ -672,7 +673,7 @@ void Kart::createPhysics()
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
-                            m_kart_model->getWheelPhysicsPosition(i),
+                            wheel_pos[i],
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
@@ -2500,40 +2501,29 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     for(unsigned int i=0; i<4; i++)
     {
         // Set the suspension length
-        height_above_terrain[i] =
-            (  m_vehicle->getWheelInfo(i).m_raycastInfo.m_hardPointWS
-             - m_vehicle->getWheelInfo(i).m_raycastInfo.m_contactPointWS).length()
-            - m_vehicle->getWheelInfo(i).m_chassisConnectionPointCS.getY();
+        const btWheelInfo &wi = m_vehicle->getWheelInfo(i);
+        height_above_terrain[i] = wi.m_raycastInfo.m_suspensionLength;
         if(height_above_terrain[i] < min_hat) min_hat = height_above_terrain[i];
     }
+    float kart_hat = m_kart_model->getLowestPoint();
 
-    float chassis_delta = 0;
-    // Check if the chassis needs to be moved down so that the wheels look
-    // like they are in the rest state, i.e. the wheels are not too far down.
-    if(min_hat > m_kart_model->getLowestPoint())
+    if(min_hat >= kart_hat)
     {
-        chassis_delta = min_hat - m_kart_model->getLowestPoint();
         for(unsigned int i=0; i<4; i++)
-            height_above_terrain[i] -= chassis_delta;
+            height_above_terrain[i] = kart_hat;
     }
-
     m_kart_model->update(dt, m_wheel_rotation_dt, getSteerPercent(),
-                        height_above_terrain, m_speed);
-
+                         height_above_terrain, m_speed);
 
     // If the kart is leaning, part of the kart might end up 'in' the track.
     // To avoid this, raise the kart enough to offset the leaning.
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
-    Vec3 center_shift  = m_kart_properties->getGravityCenterShift();
-
-    center_shift.setY(m_skidding->getGraphicalJumpOffset() + lean_height
-                       - m_kart_model->getLowestPoint() -chassis_delta    );
-    center_shift = getTrans().getBasis() * center_shift;
-
     float heading = m_skidding->getVisualSkidRotation();
-    center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() + lean_height, 0);
+    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() - kart_hat
+                              + lean_height-m_kart_model->getLowestPoint(), 0);
     center_shift = getTrans().getBasis() * center_shift;
+
     Moveable::updateGraphics(dt, center_shift,
                              btQuaternion(heading, 0, m_current_lean));
 

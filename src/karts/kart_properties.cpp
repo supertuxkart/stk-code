@@ -92,7 +92,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
-        m_smooth_flying_impulse =
+        m_smooth_flying_impulse = m_physical_wheel_position =
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -271,10 +271,9 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
         m_gravity_center_shift.setZ(0);
     }
-    m_kart_model->setDefaultPhysicsPosition(m_gravity_center_shift,
-                                           m_wheel_radius           );
-    m_wheel_base = fabsf( m_kart_model->getWheelPhysicsPosition(0).getZ()
-                         -m_kart_model->getWheelPhysicsPosition(2).getZ());
+
+    //FIXME: magix 0.25 factor to keep it compatible with previous tourning
+    m_wheel_base = fabsf( m_kart_model->getLength()-0.25f);
 
     // Now convert the turn radius into turn angle:
     for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
@@ -381,6 +380,7 @@ void KartProperties::getAllData(const XMLNode * root)
         collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
         collision_node->get("restitution",     &m_restitution              );
         collision_node->get("bevel-factor",    &m_bevel_factor             );
+        collision_node->get("physical-wheel-position",&m_physical_wheel_position);
         std::string s;
         collision_node->get("impulse-type",    &s                          );
         s = StringUtils::toLowerCase(s);
@@ -677,6 +677,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_bevel_factor.getX(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getY(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
+    CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
     CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
     CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
     CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );

@@ -381,7 +381,7 @@
                chassis-angular-damping="0"
                downward-impulse-factor="0"
                track-connection-accel="2"
-               smooth-flying-impulse="10"/>
+               smooth-flying-impulse="25"/>
 
     <!-- collision
          impulse-type: STK can apply an additional impulse in case of
@@ -411,10 +411,15 @@
            (1-bevelY).  A value of 0 for all bevel coordinates disables
            bevelling, and uses a simple box shape.
            As an example, a value of 1 for x and z will result in a 
-           sharp 'arrow' like shape.  -->
+           sharp 'arrow' like shape.
+         physical-wheel-position: Defines where the 'physical' (raycast)
+           wheel will be located. It's a weight factor with 0 = being
+           at the widest side of the bevel, 1 = at the front and
+           narrowest part of the kart.  -->
     <collision impulse-type="normal" 
                impulse="3000" impulse-time="0.1" terrain-impulse="8000"
-               restitution="1.0" bevel-factor="0.5 0.0 0.5" />
+               restitution="1.0" bevel-factor="0.5 0.0 0.7"
+               physical-wheel-position="0.5" />
 			 
      <!-- If a kart starts within the specified time after 'go',
           it receives the corresponding bonus from 'boost'. Those
