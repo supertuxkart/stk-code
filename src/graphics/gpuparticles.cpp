@@ -30,7 +30,6 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     const core::vector3df& rotation,
     const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false), m_first_execution(true)
 {
-    glGenBuffers(1, &quaternionsbuffer);
     size_increase_factor = 0.;
     ParticleParams = nullptr;
     InitialValues = nullptr;
@@ -58,8 +57,6 @@ ParticleSystemProxy::~ParticleSystemProxy()
         delete ParticleParams;
     if (!m_first_execution)
         cleanGL();
-    if (quaternionsbuffer)
-        glDeleteBuffers(1, &quaternionsbuffer);
     if (heighmapbuffer)
         glDeleteBuffers(1, &heighmapbuffer);
     if (heightmaptexture)
@@ -217,10 +214,10 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
     CParticleSystemSceneNode::setEmitter(emitter);
     if (!emitter || !isGPUParticleType(emitter->getType()))
         return;
-    has_height_map = false;
-    flip = false;
     if (!m_first_execution)
         cleanGL();
+    has_height_map = false;
+    flip = false;
     m_first_execution = true;
 
     count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
@@ -246,6 +243,8 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 
 void ParticleSystemProxy::cleanGL()
 {
+    if (flip)
+        glDeleteBuffers(1, &quaternionsbuffer);
     glDeleteBuffers(2, tfb_buffers);
     glDeleteBuffers(1, &initial_values_buffer);
     glDeleteVertexArrays(1, &current_rendering_vao);
