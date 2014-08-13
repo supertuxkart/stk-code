@@ -141,6 +141,56 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
     }
 }
 
+template<int...List>
+struct instanced_custom_unroll_args;
+
+template<>
+struct instanced_custom_unroll_args<>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        const GLMesh *mesh = STK::tuple_get<0>(t);
+        size_t instance_count = STK::tuple_get<1>(t);
+        irr_driver->IncreaseObjectCount();
+        GLenum ptype = mesh->PrimitiveType;
+        GLenum itype = mesh->IndexType;
+        size_t count = mesh->IndexCount;
+
+        Shader->setUniforms(args...);
+        glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
+    }
+};
+
+template<int N, int...List>
+struct instanced_custom_unroll_args<N, List...>
+{
+    template<typename T, typename ...TupleTypes, typename ...Args>
+    static void exec(const T *Shader, const STK::Tuple<TupleTypes...> &t, Args... args)
+    {
+        instanced_custom_unroll_args<List...>::template exec<T>(Shader, t, STK::tuple_get<N>(t), args...);
+    }
+};
+
+template<typename Shader, int ...List, typename... TupleType>
+void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
+{
+    glUseProgram(Shader::getInstance()->Program);
+    for (unsigned i = 0; i < meshes->size(); i++)
+    {
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
+        glBindVertexArray(mesh.vao);
+        for (unsigned j = 0; j < TexUnits.size(); j++)
+        {
+            if (!mesh.textures[j])
+                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
+            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+        }
+        instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
+    }
+}
+
 void IrrDriver::renderSolidFirstPass()
 {
     m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
@@ -162,6 +212,9 @@ void IrrDriver::renderSolidFirstPass()
     ListMatNormalMap::getInstance()->clear();
     ListMatGrass::getInstance()->clear();
     ListMatSplatting::getInstance()->clear();
+    ListInstancedMatDefault::getInstance()->clear();
+    ListInstancedMatAlphaRef::getInstance()->clear();
+    ListInstancedMatGrass::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -182,6 +235,16 @@ void IrrDriver::renderSolidFirstPass()
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_glossy, true),
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_normalmap, false)
         ), ListMatNormalMap::getInstance());
+
+        renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader>(
+                    TexUnits(TexUnit(MeshShader::InstancedObjectPass1Shader::getInstance()->TU_tex, true)),
+                    ListInstancedMatDefault::getInstance());
+        renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader>(
+                    TexUnits(TexUnit(MeshShader::InstancedObjectRefPass1Shader::getInstance()->TU_tex, true)),
+                    ListInstancedMatAlphaRef::getInstance());
+        renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, 2>(
+                    TexUnits(TexUnit(MeshShader::InstancedGrassPass1Shader::getInstance()->TU_tex, true)),
+                    ListInstancedMatGrass::getInstance());
     }
 }
 
@@ -219,6 +282,36 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
             continue;
         }
         custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
+    }
+}
+
+template<typename Shader, int...List, typename... TupleType>
+void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
+{
+    glUseProgram(Shader::getInstance()->Program);
+    for (unsigned i = 0; i < meshes->size(); i++)
+    {
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
+        glBindVertexArray(mesh.vao);
+        for (unsigned j = 0; j < TexUnits.size(); j++)
+        {
+            if (!mesh.textures[j])
+                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
+            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            if (irr_driver->getLightViz())
+            {
+                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
+                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+            }
+            else
+            {
+                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
+                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
+            }
+        }
+
+        instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
 
@@ -290,6 +383,19 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 3, 1>(TexUnits(
             TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatNormalMap::getInstance());
+
+
+        renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
+            TexUnits(TexUnit(MeshShader::InstancedObjectPass2Shader::getInstance()->TU_Albedo, true)),
+            ListInstancedMatDefault::getInstance());
+        renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader>(
+            TexUnits(TexUnit(MeshShader::InstancedObjectRefPass2Shader::getInstance()->TU_Albedo, true)),
+            ListInstancedMatAlphaRef::getInstance());
+        setTexture(MeshShader::InstancedGrassPass2Shader::getInstance()->TU_dtex,
+            irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+        renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, 3, 2>(
+            TexUnits(TexUnit(MeshShader::InstancedGrassPass2Shader::getInstance()->TU_Albedo, true)),
+            ListInstancedMatGrass::getInstance());
     }
 }
 
@@ -502,6 +608,52 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
         shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t->at(i));
     }
 }
+
+static void drawShadowDefault(GLMesh &mesh, size_t instance_count)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    MeshShader::InstancedShadowShader::getInstance()->setUniforms();
+
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+}
+
+
+
+static void drawShadowAlphaRefTexture(GLMesh &mesh, size_t instance_count)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    compressTexture(mesh.textures[0], true);
+    setTexture(MeshShader::InstancedRefShadowShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedRefShadowShader::getInstance()->setUniforms();
+
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+}
+
+static void drawShadowGrass(GLMesh &mesh, const core::vector3df &windDir, size_t instance_count)
+{
+    irr_driver->IncreaseObjectCount();
+    GLenum ptype = mesh.PrimitiveType;
+    GLenum itype = mesh.IndexType;
+    size_t count = mesh.IndexCount;
+
+    compressTexture(mesh.textures[0], true);
+    setTexture(MeshShader::InstancedGrassShadowShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+    MeshShader::InstancedGrassShadowShader::getInstance()->setUniforms(windDir);
+
+    glBindVertexArray(mesh.vao_shadow_pass);
+    glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+}
+
 
 template<int...List>
 struct rsm_custom_unroll_args;
