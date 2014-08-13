@@ -36,6 +36,8 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     glGenVertexArrays(1, &current_rendering_vao);
     glGenVertexArrays(1, &non_current_rendering_vao);
     size_increase_factor = 0.;
+    ParticleParams = nullptr;
+    InitialValues = nullptr;
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
@@ -56,6 +58,10 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 
 ParticleSystemProxy::~ParticleSystemProxy()
 {
+    if (InitialValues)
+        delete InitialValues;
+    if (ParticleParams)
+        delete ParticleParams;
     glDeleteBuffers(2, tfb_buffers);
     glDeleteBuffers(1, &initial_values_buffer);
     if (quaternionsbuffer)
@@ -122,51 +128,32 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
     dirZ = particledir.Z;
 }
 
-struct ParticleData
-{
-    float PositionX;
-    float PositionY;
-    float PositionZ;
-    float Lifetime;
-    float DirectionX;
-    float DirectionY;
-    float DirectionZ;
-    float Size;
-};
-
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
-    ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
+    ParticleParams = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
+    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
 
     for (unsigned i = 0; i < count; i++)
     {
-        particles[i].PositionX = 0;
-        particles[i].PositionY = 0;
-        particles[i].PositionZ = 0;
+        ParticleParams[i].PositionX = 0;
+        ParticleParams[i].PositionY = 0;
+        ParticleParams[i].PositionZ = 0;
         // Initial lifetime is >1
-        particles[i].Lifetime = 2.;
+        InitialValues[i].Lifetime = 2.;
 
-        memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
+        memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
 
-        generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
-            initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
+        generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
+            ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
 
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+        memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
     }
-
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    delete[] particles;
-    delete[] initialvalue;
 }
 
 void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *emitter)
 {
-    ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
+    ParticleParams = (ParticleData *)realloc(ParticleParams, sizeof(ParticleData)* count);
+    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
 
     const core::vector3df& extent = emitter->getBox().getExtent();
 
@@ -174,33 +161,26 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 
     for (unsigned i = 0; i < count; i++)
     {
-        particles[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
-        particles[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
-        particles[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
+        ParticleParams[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
+        ParticleParams[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
+        ParticleParams[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
         // Initial lifetime is random
-        particles[i].Lifetime = os::Randomizer::frand();
+        InitialValues[i].Lifetime = os::Randomizer::frand();
 
-        memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
-        generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
-            initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+        memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
+        generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
+            ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
+        memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
 
         if (randomize_initial_y)
-            particles[i].PositionY = os::Randomizer::frand()*50.0f; // -100.0f;
+            InitialValues[i].PositionY = os::Randomizer::frand()*50.0f; // -100.0f;
     }
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    delete[] particles;
-    delete[] initialvalue;
 }
 
 void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *emitter)
 {
-    ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
+    ParticleParams = (ParticleData *)realloc(ParticleParams, sizeof(ParticleData)* count);
+    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
 
     for (unsigned i = 0; i < count; i++) {
         // Random distance from center
@@ -212,25 +192,17 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
         pos.rotateYZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
         pos.rotateXZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
 
-        particles[i].PositionX = pos.X;
-        particles[i].PositionY = pos.Y;
-        particles[i].PositionZ = pos.Z;
+        ParticleParams[i].PositionX = pos.X;
+        ParticleParams[i].PositionY = pos.Y;
+        ParticleParams[i].PositionZ = pos.Z;
         // Initial lifetime is > 1
-        particles[i].Lifetime = 2.;
+        InitialValues[i].Lifetime = 2.;
 
-        memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
-        generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
-            initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+        memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
+        generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
+            ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
+        memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
     }
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    delete[] particles;
-    delete[] initialvalue;
 }
 
 static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
@@ -285,26 +257,26 @@ void setSimulationBind(GLuint position_vbo, GLuint initialValues_vbo)
 {
     glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
     glEnableVertexAttribArray(T::attrib_position);
-    glVertexAttribPointer(T::attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
+    glVertexAttribPointer(T::attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
     glEnableVertexAttribArray(T::attrib_lifetime);
-    glVertexAttribPointer(T::attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
+    glVertexAttribPointer(T::attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
     glEnableVertexAttribArray(T::attrib_velocity);
-    glVertexAttribPointer(T::attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glVertexAttribPointer(T::attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     if (T::attrib_size < 30)
     {
         glEnableVertexAttribArray(T::attrib_size);
-        glVertexAttribPointer(T::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
+        glVertexAttribPointer(T::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, initialValues_vbo);
     glEnableVertexAttribArray(T::attrib_initial_position);
-    glVertexAttribPointer(T::attrib_initial_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
+    glVertexAttribPointer(T::attrib_initial_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
     glEnableVertexAttribArray(T::attrib_initial_lifetime);
-    glVertexAttribPointer(T::attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
+    glVertexAttribPointer(T::attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
     glEnableVertexAttribArray(T::attrib_initial_velocity);
-    glVertexAttribPointer(T::attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glVertexAttribPointer(T::attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
     glEnableVertexAttribArray(T::attrib_initial_size);
-    glVertexAttribPointer(T::attrib_initial_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
+    glVertexAttribPointer(T::attrib_initial_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 }
 
 void ParticleSystemProxy::SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer)
@@ -342,6 +314,12 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
         assert(0 && "Wrong particle type");
     }
 
+    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
     video::ITexture *tex = getMaterial(0).getTexture(0);

@@ -35,6 +35,23 @@ protected:
     void drawNotFlip();
     virtual void simulate();
     virtual void draw();
+
+public:
+    struct ParticleData
+    {
+        float PositionX;
+        float PositionY;
+        float PositionZ;
+        float Lifetime;
+        float DirectionX;
+        float DirectionY;
+        float DirectionZ;
+        float Size;
+    };
+
+private:
+
+    ParticleData *ParticleParams, *InitialValues;
     void generateParticlesFromPointEmitter(scene::IParticlePointEmitter *);
     void generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *);
     void generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *);
