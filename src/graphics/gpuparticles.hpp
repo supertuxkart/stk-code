@@ -20,8 +20,6 @@ protected:
     float m_color_from[3];
     float m_color_to[3];
 
-    static GLuint quad_vertex_buffer;
-
     GLuint texture;
     unsigned count;
     static void SimpleParticleVAOBind(GLuint PositionBuffer);

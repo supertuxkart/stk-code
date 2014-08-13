@@ -298,6 +298,22 @@ static void initShadowVPMUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+GLuint SharedObject::ParticleQuadVBO = 0;
+
+static void initParticleQuadVBO()
+{
+    static const GLfloat quad_vertex[] = {
+        -.5, -.5, 0., 0.,
+        .5, -.5, 1., 0.,
+        -.5, .5, 0., 1.,
+        .5, .5, 1., 1.,
+    };
+    glGenBuffers(1, &SharedObject::ParticleQuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -392,14 +408,13 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
+    initParticleQuadVBO();
     FullScreenShader::DiffuseEnvMapShader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
-    ParticleShader::FlipParticleRender::init();
     ParticleShader::HeightmapSimulationShader::init();
-    ParticleShader::SimpleParticleRender::init();
     ParticleShader::SimpleSimulationShader::init();
     UtilShader::ColoredLine::init();
 }
@@ -1451,100 +1466,30 @@ namespace ParticleShader
         uniform_track_z_len = glGetUniformLocation(Program, "track_z_len");
     }
 
-    GLuint SimpleParticleRender::Program;
-    GLuint SimpleParticleRender::attrib_pos;
-    GLuint SimpleParticleRender::attrib_lf;
-    GLuint SimpleParticleRender::attrib_quadcorner;
-    GLuint SimpleParticleRender::attrib_texcoord;
-    GLuint SimpleParticleRender::attrib_sz;
-    GLuint SimpleParticleRender::uniform_matrix;
-    GLuint SimpleParticleRender::uniform_viewmatrix;
-    GLuint SimpleParticleRender::uniform_tex;
-    GLuint SimpleParticleRender::uniform_dtex;
-    GLuint SimpleParticleRender::uniform_invproj;
-    GLuint SimpleParticleRender::uniform_color_from;
-    GLuint SimpleParticleRender::uniform_color_to;
-
-    void SimpleParticleRender::init()
+    SimpleParticleRender::SimpleParticleRender()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/particle.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-        attrib_pos = glGetAttribLocation(Program, "position");
-        attrib_sz = glGetAttribLocation(Program, "size");
-        attrib_lf = glGetAttribLocation(Program, "lifetime");
-        attrib_quadcorner = glGetAttribLocation(Program, "quadcorner");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
+        AssignUniforms("color_from", "color_to");
 
-
-        uniform_matrix = glGetUniformLocation(Program, "ProjectionMatrix");
-        uniform_viewmatrix = glGetUniformLocation(Program, "ViewMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_color_from = glGetUniformLocation(Program, "color_from");
-        assert(uniform_color_from != -1);
-        uniform_color_to = glGetUniformLocation(Program, "color_to");
-        assert(uniform_color_to != -1);
+        TU_tex = 0;
+        TU_dtex = 1;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_dtex, "dtex"));
     }
 
-    void SimpleParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix,
-                                           const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_dtex,
-                                           const ParticleSystemProxy* particle_system)
-    {
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-        glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-        glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1i(uniform_dtex, TU_dtex);
-
-        const float* color_from = particle_system->getColorFrom();
-        const float* color_to = particle_system->getColorTo();
-        glUniform3f(uniform_color_from, color_from[0], color_from[1], color_from[2]);
-        glUniform3f(uniform_color_to, color_to[0], color_to[1], color_to[2]);
-    }
-
-    GLuint FlipParticleRender::Program;
-    GLuint FlipParticleRender::attrib_pos;
-    GLuint FlipParticleRender::attrib_lf;
-    GLuint FlipParticleRender::attrib_quadcorner;
-    GLuint FlipParticleRender::attrib_texcoord;
-    GLuint FlipParticleRender::attrib_sz;
-    GLuint FlipParticleRender::attrib_rotationvec;
-    GLuint FlipParticleRender::attrib_anglespeed;
-    GLuint FlipParticleRender::uniform_matrix;
-    GLuint FlipParticleRender::uniform_viewmatrix;
-    GLuint FlipParticleRender::uniform_tex;
-    GLuint FlipParticleRender::uniform_dtex;
-    GLuint FlipParticleRender::uniform_invproj;
-
-    void FlipParticleRender::init()
+    FlipParticleRender::FlipParticleRender()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/flipparticle.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-        attrib_pos = glGetAttribLocation(Program, "position");
-        attrib_sz = glGetAttribLocation(Program, "size");
-        attrib_lf = glGetAttribLocation(Program, "lifetime");
-        attrib_quadcorner = glGetAttribLocation(Program, "quadcorner");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
-        attrib_anglespeed = glGetAttribLocation(Program, "anglespeed");
-        attrib_rotationvec = glGetAttribLocation(Program, "rotationvec");
+        AssignUniforms();
 
-        uniform_matrix = glGetUniformLocation(Program, "ProjectionMatrix");
-        uniform_viewmatrix = glGetUniformLocation(Program, "ViewMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-    }
-
-    void FlipParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_dtex)
-    {
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-        glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-        glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1i(uniform_dtex, TU_dtex);
+        TU_tex = 0;
+        TU_dtex = 1;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_dtex, "dtex"));
     }
 }
 
