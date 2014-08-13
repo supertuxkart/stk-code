@@ -488,10 +488,14 @@ void Track::loadTrackInfo()
     root->get("color-level-in",        &m_color_inlevel);
     root->get("color-level-out",       &m_color_outlevel);
 
+    if (m_default_number_of_laps <= 0)
+        m_default_number_of_laps = 3;
+    m_actual_number_of_laps = m_default_number_of_laps;
+
     // Make the default for auto-rescue in battle mode and soccer mode to be false
     if(m_is_arena || m_is_soccer)
         m_enable_auto_rescue = false;
-    root->get("auto-rescue",           & m_enable_auto_rescue);
+    root->get("auto-rescue",           &m_enable_auto_rescue);
     root->get("smooth-normals",        &m_smooth_normals);
     // Reverse is meaningless in arena
     if(m_is_arena || m_is_soccer)
