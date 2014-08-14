@@ -117,8 +117,11 @@ void STKAnimatedMesh::render()
             if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS || irr_driver->getPhase() == SHADOW_PASS)
             {
                 glBindVertexArray(0);
+                size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
                 glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
-                glBufferSubData(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, mb->getVertexCount() * GLmeshes[i].Stride, mb->getVertices());
+                void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT);
+                memcpy(buf, mb->getVertices(), size);
+                glUnmapBuffer(GL_ARRAY_BUFFER);
                 glBindBuffer(GL_ARRAY_BUFFER, 0);
             }
         }
