@@ -133,6 +133,7 @@ Shaders::Shaders()
 GLuint quad_vbo, tri_vbo;
 
 GLuint SharedObject::FullScreenQuadVAO = 0;
+GLuint SharedObject::UIVAO = 0;
 
 static void initQuadVBO()
 {
@@ -179,6 +180,15 @@ static void initQuadBuffer()
     glGenBuffers(1, &quad_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), quad_vertex, GL_STATIC_DRAW);
+
+    glGenVertexArrays(1, &SharedObject::UIVAO);
+    glBindVertexArray(SharedObject::UIVAO);
+    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(3);
+    glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+    glBindVertexArray(0);
 }
 
 GLuint SharedObject::billboardvbo = 0;
@@ -288,6 +298,22 @@ static void initShadowVPMUBO()
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 
+GLuint SharedObject::ParticleQuadVBO = 0;
+
+static void initParticleQuadVBO()
+{
+    static const GLfloat quad_vertex[] = {
+        -.5, -.5, 0., 0.,
+        .5, -.5, 1., 0.,
+        -.5, .5, 0., 1.,
+        .5, .5, 1., 1.,
+    };
+    glGenBuffers(1, &SharedObject::ParticleQuadVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 void Shaders::loadShaders()
 {
     const std::string &dir = file_manager->getAsset(FileManager::SHADER, "");
@@ -382,19 +408,12 @@ void Shaders::loadShaders()
     initCubeVBO();
     initFrustrumVBO();
     initShadowVPMUBO();
+    initParticleQuadVBO();
     FullScreenShader::DiffuseEnvMapShader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
-    ParticleShader::FlipParticleRender::init();
-    ParticleShader::HeightmapSimulationShader::init();
-    ParticleShader::SimpleParticleRender::init();
-    ParticleShader::SimpleSimulationShader::init();
-    UIShader::ColoredRectShader::init();
-    UIShader::ColoredTextureRectShader::init();
-    UIShader::TextureRectShader::init();
-    UIShader::UniformColoredTextureRectShader::init();
     UtilShader::ColoredLine::init();
 }
 
@@ -628,7 +647,7 @@ namespace MeshShader
     NormalMapShader::NormalMapShader()
     {
         Program = LoadProgram(
-            GL_VERTEX_SHADER, file_manager->getAsset("shaders/normalmap.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix");
@@ -649,6 +668,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
         TU_tex = 0;
+        AssignUniforms();
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -663,6 +683,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         TU_tex = 0;
+        AssignUniforms();
         AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -682,6 +703,23 @@ namespace MeshShader
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    InstancedNormalMapShader::InstancedNormalMapShader()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
+        AssignUniforms();
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+
+        TU_normalmap = 1;
+        TU_glossy = 0;
+        AssignTextureUnit(Program, TexUnit(TU_normalmap, "normalMap"), TexUnit(TU_glossy, "DiffuseForAlpha"));
     }
 
     // Solid Lit pass shaders
@@ -1337,21 +1375,7 @@ namespace LightShader
 
 namespace ParticleShader
 {
-    GLuint SimpleSimulationShader::Program;
-    GLuint SimpleSimulationShader::attrib_position;
-    GLuint SimpleSimulationShader::attrib_velocity;
-    GLuint SimpleSimulationShader::attrib_lifetime;
-    GLuint SimpleSimulationShader::attrib_initial_position;
-    GLuint SimpleSimulationShader::attrib_initial_velocity;
-    GLuint SimpleSimulationShader::attrib_initial_lifetime;
-    GLuint SimpleSimulationShader::attrib_size;
-    GLuint SimpleSimulationShader::attrib_initial_size;
-    GLuint SimpleSimulationShader::uniform_sourcematrix;
-    GLuint SimpleSimulationShader::uniform_dt;
-    GLuint SimpleSimulationShader::uniform_level;
-    GLuint SimpleSimulationShader::uniform_size_increase_factor;
-
-    void SimpleSimulationShader::init()
+    SimpleSimulationShader::SimpleSimulationShader()
     {
         const char *varyings[] = {
             "new_particle_position",
@@ -1360,42 +1384,10 @@ namespace ParticleShader
             "new_size",
         };
         Program = LoadTFBProgram(file_manager->getAsset("shaders/pointemitter.vert").c_str(), varyings, 4);
-
-        uniform_dt = glGetUniformLocation(Program, "dt");
-        uniform_sourcematrix = glGetUniformLocation(Program, "sourcematrix");
-        uniform_level = glGetUniformLocation(Program, "level");
-        uniform_size_increase_factor = glGetUniformLocation(Program, "size_increase_factor");
-
-        attrib_position = glGetAttribLocation(Program, "particle_position");
-        attrib_lifetime = glGetAttribLocation(Program, "lifetime");
-        attrib_velocity = glGetAttribLocation(Program, "particle_velocity");
-        attrib_size = glGetAttribLocation(Program, "size");
-        attrib_initial_position = glGetAttribLocation(Program, "particle_position_initial");
-        attrib_initial_lifetime = glGetAttribLocation(Program, "lifetime_initial");
-        attrib_initial_velocity = glGetAttribLocation(Program, "particle_velocity_initial");
-        attrib_initial_size = glGetAttribLocation(Program, "size_initial");
+        AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor");
     }
 
-    GLuint HeightmapSimulationShader::Program;
-    GLuint HeightmapSimulationShader::attrib_position;
-    GLuint HeightmapSimulationShader::attrib_velocity;
-    GLuint HeightmapSimulationShader::attrib_lifetime;
-    GLuint HeightmapSimulationShader::attrib_initial_position;
-    GLuint HeightmapSimulationShader::attrib_initial_velocity;
-    GLuint HeightmapSimulationShader::attrib_initial_lifetime;
-    GLuint HeightmapSimulationShader::attrib_size;
-    GLuint HeightmapSimulationShader::attrib_initial_size;
-    GLuint HeightmapSimulationShader::uniform_sourcematrix;
-    GLuint HeightmapSimulationShader::uniform_dt;
-    GLuint HeightmapSimulationShader::uniform_level;
-    GLuint HeightmapSimulationShader::uniform_size_increase_factor;
-    GLuint HeightmapSimulationShader::uniform_track_x;
-    GLuint HeightmapSimulationShader::uniform_track_z;
-    GLuint HeightmapSimulationShader::uniform_track_x_len;
-    GLuint HeightmapSimulationShader::uniform_track_z_len;
-    GLuint HeightmapSimulationShader::uniform_heightmap;
-
-    void HeightmapSimulationShader::init()
+    HeightmapSimulationShader::HeightmapSimulationShader()
     {
         const char *varyings[] = {
             "new_particle_position",
@@ -1404,122 +1396,35 @@ namespace ParticleShader
             "new_size",
         };
         Program = LoadTFBProgram(file_manager->getAsset("shaders/particlesimheightmap.vert").c_str(), varyings, 4);
-
-        uniform_dt = glGetUniformLocation(Program, "dt");
-        uniform_sourcematrix = glGetUniformLocation(Program, "sourcematrix");
-        uniform_level = glGetUniformLocation(Program, "level");
-        uniform_size_increase_factor = glGetUniformLocation(Program, "size_increase_factor");
-
-        attrib_position = glGetAttribLocation(Program, "particle_position");
-        attrib_lifetime = glGetAttribLocation(Program, "lifetime");
-        attrib_velocity = glGetAttribLocation(Program, "particle_velocity");
-        attrib_size = glGetAttribLocation(Program, "size");
-        attrib_initial_position = glGetAttribLocation(Program, "particle_position_initial");
-        attrib_initial_lifetime = glGetAttribLocation(Program, "lifetime_initial");
-        attrib_initial_velocity = glGetAttribLocation(Program, "particle_velocity_initial");
-        attrib_initial_size = glGetAttribLocation(Program, "size_initial");
-
-        uniform_heightmap = glGetUniformLocation(Program, "heightmap");
-        uniform_track_x = glGetUniformLocation(Program, "track_x");
-        uniform_track_x_len = glGetUniformLocation(Program, "track_x_len");
-        uniform_track_z = glGetUniformLocation(Program, "track_z");
-        uniform_track_z_len = glGetUniformLocation(Program, "track_z_len");
+        TU_heightmap = 2;
+        AssignTextureUnit(Program, TexUnit(TU_heightmap, "heightmap"));
+        AssignUniforms("sourcematrix", "dt", "level", "size_increase_factor", "track_x", "track_x_len", "track_z", "track_z_len");
     }
 
-    GLuint SimpleParticleRender::Program;
-    GLuint SimpleParticleRender::attrib_pos;
-    GLuint SimpleParticleRender::attrib_lf;
-    GLuint SimpleParticleRender::attrib_quadcorner;
-    GLuint SimpleParticleRender::attrib_texcoord;
-    GLuint SimpleParticleRender::attrib_sz;
-    GLuint SimpleParticleRender::uniform_matrix;
-    GLuint SimpleParticleRender::uniform_viewmatrix;
-    GLuint SimpleParticleRender::uniform_tex;
-    GLuint SimpleParticleRender::uniform_dtex;
-    GLuint SimpleParticleRender::uniform_invproj;
-    GLuint SimpleParticleRender::uniform_color_from;
-    GLuint SimpleParticleRender::uniform_color_to;
-
-    void SimpleParticleRender::init()
+    SimpleParticleRender::SimpleParticleRender()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/particle.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-        attrib_pos = glGetAttribLocation(Program, "position");
-        attrib_sz = glGetAttribLocation(Program, "size");
-        attrib_lf = glGetAttribLocation(Program, "lifetime");
-        attrib_quadcorner = glGetAttribLocation(Program, "quadcorner");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
+        AssignUniforms("color_from", "color_to");
 
-
-        uniform_matrix = glGetUniformLocation(Program, "ProjectionMatrix");
-        uniform_viewmatrix = glGetUniformLocation(Program, "ViewMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_color_from = glGetUniformLocation(Program, "color_from");
-        assert(uniform_color_from != -1);
-        uniform_color_to = glGetUniformLocation(Program, "color_to");
-        assert(uniform_color_to != -1);
+        TU_tex = 0;
+        TU_dtex = 1;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_dtex, "dtex"));
     }
 
-    void SimpleParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix,
-                                           const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_dtex,
-                                           const ParticleSystemProxy* particle_system)
-    {
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-        glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-        glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1i(uniform_dtex, TU_dtex);
-
-        const float* color_from = particle_system->getColorFrom();
-        const float* color_to = particle_system->getColorTo();
-        glUniform3f(uniform_color_from, color_from[0], color_from[1], color_from[2]);
-        glUniform3f(uniform_color_to, color_to[0], color_to[1], color_to[2]);
-    }
-
-    GLuint FlipParticleRender::Program;
-    GLuint FlipParticleRender::attrib_pos;
-    GLuint FlipParticleRender::attrib_lf;
-    GLuint FlipParticleRender::attrib_quadcorner;
-    GLuint FlipParticleRender::attrib_texcoord;
-    GLuint FlipParticleRender::attrib_sz;
-    GLuint FlipParticleRender::attrib_rotationvec;
-    GLuint FlipParticleRender::attrib_anglespeed;
-    GLuint FlipParticleRender::uniform_matrix;
-    GLuint FlipParticleRender::uniform_viewmatrix;
-    GLuint FlipParticleRender::uniform_tex;
-    GLuint FlipParticleRender::uniform_dtex;
-    GLuint FlipParticleRender::uniform_invproj;
-
-    void FlipParticleRender::init()
+    FlipParticleRender::FlipParticleRender()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/flipparticle.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
-        attrib_pos = glGetAttribLocation(Program, "position");
-        attrib_sz = glGetAttribLocation(Program, "size");
-        attrib_lf = glGetAttribLocation(Program, "lifetime");
-        attrib_quadcorner = glGetAttribLocation(Program, "quadcorner");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
-        attrib_anglespeed = glGetAttribLocation(Program, "anglespeed");
-        attrib_rotationvec = glGetAttribLocation(Program, "rotationvec");
+        AssignUniforms();
 
-        uniform_matrix = glGetUniformLocation(Program, "ProjectionMatrix");
-        uniform_viewmatrix = glGetUniformLocation(Program, "ViewMatrix");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_invproj = glGetUniformLocation(Program, "invproj");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-    }
-
-    void FlipParticleRender::setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_dtex)
-    {
-        glUniformMatrix4fv(uniform_invproj, 1, GL_FALSE, InvProjMatrix.pointer());
-        glUniformMatrix4fv(uniform_matrix, 1, GL_FALSE, irr_driver->getProjMatrix().pointer());
-        glUniformMatrix4fv(uniform_viewmatrix, 1, GL_FALSE, irr_driver->getViewMatrix().pointer());
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform1i(uniform_dtex, TU_dtex);
+        TU_tex = 0;
+        TU_dtex = 1;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_dtex, "dtex"));
     }
 }
 
@@ -1947,127 +1852,44 @@ namespace FullScreenShader
 
 namespace UIShader
 {
-    GLuint TextureRectShader::Program;
-    GLuint TextureRectShader::attrib_position;
-    GLuint TextureRectShader::attrib_texcoord;
-    GLuint TextureRectShader::uniform_tex;
-    GLuint TextureRectShader::uniform_center;
-    GLuint TextureRectShader::uniform_size;
-    GLuint TextureRectShader::uniform_texcenter;
-    GLuint TextureRectShader::uniform_texsize;
-    GLuint TextureRectShader::vao;
-
-    void TextureRectShader::init()
+    TextureRectShader::TextureRectShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/texturedquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
-
-        attrib_position = glGetAttribLocation(Program, "position");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_center = glGetUniformLocation(Program, "center");
-        uniform_size = glGetUniformLocation(Program, "size");
-        uniform_texcenter = glGetUniformLocation(Program, "texcenter");
-        uniform_texsize = glGetUniformLocation(Program, "texsize");
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(attrib_position);
-        glEnableVertexAttribArray(attrib_texcoord);
-        glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-        glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-        glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-        glBindVertexArray(0);
+        AssignUniforms("center", "size", "texcenter", "texsize");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
 
-    void TextureRectShader::setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex)
-    {
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform2f(uniform_center, center_pos_x, center_pos_y);
-        glUniform2f(uniform_size, width, height);
-        glUniform2f(uniform_texcenter, tex_center_pos_x, tex_center_pos_y);
-        glUniform2f(uniform_texsize, tex_width, tex_height);
-    }
-
-    GLuint UniformColoredTextureRectShader::Program;
-    GLuint UniformColoredTextureRectShader::attrib_position;
-    GLuint UniformColoredTextureRectShader::attrib_texcoord;
-    GLuint UniformColoredTextureRectShader::uniform_tex;
-    GLuint UniformColoredTextureRectShader::uniform_color;
-    GLuint UniformColoredTextureRectShader::uniform_center;
-    GLuint UniformColoredTextureRectShader::uniform_size;
-    GLuint UniformColoredTextureRectShader::uniform_texcenter;
-    GLuint UniformColoredTextureRectShader::uniform_texsize;
-    GLuint UniformColoredTextureRectShader::vao;
-
-    void UniformColoredTextureRectShader::init()
+    UniformColoredTextureRectShader::UniformColoredTextureRectShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/texturedquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/uniformcolortexturedquad.frag").c_str());
 
-        attrib_position = glGetAttribLocation(Program, "position");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_color = glGetUniformLocation(Program, "color");
-        uniform_center = glGetUniformLocation(Program, "center");
-        uniform_size = glGetUniformLocation(Program, "size");
-        uniform_texcenter = glGetUniformLocation(Program, "texcenter");
-        uniform_texsize = glGetUniformLocation(Program, "texsize");
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(attrib_position);
-        glEnableVertexAttribArray(attrib_texcoord);
-        glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-        glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-        glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-        glBindVertexArray(0);
+        AssignUniforms("center", "size", "texcenter", "texsize", "color");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
     }
 
-    void UniformColoredTextureRectShader::setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, const SColor &color, unsigned TU_tex)
-    {
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform2f(uniform_center, center_pos_x, center_pos_y);
-        glUniform2f(uniform_size, width, height);
-        glUniform2f(uniform_texcenter, tex_center_pos_x, tex_center_pos_y);
-        glUniform2f(uniform_texsize, tex_width, tex_height);
-        glUniform4i(uniform_color, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
-    }
-
-    GLuint ColoredTextureRectShader::Program;
-    GLuint ColoredTextureRectShader::attrib_position;
-    GLuint ColoredTextureRectShader::attrib_texcoord;
-    GLuint ColoredTextureRectShader::attrib_color;
-    GLuint ColoredTextureRectShader::uniform_tex;
-    GLuint ColoredTextureRectShader::uniform_center;
-    GLuint ColoredTextureRectShader::uniform_size;
-    GLuint ColoredTextureRectShader::uniform_texcenter;
-    GLuint ColoredTextureRectShader::uniform_texsize;
-    GLuint ColoredTextureRectShader::colorvbo;
-    GLuint ColoredTextureRectShader::vao;
-
-    void ColoredTextureRectShader::init()
+    ColoredTextureRectShader::ColoredTextureRectShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/colortexturedquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
+        AssignUniforms("center", "size", "texcenter", "texsize");
+        TU_tex = 0;
+        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
 
-        attrib_position = glGetAttribLocation(Program, "position");
-        attrib_texcoord = glGetAttribLocation(Program, "texcoord");
-        attrib_color = glGetAttribLocation(Program, "color");
-        uniform_tex = glGetUniformLocation(Program, "tex");
-        uniform_center = glGetUniformLocation(Program, "center");
-        uniform_size = glGetUniformLocation(Program, "size");
-        uniform_texcenter = glGetUniformLocation(Program, "texcenter");
-        uniform_texsize = glGetUniformLocation(Program, "texsize");
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
-        glEnableVertexAttribArray(attrib_position);
-        glEnableVertexAttribArray(attrib_texcoord);
-        glEnableVertexAttribArray(attrib_color);
+        glEnableVertexAttribArray(0);
+        glEnableVertexAttribArray(3);
+        glEnableVertexAttribArray(2);
         glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-        glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-        glVertexAttribPointer(attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+        glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
         const unsigned quad_color[] = {
             0, 0, 0, 255,
             255, 0, 0, 255,
@@ -2077,47 +1899,15 @@ namespace UIShader
         glGenBuffers(1, &colorvbo);
         glBindBuffer(GL_ARRAY_BUFFER, colorvbo);
         glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(unsigned), quad_color, GL_DYNAMIC_DRAW);
-        glVertexAttribIPointer(attrib_color, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
+        glVertexAttribIPointer(2, 4, GL_UNSIGNED_INT, 4 * sizeof(unsigned), 0);
         glBindVertexArray(0);
     }
 
-    void ColoredTextureRectShader::setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex)
-    {
-        glUniform1i(uniform_tex, TU_tex);
-        glUniform2f(uniform_center, center_pos_x, center_pos_y);
-        glUniform2f(uniform_size, width, height);
-        glUniform2f(uniform_texcenter, tex_center_pos_x, tex_center_pos_y);
-        glUniform2f(uniform_texsize, tex_width, tex_height);
-    }
-
-    GLuint ColoredRectShader::Program;
-    GLuint ColoredRectShader::attrib_position;
-    GLuint ColoredRectShader::uniform_center;
-    GLuint ColoredRectShader::uniform_size;
-    GLuint ColoredRectShader::uniform_color;
-    GLuint ColoredRectShader::vao;
-
-    void ColoredRectShader::init()
+    ColoredRectShader::ColoredRectShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/coloredquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/coloredquad.frag").c_str());
-        attrib_position = glGetAttribLocation(Program, "position");
-        uniform_color = glGetUniformLocation(Program, "color");
-        uniform_center = glGetUniformLocation(Program, "center");
-        uniform_size = glGetUniformLocation(Program, "size");
-        glGenVertexArrays(1, &vao);
-        glBindVertexArray(vao);
-        glEnableVertexAttribArray(attrib_position);
-        glBindBuffer(GL_ARRAY_BUFFER, quad_buffer);
-        glVertexAttribPointer(attrib_position, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-        glBindVertexArray(0);
-    }
-
-    void ColoredRectShader::setUniforms(float center_pos_x, float center_pos_y, float width, float height, const video::SColor &color)
-    {
-        glUniform2f(uniform_center, center_pos_x, center_pos_y);
-        glUniform2f(uniform_size, width, height);
-        glUniform4i(uniform_color, color.getRed(), color.getGreen(), color.getBlue(), color.getAlpha());
+        AssignUniforms("center", "size", "color");
     }
 }

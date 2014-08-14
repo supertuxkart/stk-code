@@ -167,8 +167,7 @@ PlayerManager::PlayerManager()
 PlayerManager::~PlayerManager()
 {
     // If the passwords should not be remembered, clear the saved session.
-    PlayerProfile *player;
-    for_in(player, m_all_players)
+    for_var_in(PlayerProfile*, player, m_all_players)
     {
         if(!player->rememberPassword())
             player->clearSession();
@@ -270,8 +269,7 @@ void PlayerManager::save()
         }
 
         // Save all non-guest players
-        PlayerProfile *player;
-        for_in(player, m_all_players)
+        for_var_in(PlayerProfile*, player, m_all_players)
         {
             if(!player->isGuestAccount())
                 player->save(players_file);
@@ -320,8 +318,8 @@ void PlayerManager::deletePlayer(PlayerProfile *player)
 void PlayerManager::enforceCurrentPlayer()
 {
     if (m_current_player) return;
-
-    PlayerProfile *player;
+    
+    PlayerProfile* player;
     for_in(player, m_all_players)
     {
         if (!player->isGuestAccount())
@@ -408,8 +406,7 @@ void PlayerManager::createGuestPlayers(int n)
 unsigned int PlayerManager::getNumNonGuestPlayers() const
 {
     unsigned int count=0;
-    const PlayerProfile *player;
-    for_in(player, m_all_players)
+    for_var_in(const PlayerProfile*, player, m_all_players)
     {
         if(!player->isGuestAccount()) count ++;
     }
@@ -422,8 +419,7 @@ unsigned int PlayerManager::getNumNonGuestPlayers() const
 unsigned int PlayerManager::getUniqueId() const
 {
     unsigned int max_id=0;
-    const PlayerProfile *player;
-    for_in(player, m_all_players)
+    for_var_in(const PlayerProfile*, player, m_all_players)
     {
         if(player->getUniqueID()>max_id)
             max_id = player->getUniqueID();
@@ -439,8 +435,7 @@ unsigned int PlayerManager::getUniqueId() const
  */
 const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
 {
-    const PlayerProfile *player;
-    for_in(player, m_all_players)
+    for_var_in(const PlayerProfile*, player, m_all_players)
     {
         if(player->getUniqueID()==id)
             return player;
@@ -455,8 +450,7 @@ const PlayerProfile *PlayerManager::getPlayerById(unsigned int id)
  */
 PlayerProfile *PlayerManager::getPlayer(const irr::core::stringw &name)
 {
-    PlayerProfile *player;
-    for_in(player, m_all_players)
+    for_var_in(PlayerProfile*, player, m_all_players)
     {
         if(player->getName()==name)
             return player;

@@ -170,4 +170,9 @@ void STKInstancedSceneNode::render()
         GLMesh *mesh = MeshSolidMaterial[MAT_GRASS][i];
         ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9, windDir, cb->getPosition()));
     }
-}
+
+    for(unsigned i = 0; i < MeshSolidMaterial[MAT_NORMAL_MAP].size(); i++)
+    {
+        GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
+        ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9));
+    }

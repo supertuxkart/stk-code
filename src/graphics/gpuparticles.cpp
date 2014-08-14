@@ -24,29 +24,22 @@ scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
     return node;
 }
 
-GLuint ParticleSystemProxy::quad_vertex_buffer = 0;
-
 ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
     const core::vector3df& position,
     const core::vector3df& rotation,
-    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false)
+    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false), m_first_execution(true)
 {
-    glGenBuffers(1, &initial_values_buffer);
-    glGenBuffers(2, tfb_buffers);
-    glGenBuffers(1, &quaternionsbuffer);
-    glGenVertexArrays(1, &current_rendering_vao);
-    glGenVertexArrays(1, &non_current_rendering_vao);
     size_increase_factor = 0.;
+    ParticleParams = nullptr;
+    InitialValues = nullptr;
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
-
-
+    
     // We set these later but avoid coverity report them
     heighmapbuffer = 0;
     heightmaptexture = 0;
-    current_simulation_vao = 0;
     has_height_map = false;
     flip = false;
     track_x = 0;
@@ -54,27 +47,16 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     track_x_len = 0;
     track_z_len = 0;
     texture = 0;
-
-    if (quad_vertex_buffer)
-        return;
-    static const GLfloat quad_vertex[] = {
-        -.5, -.5, 0., 0.,
-        .5, -.5, 1., 0.,
-        -.5, .5, 0., 1.,
-        .5, .5, 1., 1.,
-    };
-    glGenBuffers(1, &quad_vertex_buffer);
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vertex_buffer);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(quad_vertex), quad_vertex, GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 ParticleSystemProxy::~ParticleSystemProxy()
 {
-    glDeleteBuffers(2, tfb_buffers);
-    glDeleteBuffers(1, &initial_values_buffer);
-    if (quaternionsbuffer)
-        glDeleteBuffers(1, &quaternionsbuffer);
+    if (InitialValues)
+        free(InitialValues);
+    if (ParticleParams)
+        free(ParticleParams);
+    if (!m_first_execution)
+        cleanGL();
     if (heighmapbuffer)
         glDeleteBuffers(1, &heighmapbuffer);
     if (heightmaptexture)
@@ -137,51 +119,32 @@ void generateLifetimeSizeDirection(scene::IParticleEmitter *emitter, float &life
     dirZ = particledir.Z;
 }
 
-struct ParticleData
-{
-    float PositionX;
-    float PositionY;
-    float PositionZ;
-    float Lifetime;
-    float DirectionX;
-    float DirectionY;
-    float DirectionZ;
-    float Size;
-};
-
 void ParticleSystemProxy::generateParticlesFromPointEmitter(scene::IParticlePointEmitter *emitter)
 {
-    ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
+    ParticleParams = (ParticleData *) realloc(ParticleParams, sizeof(ParticleData) * count);
+    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
 
     for (unsigned i = 0; i < count; i++)
     {
-        particles[i].PositionX = 0;
-        particles[i].PositionY = 0;
-        particles[i].PositionZ = 0;
+        ParticleParams[i].PositionX = 0;
+        ParticleParams[i].PositionY = 0;
+        ParticleParams[i].PositionZ = 0;
         // Initial lifetime is >1
-        particles[i].Lifetime = 2.;
+        InitialValues[i].Lifetime = 2.;
 
-        memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
+        memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
 
-        generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
-            initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
+        generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
+            ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
 
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+        memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
     }
-
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    delete[] particles;
-    delete[] initialvalue;
 }
 
 void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *emitter)
 {
-    ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
+    ParticleParams = (ParticleData *)realloc(ParticleParams, sizeof(ParticleData)* count);
+    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
 
     const core::vector3df& extent = emitter->getBox().getExtent();
 
@@ -189,33 +152,26 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 
     for (unsigned i = 0; i < count; i++)
     {
-        particles[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
-        particles[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
-        particles[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
+        ParticleParams[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
+        ParticleParams[i].PositionY = emitter->getBox().MinEdge.Y + os::Randomizer::frand() * extent.Y;
+        ParticleParams[i].PositionZ = emitter->getBox().MinEdge.Z + os::Randomizer::frand() * extent.Z;
         // Initial lifetime is random
-        particles[i].Lifetime = os::Randomizer::frand();
+        InitialValues[i].Lifetime = os::Randomizer::frand();
 
-        memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
-        generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
-            initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+        memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
+        generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
+            ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
+        memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
 
         if (randomize_initial_y)
-            particles[i].PositionY = os::Randomizer::frand()*50.0f; // -100.0f;
+            InitialValues[i].PositionY = os::Randomizer::frand()*50.0f; // -100.0f;
     }
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    delete[] particles;
-    delete[] initialvalue;
 }
 
 void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *emitter)
 {
-    ParticleData *particles = new ParticleData[count], *initialvalue = new ParticleData[count];
+    ParticleParams = (ParticleData *)realloc(ParticleParams, sizeof(ParticleData)* count);
+    InitialValues = (ParticleData *)realloc(InitialValues, sizeof(ParticleData)* count);
 
     for (unsigned i = 0; i < count; i++) {
         // Random distance from center
@@ -227,25 +183,17 @@ void ParticleSystemProxy::generateParticlesFromSphereEmitter(scene::IParticleSph
         pos.rotateYZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
         pos.rotateXZBy(os::Randomizer::frand() * 360.f, emitter->getCenter());
 
-        particles[i].PositionX = pos.X;
-        particles[i].PositionY = pos.Y;
-        particles[i].PositionZ = pos.Z;
+        ParticleParams[i].PositionX = pos.X;
+        ParticleParams[i].PositionY = pos.Y;
+        ParticleParams[i].PositionZ = pos.Z;
         // Initial lifetime is > 1
-        particles[i].Lifetime = 2.;
+        InitialValues[i].Lifetime = 2.;
 
-        memcpy(&(initialvalue[i].PositionX), &(particles[i].PositionX), 3 * sizeof(float));
-        generateLifetimeSizeDirection(emitter, initialvalue[i].Lifetime, initialvalue[i].Size,
-            initialvalue[i].DirectionX, initialvalue[i].DirectionY, initialvalue[i].DirectionZ);
-        memcpy(&(particles[i].DirectionX), &(initialvalue[i].DirectionX), 4 * sizeof(float));
+        memcpy(&(InitialValues[i].PositionX), &(ParticleParams[i].PositionX), 3 * sizeof(float));
+        generateLifetimeSizeDirection(emitter, ParticleParams[i].Lifetime, ParticleParams[i].Size,
+            ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
+        memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
     }
-    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), initialvalue, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), particles, GL_STREAM_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
-    delete[] particles;
-    delete[] initialvalue;
 }
 
 static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
@@ -261,91 +209,16 @@ static bool isGPUParticleType(scene::E_PARTICLE_EMITTER_TYPE type)
     }
 }
 
-template<typename T>
-void setPositionQuadAttributes(GLuint quad_vbo, GLuint position_vbo)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, quad_vbo);
-    glEnableVertexAttribArray(T::attrib_quadcorner);
-    glVertexAttribPointer(T::attrib_quadcorner, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glEnableVertexAttribArray(T::attrib_texcoord);
-    glVertexAttribPointer(T::attrib_texcoord, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
-
-    glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
-    glEnableVertexAttribArray(T::attrib_pos);
-    glVertexAttribPointer(T::attrib_pos, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
-    glVertexAttribDivisor(T::attrib_pos, 1);
-    glEnableVertexAttribArray(T::attrib_lf);
-    glVertexAttribPointer(T::attrib_lf, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
-    glVertexAttribDivisor(T::attrib_lf, 1);
-    glEnableVertexAttribArray(T::attrib_sz);
-    glVertexAttribPointer(T::attrib_sz, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
-    glVertexAttribDivisor(T::attrib_sz, 1);
-}
-
-void ParticleSystemProxy::FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer)
-{
-    setPositionQuadAttributes<ParticleShader::FlipParticleRender>(quad_vertex_buffer, PositionBuffer);
-    glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_rotationvec);
-    glEnableVertexAttribArray(ParticleShader::FlipParticleRender::attrib_anglespeed);
-
-    glBindBuffer(GL_ARRAY_BUFFER, QuaternionBuffer);
-    glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_rotationvec, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
-    glVertexAttribPointer(ParticleShader::FlipParticleRender::attrib_anglespeed, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
-
-    glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_rotationvec, 1);
-    glVertexAttribDivisor(ParticleShader::FlipParticleRender::attrib_anglespeed, 1);
-}
-
-void ParticleSystemProxy::SimpleParticleVAOBind(GLuint PositionBuffer)
-{
-    setPositionQuadAttributes<ParticleShader::SimpleParticleRender>(quad_vertex_buffer, PositionBuffer);
-}
-
-template<typename T>
-void setSimulationBind(GLuint position_vbo, GLuint initialValues_vbo)
-{
-    glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
-    glEnableVertexAttribArray(T::attrib_position);
-    glVertexAttribPointer(T::attrib_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
-    glEnableVertexAttribArray(T::attrib_lifetime);
-    glVertexAttribPointer(T::attrib_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(T::attrib_velocity);
-    glVertexAttribPointer(T::attrib_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
-    if (T::attrib_size < 30)
-    {
-        glEnableVertexAttribArray(T::attrib_size);
-        glVertexAttribPointer(T::attrib_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
-    }
-
-    glBindBuffer(GL_ARRAY_BUFFER, initialValues_vbo);
-    glEnableVertexAttribArray(T::attrib_initial_position);
-    glVertexAttribPointer(T::attrib_initial_position, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)0);
-    glEnableVertexAttribArray(T::attrib_initial_lifetime);
-    glVertexAttribPointer(T::attrib_initial_lifetime, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(T::attrib_initial_velocity);
-    glVertexAttribPointer(T::attrib_initial_velocity, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(4 * sizeof(float)));
-    glEnableVertexAttribArray(T::attrib_initial_size);
-    glVertexAttribPointer(T::attrib_initial_size, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid*)(7 * sizeof(float)));
-}
-
-void ParticleSystemProxy::SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer)
-{
-    setSimulationBind<ParticleShader::SimpleSimulationShader>(PositionBuffer, InitialValuesBuffer);
-}
-
-void ParticleSystemProxy::HeightmapSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer)
-{
-    setSimulationBind<ParticleShader::HeightmapSimulationShader>(PositionBuffer, InitialValuesBuffer);
-}
-
-
 void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
 {
     CParticleSystemSceneNode::setEmitter(emitter);
     if (!emitter || !isGPUParticleType(emitter->getType()))
         return;
+    if (!m_first_execution)
+        cleanGL();
     has_height_map = false;
     flip = false;
+    m_first_execution = true;
 
     count = emitter->getMaxParticlesPerSecond() * emitter->getMaxLifeTime() / 1000;
     switch (emitter->getType())
@@ -363,96 +236,122 @@ void ParticleSystemProxy::setEmitter(scene::IParticleEmitter* emitter)
         assert(0 && "Wrong particle type");
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
     video::ITexture *tex = getMaterial(0).getTexture(0);
     compressTexture(tex, true, true);
     texture = getTextureGLuint(getMaterial(0).getTexture(0));
 }
 
-void ParticleSystemProxy::simulateHeightmap()
+void ParticleSystemProxy::cleanGL()
 {
-    int timediff = int(GUIEngine::getLatestDt() * 1000.f);
-    int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
-    core::matrix4 matrix = getAbsoluteTransformation();
-    glUseProgram(ParticleShader::HeightmapSimulationShader::Program);
-    glEnable(GL_RASTERIZER_DISCARD);
-
-    glUniform1i(ParticleShader::HeightmapSimulationShader::uniform_dt, timediff);
-    glUniform1i(ParticleShader::HeightmapSimulationShader::uniform_level, active_count);
-    glUniformMatrix4fv(ParticleShader::HeightmapSimulationShader::uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_size_increase_factor, size_increase_factor);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
-    glUniform1i(ParticleShader::HeightmapSimulationShader::uniform_heightmap, 2);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_x, track_x);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_z, track_z);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_x_len, track_x_len);
-    glUniform1f(ParticleShader::HeightmapSimulationShader::uniform_track_z_len, track_z_len);
-
-    glBindVertexArray(current_simulation_vao);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
-
-    glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, count);
-    glEndTransformFeedback();
-    glBindVertexArray(0);
-
-    glDisable(GL_RASTERIZER_DISCARD);
-    std::swap(tfb_buffers[0], tfb_buffers[1]);
-    std::swap(current_rendering_vao, non_current_rendering_vao);
-    std::swap(current_simulation_vao, non_current_simulation_vao);
+    if (flip)
+        glDeleteBuffers(1, &quaternionsbuffer);
+    glDeleteBuffers(2, tfb_buffers);
+    glDeleteBuffers(1, &initial_values_buffer);
+    glDeleteVertexArrays(1, &current_rendering_vao);
+    glDeleteVertexArrays(1, &non_current_rendering_vao);
+    glDeleteVertexArrays(1, &current_simulation_vao);
+    glDeleteVertexArrays(1, &non_current_simulation_vao);
 }
 
-void ParticleSystemProxy::simulateNoHeightmap()
+void ParticleSystemProxy::CommonRenderingVAO(GLuint PositionBuffer)
 {
-    int timediff = int(GUIEngine::getLatestDt() * 1000.f);
-    int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
-    core::matrix4 matrix = getAbsoluteTransformation();
-    glUseProgram(ParticleShader::SimpleSimulationShader::Program);
-    glEnable(GL_RASTERIZER_DISCARD);
+    glBindBuffer(GL_ARRAY_BUFFER, SharedObject::ParticleQuadVBO);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(2 * sizeof(float)));
 
-    glUniform1i(ParticleShader::SimpleSimulationShader::uniform_dt, timediff);
-    glUniform1i(ParticleShader::SimpleSimulationShader::uniform_level, active_count);
-    glUniformMatrix4fv(ParticleShader::SimpleSimulationShader::uniform_sourcematrix, 1, GL_FALSE, matrix.pointer());
-    glUniform1f(ParticleShader::SimpleSimulationShader::uniform_size_increase_factor, size_increase_factor);
+    glBindBuffer(GL_ARRAY_BUFFER, PositionBuffer);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleData), 0);
+    glVertexAttribDivisor(0, 1);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(3 * sizeof(float)));
+    glVertexAttribDivisor(1, 1);
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleData), (GLvoid *)(7 * sizeof(float)));
+    glVertexAttribDivisor(2, 1);
+}
 
-    glBindVertexArray(current_simulation_vao);
-    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
+void ParticleSystemProxy::AppendQuaternionRenderingVAO(GLuint QuaternionBuffer)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, QuaternionBuffer);
+    glEnableVertexAttribArray(5);
 
-    glBeginTransformFeedback(GL_POINTS);
-    glDrawArrays(GL_POINTS, 0, count);
-    glEndTransformFeedback();
-    glBindVertexArray(0);
+    glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, 4 * sizeof(float), 0);
+    glVertexAttribDivisor(5, 1);
 
-    glDisable(GL_RASTERIZER_DISCARD);
-    std::swap(tfb_buffers[0], tfb_buffers[1]);
-    std::swap(current_rendering_vao, non_current_rendering_vao);
-    std::swap(current_simulation_vao, non_current_simulation_vao);
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 1, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (GLvoid *)(3 * sizeof(float)));
+    glVertexAttribDivisor(6, 1);
+}
+
+void ParticleSystemProxy::CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, position_vbo);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glEnableVertexAttribArray(3);
+    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
+
+    glBindBuffer(GL_ARRAY_BUFFER, initialValues_vbo);
+    glEnableVertexAttribArray(4);
+    glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)0);
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(6);
+    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(4 * sizeof(float)));
+    glEnableVertexAttribArray(7);
+    glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(ParticleSystemProxy::ParticleData), (GLvoid*)(7 * sizeof(float)));
 }
 
 void ParticleSystemProxy::simulate()
 {
+    int timediff = int(GUIEngine::getLatestDt() * 1000.f);
+    int active_count = getEmitter()->getMaxLifeTime() * getEmitter()->getMaxParticlesPerSecond() / 1000;
+    core::matrix4 matrix = getAbsoluteTransformation();
+
+    glEnable(GL_RASTERIZER_DISCARD);
     if (has_height_map)
-        simulateHeightmap();
+    {
+        glUseProgram(ParticleShader::HeightmapSimulationShader::getInstance()->Program);
+        glActiveTexture(GL_TEXTURE0 + ParticleShader::HeightmapSimulationShader::getInstance()->TU_heightmap);
+        glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
+        ParticleShader::HeightmapSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor, track_x, track_x_len, track_z, track_z_len);
+    }
     else
-        simulateNoHeightmap();
+    {
+        glUseProgram(ParticleShader::SimpleSimulationShader::getInstance()->Program);
+        ParticleShader::SimpleSimulationShader::getInstance()->setUniforms(matrix, timediff, active_count, size_increase_factor);
+    }
+
+    glBindVertexArray(current_simulation_vao);
+    glBindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, 0, tfb_buffers[1]);
+
+    glBeginTransformFeedback(GL_POINTS);
+    glDrawArrays(GL_POINTS, 0, count);
+    glEndTransformFeedback();
+    glBindVertexArray(0);
+
+    glDisable(GL_RASTERIZER_DISCARD);
+    std::swap(tfb_buffers[0], tfb_buffers[1]);
+    std::swap(current_rendering_vao, non_current_rendering_vao);
+    std::swap(current_simulation_vao, non_current_simulation_vao);
 }
 
 void ParticleSystemProxy::drawFlip()
 {
     glBlendFunc(GL_ONE, GL_ONE);
-    glUseProgram(ParticleShader::FlipParticleRender::Program);
+    glUseProgram(ParticleShader::FlipParticleRender::getInstance()->Program);
 
-    float screen[2] = {
-        (float)UserConfigParams::m_width,
-        (float)UserConfigParams::m_height
-    };
+    setTexture(ParticleShader::FlipParticleRender::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    setTexture(ParticleShader::FlipParticleRender::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
 
-    setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-
-    ParticleShader::FlipParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1);
+    ParticleShader::FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
@@ -464,18 +363,14 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE);
     else
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    glUseProgram(ParticleShader::SimpleParticleRender::Program);
+    glUseProgram(ParticleShader::SimpleParticleRender::getInstance()->Program);
 
-    float screen[2] = {
-        (float)UserConfigParams::m_width,
-        (float)UserConfigParams::m_height
-    };
+    setTexture(ParticleShader::SimpleParticleRender::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
+    setTexture(ParticleShader::SimpleParticleRender::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
+    video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 
-    setTexture(0, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-
-    ParticleShader::SimpleParticleRender::setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(),
-        irr_driver->getInvProjMatrix(), screen[0], screen[1], 0, 1, this);
+    ParticleShader::SimpleParticleRender::getInstance()->setUniforms(ColorFrom, ColorTo);
 
     glBindVertexArray(current_rendering_vao);
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
@@ -491,26 +386,32 @@ void ParticleSystemProxy::draw()
 
 void ParticleSystemProxy::generateVAOs()
 {
+    glBindVertexArray(0);
+    glGenBuffers(1, &initial_values_buffer);
+    glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_DRAW);
+    glGenBuffers(2, tfb_buffers);
+    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
     glGenVertexArrays(1, &current_rendering_vao);
     glGenVertexArrays(1, &non_current_rendering_vao);
     glGenVertexArrays(1, &current_simulation_vao);
     glGenVertexArrays(1, &non_current_simulation_vao);
 
     glBindVertexArray(current_simulation_vao);
-    if (has_height_map)
-        HeightmapSimulationBind(tfb_buffers[0], initial_values_buffer);
-    else
-        SimpleSimulationBind(tfb_buffers[0], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[0], initial_values_buffer);
     glBindVertexArray(non_current_simulation_vao);
-    if (has_height_map)
-        HeightmapSimulationBind(tfb_buffers[1], initial_values_buffer);
-    else
-        SimpleSimulationBind(tfb_buffers[1], initial_values_buffer);
+    CommonSimulationVAO(tfb_buffers[1], initial_values_buffer);
 
-    float *quaternions = new float[4 * count];
+
     glBindVertexArray(0);
     if (flip)
     {
+        float *quaternions = new float[4 * count];
         for (unsigned i = 0; i < count; i++)
         {
             core::vector3df rotationdir(0., 1., 0.);
@@ -523,22 +424,19 @@ void ParticleSystemProxy::generateVAOs()
         glGenBuffers(1, &quaternionsbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
         glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STATIC_DRAW);
+        delete[] quaternions;
     }
 
     glBindVertexArray(current_rendering_vao);
+    CommonRenderingVAO(tfb_buffers[0]);
     if (flip)
-        FlipParticleVAOBind(tfb_buffers[0], quaternionsbuffer);
-    else
-        SimpleParticleVAOBind(tfb_buffers[0]);
+        AppendQuaternionRenderingVAO(quaternionsbuffer);
 
     glBindVertexArray(non_current_rendering_vao);
+    CommonRenderingVAO(tfb_buffers[1]);
     if (flip)
-        FlipParticleVAOBind(tfb_buffers[1], quaternionsbuffer);
-    else
-        SimpleParticleVAOBind(tfb_buffers[1]);
+        AppendQuaternionRenderingVAO(quaternionsbuffer);
     glBindVertexArray(0);
-
-    delete[] quaternions;
 }
 
 void ParticleSystemProxy::render() {
@@ -547,8 +445,9 @@ void ParticleSystemProxy::render() {
         CParticleSystemSceneNode::render();
         return;
     }
-    if (!current_rendering_vao || !non_current_rendering_vao || !current_simulation_vao || !non_current_simulation_vao)
+    if (m_first_execution)
         generateVAOs();
+    m_first_execution = false;
     simulate();
     draw();
 }

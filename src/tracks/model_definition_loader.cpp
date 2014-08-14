@@ -21,6 +21,7 @@ using namespace irr;
 
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
+#include "graphics/mesh_tools.hpp"
 #include "graphics/stkinstancedscenenode.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/track.hpp"
@@ -82,14 +83,8 @@ LODNode* ModelDefinitionLoader::instanciateAsLOD(const XMLNode* node, scene::ISc
                 continue;
             }
 
-            if (group[m].m_tangent && a_mesh->getMeshBuffer(0)->getVertexType() != video::EVT_TANGENTS)
-            {
-                scene::IMeshManipulator* manip = irr_driver->getVideoDriver()->getMeshManipulator();
-                scene::IMesh* m2 = manip->createMeshWithTangents(a_mesh);
-                // FIXME: do we need to clean up 'a_mesh' ?
-                a_mesh = m2;
-                irr_driver->setAllMaterialFlags(a_mesh);
-            }
+            a_mesh = MeshTools::createMeshWithTangents(a_mesh, &MeshTools::isNormalMap);
+            irr_driver->setAllMaterialFlags(a_mesh);
 
             a_mesh->grab();
             //cache.push_back(a_mesh);
@@ -130,6 +125,9 @@ STKInstancedSceneNode* ModelDefinitionLoader::instanciate(const irr::core::vecto
         }
 
         scene::IMesh* mesh = irr_driver->getMesh(m_lod_groups[name][0].m_model_file);
+        mesh = MeshTools::createMeshWithTangents(mesh, &MeshTools::isNormalMap);
+        irr_driver->setAllMaterialFlags(mesh);
+
         m_instancing_nodes[name] = new STKInstancedSceneNode(mesh,
             irr_driver->getSceneManager()->getRootSceneNode(), irr_driver->getSceneManager(), -1);
         m_track->addNode(m_instancing_nodes[name]);

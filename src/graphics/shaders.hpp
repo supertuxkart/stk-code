@@ -31,9 +31,10 @@ class SharedObject
 {
 public:
     static GLuint billboardvbo;
-    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes;
+    static GLuint cubevbo, cubeindexes, frustrumvbo, frustrumindexes, ParticleQuadVBO;
     static GLuint ViewProjectionMatrixesUBO;
     static GLuint FullScreenQuadVAO;
+    static GLuint UIVAO;
 };
 
 namespace UtilShader
@@ -218,6 +219,14 @@ public:
     GLuint TU_tex;
 
     InstancedGrassPass1Shader();
+};
+
+class InstancedNormalMapShader : public ShaderHelperSingleton<InstancedNormalMapShader>
+{
+public:
+    GLuint TU_glossy, TU_normalmap;
+
+    InstancedNormalMapShader();
 };
 
 class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>
@@ -477,51 +486,36 @@ namespace LightShader
 namespace ParticleShader
 {
 
-class SimpleSimulationShader
+class SimpleSimulationShader : public ShaderHelperSingleton<SimpleSimulationShader, core::matrix4, int, int, float>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-    static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
-
-    static void init();
+    SimpleSimulationShader();
 };
 
 
 
-class HeightmapSimulationShader
+class HeightmapSimulationShader : public ShaderHelperSingleton<HeightmapSimulationShader, core::matrix4, int, int, float, float, float, float, float>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_velocity, attrib_lifetime, attrib_initial_position, attrib_initial_velocity, attrib_initial_lifetime, attrib_size, attrib_initial_size;
-    static GLuint uniform_sourcematrix, uniform_dt, uniform_level, uniform_size_increase_factor;
-    static GLuint uniform_track_x, uniform_track_z, uniform_track_x_len, uniform_track_z_len, uniform_heightmap;
+    GLuint TU_heightmap;
 
-    static void init();
+    HeightmapSimulationShader();
 };
 
-class SimpleParticleRender
+class SimpleParticleRender : public ShaderHelperSingleton<SimpleParticleRender, video::SColorf, video::SColorf>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz;
-    static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_dtex, uniform_invproj, uniform_color_from, uniform_color_to;
+    GLuint TU_tex, TU_dtex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix,
-                            const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex,
-                            unsigned TU_normal_and_depth, const ParticleSystemProxy* particle_system);
+    SimpleParticleRender();
 };
 
-class FlipParticleRender
+class FlipParticleRender : public ShaderHelperSingleton<FlipParticleRender>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_pos, attrib_lf, attrib_quadcorner, attrib_texcoord, attrib_sz, attrib_rotationvec, attrib_anglespeed;
-    static GLuint uniform_matrix, uniform_viewmatrix, uniform_tex, uniform_dtex, uniform_invproj;
+    GLuint TU_tex, TU_dtex;
 
-    static void init();
-    static void setUniforms(const core::matrix4 &ViewMatrix, const core::matrix4 &ProjMatrix, const core::matrix4 InvProjMatrix, float width, float height, unsigned TU_tex, unsigned TU_normal_and_depth);
+    FlipParticleRender();
 };
 }
 
@@ -782,53 +776,36 @@ public:
 
 namespace UIShader
 {
-class TextureRectShader
+class TextureRectShader : public ShaderHelperSingleton<TextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_tex, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
+    TextureRectShader();
 };
 
-class UniformColoredTextureRectShader
+class UniformColoredTextureRectShader : public ShaderHelperSingleton<UniformColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df, video::SColor>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord;
-    static GLuint uniform_tex, uniform_color, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
-    static GLuint vao;
+    GLuint TU_tex;
 
-    static void init();
-    static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, const video::SColor &color, unsigned TU_tex);
+    UniformColoredTextureRectShader();
 };
 
-class ColoredTextureRectShader
+class ColoredTextureRectShader : public ShaderHelperSingleton<ColoredTextureRectShader, core::vector2df, core::vector2df, core::vector2df, core::vector2df>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position, attrib_texcoord, attrib_color;
-    static GLuint uniform_tex, uniform_center, uniform_size, uniform_texcenter, uniform_texsize;
-    static GLuint colorvbo;
-    static GLuint vao;
+    GLuint TU_tex;
+    GLuint colorvbo;
+    GLuint vao;
 
-    static void init();
-    static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, float tex_center_pos_x, float tex_center_pos_y, float tex_width, float tex_height, unsigned TU_tex);
+    ColoredTextureRectShader();
 };
 
-class ColoredRectShader
+class ColoredRectShader : public ShaderHelperSingleton<ColoredRectShader, core::vector2df, core::vector2df, video::SColor>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position;
-    static GLuint uniform_center, uniform_size, uniform_color;
-    static GLuint vao;
-
-    static void init();
-    static void setUniforms(float center_pos_x, float center_pos_y, float width, float height, const video::SColor &color);
+    ColoredRectShader();
 };
 }
 

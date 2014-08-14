@@ -398,8 +398,11 @@ private:
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
 
-    /** The number of laps the track will be raced if no other value is given.*/
+    /** The number of laps the track will be raced in a random GP.
+     * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
+    /** The number of laps that is predefined in a track info dialog. */
+    int m_actual_number_of_laps;
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
@@ -614,9 +617,12 @@ public:
 
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
 
-    float getDisplacementSpeed() const { return m_displacement_speed; }
-    float getCausticsSpeed() const { return m_caustics_speed; }
+    float     getDisplacementSpeed()   const { return m_displacement_speed;    }
+    float     getCausticsSpeed()       const { return m_caustics_speed;        }
     const int getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
+    const int getActualNumberOfLap()   const { return m_actual_number_of_laps; }
+    void      setActualNumberOfLaps(unsigned int laps)
+                                         { m_actual_number_of_laps = laps; }
     bool operator<(const Track &other) const;
 };   // class Track
 

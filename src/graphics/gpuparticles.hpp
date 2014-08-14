@@ -19,24 +19,38 @@ protected:
     float size_increase_factor, track_x, track_z, track_x_len, track_z_len;
     float m_color_from[3];
     float m_color_to[3];
-
-    static GLuint quad_vertex_buffer;
+    bool m_first_execution;
 
     GLuint texture;
     unsigned count;
-    static void SimpleParticleVAOBind(GLuint PositionBuffer);
-    static void FlipParticleVAOBind(GLuint PositionBuffer, GLuint QuaternionBuffer);
-    static void SimpleSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
-    static void HeightmapSimulationBind(GLuint PositionBuffer, GLuint InitialValuesBuffer);
+    static void CommonRenderingVAO(GLuint PositionBuffer);
+    static void AppendQuaternionRenderingVAO(GLuint QuaternionBuffer);
+    static void CommonSimulationVAO(GLuint position_vbo, GLuint initialValues_vbo);
 
     void generateVAOs();
+    void cleanGL();
 
-    void simulateHeightmap();
-    void simulateNoHeightmap();
     void drawFlip();
     void drawNotFlip();
     virtual void simulate();
     virtual void draw();
+
+public:
+    struct ParticleData
+    {
+        float PositionX;
+        float PositionY;
+        float PositionZ;
+        float Lifetime;
+        float DirectionX;
+        float DirectionY;
+        float DirectionZ;
+        float Size;
+    };
+
+private:
+
+    ParticleData *ParticleParams, *InitialValues;
     void generateParticlesFromPointEmitter(scene::IParticlePointEmitter *);
     void generateParticlesFromBoxEmitter(scene::IParticleBoxEmitter *);
     void generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *);

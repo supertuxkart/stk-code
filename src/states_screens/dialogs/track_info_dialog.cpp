@@ -99,7 +99,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         if (UserConfigParams::m_artist_debug_mode)
             m_spinner->setMin(0);
 
-        m_spinner->setValue(track->getDefaultNumberOfLaps());
+        m_spinner->setValue(track->getActualNumberOfLap());
         race_manager->setNumLaps(m_spinner->getValue());
     }
     else
@@ -236,6 +236,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
     const bool reverse_track = m_checkbox == NULL ? false
                                                   : m_checkbox->getState();
+    track_manager->getTrack(m_track_ident)->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
     // Disable accidentally unlocking of a challenge

@@ -274,6 +274,10 @@ void BaseUserScreen::eventCallback(Widget* widget,
         else if (button == "new_user")
         {
             StateManager::get()->pushScreen(RegisterScreen::getInstance());
+            // Make sure the new user will have an empty online name field
+            // that can also be edited.
+            m_username_tb->setText("");
+            m_username_tb->setActivated();
         }
         else if (button == "cancel")
         {

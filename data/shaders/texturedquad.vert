@@ -3,19 +3,18 @@ uniform vec2 size;
 uniform vec2 texcenter;
 uniform vec2 texsize;
 
-#if __VERSION__ >= 130
-in vec2 position;
-in vec2 texcoord;
-out vec2 uv;
+#if __VERSION__ >= 330
+layout(location=0) in vec2 Position;
+layout(location=3) in vec2 Texcoord;
 #else
-attribute vec2 position;
-attribute vec2 texcoord;
-varying vec2 uv;
+in vec2 Position;
+in vec2 Texcoord;
 #endif
 
+out vec2 uv;
 
 void main()
 {
-	uv = texcoord * texsize + texcenter;
-	gl_Position = vec4(position * size + center, 0., 1.);
+    uv = Texcoord * texsize + texcenter;
+    gl_Position = vec4(Position * size + center, 0., 1.);
 }
