@@ -303,6 +303,8 @@ public:
 #define for_in( VAR, VECTOR ) for (unsigned int _foreach_i = 0; \
            VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL),\
            _foreach_i < VECTOR.size(); _foreach_i++)
-
+#define for_var_in( TYPE, VAR, VECTOR ) TYPE VAR; for (unsigned int _foreach_i = 0; \
+    VAR = (_foreach_i < VECTOR.size() ? VECTOR.get(_foreach_i) : NULL), \
+    _foreach_i < VECTOR.size(); _foreach_i++)
 
 #endif

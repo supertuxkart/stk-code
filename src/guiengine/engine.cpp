@@ -828,8 +828,7 @@ namespace GUIEngine
         {
             // This code needs to go outside beginScene() / endScene() since
             // the model view widget will do off-screen rendering there
-            GUIEngine::Widget* widget;
-            for_in (widget, GUIEngine::needsUpdate)
+            for_var_in(GUIEngine::Widget*, widget, GUIEngine::needsUpdate)
             {
                 widget->update(dt);
             }
