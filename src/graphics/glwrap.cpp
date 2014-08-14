@@ -580,13 +580,13 @@ void VBOGatherer::regenerateBuffer(enum VTXTYPE tp)
         glDeleteBuffers(1, &vbo[tp]);
     glGenBuffers(1, &vbo[tp]);
     glBindBuffer(GL_ARRAY_BUFFER, vbo[tp]);
-    glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vtx_cnt[tp] * getVertexPitch(tp), vtx_mirror[tp], GL_DYNAMIC_DRAW);
 
     if (ibo[tp])
         glDeleteBuffers(1, &ibo[tp]);
     glGenBuffers(1, &ibo[tp]);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo[tp]);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u16)* idx_cnt[tp], idx_mirror[tp], GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(u16)* idx_cnt[tp], idx_mirror[tp], GL_DYNAMIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
