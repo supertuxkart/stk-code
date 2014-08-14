@@ -66,19 +66,9 @@ if(USE_WIIUSE)
     include_directories("${PROJECT_SOURCE_DIR}/lib/wiiuse")
 endif()
 
-
 # Build the angelscript library
 add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
 include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
-
-
-
-# Build the angelscript library
-add_subdirectory("${PROJECT_SOURCE_DIR}/lib/angelscript/projects/cmake")
-include_directories("${PROJECT_SOURCE_DIR}/lib/angelscript/include")
-
-
-
 # Set include paths
 include_directories(${STK_SOURCE_DIR})
 
@@ -148,6 +138,9 @@ include_directories(${OPENGL_INCLUDE_DIR})
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
         find_package(Xrandr REQUIRED)
+        if(NOT XRANDR_FOUND)
+            message(FATAL_ERROR "XRANDR not found.")
+        endif()
     else()
         find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
         mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
@@ -383,4 +376,3 @@ install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)
 add_dependencies(supertuxkart supertuxkart.desktop)
->>>>>>> 7111eb55eeced3f44df7f069652ebb627616684a

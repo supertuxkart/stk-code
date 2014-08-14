@@ -281,7 +281,11 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
         m_scene_manager->setActiveCamera(m_suncam);
         if (!m_mipviz && !m_wireframe && UserConfigParams::m_dynamic_lights &&
             UserConfigParams::m_shadows && !irr_driver->needUBOWorkaround() && hasShadow)
+        {
             renderShadows();
+            if (UserConfigParams::m_gi)
+                renderRSM();
+        }
         m_scene_manager->setActiveCamera(camnode);
         PROFILER_POP_CPU_MARKER();
     }

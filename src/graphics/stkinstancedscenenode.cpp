@@ -150,14 +150,30 @@ void STKInstancedSceneNode::render()
 
     setFirstTimeMaterial();
 
-    for (auto mesh : MeshSolidMaterial[MAT_DEFAULT])
+    
+    for(unsigned i = 0; i < MeshSolidMaterial[MAT_DEFAULT].size(); i++)
+    {
+        GLMesh *mesh = MeshSolidMaterial[MAT_DEFAULT][i];
         ListInstancedMatDefault::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9));
+    }
 
-    for (auto mesh : MeshSolidMaterial[MAT_ALPHA_REF])
+    for(unsigned i = 0; i < MeshSolidMaterial[MAT_ALPHA_REF].size(); i++)
+    {
+        GLMesh *mesh = MeshSolidMaterial[MAT_ALPHA_REF][i];
         ListInstancedMatAlphaRef::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9));
+    }
 
     windDir = getWind();
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-    for (auto mesh : MeshSolidMaterial[MAT_GRASS])
+    for(unsigned i = 0; i < MeshSolidMaterial[MAT_GRASS].size(); i++)
+    {
+        GLMesh *mesh = MeshSolidMaterial[MAT_GRASS][i];
         ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9, windDir, cb->getPosition()));
+    }
+
+    for(unsigned i = 0; i < MeshSolidMaterial[MAT_NORMAL_MAP].size(); i++)
+    {
+        GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
+        ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9));
+    }
 }

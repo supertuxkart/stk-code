@@ -244,16 +244,19 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setDefaultColor();
         new RegistrationDialog();
+        if (local_name.size() > 0)
+        {
+            PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
+            if (player)
+            {
+                player->setLastOnlineName(username);
+                player->setWasOnlineLastTime(true);
+            }
+        }
         return;
     }
 
     sfx_manager->quickSound( "anvil" );
-    if(local_name.size()>0)
-    {
-        PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
-        if (player)
-            player->setLastOnlineName(username);
-    }
 }   // doRegister
 
 // -----------------------------------------------------------------------------
