@@ -33,8 +33,8 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
 {
     m_randomize_initial_y = randomize_initial_y;
     size_increase_factor = 0.;
-    ParticleParams = nullptr;
-    InitialValues = nullptr;
+    ParticleParams = NULL;
+    InitialValues = NULL;
 
     m_color_from[0] = m_color_from[1] = m_color_from[2] = 1.0;
     m_color_to[0] = m_color_to[1] = m_color_to[2] = 1.0;
