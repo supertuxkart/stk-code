@@ -32,6 +32,7 @@ vec4 DirToSh(vec3 dir, float flux)
     return SHBasis (dir) * flux;
 }
 
+// We need to manually unroll the loop, otherwise Nvidia driver crashes.
 void loop(in int i,
           in vec3 RHcenter,in vec3 RHCellSize, in vec2 RHuv, in float RHdepth,
           inout vec4 SHr, inout vec4 SHg, inout vec4 SHb)
@@ -89,6 +90,20 @@ void main(void)
 
     loop(0, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
     loop(1, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(2, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(3, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(4, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(5, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(6, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(7, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(8, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(9, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(10, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(11, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(12, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(13, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(14, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
+    loop(15, RHcenter, RHCellSize, RHuv, RHdepth, SHr, SHg, SHb);
 
     SHr /= 3.14159 * SAMPLES;
     SHg /= 3.14159 * SAMPLES;
