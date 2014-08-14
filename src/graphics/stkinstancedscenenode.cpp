@@ -176,3 +176,4 @@ void STKInstancedSceneNode::render()
         GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
         ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instance_pos.size() / 9));
     }
+}
