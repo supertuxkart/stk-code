@@ -119,9 +119,7 @@ void STKAnimatedMesh::render()
                 glBindVertexArray(0);
                 size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
                 glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
-                GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT;
-                if (irr_driver->getPhase() == TRANSPARENT_PASS)
-                    bitfield |= GL_MAP_UNSYNCHRONIZED_BIT;
+                GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
                 void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
                 memcpy(buf, mb->getVertices(), size);
                 glUnmapBuffer(GL_ARRAY_BUFFER);

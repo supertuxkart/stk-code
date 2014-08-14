@@ -195,6 +195,8 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
     }
 }
 
+static GLsync m_sync;
+
 void IrrDriver::renderSolidFirstPass()
 {
     m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
@@ -220,6 +222,7 @@ void IrrDriver::renderSolidFirstPass()
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
+    glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 0);
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -407,6 +410,8 @@ void IrrDriver::renderSolidSecondPass()
         renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, 3, 2>(
             TexUnits(TexUnit(MeshShader::InstancedGrassPass2Shader::getInstance()->TU_Albedo, true)),
             ListInstancedMatGrass::getInstance());
+
+        m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     }
 }
 
