@@ -20,6 +20,7 @@ protected:
     float m_color_from[3];
     float m_color_to[3];
     bool m_first_execution;
+    bool m_randomize_initial_y;
 
     GLuint texture;
     unsigned count;
@@ -56,7 +57,7 @@ private:
     void generateParticlesFromSphereEmitter(scene::IParticleSphereEmitter *);
 public:
     static IParticleSystemSceneNode *addParticleNode(
-        bool withDefaultEmitter = true, ISceneNode* parent = 0, s32 id = -1,
+        bool withDefaultEmitter = true, bool randomize_initial_y = false, ISceneNode* parent = 0, s32 id = -1,
         const core::vector3df& position = core::vector3df(0, 0, 0),
         const core::vector3df& rotation = core::vector3df(0, 0, 0),
         const core::vector3df& scale = core::vector3df(1.0f, 1.0f, 1.0f));
@@ -65,7 +66,8 @@ public:
         ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
         const core::vector3df& position,
         const core::vector3df& rotation,
-        const core::vector3df& scale);
+        const core::vector3df& scale,
+        bool randomize_initial_y);
     ~ParticleSystemProxy();
 
     virtual void setEmitter(scene::IParticleEmitter* emitter);

@@ -9,7 +9,7 @@
 #define COMPONENTCOUNT 8
 
 scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
-    bool withDefaultEmitter, ISceneNode* parent, s32 id,
+    bool withDefaultEmitter, bool randomize_initial_y, ISceneNode* parent, s32 id,
     const core::vector3df& position,
     const core::vector3df& rotation,
     const core::vector3df& scale)
@@ -18,7 +18,7 @@ scene::IParticleSystemSceneNode *ParticleSystemProxy::addParticleNode(
         parent = irr_driver->getSceneManager()->getRootSceneNode();
 
     IParticleSystemSceneNode* node = new ParticleSystemProxy(withDefaultEmitter,
-        parent, irr_driver->getSceneManager(), id, position, rotation, scale);
+        parent, irr_driver->getSceneManager(), id, position, rotation, scale, randomize_initial_y);
     node->drop();
 
     return node;
@@ -28,8 +28,10 @@ ParticleSystemProxy::ParticleSystemProxy(bool createDefaultEmitter,
     ISceneNode* parent, scene::ISceneManager* mgr, s32 id,
     const core::vector3df& position,
     const core::vector3df& rotation,
-    const core::vector3df& scale) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false), m_first_execution(true)
+    const core::vector3df& scale,
+    bool randomize_initial_y) : CParticleSystemSceneNode(createDefaultEmitter, parent, mgr, id, position, rotation, scale), m_alpha_additive(false), m_first_execution(true)
 {
+    m_randomize_initial_y = randomize_initial_y;
     size_increase_factor = 0.;
     ParticleParams = nullptr;
     InitialValues = nullptr;
@@ -148,8 +150,6 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
 
     const core::vector3df& extent = emitter->getBox().getExtent();
 
-    bool randomize_initial_y = ((ParticleEmitter*)emitter)->randomizeInitialY();
-
     for (unsigned i = 0; i < count; i++)
     {
         ParticleParams[i].PositionX = emitter->getBox().MinEdge.X + os::Randomizer::frand() * extent.X;
@@ -163,7 +163,7 @@ void ParticleSystemProxy::generateParticlesFromBoxEmitter(scene::IParticleBoxEmi
             ParticleParams[i].DirectionX, ParticleParams[i].DirectionY, ParticleParams[i].DirectionZ);
         memcpy(&(InitialValues[i].DirectionX), &(ParticleParams[i].DirectionX), 4 * sizeof(float));
 
-        if (randomize_initial_y)
+        if (m_randomize_initial_y)
             InitialValues[i].PositionY = os::Randomizer::frand()*50.0f; // -100.0f;
     }
 }
