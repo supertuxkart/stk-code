@@ -154,30 +154,12 @@ void STKMeshSceneNode::updatevbo()
         if (!mb)
             continue;
         GLMesh &mesh = GLmeshes[i];
-        glBindVertexArray(0);
+        glDeleteBuffers(1, &(mesh.vertex_buffer));
+        glDeleteBuffers(1, &(mesh.index_buffer));
+        glDeleteVertexArrays(1, &(mesh.vao));
 
-        glBindBuffer(GL_ARRAY_BUFFER, mesh.vertex_buffer);
-        const void* vertices = mb->getVertices();
-        const u32 vertexCount = mb->getVertexCount();
-        const c8* vbuf = static_cast<const c8*>(vertices);
-        glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf, GL_STREAM_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
-        const void* indices = mb->getIndices();
-        mesh.IndexCount = mb->getIndexCount();
-        size_t indexSize = 0;
-        switch (mb->getIndexType())
-        {
-        case irr::video::EIT_16BIT:
-            indexSize = sizeof(u16);
-            break;
-        case irr::video::EIT_32BIT:
-            indexSize = sizeof(u32);
-            break;
-        default:
-            assert(0 && "Wrong index size");
-        }
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * indexSize, indices, GL_STREAM_DRAW);
+        fillLocalBuffer(mesh, mb);
+        mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
     }
 }
 
