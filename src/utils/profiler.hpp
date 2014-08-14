@@ -148,7 +148,9 @@ private:
 
     bool m_capture_report;
     bool m_first_capture_sweep;
+    bool m_first_gpu_capture_sweep;
     StringBuffer* m_capture_report_buffer;
+    StringBuffer* m_gpu_capture_report_buffer;
 
 public:
     Profiler();
