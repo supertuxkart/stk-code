@@ -61,6 +61,8 @@ public:
     };
 
 private:
+    static Camera* s_active_camera;
+
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
 
@@ -271,6 +273,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() { return m_camera; }
+
+    // ------------------------------------------------------------------------
+    static Camera* getActiveCamera() { return s_active_camera; }
 } ;
 
 #endif
