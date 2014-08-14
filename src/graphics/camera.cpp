@@ -94,6 +94,9 @@ Camera::~Camera()
 {
     if(m_rain) delete m_rain;
     irr_driver->removeCameraSceneNode(m_camera);
+
+    if (s_active_camera == this)
+        s_active_camera = NULL;
 }   // ~Camera
 
 //-----------------------------------------------------------------------------
