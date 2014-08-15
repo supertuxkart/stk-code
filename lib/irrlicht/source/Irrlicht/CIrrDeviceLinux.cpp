@@ -185,15 +185,19 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 		}
 		#endif // #ifdef _IRR_COMPILE_WITH_OPENGL_
 
-		// Reset fullscreen resolution change
-		switchToFullscreen(true);
-
 		if (SoftwareImage)
 			XDestroyImage(SoftwareImage);
 
 		if (!ExternalWindow)
 		{
 			XDestroyWindow(display,window);
+		}
+		
+		// Reset fullscreen resolution change
+		switchToFullscreen(true);		
+		
+		if (!ExternalWindow)
+		{
 			XCloseDisplay(display);
 		}
 	}

@@ -14,6 +14,8 @@ in vec3 Position;
 in vec3 Normal;
 in vec4 Color;
 in vec2 Texcoord;
+in vec3 Tangent;
+in vec3 Bitangent;
 
 in vec3 Origin;
 in vec3 Orientation;
