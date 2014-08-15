@@ -36,7 +36,7 @@ using namespace Scripting;
 
 namespace Scripting
 {
-
+//Constructor, creates a new Scripting Engine using AngelScript
 ScriptEngine::ScriptEngine()
 {
     // Create the script engine
@@ -55,6 +55,10 @@ ScriptEngine::~ScriptEngine()
     m_engine->Release();
 }
 
+/** Get Script By it's file name
+*  \param string scriptname = name of script to get
+*  \return      The corresponding script
+*/
 std::string getScript(std::string scriptName)
 {
     std::string script_dir = file_manager->getAsset(FileManager::SCRIPT, "");
@@ -83,6 +87,11 @@ std::string getScript(std::string scriptName)
     }
     return script;
 }
+//-----------------------------------------------------------------------------
+/** runs the specified script
+*  \param ident Identifier = basename of the directory the track is in.
+*  \return      The corresponding track object, or NULL if not found
+*/
 void ScriptEngine::runScript(std::string scriptName)
 {
 
@@ -195,7 +204,10 @@ void ScriptEngine::runScript(std::string scriptName)
 }
 
 
-
+//-----------------------------------------------------------------------------
+/** Configures the script engine by binding functions, enums
+*  \param asIScriptEngine engine = engine to configure
+*/
 void ScriptEngine::configureEngine(asIScriptEngine *engine)
 {
     int r;
