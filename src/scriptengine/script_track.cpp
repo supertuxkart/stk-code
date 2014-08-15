@@ -34,7 +34,7 @@ namespace Scripting
 
     namespace Track
     {
-
+        //register callbacks
         asIScriptFunction* registerScriptCallbacks(asIScriptEngine *engine, std::string scriptName)
         {
             asIScriptFunction *func;
@@ -61,18 +61,22 @@ namespace Scripting
             std::string type = "mesh";
             World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str, type);
         }*/
+        //disables track object passed from the script
         void disable(void *memory)
         {
             ((PhysicalObject*)(memory))->removeBody();
         }
+        //enables track object passed from the script
         void enable(void *memory)
         {
             ((PhysicalObject*)(memory))->addBody();
         }
+        //pause an animation
         void setPaused(bool mode, void *memory)
         {
             ((ThreeDAnimation*)(memory))->setPaused(mode);
         }
+        //move objects of type TrackObjectPresentation, to the specified location
         void movePresentation(Vec3 *new_pos, void *memory)
         {
             core::vector3df xyz = core::vector3df(0, 0, 0);
@@ -83,30 +87,37 @@ namespace Scripting
             core::vector3df scale = core::vector3df(1, 1, 1);
             ((TrackObjectPresentation*)(memory))->move(xyz, hpr, scale);
         }
+        //stop a sound
         void stop(void *memory)
         {
             ((TrackObjectPresentationSound*)memory)->stopSound();
         }
+        //play the specified sound once
         void playOnce(void *memory)
         {
             ((TrackObjectPresentationSound*)memory)->triggerSound(false); //false = once
         }
+        //play the specified sound continuously
         void playLoop(void *memory)
         {
             ((TrackObjectPresentationSound*)memory)->triggerSound(true); //true = loop
         }
+        //sets a loop for an animation (skeletal)
         void setLoop(int start, int end, void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->setLoop(start,end);
         }
+        //sets the current frame for a skeletal animation
         void setCurrentFrame(int frame,void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->setCurrentFrame(frame);
         }
+        //getter for current frame in a skeletal animation
         void getCurrentFrame(void *memory)
         {
             ((TrackObjectPresentationMesh*)(memory))->getCurrentFrame();
         }
+        //getter for key binding for player action enums
         void getKeyBinding(asIScriptGeneric *gen)
         {
             int Enum_value = (int)gen->GetArgDWord(0);
@@ -119,12 +130,14 @@ namespace Scripting
             void *key_pointer = &key;
             gen->SetReturnObject(key_pointer);
         }
+        //generic track object getter, Entry point of track objects into scripts
         void getTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             TrackObject* t_obj = World::getWorld()->getTrack()->getTrackObjectManager()->getTrackObject(*str);
             gen->SetReturnObject(t_obj);
         }
+        //runs the script specified by the given string
         void runScript(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
@@ -145,26 +158,31 @@ namespace Scripting
             irr::core::stringw out = irr::core::stringw((*input).c_str()); //irr::core::stringw supported by message dialogs
             new TutorialMessageDialog((out), true);
         }
+        //generic disable method for track objects
         void disableTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
         }
+        //generic enable method for track objects
         void enableTrackObject(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
         }
+        //disables an action trigger of specified ID
         void disableTrigger(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             World::getWorld()->getTrack()->getTrackObjectManager()->disable(*str);
         }
+        //enables an action trigger of specified ID
         void enableTrigger(asIScriptGeneric *gen)
         {
             std::string *str = (std::string*)gen->GetArgAddress(0);
             World::getWorld()->getTrack()->getTrackObjectManager()->enable(*str);
         }
+        //Creates a trigger at the specified location
         void createTrigger(asIScriptGeneric *gen)
         {
             std::string *script_name = (std::string*)gen->GetArgAddress(0);
