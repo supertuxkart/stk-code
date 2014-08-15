@@ -588,6 +588,15 @@ public:
     RadianceHintsConstructionShader();
 };
 
+// Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
+class NVWorkaroundRadianceHintsConstructionShader : public ShaderHelperSingleton<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int>
+{
+public:
+    GLuint TU_ctex, TU_ntex, TU_dtex;
+
+    NVWorkaroundRadianceHintsConstructionShader();
+};
+
 class RHDebug : public ShaderHelperSingleton<RHDebug, core::matrix4, core::vector3df>
 {
 public:

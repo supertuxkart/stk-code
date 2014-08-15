@@ -21,6 +21,8 @@ in vec3 Normal;
 in vec4 Color;
 in vec2 Texcoord;
 in vec2 SecondTexcoord;
+in vec3 Tangent;
+in vec3 Bitangent;
 #endif
 
 out vec3 nor;

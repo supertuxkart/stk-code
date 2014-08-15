@@ -72,9 +72,12 @@ int LODNode::getLevel()
     if(m_forced_lod>-1)
         return m_forced_lod;
 
-    // TODO: optimize this, there is no need to check every frame
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
-    const Vec3 &pos = Camera::getCamera(0)->getKart()->getFrontXYZ();
+    Camera* camera = Camera::getActiveCamera();
+    if (camera == NULL)
+        return m_detail.size() - 1;
+    AbstractKart* kart = camera->getKart();
+    const Vec3 &pos = kart->getFrontXYZ();
 
     // Assumes all children are at the same location
     const int dist =

@@ -195,6 +195,8 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
     }
 }
 
+static GLsync m_sync;
+
 void IrrDriver::renderSolidFirstPass()
 {
     m_rtts->getFBO(FBO_NORMAL_AND_DEPTHS).Bind();
@@ -220,6 +222,23 @@ void IrrDriver::renderSolidFirstPass()
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
+    // Add a 30 ms timeout
+    GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 30000000);
+/*    switch (reason)
+    {
+    case GL_ALREADY_SIGNALED:
+        printf("Already Signaled\n");
+        break;
+    case GL_TIMEOUT_EXPIRED:
+        printf("Timeout Expired\n");
+        break;
+    case GL_CONDITION_SATISFIED:
+        printf("Condition Satisfied\n");
+        break;
+    case GL_WAIT_FAILED:
+        printf("Wait Failed\n");
+        break;
+    }*/
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     if (!UserConfigParams::m_dynamic_lights)
@@ -408,6 +427,7 @@ void IrrDriver::renderSolidSecondPass()
             TexUnits(TexUnit(MeshShader::InstancedGrassPass2Shader::getInstance()->TU_Albedo, true)),
             ListInstancedMatGrass::getInstance());
     }
+    m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 }
 
 template<enum E_VERTEX_TYPE VertexType, typename... TupleType>

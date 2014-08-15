@@ -197,6 +197,7 @@ private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
     bool m_need_ubo_workaround;
+    bool m_need_rh_workaround;
     /** The irrlicht device. */
     IrrlichtDevice             *m_device;
     /** Irrlicht scene manager. */
@@ -282,6 +283,11 @@ public:
     bool needUBOWorkaround() const
     {
         return m_need_ubo_workaround;
+    }
+
+    bool needRHWorkaround() const
+    {
+        return m_need_rh_workaround;
     }
 
     bool hasVSLayerExtension() const

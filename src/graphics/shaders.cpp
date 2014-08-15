@@ -1584,6 +1584,22 @@ namespace FullScreenShader
         AssignTextureUnit(Program, TexUnit(TU_ctex, "ctex"), TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
     }
 
+    NVWorkaroundRadianceHintsConstructionShader::NVWorkaroundRadianceHintsConstructionShader()
+    {
+        if (irr_driver->getGLSLVersion() < 150)
+            return;
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/slicedscreenquad_nvworkaround.vert").c_str(),
+            GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/rhpassthrough.geom").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
+
+        AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice");
+        TU_ctex = 0;
+        TU_ntex = 1;
+        TU_dtex = 2;
+        AssignTextureUnit(Program, TexUnit(TU_ctex, "ctex"), TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
+    }
+
     RHDebug::RHDebug()
     {
         Program = LoadProgram(

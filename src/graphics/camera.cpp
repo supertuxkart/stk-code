@@ -45,6 +45,8 @@
 AlignedArray<Camera::EndCameraInformation> Camera::m_end_cameras;
 std::vector<Camera*>                       Camera::m_all_cameras;
 
+Camera* Camera::s_active_camera = NULL;
+
 // ============================================================================
 Camera::Camera(int camera_index, AbstractKart* kart) : m_kart(NULL)
 {
@@ -92,6 +94,9 @@ Camera::~Camera()
 {
     if(m_rain) delete m_rain;
     irr_driver->removeCameraSceneNode(m_camera);
+
+    if (s_active_camera == this)
+        s_active_camera = NULL;
 }   // ~Camera
 
 //-----------------------------------------------------------------------------
@@ -667,6 +672,7 @@ void Camera::handleEndCamera(float dt)
  */
 void Camera::activate()
 {
+    s_active_camera = this;
     irr::scene::ISceneManager *sm = irr_driver->getSceneManager();
     sm->setActiveCamera(m_camera);
     irr_driver->getVideoDriver()->setViewPort(m_viewport);
