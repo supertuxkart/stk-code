@@ -328,8 +328,8 @@ void IrrDriver::initDevice()
 
         } // end if firstTime
 
-        const core::dimension2d<u32> ssize = m_device->getVideoModeList()
-                                                     ->getDesktopResolution();
+        video::IVideoModeList* modes = m_device->getVideoModeList();
+        const core::dimension2d<u32> ssize = modes->getDesktopResolution();
         if (UserConfigParams::m_width > (int)ssize.Width ||
             UserConfigParams::m_height > (int)ssize.Height)
         {
@@ -339,11 +339,14 @@ void IrrDriver::initDevice()
             UserConfigParams::m_height = (int)ssize.Height;
         }
 
-        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, UserConfigParams::m_height);
-        res = m_device->getVideoModeList()->getVideoModeResolution(res, res);
-
-        if (res.Width > 0 && res.Height > 0)
+        core::dimension2d<u32> res = core::dimension2du(UserConfigParams::m_width, 
+                                                    UserConfigParams::m_height);
+        
+        
+        if (modes->getVideoModeCount() > 0)
         {
+            res = modes->getVideoModeResolution(res, res);
+
             UserConfigParams::m_width = res.Width;
             UserConfigParams::m_height = res.Height;
         }
