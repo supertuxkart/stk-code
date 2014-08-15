@@ -19,7 +19,6 @@
 #include <assert.h>
 #include <angelscript.h>
 #include "karts/kart.hpp"
-#include "modes/world.hpp"
 #include "script_kart.hpp"
 
 //debug
@@ -45,6 +44,7 @@ namespace Scripting
         //Constructor using 3 floats
         new (memory)(Vec3)(Vec3(a, b, c));
     }
+    //Print for debugging purposes
     void printVec3(asIScriptGeneric *gen)
     {
         Vec3 *script_vec3 = (Vec3*)gen->GetArgObject(0);
