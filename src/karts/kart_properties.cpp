@@ -273,7 +273,7 @@ void KartProperties::load(const std::string &filename, const std::string &node)
     }
 
     //FIXME: magix 0.25 factor to keep it compatible with previous tourning
-    m_wheel_base = fabsf( m_kart_model->getLength()-0.25f);
+    m_wheel_base = fabsf( m_kart_model->getLength() - (true ? 0 : -0.25f));
 
     // Now convert the turn radius into turn angle:
     for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)

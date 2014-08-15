@@ -606,10 +606,26 @@ void Kart::createPhysics()
                 if (y == -1)
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
-                    float f = getKartProperties()->getPhysicalWheelPosition();
-                    wheel_pos[index] = p*(orig_factor*(1.0f-f) + bevel_factor*f);
-                    wheel_pos[index].setY(0);
-                }  // if z==-1
+                    if(true)
+                    {
+                        const Vec3 cs = getKartProperties()->getGravityCenterShift();
+                        wheel_pos[index].setX(x*0.5f*getKartWidth()+cs.getX());
+                        float radius = getKartProperties()->getWheelRadius();
+                        // Set the connection point so that a maximum compressed wheel
+                        // (susp. length=0) will still poke a little bit out under the
+                        // kart
+                        wheel_pos[index].setY(radius - 0.05f);
+                        wheel_pos[index].setZ((0.5f*getKartLength() - radius)* z
+                                               + cs.getZ());
+
+                    }
+                    else
+                    {
+                        float f = getKartProperties()->getPhysicalWheelPosition();
+                        wheel_pos[index] = p*(orig_factor*(1.0f - f) + bevel_factor*f);
+                        wheel_pos[index].setY(0);
+                    }
+                }  // if y==-1
             }   // for x
         }   // for z
     }   // for y
