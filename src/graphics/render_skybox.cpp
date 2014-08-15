@@ -378,7 +378,7 @@ static void testSH(unsigned char *color[6], size_t width, size_t height,
     }
 }
 
-static void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i, unsigned old_j, unsigned new_i, unsigned new_j)
+void swapPixels(char *old_img, char *new_img, unsigned stride, unsigned old_i, unsigned old_j, unsigned new_i, unsigned new_j)
 {
     new_img[4 * (stride * new_i + new_j)] = old_img[4 * (stride * old_i + old_j)];
     new_img[4 * (stride * new_i + new_j) + 1] = old_img[4 * (stride * old_i + old_j) + 1];
@@ -403,17 +403,17 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
     GLuint result;
     glGenTextures(1, &result);
 
-    unsigned w = 0, h = 0;
+    unsigned size = 0;
     for (unsigned i = 0; i < 6; i++)
     {
-        w = MAX2(w, textures[i]->getOriginalSize().Width);
-        h = MAX2(h, textures[i]->getOriginalSize().Height);
+        size = MAX2(size, textures[i]->getOriginalSize().Width);
+        size = MAX2(size, textures[i]->getOriginalSize().Height);
     }
 
     const unsigned texture_permutation[] = { 2, 3, 0, 1, 5, 4 };
     char *rgba[6];
     for (unsigned i = 0; i < 6; i++)
-        rgba[i] = new char[w * h * 4];
+        rgba[i] = new char[size * size * 4];
     for (unsigned i = 0; i < 6; i++)
     {
         unsigned idx = texture_permutation[i];
@@ -426,27 +426,27 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
             );
         textures[idx]->unlock();
 
-        image->copyToScaling(rgba[i], w, h);
+        image->copyToScaling(rgba[i], size, size);
         image->drop();
 
         if (i == 2 || i == 3)
         {
-            char *tmp = new char[w * h * 4];
-            memcpy(tmp, rgba[i], w * h * 4);
-            for (unsigned x = 0; x < w; x++)
+            char *tmp = new char[size * size * 4];
+            memcpy(tmp, rgba[i], size * size * 4);
+            for (unsigned x = 0; x < size; x++)
             {
-                for (unsigned y = 0; y < h; y++)
+                for (unsigned y = 0; y < size; y++)
                 {
-                    swapPixels(tmp, rgba[i], h, x, y, (w - y - 1), x);
+                    swapPixels(tmp, rgba[i], size, x, y, (size - y - 1), x);
                 }
             }
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);
         if (UserConfigParams::m_texture_compression)
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_COMPRESSED_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
         else
-            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, w, h, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];
