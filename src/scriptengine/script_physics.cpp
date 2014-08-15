@@ -28,6 +28,7 @@ namespace Scripting
     
     namespace Physics
     {
+        //Creates an explosion animation at specified Vec3 location
         void createExplosion(asIScriptGeneric *gen)
         {
             //TODO: allow different types? sand etc
@@ -35,6 +36,7 @@ namespace Scripting
             HitEffect *he = new Explosion(*explosion_loc, "explosion", "explosion_bomb.xml");
             projectile_manager->addHitEffect(he);
         }
+        //Bind getters for colliding karts
         void getCollidingKart1(asIScriptGeneric *gen)
         {
             gen->SetReturnDWord(m_collidingkartid1);
@@ -43,6 +45,7 @@ namespace Scripting
         {
             gen->SetReturnDWord(m_collidingkartid2);
         }
+        //Bind getter for colliding objects
         void getCollidingID(asIScriptGeneric *gen)
         {
             void *pointer = &m_collider1;
@@ -53,6 +56,8 @@ namespace Scripting
             void *pointer = &m_collisionType;
             gen->SetReturnObject(pointer);
         }
+
+        //Callbacks from Physics Engine, for collisions
         void setCollision(int collider1,int collider2)
         {
             m_collidingkartid1 = collider1;
