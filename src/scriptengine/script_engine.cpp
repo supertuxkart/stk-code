@@ -89,8 +89,7 @@ std::string getScript(std::string scriptName)
 }
 //-----------------------------------------------------------------------------
 /** runs the specified script
-*  \param ident Identifier = basename of the directory the track is in.
-*  \return      The corresponding track object, or NULL if not found
+*  \param ident scriptName = name of script to run
 */
 void ScriptEngine::runScript(std::string scriptName)
 {
@@ -233,6 +232,7 @@ void ScriptEngine::configureEngine(asIScriptEngine *engine)
     // without having to recompile all the scripts.
 }
 
+//-----------------------------------------------------------------------------
 
 
 

@@ -31,7 +31,7 @@ namespace Scripting
 
     namespace Kart
     {
-
+        //Squashes the specified kart, specified time
         void squashKart(asIScriptGeneric *gen)
         {
             int id = (int)gen->GetArgDWord(0);
@@ -39,6 +39,7 @@ namespace Scripting
             AbstractKart* kart = World::getWorld()->getKart(id);
             kart->setSquash(time, 0.5);  //0.5 * max speed is new max for squashed duration
         }
+        //Teleports the kart to the specified Vec3 location
         void teleportKart(asIScriptGeneric *gen)
         {
             int id = (int)gen->GetArgDWord(0);
@@ -57,6 +58,8 @@ namespace Scripting
             s.setRotation(btQuaternion(btVector3(0.0f, 1.0f, 0.0f), angle));
             World::getWorld()->moveKartTo(kart, s);
         }
+        //Attempts to project kart to the given 2D location, to the position
+        //with height 0, at a 45 degree angle.
         void jumpKartTo(asIScriptGeneric *gen)
         {
             //attempts to project kart to target destination
@@ -83,6 +86,7 @@ namespace Scripting
             
             kart->setVelocity(btVector3(velocity * normalized_dx, velocity, velocity * normalized_dy));
         }
+        //Bind kart location
         void getKartLocation(asIScriptGeneric *gen)
         {
             int id = (int)gen->GetArgDWord(0);
@@ -93,6 +97,7 @@ namespace Scripting
 
             gen->SetReturnObject(pointer);
         }
+        //Bind setter for velocity
         void setVelocity(asIScriptGeneric *gen)
         {
             int id = (int)gen->GetArgDWord(0);
