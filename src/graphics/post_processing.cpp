@@ -784,6 +784,10 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
         PROFILER_POP_CPU_MARKER();
     }
 
+    // Workaround a bug with srgb fbo on sandy bridge windows
+    if (irr_driver->needUBOWorkaround())
+        return in_fbo;
+
     glEnable(GL_FRAMEBUFFER_SRGB);
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
     renderPassThrough(in_fbo->getRTT()[0]);
