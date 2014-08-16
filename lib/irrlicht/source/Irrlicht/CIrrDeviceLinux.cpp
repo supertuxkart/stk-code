@@ -1629,9 +1629,12 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					
 					if (res->outputs[i] == primary_id)
 					{
-						output_id = res->outputs[i];
 						crtc_x = crtc->x;
 						crtc_y = crtc->y;	
+						output_id = res->outputs[i];
+						
+						XRRFreeCrtcInfo(crtc);
+						XRRFreeOutputInfo(output);
 						break;
 					}
 					
