@@ -1605,6 +1605,8 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				XRROutputInfo *output = NULL;
 				XRRCrtcInfo* crtc = NULL;
 				crtc_x = crtc_y = -1;
+				
+				RROutput primary_id = XRRGetOutputPrimary(display, DefaultRootWindow(display));
 		
 				for (int i = 0; i < res->noutput; i++) 
 				{
@@ -1625,6 +1627,14 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 						continue;
 					}
 					
+					if (res->outputs[i] == primary_id)
+					{
+						output_id = res->outputs[i];
+						crtc_x = crtc->x;
+						crtc_y = crtc->y;	
+						break;
+					}
+					
 					if (crtc_x == -1 || crtc->x < crtc_x)
 					{
 						crtc_x = crtc->x;
@@ -1641,7 +1651,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					XRRFreeCrtcInfo(crtc);
 					XRRFreeOutputInfo(output);
 				}
-				
+
 				output = XRRGetOutputInfo(display, res, output_id);
 				crtc = XRRGetCrtcInfo(display, res, output->crtc);
 
