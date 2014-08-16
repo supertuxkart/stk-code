@@ -606,7 +606,10 @@ void Kart::createPhysics()
                 if (y == -1)
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
-                    if(true)
+                    float f = getKartProperties()->getPhysicalWheelPosition();
+                    // f < 0 indicates to use the old physics position, i.e. 
+                    // to place the wheels outside of the chassis
+                    if(f<0)
                     {
                         const Vec3 cs = getKartProperties()->getGravityCenterShift();
                         wheel_pos[index].setX(x*0.5f*getKartWidth()+cs.getX());
@@ -621,7 +624,6 @@ void Kart::createPhysics()
                     }
                     else
                     {
-                        float f = getKartProperties()->getPhysicalWheelPosition();
                         wheel_pos[index] = p*(orig_factor*(1.0f - f) + bevel_factor*f);
                         wheel_pos[index].setY(0);
                     }

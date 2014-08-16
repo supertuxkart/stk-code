@@ -415,11 +415,14 @@
          physical-wheel-position: Defines where the 'physical' (raycast)
            wheel will be located. It's a weight factor with 0 = being
            at the widest side of the bevel, 1 = at the front and
-           narrowest part of the kart.  -->
+           narrowest part of the kart. If the value is less than 0, the old
+           physics settings are used which places the raycast wheels
+           outside of the chassis and results in more stable physical
+           behaviour of the karts. -->
     <collision impulse-type="normal" 
                impulse="3000" impulse-time="0.1" terrain-impulse="8000"
                restitution="1.0" bevel-factor="0.5 0.0 0.7"
-               physical-wheel-position="0.5" />
+               physical-wheel-position="-1" />
 			 
      <!-- If a kart starts within the specified time after 'go',
           it receives the corresponding bonus from 'boost'. Those

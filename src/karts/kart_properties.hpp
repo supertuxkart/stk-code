@@ -152,7 +152,11 @@ private:
 
     /** The position of the physical wheel is a weighted average of the
      *  two ends of the beveled shape. This determines the weight: 0 = 
-     *  a the widest end, 1 = at the narrowest front end. */
+     *  a the widest end, 1 = at the narrowest front end. If the value is 
+     *  < 0, the old physics settings are used which places the raycast
+     *  wheels outside of the chassis - but result in a more stable
+     *  physics behaviour (which is therefore atm still the default).
+     */
     float m_physical_wheel_position;
 
     /** Time a kart is moved upwards after when it is rescued. */
@@ -916,7 +920,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns position of the physical wheel is a weighted average of the
      *  two ends of the beveled shape. This determines the weight: 0 = 
-     *  a the widest end, 1 = at the narrowest, front end. */
+     *  a the widest end, 1 = at the narrowest, front end. If the value is <0,
+     *  the old physics position is picked, which placed the raycast wheels
+     *  outside of the chassis, but gives more stable physics. */
     const float getPhysicalWheelPosition() const 
     {
         return m_physical_wheel_position; 
