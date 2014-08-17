@@ -131,6 +131,10 @@ void OptionsScreenUI::init()
     news->setState( UserConfigParams::m_internet_status
                                      ==RequestManager::IPERM_ALLOWED );
 
+    CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-internet");
+    assert( news != NULL );
+    news->setState( UserConfigParams::m_stats_status);
+
     CheckBoxWidget* show_login = getWidget<CheckBoxWidget>("show-login");
     assert( show_login!= NULL );
     show_login->setState( UserConfigParams::m_always_show_login_screen);
@@ -253,6 +257,11 @@ void OptionsScreenUI::eventCallback(Widget* widget, const std::string& name, con
         // downloaded if necessary.
         if(internet->getState())
             NewsManager::get()->init(false);
+    }
+    else if (name=="enable-stats"){
+        CheckBoxWidget* stats = getWidget<CheckBoxWidget>("enable-stats");
+        assert( stats != NULL);
+        UserConfigParams::m_stats_status = stats->getState();
     }
     else if (name=="show-login")
     {

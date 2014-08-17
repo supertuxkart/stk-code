@@ -348,6 +348,9 @@ private:
     /** Determines if saved GP should be continued or not*/
     bool m_continue_saved_gp;
 
+    #define STAT_URL "statcollector.php"
+    void sendStatisticsToServer();
+
 public:
          RaceManager();
         ~RaceManager();

@@ -135,7 +135,6 @@ void* NewsManager::downloadNews(void *obj)
     if(download)
     {
         core::stringw error_message("");
-
         HTTPRequest *download_req = new HTTPRequest("news.xml");
         download_req->setAddonsURL("news.xml");
 

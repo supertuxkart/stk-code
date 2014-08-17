@@ -373,3 +373,4 @@ install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)
 add_dependencies(supertuxkart supertuxkart.desktop)
+
