@@ -146,16 +146,16 @@ void STKAnimatedMesh::render()
 
         GLMesh* mesh;
         for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
-            pushVector(ListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(AnimatedListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
-            pushVector(ListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(AnimatedListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
-            pushVector(ListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
+            pushVector(AnimatedListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
-            pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
+            pushVector(AnimatedListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
         return;
     }

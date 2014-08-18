@@ -222,6 +222,10 @@ void IrrDriver::renderSolidFirstPass()
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
+    AnimatedListMatDefault::getInstance()->clear();
+    AnimatedListMatAlphaRef::getInstance()->clear();
+    AnimatedListMatDetails::getInstance()->clear();
+    AnimatedListMatUnlit::getInstance()->clear();
     // Add a 30 ms timeout
     GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 30000000);
 /*    switch (reason)
@@ -259,6 +263,11 @@ void IrrDriver::renderSolidFirstPass()
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_glossy, true),
             TexUnit(MeshShader::NormalMapShader::getInstance()->TU_normalmap, false)
         ), ListMatNormalMap::getInstance());
+
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, AnimatedListMatDefault::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true)), AnimatedListMatAlphaRef::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, AnimatedListMatDetails::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(object_pass1_texunits, AnimatedListMatUnlit::getInstance());
 
         renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, video::EVT_STANDARD>(
                     TexUnits(TexUnit(MeshShader::InstancedObjectPass1Shader::getInstance()->TU_tex, true)),
@@ -376,10 +385,16 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatDefault::getInstance());
+        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
+            TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
+            ), AnimatedListMatDefault::getInstance());
 
         renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
             TexUnit(MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatAlphaRef::getInstance());
+        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
+            TexUnit(MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true)
+            ), AnimatedListMatAlphaRef::getInstance());
 
         renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 2, 1>(TexUnits(
             TexUnit(MeshShader::SphereMapShader::getInstance()->TU_tex, true)
@@ -389,6 +404,10 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true),
             TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true)
         ), ListMatDetails::getInstance());
+        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
+            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true),
+            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true)
+            ), AnimatedListMatDetails::getInstance());
 
         renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(MeshShader::GrassPass2Shader::getInstance()->TU_Albedo, true)
@@ -397,6 +416,9 @@ void IrrDriver::renderSolidSecondPass()
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
         ), ListMatUnlit::getInstance());
+        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 1>(TexUnits(
+            TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
+            ), AnimatedListMatUnlit::getInstance());
 
         renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 1>(TexUnits(
             TexUnit(8, true),
@@ -715,6 +737,10 @@ void IrrDriver::renderShadows()
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
+    AnimatedListMatDefault::getInstance()->clear();
+    AnimatedListMatAlphaRef::getInstance()->clear();
+    AnimatedListMatDetails::getInstance()->clear();
+    AnimatedListMatUnlit::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     std::vector<GLuint> noTexUnits;
@@ -726,6 +752,11 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, ListMatAlphaRef::getInstance());
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, ListMatUnlit::getInstance());
     renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(std::vector<GLuint>{ MeshShader::GrassShadowShader::getInstance()->TU_tex }, ListMatGrass::getInstance());
+
+    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(noTexUnits, AnimatedListMatDefault::getInstance());
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, AnimatedListMatAlphaRef::getInstance());
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, AnimatedListMatUnlit::getInstance());
+    renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, AnimatedListMatDetails::getInstance());
 
     renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
     renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ MeshShader::InstancedRefShadowShader::getInstance()->TU_tex }, ListInstancedMatAlphaRef::getInstance());
