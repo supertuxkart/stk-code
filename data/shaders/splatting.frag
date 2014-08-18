@@ -1,8 +1,16 @@
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D tex_layout;
+layout(bindless_sampler) uniform sampler2D tex_detail0;
+layout(bindless_sampler) uniform sampler2D tex_detail1;
+layout(bindless_sampler) uniform sampler2D tex_detail2;
+layout(bindless_sampler) uniform sampler2D tex_detail3;
+#else
 uniform sampler2D tex_layout;
 uniform sampler2D tex_detail0;
 uniform sampler2D tex_detail1;
 uniform sampler2D tex_detail2;
 uniform sampler2D tex_detail3;
+#endif
 
 #if __VERSION__ >= 130
 in vec2 uv;
@@ -24,6 +32,12 @@ void main() {
     vec4 detail2 = texture(tex_detail2, uv);
     vec4 detail3 = texture(tex_detail3, uv);
     vec4 detail4 = vec4(0.0);
+#ifdef GL_ARB_bindless_texture
+    detail0.xyz = pow(detail0.xyz, vec3(2.2));
+    detail1.xyz = pow(detail1.xyz, vec3(2.2));
+    detail2.xyz = pow(detail2.xyz, vec3(2.2));
+    detail3.xyz = pow(detail3.xyz, vec3(2.2));
+#endif
 
     vec4 splatted = splatting.r * detail0 +
         splatting.g * detail1 +

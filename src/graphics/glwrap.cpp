@@ -319,6 +319,13 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
+    if (UserConfigParams::m_bindless_textures)
+        Code += "#extension GL_ARB_bindless_texture : enable\n";
+    else
+    {
+        Code += "#extension GL_ARB_bindless_texture : disable\n";
+        Code += "#undef GL_ARB_bindless_texture\n";
+    }
     std::ifstream Stream(file, std::ios::in);
     Code += "//" + std::string(file) + "\n";
     if (irr_driver->needUBOWorkaround())

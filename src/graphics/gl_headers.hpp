@@ -125,4 +125,9 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #endif
 #endif
 
+
+#ifdef WIN32
+#define Bindless_Texture_Support
+#endif
+
 #endif

@@ -1,5 +1,10 @@
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D normalMap;
+layout(bindless_sampler) uniform sampler2D DiffuseForAlpha;
+#else
 uniform sampler2D normalMap;
 uniform sampler2D DiffuseForAlpha;
+#endif
 
 in vec3 tangent;
 in vec3 bitangent;

@@ -464,6 +464,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_gi
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_gi",
         &m_video_group, "Enable Global Illumination"));
+    PARAM_PREFIX BoolUserConfigParam        m_bindless_textures
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_bindless_textures",
+        &m_video_group, "Enable Bindless Texture (Experimental !)"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
