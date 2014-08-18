@@ -340,8 +340,9 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 	{
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 
-		if (!res)
+		if (!res || output_id == BadRRMode)
 		{
+			os::Printer::log("Could not get video output. Try to run in windowed mode.", ELL_WARNING);
 			CreationParams.Fullscreen = false;
 			return CreationParams.Fullscreen;
 		}
@@ -349,31 +350,28 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
 		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
 		float refresh_rate, refresh_rate_new;
-		unsigned int mode0_width = -1, mode0_height = -1;
+		core::dimension2d<u32> mode0_size = core::dimension2d<u32>(0, 0);
 
 		for (int i = 0; i < res->nmode; i++)
 		{
 			const XRRModeInfo* mode = &res->modes[i];
-			unsigned int w, h;
-			
+			core::dimension2d<u32> size;
+
 			if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
 			{
-				w = mode->height;
-				h = mode->width;
+				size = core::dimension2d<u32>(mode->height, mode->width);
 			} 
 			else 
 			{
-				w = mode->width;
-				h = mode->height;
+				size = core::dimension2d<u32>(mode->width, mode->height);
 			}
 			
 			if (bestMode == -1 && mode->id == output->modes[0])
 			{
-				mode0_width = w;
-				mode0_height = h;
+				mode0_size = size;
 			}
 
-			if (bestMode == -1 && w == Width && h == Height)
+			if (bestMode == -1 && size.Width == Width && size.Height == Height)
 			{
 				for (int j = 0; j < output->nmode; j++)
 				{
@@ -385,7 +383,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 					}
 				}
 			}
-			else if (bestMode != -1 && w == Width && h == Height)
+			else if (bestMode != -1 && size.Width == Width && size.Height == Height)
 			{
 				refresh_rate_new = (mode->dotClock * 1000.0) / (mode->hTotal * mode->vTotal);
 
@@ -408,8 +406,8 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		if (bestMode == -1)
 		{
 			bestMode = 0;
-			Width = mode0_width;
-			Height = mode0_height;
+			Width = mode0_size.Width;
+			Height = mode0_size.Height;
 		}
 
 		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
@@ -1595,16 +1593,17 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			else
 			#endif
 			#ifdef _IRR_LINUX_X11_RANDR_
-			if (XRRQueryExtension(display, &eventbase, &errorbase))
+			while (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
+				XRROutputInfo* output = NULL;
+				XRRCrtcInfo* crtc = NULL;
+				crtc_x = crtc_y = -1;
+				output_id = BadRRMode;
+
 				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 
 				if (!res)
-					return &VideoModeList;
-
-				XRROutputInfo *output = NULL;
-				XRRCrtcInfo* crtc = NULL;
-				crtc_x = crtc_y = -1;
+					break;
 				
 				RROutput primary_id = XRRGetOutputPrimary(display, DefaultRootWindow(display));
 		
@@ -1654,40 +1653,35 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					XRRFreeCrtcInfo(crtc);
 					XRRFreeOutputInfo(output);
 				}
+				
+				if (output_id == BadRRMode)
+				{
+					os::Printer::log("Could not get video output.", ELL_WARNING);
+					break;
+				}
 
 				output = XRRGetOutputInfo(display, res, output_id);
 				crtc = XRRGetCrtcInfo(display, res, output->crtc);
 
-				if (crtc == NULL)
-				{
-					XRRFreeCrtcInfo(crtc);
-					XRRFreeOutputInfo(output);
-					XRRFreeScreenResources(res);
-					return &VideoModeList;
-				}
-
 				for (int i = 0; i < res->nmode; i++)
 				{
 					const XRRModeInfo* mode = &res->modes[i];
-					unsigned int w, h;
+					core::dimension2d<u32> size;
 
 					if (crtc->rotation & (XRANDR_ROTATION_LEFT|XRANDR_ROTATION_RIGHT))
 					{
-						w = mode->height;
-						h = mode->width;
+						size = core::dimension2d<u32>(mode->height, mode->width);
 					} 
 					else 
 					{
-						w = mode->width;
-						h = mode->height;
+						size = core::dimension2d<u32>(mode->width, mode->height);
 					}
 
 					for (int j = 0; j < output->nmode; j++)
 					{            
 						if (mode->id == output->modes[j])
 						{
-							VideoModeList.addMode(core::dimension2d<u32>(
-									w, h), defaultDepth);
+							VideoModeList.addMode(size, defaultDepth);
 							break;
 						}
 					}
@@ -1695,21 +1689,19 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					if (mode->id == crtc->mode)
 					{
 						old_mode = crtc->mode;
-						VideoModeList.setDesktop(defaultDepth,
-							core::dimension2d<u32>(w, h));
+						VideoModeList.setDesktop(defaultDepth, size);
 					}
 				}
-
+				
 				XRRFreeCrtcInfo(crtc);
 				XRRFreeOutputInfo(output);
-				XRRFreeScreenResources(res);
+				XRRFreeScreenResources(res);	
+							
+				break;
 			}
-			else
 			#endif
-			{
-				os::Printer::log("VidMode or RandR X11 extension requireed for VideoModeList." , ELL_WARNING);
-			}
 		}
+	
 		if (display && temporaryDisplay)
 		{
 			XCloseDisplay(display);
