@@ -261,7 +261,7 @@ public:
     DetailledObjectPass2Shader();
 };
 
-class ObjectUnlitShader : public ShaderHelperSingleton<ObjectUnlitShader, core::matrix4>
+class ObjectUnlitShader : public ShaderHelperSingleton<ObjectUnlitShader, core::matrix4, core::matrix4>
 {
 public:
     GLuint TU_tex;

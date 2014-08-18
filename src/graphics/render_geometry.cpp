@@ -394,7 +394,7 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(MeshShader::GrassPass2Shader::getInstance()->TU_Albedo, true)
         ), ListMatGrass::getInstance());
 
-        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 1>(TexUnits(
+        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
         ), ListMatUnlit::getInstance());
 
