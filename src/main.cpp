@@ -1436,7 +1436,6 @@ static void cleanSuperTuxKart()
     Referee::cleanup();
     if(ReplayPlay::get())       ReplayPlay::destroy();
     if(race_manager)            delete race_manager;
-    if(addons_manager)          delete addons_manager;
     if(grand_prix_manager)      delete grand_prix_manager;
     if(highscore_manager)       delete highscore_manager;
     if(attachment_manager)      delete attachment_manager;
@@ -1475,6 +1474,10 @@ static void cleanSuperTuxKart()
         Log::info("Thread", "Request Manager not aborting in time, aborting.");
     }
     Online::RequestManager::deallocate();
+
+    // The addons manager might still be called from a currenty running request
+    // in the request manager, so it can not be deleted earlier.
+    if(addons_manager)  delete addons_manager;
 
     // FIXME: do we need to wait for threads there, can they be
     // moved further up?

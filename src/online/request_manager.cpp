@@ -221,7 +221,9 @@ namespace Online
 
             me->m_request_queue.unlock();
             me->m_current_request->execute();
-            me->addResult(me->m_current_request);
+            // This test is necessary in case that execute() was aborted
+            // (otherwise the assert in addResult will be triggered).
+            if (!me->getAbort()) me->addResult(me->m_current_request);
             me->m_request_queue.lock();
         } // while handle all requests
 
