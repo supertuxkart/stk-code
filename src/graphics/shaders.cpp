@@ -597,9 +597,11 @@ void glUniform1iWrapper(GLuint a, int b)
 
 void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
 {
+#ifdef WIN32
     glActiveTexture(GL_TEXTURE0 + texunit);
     glBindTexture(tp, tid);
     glBindSampler(texunit, sid);
+#endif
 }
 
 

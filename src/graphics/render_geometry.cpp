@@ -380,11 +380,20 @@ void IrrDriver::renderSolidSecondPass()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
-    glBindSampler(0, 0);
+#ifdef WIN32
+    if (irr_driver->getGLSLVersion() >= 330)
+        glBindSampler(0, 0);
+#endif
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
-    glBindSampler(1, 0);
+#ifdef WIN32
+    if (irr_driver->getGLSLVersion() >= 330)
+        glBindSampler(1, 0);
+#endif
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
-    glBindSampler(2, 0);
+#ifdef WIN32
+    if (irr_driver->getGLSLVersion() >= 330)
+        glBindSampler(2, 0);
+#endif
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
 
     {
