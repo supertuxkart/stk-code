@@ -34,6 +34,9 @@
 #include "utils/profiler.hpp"
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
+
+#include <functional>
+
 using namespace irr;
 using namespace gui;
 
