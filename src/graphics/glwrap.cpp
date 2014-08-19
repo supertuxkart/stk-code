@@ -932,7 +932,7 @@ static void drawTexColoredQuad(const video::ITexture *texture, const video::SCol
     glUseProgram(UIShader::ColoredTextureRectShader::getInstance()->Program);
     glBindVertexArray(UIShader::ColoredTextureRectShader::getInstance()->vao);
 
-    setTexture(UIShader::ColoredTextureRectShader::getInstance()->TU_tex, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    UIShader::ColoredTextureRectShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName() });
     UIShader::ColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height));
@@ -952,7 +952,7 @@ void drawTexQuad(GLuint texture, float width, float height,
     glUseProgram(UIShader::TextureRectShader::getInstance()->Program);
     glBindVertexArray(SharedObject::UIVAO);
 
-    setTexture(UIShader::TextureRectShader::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR);
+    UIShader::TextureRectShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ texture });
     UIShader::TextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y),
@@ -1055,7 +1055,7 @@ void draw2DImage(const video::ITexture* texture, const core::rect<s32>& destRect
     glUseProgram(UIShader::UniformColoredTextureRectShader::getInstance()->Program);
     glBindVertexArray(SharedObject::UIVAO);
 
-    setTexture(UIShader::UniformColoredTextureRectShader::getInstance()->TU_tex, static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName(), GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ static_cast<const irr::video::COpenGLTexture*>(texture)->getOpenGLTextureName() });
     UIShader::UniformColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height), core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height), colors);
 
@@ -1091,7 +1091,7 @@ void draw2DImageFromRTT(GLuint texture, size_t texture_w, size_t texture_h,
     glUseProgram(UIShader::UniformColoredTextureRectShader::getInstance()->Program);
     glBindVertexArray(SharedObject::UIVAO);
 
-    setTexture(UIShader::UniformColoredTextureRectShader::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR);
+    UIShader::UniformColoredTextureRectShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ texture });
     UIShader::UniformColoredTextureRectShader::getInstance()->setUniforms(
         core::vector2df(center_pos_x, center_pos_y), core::vector2df(width, height),
         core::vector2df(tex_center_pos_x, tex_center_pos_y), core::vector2df(tex_width, tex_height),

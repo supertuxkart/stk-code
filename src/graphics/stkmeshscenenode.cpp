@@ -278,7 +278,7 @@ void STKMeshSceneNode::render()
                 GLenum itype = mesh.IndexType;
                 size_t count = mesh.IndexCount;
 
-                setTexture(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, getTextureGLuint(spareWhiteTex), GL_NEAREST, GL_NEAREST, false);
+                MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(spareWhiteTex) });
                 MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
@@ -341,7 +341,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-                    setTexture(MeshShader::TransparentFogShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    MeshShader::TransparentFogShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
                     MeshShader::TransparentFogShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col);
 
                     assert(mesh.vao);
@@ -362,7 +362,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    setTexture(MeshShader::TransparentShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+                    MeshShader::TransparentShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
 
                     MeshShader::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                     assert(mesh.vao);

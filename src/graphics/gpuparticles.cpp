@@ -348,9 +348,7 @@ void ParticleSystemProxy::drawFlip()
     glBlendFunc(GL_ONE, GL_ONE);
     glUseProgram(ParticleShader::FlipParticleRender::getInstance()->Program);
 
-    setTexture(ParticleShader::FlipParticleRender::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(ParticleShader::FlipParticleRender::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-
+    ParticleShader::FlipParticleRender::getInstance()->SetTextureUnits(std::vector<GLuint>{ texture, irr_driver->getDepthStencilTexture() });
     ParticleShader::FlipParticleRender::getInstance()->setUniforms();
 
     glBindVertexArray(current_rendering_vao);
@@ -365,8 +363,7 @@ void ParticleSystemProxy::drawNotFlip()
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glUseProgram(ParticleShader::SimpleParticleRender::getInstance()->Program);
 
-    setTexture(ParticleShader::SimpleParticleRender::getInstance()->TU_tex, texture, GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR);
-    setTexture(ParticleShader::SimpleParticleRender::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    ParticleShader::SimpleParticleRender::getInstance()->SetTextureUnits(std::vector<GLuint>{ texture, irr_driver->getDepthStencilTexture() });
     video::SColorf ColorFrom = video::SColorf(getColorFrom()[0], getColorFrom()[1], getColorFrom()[2]);
     video::SColorf ColorTo = video::SColorf(getColorTo()[0], getColorTo()[1], getColorTo()[2]);
 

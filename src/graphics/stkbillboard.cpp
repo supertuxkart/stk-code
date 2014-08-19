@@ -51,8 +51,8 @@ void STKBillboard::render()
         return;
     compressTexture(tex, true, true);
     GLuint texid = getTextureGLuint(tex);
-    setTexture(0, texid, GL_LINEAR, GL_LINEAR);
     glUseProgram(MeshShader::BillboardShader::getInstance()->Program);
+    MeshShader::BillboardShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ texid });
     MeshShader::BillboardShader::getInstance()->setUniforms(irr_driver->getViewMatrix(), irr_driver->getProjMatrix(), pos, Size);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glBindVertexArray(0);
