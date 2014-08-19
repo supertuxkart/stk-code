@@ -47,7 +47,7 @@ template<typename T, typename...Args>
 static std::vector<T> createVector(Args...args)
 {
     std::vector<T> result = std::vector<T>();
-    Util::populate(result, args...);
+    Util::template populate<T>(result, args...);
     return result;
 }
 
