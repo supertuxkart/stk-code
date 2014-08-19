@@ -68,6 +68,9 @@ unsigned IrrDriver::UpdateLightsInfo(scene::ICameraSceneNode * const camnode, fl
     std::vector<LightNode *> BucketedLN[15];
     for (unsigned int i = 0; i < lightcount; i++)
     {
+        if (!m_lights[i]->isVisible())
+            continue;
+
         if (!m_lights[i]->isPointLight())
         {
             m_lights[i]->render();
