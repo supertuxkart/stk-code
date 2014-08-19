@@ -607,6 +607,7 @@ void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
 
 GLuint createNearestSampler()
 {
+#ifdef WIN32
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -615,6 +616,7 @@ GLuint createNearestSampler()
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
     return id;
+#endif
 }
 
 void BindTextureNearest(GLuint TU, GLuint tex)
@@ -630,6 +632,7 @@ void BindTextureNearest(GLuint TU, GLuint tex)
 
 GLuint createBilinearSampler()
 {
+#ifdef WIN32
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -638,6 +641,7 @@ GLuint createBilinearSampler()
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
     return id;
+#endif
 }
 
 void BindTextureBilinear(GLuint TU, GLuint tex)
@@ -653,6 +657,7 @@ void BindTextureBilinear(GLuint TU, GLuint tex)
 
 GLuint createBilinearClampedSampler()
 {
+#ifdef WIN32
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -661,6 +666,7 @@ GLuint createBilinearClampedSampler()
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
     return id;
+#endif
 }
 
 void BindTextureBilinearClamped(GLuint TU, GLuint tex)
@@ -676,6 +682,7 @@ void BindTextureBilinearClamped(GLuint TU, GLuint tex)
 
 GLuint createSemiTrilinearSampler()
 {
+#ifdef WIN32
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -684,6 +691,7 @@ GLuint createSemiTrilinearSampler()
     glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
     return id;
+#endif
 }
 
 void BindTextureSemiTrilinear(GLuint TU, GLuint tex)
@@ -699,6 +707,7 @@ void BindTextureSemiTrilinear(GLuint TU, GLuint tex)
 
 GLuint createTrilinearSampler()
 {
+#ifdef WIN32
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -710,6 +719,7 @@ GLuint createTrilinearSampler()
     if (aniso == 0) aniso = 1;
     glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
     return id;
+#endif
 }
 
 void BindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
@@ -728,6 +738,7 @@ void BindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
 
 GLuint createShadowSampler()
 {
+#ifdef WIN32
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -737,6 +748,7 @@ GLuint createShadowSampler()
     glSamplerParameterf(id, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
     glSamplerParameterf(id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
     return id;
+#endif
 }
 
 void BindTextureShadow(GLuint TU, GLuint tex)
