@@ -597,7 +597,7 @@ void glUniform1iWrapper(GLuint a, int b)
 
 void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     glActiveTexture(GL_TEXTURE0 + texunit);
     glBindTexture(tp, tid);
     glBindSampler(texunit, sid);
@@ -607,7 +607,7 @@ void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
 
 GLuint createNearestSampler()
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -632,7 +632,7 @@ void BindTextureNearest(GLuint TU, GLuint tex)
 
 GLuint createBilinearSampler()
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -657,7 +657,7 @@ void BindTextureBilinear(GLuint TU, GLuint tex)
 
 GLuint createBilinearClampedSampler()
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -682,7 +682,7 @@ void BindTextureBilinearClamped(GLuint TU, GLuint tex)
 
 GLuint createSemiTrilinearSampler()
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -707,7 +707,7 @@ void BindTextureSemiTrilinear(GLuint TU, GLuint tex)
 
 GLuint createTrilinearSampler()
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -738,7 +738,7 @@ void BindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
 
 GLuint createShadowSampler()
 {
-#ifdef WIN32
+#ifdef GL_VERSION_3_3
     unsigned id;
     glGenSamplers(1, &id);
     glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
