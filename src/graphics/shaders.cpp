@@ -103,11 +103,6 @@
 
 using namespace video;
 
-GLuint getUniformLocation(GLuint program, const char* name)
-{
-    return glGetUniformLocation(program, name);
-}
-
 Shaders::Shaders()
 {
     // Callbacks
@@ -564,36 +559,6 @@ namespace UtilShader
     }
 }
 using namespace UtilShader;
-
-void glUniformMatrix4fvWraper(GLuint a, size_t b, unsigned c, const float *d)
-{
-    glUniformMatrix4fv(a, b, c, d);
-}
-
-void glUniform3fWraper(GLuint a, float b, float c, float d)
-{
-    glUniform3f(a, b, c, d);
-}
-
-void glUniform4iWraper(GLuint a, int b, int c, int d, int e)
-{
-    glUniform4i(a, b, c, d, e);
-}
-
-void glUniform2fWraper(GLuint a, float b, float c)
-{
-    glUniform2f(a, b, c);
-}
-
-void glUniform1fWrapper(GLuint a, float b)
-{
-    glUniform1f(a, b);
-}
-
-void glUniform1iWrapper(GLuint a, int b)
-{
-    glUniform1i(a, b);
-}
 
 bool needsUBO()
 {
