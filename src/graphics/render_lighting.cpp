@@ -155,7 +155,13 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         else
         {
             glUseProgram(FullScreenShader::RadianceHintsConstructionShader::getInstance()->Program);
-            FullScreenShader::RadianceHintsConstructionShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ m_rtts->getRSM().getRTT()[0], m_rtts->getRSM().getRTT()[1], m_rtts->getRSM().getDepthTexture() });
+            FullScreenShader::RadianceHintsConstructionShader::getInstance()->SetTextureUnits(
+                createVector<GLuint>(
+                    m_rtts->getRSM().getRTT()[0],
+                    m_rtts->getRSM().getRTT()[1],
+                    m_rtts->getRSM().getDepthTexture()
+                )
+            );
             FullScreenShader::RadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend);
             glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, 32);
         }

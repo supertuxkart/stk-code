@@ -608,7 +608,10 @@ void IrrDriver::renderTransparent()
         size_t count = mesh.IndexCount;
         // Render the effect
         MeshShader::DisplaceShader::getInstance()->SetTextureUnits(
-            { getTextureGLuint(displaceTex), irr_driver->getRenderTargetTexture(RTT_COLOR), irr_driver->getRenderTargetTexture(RTT_TMP1), getTextureGLuint(mesh.textures[0]) });
+            createVector<GLuint>(getTextureGLuint(displaceTex),
+                irr_driver->getRenderTargetTexture(RTT_COLOR),
+                irr_driver->getRenderTargetTexture(RTT_TMP1),
+                getTextureGLuint(mesh.textures[0])));
         glUseProgram(MeshShader::DisplaceShader::getInstance()->Program);
         MeshShader::DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),
