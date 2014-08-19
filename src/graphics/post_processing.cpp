@@ -264,8 +264,8 @@ void PostProcessing::renderGI(const core::matrix4 &RHMatrix, const core::vector3
     core::matrix4 InvRHMatrix;
     RHMatrix.getInverse(InvRHMatrix);
     glDisable(GL_DEPTH_TEST);
-    FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->SetTextureUnits(std::vector<GLuint>
-        { irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), shr, shg, shb });
+    FullScreenShader::GlobalIlluminationReconstructionShader::getInstance()->SetTextureUnits(createVector<GLuint>
+        (irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture(), shr, shg, shb ));
     DrawFullScreenEffect<FullScreenShader::GlobalIlluminationReconstructionShader>(RHMatrix, InvRHMatrix, rh_extend);
 }
 
