@@ -23,7 +23,8 @@
 #include "config/user_config.hpp"
 #include "utils/singleton.hpp"
 
-typedef unsigned int    GLuint;
+#include "gl_headers.hpp"
+
 using namespace irr;
 class ParticleSystemProxy;
 
@@ -51,13 +52,9 @@ public:
 };
 }
 
-void glUniformMatrix4fvWraper(GLuint, size_t, unsigned, const float *mat);
-void glUniform3fWraper(GLuint, float, float, float);
-void glUniform4iWraper(GLuint, int, int, int, int);
-void glUniform2fWraper(GLuint a, float b, float c);
-void glUniform1fWrapper(GLuint, float);
-void glUniform1iWrapper(GLuint, int);
 bool needsUBO();
+
+unsigned getGLSLVersion();
 
 struct UniformHelper
 {
@@ -69,31 +66,28 @@ struct UniformHelper
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::matrix4 &mat, Args... arg)
     {
-#ifndef GL_FALSE
-#define GL_FALSE 0
-#endif
-        glUniformMatrix4fvWraper(uniforms[N], 1, GL_FALSE, mat.pointer());
+        glUniformMatrix4fv(uniforms[N], 1, GL_FALSE, mat.pointer());
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColorf &col, Args... arg)
     {
-        glUniform3fWraper(uniforms[N], col.r, col.g, col.b);
+        glUniform3f(uniforms[N], col.r, col.g, col.b);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const video::SColor &col, Args... arg)
     {
-        glUniform4iWraper(uniforms[N], col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
+        glUniform4i(uniforms[N], col.getRed(), col.getGreen(), col.getBlue(), col.getAlpha());
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector3df &v, Args... arg)
     {
-        glUniform3fWraper(uniforms[N], v.X, v.Y, v.Z);
+        glUniform3f(uniforms[N], v.X, v.Y, v.Z);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
@@ -101,35 +95,34 @@ struct UniformHelper
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::vector2df &v, Args... arg)
     {
-        glUniform2fWraper(uniforms[N], v.X, v.Y);
+        glUniform2f(uniforms[N], v.X, v.Y);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, const core::dimension2df &v, Args... arg)
     {
-        glUniform2fWraper(uniforms[N], v.Width, v.Height);
+        glUniform2f(uniforms[N], v.Width, v.Height);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, float f, Args... arg)
     {
-        glUniform1fWrapper(uniforms[N], f);
+        glUniform1f(uniforms[N], f);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
     template<unsigned N = 0, typename... Args>
     static void setUniformsHelper(const std::vector<GLuint> &uniforms, int f, Args... arg)
     {
-        glUniform1iWrapper(uniforms[N], f);
+        glUniform1i(uniforms[N], f);
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
 };
 
 void bypassUBO(GLuint Program);
-GLuint getUniformLocation(GLuint program, const char* name);
 
 template<typename T, typename... Args>
 class ShaderHelperSingleton : public Singleton<T>

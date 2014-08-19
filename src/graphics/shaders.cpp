@@ -600,6 +600,11 @@ bool needsUBO()
     return irr_driver->needUBOWorkaround();
 }
 
+unsigned getGLSLVersion()
+{
+    return irr_driver->getGLSLVersion();
+}
+
 namespace MeshShader
 {
     // Solid Normal and depth pass shaders
