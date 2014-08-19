@@ -162,4 +162,7 @@ void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>
 
 void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
     const irr::core::rect<s32>* clip = 0);
+
+bool hasGLExtension(const char* extension);
+
 #endif

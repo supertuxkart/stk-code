@@ -486,9 +486,9 @@ void IrrDriver::initDevice()
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
-        const GLubyte *extensions = glGetString(GL_EXTENSIONS);
-        if (extensions && strstr((const char*)extensions, "GL_AMD_vertex_shader_layer") != NULL)
-        hasVSLayer = true;
+        if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
+            hasVSLayer = true;
+        }
     }
 
 
