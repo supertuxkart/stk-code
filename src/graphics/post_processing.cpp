@@ -33,6 +33,7 @@
 #include "tracks/track.hpp"
 #include "utils/log.hpp"
 #include "utils/profiler.hpp"
+#include "utils/cpp2011.hpp"
 
 #include <SViewFrustum.h>
 
@@ -711,8 +712,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             glEnable(GL_BLEND);
             glBlendFunc(GL_ONE, GL_ONE);
             glBlendEquation(GL_FUNC_ADD);
-            FullScreenShader::BloomBlendShader::getInstance()->SetTextureUnits(std::vector<GLuint>
-                { irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512) });
+            FullScreenShader::BloomBlendShader::getInstance()->SetTextureUnits(createVector<GLuint>(
+                irr_driver->getRenderTargetTexture(RTT_BLOOM_128), irr_driver->getRenderTargetTexture(RTT_BLOOM_256), irr_driver->getRenderTargetTexture(RTT_BLOOM_512) ));
             DrawFullScreenEffect<FullScreenShader::BloomBlendShader>();
 
             glDisable(GL_BLEND);

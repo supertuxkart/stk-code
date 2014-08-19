@@ -27,4 +27,28 @@ void pushVector(std::vector<T> *vec, Args ...args)
     vec->emplace_back(args...);
 #endif
 }
+
+struct Util
+{
+    template <typename T>
+    static void populate(std::vector<T> &v)
+    { }
+
+    template <typename T, typename...Args>
+    static void populate(std::vector<T> &v, T t, Args... args)
+    {
+        v.push_back(t);
+        populate<T>(v, args...);
+    }
+};
+
+
+template<typename T, typename...Args>
+static std::vector<T> createVector(Args...args)
+{
+    std::vector<T> result = std::vector<T>();
+    Util::populate(result, args...);
+    return result;
+}
+
 #endif
