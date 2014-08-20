@@ -253,8 +253,26 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 		if (UseXRandR && CreationParams.Fullscreen && old_mode != BadRRMode)
 		{
 			XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
+			
+			if (!res)
+				return false;
+
 			XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
+			
+			if (!output || !output->crtc || output->connection == RR_Disconnected) 
+			{
+				XRRFreeOutputInfo(output);
+				return false;
+			}
+
 			XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
+
+			if (!crtc) 
+			{
+				XRRFreeCrtcInfo(crtc);
+				XRRFreeOutputInfo(output);
+				return false;
+			}
 
 			Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
 										crtc->x, crtc->y, old_mode,
