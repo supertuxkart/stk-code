@@ -611,15 +611,20 @@ void Kart::createPhysics()
                     // to place the wheels outside of the chassis
                     if(f<0)
                     {
-                        const Vec3 cs = getKartProperties()->getGravityCenterShift();
-                        wheel_pos[index].setX(x*0.5f*getKartWidth()+cs.getX());
+                        // All wheel positions are relative to the center of
+                        // the collision shape.
+                        wheel_pos[index].setX(x*0.5f*getKartWidth());
                         float radius = getKartProperties()->getWheelRadius();
-                        // Set the connection point so that a maximum compressed wheel
-                        // (susp. length=0) will still poke a little bit out under the
-                        // kart
-                        wheel_pos[index].setY(radius - 0.05f);
-                        wheel_pos[index].setZ((0.5f*getKartLength() - radius)* z
-                                               + cs.getZ());
+                        // The y position of the wheels (i.e. the points where
+                        // the suspension is attached to) is just at the
+                        // bottom of the kart. That is half the kart height
+                        // down. The wheel radius is added to the suspension
+                        // length in the physics, so we move the connection
+                        // point 'radius' up. That means that if the suspension
+                        // is fully compressed (0), the wheel will just be at
+                        // the bottom of the kart chassis and touch the ground
+                        wheel_pos[index].setY(- 0.5f*getKartHeight() + radius);
+                        wheel_pos[index].setZ((0.5f*getKartLength() - radius)* z);
 
                     }
                     else
@@ -687,11 +692,12 @@ void Kart::createPhysics()
     tuning.m_maxSuspensionForce    =
         m_kart_properties->getMaxSuspensionForce();
 
+    const Vec3 &cs = getKartProperties()->getGravityCenterShift();
     for(unsigned int i=0; i<4; i++)
     {
         bool is_front_wheel = i<2;
         btWheelInfo& wheel = m_vehicle->addWheel(
-                            wheel_pos[i],
+                            wheel_pos[i]+cs,
                             wheel_direction, wheel_axle, suspension_rest,
                             wheel_radius, tuning, is_front_wheel);
         wheel.m_suspensionStiffness      = m_kart_properties->getSuspensionStiffness();
