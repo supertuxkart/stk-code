@@ -565,6 +565,185 @@ bool needsUBO()
     return irr_driver->needUBOWorkaround();
 }
 
+void setTextureSampler(GLenum tp, GLuint texunit, GLuint tid, GLuint sid)
+{
+#ifdef GL_VERSION_3_3
+    glActiveTexture(GL_TEXTURE0 + texunit);
+    glBindTexture(tp, tid);
+    glBindSampler(texunit, sid);
+#endif
+}
+
+
+GLuint createNearestSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}
+
+void BindTextureNearest(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+}
+
+GLuint createBilinearSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}
+
+void BindTextureBilinear(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+}
+
+GLuint createBilinearClampedSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}
+
+void BindTextureBilinearClamped(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+}
+
+GLuint createSemiTrilinearSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+    return id;
+#endif
+}
+
+void BindTextureSemiTrilinear(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+}
+
+GLuint createTrilinearSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glSamplerParameterf(id, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+    return id;
+#endif
+}
+
+void BindTextureTrilinearAnisotropic(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+    int aniso = UserConfigParams::m_anisotropic;
+    if (aniso == 0) aniso = 1;
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, (float)aniso);
+}
+
+GLuint createShadowSampler()
+{
+#ifdef GL_VERSION_3_3
+    unsigned id;
+    glGenSamplers(1, &id);
+    glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glSamplerParameteri(id, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glSamplerParameterf(id, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glSamplerParameterf(id, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+    return id;
+#endif
+}
+
+void BindTextureShadow(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_2D_ARRAY, tex);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_MODE, GL_COMPARE_REF_TO_TEXTURE);
+    glTexParameterf(GL_TEXTURE_2D_ARRAY, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+}
+
+void BindTextureVolume(GLuint TU, GLuint tex)
+{
+    glActiveTexture(GL_TEXTURE0 + TU);
+    glBindTexture(GL_TEXTURE_3D, tex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 1.);
+}
+
 unsigned getGLSLVersion()
 {
     return irr_driver->getGLSLVersion();
@@ -584,8 +763,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     ObjectRefPass1Shader::ObjectRefPass1Shader()
@@ -599,8 +777,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     GrassPass1Shader::GrassPass1Shader()
@@ -610,8 +787,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms("ModelMatrix", "InverseModelMatrix", "windDir");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     NormalMapShader::NormalMapShader()
@@ -625,9 +802,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_normalmap = 1;
-        TU_glossy = 0;
-        AssignTextureUnit(Program, TexUnit(TU_normalmap, "normalMap"), TexUnit(TU_glossy, "DiffuseForAlpha"));
+        AssignSamplerNames(Program, 1, "normalMap", 0, "DiffuseForAlpha");
     }
 
     InstancedObjectPass1Shader::InstancedObjectPass1Shader()
@@ -637,9 +812,9 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
-        TU_tex = 0;
+
         AssignUniforms();
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -652,9 +827,9 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
-        TU_tex = 0;
+
         AssignUniforms();
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -668,8 +843,8 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
         AssignUniforms("windDir");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -687,9 +862,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_normalmap = 1;
-        TU_glossy = 0;
-        AssignTextureUnit(Program, TexUnit(TU_normalmap, "normalMap"), TexUnit(TU_glossy, "DiffuseForAlpha"));
+        AssignSamplerNames(Program, 0, "normalMap", 1, "DiffuseForAlpha");
     }
 
     // Solid Lit pass shaders
@@ -704,14 +877,11 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_Albedo = 3;
-
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo")
-        );
+            TexUnit(2, "SSAO"));
+        AssignSamplerNames(Program, 3, "Albedo");
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
@@ -722,14 +892,13 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
         AssignUniforms();
-        TU_Albedo = 3;
 
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo")
-        );
+            TexUnit(2, "SSAO"));
+
+        AssignSamplerNames(Program, 3, "Albedo");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -744,14 +913,13 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
         AssignUniforms();
-        TU_Albedo = 3;
 
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo")
-        );
+            TexUnit(2, "SSAO"));
+
+        AssignSamplerNames(Program, 3, "Albedo");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -766,16 +934,12 @@ namespace MeshShader
         AssignUniforms("ModelMatrix");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-        TU_Albedo = 3;
-        TU_detail = 4;
 
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo"),
-            TexUnit(TU_detail, "Detail")
-        );
+            TexUnit(2, "SSAO"));
+        AssignSamplerNames(Program, 3, "Albedo", 4, "Detail");
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -788,9 +952,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_tex = 3;
-
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 3, "tex");
     }
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
@@ -804,14 +966,11 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_Albedo = 3;
-
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo")
-        );
+            TexUnit(2, "SSAO"));
+        AssignSamplerNames(Program, 3, "Albedo");
     }
 
     GrassPass2Shader::GrassPass2Shader()
@@ -821,14 +980,12 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "windDir");
-        TU_Albedo = 3;
 
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo")
-        );
+            TexUnit(2, "SSAO"));
+        AssignSamplerNames(Program, 3, "Albedo");
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
@@ -839,16 +996,16 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("windDir", "SunDir");
-        TU_Albedo = 3;
-        TU_dtex = 4;
 
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
             TexUnit(2, "SSAO"),
-            TexUnit(TU_Albedo, "Albedo"),
-            TexUnit(TU_dtex, "dtex")
-        );
+            TexUnit(4, "dtex")
+            );
+
+        AssignSamplerNames(Program, 3, "Albedo");
+
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -866,14 +1023,11 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_tex = 3;
-
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_tex, "tex")
-        );
+            TexUnit(2, "SSAO"));
+        AssignSamplerNames(Program, 3, "tex");
     }
 
     SplattingShader::SplattingShader()
@@ -883,22 +1037,17 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
         AssignUniforms("ModelMatrix");
-        TU_tex_layout = 3;
-        TU_tex_detail0 = 4;
-        TU_tex_detail1 = 5;
-        TU_tex_detail2 = 6;
-        TU_tex_detail3 = 7;
 
         AssignTextureUnit(Program,
             TexUnit(0, "DiffuseMap"),
             TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(TU_tex_layout, "tex_layout"),
-            TexUnit(TU_tex_detail0, "tex_detail0"),
-            TexUnit(TU_tex_detail1, "tex_detail1"),
-            TexUnit(TU_tex_detail2, "tex_detail2"),
-            TexUnit(TU_tex_detail3, "tex_detail3")
-        );
+            TexUnit(2, "SSAO"));
+        AssignSamplerNames(Program,
+            3, "tex_layout",
+            4, "tex_detail0",
+            5, "tex_detail1",
+            6, "tex_detail2",
+            7, "tex_detail3");
     }
 
     GLuint BubbleShader::Program;
@@ -935,9 +1084,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_tex = 0;
-
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     TransparentFogShader::TransparentFogShader()
@@ -950,9 +1097,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        TU_tex = 0;
-
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     BillboardShader::BillboardShader()
@@ -965,9 +1110,7 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
         AssignUniforms("ModelViewMatrix", "ProjectionMatrix", "Position", "Size");
 
-        TU_tex = 0;
-
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     ColorizeShader::ColorizeShader()
@@ -1009,9 +1152,9 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
-        TU_tex = 0;
+
         AssignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1022,13 +1165,9 @@ namespace MeshShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/rsm.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting_rsm.frag").c_str());
-        TU_layout = 0;
-        TU_detail0 = 1;
-        TU_detail1 = 2;
-        TU_detail2 = 3;
-        TU_detail3 = 4;
+
         AssignUniforms("RSMMatrix", "ModelMatrix");
-        AssignTextureUnit(Program, TexUnit(TU_layout, "tex_layout"), TexUnit(TU_detail0, "tex_detail0"), TexUnit(TU_detail1, "tex_detail1"), TexUnit(TU_detail2, "tex_detail2"), TexUnit(TU_detail3, "tex_detail3"));
+        AssignSamplerNames(Program, 0, "tex_layout", 1, "tex_detail0", 2, "tex_detail1", 3, "tex_detail2", 4, "tex_detail3");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1079,9 +1218,8 @@ namespace MeshShader
         AssignUniforms("ModelMatrix");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-        TU_tex = 0;
 
-        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     InstancedRefShadowShader::InstancedRefShadowShader()
@@ -1104,8 +1242,8 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        TU_tex = 0;
-        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
+
+        AssignSamplerNames(Program, 0, "tex");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -1131,9 +1269,8 @@ namespace MeshShader
         AssignUniforms("ModelMatrix", "windDir");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
-        TU_tex = 0;
 
-        AssignTextureUnit(Program, { TexUnit(TU_tex, "tex") });
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     InstancedGrassShadowShader::InstancedGrassShadowShader()
@@ -1156,8 +1293,8 @@ namespace MeshShader
                 GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
         }
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
 
         AssignUniforms("windDir");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1182,16 +1319,12 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/displace.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/displace.frag").c_str());
         AssignUniforms("ModelMatrix", "dir", "dir2");
-        TU_displacement_tex = 0;
-        TU_color_tex = 1;
-        TU_mask_tex = 2;
-        TU_tex = 3;
-        AssignTextureUnit(Program,
-            TexUnit(TU_displacement_tex, "displacement_tex"),
-            TexUnit(TU_color_tex, "color_tex"),
-            TexUnit(TU_mask_tex, "mask_tex"),
-            TexUnit(TU_tex, "tex")
-        );
+
+        AssignSamplerNames(Program,
+            0, "displacement_tex",
+            1, "color_tex",
+            2, "mask_tex",
+            3, "tex");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -1379,9 +1512,7 @@ namespace ParticleShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
         AssignUniforms("color_from", "color_to");
 
-        TU_tex = 0;
-        TU_dtex = 1;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_dtex, "dtex"));
+        AssignSamplerNames(Program, 0, "tex", 1, "dtex");
     }
 
     FlipParticleRender::FlipParticleRender()
@@ -1392,9 +1523,7 @@ namespace ParticleShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/particle.frag").c_str());
         AssignUniforms();
 
-        TU_tex = 0;
-        TU_dtex = 1;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_dtex, "dtex"));
+        AssignSamplerNames(Program, 0, "tex", 1, "dtex");
     }
 }
 
@@ -1423,8 +1552,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloom.frag").c_str());
         AssignUniforms();
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     BloomBlendShader::BloomBlendShader()
@@ -1433,10 +1562,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bloomblend.frag").c_str());
         AssignUniforms();
-        TU_tex_128 = 0;
-        TU_tex_256 = 1;
-        TU_tex_512 = 2;
-        AssignTextureUnit(Program, TexUnit(TU_tex_128, "tex_128"), TexUnit(TU_tex_256, "tex_256"), TexUnit(TU_tex_512, "tex_512"));
+
+        AssignSamplerNames(Program, 0, "tex_128", 1, "tex_256", 2, "tex_512");
     }
 
     ToneMapShader::ToneMapShader()
@@ -1447,8 +1574,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getCIEXYZ.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/tonemap.frag").c_str());
         AssignUniforms();
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "text"));
+
+        AssignSamplerNames(Program, 0, "text");
     }
 
     DepthOfFieldShader::DepthOfFieldShader()
@@ -1456,10 +1583,9 @@ namespace FullScreenShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/dof.frag").c_str());
-        TU_tex = 0;
-        TU_depth = 1;
+
         AssignUniforms();
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "dtex"));
+        AssignSamplerNames(Program, 0, "tex", 1, "dtex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1519,10 +1645,9 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlightshadow.frag").c_str());
-        TU_ntex = 0;
-        TU_dtex = 1;
-        TU_shadowtex = 2;
-        AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"), TexUnit(TU_shadowtex, "shadowtex"));
+
+        // Use 8 to circumvent a catalyst bug when binding sampler
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 8, "shadowtex");
         AssignUniforms("direction", "col");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1548,10 +1673,7 @@ namespace FullScreenShader
         }
 
         AssignUniforms("RSMMatrix", "RHMatrix", "extents");
-        TU_ctex = 0;
-        TU_ntex = 1;
-        TU_dtex = 2;
-        AssignTextureUnit(Program, TexUnit(TU_ctex, "ctex"), TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
+        AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
     NVWorkaroundRadianceHintsConstructionShader::NVWorkaroundRadianceHintsConstructionShader()
@@ -1593,12 +1715,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gi.frag").c_str());
 
         AssignUniforms("RHMatrix", "InvRHMatrix", "extents");
-        TU_ntex = 0;
-        TU_dtex = 1;
-        TU_SHR = 2;
-        TU_SHG = 3;
-        TU_SHB = 4;
-        AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"), TexUnit(TU_SHR, "SHR"), TexUnit(TU_SHG, "SHG"), TexUnit(TU_SHB, "SHB"));
+
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex", 2, "SHR", 3, "SHG", 4, "SHB");
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
@@ -1635,8 +1753,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6h.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     Gaussian3HBlurShader::Gaussian3HBlurShader()
@@ -1645,8 +1763,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3h.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     Gaussian17TapVShader::Gaussian17TapVShader()
@@ -1680,8 +1798,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian6v.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     Gaussian3VBlurShader::Gaussian3VBlurShader()
@@ -1690,8 +1808,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/gaussian3v.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     PassThroughShader::PassThroughShader()
@@ -1699,9 +1817,9 @@ namespace FullScreenShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
-        TU_tex = 0;
+
         AssignUniforms();
-        AssignTextureUnit(Program, TexUnit(TU_tex, "texture"));
+        AssignSamplerNames(Program, 0, "texture");
         vao = createVAO(Program);
     }
 
@@ -1722,8 +1840,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/linearizedepth.frag").c_str());
         AssignUniforms("zn", "zf");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "texture"));
+
+        AssignSamplerNames(Program, 0, "texture");
     }
 
     GlowShader::GlowShader()
@@ -1732,8 +1850,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow.frag").c_str());
         AssignUniforms();
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
         vao = createVAO(Program);
     }
 
@@ -1744,8 +1862,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/ssao.frag").c_str());
-        TU_dtex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_dtex, "dtex"));
+
+        AssignSamplerNames(Program, 0, "dtex");
         AssignUniforms("radius", "k", "sigma");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1758,9 +1876,9 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/fog.frag").c_str());
-        TU_tex = 0;
+
         AssignUniforms("fogmax", "startH", "endH", "start", "end", "col");
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1773,9 +1891,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/motion_blur.frag").c_str());
         AssignUniforms("previous_viewproj", "center", "boost_amount", "mask_radius");
-        TU_cb = 0;
-        TU_dtex = 1;
-        AssignTextureUnit(Program, TexUnit(TU_dtex, "dtex"), TexUnit(TU_cb, "color_buffer"));
+
+        AssignSamplerNames(Program, 0, "color_buffer", 1, "dtex");
     }
 
     GodFadeShader::GodFadeShader()
@@ -1784,8 +1901,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godfade.frag").c_str());
         AssignUniforms("col");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
         vao = createVAO(Program);
     }
 
@@ -1794,9 +1911,9 @@ namespace FullScreenShader
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/godray.frag").c_str());
-        TU_tex = 0;
+
         AssignUniforms("sunpos");
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+        AssignSamplerNames(Program, 0, "tex");
         vao = createVAO(Program);
     }
 
@@ -1806,8 +1923,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_color1.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
-        TU_colorMapG = 0;
-        AssignTextureUnit(Program, TexUnit(TU_colorMapG, "colorMapG"));
+
+        AssignSamplerNames(Program, 0, "colorMapG");
         vao = createVAO(Program);
     }
 
@@ -1817,9 +1934,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_blend2.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
-        TU_edgesMap = 0;
-        TU_areaMap = 1;
-        AssignTextureUnit(Program, TexUnit(TU_edgesMap, "edgesMap"), TexUnit(TU_areaMap, "areaMap"));
+
+        AssignSamplerNames(Program, 0, "edgesMap", 1, "areaMap");
         vao = createVAO(Program);
     }
 
@@ -1829,9 +1945,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/mlaa_offset.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/mlaa_neigh3.frag").c_str());
         AssignUniforms("PIXEL_SIZE");
-        TU_blendMap = 0;
-        TU_colorMap = 1;
-        AssignTextureUnit(Program, TexUnit(TU_blendMap, "blendMap"), TexUnit(TU_colorMap, "colorMap"));
+
+        AssignSamplerNames(Program, 0, "blendMap", 1, "colorMap");
         vao = createVAO(Program);
     }
 }
@@ -1844,8 +1959,8 @@ namespace UIShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/texturedquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/texturedquad.frag").c_str());
         AssignUniforms("center", "size", "texcenter", "texsize");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     UniformColoredTextureRectShader::UniformColoredTextureRectShader()
@@ -1855,8 +1970,8 @@ namespace UIShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/uniformcolortexturedquad.frag").c_str());
 
         AssignUniforms("center", "size", "texcenter", "texsize", "color");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
     }
 
     ColoredTextureRectShader::ColoredTextureRectShader()
@@ -1865,8 +1980,8 @@ namespace UIShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/colortexturedquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/colortexturedquad.frag").c_str());
         AssignUniforms("center", "size", "texcenter", "texsize");
-        TU_tex = 0;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"));
+
+        AssignSamplerNames(Program, 0, "tex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);

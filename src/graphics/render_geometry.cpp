@@ -122,13 +122,14 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
+        std::vector<GLuint> Textures;
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (!mesh.textures[j])
                 mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
-            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
         }
         if (mesh.VAOType != VertexType)
         {
@@ -137,6 +138,7 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
 #endif
             continue;
         }
+        Shader::getInstance()->SetTextureUnits(Textures);
         custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -178,6 +180,7 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
     glUseProgram(Shader::getInstance()->Program);
     for (unsigned i = 0; i < meshes->size(); i++)
     {
+        std::vector<GLuint> Textures;
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
 #ifdef DEBUG
         if (mesh.VAOType != VertexType)
@@ -186,11 +189,12 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
         glBindVertexArray(mesh.vao);
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
-            if (!mesh.textures[j])
+            if (!mesh.textures[TexUnits[j].m_id])
                 mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
-            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+            Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
         }
+        Shader::getInstance()->SetTextureUnits(Textures);
         instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -251,35 +255,35 @@ void IrrDriver::renderSolidFirstPass()
     {
         ScopedGPUTimer Timer(getGPUTimer(Q_SOLID_PASS1));
 
-        std::vector<TexUnit> object_pass1_texunits = TexUnits(TexUnit(MeshShader::ObjectPass1Shader::getInstance()->TU_tex, true) );
+        std::vector<TexUnit> object_pass1_texunits = TexUnits(TexUnit(0, true) );
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatDefault::getInstance());
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, ListMatSphereMap::getInstance());
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatDetails::getInstance());
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, ListMatSplatting::getInstance());
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(object_pass1_texunits, ListMatUnlit::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true)), ListMatAlphaRef::getInstance());
-        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::GrassPass1Shader::getInstance()->TU_tex, true)), ListMatGrass::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), ListMatAlphaRef::getInstance());
+        renderMeshes1stPass<MeshShader::GrassPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), ListMatGrass::getInstance());
         renderMeshes1stPass<MeshShader::NormalMapShader, video::EVT_TANGENTS, 2, 1>(TexUnits(
-            TexUnit(MeshShader::NormalMapShader::getInstance()->TU_glossy, true),
-            TexUnit(MeshShader::NormalMapShader::getInstance()->TU_normalmap, false)
+            TexUnit(1, false),
+            TexUnit(0, true)
         ), ListMatNormalMap::getInstance());
 
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(object_pass1_texunits, AnimatedListMatDefault::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(MeshShader::ObjectRefPass1Shader::getInstance()->TU_tex, true)), AnimatedListMatAlphaRef::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(object_pass1_texunits, AnimatedListMatDetails::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(object_pass1_texunits, AnimatedListMatUnlit::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDefault::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatAlphaRef::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDetails::getInstance());
+        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatUnlit::getInstance());
 
         renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, video::EVT_STANDARD>(
-                    TexUnits(TexUnit(MeshShader::InstancedObjectPass1Shader::getInstance()->TU_tex, true)),
+                    TexUnits(TexUnit(0, true)),
                     ListInstancedMatDefault::getInstance());
         renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, video::EVT_STANDARD>(
-                    TexUnits(TexUnit(MeshShader::InstancedObjectRefPass1Shader::getInstance()->TU_tex, true)),
+                    TexUnits(TexUnit(0, true)),
                     ListInstancedMatAlphaRef::getInstance());
         renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, video::EVT_STANDARD, 2>(
-                    TexUnits(TexUnit(MeshShader::InstancedGrassPass1Shader::getInstance()->TU_tex, true)),
+                    TexUnits(TexUnit(0, true)),
                     ListInstancedMatGrass::getInstance());
         renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, video::EVT_TANGENTS>(
-            TexUnits(TexUnit(MeshShader::InstancedNormalMapShader::getInstance()->TU_glossy, true), TexUnit(MeshShader::InstancedNormalMapShader::getInstance()->TU_normalmap, false)),
+            TexUnits(TexUnit(1, false), TexUnit(0, true)),
             ListInstancedMatNormalMap::getInstance());
     }
 }
@@ -291,13 +295,14 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
+        std::vector<GLuint> Textures;
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
-            if (!mesh.textures[j])
-                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
-            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            if (!mesh.textures[TexUnits[j].m_id])
+                mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+            Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
             if (irr_driver->getLightViz())
             {
                 GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
@@ -317,6 +322,7 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
 #endif
             continue;
         }
+        Shader::getInstance()->SetTextureUnits(Textures);
         custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -329,12 +335,13 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vec
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
         glBindVertexArray(mesh.vao);
+        std::vector<GLuint> Textures;
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
-            if (!mesh.textures[j])
-                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[j], TexUnits[j].m_premul_alpha);
-            setTexture(TexUnits[j].m_id, getTextureGLuint(mesh.textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            if (!mesh.textures[TexUnits[j].m_id])
+                mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+            Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
             if (irr_driver->getLightViz())
             {
                 GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
@@ -346,7 +353,7 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vec
                 glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
             }
         }
-
+        Shader::getInstance()->SetTextureUnits(Textures);
         instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -373,8 +380,20 @@ void IrrDriver::renderSolidSecondPass()
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_ALPHA_TEST);
     glDisable(GL_BLEND);
+#ifdef GL_VERSION_3_3
+    if (irr_driver->getGLSLVersion() >= 330)
+        glBindSampler(0, 0);
+#endif
     setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
+#ifdef GL_VERSION_3_3
+    if (irr_driver->getGLSLVersion() >= 330)
+        glBindSampler(1, 0);
+#endif
     setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
+#ifdef GL_VERSION_3_3
+    if (irr_driver->getGLSLVersion() >= 330)
+        glBindSampler(2, 0);
+#endif
     setTexture(2, m_rtts->getRenderTarget(RTT_HALF1_R), GL_LINEAR, GL_LINEAR);
 
     {
@@ -383,70 +402,68 @@ void IrrDriver::renderSolidSecondPass()
         m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
+            TexUnit(0, true)
         ), ListMatDefault::getInstance());
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
+            TexUnit(0, true)
             ), AnimatedListMatDefault::getInstance());
 
         renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
-            TexUnit(MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true)
+            TexUnit(0, true)
         ), ListMatAlphaRef::getInstance());
         renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
-            TexUnit(MeshShader::ObjectRefPass2Shader::getInstance()->TU_Albedo, true)
+            TexUnit(0, true)
             ), AnimatedListMatAlphaRef::getInstance());
 
         renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(MeshShader::SphereMapShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
         ), ListMatSphereMap::getInstance());
 
         renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
-            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true),
-            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true)
+            TexUnit(0, true),
+            TexUnit(1, true)
         ), ListMatDetails::getInstance());
         renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
-            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_Albedo, true),
-            TexUnit(MeshShader::DetailledObjectPass2Shader::getInstance()->TU_detail, true)
+            TexUnit(0, true),
+            TexUnit(1, true)
             ), AnimatedListMatDetails::getInstance());
 
         renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(MeshShader::GrassPass2Shader::getInstance()->TU_Albedo, true)
+            TexUnit(0, true)
         ), ListMatGrass::getInstance());
 
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
         ), ListMatUnlit::getInstance());
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(MeshShader::ObjectUnlitShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
             ), AnimatedListMatUnlit::getInstance());
 
         renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 1>(TexUnits(
-            TexUnit(8, true),
-            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_layout, false),
-            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail0, true),
-            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail1, true),
-            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail2, true),
-            TexUnit(MeshShader::SplattingShader::getInstance()->TU_tex_detail3, true)
+            TexUnit(1, false),
+            TexUnit(2, true),
+            TexUnit(3, true),
+            TexUnit(4, true),
+            TexUnit(5, true)
         ), ListMatSplatting::getInstance());
 
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 3, 1>(TexUnits(
-            TexUnit(MeshShader::ObjectPass2Shader::getInstance()->TU_Albedo, true)
+            TexUnit(0, true)
         ), ListMatNormalMap::getInstance());
 
 
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
-            TexUnits(TexUnit(MeshShader::InstancedObjectPass2Shader::getInstance()->TU_Albedo, true)),
+            TexUnits(TexUnit(0, true)),
             ListInstancedMatDefault::getInstance());
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
-            TexUnits(TexUnit(MeshShader::InstancedObjectPass2Shader::getInstance()->TU_Albedo, true)),
+            TexUnits(TexUnit(0, true)),
             ListInstancedMatNormalMap::getInstance());
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader>(
-            TexUnits(TexUnit(MeshShader::InstancedObjectRefPass2Shader::getInstance()->TU_Albedo, true)),
+            TexUnits(TexUnit(0, true)),
             ListInstancedMatAlphaRef::getInstance());
-        setTexture(MeshShader::InstancedGrassPass2Shader::getInstance()->TU_dtex,
-            irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+        setTexture(4, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
         renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, 3, 2>(
-            TexUnits(TexUnit(MeshShader::InstancedGrassPass2Shader::getInstance()->TU_Albedo, true)),
+            TexUnits(TexUnit(0, true)),
             ListInstancedMatGrass::getInstance());
     }
     m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -511,22 +528,22 @@ void IrrDriver::renderTransparent()
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
-            TexUnit(MeshShader::TransparentFogShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
         ), ListBlendTransparentFog::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
         renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
-            TexUnit(MeshShader::TransparentFogShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
         ), ListAdditiveTransparentFog::getInstance());
     }
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
         renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(MeshShader::TransparentShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
         ), ListBlendTransparent::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
         renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(MeshShader::TransparentShader::getInstance()->TU_tex, true)
+            TexUnit(0, true)
         ), ListAdditiveTransparent::getInstance());
     }
 
@@ -590,10 +607,11 @@ void IrrDriver::renderTransparent()
         GLenum itype = mesh.IndexType;
         size_t count = mesh.IndexCount;
         // Render the effect
-        setTexture(MeshShader::DisplaceShader::getInstance()->TU_displacement_tex, getTextureGLuint(displaceTex), GL_LINEAR, GL_LINEAR, true);
-        setTexture(MeshShader::DisplaceShader::getInstance()->TU_mask_tex, irr_driver->getRenderTargetTexture(RTT_TMP1), GL_LINEAR, GL_LINEAR, true);
-        setTexture(MeshShader::DisplaceShader::getInstance()->TU_color_tex, irr_driver->getRenderTargetTexture(RTT_COLOR), GL_LINEAR, GL_LINEAR, true);
-        setTexture(MeshShader::DisplaceShader::getInstance()->TU_tex, getTextureGLuint(mesh.textures[0]), GL_LINEAR, GL_LINEAR, true);
+        MeshShader::DisplaceShader::getInstance()->SetTextureUnits(
+            createVector<GLuint>(getTextureGLuint(displaceTex),
+                irr_driver->getRenderTargetTexture(RTT_COLOR),
+                irr_driver->getRenderTargetTexture(RTT_TMP1),
+                getTextureGLuint(mesh.textures[0])));
         glUseProgram(MeshShader::DisplaceShader::getInstance()->Program);
         MeshShader::DisplaceShader::getInstance()->setUniforms(AbsoluteTransformation,
             core::vector2df(cb->getDirX(), cb->getDirY()),
@@ -651,13 +669,14 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t->size(); i++)
     {
+        std::vector<GLuint> Textures;
         const GLMesh *mesh = STK::tuple_get<0>(t->at(i));
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
-            compressTexture(mesh->textures[j], true);
-            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            compressTexture(mesh->textures[TextureUnits[j]], true);
+            Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
         }
-
+        T::getInstance()->SetTextureUnits(Textures);
         shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t->at(i));
     }
 }
@@ -699,14 +718,15 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, const std::ve
     glUseProgram(T::getInstance()->Program);
     for (unsigned i = 0; i < t->size(); i++)
     {
+        std::vector<GLuint> Textures;
         const GLMesh *mesh = STK::tuple_get<0>(t->at(i));
         glBindVertexArray(mesh->vao_shadow_pass);
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
-            compressTexture(mesh->textures[j], true);
-            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            compressTexture(mesh->textures[TextureUnits[j]], true);
+            Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
         }
-
+        T::getInstance()->SetTextureUnits(Textures);
         instanced_shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t->at(i));
     }
 }
@@ -749,18 +769,18 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, ListMatDetails::getInstance());
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, ListMatSplatting::getInstance());
     renderShadow<MeshShader::ShadowShader, EVT_TANGENTS, 1>(noTexUnits, ListMatNormalMap::getInstance());
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, ListMatAlphaRef::getInstance());
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, ListMatUnlit::getInstance());
-    renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(std::vector<GLuint>{ MeshShader::GrassShadowShader::getInstance()->TU_tex }, ListMatGrass::getInstance());
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, ListMatAlphaRef::getInstance());
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, ListMatUnlit::getInstance());
+    renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(std::vector<GLuint>{ 0 }, ListMatGrass::getInstance());
 
     renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(noTexUnits, AnimatedListMatDefault::getInstance());
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, AnimatedListMatAlphaRef::getInstance());
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ MeshShader::RefShadowShader::getInstance()->TU_tex }, AnimatedListMatUnlit::getInstance());
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, AnimatedListMatAlphaRef::getInstance());
+    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, AnimatedListMatUnlit::getInstance());
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, AnimatedListMatDetails::getInstance());
 
     renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
-    renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ MeshShader::InstancedRefShadowShader::getInstance()->TU_tex }, ListInstancedMatAlphaRef::getInstance());
-    renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ MeshShader::InstancedGrassShadowShader::getInstance()->TU_tex }, ListInstancedMatGrass::getInstance());
+    renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ 0 }, ListInstancedMatAlphaRef::getInstance());
+    renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ 0 }, ListInstancedMatGrass::getInstance());
     renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatNormalMap::getInstance());
 
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -798,14 +818,16 @@ void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> &Textur
     glBindVertexArray(getVAO(VertexType));
     for (unsigned i = 0; i < t->size(); i++)
     {
+        std::vector<GLuint> Textures;
         GLMesh *mesh = STK::tuple_get<0>(t->at(i));
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
-            if (!mesh->textures[j])
-                mesh->textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh->textures[j], true);
-            setTexture(TextureUnits[j], getTextureGLuint(mesh->textures[j]), GL_LINEAR, GL_LINEAR_MIPMAP_LINEAR, true);
+            if (!mesh->textures[TextureUnits[j]])
+                mesh->textures[TextureUnits[j]] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh->textures[TextureUnits[j]], true);
+            Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
         }
+        T::getInstance()->SetTextureUnits(Textures);
         rsm_custom_unroll_args<Selector...>::template exec<T>(rsm_matrix, t->at(i));
     }
 }
@@ -815,18 +837,10 @@ void IrrDriver::renderRSM()
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatDefault::getInstance());
-    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatAlphaRef::getInstance());
-    drawRSM<MeshShader::RSMShader, EVT_TANGENTS, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatNormalMap::getInstance());
-    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatUnlit::getInstance());
-    drawRSM<MeshShader::RSMShader, EVT_2TCOORDS, 3, 1>(rsm_matrix, std::vector<GLuint>{ MeshShader::RSMShader::getInstance()->TU_tex }, ListMatDetails::getInstance());
-    drawRSM<MeshShader::SplattingRSMShader, EVT_2TCOORDS, 1>(rsm_matrix,
-        std::vector<GLuint>{
-            8,
-            MeshShader::SplattingRSMShader::getInstance()->TU_layout,
-            MeshShader::SplattingRSMShader::getInstance()->TU_detail0,
-            MeshShader::SplattingRSMShader::getInstance()->TU_detail1,
-            MeshShader::SplattingRSMShader::getInstance()->TU_detail2,
-            MeshShader::SplattingRSMShader::getInstance()->TU_detail3},
-            ListMatSplatting::getInstance());
+    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatDefault::getInstance());
+    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatAlphaRef::getInstance());
+    drawRSM<MeshShader::RSMShader, EVT_TANGENTS, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatNormalMap::getInstance());
+    drawRSM<MeshShader::RSMShader, EVT_STANDARD, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatUnlit::getInstance());
+    drawRSM<MeshShader::RSMShader, EVT_2TCOORDS, 3, 1>(rsm_matrix, std::vector<GLuint>{ 0 }, ListMatDetails::getInstance());
+    drawRSM<MeshShader::SplattingRSMShader, EVT_2TCOORDS, 1>(rsm_matrix, createVector<GLuint>(1, 2, 3, 4, 5), ListMatSplatting::getInstance());
 }
