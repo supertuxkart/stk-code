@@ -90,6 +90,7 @@ PFNGLDELETESAMPLERSPROC glDeleteSamplers;
 PFNGLBINDSAMPLERPROC glBindSampler;
 PFNGLSAMPLERPARAMETERFPROC glSamplerParameterf;
 PFNGLSAMPLERPARAMETERIPROC glSamplerParameteri;
+PFNGLGETSTRINGIPROC glGetStringi;
 #endif
 
 static bool is_gl_init = false;
@@ -262,6 +263,7 @@ void initGL()
     glBindSampler = (PFNGLBINDSAMPLERPROC)IRR_OGL_LOAD_EXTENSION("glBindSampler");
     glSamplerParameterf = (PFNGLSAMPLERPARAMETERFPROC)IRR_OGL_LOAD_EXTENSION("glSamplerParameterf");
     glSamplerParameteri = (PFNGLSAMPLERPARAMETERIPROC)IRR_OGL_LOAD_EXTENSION("glSamplerParameteri");
+    glGetStringi = (PFNGLGETSTRINGIPROC)IRR_OGL_LOAD_EXTENSION("glGetstringi");
 #ifdef DEBUG
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
@@ -1175,23 +1177,27 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 
 bool hasGLExtension(const char* extension) 
 {
-#ifdef WIN32
-    return false;
-#else
-    GLint numExtensions = 0;
-    glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
-    Log::debug("GLWrap", "Found %d OpenGL Extensions", numExtensions);
-    for (GLint i = 0; i < numExtensions; i++)
+    if (glGetStringi != NULL)
     {
-        const char* foundExtension =
-            (const char*) glGetStringi(GL_EXTENSIONS, i);
-        if (foundExtension && strcmp(foundExtension, extension) == 0)
+        GLint numExtensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+        for (GLint i = 0; i < numExtensions; i++)
         {
-            Log::debug("GLWrap", "Extension %s found", extension);
+            const char* foundExtension =
+                (const char*) glGetStringi(GL_EXTENSIONS, i);
+            if (foundExtension && strcmp(foundExtension, extension) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        if (extensions && strstr(extensions, extension) != NULL)
+        {
             return true;
         }
     }
-    Log::debug("GLWrap", "Extension %s not found", extension);
     return false;
-#endif
 }
