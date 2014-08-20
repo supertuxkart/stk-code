@@ -2429,7 +2429,7 @@ void Kart::kartIsInRestNow()
         f +=  wi.m_chassisConnectionPointCS.getY()
             - wi.m_raycastInfo.m_suspensionLength - wi.m_wheelsRadius;
     }
-    m_graphical_y_offset = f/m_vehicle->getNumWheels() + 0.1f;
+    m_graphical_y_offset = f/m_vehicle->getNumWheels() + 0.0f;
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow

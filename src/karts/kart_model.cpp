@@ -541,7 +541,7 @@ bool KartModel::loadModels(const KartProperties &kart_properties)
         }
     }
     for(unsigned int i=0; i<4; i++)
-        m_wheel_graphics_position[i].setY(m_wheel_graphics_position[i].getY()-0.1f);
+        m_wheel_graphics_position[i].setY(m_wheel_graphics_position[i].getY()-0.0f);
 
     // Load the wheel models. This can't be done early, since the default
     // values for the graphical position must be defined, which in turn
