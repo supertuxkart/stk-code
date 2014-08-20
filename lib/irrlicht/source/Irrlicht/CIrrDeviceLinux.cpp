@@ -1590,7 +1590,6 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 				}
 				XFree(modes);
 			}
-			else
 			#endif
 			#ifdef _IRR_LINUX_X11_RANDR_
 			while (XRRQueryExtension(display, &eventbase, &errorbase))
