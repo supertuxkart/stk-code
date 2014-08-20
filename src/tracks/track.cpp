@@ -270,7 +270,7 @@ void Track::cleanup()
 {
     QuadGraph::destroy();
     ItemManager::destroy();
-    resetVAO();
+    VAOManager::kill();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     // Clear reminder of transformed textures

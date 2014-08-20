@@ -119,7 +119,7 @@ template<typename Shader, enum E_VERTEX_TYPE VertexType, int ...List, typename..
 void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -292,7 +292,7 @@ template<typename Shader, enum E_VERTEX_TYPE VertexType, int...List, typename...
 void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -473,7 +473,7 @@ template<enum E_VERTEX_TYPE VertexType, typename... TupleType>
 static void renderMeshNormals(std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
@@ -522,7 +522,7 @@ void IrrDriver::renderTransparent()
     ListDisplacement::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
 
-    glBindVertexArray(getVAO(EVT_STANDARD));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
 
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
@@ -568,7 +568,7 @@ void IrrDriver::renderTransparent()
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    glBindVertexArray(getVAO(EVT_2TCOORDS));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
@@ -666,7 +666,7 @@ template<typename T, enum E_VERTEX_TYPE VertexType, int...List, typename... Args
 void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<Args...> > *t)
 {
     glUseProgram(T::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < t->size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -815,7 +815,7 @@ template<typename T, enum E_VERTEX_TYPE VertexType, int... Selector, typename...
 void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> &TextureUnits, std::vector<STK::Tuple<Args...> > *t)
 {
     glUseProgram(T::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < t->size(); i++)
     {
         std::vector<GLuint> Textures;

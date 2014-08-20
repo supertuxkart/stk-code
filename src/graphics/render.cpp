@@ -768,7 +768,7 @@ void IrrDriver::renderGlow(std::vector<GlowData>& glows)
     glDepthMask(GL_FALSE);
     glDisable(GL_BLEND);
 
-    glBindVertexArray(getVAO(EVT_STANDARD));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
     for (u32 i = 0; i < glowcount; i++)
     {
         const GlowData &dat = glows[i];
