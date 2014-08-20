@@ -23,7 +23,8 @@
 #include <IMeshSceneNode.h>
 #include <ISceneNode.h>
 
-Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node, float scale = 1.0, float xOffset = 0.0, float yOffset = 0.0)
+Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node, 
+               float scale = 1.0, float xOffset = 0.0, float yOffset = 0.0)
 {
     video::SMaterial m;
     m.setTexture(0, texture);
@@ -49,6 +50,7 @@ Shadow::Shadow(video::ITexture *texture, scene::ISceneNode *node, float scale = 
     buffer->recalculateBoundingBox();
 
     m_node   = irr_driver->addMesh(m_mesh);
+    m_node->setPosition(core::vector3df(0, -0.1f, 0));
 #ifdef DEBUG
     m_node->setName("shadow");
 #endif
