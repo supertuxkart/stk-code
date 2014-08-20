@@ -1214,18 +1214,25 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
     glGetError();
 }
 
-bool hasGLExtension(const char* extension) {
+bool hasGLExtension(const char* extension) 
+{
+#ifdef WIN32
+    return false;
+#else
     GLint numExtensions = 0;
     glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
     Log::debug("GLWrap", "Found %d OpenGL Extensions", numExtensions);
-    for (GLint i = 0; i < numExtensions; i++) {
+    for (GLint i = 0; i < numExtensions; i++)
+    {
         const char* foundExtension =
             (const char*) glGetStringi(GL_EXTENSIONS, i);
-        if (foundExtension && strcmp(foundExtension, extension) == 0) {
+        if (foundExtension && strcmp(foundExtension, extension) == 0)
+        {
             Log::debug("GLWrap", "Extension %s found", extension);
             return true;
         }
     }
     Log::debug("GLWrap", "Extension %s not found", extension);
     return false;
+#endif
 }
