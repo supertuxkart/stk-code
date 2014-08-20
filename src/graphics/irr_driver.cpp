@@ -472,11 +472,11 @@ void IrrDriver::initDevice()
         m_need_rh_workaround = false;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
-        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != nullptr && (GLMajorVersion == 3 && GLMinorVersion == 1))
+        if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (GLMajorVersion == 3 && GLMinorVersion == 1))
             m_need_ubo_workaround = true;
 #endif
         // Fix for Nvidia and instanced RH
-        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != nullptr)
+        if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
             m_need_rh_workaround = true;
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
