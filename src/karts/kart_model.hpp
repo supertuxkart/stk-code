@@ -169,6 +169,9 @@ private:
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
     
+    /** Length of the physics suspension when the kart is at rest. */
+    float m_default_physics_suspension[4];
+
     /** Minimum suspension length. If the displayed suspension is
      *  shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
@@ -227,8 +230,9 @@ public:
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
+    void          setDefaultSuspension();
     void          update(float dt, float rotation_dt, float steer,
-                         const float height_abve_terrain[4], float speed);
+                         float speed);
     void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);

@@ -677,9 +677,7 @@ void World::resetAllKarts()
 
     for ( KartList::iterator i=m_karts.begin(); i!=m_karts.end(); i++)
     {
-        // Update the kart transforms with the newly computed position
-        // after all karts are reset
-        (*i)->setTrans((*i)->getBody()->getWorldTransform());
+        (*i)->kartIsInRestNow();
     }
 
     // Initialise the cameras, now that the correct kart positions are set
@@ -799,6 +797,7 @@ void World::updateWorld(float dt)
     }
     catch (AbortWorldUpdateException& e)
     {
+        (void)e;   // avoid compiler warning
         return;
     }
 
