@@ -35,8 +35,6 @@
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
 
-#include <functional>
-
 using namespace irr;
 using namespace gui;
 
@@ -439,6 +437,7 @@ bool onEvent(const SEvent &event)
                 }
                 else if (cmdID == DEBUG_VISUAL_VALUES)
                 {
+#if !defined(__APPLE__)
                     DebugSliderDialog *dsd = new DebugSliderDialog();
                     dsd->setSliderHook( "red_slider", 0, 255, [](){ return irr_driver->getAmbientLight().r * 255.; },
                         [](int v){
@@ -467,6 +466,7 @@ bool onEvent(const SEvent &event)
                     dsd->setSliderHook("ssao_sigma", 0, 100, [](){ return irr_driver->getSSAOSigma() * 10; },
                         [](int v){irr_driver->setSSAOSigma(v / 10.); }
                     );
+#endif
                 }
             }
 

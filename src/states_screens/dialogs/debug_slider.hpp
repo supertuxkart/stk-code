@@ -33,14 +33,17 @@ class DebugSliderDialog : public GUIEngine::ModalDialog
 private:
 
     std::string m_id;
+#if !defined(__APPLE__)
     std::map<std::string, std::function<void(int)> >Setters;
+#endif
 
 public:
     DebugSliderDialog();
 
     ~DebugSliderDialog();
-
+#if !defined(__APPLE__)
     void setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S);
+#endif
 
     virtual void onEnterPressedInternal() OVERRIDE;
     virtual void onUpdate(float dt) OVERRIDE;

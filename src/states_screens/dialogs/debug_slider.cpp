@@ -39,6 +39,7 @@ DebugSliderDialog::DebugSliderDialog() : ModalDialog(0.85f, 0.25f, MODAL_DIALOG_
     loadFromFile("debug_slider.stkgui");
 }
 
+#if !defined(__APPLE__)
 void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max, std::function<int()> G, std::function<void(int)> S)
 {
     getWidget<SpinnerWidget>(id.c_str())->setValue(G());
@@ -46,6 +47,7 @@ void DebugSliderDialog::setSliderHook(std::string id, unsigned min, unsigned max
     getWidget<SpinnerWidget>(id.c_str())->setMax(max);
     Setters[id] = S;
 }
+#endif
 
 // ------------------------------------------------------------------------------------------------------
 
