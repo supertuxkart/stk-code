@@ -69,12 +69,16 @@ void DebugSliderDialog::onEnterPressedInternal()
 
 GUIEngine::EventPropagation DebugSliderDialog::processEvent(const std::string& eventSource)
 {
+#if !defined(__APPLE__)
     if (Setters.find(eventSource) == Setters.end())
+#endif
         return GUIEngine::EVENT_LET;
+#if !defined(__APPLE__)
     int value = getWidget<SpinnerWidget>(eventSource.c_str())->getValue();
     Log::info("DebugSlider", "Value for <%s> : %i", eventSource.c_str(), value);
     Setters[eventSource](value);
     return GUIEngine::EVENT_BLOCK;
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------------
