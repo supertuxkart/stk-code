@@ -103,6 +103,8 @@
 
 using namespace video;
 
+std::vector<void(*)()> CleanTable;
+
 Shaders::Shaders()
 {
     // Callbacks
@@ -397,6 +399,10 @@ void Shaders::loadShaders()
     }
 
     initGL();
+    // Clean alive shaders
+    for (unsigned i = 0; i < CleanTable.size(); i++)
+        CleanTable[i]();
+    CleanTable.clear();
     initQuadVBO();
     initQuadBuffer();
     initBillboardVBO();

@@ -124,6 +124,8 @@ struct UniformHelper
 
 void bypassUBO(GLuint Program);
 
+extern std::vector<void(*)()> CleanTable;
+
 template<typename T, typename... Args>
 class ShaderHelperSingleton : public Singleton<T>
 {
@@ -150,6 +152,16 @@ protected:
 
 public:
     GLuint Program;
+
+    ShaderHelperSingleton()
+    {
+        CleanTable.push_back(this->kill);
+    }
+
+    ~ShaderHelperSingleton()
+    {
+        glDeleteProgram(Program);
+    }
 
     void setUniforms(const Args & ... args) const
     {
@@ -408,6 +420,12 @@ public:
         }
         else
             BindTexture<tp...>::exec(TextureUnits, args, 0);
+    }
+
+    ~TextureRead()
+    {
+        for (unsigned i = 0; i < SamplersId.size(); i++)
+            glDeleteSamplers(1, &SamplersId[i]);
     }
 };
 
