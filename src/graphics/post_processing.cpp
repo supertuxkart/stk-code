@@ -217,7 +217,7 @@ static void DrawFullScreenEffect(Args...args)
 static
 void renderBloom(GLuint in)
 {
-    FullScreenShader::BloomShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ in });
+    FullScreenShader::BloomShader::getInstance()->SetTextureUnits(createVector<GLuint>(in));
     DrawFullScreenEffect<FullScreenShader::BloomShader>();
 }
 
@@ -304,13 +304,13 @@ void PostProcessing::renderGaussian3Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     {
         auxiliary.Bind();
 
-        FullScreenShader::Gaussian3VBlurShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ in_fbo.getRTT()[0] });
+        FullScreenShader::Gaussian3VBlurShader::getInstance()->SetTextureUnits(createVector<GLuint>(in_fbo.getRTT()[0]));
         DrawFullScreenEffect<FullScreenShader::Gaussian3VBlurShader>(core::vector2df(inv_width, inv_height));
     }
     {
         in_fbo.Bind();
 
-        FullScreenShader::Gaussian3HBlurShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ auxiliary.getRTT()[0] });
+        FullScreenShader::Gaussian3HBlurShader::getInstance()->SetTextureUnits(createVector<GLuint>(auxiliary.getRTT()[0]));
         DrawFullScreenEffect<FullScreenShader::Gaussian3HBlurShader>(core::vector2df(inv_width, inv_height));
     }
 }
@@ -322,13 +322,13 @@ void PostProcessing::renderGaussian6Blur(FrameBuffer &in_fbo, FrameBuffer &auxil
     {
         auxiliary.Bind();
 
-        FullScreenShader::Gaussian6VBlurShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ in_fbo.getRTT()[0] });
+        FullScreenShader::Gaussian6VBlurShader::getInstance()->SetTextureUnits(createVector<GLuint>(in_fbo.getRTT()[0]));
         DrawFullScreenEffect<FullScreenShader::Gaussian6VBlurShader>(core::vector2df(inv_width, inv_height));
     }
     {
         in_fbo.Bind();
 
-        FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ auxiliary.getRTT()[0] });
+        FullScreenShader::Gaussian6HBlurShader::getInstance()->SetTextureUnits(createVector<GLuint>(auxiliary.getRTT()[0]));
         DrawFullScreenEffect<FullScreenShader::Gaussian6HBlurShader>(core::vector2df(inv_width, inv_height));
     }
 }
@@ -399,7 +399,7 @@ void PostProcessing::renderPassThrough(GLuint tex)
     glUseProgram(FullScreenShader::PassThroughShader::getInstance()->Program);
     glBindVertexArray(FullScreenShader::PassThroughShader::getInstance()->vao);
 
-    FullScreenShader::PassThroughShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ tex });
+    FullScreenShader::PassThroughShader::getInstance()->SetTextureUnits(createVector<GLuint>(tex));
     FullScreenShader::PassThroughShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -424,7 +424,7 @@ void PostProcessing::renderGlow(unsigned tex)
     glUseProgram(FullScreenShader::GlowShader::getInstance()->Program);
     glBindVertexArray(FullScreenShader::GlowShader::getInstance()->vao);
 
-    FullScreenShader::GlowShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ tex });
+    FullScreenShader::GlowShader::getInstance()->SetTextureUnits(createVector<GLuint>(tex));
     FullScreenShader::GlowShader::getInstance()->setUniforms();
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -438,11 +438,11 @@ void PostProcessing::renderSSAO()
 
     // Generate linear depth buffer
     irr_driver->getFBO(FBO_LINEAR_DEPTH).Bind();
-    FullScreenShader::LinearizeDepthShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ irr_driver->getDepthStencilTexture() });
+    FullScreenShader::LinearizeDepthShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getDepthStencilTexture()));
     DrawFullScreenEffect<FullScreenShader::LinearizeDepthShader>(irr_driver->getSceneManager()->getActiveCamera()->getNearValue(), irr_driver->getSceneManager()->getActiveCamera()->getFarValue());
     irr_driver->getFBO(FBO_SSAO).Bind();
 
-    FullScreenShader::SSAOShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH) });
+    FullScreenShader::SSAOShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_LINEAR_DEPTH)));
     glGenerateMipmap(GL_TEXTURE_2D);
 
     DrawFullScreenEffect<FullScreenShader::SSAOShader>(irr_driver->getSSAORadius(), irr_driver->getSSAOK(), irr_driver->getSSAOSigma());
@@ -470,7 +470,7 @@ void PostProcessing::renderFog()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 
-    FullScreenShader::FogShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ irr_driver->getDepthStencilTexture() });
+    FullScreenShader::FogShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getDepthStencilTexture()));
     DrawFullScreenEffect<FullScreenShader::FogShader>(fogmax, startH, endH, start, end, col);
 
     glEnable(GL_DEPTH_TEST);
@@ -498,7 +498,7 @@ void PostProcessing::renderMotionBlur(unsigned cam, FrameBuffer &in_fbo, FrameBu
     out_fbo.Bind();
     glClear(GL_COLOR_BUFFER_BIT);
 
-    FullScreenShader::MotionBlurShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ in_fbo.getRTT()[0], irr_driver->getDepthStencilTexture() });
+    FullScreenShader::MotionBlurShader::getInstance()->SetTextureUnits(createVector<GLuint>(in_fbo.getRTT()[0], irr_driver->getDepthStencilTexture()));
     DrawFullScreenEffect<FullScreenShader::MotionBlurShader>(
                                   // Todo : use a previousPVMatrix per cam, not global
                                   irr_driver->getPreviousPVMatrix(),
@@ -511,7 +511,7 @@ static void renderGodFade(GLuint tex, const SColor &col)
 {
     glUseProgram(FullScreenShader::GodFadeShader::getInstance()->Program);
     glBindVertexArray(FullScreenShader::GodFadeShader::getInstance()->vao);
-    FullScreenShader::GodFadeShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ tex });
+    FullScreenShader::GodFadeShader::getInstance()->SetTextureUnits(createVector<GLuint>(tex));
     FullScreenShader::GodFadeShader::getInstance()->setUniforms(col);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -521,7 +521,7 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 {
     glUseProgram(FullScreenShader::GodRayShader::getInstance()->Program);
     glBindVertexArray(FullScreenShader::GodRayShader::getInstance()->vao);
-    FullScreenShader::GodRayShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ tex });
+    FullScreenShader::GodRayShader::getInstance()->SetTextureUnits(createVector<GLuint>(tex));
     FullScreenShader::GodRayShader::getInstance()->setUniforms(sunpos);
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -530,14 +530,14 @@ static void renderGodRay(GLuint tex, const core::vector2df &sunpos)
 static void toneMap(FrameBuffer &fbo, GLuint rtt)
 {
     fbo.Bind();
-    FullScreenShader::ToneMapShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ rtt });
+    FullScreenShader::ToneMapShader::getInstance()->SetTextureUnits(createVector<GLuint>(rtt));
     DrawFullScreenEffect<FullScreenShader::ToneMapShader>();
 }
 
 static void renderDoF(FrameBuffer &fbo, GLuint rtt)
 {
     fbo.Bind();
-    FullScreenShader::DepthOfFieldShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ rtt, irr_driver->getDepthStencilTexture() });
+    FullScreenShader::DepthOfFieldShader::getInstance()->SetTextureUnits(createVector<GLuint>(rtt, irr_driver->getDepthStencilTexture()));
     DrawFullScreenEffect<FullScreenShader::DepthOfFieldShader>();
 }
 
@@ -554,7 +554,7 @@ void PostProcessing::applyMLAA()
 
     // Pass 1: color edge detection
     glUseProgram(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->Program);
-    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->SetTextureUnits(std::vector<GLuint>{ irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS) });
+    FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_MLAA_COLORS)));
     FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->setUniforms(PIXEL_SIZE);
 
     glBindVertexArray(FullScreenShader::MLAAColorEdgeDetectionSHader::getInstance()->vao);
@@ -568,7 +568,7 @@ void PostProcessing::applyMLAA()
     glClear(GL_COLOR_BUFFER_BIT);
 
     glUseProgram(FullScreenShader::MLAABlendWeightSHader::getInstance()->Program);
-    FullScreenShader::MLAABlendWeightSHader::getInstance()->SetTextureUnits(std::vector<GLuint>{ irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), getTextureGLuint(m_areamap) });
+    FullScreenShader::MLAABlendWeightSHader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_MLAA_TMP), getTextureGLuint(m_areamap)));
     FullScreenShader::MLAABlendWeightSHader::getInstance()->setUniforms(PIXEL_SIZE);
 
     glBindVertexArray(FullScreenShader::MLAABlendWeightSHader::getInstance()->vao);
@@ -581,7 +581,7 @@ void PostProcessing::applyMLAA()
     irr_driver->getFBO(FBO_MLAA_COLORS).Bind();
 
     glUseProgram(FullScreenShader::MLAAGatherSHader::getInstance()->Program);
-    FullScreenShader::MLAAGatherSHader::getInstance()->SetTextureUnits(std::vector<GLuint>{ irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), irr_driver->getRenderTargetTexture(RTT_MLAA_TMP)});
+    FullScreenShader::MLAAGatherSHader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_MLAA_BLEND), irr_driver->getRenderTargetTexture(RTT_MLAA_TMP)));
     FullScreenShader::MLAAGatherSHader::getInstance()->setUniforms(PIXEL_SIZE);
 
     glBindVertexArray(FullScreenShader::MLAAGatherSHader::getInstance()->vao);
