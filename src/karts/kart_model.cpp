@@ -113,8 +113,8 @@ KartModel::KartModel(bool is_master)
 
         // default value for kart suspensions. move to config file later
         // if we find each kart needs custom values
-        m_min_suspension[i] = -0.59f;
-        m_max_suspension[i] = 0.59f;
+        m_min_suspension[i] = -0.07;
+        m_max_suspension[i] = 0.20f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
     m_wheel_filename[0] = "";
@@ -782,15 +782,16 @@ void KartModel::update(float dt, float rotation_dt, float steer,  float speed)
             m_wheel_node[i]->setVisible(wi.m_raycastInfo.m_isInContact);
         }
 #endif
-        float rel_suspension = m_default_physics_suspension[i] 
-                             - wi.m_raycastInfo.m_suspensionLength;
+        float rel_suspension = wi.m_raycastInfo.m_suspensionLength
+                             - m_default_physics_suspension[i];
+        // If the suspension is too compressed
         if(rel_suspension< m_min_suspension[i])
             rel_suspension = m_min_suspension[i];
         else if(rel_suspension > m_max_suspension[i])
             rel_suspension = m_max_suspension[i];
 
         core::vector3df pos =  m_wheel_graphics_position[i].toIrrVector();
-        pos.Y += rel_suspension;
+        pos.Y -= rel_suspension;
 
         m_wheel_node[i]->setPosition(pos);
 

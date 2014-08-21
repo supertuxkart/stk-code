@@ -172,12 +172,13 @@ private:
     /** Length of the physics suspension when the kart is at rest. */
     float m_default_physics_suspension[4];
 
-    /** Minimum suspension length. If the displayed suspension is
-     *  shorter than this, the wheel would look wrong. */
+    /** Minimum suspension length (i.e. most compressed). If the displayed
+     *  suspension is shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
 
-    /** Maximum suspension length. If the displayed suspension is
-     *  any longer, the wheel would look too far away from the chassis. */
+    /** Maximum suspension length (i.e. most extended). If the displayed
+     *  suspension is any longer, the wheel would look too far away from the 
+     *  chassis. */
     float         m_max_suspension[4];
 
     /** value used to divide the visual movement of wheels (because the actual movement
