@@ -1608,9 +1608,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
-        TU_ntex = 0;
-        TU_dtex = 1;
-        AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
+
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
         AssignUniforms("direction", "col");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");

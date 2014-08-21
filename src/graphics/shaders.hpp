@@ -757,11 +757,9 @@ public:
     DepthOfFieldShader();
 };
 
-class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>
+class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint TU_ntex, TU_dtex;
-
     SunLightShader();
 };
 

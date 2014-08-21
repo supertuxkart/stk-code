@@ -278,8 +278,7 @@ void PostProcessing::renderSunlight()
   glBlendFunc(GL_ONE, GL_ONE);
   glBlendEquation(GL_FUNC_ADD);
 
-  setTexture(FullScreenShader::SunLightShader::getInstance()->TU_ntex, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-  setTexture(FullScreenShader::SunLightShader::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture()));
   DrawFullScreenEffect<FullScreenShader::SunLightShader>(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
 }
 
