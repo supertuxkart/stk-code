@@ -1039,6 +1039,7 @@ public:
     video::IShaderConstantSetCallBack * m_callbacks[ES_COUNT];
 
     void loadShaders();
+    void killShaders();
 private:
     void check(const int num) const;
     

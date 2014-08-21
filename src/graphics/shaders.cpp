@@ -399,9 +399,6 @@ void Shaders::loadShaders()
     }
 
     initGL();
-    // Clean alive shaders
-    for (unsigned i = 0; i < CleanTable.size(); i++)
-        CleanTable[i]();
     CleanTable.clear();
     initQuadVBO();
     initQuadBuffer();
@@ -416,6 +413,12 @@ void Shaders::loadShaders()
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     UtilShader::ColoredLine::init();
+}
+
+void Shaders::killShaders()
+{
+    for (unsigned i = 0; i < CleanTable.size(); i++)
+        CleanTable[i]();
 }
 
 Shaders::~Shaders()

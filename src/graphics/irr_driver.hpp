@@ -570,7 +570,7 @@ public:
     // -----------------------------------------------------------------------
     inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
     // -----------------------------------------------------------------------
-    inline void updateShaders()  {m_shaders->loadShaders();}
+    inline void updateShaders()  {m_shaders->killShaders();}
     // ------------------------------------------------------------------------
     inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
     {

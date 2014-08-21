@@ -736,7 +736,7 @@ void IrrDriver::applyResolutionSettings()
     // FIXME: this load sequence is (mostly) duplicated from main.cpp!!
     // That's just error prone
     // (we're sure to update main.cpp at some point and forget this one...)
-
+    m_shaders->killShaders();
     // initDevice will drop the current device.
     initDevice();
 
