@@ -391,6 +391,8 @@ World::~World()
     music_manager->stopMusic();
     m_world = NULL;
 
+    irr_driver->getSceneManager()->clear();
+
 #ifdef DEBUG
     m_magic_number = 0xDEADBEEF;
 #endif
