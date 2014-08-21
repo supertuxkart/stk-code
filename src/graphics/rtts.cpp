@@ -115,6 +115,8 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_MLAA_BLEND] = generateRTT(res, GL_SRGB8_ALPHA8, GL_BGR, GL_UNSIGNED_BYTE);
     RenderTargetTextures[RTT_SSAO] = generateRTT(res, GL_R16F, GL_RED, GL_FLOAT);
     RenderTargetTextures[RTT_DISPLACE] = generateRTT(res, GL_RGBA16F, GL_BGRA, GL_FLOAT);
+    RenderTargetTextures[RTT_DIFFUSE] = generateRTT(res, GL_RGB16F, GL_BGR, GL_FLOAT);
+    RenderTargetTextures[RTT_SPECULAR] = generateRTT(res, GL_RGB16F, GL_BGR, GL_FLOAT);
 
     RenderTargetTextures[RTT_HALF1] = generateRTT(half, GL_RGBA16F, GL_BGRA, GL_FLOAT);
     RenderTargetTextures[RTT_QUARTER1] = generateRTT(quarter, GL_RGBA16F, GL_BGRA, GL_FLOAT);
@@ -133,7 +135,6 @@ RTT::RTT(size_t width, size_t height)
     RenderTargetTextures[RTT_TMP_256] = generateRTT(shadowsize2, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_BLOOM_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
     RenderTargetTextures[RTT_TMP_128] = generateRTT(shadowsize3, GL_RGBA16F, GL_BGR, GL_FLOAT);
-    RenderTargetTextures[RTT_LOG_LUMINANCE] = generateRTT(shadowsize0, GL_R16F, GL_RED, GL_FLOAT);
 
     std::vector<GLuint> somevector;
     somevector.push_back(RenderTargetTextures[RTT_SSAO]);
@@ -143,14 +144,17 @@ RTT::RTT(size_t width, size_t height)
     somevector.push_back(RenderTargetTextures[RTT_NORMAL_AND_DEPTH]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_TMP1]);
-    somevector.push_back(RenderTargetTextures[RTT_TMP2]);
+    somevector.push_back(RenderTargetTextures[RTT_DIFFUSE]);
+    somevector.push_back(RenderTargetTextures[RTT_SPECULAR]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_COLOR]);
     FrameBuffers.push_back(new FrameBuffer(somevector, DepthStencilTexture, res.Width, res.Height));
     somevector.clear();
-    somevector.push_back(RenderTargetTextures[RTT_LOG_LUMINANCE]);
+    somevector.push_back(RenderTargetTextures[RTT_DIFFUSE]);
+    FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
+    somevector.clear();
+    somevector.push_back(RenderTargetTextures[RTT_SPECULAR]);
     FrameBuffers.push_back(new FrameBuffer(somevector, res.Width, res.Height));
     somevector.clear();
     somevector.push_back(RenderTargetTextures[RTT_MLAA_COLORS]);

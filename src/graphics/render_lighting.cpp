@@ -169,14 +169,14 @@ void IrrDriver::renderLights(unsigned pointlightcount)
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
     if (!UserConfigParams::m_dynamic_lights)
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
         return;
 
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
+    m_rtts->getFBO(FBO_DIFFUSE).Bind();
     if (UserConfigParams::m_gi)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
@@ -188,7 +188,7 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     }
 
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
 
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())

@@ -384,12 +384,12 @@ void IrrDriver::renderSolidSecondPass()
     if (irr_driver->getGLSLVersion() >= 330)
         glBindSampler(0, 0);
 #endif
-    setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
+    setTexture(0, m_rtts->getRenderTarget(RTT_DIFFUSE), GL_NEAREST, GL_NEAREST);
 #ifdef GL_VERSION_3_3
     if (irr_driver->getGLSLVersion() >= 330)
         glBindSampler(1, 0);
 #endif
-    setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
+    setTexture(1, m_rtts->getRenderTarget(RTT_SPECULAR), GL_NEAREST, GL_NEAREST);
 #ifdef GL_VERSION_3_3
     if (irr_driver->getGLSLVersion() >= 330)
         glBindSampler(2, 0);
