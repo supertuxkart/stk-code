@@ -408,7 +408,6 @@ void Shaders::loadShaders()
     initShadowVPMUBO();
     initParticleQuadVBO();
     MeshShader::BubbleShader::init();
-    LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     UtilShader::ColoredLine::init();
@@ -1421,19 +1420,7 @@ namespace MeshShader
 
 namespace LightShader
 {
-
-    GLuint PointLightShader::Program;
-    GLuint PointLightShader::attrib_Position;
-    GLuint PointLightShader::attrib_Color;
-    GLuint PointLightShader::attrib_Energy;
-    GLuint PointLightShader::attrib_Radius;
-    GLuint PointLightShader::uniform_ntex;
-    GLuint PointLightShader::uniform_dtex;
-    GLuint PointLightShader::uniform_spec;
-    GLuint PointLightShader::vbo;
-    GLuint PointLightShader::vao;
-
-    void PointLightShader::init()
+    PointLightShader::PointLightShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
@@ -1441,13 +1428,9 @@ namespace LightShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
-        attrib_Position = glGetAttribLocation(Program, "Position");
-        attrib_Color = glGetAttribLocation(Program, "Color");
-        attrib_Energy = glGetAttribLocation(Program, "Energy");
-        attrib_Radius = glGetAttribLocation(Program, "Radius");
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_spec = glGetUniformLocation(Program, "spec");
+
+        AssignUniforms();
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1455,6 +1438,11 @@ namespace LightShader
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0, GL_DYNAMIC_DRAW);
+
+        GLuint attrib_Position = glGetAttribLocation(Program, "Position");
+        GLuint attrib_Color = glGetAttribLocation(Program, "Color");
+        GLuint attrib_Energy = glGetAttribLocation(Program, "Energy");
+        GLuint attrib_Radius = glGetAttribLocation(Program, "Radius");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
@@ -1470,17 +1458,6 @@ namespace LightShader
         glVertexAttribDivisor(attrib_Color, 1);
         glVertexAttribDivisor(attrib_Radius, 1);
     }
-
-    void PointLightShader::setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform1f(uniform_spec, 200);
-
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1i(uniform_dtex, TU_dtex);
-    }
-
 }
 
 

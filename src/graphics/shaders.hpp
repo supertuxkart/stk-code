@@ -691,17 +691,12 @@ namespace LightShader
     };
 
 
-    class PointLightShader
+    class PointLightShader : public ShaderHelperSingleton<PointLightShader>, TextureRead<Nearest_Filtered, Nearest_Filtered>
     {
     public:
-        static GLuint Program;
-        static GLuint attrib_Position, attrib_Energy, attrib_Color, attrib_Radius;
-        static GLuint uniform_ntex, uniform_dtex, uniform_spec;
-        static GLuint vbo;
-        static GLuint vao;
-
-        static void init();
-        static void setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
+        GLuint vbo;
+        GLuint vao;
+        PointLightShader();
     };
 }
 
