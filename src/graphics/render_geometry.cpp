@@ -231,6 +231,8 @@ void IrrDriver::renderSolidFirstPass()
     AnimatedListMatDetails::getInstance()->clear();
     AnimatedListMatUnlit::getInstance()->clear();
     // Add a 30 ms timeout
+    if (!m_sync)
+        m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 30000000);
 /*    switch (reason)
     {
