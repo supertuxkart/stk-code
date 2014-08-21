@@ -120,6 +120,13 @@ struct UniformHelper
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const std::vector<float> &v, Args... arg)
+    {
+        glUniform1fv(uniforms[N], v.size(), v.data());
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
 };
 
 void bypassUBO(GLuint Program);
@@ -763,14 +770,10 @@ public:
     SunLightShader();
 };
 
-class DiffuseEnvMapShader
+class DiffuseEnvMapShader : public ShaderHelperSingleton<DiffuseEnvMapShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_TVM, uniform_blueLmn, uniform_greenLmn, uniform_redLmn;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
+    DiffuseEnvMapShader();
 };
 
 class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>

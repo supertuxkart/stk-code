@@ -407,7 +407,6 @@ void Shaders::loadShaders()
     initFrustrumVBO();
     initShadowVPMUBO();
     initParticleQuadVBO();
-    FullScreenShader::DiffuseEnvMapShader::init();
     MeshShader::BubbleShader::init();
     LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
@@ -1616,33 +1615,14 @@ namespace FullScreenShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    GLuint DiffuseEnvMapShader::Program;
-    GLuint DiffuseEnvMapShader::uniform_ntex;
-    GLuint DiffuseEnvMapShader::uniform_blueLmn;
-    GLuint DiffuseEnvMapShader::uniform_greenLmn;
-    GLuint DiffuseEnvMapShader::uniform_redLmn;
-    GLuint DiffuseEnvMapShader::uniform_TVM;
-
-    void DiffuseEnvMapShader::init()
+    DiffuseEnvMapShader::DiffuseEnvMapShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
-        uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
-        uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
-        uniform_TVM = glGetUniformLocation(Program, "TransposeViewMatrix");
-    }
-
-    void DiffuseEnvMapShader::setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
-    {
-        glUniformMatrix4fv(uniform_TVM, 1, GL_FALSE, TransposeViewMatrix.pointer());
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1fv(uniform_blueLmn, 9, blueSHCoeff);
-        glUniform1fv(uniform_greenLmn, 9, greenSHCoeff);
-        glUniform1fv(uniform_redLmn, 9, redSHCoeff);
+        AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
+        AssignSamplerNames(Program, 0, "ntex");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()
