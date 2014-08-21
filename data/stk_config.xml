@@ -155,12 +155,13 @@
                  otherwise obstricts too much of the view.  -->
     <camera distance="1.5" forward-up-angle="15"
             backward-up-angle="30"/>
+    <!-- Additional offset to move graphical chassis with regards to the physics. -->
+    <graphics y-offset="0.0"/>
 
-   <!-- Jump animation related values:
-        animation-time: only if the estimated time for a jump is larger
-                        than this value will the jump animation being
-                        shown. -->
-   <jump animation-time="0.5" />
+    <!-- Jump animation related values:
+         animation-time: only if the estimated time for a jump is larger
+                         than this value will the jump animation being shown. -->
+    <jump animation-time="0.5" />
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.

@@ -2379,7 +2379,8 @@ void Kart::loadData(RaceManager::KartType type, bool is_animated_model)
                           m_node,
                           m_kart_properties->getShadowScale(),
                           m_kart_properties->getShadowXOffset(),
-                          m_kart_properties->getShadowYOffset());
+                          m_kart_properties->getGraphicalYOffset(),
+                          m_kart_properties->getShadowZOffset());
 
     World::getWorld()->kartAdded(this, m_node);
 }   // loadData
@@ -2429,7 +2430,8 @@ void Kart::kartIsInRestNow()
         f +=  wi.m_chassisConnectionPointCS.getY()
             - wi.m_raycastInfo.m_suspensionLength - wi.m_wheelsRadius;
     }
-    m_graphical_y_offset = f/m_vehicle->getNumWheels() + 0.0f;
+    m_graphical_y_offset = f/m_vehicle->getNumWheels() 
+                         + getKartProperties()->getGraphicalYOffset();
 
     m_kart_model->setDefaultSuspension();
 }   // kartIsInRestNow

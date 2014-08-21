@@ -57,7 +57,7 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_file   = "";
     m_shadow_scale    = 1.0f;
     m_shadow_x_offset = 0.0f;
-    m_shadow_y_offset = 0.0f;
+    m_shadow_z_offset = 0.0f;
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
@@ -92,7 +92,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
-        m_smooth_flying_impulse = m_physical_wheel_position =
+        m_smooth_flying_impulse = m_physical_wheel_position = 
+        m_graphical_y_offset =
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -322,7 +323,7 @@ void KartProperties::getAllData(const XMLNode * root)
 
     root->get("shadow-scale",      &m_shadow_scale     );
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
-    root->get("shadow-y-offset",   &m_shadow_y_offset  );
+    root->get("shadow-z-offset",   &m_shadow_z_offset  );
 
     root->get("type",     &m_kart_type        );
 
@@ -615,6 +616,11 @@ void KartProperties::getAllData(const XMLNode * root)
         startup_node->get("boost", &m_startup_boost);
     }
 
+    if(const XMLNode *graphics_node = root->getNode("graphics"))
+    {
+        graphics_node->get("y-offset", &m_graphical_y_offset);
+    }
+
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
 }   // getAllData
@@ -735,7 +741,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_invulnerability_time,
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
-
+    CHECK_NEG(m_graphical_y_offset,         "graphics y-offset"             );
     for(unsigned int i=RaceManager::DIFFICULTY_FIRST;
         i<=RaceManager::DIFFICULTY_LAST; i++)
     {
