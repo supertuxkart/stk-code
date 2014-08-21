@@ -50,8 +50,7 @@ static void renderPointLights(unsigned count)
     glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+    LightShader::PointLightShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture()));
     LightShader::PointLightShader::getInstance()->setUniforms();
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);

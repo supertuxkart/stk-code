@@ -691,7 +691,7 @@ namespace LightShader
     };
 
 
-    class PointLightShader : public ShaderHelperSingleton<PointLightShader>, TextureRead<Nearest_Filtered, Nearest_Filtered>
+    class PointLightShader : public ShaderHelperSingleton<PointLightShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
     {
     public:
         GLuint vbo;
