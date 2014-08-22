@@ -884,11 +884,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-        AssignSamplerNames(Program, 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
     }
 
     InstancedObjectPass2Shader::InstancedObjectPass2Shader()
@@ -900,12 +896,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
         AssignUniforms();
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-
-        AssignSamplerNames(Program, 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -921,12 +912,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
         AssignUniforms();
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-
-        AssignSamplerNames(Program, 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -942,11 +928,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-        AssignSamplerNames(Program, 3, "Albedo", 4, "Detail");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
     }
 
     ObjectUnlitShader::ObjectUnlitShader()
@@ -959,7 +941,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        AssignSamplerNames(Program, 3, "tex");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     ObjectRefPass2Shader::ObjectRefPass2Shader()
@@ -973,11 +955,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-        AssignSamplerNames(Program, 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
     }
 
     GrassPass2Shader::GrassPass2Shader()
@@ -988,11 +966,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("ModelMatrix", "windDir");
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-        AssignSamplerNames(Program, 3, "Albedo");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
     }
 
     InstancedGrassPass2Shader::InstancedGrassPass2Shader()
@@ -1004,15 +978,7 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
         AssignUniforms("windDir", "SunDir");
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"),
-            TexUnit(4, "dtex")
-            );
-
-        AssignSamplerNames(Program, 3, "Albedo");
-
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
@@ -1030,11 +996,7 @@ namespace MeshShader
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
-        AssignSamplerNames(Program, 3, "tex");
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "tex");
     }
 
     SplattingShader::SplattingShader()
@@ -1045,11 +1007,10 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/splatting.frag").c_str());
         AssignUniforms("ModelMatrix");
 
-        AssignTextureUnit(Program,
-            TexUnit(0, "DiffuseMap"),
-            TexUnit(1, "SpecularMap"),
-            TexUnit(2, "SSAO"));
         AssignSamplerNames(Program,
+            0, "DiffuseMap",
+            1, "SpecularMap",
+            2, "SSAO",
             3, "tex_layout",
             4, "tex_detail0",
             5, "tex_detail1",

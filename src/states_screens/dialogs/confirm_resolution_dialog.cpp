@@ -64,6 +64,15 @@ void ConfirmResolutionDialog::onUpdate(float dt)
 
 }
 
+// ----------------------------------------------------------------------------
+
+bool ConfirmResolutionDialog::onEscapePressed()
+{
+    ModalDialog::dismiss();
+    irr_driver->cancelResChange();
+    return true;
+}   // escapePressed
+
 // ------------------------------------------------------------------------------------------------------
 
 void ConfirmResolutionDialog::updateMessage()

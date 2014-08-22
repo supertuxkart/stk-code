@@ -1,4 +1,8 @@
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D tex;
+#else
 uniform sampler2D tex;
+#endif
 
 #if __VERSION__ >= 130
 in vec3 nor;

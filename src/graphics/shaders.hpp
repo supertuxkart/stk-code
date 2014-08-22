@@ -395,15 +395,16 @@ private:
     void AssignTextureNames_impl(GLuint Program, GLuint TexUnit, const char *name, Args...args...)
     {
         GLuint location = glGetUniformLocation(Program, name);
+        TextureLocation.push_back(location);
         glUniform1i(location, TexUnit);
         TextureUnits.push_back(TexUnit);
         AssignTextureNames_impl<N + 1>(Program, args...);
     }
 
 protected:
-    std::vector<GLuint> SamplersId;
     std::vector<GLuint> TextureUnits;
     std::vector<GLenum> TextureType;
+    std::vector<GLenum> TextureLocation;
     template<typename...Args>
     void AssignSamplerNames(GLuint Program, Args...args)
     {
@@ -415,6 +416,7 @@ protected:
     }
 
 public:
+    std::vector<GLuint> SamplersId;
     void SetTextureUnits(const std::vector<GLuint> &args)
     {
         assert(args.size() == sizeof...(tp) && "Too much texture unit provided");
@@ -433,6 +435,16 @@ public:
     {
         for (unsigned i = 0; i < SamplersId.size(); i++)
             glDeleteSamplers(1, &SamplersId[i]);
+    }
+
+    void SetTextureHandles(const std::vector<uint64_t> &args)
+    {
+        for (unsigned i = 0; i < args.size(); i++)
+        {
+#ifdef Bindless_Texture_Support
+            glUniformHandleui64ARB(TextureLocation[i], args[i]);
+#endif
+        }
     }
 };
 
@@ -486,61 +498,61 @@ public:
     InstancedNormalMapShader();
 };
 
-class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class ObjectPass2Shader : public ShaderHelperSingleton<ObjectPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectPass2Shader();
 };
 
-class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedObjectPass2Shader : public ShaderHelperSingleton<InstancedObjectPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectPass2Shader();
 };
 
-class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedObjectRefPass2Shader : public ShaderHelperSingleton<InstancedObjectRefPass2Shader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedObjectRefPass2Shader();
 };
 
-class DetailledObjectPass2Shader : public ShaderHelperSingleton<DetailledObjectPass2Shader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class DetailledObjectPass2Shader : public ShaderHelperSingleton<DetailledObjectPass2Shader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     DetailledObjectPass2Shader();
 };
 
-class ObjectUnlitShader : public ShaderHelperSingleton<ObjectUnlitShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class ObjectUnlitShader : public ShaderHelperSingleton<ObjectUnlitShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectUnlitShader();
 };
 
-class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     ObjectRefPass2Shader();
 };
 
-class GrassPass2Shader : public ShaderHelperSingleton<GrassPass2Shader, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class GrassPass2Shader : public ShaderHelperSingleton<GrassPass2Shader, core::matrix4, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     GrassPass2Shader();
 };
 
-class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedGrassPass2Shader : public ShaderHelperSingleton<InstancedGrassPass2Shader, core::vector3df, core::vector3df>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Nearest_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedGrassPass2Shader();
 };
 
-class SphereMapShader : public ShaderHelperSingleton<SphereMapShader, core::matrix4, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class SphereMapShader : public ShaderHelperSingleton<SphereMapShader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     SphereMapShader();
 };
 
-class SplattingShader : public ShaderHelperSingleton<SplattingShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
+class SplattingShader : public ShaderHelperSingleton<SplattingShader, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
     SplattingShader();

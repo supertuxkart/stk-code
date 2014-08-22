@@ -1,4 +1,9 @@
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D tex;
+#else
 uniform sampler2D tex;
+#endif
+
 
 uniform float fogmax;
 uniform float startH;
@@ -15,6 +20,9 @@ out vec4 FragColor;
 void main()
 {
     vec4 diffusecolor = texture(tex, uv);
+#ifdef GL_ARB_bindless_texture
+    diffusecolor.xyz = pow(diffusecolor.xyz, vec3(2.2));
+#endif
     diffusecolor.xyz *= pow(color.xyz, vec3(2.2));
     diffusecolor.a *= color.a;
     vec3 tmp = vec3(gl_FragCoord.xy / screen, gl_FragCoord.z);

@@ -341,7 +341,18 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-                    MeshShader::TransparentFogShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
+                    if (UserConfigParams::m_bindless_textures)
+                    {
+#ifdef Bindless_Texture_Support
+                        if (!mesh.TextureHandles[0])
+                            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                        MeshShader::TransparentFogShader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
+#endif
+                    }
+                    else
+                        MeshShader::TransparentFogShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
                     MeshShader::TransparentFogShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix, fogmax, startH, endH, start, end, col);
 
                     assert(mesh.vao);
@@ -362,7 +373,18 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    MeshShader::TransparentShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
+                    if (UserConfigParams::m_bindless_textures)
+                    {
+#ifdef Bindless_Texture_Support
+                        if (!mesh.TextureHandles[0])
+                            mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[0]), MeshShader::TransparentShader::getInstance()->SamplersId[0]);
+                        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                            glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                        MeshShader::TransparentShader::getInstance()->SetTextureHandles(createVector<uint64_t>(mesh.TextureHandles[0]));
+#endif
+                    }
+                    else
+                        MeshShader::TransparentShader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(mesh.textures[0]) });
 
                     MeshShader::TransparentShader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                     assert(mesh.vao);
