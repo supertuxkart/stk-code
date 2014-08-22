@@ -805,11 +805,9 @@ public:
     GlobalIlluminationReconstructionShader();
 };
 
-class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>
+class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
 {
 public:
-    GLuint TU_tex, TU_depth;
-
     Gaussian17TapHShader();
 };
 
@@ -832,11 +830,9 @@ public:
     Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>
+class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
 {
 public:
-    GLuint TU_tex, TU_depth;
-
     Gaussian17TapVShader();
 };
 

@@ -1690,9 +1690,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        TU_depth = 1;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
+
+        AssignSamplerNames(Program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
@@ -1736,9 +1735,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralV.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        TU_depth = 1;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
+
+        AssignSamplerNames(Program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
