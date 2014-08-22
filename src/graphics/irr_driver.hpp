@@ -199,6 +199,7 @@ class IrrDriver : public IEventReceiver, public NoCopy
 private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
+    bool hasBaseInstance;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     /** The irrlicht device. */
@@ -291,6 +292,11 @@ public:
     bool needRHWorkaround() const
     {
         return m_need_rh_workaround;
+    }
+
+    bool hasARB_base_instance() const
+    {
+        return hasBaseInstance;
     }
 
     bool hasVSLayerExtension() const

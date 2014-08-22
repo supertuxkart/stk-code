@@ -483,12 +483,20 @@ void IrrDriver::initDevice()
 
     // Parse extensions
     hasVSLayer = false;
+    hasBaseInstance = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
         if (hasGLExtension("GL_AMD_vertex_shader_layer")) {
             hasVSLayer = true;
+            Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
         }
+#ifdef Base_Instance_Support
+        if (hasGLExtension("GL_ARB_base_instance")) {
+            hasBaseInstance = true;
+            Log::info("GLDriver", "ARB Instance enabled");
+        }
+#endif
     }
 
 

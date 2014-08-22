@@ -176,7 +176,12 @@ struct instanced_custom_unroll_args<>
         size_t count = mesh->IndexCount;
 
         Shader->setUniforms(args...);
-        glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
+#ifdef Base_Instance_Support
+        if (irr_driver->hasARB_base_instance())
+            glDrawElementsInstancedBaseVertexBaseInstance(ptype, count, itype, (const void*)mesh->vaoOffset, instance_count, mesh->vaoBaseVertex, mesh->vaoBaseInstance);
+        else
+#endif
+            glDrawElementsInstanced(ptype, count, itype, 0, instance_count);
     }
 };
 
@@ -203,7 +208,8 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
         if (mesh.VAOType != VertexType)
             Log::error("RenderGeometry", "Wrong instanced vertex format");
 #endif
-        glBindVertexArray(mesh.vao);
+        if (!irr_driver->hasARB_base_instance())
+            glBindVertexArray(mesh.vao);
         for (unsigned j = 0; j < TexUnits.size(); j++)
         {
             if (!mesh.textures[TexUnits[j].m_id])
@@ -306,15 +312,23 @@ void IrrDriver::renderSolidFirstPass()
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDetails::getInstance());
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatUnlit::getInstance());
 
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
         renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, video::EVT_STANDARD>(
                     TexUnits(TexUnit(0, true)),
                     ListInstancedMatDefault::getInstance());
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
         renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, video::EVT_STANDARD>(
                     TexUnits(TexUnit(0, true)),
                     ListInstancedMatAlphaRef::getInstance());
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
         renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, video::EVT_STANDARD, 2>(
                     TexUnits(TexUnit(0, true)),
                     ListInstancedMatGrass::getInstance());
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
         renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, video::EVT_TANGENTS>(
             TexUnits(TexUnit(1, false), TexUnit(0, true)),
             ListInstancedMatNormalMap::getInstance());
@@ -385,7 +399,8 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vec
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
-        glBindVertexArray(mesh.vao);
+        if (!irr_driver->hasARB_base_instance())
+            glBindVertexArray(mesh.vao);
 
         std::vector<GLuint> Textures(Prefilled_tex);
         std::vector<uint64_t> Handles(Prefilled_Handles);
@@ -529,15 +544,23 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(0, true)
             ), ListMatNormalMap::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
             TexUnits(TexUnit(0, true)),
             ListInstancedMatDefault::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
             TexUnits(TexUnit(0, true)),
             ListInstancedMatNormalMap::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
         renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader>(
             TexUnits(TexUnit(0, true)),
             ListInstancedMatAlphaRef::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
         DiffSpecSSAOTex.push_back(irr_driver->getDepthStencilTexture());
         renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, 3, 2>(
             TexUnits(TexUnit(0, true)),
@@ -788,7 +811,12 @@ struct instanced_shadow_custom_unroll_args<>
         size_t count = mesh->IndexCount;
 
         Shader->setUniforms(args...);
-        glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
+#ifdef Base_Instance_Support
+        if (irr_driver->hasARB_base_instance())
+            glDrawElementsInstancedBaseVertexBaseInstance(ptype, count, itype, (const void*) mesh->vaoOffset, 4 * instance_count, mesh->vaoBaseVertex, mesh->vaoBaseInstance);
+        else
+#endif
+            glDrawElementsInstanced(ptype, count, itype, 0, 4 * instance_count);
     }
 };
 
@@ -811,7 +839,8 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, const std::ve
         std::vector<uint64_t> Handles;
         std::vector<GLuint> Textures;
         GLMesh *mesh = STK::tuple_get<0>(t->at(i));
-        glBindVertexArray(mesh->vao_shadow_pass);
+        if (!irr_driver->hasARB_base_instance())
+            glBindVertexArray(mesh->vao_shadow_pass);
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
             compressTexture(mesh->textures[TextureUnits[j]], true);
@@ -883,9 +912,17 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, AnimatedListMatUnlit::getInstance());
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, AnimatedListMatDetails::getInstance());
 
+    if (irr_driver->hasARB_base_instance())
+        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
     renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
+    if (irr_driver->hasARB_base_instance())
+        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
     renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ 0 }, ListInstancedMatAlphaRef::getInstance());
+    if (irr_driver->hasARB_base_instance())
+        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
     renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ 0 }, ListInstancedMatGrass::getInstance());
+    if (irr_driver->hasARB_base_instance())
+        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
     renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatNormalMap::getInstance());
 
     glDisable(GL_POLYGON_OFFSET_FILL);

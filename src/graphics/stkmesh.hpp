@@ -46,6 +46,7 @@ struct GLMesh {
     core::matrix4 TextureMatrix;
     size_t vaoBaseVertex;
     size_t vaoOffset;
+    size_t vaoBaseInstance;
     video::E_VERTEX_TYPE VAOType;
     uint64_t TextureHandles[6];
 };
