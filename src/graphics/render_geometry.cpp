@@ -130,7 +130,7 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
             if (!mesh.textures[TexUnits[j].m_id])
                 mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-            if (UserConfigParams::m_bindless_textures)
+            if (UserConfigParams::m_azdo)
             {
 #ifdef Bindless_Texture_Support
                 if (!mesh.TextureHandles[TexUnits[j].m_id])
@@ -151,7 +151,7 @@ void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
             continue;
         }
 
-        if (UserConfigParams::m_bindless_textures)
+        if (UserConfigParams::m_azdo)
             Shader::getInstance()->SetTextureHandles(Handles);
         else
             Shader::getInstance()->SetTextureUnits(Textures);
@@ -209,22 +209,21 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
 #endif
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh.vao);
-        if (!UserConfigParams::m_bindless_textures)
+        for (unsigned j = 0; j < TexUnits.size(); j++)
         {
-            for (unsigned j = 0; j < TexUnits.size(); j++)
-            {
-                if (!mesh.textures[TexUnits[j].m_id])
-                    mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-                compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
-            }
-            Shader::getInstance()->SetTextureUnits(Textures);
+            if (!mesh.textures[TexUnits[j].m_id])
+                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+            Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
         }
+        Shader::getInstance()->SetTextureUnits(Textures);
         instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
 
 static GLsync m_sync;
+static GLuint drawindirectcmd;
+static DrawElementsIndirectCommand *CommandBufferPtr = 0;
 
 void IrrDriver::renderSolidFirstPass()
 {
@@ -295,31 +294,122 @@ void IrrDriver::renderSolidFirstPass()
             TexUnit(0, true)
         ), ListMatNormalMap::getInstance());
 
+
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDefault::getInstance());
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatAlphaRef::getInstance());
         renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDetails::getInstance());
         renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatUnlit::getInstance());
 
-        if (irr_driver->hasARB_base_instance())
+        if (UserConfigParams::m_azdo)
+        {
+#ifdef Buffer_Storage
+            if (!CommandBufferPtr)
+            {
+                glGenBuffers(1, &drawindirectcmd);
+                glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
+                glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 100 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT);
+                CommandBufferPtr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 100 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT);
+            }
+
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, drawindirectcmd);
+
+            size_t offset = 0;
+            for (unsigned i = 0; i < ListInstancedMatDefault::getInstance()->size(); i++)
+            {
+                const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatDefault::getInstance()->at(i)));
+                size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatDefault::getInstance()->at(i));
+                DrawElementsIndirectCommand &CurrentCommand = CommandBufferPtr[offset++];
+                CurrentCommand.instanceCount = instanceCount;
+                CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+                CurrentCommand.count = mesh.IndexCount;
+                CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+                CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+            }
+            for (unsigned i = 0; i < ListInstancedMatNormalMap::getInstance()->size(); i++)
+            {
+                const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatNormalMap::getInstance()->at(i)));
+                size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatNormalMap::getInstance()->at(i));
+                DrawElementsIndirectCommand &CurrentCommand = CommandBufferPtr[offset++];
+                CurrentCommand.instanceCount = instanceCount;
+                CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+                CurrentCommand.count = mesh.IndexCount;
+                CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+                CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+            }
+            for (unsigned i = 0; i < ListInstancedMatAlphaRef::getInstance()->size(); i++)
+            {
+                const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatAlphaRef::getInstance()->at(i)));
+                size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatAlphaRef::getInstance()->at(i));
+                DrawElementsIndirectCommand &CurrentCommand = CommandBufferPtr[offset++];
+                CurrentCommand.instanceCount = instanceCount;
+                CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+                CurrentCommand.count = mesh.IndexCount;
+                CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+                CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+            }
+            for (unsigned i = 0; i < ListInstancedMatGrass::getInstance()->size(); i++)
+            {
+                const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatGrass::getInstance()->at(i)));
+                size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatGrass::getInstance()->at(i));
+                DrawElementsIndirectCommand &CurrentCommand = CommandBufferPtr[offset++];
+                CurrentCommand.instanceCount = instanceCount;
+                CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+                CurrentCommand.count = mesh.IndexCount;
+                CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+                CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+            }
+#endif
+#ifdef Multi_Draw_Indirect
+            unsigned ptr = 0;
+            glUseProgram(MeshShader::InstancedObjectPass1Shader::getInstance()->Program);
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-        renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, video::EVT_STANDARD>(
-                    TexUnits(TexUnit(0, true)),
-                    ListInstancedMatDefault::getInstance());
-        if (irr_driver->hasARB_base_instance())
-            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-        renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, video::EVT_STANDARD>(
-                    TexUnits(TexUnit(0, true)),
-                    ListInstancedMatAlphaRef::getInstance());
-        if (irr_driver->hasARB_base_instance())
-            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-        renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, video::EVT_STANDARD, 2>(
-                    TexUnits(TexUnit(0, true)),
-                    ListInstancedMatGrass::getInstance());
-        if (irr_driver->hasARB_base_instance())
+            if (!ListInstancedMatDefault::getInstance()->empty())
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatDefault::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatDefault::getInstance()->size();
+
+            glUseProgram(MeshShader::InstancedNormalMapShader::getInstance()->Program);
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
-        renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, video::EVT_TANGENTS>(
-            TexUnits(TexUnit(1, false), TexUnit(0, true)),
-            ListInstancedMatNormalMap::getInstance());
+            if (!ListInstancedMatNormalMap::getInstance()->empty())
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatNormalMap::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatNormalMap::getInstance()->size();
+
+            glUseProgram(MeshShader::InstancedObjectRefPass1Shader::getInstance()->Program);
+            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            if (!ListInstancedMatAlphaRef::getInstance()->empty())
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatAlphaRef::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatAlphaRef::getInstance()->size();
+
+            glUseProgram(MeshShader::InstancedGrassPass1Shader::getInstance()->Program);
+            if (!ListInstancedMatGrass::getInstance()->empty())
+            {
+                MeshShader::InstancedGrassPass1Shader::getInstance()->setUniforms(STK::tuple_get<2>(ListInstancedMatGrass::getInstance()->at(0)));
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatGrass::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            }
+#endif
+        }
+        else
+        {
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectPass1Shader, video::EVT_STANDARD>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatDefault::getInstance());
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            renderInstancedMeshes1stPass<MeshShader::InstancedObjectRefPass1Shader, video::EVT_STANDARD>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatAlphaRef::getInstance());
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            renderInstancedMeshes1stPass<MeshShader::InstancedGrassPass1Shader, video::EVT_STANDARD, 2>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatGrass::getInstance());
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
+            renderInstancedMeshes1stPass<MeshShader::InstancedNormalMapShader, video::EVT_TANGENTS>(
+                TexUnits(TexUnit(1, false), TexUnit(0, true)),
+                ListInstancedMatNormalMap::getInstance());
+        }
     }
 }
 
@@ -339,7 +429,7 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
             if (!mesh.textures[TexUnits[j].m_id])
                 mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
             compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-            if (UserConfigParams::m_bindless_textures)
+            if (UserConfigParams::m_azdo)
             {
 #ifdef Bindless_Texture_Support
                 if (!mesh.TextureHandles[TexUnits[j].m_id])
@@ -361,7 +451,7 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
             continue;
         }
 
-        if (UserConfigParams::m_bindless_textures)
+        if (UserConfigParams::m_azdo)
             Shader::getInstance()->SetTextureHandles(Handles);
         else
             Shader::getInstance()->SetTextureUnits(Textures);
@@ -370,8 +460,7 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
 }
 
 template<typename Shader, int...List, typename... TupleType>
-void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes, const std::vector<uint64_t> &Prefilled_Handles,
-    const std::vector<GLuint> &Prefilled_tex)
+void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes, const std::vector<GLuint> &Prefilled_tex)
 {
     glUseProgram(Shader::getInstance()->Program);
     for (unsigned i = 0; i < meshes->size(); i++)
@@ -380,26 +469,16 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vec
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh.vao);
 
-        if (UserConfigParams::m_bindless_textures)
+        std::vector<GLuint> Textures(Prefilled_tex);
+        for (unsigned j = 0; j < TexUnits.size(); j++)
         {
-            std::vector<uint64_t> Handles(Prefilled_Handles);
-            for (unsigned i = 0; i < TexUnits.size(); i++)
-                Handles.push_back(0);
-            Shader::getInstance()->SetTextureHandles(Handles);
-        }
-        else
-        {
-            std::vector<GLuint> Textures(Prefilled_tex);
-            for (unsigned j = 0; j < TexUnits.size(); j++)
-            {
-                if (!mesh.textures[TexUnits[j].m_id])
-                    mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-                compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
-                Shader::getInstance()->SetTextureUnits(Textures);
-            }
-        }
+            if (!mesh.textures[TexUnits[j].m_id])
+                mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+            Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
 
+        }
+        Shader::getInstance()->SetTextureUnits(Textures);
         instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -429,7 +508,7 @@ void IrrDriver::renderSolidSecondPass()
 
     uint64_t DiffuseHandle = 0, SpecularHandle = 0, SSAOHandle = 0, DepthHandle = 0;
 
-    if (UserConfigParams::m_bindless_textures)
+    if (UserConfigParams::m_azdo)
     {
 #ifdef Bindless_Texture_Support
         DiffuseHandle = glGetTextureSamplerHandleARB(m_rtts->getRenderTarget(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
@@ -507,27 +586,64 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(0, true)
             ), ListMatNormalMap::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
-        if (irr_driver->hasARB_base_instance())
+        if (UserConfigParams::m_azdo)
+        {
+#ifdef Multi_Draw_Indirect
+            unsigned ptr = 0;
+            glUseProgram(MeshShader::InstancedObjectPass2Shader::getInstance()->Program);
+            MeshShader::InstancedObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-        renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
-            TexUnits(TexUnit(0, true)),
-            ListInstancedMatDefault::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        if (irr_driver->hasARB_base_instance())
+            if (!ListInstancedMatDefault::getInstance()->empty())
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatDefault::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatDefault::getInstance()->size();
+
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
-        renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
-            TexUnits(TexUnit(0, true)),
-            ListInstancedMatNormalMap::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        if (irr_driver->hasARB_base_instance())
+            MeshShader::InstancedObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            if (!ListInstancedMatNormalMap::getInstance()->empty())
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatNormalMap::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatNormalMap::getInstance()->size();
+
+            glUseProgram(MeshShader::InstancedObjectRefPass2Shader::getInstance()->Program);
             glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-        renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader>(
-            TexUnits(TexUnit(0, true)),
-            ListInstancedMatAlphaRef::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        if (irr_driver->hasARB_base_instance())
-            glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-        DiffSpecSSAOTex.push_back(irr_driver->getDepthStencilTexture());
-        renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, 3, 2>(
-            TexUnits(TexUnit(0, true)),
-            ListInstancedMatGrass::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle), DiffSpecSSAOTex);
+            MeshShader::InstancedObjectRefPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, 0));
+            if (!ListInstancedMatAlphaRef::getInstance()->empty())
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatAlphaRef::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatAlphaRef::getInstance()->size();
+
+            glUseProgram(MeshShader::InstancedGrassPass2Shader::getInstance()->Program);
+            MeshShader::InstancedGrassPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, DepthHandle, 0));
+            if (!ListInstancedMatGrass::getInstance()->empty())
+            {
+                MeshShader::InstancedGrassPass2Shader::getInstance()->setUniforms(STK::tuple_get<2>(ListInstancedMatGrass::getInstance()->at(0)), STK::tuple_get<3>(ListInstancedMatGrass::getInstance()->at(0)));
+                glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatGrass::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+            }
+#endif
+        }
+        else
+        {
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatDefault::getInstance(), DiffSpecSSAOTex);
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectPass2Shader>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatNormalMap::getInstance(), DiffSpecSSAOTex);
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            renderInstancedMeshes2ndPass<MeshShader::InstancedObjectRefPass2Shader>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatAlphaRef::getInstance(), DiffSpecSSAOTex);
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+            DiffSpecSSAOTex.push_back(irr_driver->getDepthStencilTexture());
+            renderInstancedMeshes2ndPass<MeshShader::InstancedGrassPass2Shader, 3, 2>(
+                TexUnits(TexUnit(0, true)),
+                ListInstancedMatGrass::getInstance(), DiffSpecSSAOTex);
+        }
+
     }
     m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 }
@@ -736,7 +852,7 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
         for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
             compressTexture(mesh->textures[TextureUnits[j]], true);
-            if (UserConfigParams::m_bindless_textures)
+            if (UserConfigParams::m_azdo)
             {
 #ifdef Bindless_Texture_Support
                 if (!mesh->TextureHandles[TextureUnits[j]])
@@ -749,7 +865,7 @@ void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK:
             else
                 Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
         }
-        if (UserConfigParams::m_bindless_textures)
+        if (UserConfigParams::m_azdo)
             T::getInstance()->SetTextureHandles(Handles);
         else
             T::getInstance()->SetTextureUnits(Textures);
@@ -804,18 +920,20 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, const std::ve
         GLMesh *mesh = STK::tuple_get<0>(t->at(i));
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh->vao_shadow_pass);
-        if (!UserConfigParams::m_bindless_textures)
+
+        for (unsigned j = 0; j < TextureUnits.size(); j++)
         {
-            for (unsigned j = 0; j < TextureUnits.size(); j++)
-            {
-                compressTexture(mesh->textures[TextureUnits[j]], true);
-                Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
-                T::getInstance()->SetTextureUnits(Textures);
-            }
+            compressTexture(mesh->textures[TextureUnits[j]], true);
+            Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
+
         }
+        T::getInstance()->SetTextureUnits(Textures);
         instanced_shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t->at(i));
     }
 }
+
+static GLuint shadowdrawindirectcmd;
+static DrawElementsIndirectCommand *ShadowCommandBufferPtr = 0;
 
 void IrrDriver::renderShadows()
 {
@@ -864,18 +982,103 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, AnimatedListMatUnlit::getInstance());
     renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, AnimatedListMatDetails::getInstance());
 
-    if (irr_driver->hasARB_base_instance())
+    if (UserConfigParams::m_azdo)
+    {
+#ifdef Buffer_Storage
+        if (!ShadowCommandBufferPtr)
+        {
+            glGenBuffers(1, &shadowdrawindirectcmd);
+            glBindBuffer(GL_DRAW_INDIRECT_BUFFER, shadowdrawindirectcmd);
+            glBufferStorage(GL_DRAW_INDIRECT_BUFFER, 100 * sizeof(DrawElementsIndirectCommand), 0, GL_MAP_PERSISTENT_BIT | GL_MAP_WRITE_BIT | GL_MAP_COHERENT_BIT);
+            ShadowCommandBufferPtr = (DrawElementsIndirectCommand *)glMapBufferRange(GL_DRAW_INDIRECT_BUFFER, 0, 100 * sizeof(DrawElementsIndirectCommand), GL_MAP_PERSISTENT_BIT | GL_MAP_COHERENT_BIT | GL_MAP_WRITE_BIT);
+        }
+
+        glBindBuffer(GL_DRAW_INDIRECT_BUFFER, shadowdrawindirectcmd);
+
+        size_t offset = 0;
+        for (unsigned i = 0; i < ListInstancedMatDefault::getInstance()->size(); i++)
+        {
+            const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatDefault::getInstance()->at(i)));
+            size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatDefault::getInstance()->at(i));
+            DrawElementsIndirectCommand &CurrentCommand = ShadowCommandBufferPtr[offset++];
+            CurrentCommand.instanceCount = 4 * instanceCount;
+            CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+            CurrentCommand.count = mesh.IndexCount;
+            CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+            CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+        }
+        for (unsigned i = 0; i < ListInstancedMatNormalMap::getInstance()->size(); i++)
+        {
+            const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatNormalMap::getInstance()->at(i)));
+            size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatNormalMap::getInstance()->at(i));
+            DrawElementsIndirectCommand &CurrentCommand = ShadowCommandBufferPtr[offset++];
+            CurrentCommand.instanceCount = 4 * instanceCount;
+            CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+            CurrentCommand.count = mesh.IndexCount;
+            CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+            CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+        }
+        for (unsigned i = 0; i < ListInstancedMatAlphaRef::getInstance()->size(); i++)
+        {
+            const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatAlphaRef::getInstance()->at(i)));
+            size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatAlphaRef::getInstance()->at(i));
+            DrawElementsIndirectCommand &CurrentCommand = ShadowCommandBufferPtr[offset++];
+            CurrentCommand.instanceCount = 4 * instanceCount;
+            CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+            CurrentCommand.count = mesh.IndexCount;
+            CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+            CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+        }
+        for (unsigned i = 0; i < ListInstancedMatGrass::getInstance()->size(); i++)
+        {
+            const GLMesh &mesh = *(STK::tuple_get<0>(ListInstancedMatGrass::getInstance()->at(i)));
+            size_t &instanceCount = STK::tuple_get<1>(ListInstancedMatGrass::getInstance()->at(i));
+            DrawElementsIndirectCommand &CurrentCommand = ShadowCommandBufferPtr[offset++];
+            CurrentCommand.instanceCount = 4 * instanceCount;
+            CurrentCommand.baseVertex = mesh.vaoBaseVertex;
+            CurrentCommand.count = mesh.IndexCount;
+            CurrentCommand.firstIndex = mesh.vaoOffset / 2;
+            CurrentCommand.baseInstance = mesh.vaoBaseInstance;
+        }
+#endif
+#ifdef Multi_Draw_Indirect
+        unsigned ptr = 0;
+        glUseProgram(MeshShader::InstancedShadowShader::getInstance()->Program);
         glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-    renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
-    if (irr_driver->hasARB_base_instance())
-        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-    renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ 0 }, ListInstancedMatAlphaRef::getInstance());
-    if (irr_driver->hasARB_base_instance())
-        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
-    renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ 0 }, ListInstancedMatGrass::getInstance());
-    if (irr_driver->hasARB_base_instance())
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatDefault::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+        ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatDefault::getInstance()->size();
+
+        glUseProgram(MeshShader::InstancedShadowShader::getInstance()->Program);
         glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
-    renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatNormalMap::getInstance());
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatNormalMap::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+        ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatNormalMap::getInstance()->size();
+
+        glUseProgram(MeshShader::InstancedRefShadowShader::getInstance()->Program);
+        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatAlphaRef::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+        ptr += sizeof(DrawElementsIndirectCommand)* ListInstancedMatAlphaRef::getInstance()->size();
+
+        glUseProgram(MeshShader::InstancedGrassShadowShader::getInstance()->Program);
+        MeshShader::InstancedGrassShadowShader::getInstance()->setUniforms(STK::tuple_get<2>(ListInstancedMatGrass::getInstance()->at(0)));
+        glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+        glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)ptr, ListInstancedMatGrass::getInstance()->size(), sizeof(DrawElementsIndirectCommand));
+#endif
+    }
+    else
+    {
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+        renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatDefault::getInstance());
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+        renderInstancedShadow<MeshShader::InstancedRefShadowShader>(std::vector<GLuint>{ 0 }, ListInstancedMatAlphaRef::getInstance());
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_STANDARD, InstanceTypeDefault));
+        renderInstancedShadow<MeshShader::InstancedGrassShadowShader, 2>(std::vector<GLuint>{ 0 }, ListInstancedMatGrass::getInstance());
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getShadowInstanceVAO(video::EVT_TANGENTS, InstanceTypeDefault));
+        renderInstancedShadow<MeshShader::InstancedShadowShader>(noTexUnits, ListInstancedMatNormalMap::getInstance());
+    }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 }

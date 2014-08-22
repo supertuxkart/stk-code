@@ -129,6 +129,17 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #ifdef WIN32
 #define Bindless_Texture_Support
 #define Base_Instance_Support
+#define Buffer_Storage
+#define Multi_Draw_Indirect
 #endif
+
+
+struct DrawElementsIndirectCommand{
+    GLuint count;
+    GLuint instanceCount;
+    GLuint firstIndex;
+    GLuint baseVertex;
+    GLuint baseInstance;
+};
 
 #endif

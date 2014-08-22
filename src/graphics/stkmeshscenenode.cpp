@@ -341,7 +341,7 @@ void STKMeshSceneNode::render()
                         tmpcol.getBlue() / 255.0f);
 
                     compressTexture(mesh.textures[0], true);
-                    if (UserConfigParams::m_bindless_textures)
+                    if (UserConfigParams::m_azdo)
                     {
 #ifdef Bindless_Texture_Support
                         if (!mesh.TextureHandles[0])
@@ -373,7 +373,7 @@ void STKMeshSceneNode::render()
                     size_t count = mesh.IndexCount;
 
                     compressTexture(mesh.textures[0], true);
-                    if (UserConfigParams::m_bindless_textures)
+                    if (UserConfigParams::m_azdo)
                     {
 #ifdef Bindless_Texture_Support
                         if (!mesh.TextureHandles[0])

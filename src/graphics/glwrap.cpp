@@ -320,7 +320,7 @@ GLuint LoadShader(const char * file, unsigned type)
     char versionString[20];
     sprintf(versionString, "#version %d\n", irr_driver->getGLSLVersion());
     std::string Code = versionString;
-    if (UserConfigParams::m_bindless_textures)
+    if (UserConfigParams::m_azdo)
         Code += "#extension GL_ARB_bindless_texture : enable\n";
     else
     {

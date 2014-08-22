@@ -127,7 +127,7 @@ void STKInstancedSceneNode::addInstance(const core::vector3df &origin, const cor
     {
         GLMesh &mesh = GLmeshes[i];
 #ifdef Bindless_Texture_Support
-        if (UserConfigParams::m_bindless_textures)
+        if (UserConfigParams::m_azdo)
         {
             for (unsigned j = 0; j < 2; j++)
             {
