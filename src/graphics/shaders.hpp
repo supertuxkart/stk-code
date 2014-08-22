@@ -784,11 +784,9 @@ public:
 };
 
 // Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader : public ShaderHelperSingleton<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int>
+class NVWorkaroundRadianceHintsConstructionShader : public ShaderHelperSingleton<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
-    GLuint TU_ctex, TU_ntex, TU_dtex;
-
     NVWorkaroundRadianceHintsConstructionShader();
 };
 
@@ -807,11 +805,9 @@ public:
     GlobalIlluminationReconstructionShader();
 };
 
-class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>
+class Gaussian17TapHShader : public ShaderHelperSingleton<Gaussian17TapHShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
 {
 public:
-    GLuint TU_tex, TU_depth;
-
     Gaussian17TapHShader();
 };
 
@@ -834,11 +830,9 @@ public:
     Gaussian3HBlurShader();
 };
 
-class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>
+class Gaussian17TapVShader : public ShaderHelperSingleton<Gaussian17TapVShader, core::vector2df>, public TextureRead<Bilinear_Clamped_Filtered, Bilinear_Clamped_Filtered>
 {
 public:
-    GLuint TU_tex, TU_depth;
-
     Gaussian17TapVShader();
 };
 

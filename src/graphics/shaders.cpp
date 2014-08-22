@@ -1651,10 +1651,8 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rh.frag").c_str());
 
         AssignUniforms("RSMMatrix", "RHMatrix", "extents", "slice");
-        TU_ctex = 0;
-        TU_ntex = 1;
-        TU_dtex = 2;
-        AssignTextureUnit(Program, TexUnit(TU_ctex, "ctex"), TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
+
+        AssignSamplerNames(Program, 0, "ctex", 1, "ntex", 2, "dtex");
     }
 
     RHDebug::RHDebug()
@@ -1692,9 +1690,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralH.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        TU_depth = 1;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
+
+        AssignSamplerNames(Program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapHShader::ComputeGaussian17TapHShader()
@@ -1738,9 +1735,8 @@ namespace FullScreenShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/bilateralV.frag").c_str());
         AssignUniforms("pixel");
-        TU_tex = 0;
-        TU_depth = 1;
-        AssignTextureUnit(Program, TexUnit(TU_tex, "tex"), TexUnit(TU_depth, "depth"));
+
+        AssignSamplerNames(Program, 0, "tex", 1, "depth");
     }
 
     ComputeGaussian17TapVShader::ComputeGaussian17TapVShader()
