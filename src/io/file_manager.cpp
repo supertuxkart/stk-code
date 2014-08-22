@@ -350,6 +350,25 @@ FileManager::~FileManager()
     m_file_system = NULL;
 }   // ~FileManager
 
+// ----------------------------------------------------------------------------
+/** Returns true if the specified file exists.
+ */
+bool FileManager::fileExists(const std::string& path) const
+{
+#ifdef DEBUG
+    bool exists = m_file_system->existFile(path.c_str());
+    if(exists) return true;
+    // Now the original file was not found. Test if replacing \ with / helps:
+    std::string s = StringUtils::replace(path, "\\", "/");
+    exists = m_file_system->existFile(s.c_str());
+    if(exists)
+        Log::warn("FileManager", "File '%s' does not exists, but '%s' does!",
+        path.c_str(), s.c_str());
+    return exists;
+#else
+    return m_file_system->existFile(path.c_str());
+#endif
+}   // fileExists
 //-----------------------------------------------------------------------------
 /** Adds paths to the list of stk root directories.
  *  \param roots A ":" separated string of directories to add.

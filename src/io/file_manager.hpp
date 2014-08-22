@@ -133,6 +133,7 @@ public:
     std::string searchMusic(const std::string& file_name) const;
     std::string searchTexture(const std::string& fname) const;
     std::string getUserConfigFile(const std::string& fname) const;
+    bool        fileExists(const std::string& path) const;
     void        listFiles        (std::set<std::string>& result,
                                   const std::string& dir,
                                   bool make_full_path=false) const;
@@ -154,14 +155,6 @@ public:
     {
         m_music_search_path.push_back(path);
     }   // pushMusicSearchPath
-
-    // ------------------------------------------------------------------------
-    /** Returns true if the specified file exists.
-     */
-    bool fileExists(const std::string& path) const
-    {
-        return m_file_system->existFile(path.c_str());
-    }   // fileExists
 
 };   // FileManager
 
