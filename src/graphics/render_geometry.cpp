@@ -201,7 +201,6 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
     glUseProgram(Shader::getInstance()->Program);
     for (unsigned i = 0; i < meshes->size(); i++)
     {
-        std::vector<uint64_t> Handles;
         std::vector<GLuint> Textures;
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
 #ifdef DEBUG
@@ -210,28 +209,17 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
 #endif
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh.vao);
-        for (unsigned j = 0; j < TexUnits.size(); j++)
+        if (!UserConfigParams::m_bindless_textures)
         {
-            if (!mesh.textures[TexUnits[j].m_id])
-                mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-            if (UserConfigParams::m_bindless_textures)
+            for (unsigned j = 0; j < TexUnits.size(); j++)
             {
-#ifdef Bindless_Texture_Support
-                if (!mesh.TextureHandles[TexUnits[j].m_id])
-                    mesh.TextureHandles[TexUnits[j].m_id] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[TexUnits[j].m_id]), Shader::getInstance()->SamplersId[j]);
-                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]))
-                    glMakeTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]);
-#endif
-                Handles.push_back(mesh.TextureHandles[TexUnits[j].m_id]);
-            }
-            else
+                if (!mesh.textures[TexUnits[j].m_id])
+                    mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+                compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
                 Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
-        }
-        if (UserConfigParams::m_bindless_textures)
-            Shader::getInstance()->SetTextureHandles(Handles);
-        else
+            }
             Shader::getInstance()->SetTextureUnits(Textures);
+        }
         instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
 }
@@ -363,16 +351,6 @@ void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::
             }
             else
                 Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
-/*            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }*/
         }
 
         if (mesh.VAOType != VertexType)
@@ -402,40 +380,25 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vec
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh.vao);
 
-        std::vector<GLuint> Textures(Prefilled_tex);
-        std::vector<uint64_t> Handles(Prefilled_Handles);
-
-        for (unsigned j = 0; j < TexUnits.size(); j++)
-        {
-            if (!mesh.textures[TexUnits[j].m_id])
-                mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
-            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
-#ifdef Bindless_Texture_Support
-            if (!mesh.TextureHandles[TexUnits[j].m_id])
-                mesh.TextureHandles[TexUnits[j].m_id] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[TexUnits[j].m_id]), Shader::getInstance()->SamplersId[Handles.size()]);
-            if (!glIsTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]))
-                glMakeTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]);
-#endif
-            if (UserConfigParams::m_bindless_textures)
-                Handles.push_back(mesh.TextureHandles[TexUnits[j].m_id]);
-            else
-                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
-/*            if (irr_driver->getLightViz())
-            {
-                GLint swizzleMask[] = { GL_ONE, GL_ONE, GL_ONE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }
-            else
-            {
-                GLint swizzleMask[] = { GL_RED, GL_GREEN, GL_BLUE, GL_ALPHA };
-                glTexParameteriv(GL_TEXTURE_2D, GL_TEXTURE_SWIZZLE_RGBA, swizzleMask);
-            }*/
-        }
-
         if (UserConfigParams::m_bindless_textures)
+        {
+            std::vector<uint64_t> Handles(Prefilled_Handles);
+            for (unsigned i = 0; i < TexUnits.size(); i++)
+                Handles.push_back(0);
             Shader::getInstance()->SetTextureHandles(Handles);
+        }
         else
-            Shader::getInstance()->SetTextureUnits(Textures);
+        {
+            std::vector<GLuint> Textures(Prefilled_tex);
+            for (unsigned j = 0; j < TexUnits.size(); j++)
+            {
+                if (!mesh.textures[TexUnits[j].m_id])
+                    mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+                compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
+                Shader::getInstance()->SetTextureUnits(Textures);
+            }
+        }
 
         instanced_custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
     }
@@ -841,26 +804,15 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, const std::ve
         GLMesh *mesh = STK::tuple_get<0>(t->at(i));
         if (!irr_driver->hasARB_base_instance())
             glBindVertexArray(mesh->vao_shadow_pass);
-        for (unsigned j = 0; j < TextureUnits.size(); j++)
+        if (!UserConfigParams::m_bindless_textures)
         {
-            compressTexture(mesh->textures[TextureUnits[j]], true);
-            if (UserConfigParams::m_bindless_textures)
+            for (unsigned j = 0; j < TextureUnits.size(); j++)
             {
-#ifdef Bindless_Texture_Support
-                if (!mesh->TextureHandles[TextureUnits[j]])
-                    mesh->TextureHandles[TextureUnits[j]] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh->textures[TextureUnits[j]]), T::getInstance()->SamplersId[j]);
-                if (!glIsTextureHandleResidentARB(mesh->TextureHandles[TextureUnits[j]]))
-                    glMakeTextureHandleResidentARB(mesh->TextureHandles[TextureUnits[j]]);
-#endif
-                Handles.push_back(mesh->TextureHandles[TextureUnits[j]]);
-            }
-            else
+                compressTexture(mesh->textures[TextureUnits[j]], true);
                 Textures.push_back(getTextureGLuint(mesh->textures[TextureUnits[j]]));
+                T::getInstance()->SetTextureUnits(Textures);
+            }
         }
-        if (UserConfigParams::m_bindless_textures)
-            T::getInstance()->SetTextureHandles(Handles);
-        else
-            T::getInstance()->SetTextureUnits(Textures);
         instanced_shadow_custom_unroll_args<List...>::template exec<T>(T::getInstance(), t->at(i));
     }
 }

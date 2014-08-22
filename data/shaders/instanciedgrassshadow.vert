@@ -7,6 +7,10 @@ layout(location = 3) in vec2 Texcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
+#ifdef GL_ARB_bindless_texture
+layout(location = 10) in sampler2D Handle;
+#endif
+
 #else
 in vec3 Position;
 in vec4 Color;
@@ -19,9 +23,15 @@ in vec3 Scale;
 
 #ifdef VSLayer
 out vec2 uv;
+#ifdef GL_ARB_bindless_texture
+flat out sampler2D handle;
+#endif
 #else
 out vec2 tc;
 out int layerId;
+#ifdef GL_ARB_bindless_texture
+flat out sampler2D hdle;
+#endif
 #endif
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
@@ -34,9 +44,15 @@ void main(void)
     gl_Layer = gl_InstanceID & 3;
     gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
     uv = Texcoord;
+#ifdef GL_ARB_bindless_texture
+    handle = Handle;
+#endif
 #else
     layerId = gl_InstanceID & 3;
     gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
     tc = Texcoord;
+#ifdef GL_ARB_bindless_texture
+    hdle = Handle;
+#endif
 #endif
 }

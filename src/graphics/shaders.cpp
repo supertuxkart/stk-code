@@ -818,7 +818,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass1.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass1.frag").c_str());
 
         AssignUniforms();
         AssignSamplerNames(Program, 0, "tex");
@@ -833,7 +833,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
 
         AssignUniforms();
         AssignSamplerNames(Program, 0, "tex");
@@ -848,7 +848,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass1.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass1.frag").c_str());
         AssignUniforms("windDir");
 
         AssignSamplerNames(Program, 0, "tex");
@@ -863,7 +863,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/encode_normal.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/normalmap.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_normalmap.frag").c_str());
         AssignUniforms();
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -893,7 +893,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_pass2.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_object_pass2.frag").c_str());
         AssignUniforms();
 
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
@@ -909,7 +909,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/objectref_pass2.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_objectref_pass2.frag").c_str());
         AssignUniforms();
 
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo");
@@ -975,7 +975,7 @@ namespace MeshShader
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_grass.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
-            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/grass_pass2.frag").c_str());
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_grass_pass2.frag").c_str());
         AssignUniforms("windDir", "SunDir");
 
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "dtex", 4, "Albedo");
@@ -1158,7 +1158,7 @@ namespace MeshShader
             Program = LoadProgram(
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
                 GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/white.frag").c_str());
         }
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
@@ -1200,15 +1200,15 @@ namespace MeshShader
             Program = LoadProgram(
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
         }
         else
         {
             Program = LoadProgram(
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedshadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
         }
 
         AssignSamplerNames(Program, 0, "tex");
@@ -1251,15 +1251,15 @@ namespace MeshShader
             Program = LoadProgram(
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedgrassshadow.vert").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
         }
         else
         {
             Program = LoadProgram(
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
                 GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanciedgrassshadow.vert").c_str(),
-                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/shadow.geom").c_str(),
-                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/object_unlit.frag").c_str());
+                GL_GEOMETRY_SHADER, file_manager->getAsset("shaders/instanced_shadow.geom").c_str(),
+                GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_shadowref.frag").c_str());
         }
 
         AssignSamplerNames(Program, 0, "tex");

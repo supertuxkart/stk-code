@@ -22,7 +22,7 @@ protected:
     int m_ref_count;
     std::vector<GLMesh *> MeshSolidMaterial[MAT_COUNT];
     std::vector<GLMesh> GLmeshes;
-    std::vector<InstanceData> instanceData;
+    std::vector<std::vector<InstanceData> > instanceData;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
     GLuint instances_vbo;
     void createGLMeshes();

@@ -166,6 +166,7 @@ struct InstanceData
         float Z;
     } Scale;
     uint64_t Texture;
+    uint64_t SecondTexture;
 };
 
 class VAOManager : public Singleton<VAOManager>

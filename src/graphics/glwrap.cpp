@@ -745,6 +745,12 @@ void VAOManager::regenerateInstancedVAO()
             glEnableVertexAttribArray(9);
             glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
             glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 1);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
             InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, (InstanceType) j)] = vao;
 
             GLuint shadow_vao = createVAO(vbo[tp], ibo[tp], tp);
@@ -759,6 +765,12 @@ void VAOManager::regenerateInstancedVAO()
             glEnableVertexAttribArray(9);
             glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
             glVertexAttribDivisor(9, 4);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 4);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)+2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
             ShadowInstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, (InstanceType)j)] = shadow_vao;
             glBindVertexArray(0);
         }

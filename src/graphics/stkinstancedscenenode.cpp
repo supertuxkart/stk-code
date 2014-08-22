@@ -57,6 +57,7 @@ void STKInstancedSceneNode::createGLMeshes()
             mesh.vaoBaseVertex = p.first;
             mesh.vaoOffset = p.second;
             mesh.VAOType = mb->getVertexType();
+            instanceData.push_back(std::vector<InstanceData>());
         }
         else
             fillLocalBuffer(mesh, mb);
@@ -66,9 +67,7 @@ void STKInstancedSceneNode::createGLMeshes()
 
 void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh)
 {
-    if (irr_driver->hasARB_base_instance())
-        mesh.vaoBaseInstance = VAOManager::getInstance()->appendInstance(InstanceTypeDefault, instanceData);
-    else
+    if (!irr_driver->hasARB_base_instance())
     {
         mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glGenBuffers(1, &instances_vbo);
@@ -115,6 +114,7 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
         GLMesh &mesh = GLmeshes[i];
         MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
         initinstancedvaostate(mesh);
+        mesh.vaoBaseInstance = VAOManager::getInstance()->appendInstance(InstanceTypeDefault, instanceData[i]);
         MeshSolidMaterial[MatType].push_back(&mesh);
     }
     isMaterialInitialized = true;
@@ -122,32 +122,53 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
 
 void STKInstancedSceneNode::addInstance(const core::vector3df &origin, const core::vector3df &orientation, const core::vector3df &scale)
 {
-    InstanceData instance = {
+    for (unsigned i = 0; i < GLmeshes.size(); i++)
+    {
+        GLMesh &mesh = GLmeshes[i];
+#ifdef Bindless_Texture_Support
+        if (UserConfigParams::m_bindless_textures)
         {
-            origin.X,
-            origin.Y,
-            origin.Z
-        },
-        {
-            orientation.X,
-            orientation.Y,
-            orientation.Z
-        },
-        {
-            scale.X,
-            scale.Y,
-            scale.Z
-        },
-        0
-    };
-    instanceData.push_back(instance);
+            for (unsigned j = 0; j < 2; j++)
+            {
+                if (!mesh.textures[j])
+                    mesh.textures[j] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+                compressTexture(mesh.textures[j], true);
+
+                if (!mesh.TextureHandles[j])
+                    mesh.TextureHandles[j] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[j]), MeshShader::InstancedNormalMapShader::getInstance()->SamplersId[j]);
+                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[j]))
+                    glMakeTextureHandleResidentARB(mesh.TextureHandles[j]);
+            }
+        }
+#endif
+        InstanceData instance = {
+            {
+                origin.X,
+                origin.Y,
+                origin.Z
+            },
+            {
+                orientation.X,
+                orientation.Y,
+                orientation.Z
+            },
+            {
+                scale.X,
+                scale.Y,
+                scale.Z
+            },
+            mesh.TextureHandles[0],
+            mesh.TextureHandles[1]
+        };
+        instanceData[i].push_back(instance);
+    }
 }
 
 core::matrix4 STKInstancedSceneNode::getInstanceTransform(int id)
 {
     core::matrix4 mat;
 
-    const InstanceData &instance = instanceData[id];
+    const InstanceData &instance = instanceData[0][id];
     mat.setTranslation(core::vector3df(
         instance.Origin.X,
         instance.Origin.Y,
@@ -174,17 +195,16 @@ void STKInstancedSceneNode::render()
 
     setFirstTimeMaterial();
 
-    
     for(unsigned i = 0; i < MeshSolidMaterial[MAT_DEFAULT].size(); i++)
     {
         GLMesh *mesh = MeshSolidMaterial[MAT_DEFAULT][i];
-        ListInstancedMatDefault::getInstance()->push_back(STK::make_tuple(mesh, instanceData.size()));
+        ListInstancedMatDefault::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
     }
 
     for(unsigned i = 0; i < MeshSolidMaterial[MAT_ALPHA_REF].size(); i++)
     {
         GLMesh *mesh = MeshSolidMaterial[MAT_ALPHA_REF][i];
-        ListInstancedMatAlphaRef::getInstance()->push_back(STK::make_tuple(mesh, instanceData.size()));
+        ListInstancedMatAlphaRef::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
     }
 
     windDir = getWind();
@@ -192,12 +212,12 @@ void STKInstancedSceneNode::render()
     for(unsigned i = 0; i < MeshSolidMaterial[MAT_GRASS].size(); i++)
     {
         GLMesh *mesh = MeshSolidMaterial[MAT_GRASS][i];
-        ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instanceData.size(), windDir, cb->getPosition()));
+        ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size(), windDir, cb->getPosition()));
     }
 
     for(unsigned i = 0; i < MeshSolidMaterial[MAT_NORMAL_MAP].size(); i++)
     {
         GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
-        ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instanceData.size()));
+        ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
     }
 }
