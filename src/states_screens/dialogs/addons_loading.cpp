@@ -190,11 +190,12 @@ void AddonsLoading::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-void AddonsLoading::escapePressed()
+bool AddonsLoading::onEscapePressed()
 {
     stopDownload();
     ModalDialog::dismiss();
-}   // escapePressed
+    return true;
+}   // onEscapePressed
 
 // ----------------------------------------------------------------------------
 
@@ -335,7 +336,6 @@ void AddonsLoading::stopDownload()
         // order to avoid a memory leak, we let network_http free
         // the request.
         //m_download_request->setManageMemory(true);
-        assert(false);
         m_download_request->cancel();
     };
 }   // startDownload
