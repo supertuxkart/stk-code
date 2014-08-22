@@ -155,12 +155,13 @@
                  otherwise obstricts too much of the view.  -->
     <camera distance="1.5" forward-up-angle="15"
             backward-up-angle="30"/>
+    <!-- Additional offset to move graphical chassis with regards to the physics. -->
+    <graphics y-offset="0.0"/>
 
-   <!-- Jump animation related values:
-        animation-time: only if the estimated time for a jump is larger
-                        than this value will the jump animation being
-                        shown. -->
-   <jump animation-time="0.5" />
+    <!-- Jump animation related values:
+         animation-time: only if the estimated time for a jump is larger
+                         than this value will the jump animation being shown. -->
+    <jump animation-time="0.5" />
 
     <!-- Skidding: increase: multiplicative increase of skidding factor in each frame.
          decrease: multiplicative decrease of skidding factor in each frame.
@@ -420,7 +421,7 @@
            outside of the chassis and results in more stable physical
            behaviour of the karts. -->
     <collision impulse-type="normal" 
-               impulse="3000" impulse-time="0.1" terrain-impulse="8000"
+               impulse="3000" impulse-time="0.1" terrain-impulse="1600"
                restitution="1.0" bevel-factor="0.5 0.0 0.7"
                physical-wheel-position="-1" />
 			 
