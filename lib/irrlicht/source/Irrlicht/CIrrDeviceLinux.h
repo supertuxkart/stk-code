@@ -150,7 +150,8 @@ namespace irr
 
 		void initXAtoms();
 
-		bool switchToFullscreen(bool reset=false);
+		bool restoreResolution();
+		bool switchToFullscreen();
 
 		//! Implementation of the linux cursor control
 		class CCursorControl : public gui::ICursorControl

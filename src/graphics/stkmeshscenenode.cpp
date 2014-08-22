@@ -95,7 +95,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
 
       if (!immediate_draw)
       {
-          std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
+          std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
           mesh.vaoBaseVertex = p.first;
           mesh.vaoOffset = p.second;
           mesh.VAOType = mb->getVertexType();
@@ -300,7 +300,7 @@ void STKMeshSceneNode::render()
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
-            glBindVertexArray(getVAO(video::EVT_STANDARD));
+            glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
             drawGlow(GLmeshes[i]);
         }
     }
@@ -413,7 +413,7 @@ void STKMeshSceneNode::render()
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
-        glBindVertexArray(getVAO(video::EVT_STANDARD));
+        glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
         for_in(mesh, TransparentMesh[TM_BUBBLE])
             drawBubble(*mesh, ModelViewProjectionMatrix);
         return;

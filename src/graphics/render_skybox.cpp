@@ -440,6 +440,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
                     swapPixels(tmp, rgba[i], size, x, y, (size - y - 1), x);
                 }
             }
+            free(tmp);
         }
 
         glBindTexture(GL_TEXTURE_CUBE_MAP, result);

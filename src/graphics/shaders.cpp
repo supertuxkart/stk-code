@@ -103,6 +103,8 @@
 
 using namespace video;
 
+std::vector<void(*)()> CleanTable;
+
 Shaders::Shaders()
 {
     // Callbacks
@@ -397,6 +399,7 @@ void Shaders::loadShaders()
     }
 
     initGL();
+    CleanTable.clear();
     initQuadVBO();
     initQuadBuffer();
     initBillboardVBO();
@@ -404,12 +407,16 @@ void Shaders::loadShaders()
     initFrustrumVBO();
     initShadowVPMUBO();
     initParticleQuadVBO();
-    FullScreenShader::DiffuseEnvMapShader::init();
     MeshShader::BubbleShader::init();
-    LightShader::PointLightShader::init();
     MeshShader::SkyboxShader::init();
     MeshShader::ViewFrustrumShader::init();
     UtilShader::ColoredLine::init();
+}
+
+void Shaders::killShaders()
+{
+    for (unsigned i = 0; i < CleanTable.size(); i++)
+        CleanTable[i]();
 }
 
 Shaders::~Shaders()
@@ -1413,19 +1420,7 @@ namespace MeshShader
 
 namespace LightShader
 {
-
-    GLuint PointLightShader::Program;
-    GLuint PointLightShader::attrib_Position;
-    GLuint PointLightShader::attrib_Color;
-    GLuint PointLightShader::attrib_Energy;
-    GLuint PointLightShader::attrib_Radius;
-    GLuint PointLightShader::uniform_ntex;
-    GLuint PointLightShader::uniform_dtex;
-    GLuint PointLightShader::uniform_spec;
-    GLuint PointLightShader::vbo;
-    GLuint PointLightShader::vao;
-
-    void PointLightShader::init()
+    PointLightShader::PointLightShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/pointlight.vert").c_str(),
@@ -1433,13 +1428,9 @@ namespace LightShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/pointlight.frag").c_str());
-        attrib_Position = glGetAttribLocation(Program, "Position");
-        attrib_Color = glGetAttribLocation(Program, "Color");
-        attrib_Energy = glGetAttribLocation(Program, "Energy");
-        attrib_Radius = glGetAttribLocation(Program, "Radius");
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_dtex = glGetUniformLocation(Program, "dtex");
-        uniform_spec = glGetUniformLocation(Program, "spec");
+
+        AssignUniforms();
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
 
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
@@ -1447,6 +1438,11 @@ namespace LightShader
         glGenBuffers(1, &vbo);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferData(GL_ARRAY_BUFFER, MAXLIGHT * sizeof(PointLightInfo), 0, GL_DYNAMIC_DRAW);
+
+        GLuint attrib_Position = glGetAttribLocation(Program, "Position");
+        GLuint attrib_Color = glGetAttribLocation(Program, "Color");
+        GLuint attrib_Energy = glGetAttribLocation(Program, "Energy");
+        GLuint attrib_Radius = glGetAttribLocation(Program, "Radius");
 
         glEnableVertexAttribArray(attrib_Position);
         glVertexAttribPointer(attrib_Position, 3, GL_FLOAT, GL_FALSE, sizeof(PointLightInfo), 0);
@@ -1462,17 +1458,6 @@ namespace LightShader
         glVertexAttribDivisor(attrib_Color, 1);
         glVertexAttribDivisor(attrib_Radius, 1);
     }
-
-    void PointLightShader::setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex)
-    {
-        if (irr_driver->needUBOWorkaround())
-            bypassUBO(Program);
-        glUniform1f(uniform_spec, 200);
-
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1i(uniform_dtex, TU_dtex);
-    }
-
 }
 
 
@@ -1599,42 +1584,22 @@ namespace FullScreenShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getSpecular.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getPosFromUVDepth.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/sunlight.frag").c_str());
-        TU_ntex = 0;
-        TU_dtex = 1;
-        AssignTextureUnit(Program, TexUnit(TU_ntex, "ntex"), TexUnit(TU_dtex, "dtex"));
+
+        AssignSamplerNames(Program, 0, "ntex", 1, "dtex");
         AssignUniforms("direction", "col");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
-    GLuint DiffuseEnvMapShader::Program;
-    GLuint DiffuseEnvMapShader::uniform_ntex;
-    GLuint DiffuseEnvMapShader::uniform_blueLmn;
-    GLuint DiffuseEnvMapShader::uniform_greenLmn;
-    GLuint DiffuseEnvMapShader::uniform_redLmn;
-    GLuint DiffuseEnvMapShader::uniform_TVM;
-
-    void DiffuseEnvMapShader::init()
+    DiffuseEnvMapShader::DiffuseEnvMapShader()
     {
         Program = LoadProgram(
             GL_VERTEX_SHADER, file_manager->getAsset("shaders/screenquad.vert").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/decodeNormal.frag").c_str(),
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/diffuseenvmap.frag").c_str());
-        uniform_ntex = glGetUniformLocation(Program, "ntex");
-        uniform_blueLmn = glGetUniformLocation(Program, "blueLmn[0]");
-        uniform_greenLmn = glGetUniformLocation(Program, "greenLmn[0]");
-        uniform_redLmn = glGetUniformLocation(Program, "redLmn[0]");
-        uniform_TVM = glGetUniformLocation(Program, "TransposeViewMatrix");
-    }
-
-    void DiffuseEnvMapShader::setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex)
-    {
-        glUniformMatrix4fv(uniform_TVM, 1, GL_FALSE, TransposeViewMatrix.pointer());
-        glUniform1i(uniform_ntex, TU_ntex);
-        glUniform1fv(uniform_blueLmn, 9, blueSHCoeff);
-        glUniform1fv(uniform_greenLmn, 9, greenSHCoeff);
-        glUniform1fv(uniform_redLmn, 9, redSHCoeff);
+        AssignUniforms("TransposeViewMatrix", "blueLmn[0]", "greenLmn[0]", "redLmn[0]");
+        AssignSamplerNames(Program, 0, "ntex");
     }
 
     ShadowedSunLightShader::ShadowedSunLightShader()

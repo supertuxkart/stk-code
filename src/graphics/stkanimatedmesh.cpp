@@ -100,7 +100,7 @@ void STKAnimatedMesh::render()
                 MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
                 MeshSolidMaterial[MatType].push_back(&mesh);
             }
-            std::pair<unsigned, unsigned> p = getVAOOffsetAndBase(mb);
+            std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
             mesh.vaoBaseVertex = p.first;
             mesh.vaoOffset = p.second;
             mesh.VAOType = mb->getVertexType();
@@ -118,7 +118,7 @@ void STKAnimatedMesh::render()
             {
                 glBindVertexArray(0);
                 size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
-                glBindBuffer(GL_ARRAY_BUFFER, getVBO(mb->getVertexType()));
+                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
                 GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
                 void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
                 memcpy(buf, mb->getVertices(), size);

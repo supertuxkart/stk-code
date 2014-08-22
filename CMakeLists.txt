@@ -173,6 +173,9 @@ endif()
 # TODO: remove this switch
 add_definitions(-DHAVE_OGGVORBIS)
 
+if(WIN32)
+    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
 include(sources.cmake)
@@ -228,7 +231,7 @@ else()
     endif()
 
     # Build the final executable
-    add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
+    add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
@@ -368,7 +371,6 @@ endif()
 install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
-
 
 set(PREFIX ${CMAKE_INSTALL_PREFIX})
 configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)

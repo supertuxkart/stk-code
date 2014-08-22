@@ -228,12 +228,12 @@ void PostProcessing::renderDiffuseEnvMap(const float *bSHCoeff, const float *gSH
     glBlendEquation(GL_FUNC_ADD);
     glBlendFunc(GL_ONE, GL_ONE);
 
-    glUseProgram(FullScreenShader::DiffuseEnvMapShader::Program);
+    glUseProgram(FullScreenShader::DiffuseEnvMapShader::getInstance()->Program);
     glBindVertexArray(SharedObject::FullScreenQuadVAO);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
+    FullScreenShader::DiffuseEnvMapShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH)));
     core::matrix4 TVM = irr_driver->getViewMatrix().getTransposed();
-    FullScreenShader::DiffuseEnvMapShader::setUniforms(TVM, bSHCoeff, gSHCoeff, rSHCoeff, 0);
+    FullScreenShader::DiffuseEnvMapShader::getInstance()->setUniforms(TVM, std::vector<float>(bSHCoeff, bSHCoeff + 9), std::vector<float>(gSHCoeff, gSHCoeff + 9), std::vector<float>(rSHCoeff, rSHCoeff + 9));
 
     glDrawArrays(GL_TRIANGLES, 0, 3);
     glBindVertexArray(0);
@@ -278,8 +278,7 @@ void PostProcessing::renderSunlight()
   glBlendFunc(GL_ONE, GL_ONE);
   glBlendEquation(GL_FUNC_ADD);
 
-  setTexture(FullScreenShader::SunLightShader::getInstance()->TU_ntex, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-  setTexture(FullScreenShader::SunLightShader::getInstance()->TU_dtex, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
+  FullScreenShader::SunLightShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture()));
   DrawFullScreenEffect<FullScreenShader::SunLightShader>(cb->getPosition(), video::SColorf(cb->getRed(), cb->getGreen(), cb->getBlue()));
 }
 

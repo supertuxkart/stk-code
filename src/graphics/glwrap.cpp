@@ -25,6 +25,7 @@ PFNGLCREATEPROGRAMPROC glCreateProgram;
 PFNGLATTACHSHADERPROC glAttachShader;
 PFNGLLINKPROGRAMPROC glLinkProgram;
 PFNGLUSEPROGRAMPROC glUseProgram;
+PFNGLDELETEPROGRAMPROC glDeleteProgram;
 PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
 PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
 PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
@@ -85,9 +86,11 @@ PFNGLTEXSTORAGE3DPROC glTexStorage3D;
 PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
 PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
 PFNGLGENSAMPLERSPROC glGenSamplers;
+PFNGLDELETESAMPLERSPROC glDeleteSamplers;
 PFNGLBINDSAMPLERPROC glBindSampler;
 PFNGLSAMPLERPARAMETERFPROC glSamplerParameterf;
 PFNGLSAMPLERPARAMETERIPROC glSamplerParameteri;
+PFNGLGETSTRINGIPROC glGetStringi;
 #endif
 
 static bool is_gl_init = false;
@@ -200,6 +203,7 @@ void initGL()
     glAttachShader = (PFNGLATTACHSHADERPROC)IRR_OGL_LOAD_EXTENSION("glAttachShader");
     glLinkProgram = (PFNGLLINKPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glLinkProgram");
     glUseProgram = (PFNGLUSEPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glUseProgram");
+    glDeleteProgram = (PFNGLDELETEPROGRAMPROC)IRR_OGL_LOAD_EXTENSION("glDeleteProgram");
     glEnableVertexAttribArray = (PFNGLENABLEVERTEXATTRIBARRAYPROC)IRR_OGL_LOAD_EXTENSION("glEnableVertexAttribArray");
     glGetUniformLocation = (PFNGLGETUNIFORMLOCATIONPROC)IRR_OGL_LOAD_EXTENSION("glGetUniformLocation");
     glUniformMatrix4fv = (PFNGLUNIFORMMATRIX4FVPROC)IRR_OGL_LOAD_EXTENSION("glUniformMatrix4fv");
@@ -255,9 +259,11 @@ void initGL()
     glBindImageTexture = (PFNGLBINDIMAGETEXTUREPROC)IRR_OGL_LOAD_EXTENSION("glBindImageTexture");
     glDispatchCompute = (PFNGLDISPATCHCOMPUTEPROC)IRR_OGL_LOAD_EXTENSION("glDispatchCompute");
     glGenSamplers = (PFNGLGENSAMPLERSPROC)IRR_OGL_LOAD_EXTENSION("glGenSamplers");
+    glDeleteSamplers = (PFNGLDELETESAMPLERSPROC)IRR_OGL_LOAD_EXTENSION("glDeleteSamplers");
     glBindSampler = (PFNGLBINDSAMPLERPROC)IRR_OGL_LOAD_EXTENSION("glBindSampler");
     glSamplerParameterf = (PFNGLSAMPLERPARAMETERFPROC)IRR_OGL_LOAD_EXTENSION("glSamplerParameterf");
     glSamplerParameteri = (PFNGLSAMPLERPARAMETERIPROC)IRR_OGL_LOAD_EXTENSION("glSamplerParameteri");
+    glGetStringi = (PFNGLGETSTRINGIPROC)IRR_OGL_LOAD_EXTENSION("glGetstringi");
 #ifdef DEBUG
     glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)IRR_OGL_LOAD_EXTENSION("glDebugMessageCallbackARB");
 #endif
@@ -548,40 +554,7 @@ void setTexture(unsigned TextureUnit, GLuint TextureId, GLenum MagFilter, GLenum
     glGetError();
 }
 
-class VBOGatherer
-{
-    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
-    GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
-    std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
-    void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
-    size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
-    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
-
-    void regenerateBuffer(enum VTXTYPE);
-    void regenerateVAO(enum VTXTYPE);
-    size_t getVertexPitch(enum VTXTYPE) const;
-    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
-    void append(scene::IMeshBuffer *, VBOGatherer::VTXTYPE tp);
-public:
-    VBOGatherer();
-    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
-    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
-    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
-    ~VBOGatherer()
-    {
-        for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
-        {
-            if (vbo[i])
-                glDeleteBuffers(1, &vbo[i]);
-            if (ibo[i])
-                glDeleteBuffers(1, &ibo[i]);
-            if (vao[i])
-                glDeleteVertexArrays(1, &vao[i]);
-        }
-    }
-};
-
-VBOGatherer::VBOGatherer()
+VAOManager::VAOManager()
 {
     vao[0] = vao[1] = vao[2] = 0;
     vbo[0] = vbo[1] = vbo[2] = 0;
@@ -592,7 +565,25 @@ VBOGatherer::VBOGatherer()
     idx_mirror[0] = idx_mirror[1] = idx_mirror[2] = NULL;
 }
 
-void VBOGatherer::regenerateBuffer(enum VTXTYPE tp)
+VAOManager::~VAOManager()
+{
+    for (unsigned i = 0; i < 3; i++)
+    {
+        if (vtx_mirror[i])
+            free(vtx_mirror[i]);
+        if (idx_mirror[i])
+            free(idx_mirror[i]);
+        if (vbo[i])
+            glDeleteBuffers(1, &vbo[i]);
+        if (ibo[i])
+            glDeleteBuffers(1, &ibo[i]);
+        if (vao[i])
+            glDeleteVertexArrays(1, &vao[i]);
+    }
+
+}
+
+void VAOManager::regenerateBuffer(enum VTXTYPE tp)
 {
     glBindVertexArray(0);
     if (vbo[tp])
@@ -611,7 +602,7 @@ void VBOGatherer::regenerateBuffer(enum VTXTYPE tp)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void VBOGatherer::regenerateVAO(enum VTXTYPE tp)
+void VAOManager::regenerateVAO(enum VTXTYPE tp)
 {
     if (vao[tp])
         glDeleteVertexArrays(1, &vao[tp]);
@@ -677,7 +668,7 @@ void VBOGatherer::regenerateVAO(enum VTXTYPE tp)
     glBindVertexArray(0);
 }
 
-size_t VBOGatherer::getVertexPitch(enum VTXTYPE tp) const
+size_t VAOManager::getVertexPitch(enum VTXTYPE tp) const
 {
     switch (tp)
     {
@@ -693,22 +684,22 @@ size_t VBOGatherer::getVertexPitch(enum VTXTYPE tp) const
     }
 }
 
-VBOGatherer::VTXTYPE VBOGatherer::getVTXTYPE(video::E_VERTEX_TYPE type)
+VAOManager::VTXTYPE VAOManager::getVTXTYPE(video::E_VERTEX_TYPE type)
 {
     switch (type)
     {
+    default:
+        assert(0 && "Wrong vtxtype");
     case video::EVT_STANDARD:
         return VTXTYPE_STANDARD;
     case video::EVT_2TCOORDS:
         return VTXTYPE_TCOORD;
     case video::EVT_TANGENTS:
         return VTXTYPE_TANGENT;
-    default:
-        assert(0 && "Wrong vtxtype");
     }
 };
 
-void VBOGatherer::append(scene::IMeshBuffer *mb, VBOGatherer::VTXTYPE tp)
+void VAOManager::append(scene::IMeshBuffer *mb, VTXTYPE tp)
 {
     size_t old_vtx_cnt = vtx_cnt[tp];
     vtx_cnt[tp] += mb->getVertexCount();
@@ -726,7 +717,7 @@ void VBOGatherer::append(scene::IMeshBuffer *mb, VBOGatherer::VTXTYPE tp)
     mappedBaseIndex[tp][mb] = old_idx_cnt * sizeof(u16);
 }
 
-std::pair<unsigned, unsigned> VBOGatherer::getBase(scene::IMeshBuffer *mb)
+std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
 {
     VTXTYPE tp = getVTXTYPE(mb->getVertexType());
     if (mappedBaseVertex[tp].find(mb) == mappedBaseVertex[tp].end())
@@ -745,36 +736,6 @@ std::pair<unsigned, unsigned> VBOGatherer::getBase(scene::IMeshBuffer *mb)
     It = mappedBaseIndex[tp].find(mb);
     assert(It != mappedBaseIndex[tp].end());
     return std::pair<unsigned, unsigned>(vtx, It->second);
-}
-
-static VBOGatherer *gatherersingleton = 0;
-
-std::pair<unsigned, unsigned> getVAOOffsetAndBase(scene::IMeshBuffer *mb)
-{
-    if (!gatherersingleton)
-        gatherersingleton = new VBOGatherer();
-    return gatherersingleton->getBase(mb);
-}
-
-unsigned getVBO(video::E_VERTEX_TYPE type)
-{
-    if (gatherersingleton)
-        return gatherersingleton->getVBO(type);
-    return 0;
-}
-
-unsigned getVAO(video::E_VERTEX_TYPE type)
-{
-    if (gatherersingleton)
-        return gatherersingleton->getVAO(type);
-    return 0;
-}
-
-void resetVAO()
-{
-    if (gatherersingleton)
-        delete gatherersingleton;
-    gatherersingleton = 0;
 }
 
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)
@@ -1216,23 +1177,27 @@ void GL32_draw2DRectangle(video::SColor color, const core::rect<s32>& position,
 
 bool hasGLExtension(const char* extension) 
 {
-#ifdef WIN32
-    return false;
-#else
-    GLint numExtensions = 0;
-    glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
-    Log::debug("GLWrap", "Found %d OpenGL Extensions", numExtensions);
-    for (GLint i = 0; i < numExtensions; i++)
+    if (glGetStringi != NULL)
     {
-        const char* foundExtension =
-            (const char*) glGetStringi(GL_EXTENSIONS, i);
-        if (foundExtension && strcmp(foundExtension, extension) == 0)
+        GLint numExtensions = 0;
+        glGetIntegerv(GL_NUM_EXTENSIONS, &numExtensions);
+        for (GLint i = 0; i < numExtensions; i++)
         {
-            Log::debug("GLWrap", "Extension %s found", extension);
+            const char* foundExtension =
+                (const char*) glGetStringi(GL_EXTENSIONS, i);
+            if (foundExtension && strcmp(foundExtension, extension) == 0)
+            {
+                return true;
+            }
+        }
+    }
+    else
+    {
+        const char* extensions = (const char*) glGetString(GL_EXTENSIONS);
+        if (extensions && strstr(extensions, extension) != NULL)
+        {
             return true;
         }
     }
-    Log::debug("GLWrap", "Extension %s not found", extension);
     return false;
-#endif
 }

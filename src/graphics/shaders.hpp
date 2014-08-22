@@ -120,9 +120,18 @@ struct UniformHelper
         setUniformsHelper<N + 1>(uniforms, arg...);
     }
 
+    template<unsigned N = 0, typename... Args>
+    static void setUniformsHelper(const std::vector<GLuint> &uniforms, const std::vector<float> &v, Args... arg)
+    {
+        glUniform1fv(uniforms[N], v.size(), v.data());
+        setUniformsHelper<N + 1>(uniforms, arg...);
+    }
+
 };
 
 void bypassUBO(GLuint Program);
+
+extern std::vector<void(*)()> CleanTable;
 
 template<typename T, typename... Args>
 class ShaderHelperSingleton : public Singleton<T>
@@ -150,6 +159,16 @@ protected:
 
 public:
     GLuint Program;
+
+    ShaderHelperSingleton()
+    {
+        CleanTable.push_back(this->kill);
+    }
+
+    ~ShaderHelperSingleton()
+    {
+        glDeleteProgram(Program);
+    }
 
     void setUniforms(const Args & ... args) const
     {
@@ -409,6 +428,12 @@ public:
         else
             BindTexture<tp...>::exec(TextureUnits, args, 0);
     }
+
+    ~TextureRead()
+    {
+        for (unsigned i = 0; i < SamplersId.size(); i++)
+            glDeleteSamplers(1, &SamplersId[i]);
+    }
 };
 
 namespace MeshShader
@@ -666,17 +691,12 @@ namespace LightShader
     };
 
 
-    class PointLightShader
+    class PointLightShader : public ShaderHelperSingleton<PointLightShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
     {
     public:
-        static GLuint Program;
-        static GLuint attrib_Position, attrib_Energy, attrib_Color, attrib_Radius;
-        static GLuint uniform_ntex, uniform_dtex, uniform_spec;
-        static GLuint vbo;
-        static GLuint vao;
-
-        static void init();
-        static void setUniforms(const core::vector2df &screen, unsigned spec, unsigned TU_ntex, unsigned TU_dtex);
+        GLuint vbo;
+        GLuint vao;
+        PointLightShader();
     };
 }
 
@@ -739,22 +759,16 @@ public:
     DepthOfFieldShader();
 };
 
-class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>
+class SunLightShader : public ShaderHelperSingleton<SunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered>
 {
 public:
-    GLuint TU_ntex, TU_dtex;
-
     SunLightShader();
 };
 
-class DiffuseEnvMapShader
+class DiffuseEnvMapShader : public ShaderHelperSingleton<DiffuseEnvMapShader, core::matrix4, std::vector<float>, std::vector<float>, std::vector<float> >, public TextureRead<Nearest_Filtered>
 {
 public:
-    static GLuint Program;
-    static GLuint uniform_ntex, uniform_TVM, uniform_blueLmn, uniform_greenLmn, uniform_redLmn;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &TransposeViewMatrix, const float *blueSHCoeff, const float *greenSHCoeff, const float *redSHCoeff, unsigned TU_ntex);
+    DiffuseEnvMapShader();
 };
 
 class ShadowedSunLightShader : public ShaderHelperSingleton<ShadowedSunLightShader, core::vector3df, video::SColorf>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Shadow_Sampler>
@@ -1021,6 +1035,7 @@ public:
     video::IShaderConstantSetCallBack * m_callbacks[ES_COUNT];
 
     void loadShaders();
+    void killShaders();
 private:
     void check(const int num) const;
     

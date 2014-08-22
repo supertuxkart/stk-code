@@ -78,9 +78,10 @@ enum TypeFBO
 {
     FBO_SSAO,
     FBO_NORMAL_AND_DEPTHS,
-    FBO_COMBINED_TMP1_TMP2,
+    FBO_COMBINED_DIFFUSE_SPECULAR,
     FBO_COLORS,
-    FBO_LOG_LUMINANCE,
+    FBO_DIFFUSE,
+    FBO_SPECULAR,
     FBO_MLAA_COLORS,
     FBO_MLAA_BLEND,
     FBO_MLAA_TMP,
@@ -140,7 +141,9 @@ enum TypeRTT
     RTT_LINEAR_DEPTH,
     RTT_NORMAL_AND_DEPTH,
     RTT_COLOR,
-    RTT_LOG_LUMINANCE,
+    RTT_DIFFUSE,
+    RTT_SPECULAR,
+
 
     RTT_HALF1,
     RTT_HALF2,
@@ -570,7 +573,7 @@ public:
     // -----------------------------------------------------------------------
     inline video::E_MATERIAL_TYPE getShader(const ShaderType num)  {return m_shaders->getShader(num);}
     // -----------------------------------------------------------------------
-    inline void updateShaders()  {m_shaders->loadShaders();}
+    inline void updateShaders()  {m_shaders->killShaders();}
     // ------------------------------------------------------------------------
     inline video::IShaderConstantSetCallBack* getCallback(const ShaderType num)
     {

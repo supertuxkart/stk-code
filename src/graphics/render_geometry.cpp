@@ -119,7 +119,7 @@ template<typename Shader, enum E_VERTEX_TYPE VertexType, int ...List, typename..
 void renderMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -231,6 +231,8 @@ void IrrDriver::renderSolidFirstPass()
     AnimatedListMatDetails::getInstance()->clear();
     AnimatedListMatUnlit::getInstance()->clear();
     // Add a 30 ms timeout
+    if (!m_sync)
+        m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
     GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 30000000);
 /*    switch (reason)
     {
@@ -292,7 +294,7 @@ template<typename Shader, enum E_VERTEX_TYPE VertexType, int...List, typename...
 void renderMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(Shader::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -384,12 +386,12 @@ void IrrDriver::renderSolidSecondPass()
     if (irr_driver->getGLSLVersion() >= 330)
         glBindSampler(0, 0);
 #endif
-    setTexture(0, m_rtts->getRenderTarget(RTT_TMP1), GL_NEAREST, GL_NEAREST);
+    setTexture(0, m_rtts->getRenderTarget(RTT_DIFFUSE), GL_NEAREST, GL_NEAREST);
 #ifdef GL_VERSION_3_3
     if (irr_driver->getGLSLVersion() >= 330)
         glBindSampler(1, 0);
 #endif
-    setTexture(1, m_rtts->getRenderTarget(RTT_TMP2), GL_NEAREST, GL_NEAREST);
+    setTexture(1, m_rtts->getRenderTarget(RTT_SPECULAR), GL_NEAREST, GL_NEAREST);
 #ifdef GL_VERSION_3_3
     if (irr_driver->getGLSLVersion() >= 330)
         glBindSampler(2, 0);
@@ -473,7 +475,7 @@ template<enum E_VERTEX_TYPE VertexType, typename... TupleType>
 static void renderMeshNormals(std::vector<STK::Tuple<TupleType...> > *meshes)
 {
     glUseProgram(MeshShader::NormalVisualizer::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < meshes->size(); i++)
     {
         GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
@@ -522,7 +524,7 @@ void IrrDriver::renderTransparent()
     ListDisplacement::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_TRANSPARENT);
 
-    glBindVertexArray(getVAO(EVT_STANDARD));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_STANDARD));
 
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
@@ -568,7 +570,7 @@ void IrrDriver::renderTransparent()
     glStencilFunc(GL_ALWAYS, 1, 0xFF);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
-    glBindVertexArray(getVAO(EVT_2TCOORDS));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(EVT_2TCOORDS));
     // Generate displace mask
     // Use RTT_TMP4 as displace mask
     irr_driver->getFBO(FBO_TMP1_WITH_DS).Bind();
@@ -666,7 +668,7 @@ template<typename T, enum E_VERTEX_TYPE VertexType, int...List, typename... Args
 void renderShadow(const std::vector<GLuint> TextureUnits, const std::vector<STK::Tuple<Args...> > *t)
 {
     glUseProgram(T::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < t->size(); i++)
     {
         std::vector<GLuint> Textures;
@@ -815,7 +817,7 @@ template<typename T, enum E_VERTEX_TYPE VertexType, int... Selector, typename...
 void drawRSM(const core::matrix4 & rsm_matrix, const std::vector<GLuint> &TextureUnits, std::vector<STK::Tuple<Args...> > *t)
 {
     glUseProgram(T::getInstance()->Program);
-    glBindVertexArray(getVAO(VertexType));
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
     for (unsigned i = 0; i < t->size(); i++)
     {
         std::vector<GLuint> Textures;

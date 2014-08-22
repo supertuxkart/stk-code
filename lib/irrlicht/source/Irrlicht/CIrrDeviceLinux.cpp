@@ -194,7 +194,7 @@ CIrrDeviceLinux::~CIrrDeviceLinux()
 		}
 		
 		// Reset fullscreen resolution change
-		switchToFullscreen(true);		
+		restoreResolution();		
 		
 		if (!ExternalWindow)
 		{
@@ -235,43 +235,66 @@ int IrrPrintXError(Display *display, XErrorEvent *event)
 }
 #endif
 
-
-bool CIrrDeviceLinux::switchToFullscreen(bool reset)
+bool CIrrDeviceLinux::restoreResolution()
 {
 	if (!CreationParams.Fullscreen)
 		return true;
-	if (reset)
+
+	#ifdef _IRR_LINUX_X11_VIDMODE_
+	if (UseXVidMode && CreationParams.Fullscreen)
 	{
-		#ifdef _IRR_LINUX_X11_VIDMODE_
-		if (UseXVidMode && CreationParams.Fullscreen)
-		{
-			XF86VidModeSwitchToMode(display, screennr, &oldVideoMode);
-			XF86VidModeSetViewPort(display, screennr, 0, 0);
-		}
-		#endif
-		#ifdef _IRR_LINUX_X11_RANDR_
-		if (UseXRandR && CreationParams.Fullscreen)
-		{
-			XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
-			XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
-			XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
-
-			Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
-										crtc->x, crtc->y, old_mode,
-										crtc->rotation, &output_id, 1);
-
-			XRRFreeOutputInfo(output);
-			XRRFreeCrtcInfo(crtc);
-			XRRFreeScreenResources(res);
-
-			if (s != Success)
-				return false;
-		}
-		#endif
-		return true;
+		XF86VidModeSwitchToMode(display, screennr, &oldVideoMode);
+		XF86VidModeSetViewPort(display, screennr, 0, 0);
 	}
+	#endif
+	#ifdef _IRR_LINUX_X11_RANDR_
+	if (UseXRandR && CreationParams.Fullscreen && old_mode != BadRRMode)
+	{
+		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
+		
+		if (!res)
+			return false;
+
+		XRROutputInfo* output = XRRGetOutputInfo(display, res, output_id);
+		
+		if (!output || !output->crtc || output->connection == RR_Disconnected) 
+		{
+			XRRFreeOutputInfo(output);
+			return false;
+		}
+
+		XRRCrtcInfo* crtc = XRRGetCrtcInfo(display, res, output->crtc);
+
+		if (!crtc) 
+		{
+			XRRFreeCrtcInfo(crtc);
+			XRRFreeOutputInfo(output);
+			return false;
+		}
+
+		Status s = XRRSetCrtcConfig(display, res, output->crtc, CurrentTime,
+									crtc->x, crtc->y, old_mode,
+									crtc->rotation, &output_id, 1);
+
+		XRRFreeOutputInfo(output);
+		XRRFreeCrtcInfo(crtc);
+		XRRFreeScreenResources(res);
+
+		if (s != Success)
+			return false;
+	}
+	#endif
+	return true;
+}
+
+
+bool CIrrDeviceLinux::switchToFullscreen()
+{
+	if (!CreationParams.Fullscreen)
+		return true;
 
 	getVideoModeList();
+
 	#if defined(_IRR_LINUX_X11_VIDMODE_) || defined(_IRR_LINUX_X11_RANDR_)
 	s32 eventbase, errorbase;
 	s32 bestMode = -1;
@@ -340,7 +363,7 @@ bool CIrrDeviceLinux::switchToFullscreen(bool reset)
 	{
 		XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 
-		if (!res || output_id == BadRRMode)
+		if (!res || output_id == BadRROutput)
 		{
 			os::Printer::log("Could not get video output. Try to run in windowed mode.", ELL_WARNING);
 			CreationParams.Fullscreen = false;
@@ -1592,12 +1615,14 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 			}
 			#endif
 			#ifdef _IRR_LINUX_X11_RANDR_
+			output_id = BadRROutput;
+			old_mode = BadRRMode;
+			
 			while (XRRQueryExtension(display, &eventbase, &errorbase))
 			{
 				XRROutputInfo* output = NULL;
 				XRRCrtcInfo* crtc = NULL;
 				crtc_x = crtc_y = -1;
-				output_id = BadRRMode;
 
 				XRRScreenResources* res = XRRGetScreenResources(display, DefaultRootWindow(display));
 
@@ -1653,7 +1678,7 @@ video::IVideoModeList* CIrrDeviceLinux::getVideoModeList()
 					XRRFreeOutputInfo(output);
 				}
 				
-				if (output_id == BadRRMode)
+				if (output_id == BadRROutput)
 				{
 					os::Printer::log("Could not get video output.", ELL_WARNING);
 					break;

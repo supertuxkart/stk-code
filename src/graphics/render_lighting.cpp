@@ -45,17 +45,13 @@ static void renderPointLights(unsigned count)
     glEnable(GL_DEPTH_TEST);
     glDepthMask(GL_FALSE);
 
-    glUseProgram(LightShader::PointLightShader::Program);
-    glBindVertexArray(LightShader::PointLightShader::vao);
-    glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::vbo);
+    glUseProgram(LightShader::PointLightShader::getInstance()->Program);
+    glBindVertexArray(LightShader::PointLightShader::getInstance()->vao);
+    glBindBuffer(GL_ARRAY_BUFFER, LightShader::PointLightShader::getInstance()->vbo);
     glBufferSubData(GL_ARRAY_BUFFER, 0, count * sizeof(LightShader::PointLightInfo), PointLightsInfo);
 
-    setTexture(0, irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), GL_NEAREST, GL_NEAREST);
-    setTexture(1, irr_driver->getDepthStencilTexture(), GL_NEAREST, GL_NEAREST);
-    LightShader::PointLightShader
-        ::setUniforms(core::vector2df(float(UserConfigParams::m_width),
-        float(UserConfigParams::m_height)),
-        200, 0, 1);
+    LightShader::PointLightShader::getInstance()->SetTextureUnits(createVector<GLuint>(irr_driver->getRenderTargetTexture(RTT_NORMAL_AND_DEPTH), irr_driver->getDepthStencilTexture()));
+    LightShader::PointLightShader::getInstance()->setUniforms();
 
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, count);
 }
@@ -169,14 +165,14 @@ void IrrDriver::renderLights(unsigned pointlightcount)
 
     for (unsigned i = 0; i < sun_ortho_matrix.size(); i++)
         sun_ortho_matrix[i] *= getInvViewMatrix();
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
     if (!UserConfigParams::m_dynamic_lights)
         glClearColor(.5, .5, .5, .5);
     glClear(GL_COLOR_BUFFER_BIT);
     if (!UserConfigParams::m_dynamic_lights)
         return;
 
-    m_rtts->getFBO(FBO_TMP1_WITH_DS).Bind();
+    m_rtts->getFBO(FBO_DIFFUSE).Bind();
     if (UserConfigParams::m_gi)
     {
         ScopedGPUTimer timer(irr_driver->getGPUTimer(Q_GI));
@@ -188,7 +184,7 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         m_post_processing->renderDiffuseEnvMap(blueSHCoeff, greenSHCoeff, redSHCoeff);
     }
 
-    m_rtts->getFBO(FBO_COMBINED_TMP1_TMP2).Bind();
+    m_rtts->getFBO(FBO_COMBINED_DIFFUSE_SPECULAR).Bind();
 
     // Render sunlight if and only if track supports shadow
     if (!World::getWorld() || World::getWorld()->getTrack()->hasShadows())

@@ -139,10 +139,27 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = f
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
 
-std::pair<unsigned, unsigned> getVAOOffsetAndBase(scene::IMeshBuffer *mb);
-unsigned getVAO(video::E_VERTEX_TYPE type);
-unsigned getVBO(video::E_VERTEX_TYPE type);
-void resetVAO();
+class VAOManager : public Singleton<VAOManager>
+{
+    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
+    GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
+    std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
+    void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
+    size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
+    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
+
+    void regenerateBuffer(enum VTXTYPE);
+    void regenerateVAO(enum VTXTYPE);
+    size_t getVertexPitch(enum VTXTYPE) const;
+    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
+    void append(scene::IMeshBuffer *, VTXTYPE tp);
+public:
+    VAOManager();
+    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
+    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
+    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
+    ~VAOManager();
+};
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);

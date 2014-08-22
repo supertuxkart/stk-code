@@ -270,7 +270,7 @@ void Track::cleanup()
 {
     QuadGraph::destroy();
     ItemManager::destroy();
-    resetVAO();
+    VAOManager::kill();
 
     ParticleKindManager::get()->cleanUpTrackSpecificGfx();
     // Clear reminder of transformed textures
@@ -425,7 +425,6 @@ void Track::cleanup()
         }
 #endif
     }   // if verbose
-
 }   // cleanup
 
 //-----------------------------------------------------------------------------
@@ -2020,11 +2019,15 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
             }
 
             scene::ISceneNode* parent = irr_driver->getSceneManager()->addEmptySceneNode();
+#ifdef DEBUG
+            parent->setName(("libnode_" + name).c_str());
+#endif
             parent->setPosition(xyz);
             parent->setRotation(hpr);
             parent->setScale(scale);
             parent->updateAbsolutePosition();
             loadObjects(libroot, lib_path, model_def_loader, create_lod_definitions, parent, library_nodes);
+            //m_all_nodes.push_back(parent);
         }
         else if (name == "water")
         {

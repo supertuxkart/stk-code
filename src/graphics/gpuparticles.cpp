@@ -88,7 +88,7 @@ void ParticleSystemProxy::setHeightmap(const std::vector<std::vector<float> > &h
     has_height_map = true;
     glGenBuffers(1, &heighmapbuffer);
     glBindBuffer(GL_TEXTURE_BUFFER, heighmapbuffer);
-    glBufferData(GL_TEXTURE_BUFFER, width * height * sizeof(float), hm_array, GL_STATIC_DRAW);
+    glBufferData(GL_TEXTURE_BUFFER, width * height * sizeof(float), hm_array, GL_STREAM_COPY);
     glGenTextures(1, &heightmaptexture);
     glBindTexture(GL_TEXTURE_BUFFER, heightmaptexture);
     glTexBuffer(GL_TEXTURE_BUFFER, GL_R32F, heighmapbuffer);
@@ -386,12 +386,12 @@ void ParticleSystemProxy::generateVAOs()
     glBindVertexArray(0);
     glGenBuffers(1, &initial_values_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, initial_values_buffer);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), ParticleParams, GL_STREAM_COPY);
     glGenBuffers(2, tfb_buffers);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[0]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), InitialValues, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, tfb_buffers[1]);
-    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, count * sizeof(ParticleData), 0, GL_STREAM_COPY);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &current_rendering_vao);
@@ -420,7 +420,7 @@ void ParticleSystemProxy::generateVAOs()
         }
         glGenBuffers(1, &quaternionsbuffer);
         glBindBuffer(GL_ARRAY_BUFFER, quaternionsbuffer);
-        glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, 4 * count * sizeof(float), quaternions, GL_STREAM_COPY);
         delete[] quaternions;
     }
 

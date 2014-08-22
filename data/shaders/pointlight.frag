@@ -1,6 +1,5 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform float spec;
 
 flat in vec3 center;
 flat in float energy;
