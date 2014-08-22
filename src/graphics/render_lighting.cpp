@@ -139,9 +139,8 @@ void IrrDriver::renderLights(unsigned pointlightcount)
         if (irr_driver->needRHWorkaround())
         {
             glUseProgram(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->Program);
-            setTexture(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->TU_ctex, m_rtts->getRSM().getRTT()[0], GL_LINEAR, GL_LINEAR);
-            setTexture(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->TU_ntex, m_rtts->getRSM().getRTT()[1], GL_LINEAR, GL_LINEAR);
-            setTexture(FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->TU_dtex, m_rtts->getRSM().getDepthTexture(), GL_LINEAR, GL_LINEAR);
+            FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->SetTextureUnits(
+                createVector<GLuint>(m_rtts->getRSM().getRTT()[0], m_rtts->getRSM().getRTT()[1], m_rtts->getRSM().getDepthTexture()));
             for (unsigned i = 0; i < 32; i++)
             {
                 FullScreenShader::NVWorkaroundRadianceHintsConstructionShader::getInstance()->setUniforms(rsm_matrix, rh_matrix, rh_extend, i);

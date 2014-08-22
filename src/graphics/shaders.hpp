@@ -784,11 +784,9 @@ public:
 };
 
 // Workaround for a bug found in kepler nvidia linux and fermi nvidia windows
-class NVWorkaroundRadianceHintsConstructionShader : public ShaderHelperSingleton<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int>
+class NVWorkaroundRadianceHintsConstructionShader : public ShaderHelperSingleton<NVWorkaroundRadianceHintsConstructionShader, core::matrix4, core::matrix4, core::vector3df, int>, public TextureRead<Bilinear_Filtered, Bilinear_Filtered, Bilinear_Filtered>
 {
 public:
-    GLuint TU_ctex, TU_ntex, TU_dtex;
-
     NVWorkaroundRadianceHintsConstructionShader();
 };
 
