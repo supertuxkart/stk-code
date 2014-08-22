@@ -1155,8 +1155,12 @@ void askForInternetPermission()
 
 //=============================================================================
 
-#if defined(DEBUG) && defined(WIN32) && !defined(__CYGWIN__)
-#pragma comment(linker, "/SUBSYSTEM:console")
+#if defined(WIN32) && defined(_MSC_VER)
+    #ifdef DEBUG
+        #pragma comment(linker, "/SUBSYSTEM:console")
+    #else
+        #pragma comment(linker, "/SUBSYSTEM:windows /ENTRY:mainCRTStartup")
+    #endif
 #endif
 
 // ----------------------------------------------------------------------------
