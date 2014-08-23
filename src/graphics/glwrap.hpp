@@ -145,6 +145,9 @@ enum InstanceType
     InstanceTypeCount,
 };
 
+#ifdef WIN32
+#pragma pack(push, 1)
+#endif
 struct InstanceData
 {
     struct
@@ -167,7 +170,12 @@ struct InstanceData
     } Scale;
     uint64_t Texture;
     uint64_t SecondTexture;
+#ifdef WIN32
 };
+#pragma pack(pop)
+#else
+} __attribute__((packed));
+#endif
 
 class VAOManager : public Singleton<VAOManager>
 {
