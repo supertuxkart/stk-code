@@ -108,7 +108,7 @@ PFNGLVERTEXATTRIBLPOINTERPROC glVertexAttribLPointer;
 static bool is_gl_init = false;
 
 #ifdef DEBUG
-#ifdef WIN32
+#if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT
 #endif
 #endif
