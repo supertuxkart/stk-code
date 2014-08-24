@@ -40,7 +40,7 @@ public:
     virtual void render();
     void addInstance(const core::vector3df &origin, const core::vector3df &orientation, const core::vector3df &scale);
 
-    int getInstanceCount() const { return instanceData.size(); }
+    int getInstanceCount() const { return instanceData[0].size(); }
 
     core::matrix4 getInstanceTransform(int id);
 
