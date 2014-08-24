@@ -57,10 +57,10 @@ void STKInstancedSceneNode::createGLMeshes()
             mesh.vaoBaseVertex = p.first;
             mesh.vaoOffset = p.second;
             mesh.VAOType = mb->getVertexType();
-            instanceData.push_back(std::vector<InstanceData>());
         }
         else
             fillLocalBuffer(mesh, mb);
+        instanceData.push_back(std::vector<InstanceData>());
     }
     isMaterialInitialized = false;
 }
