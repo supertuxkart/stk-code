@@ -45,6 +45,7 @@
 #include "states_screens/online_screen.hpp"
 #include "states_screens/options_screen_video.hpp"
 #include "states_screens/state_manager.hpp"
+#include "states_screens/track_info_screen.hpp"
 #include "states_screens/user_screen.hpp"
 #if DEBUG_MENU_ITEM
 #include "states_screens/feature_unlocked.hpp"
@@ -332,10 +333,18 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
+#undef XX
+#ifdef XX
+        Track *track = track_manager->getTrack("olivermath");
+        TrackInfoScreen *tis = TrackInfoScreen::getInstance();
+        tis->setTrack(track);
+        StateManager::get()->pushScreen(tis);
+#else
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
+#endif
     }
     else if (selection == "multiplayer")
     {

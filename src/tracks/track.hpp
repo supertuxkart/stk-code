@@ -401,6 +401,7 @@ private:
     /** The number of laps the track will be raced in a random GP.
      * m_actual_number_of_laps is initialised with this value.*/
     int m_default_number_of_laps;
+
     /** The number of laps that is predefined in a track info dialog. */
     int m_actual_number_of_laps;
 
@@ -419,7 +420,7 @@ private:
 
 public:
 
-    bool reverseAvailable() { return m_reverse_available; }
+    bool reverseAvailable() const { return m_reverse_available; }
     void handleAnimatedTextures(scene::ISceneNode *node, const XMLNode &xml);
 
     static const float NOHIT;
