@@ -196,29 +196,32 @@ void STKInstancedSceneNode::render()
 
     setFirstTimeMaterial();
 
-    for(unsigned i = 0; i < MeshSolidMaterial[MAT_DEFAULT].size(); i++)
+    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
-        GLMesh *mesh = MeshSolidMaterial[MAT_DEFAULT][i];
-        ListInstancedMatDefault::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
-    }
+        for (unsigned i = 0; i < MeshSolidMaterial[MAT_DEFAULT].size(); i++)
+        {
+            GLMesh *mesh = MeshSolidMaterial[MAT_DEFAULT][i];
+            ListInstancedMatDefault::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
+        }
 
-    for(unsigned i = 0; i < MeshSolidMaterial[MAT_ALPHA_REF].size(); i++)
-    {
-        GLMesh *mesh = MeshSolidMaterial[MAT_ALPHA_REF][i];
-        ListInstancedMatAlphaRef::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
-    }
+        for (unsigned i = 0; i < MeshSolidMaterial[MAT_ALPHA_REF].size(); i++)
+        {
+            GLMesh *mesh = MeshSolidMaterial[MAT_ALPHA_REF][i];
+            ListInstancedMatAlphaRef::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
+        }
 
-    windDir = getWind();
-    SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
-    for(unsigned i = 0; i < MeshSolidMaterial[MAT_GRASS].size(); i++)
-    {
-        GLMesh *mesh = MeshSolidMaterial[MAT_GRASS][i];
-        ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size(), windDir, cb->getPosition()));
-    }
+        windDir = getWind();
+        SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
+        for (unsigned i = 0; i < MeshSolidMaterial[MAT_GRASS].size(); i++)
+        {
+            GLMesh *mesh = MeshSolidMaterial[MAT_GRASS][i];
+            ListInstancedMatGrass::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size(), windDir, cb->getPosition()));
+        }
 
-    for(unsigned i = 0; i < MeshSolidMaterial[MAT_NORMAL_MAP].size(); i++)
-    {
-        GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
-        ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
+        for (unsigned i = 0; i < MeshSolidMaterial[MAT_NORMAL_MAP].size(); i++)
+        {
+            GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
+            ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
+        }
     }
 }
