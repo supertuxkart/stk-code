@@ -613,7 +613,7 @@ public:
     ColorizeShader();
 };
 
-class ShadowShader : public ShaderHelperSingleton<ShadowShader, core::matrix4>, public TextureRead<>
+class ShadowShader : public ShaderHelperSingleton<ShadowShader, int, core::matrix4>, public TextureRead<>
 {
 public:
     ShadowShader();
@@ -632,31 +632,31 @@ public:
     SplattingRSMShader();
 };
 
-class InstancedShadowShader : public ShaderHelperSingleton<InstancedShadowShader>, public TextureRead<>
+class InstancedShadowShader : public ShaderHelperSingleton<InstancedShadowShader, int>, public TextureRead<>
 {
 public:
     InstancedShadowShader();
 };
 
-class RefShadowShader : public ShaderHelperSingleton<RefShadowShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class RefShadowShader : public ShaderHelperSingleton<RefShadowShader, int, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     RefShadowShader();
 };
 
-class InstancedRefShadowShader : public ShaderHelperSingleton<InstancedRefShadowShader>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedRefShadowShader : public ShaderHelperSingleton<InstancedRefShadowShader, int>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedRefShadowShader();
 };
 
-class GrassShadowShader : public ShaderHelperSingleton<GrassShadowShader, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class GrassShadowShader : public ShaderHelperSingleton<GrassShadowShader, int, core::matrix4, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     GrassShadowShader();
 };
 
-class InstancedGrassShadowShader : public ShaderHelperSingleton<InstancedGrassShadowShader, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class InstancedGrassShadowShader : public ShaderHelperSingleton<InstancedGrassShadowShader, int, core::vector3df>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
     InstancedGrassShadowShader();

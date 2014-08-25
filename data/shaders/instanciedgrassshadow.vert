@@ -1,3 +1,5 @@
+uniform int layer;
+
 uniform vec3 windDir;
 #if __VERSION__ >= 330
 layout(location = 0) in vec3 Position;
@@ -41,14 +43,14 @@ void main(void)
 {
     mat4 ModelMatrix = getWorldMatrix(Origin, Orientation, Scale);
 #ifdef VSLayer
-    gl_Layer = gl_InstanceID & 3;
+    gl_Layer = layer;
     gl_Position = ShadowViewProjMatrixes[gl_Layer] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
     uv = Texcoord;
 #ifdef GL_ARB_bindless_texture
     handle = Handle;
 #endif
 #else
-    layerId = gl_InstanceID & 3;
+    layerId = layer;
     gl_Position = ShadowViewProjMatrixes[layerId] * ModelMatrix * vec4(Position + windDir * Color.r, 1.);
     tc = Texcoord;
 #ifdef GL_ARB_bindless_texture
