@@ -5,7 +5,7 @@
     <div x="1%" y="1%" width="98%" height="98%">
         <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row">
 
-            <label id="name" width="100%" text_align="center"/>
+            <header id="name" width="100%" text_align="center"/>
 
             <spacer width="1" height="5%"/>
 
@@ -85,8 +85,6 @@
                 <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
                         I18N="Start race" text="Start Race"/>
 
-                <icon-button id="back" width="64" height="64" icon="gui/back.png"
-                        I18N="Back to previous screen" text="Back"/>
             </buttonbar>>
         </div>
 
