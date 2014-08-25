@@ -185,12 +185,13 @@ public:
             case MINOR_MODE_SOCCER:         return _("Soccer");
             default: assert(false); return NULL;
         }
-    }
+    }   // getNameOf
 
     // ------------------------------------------------------------------------
-    static bool hasAI(const MinorRaceModeType mode)
+    /** Returns if the currently set minor game mode can be used by the AI. */
+    bool hasAI()
     {
-        switch (mode)
+        switch (m_minor_mode)
         {
             case MINOR_MODE_NORMAL_RACE:    return true;
             case MINOR_MODE_TIME_TRIAL:     return true;
@@ -200,7 +201,7 @@ public:
             case MINOR_MODE_SOCCER:         return false;
             default: assert(false);         return false;
         }
-    }
+    }   // hasAI
 
 
     // ------------------------------------------------------------------------

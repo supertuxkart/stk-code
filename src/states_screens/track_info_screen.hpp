@@ -55,9 +55,13 @@ class TrackInfoScreen : public GUIEngine::Screen,
     /** Spinner for number of AI karts. */
     GUIEngine::SpinnerWidget* m_ai_kart_spinner;
 
-    /** */
-    GUIEngine::CheckBoxWidget* m_checkbox;
+    /** Check box for reverse mode. */
+    GUIEngine::CheckBoxWidget* m_reverse;
+
+    /** The icons for the highscore list. */
     GUIEngine::IconButtonWidget* m_kart_icons[HIGHSCORE_COUNT];
+
+    /** The actual highscore text values shown. */
     GUIEngine::LabelWidget* m_highscore_entries[HIGHSCORE_COUNT];
     
     void updateHighScores();
@@ -75,7 +79,7 @@ public:
     virtual ~TrackInfoScreen();
     
     virtual void init();
-    virtual void loadedFromFile() {}
+    virtual void loadedFromFile();
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
                                const int player_id);
     void onEnterPressedInternal();

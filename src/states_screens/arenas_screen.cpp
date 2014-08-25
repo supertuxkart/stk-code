@@ -25,7 +25,7 @@
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/arenas_screen.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
+#include "states_screens/track_info_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/random_generator.hpp"
@@ -163,13 +163,11 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
             RandomGenerator random;
             const int randomID = random.get(curr_group.size());
 
-            Track* clickedTrack = track_manager->getTrack( curr_group[randomID] );
-            if (clickedTrack != NULL)
+            Track* clicked_track = track_manager->getTrack( curr_group[randomID] );
+            if (clicked_track != NULL)
             {
-                ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
-
-                new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName(),
-                                    screenshot, 0.8f, 0.7f);
+                TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
             }
 
         }
@@ -182,13 +180,11 @@ void ArenasScreen::eventCallback(Widget* widget, const std::string& name, const 
         }
         else
         {
-            Track* clickedTrack = track_manager->getTrack(selection);
-            if (clickedTrack != NULL)
+            Track* clicked_track = track_manager->getTrack(selection);
+            if (clicked_track != NULL)
             {
-                ITexture* screenshot = irr_driver->getTexture( clickedTrack->getScreenshotFile().c_str() );
-
-                new TrackInfoDialog(selection, clickedTrack->getIdent(), clickedTrack->getName(),
-                                    screenshot, 0.8f, 0.7f);
+                TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
             }   // clickedTrack !=  NULL
         }   // if random_track
 

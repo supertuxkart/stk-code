@@ -26,7 +26,7 @@
 #include "guiengine/widgets/icon_button_widget.hpp"
 #include "io/file_manager.hpp"
 #include "states_screens/state_manager.hpp"
-#include "states_screens/dialogs/track_info_dialog.hpp"
+#include "states_screens/track_info_screen.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"
@@ -80,19 +80,13 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
                 std::string track = m_random_track_list.front();
                 m_random_track_list.pop_front();
                 m_random_track_list.push_back(track);
-                Track* clickedTrack = track_manager->getTrack( track );
+                Track* clicked_track = track_manager->getTrack( track );
 
 
-                if (clickedTrack != NULL)
+                if (clicked_track != NULL)
                 {
-                    ITexture* screenshot =
-                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                                "While loading screenshot for track '%s':",
-                                                clickedTrack->getFilename()   );
-
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
-                                        translations->fribidize(clickedTrack->getName()),
-                                        screenshot, 0.8f, 0.7f);
+                    TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                    StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
                 }
 
             }
@@ -100,22 +94,13 @@ void EasterEggScreen::eventCallback(Widget* widget, const std::string& name, con
             {
                 unlock_manager->playLockSound();
             }
-            else if (selection == RibbonWidget::NO_ITEM_ID)
+            else if (selection != RibbonWidget::NO_ITEM_ID)
             {
-            }
-            else
-            {
-                Track* clickedTrack = track_manager->getTrack(selection);
-                if (clickedTrack != NULL)
+                Track* clicked_track = track_manager->getTrack(selection);
+                if (clicked_track != NULL)
                 {
-                    ITexture* screenshot =
-                        irr_driver->getTexture( clickedTrack->getScreenshotFile(),
-                                                "While loading screenshot for track '%s'",
-                                                clickedTrack->getFilename());
-
-                    new TrackInfoDialog(selection, clickedTrack->getIdent(),
-                                        translations->fribidize(clickedTrack->getName()),
-                                        screenshot, 0.8f, 0.7f);
+                    TrackInfoScreen::getInstance()->setTrack(clicked_track);
+                    StateManager::get()->pushScreen(TrackInfoScreen::getInstance());
                 }
             }
         }

@@ -333,18 +333,10 @@ void MainMenuScreen::eventCallback(Widget* widget, const std::string& name,
 #endif
     if (selection == "new")
     {
-#undef XX
-#ifdef XX
-        Track *track = track_manager->getTrack("olivermath");
-        TrackInfoScreen *tis = TrackInfoScreen::getInstance();
-        tis->setTrack(track);
-        StateManager::get()->pushScreen(tis);
-#else
         KartSelectionScreen* s = OfflineKartSelectionScreen::getInstance(); //FIXME : that was for tests
         s->setMultiplayer(false);
         s->setFromOverworld(false);
         StateManager::get()->pushScreen( s );
-#endif
     }
     else if (selection == "multiplayer")
     {

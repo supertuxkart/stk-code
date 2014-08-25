@@ -54,14 +54,21 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( TrackInfoScreen );
 
-// ------------------------------------------------------------------------------------------------------
-
-//TrackInfoScreen::TrackInfoScreen(const std::string& ribbonItem, const std::string& trackIdent,
-//                     const irr::core::stringw& trackName, ITexture* screenshot)
+// ----------------------------------------------------------------------------
+/** Constructor, which loads the corresponding track_info.stkgui file. */
 TrackInfoScreen::TrackInfoScreen()
           : Screen("track_info.stkgui")
 {
 }   // TrackInfoScreen
+
+// ----------------------------------------------------------------------------
+/* Saves some often used pointers. */
+void TrackInfoScreen::loadedFromFile()
+{
+    m_lap_spinner     = getWidget<SpinnerWidget>("lap-spinner");
+    m_ai_kart_spinner = getWidget<SpinnerWidget>("ai-spinner");
+    m_reverse         = getWidget<CheckBoxWidget>("reverse");
+}   // loadedFromFile
 
 // ----------------------------------------------------------------------------
 void TrackInfoScreen::setTrack(const Track *track)
@@ -75,9 +82,6 @@ void TrackInfoScreen::setTrack(const Track *track)
  */
 void TrackInfoScreen::init()
 {
-    RaceManager::MinorRaceModeType minor = race_manager->getMinorMode();
-
-    const bool has_AI         = race_manager->hasAI(minor);
     const bool has_laps       = race_manager->modeHasLaps();
     const bool has_highscores = race_manager->modeHasHighscores();
 
@@ -115,29 +119,23 @@ void TrackInfoScreen::init()
 
     // Lap count m_lap_spinner
     // -----------------------
+    m_lap_spinner->setVisible(has_laps);
+    getWidget<LabelWidget>("lap-text")->setVisible(has_laps);
     if (has_laps)
     {
-        m_lap_spinner = getWidget<SpinnerWidget>("lapcountspinner");
-        m_lap_spinner->setVisible(true);
-        getWidget<LabelWidget>("lap-text")->setVisible(true);
         if (UserConfigParams::m_artist_debug_mode)
             m_lap_spinner->setMin(0);
-
         m_lap_spinner->setValue(m_track->getActualNumberOfLap());
         race_manager->setNumLaps(m_lap_spinner->getValue());
-    }
-    else
-    {
-        getWidget<SpinnerWidget>("lapcountspinner")->setVisible(false);
-        getWidget<LabelWidget>("lap-text")->setVisible(false);
-        m_lap_spinner = NULL;
     }
 
     // Number of AIs
     // -------------
+    const bool has_AI = race_manager->hasAI();
+    m_ai_kart_spinner->setVisible(has_AI);
+    getWidget<LabelWidget>("ai-text")->setVisible(has_AI);
     if (has_AI)
     {
-        m_ai_kart_spinner = getWidget<SpinnerWidget>("kartcountspinner");
         m_ai_kart_spinner->setActivated();
 
         // Avoid negative numbers (which can happen if e.g. the number of karts
@@ -145,30 +143,27 @@ void TrackInfoScreen::init()
         int num_ai = UserConfigParams::m_num_karts - race_manager->getNumLocalPlayers();
         if (num_ai < 0) num_ai = 0;
         m_ai_kart_spinner->setValue(num_ai);
-        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
         race_manager->setNumKarts(num_ai + race_manager->getNumLocalPlayers());
-    }
-    else
-    {
-        getWidget<SpinnerWidget>("kartcountspinner")->setVisible(false);
-        m_ai_kart_spinner = NULL;
-    }
+        m_ai_kart_spinner->setMax(stk_config->m_max_karts - race_manager->getNumLocalPlayers());
+        // A ftl reace needs at least three karts to make any sense
+        if(race_manager->getMinorMode()==RaceManager::MINOR_MODE_FOLLOW_LEADER)
+        {
+            m_ai_kart_spinner->setMin(3-race_manager->getNumLocalPlayers());
+        }
+        else
+            m_ai_kart_spinner->setMin(0);
+
+    }   // has_AI
 
     // Reverse track
     // -------------
     const bool reverse_available = m_track->reverseAvailable() &&
                race_manager->getMinorMode() != RaceManager::MINOR_MODE_EASTER_EGG;
+    m_reverse->setVisible(reverse_available);
+    getWidget<LabelWidget>("reverse-text")->setVisible(reverse_available);
     if (reverse_available)
     {
-        m_checkbox = getWidget<CheckBoxWidget>("reverse");
-        m_checkbox->setState(race_manager->getReverseTrack());
-    }
-    else
-    {
-        getWidget<CheckBoxWidget>("reverse")->setVisible(false);
-        getWidget<LabelWidget>("reverse-text")->setVisible(false);
-        m_checkbox = NULL;
-        race_manager->setReverseTrack(false);
+        m_reverse->setState(race_manager->getReverseTrack());
     }
 
     // ---- High Scores
@@ -196,9 +191,7 @@ void TrackInfoScreen::init()
         getWidget<LabelWidget>("highscore3")->setVisible(false);
     }
 
-    //FIXME getWidget<ButtonWidget>("start")->setFocusForPlayer( PLAYER_ID_GAME_MASTER );
-
-}   // TrackInfoScreen
+}   // init
 
 // ----------------------------------------------------------------------------
 
@@ -271,9 +264,10 @@ void TrackInfoScreen::onEnterPressedInternal()
 
     // Create a copy of member variables we still need, since they will
     // not be accessible after dismiss:
-    const int num_laps = (m_lap_spinner == NULL ? -1 : m_lap_spinner->getValue());
-    const bool reverse_track = m_checkbox == NULL ? false
-                                                  : m_checkbox->getState();
+    const int num_laps = race_manager->modeHasLaps() ? m_lap_spinner->getValue() 
+                                                     : -1;
+    const bool reverse_track = m_reverse == NULL ? false
+                                                  : m_reverse->getState();
    //FIXME m_track->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
 
@@ -302,7 +296,7 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
     }
     else if (name == "reverse")
     {
-        race_manager->setReverseTrack(m_checkbox->getState());
+        race_manager->setReverseTrack(m_reverse->getState());
         // Makes sure the highscores get swapped when clicking the 'reverse'
         // checkbox.
         if (race_manager->modeHasHighscores())
@@ -310,20 +304,20 @@ void TrackInfoScreen::eventCallback(Widget* widget, const std::string& name,
             updateHighScores();
         }
     }
-    else if (name == "lapcountspinner")
+    else if (name == "lap-spinner")
     {
-        assert(m_lap_spinner != NULL);
+        assert(race_manager->modeHasLaps());
         const int num_laps = m_lap_spinner->getValue();
         race_manager->setNumLaps(num_laps);
         UserConfigParams::m_num_laps = num_laps;
         updateHighScores();
     }
-    else if (name=="kartcountspinner")
+    else if (name=="ai-spinner")
     {
         SpinnerWidget* w = dynamic_cast<SpinnerWidget*>(widget);
-        race_manager->setNumKarts( race_manager->getNumLocalPlayers() + w->getValue() );
-        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + w->getValue();
-
+        const int num_ai = m_ai_kart_spinner->getValue();
+        race_manager->setNumKarts( race_manager->getNumLocalPlayers() + num_ai );
+        UserConfigParams::m_num_karts = race_manager->getNumLocalPlayers() + num_ai;
     }
 }   // eventCallback
 
