@@ -104,7 +104,7 @@ void TrackObject::init(const XMLNode &xml_node, scene::ISceneNode* parent,
     xml_node.get("lod_instance", &lod_instance);
 
     bool instancing = false;
-    xml_node.get("instancing", &instancing);
+//    xml_node.get("instancing", &instancing);
 
     m_soccer_ball = false;
     xml_node.get("soccer_ball", &m_soccer_ball);

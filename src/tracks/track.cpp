@@ -743,7 +743,7 @@ void Track::convertTrackToBullet(scene::ISceneNode *node)
 
     std::vector<core::matrix4> matrices;
 
-    STKInstancedSceneNode* instancing_node = dynamic_cast<STKInstancedSceneNode*>(node);
+    STKInstancedSceneNode* instancing_node = NULL;// dynamic_cast<STKInstancedSceneNode*>(node);
     if (instancing_node != NULL)
     {
         int count = instancing_node->getInstanceCount();
@@ -1064,7 +1064,7 @@ bool Track::loadMainTrack(const XMLNode &root)
     }
 
     // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
-    const XMLNode *instancing_xml_node = root.getNode("instancing");
+    const XMLNode *instancing_xml_node = NULL;// root.getNode("instancing");
     if (instancing_xml_node != NULL)
     {
         for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
@@ -1757,7 +1757,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     }
 
     // Load instancing models (for the moment they are loaded the same way as LOD to simplify implementation)
-    const XMLNode *instancing_xml_node = root->getNode("instancing");
+    const XMLNode *instancing_xml_node = NULL;// root->getNode("instancing");
     if (instancing_xml_node != NULL)
     {
         for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
@@ -2012,7 +2012,7 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
                 }
 
                 // Load instancing definitions
-                const XMLNode *instancing_xml_node = libroot->getNode("instancing");
+                const XMLNode *instancing_xml_node = NULL;// libroot->getNode("instancing");
                 if (instancing_xml_node != NULL)
                 {
                     for (unsigned int i = 0; i < instancing_xml_node->getNumNodes(); i++)
