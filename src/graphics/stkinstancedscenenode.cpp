@@ -65,14 +65,14 @@ void STKInstancedSceneNode::createGLMeshes()
     isMaterialInitialized = false;
 }
 
-void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh)
+void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, const std::vector<InstanceData> &instances)
 {
     if (!irr_driver->hasARB_base_instance())
     {
         mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
         glGenBuffers(1, &instances_vbo);
         glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-        glBufferData(GL_ARRAY_BUFFER, instanceData.size() * sizeof(InstanceData), instanceData.data(), GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(InstanceData), instances.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(7);
         glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
@@ -113,8 +113,9 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
 
         GLMesh &mesh = GLmeshes[i];
         MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
-        initinstancedvaostate(mesh);
-        mesh.vaoBaseInstance = VAOManager::getInstance()->appendInstance(InstanceTypeDefault, instanceData[i]);
+        initinstancedvaostate(mesh, instanceData[i]);
+        if (irr_driver->hasARB_base_instance())
+            mesh.vaoBaseInstance = VAOManager::getInstance()->appendInstance(InstanceTypeDefault, instanceData[i]);
         MeshSolidMaterial[MatType].push_back(&mesh);
     }
     isMaterialInitialized = true;

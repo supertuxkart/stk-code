@@ -28,7 +28,7 @@ protected:
     void createGLMeshes();
     bool isMaterialInitialized;
     void setFirstTimeMaterial();
-    void initinstancedvaostate(GLMesh &mesh);
+    void initinstancedvaostate(GLMesh &mesh, const std::vector<InstanceData> &);
     void cleanGL();
     core::vector3df windDir;
 public:
