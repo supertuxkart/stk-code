@@ -22,6 +22,8 @@ protected:
     bool immediate_draw;
     bool update_each_frame;
     bool isDisplacement;
+    bool isGlow;
+    video::SColor glowcolor;
 public:
     virtual void update();
     void setReloadEachFrame(bool);
@@ -46,6 +48,9 @@ public:
                 mb->getMaterial().MaterialType = irr_driver->getShader(ES_DISPLACE);
         }
     }
+    virtual bool glow() const { return isGlow; }
+    void setGlowColors(const video::SColor &c) { isGlow = true; glowcolor = c; }
+    video::SColor getGlowColor() const { return glowcolor; }
 };
 
 #endif

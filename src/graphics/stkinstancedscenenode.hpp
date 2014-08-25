@@ -4,18 +4,6 @@
 #include "stkmesh.hpp"
 #include "utils/leak_check.hpp"
 
-class ListInstancedMatDefault : public MeshList<ListInstancedMatDefault, GLMesh *, size_t>
-{};
-
-class ListInstancedMatAlphaRef : public MeshList<ListInstancedMatAlphaRef, GLMesh *, size_t>
-{};
-
-class ListInstancedMatGrass : public MeshList<ListInstancedMatGrass, GLMesh *, size_t, core::vector3df, core::vector3df>
-{};
-
-class ListInstancedMatNormalMap : public MeshList<ListInstancedMatNormalMap, GLMesh *, size_t>
-{};
-
 class STKInstancedSceneNode : public irr::scene::CMeshSceneNode
 {
 protected:

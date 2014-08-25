@@ -11,8 +11,6 @@ class STKAnimatedMesh : public irr::scene::CAnimatedMeshSceneNode, public STKMes
 {
 protected:
     bool firstTime;
-    PtrVector<GLMesh, REF> MeshSolidMaterial[MAT_COUNT];
-    PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
     std::vector<GLMesh> GLmeshes;
     core::matrix4 ModelViewProjectionMatrix;
     void cleanGLMeshes();
@@ -26,6 +24,7 @@ public:
 
   virtual void render();
   virtual void setMesh(irr::scene::IAnimatedMesh* mesh);
+  virtual bool glow() const { return false; }
 };
 
 #endif // STKANIMATEDMESH_HPP

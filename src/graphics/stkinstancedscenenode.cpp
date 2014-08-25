@@ -108,8 +108,6 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
         GLMesh &mesh = GLmeshes[i];
         MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
         initinstancedvaostate(mesh, instanceData[i]);
-        if (irr_driver->hasARB_base_instance())
-            mesh.vaoBaseInstance = VAOManager::getInstance()->appendInstance(InstanceTypeDefault, instanceData[i]);
         MeshSolidMaterial[MatType].push_back(&mesh);
         InitTextures(mesh, MatType);
     }
@@ -191,7 +189,7 @@ void STKInstancedSceneNode::render()
 
     setFirstTimeMaterial();
 
-    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
+/*    if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {
         for (unsigned i = 0; i < MeshSolidMaterial[MAT_DEFAULT].size(); i++)
         {
@@ -218,5 +216,5 @@ void STKInstancedSceneNode::render()
             GLMesh *mesh = MeshSolidMaterial[MAT_NORMAL_MAP][i];
             ListInstancedMatNormalMap::getInstance()->push_back(STK::make_tuple(mesh, instanceData[0].size()));
         }
-    }
+    }*/
 }
