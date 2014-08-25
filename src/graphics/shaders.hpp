@@ -439,10 +439,12 @@ public:
 
     void SetTextureHandles(const std::vector<uint64_t> &args)
     {
+        assert(args.size() == TextureLocation.size() && "Wrong Handle count");
         for (unsigned i = 0; i < args.size(); i++)
         {
 #ifdef Bindless_Texture_Support
-            glUniformHandleui64ARB(TextureLocation[i], args[i]);
+            if (args[i])
+                glUniformHandleui64ARB(TextureLocation[i], args[i]);
 #endif
         }
     }

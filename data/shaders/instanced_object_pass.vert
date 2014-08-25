@@ -9,6 +9,11 @@ layout(location = 6) in vec3 Bitangent;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
+#ifdef GL_ARB_bindless_texture
+layout(location = 10) in sampler2D Handle;
+layout(location = 11) in sampler2D SecondHandle;
+#endif
+
 #else
 in vec3 Position;
 in vec3 Normal;
@@ -27,6 +32,10 @@ out vec3 tangent;
 out vec3 bitangent;
 out vec2 uv;
 out vec4 color;
+#ifdef GL_ARB_bindless_texture
+flat out sampler2D handle;
+flat out sampler2D secondhandle;
+#endif
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
@@ -41,4 +50,8 @@ void main(void)
     bitangent = (TransposeInverseModelView * vec4(Bitangent, 1.)).xyz;
     uv = Texcoord;
     color = Color.zyxw;
+#ifdef GL_ARB_bindless_texture
+    handle = Handle;
+    secondhandle = SecondHandle;
+#endif
 }

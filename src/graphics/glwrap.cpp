@@ -4,6 +4,7 @@
 #include "config/user_config.hpp"
 #include "utils/profiler.hpp"
 #include "utils/cpp2011.hpp"
+#include "graphics/stkmesh.hpp"
 
 #ifdef _IRR_WINDOWS_API_
 #define IRR_OGL_LOAD_EXTENSION(X) wglGetProcAddress(reinterpret_cast<const char*>(X))
@@ -107,7 +108,7 @@ PFNGLVERTEXATTRIBLPOINTERPROC glVertexAttribLPointer;
 static bool is_gl_init = false;
 
 #ifdef DEBUG
-#ifdef WIN32
+#if !defined(__APPLE__)
 #define ARB_DEBUG_OUTPUT
 #endif
 #endif
@@ -592,10 +593,33 @@ VAOManager::VAOManager()
     idx_cnt[0] = idx_cnt[1] = idx_cnt[2] = 0;
     vtx_mirror[0] = vtx_mirror[1] = vtx_mirror[2] = NULL;
     idx_mirror[0] = idx_mirror[1] = idx_mirror[2] = NULL;
+    instance_count[0] = 0;
+
+    glGenBuffers(1, &instance_vbo[0]);
+    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, 10000 * sizeof(float)* 9, 0, GL_STATIC_DRAW);
+}
+
+static void cleanVAOMap(std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> Map)
+{
+    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint>::iterator It = Map.begin(), E = Map.end();
+    for (; It != E; It++)
+    {
+        glDeleteVertexArrays(1, &(It->second));
+    }
+}
+
+void VAOManager::cleanInstanceVAOs()
+{
+    cleanVAOMap(InstanceVAO);
+    cleanVAOMap(ShadowInstanceVAO);
+    InstanceVAO.clear();
+    ShadowInstanceVAO.clear();
 }
 
 VAOManager::~VAOManager()
 {
+    cleanInstanceVAOs();
     for (unsigned i = 0; i < 3; i++)
     {
         if (vtx_mirror[i])
@@ -609,7 +633,7 @@ VAOManager::~VAOManager()
         if (vao[i])
             glDeleteVertexArrays(1, &vao[i]);
     }
-
+    glDeleteBuffers(1, &instance_vbo[0]);
 }
 
 void VAOManager::regenerateBuffer(enum VTXTYPE tp)
@@ -697,6 +721,65 @@ void VAOManager::regenerateVAO(enum VTXTYPE tp)
     glBindVertexArray(0);
 }
 
+void VAOManager::regenerateInstancedVAO()
+{
+    cleanInstanceVAOs();
+
+    enum video::E_VERTEX_TYPE IrrVT[] = { video::EVT_STANDARD, video::EVT_2TCOORDS, video::EVT_TANGENTS };
+    for (unsigned i = 0; i < VTXTYPE_COUNT; i++)
+    {
+        for (unsigned j = 0; j < InstanceTypeCount; j++)
+        {
+            video::E_VERTEX_TYPE tp = IrrVT[i];
+            if (!vbo[tp] || !ibo[tp])
+                continue;
+            GLuint vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[j]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+            glVertexAttribDivisor(7, 1);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 1);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 1);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 1);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float) + 2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
+            InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, (InstanceType) j)] = vao;
+
+            GLuint shadow_vao = createVAO(vbo[tp], ibo[tp], tp);
+            glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[j]);
+
+            glEnableVertexAttribArray(7);
+            glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+            glVertexAttribDivisor(7, 4);
+            glEnableVertexAttribArray(8);
+            glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+            glVertexAttribDivisor(8, 4);
+            glEnableVertexAttribArray(9);
+            glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+            glVertexAttribDivisor(9, 4);
+            glEnableVertexAttribArray(10);
+            glVertexAttribIPointer(10, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)));
+            glVertexAttribDivisor(10, 4);
+            glEnableVertexAttribArray(11);
+            glVertexAttribIPointer(11, 2, GL_UNSIGNED_INT, sizeof(InstanceData), (GLvoid*)(9 * sizeof(float)+2 * sizeof(unsigned)));
+            glVertexAttribDivisor(11, 1);
+            ShadowInstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(tp, (InstanceType)j)] = shadow_vao;
+            glBindVertexArray(0);
+        }
+    }
+
+
+
+}
+
 size_t VAOManager::getVertexPitch(enum VTXTYPE tp) const
 {
     switch (tp)
@@ -756,6 +839,7 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
         append(mb, tp);
         regenerateBuffer(tp);
         regenerateVAO(tp);
+        regenerateInstancedVAO();
     }
 
     std::map<scene::IMeshBuffer*, unsigned>::iterator It;
@@ -765,6 +849,15 @@ std::pair<unsigned, unsigned> VAOManager::getBase(scene::IMeshBuffer *mb)
     It = mappedBaseIndex[tp].find(mb);
     assert(It != mappedBaseIndex[tp].end());
     return std::pair<unsigned, unsigned>(vtx, It->second);
+}
+
+size_t VAOManager::appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, instance_vbo[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, instance_count[0] * sizeof(InstanceData), instance_data.size() * sizeof(InstanceData), instance_data.data());
+    size_t result = instance_count[0];
+    instance_count[0] += instance_data.size();
+    return result;
 }
 
 ScopedGPUTimer::ScopedGPUTimer(GPUTimer &timer)

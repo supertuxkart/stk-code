@@ -368,10 +368,8 @@ install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".
 if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
-install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32 RENAME supertuxkart.png)
+install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
-
-set(PREFIX ${CMAKE_INSTALL_PREFIX})
-configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)
-add_dependencies(supertuxkart supertuxkart.desktop)

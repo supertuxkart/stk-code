@@ -22,13 +22,13 @@ protected:
     int m_ref_count;
     std::vector<GLMesh *> MeshSolidMaterial[MAT_COUNT];
     std::vector<GLMesh> GLmeshes;
-    std::vector<float> instance_pos;
+    std::vector<std::vector<InstanceData> > instanceData;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
     GLuint instances_vbo;
     void createGLMeshes();
     bool isMaterialInitialized;
     void setFirstTimeMaterial();
-    void initinstancedvaostate(GLMesh &mesh);
+    void initinstancedvaostate(GLMesh &mesh, const std::vector<InstanceData> &);
     void cleanGL();
     core::vector3df windDir;
 public:
@@ -40,7 +40,7 @@ public:
     virtual void render();
     void addInstance(const core::vector3df &origin, const core::vector3df &orientation, const core::vector3df &scale);
 
-    int getInstanceCount() const { return instance_pos.size() / 9; }
+    int getInstanceCount() const { return instanceData[0].size(); }
 
     core::matrix4 getInstanceTransform(int id);
 
