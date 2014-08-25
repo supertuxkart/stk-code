@@ -150,7 +150,7 @@ FileManager::FileManager()
     if(exe_path.size()==0 || exe_path[exe_path.size()-1]!='/')
         exe_path += "/";
     if ( getenv ( "SUPERTUXKART_DATADIR" ) != NULL )
-        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/" ;
+        root_dir = std::string(getenv("SUPERTUXKART_DATADIR"))+"/data/" ;
 #ifdef __APPLE__
     else if( macSetBundlePathIfRelevant( root_dir ) ) { root_dir = root_dir + "data/"; }
 #endif
@@ -174,7 +174,7 @@ FileManager::FileManager()
     else
     {
 #ifdef SUPERTUXKART_DATADIR
-        root_dir = SUPERTUXKART_DATADIR;
+        root_dir = SUPERTUXKART_DATADIR"/data/";
         if(root_dir.size()==0 || root_dir[root_dir.size()-1]!='/')
             root_dir+='/';
 
@@ -186,6 +186,8 @@ FileManager::FileManager()
     addRootDirs(root_dir);
     if( fileExists(root_dir+"../../stk-assets"))
         addRootDirs(root_dir+"../../stk-assets");
+    if( fileExists(root_dir+"../../supertuxkart-assets"))
+        addRootDirs(root_dir+"../../supertuxkart-assets");
     if ( getenv ( "SUPERTUXKART_ROOT_PATH" ) != NULL )
         addRootDirs(getenv("SUPERTUXKART_ROOT_PATH"));
 
