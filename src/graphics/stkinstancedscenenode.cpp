@@ -31,6 +31,13 @@ void STKInstancedSceneNode::cleanGL()
             glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
+#ifdef Bindless_Texture_Support
+        for (unsigned j = 0; i < 6; i++)
+        {
+            if (mesh.TextureHandles[j] && glIsTextureHandleResidentARB(mesh.TextureHandles[j]))
+                glMakeTextureHandleNonResidentARB(mesh.TextureHandles[j]);
+        }
+#endif
     }
     glDeleteBuffers(1, &instances_vbo);
 }

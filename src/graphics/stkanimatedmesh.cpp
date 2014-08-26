@@ -33,6 +33,13 @@ void STKAnimatedMesh::cleanGLMeshes()
             glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
+#ifdef Bindless_Texture_Support
+        for (unsigned j = 0; j < 6; j++)
+        {
+            if (mesh.TextureHandles[j] && glIsTextureHandleResidentARB(mesh.TextureHandles[j]))
+                glMakeTextureHandleNonResidentARB(mesh.TextureHandles[j]);
+        }
+#endif
     }
 }
 
