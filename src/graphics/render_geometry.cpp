@@ -250,10 +250,6 @@ void IrrDriver::renderSolidFirstPass()
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
-    AnimatedListMatDefault::getInstance()->clear();
-    AnimatedListMatAlphaRef::getInstance()->clear();
-    AnimatedListMatDetails::getInstance()->clear();
-    AnimatedListMatUnlit::getInstance()->clear();
     // Add a 30 ms timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -293,12 +289,6 @@ void IrrDriver::renderSolidFirstPass()
             TexUnit(1, false),
             TexUnit(0, true)
         ), ListMatNormalMap::getInstance());
-
-
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_STANDARD, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDefault::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatAlphaRef::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectPass1Shader, video::EVT_2TCOORDS, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatDetails::getInstance());
-        renderMeshes1stPass<MeshShader::ObjectRefPass1Shader, video::EVT_STANDARD, 3, 2, 1>(TexUnits(TexUnit(0, true)), AnimatedListMatUnlit::getInstance());
 
         if (UserConfigParams::m_azdo)
         {
@@ -540,39 +530,22 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(0, true)
         ), ListMatDefault::getInstance(),
         createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(0, true)
-            ), AnimatedListMatDefault::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-
         renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
             TexUnit(0, true)
             ), ListMatAlphaRef::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<MeshShader::ObjectRefPass2Shader, video::EVT_STANDARD, 3, 1 >(TexUnits(
-            TexUnit(0, true)
-            ), AnimatedListMatAlphaRef::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-
         renderMeshes2ndPass<MeshShader::SphereMapShader, video::EVT_STANDARD, 2, 1>(TexUnits(
             TexUnit(0, true)
             ), ListMatSphereMap::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-
         renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
             TexUnit(0, true),
             TexUnit(1, true)
             ), ListMatDetails::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<MeshShader::DetailledObjectPass2Shader, video::EVT_2TCOORDS, 1>(TexUnits(
-            TexUnit(0, true),
-            TexUnit(1, true)
-            ), AnimatedListMatDetails::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
         renderMeshes2ndPass<MeshShader::GrassPass2Shader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(0, true)
             ), ListMatGrass::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-
         renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 3, 1>(TexUnits(
             TexUnit(0, true)
             ), ListMatUnlit::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-        renderMeshes2ndPass<MeshShader::ObjectUnlitShader, video::EVT_STANDARD, 3, 1>(TexUnits(
-            TexUnit(0, true)
-            ), AnimatedListMatUnlit::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
 
         renderMeshes2ndPass<MeshShader::SplattingShader, video::EVT_2TCOORDS, 1>(TexUnits(
             TexUnit(1, false),
@@ -581,7 +554,6 @@ void IrrDriver::renderSolidSecondPass()
             TexUnit(4, true),
             TexUnit(5, true)
             ), ListMatSplatting::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
-
         renderMeshes2ndPass<MeshShader::ObjectPass2Shader, video::EVT_TANGENTS, 3, 1>(TexUnits(
             TexUnit(0, true)
             ), ListMatNormalMap::getInstance(), createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle), DiffSpecSSAOTex);
@@ -961,10 +933,6 @@ void IrrDriver::renderShadows()
     ListInstancedMatAlphaRef::getInstance()->clear();
     ListInstancedMatGrass::getInstance()->clear();
     ListInstancedMatNormalMap::getInstance()->clear();
-    AnimatedListMatDefault::getInstance()->clear();
-    AnimatedListMatAlphaRef::getInstance()->clear();
-    AnimatedListMatDetails::getInstance()->clear();
-    AnimatedListMatUnlit::getInstance()->clear();
     m_scene_manager->drawAll(scene::ESNRP_SOLID);
 
     std::vector<GLuint> noTexUnits;
@@ -976,11 +944,6 @@ void IrrDriver::renderShadows()
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, ListMatAlphaRef::getInstance());
     renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, ListMatUnlit::getInstance());
     renderShadow<MeshShader::GrassShadowShader, EVT_STANDARD, 3, 1>(std::vector<GLuint>{ 0 }, ListMatGrass::getInstance());
-
-    renderShadow<MeshShader::ShadowShader, EVT_STANDARD, 1>(noTexUnits, AnimatedListMatDefault::getInstance());
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, AnimatedListMatAlphaRef::getInstance());
-    renderShadow<MeshShader::RefShadowShader, EVT_STANDARD, 1>(std::vector<GLuint>{ 0 }, AnimatedListMatUnlit::getInstance());
-    renderShadow<MeshShader::ShadowShader, EVT_2TCOORDS, 1>(noTexUnits, AnimatedListMatDetails::getInstance());
 
     if (UserConfigParams::m_azdo)
     {

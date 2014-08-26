@@ -67,13 +67,7 @@ class MeshList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
 class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
 {};
 
-class AnimatedListMatDefault : public MeshList<AnimatedListMatDefault, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
-{};
-
 class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
-{};
-
-class AnimatedListMatAlphaRef : public MeshList<AnimatedListMatAlphaRef, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
 {};
 
 class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
@@ -91,13 +85,7 @@ class ListMatSplatting : public MeshList<ListMatSplatting, GLMesh *, core::matri
 class ListMatUnlit : public MeshList<ListMatUnlit, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
 {};
 
-class AnimatedListMatUnlit : public MeshList<AnimatedListMatUnlit, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
-{};
-
 class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
-{};
-
-class AnimatedListMatDetails : public MeshList<AnimatedListMatDetails, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
 {};
 
 class ListBlendTransparent : public MeshList<ListBlendTransparent, GLMesh *, core::matrix4, core::matrix4>
