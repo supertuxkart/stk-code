@@ -22,9 +22,6 @@
 
 #include "guiengine/screen.hpp"
 
-//#include "guiengine/widgets/check_box_widget.hpp"
-
-
 namespace GUIEngine
 {
     class CheckBoxWidget;
@@ -40,12 +37,12 @@ class Track;
  * \ingroup states_screens
  */
 class TrackInfoScreen : public GUIEngine::Screen,
-                  public GUIEngine::ScreenSingleton<TrackInfoScreen>
+                        public GUIEngine::ScreenSingleton<TrackInfoScreen>
 {
     static const int HIGHSCORE_COUNT = 3;
 
     /** A pointer to the track of which the info is shown. */
-    const Track *m_track;
+    Track *m_track;
 
     // When there is no need to tab through / click on images/labels, we can add directly
     // irrlicht labels (more complicated uses require the use of our widget set)
@@ -67,14 +64,6 @@ class TrackInfoScreen : public GUIEngine::Screen,
     void updateHighScores();
     
 public:
-    /**
-     * \brief Creates a track info modal dialog with given percentage of screen width and height
-     * \param ribbonItem identifier name of the ribbon item that was clicked in the track selection
-     *        screen to get there (often will be 'trackIdent' but may also be the random item)
-     * \param trackIdent identifier name of the track to show information about
-     * \param trackName  human-readable, possibly translated, name of the track to show information about
-     * \param screenshot screenshot of the track to show information about
-     */
     TrackInfoScreen();
     virtual ~TrackInfoScreen();
     
@@ -83,7 +72,7 @@ public:
     virtual void eventCallback(GUIEngine::Widget *,const std::string &name ,
                                const int player_id);
     void onEnterPressedInternal();
-    void setTrack(const Track *track);
+    void setTrack(Track *track);
 };
 
 #endif

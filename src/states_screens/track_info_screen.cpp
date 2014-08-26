@@ -71,7 +71,7 @@ void TrackInfoScreen::loadedFromFile()
 }   // loadedFromFile
 
 // ----------------------------------------------------------------------------
-void TrackInfoScreen::setTrack(const Track *track)
+void TrackInfoScreen::setTrack(Track *track)
 {
     m_track = track;
 }   // setTrack
@@ -107,7 +107,6 @@ void TrackInfoScreen::init()
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
     screenshot_widget->m_properties[PROP_ICON] = "gui/main_help.png";
-    //FIXME screenshot_widget->setParent(m_irrlicht_window);
     screenshot_widget->add();
 
     ITexture* screenshot = irr_driver->getTexture(m_track->getScreenshotFile(),
@@ -268,7 +267,7 @@ void TrackInfoScreen::onEnterPressedInternal()
                                                      : -1;
     const bool reverse_track = m_reverse == NULL ? false
                                                   : m_reverse->getState();
-   //FIXME m_track->setActualNumberOfLaps(num_laps);
+    m_track->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
 
     // Disable accidentally unlocking of a challenge
