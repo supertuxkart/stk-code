@@ -931,6 +931,21 @@ namespace MeshShader
         AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
     }
 
+    InstancedDetailledObjectPass2Shader::InstancedDetailledObjectPass2Shader()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_object_pass.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/utils/getLightFactor.frag").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_detailledobject_pass2.frag").c_str());
+        AssignUniforms();
+
+        AssignSamplerNames(Program, 0, "DiffuseMap", 1, "SpecularMap", 2, "SSAO", 3, "Albedo", 4, "Detail");
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
     ObjectUnlitShader::ObjectUnlitShader()
     {
         Program = LoadProgram(
