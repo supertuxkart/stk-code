@@ -536,6 +536,12 @@ public:
     ObjectUnlitShader();
 };
 
+class InstancedObjectUnlitShader : public ShaderHelperSingleton<InstancedObjectUnlitShader>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
+{
+public:
+    InstancedObjectUnlitShader();
+};
+
 class ObjectRefPass2Shader : public ShaderHelperSingleton<ObjectRefPass2Shader, core::matrix4, core::matrix4>, public TextureRead<Nearest_Filtered, Nearest_Filtered, Bilinear_Filtered, Trilinear_Anisotropic_Filtered>
 {
 public:
