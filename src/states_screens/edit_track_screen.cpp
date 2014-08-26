@@ -234,7 +234,9 @@ void EditTrackScreen::selectTrack(const std::string& id)
         tracks->setSelection("", PLAYER_ID_GAME_MASTER, true);
         selected_track->setText(_("Select a track"), true);
 
-        laps->setValue(m_track->getDefaultNumberOfLaps());
+        // We can't set a better default for number of laps. On the other
+        // hand, if a track is selected, the number of laps will be updated.
+        laps->setValue(3);
 
         reverse->setVisible(true);
         reverse->setState(false);
