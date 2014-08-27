@@ -27,10 +27,12 @@ void STKInstancedSceneNode::cleanGL()
             continue;
         if (mesh.vao)
             glDeleteVertexArrays(1, &(mesh.vao));
-        if (mesh.vao_shadow_pass)
-            glDeleteVertexArrays(1, &(mesh.vao_shadow_pass));
-        glDeleteBuffers(1, &(mesh.vertex_buffer));
-        glDeleteBuffers(1, &(mesh.index_buffer));
+        if (mesh.vertex_buffer)
+            glDeleteBuffers(1, &(mesh.vertex_buffer));
+        if (mesh.index_buffer)
+            glDeleteBuffers(1, &(mesh.index_buffer));
+        if (mesh.instance_buffer)
+            glDeleteBuffers(1, &(mesh.instance_buffer));
 #ifdef Bindless_Texture_Support
         for (unsigned j = 0; i < 6; i++)
         {
@@ -39,7 +41,6 @@ void STKInstancedSceneNode::cleanGL()
         }
 #endif
     }
-    glDeleteBuffers(1, &instances_vbo);
 }
 
 STKInstancedSceneNode::~STKInstancedSceneNode()
@@ -63,7 +64,6 @@ void STKInstancedSceneNode::createGLMeshes()
             std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
             mesh.vaoBaseVertex = p.first;
             mesh.vaoOffset = p.second;
-            mesh.VAOType = mb->getVertexType();
         }
         else
             fillLocalBuffer(mesh, mb);
@@ -77,8 +77,8 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, const std::vecto
     if (!irr_driver->hasARB_base_instance())
     {
         mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        glGenBuffers(1, &instances_vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
+        glGenBuffers(1, &(mesh.instance_buffer));
+        glBindBuffer(GL_ARRAY_BUFFER, mesh.instance_buffer);
         glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(InstanceData), instances.data(), GL_STATIC_DRAW);
 
         glEnableVertexAttribArray(7);
@@ -90,19 +90,6 @@ void STKInstancedSceneNode::initinstancedvaostate(GLMesh &mesh, const std::vecto
         glEnableVertexAttribArray(9);
         glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
         glVertexAttribDivisor(9, 1);
-
-        mesh.vao_shadow_pass = createVAO(mesh.vertex_buffer, mesh.index_buffer, getVTXTYPEFromStride(mesh.Stride));
-        glBindBuffer(GL_ARRAY_BUFFER, instances_vbo);
-        glEnableVertexAttribArray(7);
-        glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
-        glVertexAttribDivisor(7, 1);
-        glEnableVertexAttribArray(8);
-        glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
-        glVertexAttribDivisor(8, 1);
-        glEnableVertexAttribArray(9);
-        glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
-        glVertexAttribDivisor(9, 1);
-
         glBindVertexArray(0);
     }
 }

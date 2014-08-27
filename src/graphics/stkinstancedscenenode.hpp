@@ -24,7 +24,6 @@ protected:
     std::vector<GLMesh> GLmeshes;
     std::vector<std::vector<InstanceData> > instanceData;
     core::matrix4 ModelViewProjectionMatrix, TransposeInverseModelView;
-    GLuint instances_vbo;
     void createGLMeshes();
     bool isMaterialInitialized;
     void setFirstTimeMaterial();

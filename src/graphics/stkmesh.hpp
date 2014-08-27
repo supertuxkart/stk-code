@@ -35,9 +35,9 @@ enum TransparentMaterial
 
 struct GLMesh {
     GLuint vao;
-    GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
+    GLuint instance_buffer;
     video::ITexture *textures[6];
     GLenum PrimitiveType;
     GLenum IndexType;

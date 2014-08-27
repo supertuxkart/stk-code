@@ -178,6 +178,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
     for (unsigned i = 0; i < 6; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.TextureMatrix = 0;
+    result.VAOType = mb->getVertexType();
     return result;
 }
 

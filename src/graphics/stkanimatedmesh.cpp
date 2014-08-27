@@ -33,6 +33,8 @@ void STKAnimatedMesh::cleanGLMeshes()
             glDeleteVertexArrays(1, &(mesh.vao));
         glDeleteBuffers(1, &(mesh.vertex_buffer));
         glDeleteBuffers(1, &(mesh.index_buffer));
+        if (mesh.instance_buffer)
+            glDeleteBuffers(1, &(mesh.instance_buffer));
 #ifdef Bindless_Texture_Support
         for (unsigned j = 0; j < 6; j++)
         {
@@ -108,10 +110,29 @@ void STKAnimatedMesh::render()
                 MeshSolidMaterial[MatType].push_back(&mesh);
                 InitTextures(mesh, MatType);
             }
-            std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
-            mesh.vaoBaseVertex = p.first;
-            mesh.vaoOffset = p.second;
-            mesh.VAOType = mb->getVertexType();
+
+            if (irr_driver->hasARB_base_instance())
+            {
+                std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
+                mesh.vaoBaseVertex = p.first;
+                mesh.vaoOffset = p.second;
+            }
+            else
+            {
+                fillLocalBuffer(mesh, mb);
+                mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
+                glGenBuffers(1, &(mesh.instance_buffer));
+                glBindBuffer(GL_ARRAY_BUFFER, mesh.instance_buffer);
+                glEnableVertexAttribArray(7);
+                glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+                glVertexAttribDivisor(7, 1);
+                glEnableVertexAttribArray(8);
+                glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+                glVertexAttribDivisor(8, 1);
+                glEnableVertexAttribArray(9);
+                glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+                glVertexAttribDivisor(9, 1);
+            }
         }
     }
     firstTime = false;
@@ -126,7 +147,10 @@ void STKAnimatedMesh::render()
             {
                 glBindVertexArray(0);
                 size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
+                if (irr_driver->hasARB_base_instance())
+                    glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
+                else
+                    glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
                 GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
                 void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
                 memcpy(buf, mb->getVertices(), size);

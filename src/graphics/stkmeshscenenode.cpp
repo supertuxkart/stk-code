@@ -70,38 +70,42 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       if (rnd->isTransparent())
       {
           TransparentMaterial TranspMat = MaterialTypeToTransparentMaterial(type, MaterialTypeParam);
-          if (immediate_draw)
-          {
-              fillLocalBuffer(mesh, mb);
-              mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
-              glBindVertexArray(0);
-          }
-          else
+          if (!immediate_draw)
               TransparentMesh[TranspMat].push_back(&mesh);
       }
       else
       {
           assert(!isDisplacement);
           MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
-          if (immediate_draw)
-          {
-              fillLocalBuffer(mesh, mb);
-              mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
-              glBindVertexArray(0);
-          }
-          else
+          if (!immediate_draw)
           {
               InitTextures(mesh, MatType);
               MeshSolidMaterials[MatType].push_back(&mesh);
           }
       }
 
-      if (!immediate_draw)
+      if (!immediate_draw && irr_driver->hasARB_base_instance())
       {
           std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
           mesh.vaoBaseVertex = p.first;
           mesh.vaoOffset = p.second;
-          mesh.VAOType = mb->getVertexType();
+      }
+      else
+      {
+          fillLocalBuffer(mesh, mb);
+          mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
+          glGenBuffers(1, &(mesh.instance_buffer));
+          glBindBuffer(GL_ARRAY_BUFFER, mesh.instance_buffer);
+          glEnableVertexAttribArray(7);
+          glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
+          glVertexAttribDivisor(7, 1);
+          glEnableVertexAttribArray(8);
+          glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
+          glVertexAttribDivisor(8, 1);
+          glEnableVertexAttribArray(9);
+          glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
+          glVertexAttribDivisor(9, 1);
+          glBindVertexArray(0);
       }
   }
   isMaterialInitialized = true;
@@ -116,8 +120,12 @@ void STKMeshSceneNode::cleanGLMeshes()
             continue;
         if (mesh.vao)
             glDeleteVertexArrays(1, &(mesh.vao));
-        glDeleteBuffers(1, &(mesh.vertex_buffer));
-        glDeleteBuffers(1, &(mesh.index_buffer));
+        if (mesh.vertex_buffer)
+            glDeleteBuffers(1, &(mesh.vertex_buffer));
+        if (mesh.index_buffer)
+            glDeleteBuffers(1, &(mesh.index_buffer));
+        if (mesh.instance_buffer)
+            glDeleteBuffers(1, &(mesh.instance_buffer));
 #ifdef Bindless_Texture_Support
         for (unsigned j = 0; j < 6; j++)
         {
@@ -310,7 +318,10 @@ void STKMeshSceneNode::render()
             scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
             if (!mb)
                 continue;
-            glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
+            else
+                glBindVertexArray(GLmeshes[i].vao);
             drawGlow(GLmeshes[i]);
         }
     }
@@ -445,9 +456,14 @@ void STKMeshSceneNode::render()
 
         if (!TransparentMesh[TM_BUBBLE].empty())
             glUseProgram(MeshShader::BubbleShader::Program);
-        glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
+        if (irr_driver->hasARB_base_instance())
+            glBindVertexArray(VAOManager::getInstance()->getVAO(video::EVT_STANDARD));
         for_in(mesh, TransparentMesh[TM_BUBBLE])
+        {
+            if (irr_driver->hasARB_base_instance())
+                glBindVertexArray(mesh->vao);
             drawBubble(*mesh, ModelViewProjectionMatrix);
+        }
         return;
     }
 }
