@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<stkgui>
+    <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
+
+    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row">
+
+        <header id="name" width="100%" text_align="center"/>
+
+        <spacer width="1" height="5%"/>
+
+        <box width="95%" height="50%" padding="10" layout="horizontal-row">
+            <spacer width="10" height="100%"/>
+            <!-- Left pane -->
+            <div width="45%" height="95%" align="center" layout="vertical-row">
+                <placeholder proportion="1" width="100%" height="100%" id="screenshot_div">
+                </placeholder>
+            </div>
+
+            <spacer width="5%" height="100%"/>
+
+            <!-- Right pane -->
+            <div width="45%" height="95%" align="center" layout="vertical-row">
+                <list id="tracks" width="100%" height="100%"/>
+            </div>
+
+        </box>
+        <spacer width="1" height="3%"/>
+        <box width="95%" height="17%" padding="10" layout="vertical-row">
+            <spacer width="1" height="5%"/>
+
+            <div width="75%" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="2" />
+                <label id="ai-text" height="100%" width="40%" I18N="Number of AI karts" text="Number of AI karts"/>
+                <spacer with="40" height="2" />
+                <spinner id="ai-spinner" width="20%" min_value="1" max_value="20" align="center"
+                         wrap_around="true" />
+                <spacer proportion="1" height="2" />
+            </div>
+            <div width="75%" height="fit" layout="horizontal-row" >
+                <spacer width="40" height="2" />
+                <label id="reverse-text" height="100%" width="40%" I18N="Drive the track reverse" text="Drive in reverse"/>
+                <spacer width="40" height="2" />
+                <checkbox id="reverse"/>
+                <spacer proportion="1" height="2" />
+            </div>
+            <spacer width="1" height="2%"/>
+        </box>
+        <spacer width="1" height="2%"/>
+        <buttonbar id="buttons" height="15%" width="100%" align="center">
+
+            <icon-button id="start" width="64" height="64" icon="gui/green_check.png"
+                    I18N="Start race" text="Start Race"/>
+
+            <icon-button id="continue" width="64" height="64" icon="gui/green_check.png"
+                    I18N="Continue race" text="Continue Race"/>
+        </buttonbar>
+
+    </div>
+</stkgui>

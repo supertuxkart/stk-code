@@ -29,7 +29,7 @@
 #include "race/grand_prix_manager.hpp"
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
-#include "states_screens/dialogs/gp_info_dialog.hpp"
+#include "states_screens/gp_info_screen.hpp"
 #include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
@@ -118,7 +118,11 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
             if (selection == "Random Grand Prix")
                 new RandomGPInfoDialog();
             else
-                new GPInfoDialog(selection);
+            {
+                GPInfoScreen *gpis = GPInfoScreen::getInstance();
+                gpis->setGP(selection);
+                StateManager::get()->pushScreen(gpis);
+            }
         }
     }
     else if (name == "trackgroups")
