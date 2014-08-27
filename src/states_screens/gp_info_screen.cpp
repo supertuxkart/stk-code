@@ -174,7 +174,7 @@ void GPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &name,
         const std::string &button = getWidget<GUIEngine::RibbonWidget>("buttons")
                                   ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (button == "start")
+        if (button == "start" || button=="continue")
         {
             // Save GP identifier, since dismiss will delete this object.
             std::string gp_id = m_gp->getId();
