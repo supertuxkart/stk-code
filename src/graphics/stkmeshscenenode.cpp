@@ -276,6 +276,7 @@ void STKMeshSceneNode::render()
 
         if (immediate_draw)
         {
+            return;
             glDisable(GL_CULL_FACE);
             if (!spareWhiteTex)
                 spareWhiteTex = getUnicolorTexture(video::SColor(255, 255, 255, 255));
