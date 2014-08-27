@@ -611,6 +611,51 @@ void IrrDriver::renderNormalsVisualisation()
 
 }
 
+template<typename Shader, enum E_VERTEX_TYPE VertexType, int...List, typename... TupleType>
+void renderTransparenPass(const std::vector<TexUnit> &TexUnits, std::vector<STK::Tuple<TupleType...> > *meshes)
+{
+    glUseProgram(Shader::getInstance()->Program);
+    glBindVertexArray(VAOManager::getInstance()->getVAO(VertexType));
+    for (unsigned i = 0; i < meshes->size(); i++)
+    {
+        std::vector<uint64_t> Handles;
+        std::vector<GLuint> Textures;
+        GLMesh &mesh = *(STK::tuple_get<0>(meshes->at(i)));
+        for (unsigned j = 0; j < TexUnits.size(); j++)
+        {
+            if (!mesh.textures[TexUnits[j].m_id])
+                mesh.textures[TexUnits[j].m_id] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+            compressTexture(mesh.textures[TexUnits[j].m_id], TexUnits[j].m_premul_alpha);
+            if (UserConfigParams::m_azdo)
+            {
+#ifdef Bindless_Texture_Support
+                if (!mesh.TextureHandles[TexUnits[j].m_id])
+                    mesh.TextureHandles[TexUnits[j].m_id] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[TexUnits[j].m_id]), Shader::getInstance()->SamplersId[Handles.size()]);
+                if (!glIsTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]))
+                    glMakeTextureHandleResidentARB(mesh.TextureHandles[TexUnits[j].m_id]);
+#endif
+                Handles.push_back(mesh.TextureHandles[TexUnits[j].m_id]);
+            }
+            else
+                Textures.push_back(getTextureGLuint(mesh.textures[TexUnits[j].m_id]));
+        }
+
+        if (mesh.VAOType != VertexType)
+        {
+#ifdef DEBUG
+            Log::error("Materials", "Wrong vertex Type associed to pass 2 (hint texture : %s)", mesh.textures[0]->getName().getPath().c_str());
+#endif
+            continue;
+        }
+
+        if (UserConfigParams::m_azdo)
+            Shader::getInstance()->SetTextureHandles(Handles);
+        else
+            Shader::getInstance()->SetTextureUnits(Textures);
+        custom_unroll_args<List...>::template exec(Shader::getInstance(), meshes->at(i));
+    }
+}
+
 static video::ITexture *displaceTex = 0;
 
 void IrrDriver::renderTransparent()
@@ -634,24 +679,20 @@ void IrrDriver::renderTransparent()
     if (World::getWorld() && World::getWorld()->isFogEnabled())
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
-            TexUnit(0, true)
-            ), ListBlendTransparentFog::getInstance(), createVector<uint64_t>(), createVector<GLuint>());
+        renderTransparenPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
+            TexUnit(0, true)), ListBlendTransparentFog::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderMeshes2ndPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
-            TexUnit(0, true)
-            ), ListAdditiveTransparentFog::getInstance(), createVector<uint64_t>(), createVector<GLuint>());
+        renderTransparenPass<MeshShader::TransparentFogShader, video::EVT_STANDARD, 8, 7, 6, 5, 4, 3, 2, 1>(TexUnits(
+            TexUnit(0, true)), ListAdditiveTransparentFog::getInstance());
     }
     else
     {
         glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(0, true)
-            ), ListBlendTransparent::getInstance(), createVector<uint64_t>(), createVector<GLuint>());
+        renderTransparenPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
+            TexUnit(0, true)), ListBlendTransparent::getInstance());
         glBlendFunc(GL_ONE, GL_ONE);
-        renderMeshes2ndPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
-            TexUnit(0, true)
-            ), ListAdditiveTransparent::getInstance(), createVector<uint64_t>(), createVector<GLuint>());
+        renderTransparenPass<MeshShader::TransparentShader, video::EVT_STANDARD, 2, 1>(TexUnits(
+            TexUnit(0, true)), ListAdditiveTransparent::getInstance());
     }
 
     if (!UserConfigParams::m_dynamic_lights)
