@@ -300,6 +300,7 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
     if (!mesh.textures[i])
         mesh.textures[i] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
     compressTexture(mesh.textures[i], isSrgb);
+#ifdef Bindless_Texture_Support
     if (UserConfigParams::m_azdo)
     {
         if (!mesh.TextureHandles[i])
@@ -307,6 +308,7 @@ SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
         if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
             glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
     }
+#endif
 }
 
 void InitTextures(GLMesh &mesh, MeshMaterial Mat)
