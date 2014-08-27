@@ -106,6 +106,7 @@ void STKAnimatedMesh::render()
             {
                 MeshMaterial MatType = MaterialTypeToMeshMaterial(type, mb->getVertexType());
                 MeshSolidMaterial[MatType].push_back(&mesh);
+                InitTextures(mesh, MatType);
             }
             std::pair<unsigned, unsigned> p = VAOManager::getInstance()->getBase(mb);
             mesh.vaoBaseVertex = p.first;

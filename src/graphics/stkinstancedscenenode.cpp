@@ -124,6 +124,7 @@ void STKInstancedSceneNode::setFirstTimeMaterial()
         if (irr_driver->hasARB_base_instance())
             mesh.vaoBaseInstance = VAOManager::getInstance()->appendInstance(InstanceTypeDefault, instanceData[i]);
         MeshSolidMaterial[MatType].push_back(&mesh);
+        InitTextures(mesh, MatType);
     }
     isMaterialInitialized = true;
 }

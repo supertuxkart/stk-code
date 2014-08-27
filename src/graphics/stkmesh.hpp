@@ -109,4 +109,6 @@ void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatr
 MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
 
+void InitTextures(GLMesh &mesh, MeshMaterial);
+
 #endif // STKMESH_H

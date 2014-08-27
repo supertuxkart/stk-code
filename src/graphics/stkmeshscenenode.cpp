@@ -90,7 +90,10 @@ void STKMeshSceneNode::setFirstTimeMaterial()
               glBindVertexArray(0);
           }
           else
+          {
+              InitTextures(mesh, MatType);
               MeshSolidMaterials[MatType].push_back(&mesh);
+          }
       }
 
       if (!immediate_draw)

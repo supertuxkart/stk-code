@@ -293,3 +293,45 @@ bool isObject(video::E_MATERIAL_TYPE type)
         return true;
     return false;
 }
+
+static void
+SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
+{
+    if (!mesh.textures[i])
+        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+    compressTexture(mesh.textures[i], isSrgb);
+    if (UserConfigParams::m_azdo)
+    {
+        if (!mesh.TextureHandles[i])
+            mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[i]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
+        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
+            glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
+    }
+}
+
+void InitTextures(GLMesh &mesh, MeshMaterial Mat)
+{
+    switch (Mat)
+    {
+    default:
+    case MAT_DEFAULT:
+    case MAT_ALPHA_REF:
+    case MAT_GRASS:
+    case MAT_SPHEREMAP:
+    case MAT_UNLIT:
+        SetTexture(mesh, 0, true);
+        break;
+    case MAT_DETAIL:
+    case MAT_NORMAL_MAP:
+        SetTexture(mesh, 0, true);
+        SetTexture(mesh, 1, false);
+        break;
+    case MAT_SPLATTING:
+        SetTexture(mesh, 0, true);
+        SetTexture(mesh, 1, true);
+        SetTexture(mesh, 2, true);
+        SetTexture(mesh, 3, true);
+        SetTexture(mesh, 4, true);
+        break;
+    }
+}
