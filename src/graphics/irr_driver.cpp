@@ -481,7 +481,7 @@ void IrrDriver::initDevice()
             m_need_rh_workaround = true;
 
         // Fix for AMD and bindless sRGB textures
-        if (strstr((const char *)glGetString(GL_VENDOR), "AMD") != NULL)
+        if (strstr((const char *)glGetString(GL_VENDOR), "ATI") != NULL)
             m_need_srgb_workaround = true;
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
