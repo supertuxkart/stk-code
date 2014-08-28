@@ -32,6 +32,7 @@ public:
         const irr::core::vector3df& scale = irr::core::vector3df(1.0f, 1.0f, 1.0f),
         bool createGLMeshes = true);
     virtual void render();
+    void update();
     virtual void setMesh(irr::scene::IMesh* mesh);
     virtual void OnRegisterSceneNode();
     virtual ~STKMeshSceneNode();

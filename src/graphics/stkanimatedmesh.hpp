@@ -17,6 +17,7 @@ protected:
     core::matrix4 ModelViewProjectionMatrix;
     void cleanGLMeshes();
 public:
+    void update();
   STKAnimatedMesh(irr::scene::IAnimatedMesh* mesh, irr::scene::ISceneNode* parent,
      irr::scene::ISceneManager* mgr, irr::s32 id,
      const irr::core::vector3df& position = irr::core::vector3df(0,0,0),

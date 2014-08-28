@@ -54,21 +54,13 @@ void STKAnimatedMesh::setMesh(scene::IAnimatedMesh* mesh)
     CAnimatedMeshSceneNode::setMesh(mesh);
 }
 
-void STKAnimatedMesh::render()
+void STKAnimatedMesh::update()
 {
     video::IVideoDriver* driver = SceneManager->getVideoDriver();
-
-    bool isTransparentPass =
-        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
-
-    ++PassCount;
-
     scene::IMesh* m = getMeshForCurrentFrame();
 
     if (m)
-    {
         Box = m->getBoundingBox();
-    }
     else
     {
         Log::error("animated mesh", "Animated Mesh returned no mesh to render.");
@@ -143,32 +135,32 @@ void STKAnimatedMesh::render()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-            if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == TRANSPARENT_PASS)
-            {
-                glBindVertexArray(0);
-                size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
-                if (irr_driver->hasARB_base_instance())
-                    glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
-                else
-                    glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
-                GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
-                void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
-                memcpy(buf, mb->getVertices(), size);
-                glUnmapBuffer(GL_ARRAY_BUFFER);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-            }
+            glBindVertexArray(0);
+            size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
+            if (irr_driver->hasARB_base_instance())
+                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
+            else
+                glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
+            GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+            void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
+            memcpy(buf, mb->getVertices(), size);
+            glUnmapBuffer(GL_ARRAY_BUFFER);
+            glBindBuffer(GL_ARRAY_BUFFER, 0);
         }
         if (mb)
             GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
-
-        video::IMaterialRenderer* rnd = driver->getMaterialRenderer(Materials[i].MaterialType);
-        bool transparent = (rnd && rnd->isTransparent());
-
-       // only render transparent buffer if this is the transparent render pass
-       // and solid only in solid pass
-       if (transparent != isTransparentPass)
-          continue;
     }
+
+}
+
+void STKAnimatedMesh::render()
+{
+    bool isTransparentPass =
+        SceneManager->getSceneNodeRenderPass() == scene::ESNRP_TRANSPARENT;
+
+    ++PassCount;
+
+    update();
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS || irr_driver->getPhase() == SHADOW_PASS)
     {

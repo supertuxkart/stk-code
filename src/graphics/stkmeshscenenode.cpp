@@ -183,6 +183,21 @@ void STKMeshSceneNode::updatevbo()
 
 static video::ITexture *spareWhiteTex = 0;
 
+void STKMeshSceneNode::update()
+{
+    Box = Mesh->getBoundingBox();
+
+    setFirstTimeMaterial();
+
+    for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
+    {
+        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
+        if (!mb)
+            continue;
+        GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
+    }
+}
+
 
 void STKMeshSceneNode::OnRegisterSceneNode()
 {
@@ -201,23 +216,12 @@ void STKMeshSceneNode::render()
 
     ++PassCount;
 
-    Box = Mesh->getBoundingBox();
-
-    setFirstTimeMaterial();
-
-    for (u32 i = 0; i < Mesh->getMeshBufferCount(); ++i)
-    {
-        scene::IMeshBuffer* mb = Mesh->getMeshBuffer(i);
-        if (!mb)
-            continue;
-        GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);
-    }
+    update();
 
     if (irr_driver->getPhase() == SOLID_NORMAL_AND_DEPTH_PASS && immediate_draw)
     {
         core::matrix4 invmodel;
         AbsoluteTransformation.getInverse(invmodel);
-
 
         glDisable(GL_CULL_FACE);
         if (update_each_frame)
