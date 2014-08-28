@@ -16,11 +16,11 @@ option(USE_FRIBIDI "Support for right-to-left languages" ON)
 option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
 if(UNIX)
-    option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
+    option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" ON)
 endif()
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
-    # on the installation of the Windows DDK (Driver Developer Kit), 
+    # on the installation of the Windows DDK (Driver Developer Kit),
     # which also needs an absolute path :(
     option(WIIUSE_BUILD "Build wiiuse lib (only for developers)" OFF)
     mark_as_advanced(WIIUSE_BUILD)
@@ -124,9 +124,9 @@ endif()
 
 
 if(UNIX)
-#    if(USE_CPP2011)
+    if(USE_CPP2011)
         add_definitions("-std=gnu++0x")
-#    endif()
+    endif()
 endif()
 
 # OpenGL
@@ -145,7 +145,7 @@ if(UNIX AND NOT APPLE)
     endif()
 endif()
 
-    
+
 # Set some compiler options
 if(UNIX)
     add_definitions(-Wall)
@@ -254,7 +254,7 @@ target_link_libraries(supertuxkart
     ${OGGVORBIS_LIBRARIES}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
-    
+
 if(UNIX AND NOT APPLE)
     if(USE_XRANDR)
         target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
@@ -307,7 +307,7 @@ if(MSVC)
   add_custom_command(TARGET supertuxkart POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${PROJECT_SOURCE_DIR}/dependencies/dll"
-        $<TARGET_FILE_DIR:supertuxkart>) 
+        $<TARGET_FILE_DIR:supertuxkart>)
   add_custom_target(stkshaders SOURCES ${STK_SHADERS})
 endif()
 
@@ -340,9 +340,9 @@ endif()
 
 # ==== Checking if stk-assets folder exists ====
 if(CHECK_ASSETS)
-  if((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/karts) AND 
-       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/library) AND 
-       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/music) AND 
+  if((IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/karts) AND
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/library) AND
+       (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/music) AND
        (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/sfx) AND
        (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/textures) AND
        (IS_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/data/tracks))

@@ -244,11 +244,11 @@ DictionaryManager::add_directory(const std::string& pathname)
   search_path.push_back(pathname);
 }
 
-void
+/*void
 DictionaryManager::set_filesystem(std::auto_ptr<FileSystem> filesystem_)
 {
   filesystem = filesystem_;
-}
+}*/
 // ----------------------------------------------------------------------------
 /** This function converts a .po filename (e.g. zh_TW.po) into a language
  *  specification (zh_TW). On case insensitive file systems (think windows)
