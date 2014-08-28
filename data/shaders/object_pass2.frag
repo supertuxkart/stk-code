@@ -13,7 +13,10 @@ vec3 getLightFactor(float specMapValue);
 void main(void)
 {
 #ifdef GL_ARB_bindless_texture
-    vec4 col = pow(texture(Albedo, uv), vec4(2.2));
+    vec4 col = texture(Albedo, uv);
+#ifdef SRGBBindlessFix
+    col.xyz = pow(col.xyz, vec3(2.2));
+#endif
 #else
     vec4 col = texture(Albedo, uv);
 #endif

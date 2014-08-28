@@ -26,7 +26,9 @@ void main() {
     r.y = - r.y;
     vec4 detail0 = texture(tex, r.xy / m + .5);
 #ifdef GL_ARB_bindless_texture
+#ifdef SRGBBindlessFix
     detail0.xyz = pow(detail0.xyz, vec3(2.2));
+#endif
 #endif
     vec3 LightFactor = getLightFactor(1.);
 

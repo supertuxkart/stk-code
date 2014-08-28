@@ -23,7 +23,9 @@ void main() {
     r.y = - r.y;
 #ifdef GL_ARB_bindless_texture
     vec4 detail0 = texture(handle, r.xy / m + .5);
+#ifdef SRGBBindlessFix
     detail0.xyz = pow(detail0.xyz, vec3(2.2));
+#endif
 #else
     vec4 detail0 = texture(tex, r.xy / m + .5);
 #endif

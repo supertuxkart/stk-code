@@ -333,6 +333,8 @@ GLuint LoadShader(const char * file, unsigned type)
         Code += "#define UBO_DISABLED\n";
     if (irr_driver->hasVSLayerExtension())
         Code += "#define VSLayer\n";
+    if (irr_driver->needsRGBBindlessWorkaround())
+        Code += "#define SRGBBindlessFix\n";
     Code += LoadHeader();
     if (Stream.is_open())
     {

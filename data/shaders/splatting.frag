@@ -33,10 +33,12 @@ void main() {
     vec4 detail3 = texture(tex_detail3, uv);
     vec4 detail4 = vec4(0.0);
 #ifdef GL_ARB_bindless_texture
+#ifdef SRGBBindlessFix
     detail0.xyz = pow(detail0.xyz, vec3(2.2));
     detail1.xyz = pow(detail1.xyz, vec3(2.2));
     detail2.xyz = pow(detail2.xyz, vec3(2.2));
     detail3.xyz = pow(detail3.xyz, vec3(2.2));
+#endif
 #endif
 
     vec4 splatted = splatting.r * detail0 +

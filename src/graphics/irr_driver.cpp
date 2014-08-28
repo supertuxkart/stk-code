@@ -470,6 +470,7 @@ void IrrDriver::initDevice()
 
         m_need_ubo_workaround = false;
         m_need_rh_workaround = false;
+        m_need_srgb_workaround = false;
 #ifdef WIN32
         // Fix for Intel Sandy Bridge on Windows which supports GL up to 3.1 only
         if (strstr((const char *)glGetString(GL_VENDOR), "Intel") != NULL && (GLMajorVersion == 3 && GLMinorVersion == 1))
@@ -478,6 +479,10 @@ void IrrDriver::initDevice()
         // Fix for Nvidia and instanced RH
         if (strstr((const char *)glGetString(GL_VENDOR), "NVIDIA") != NULL)
             m_need_rh_workaround = true;
+
+        // Fix for AMD and bindless sRGB textures
+        if (strstr((const char *)glGetString(GL_VENDOR), "AMD") != NULL)
+            m_need_srgb_workaround = true;
     }
     m_glsl = (GLMajorVersion > 3 || (GLMajorVersion == 3 && GLMinorVersion >= 1));
 

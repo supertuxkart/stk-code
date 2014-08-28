@@ -17,7 +17,9 @@ void main(void)
 {
 #ifdef GL_ARB_bindless_texture
     vec4 color = texture(handle, uv);
+#ifdef SRGBBindlessFix
     color.xyz = pow(color.xyz, vec3(2.2));
+#endif
     vec4 detail = texture(secondhandle, uv_bis);
 #else
     vec4 color = texture(Albedo, uv);
