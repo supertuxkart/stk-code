@@ -2095,6 +2095,11 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
 
             if (weather_particles.size() > 0)
             {
+                if (weather_particles == "rain.xml")
+                {
+                    m_weather_type = WEATHER_RAIN;
+                }
+
                 m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
             }
