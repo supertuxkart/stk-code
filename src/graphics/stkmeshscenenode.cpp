@@ -94,17 +94,6 @@ void STKMeshSceneNode::setFirstTimeMaterial()
       {
           fillLocalBuffer(mesh, mb);
           mesh.vao = createVAO(mesh.vertex_buffer, mesh.index_buffer, mb->getVertexType());
-          glGenBuffers(1, &(mesh.instance_buffer));
-          glBindBuffer(GL_ARRAY_BUFFER, mesh.instance_buffer);
-          glEnableVertexAttribArray(7);
-          glVertexAttribPointer(7, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), 0);
-          glVertexAttribDivisor(7, 1);
-          glEnableVertexAttribArray(8);
-          glVertexAttribPointer(8, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(3 * sizeof(float)));
-          glVertexAttribDivisor(8, 1);
-          glEnableVertexAttribArray(9);
-          glVertexAttribPointer(9, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (GLvoid*)(6 * sizeof(float)));
-          glVertexAttribDivisor(9, 1);
           glBindVertexArray(0);
       }
   }
