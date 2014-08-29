@@ -135,17 +135,30 @@ void STKAnimatedMesh::update()
         const video::SMaterial& material = ReadOnlyMaterials ? mb->getMaterial() : Materials[i];
         if (isObject(material.MaterialType))
         {
-            glBindVertexArray(0);
-            size_t size = mb->getVertexCount() * GLmeshes[i].Stride;
-            if (irr_driver->hasARB_base_instance())
-                glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
+
+            size_t size = mb->getVertexCount() * GLmeshes[i].Stride, offset = GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride;
+            void *buf;
+            if (irr_driver->hasBufferStorageExtension())
+            {
+                buf = VAOManager::getInstance()->getVBOPtr(mb->getVertexType());
+                buf = (char *)buf + offset;
+            }
             else
-                glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
-            GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
-            void * buf = glMapBufferRange(GL_ARRAY_BUFFER, GLmeshes[i].vaoBaseVertex * GLmeshes[i].Stride, size, bitfield);
+            {
+                glBindVertexArray(0);
+                if (irr_driver->hasARB_base_instance())
+                    glBindBuffer(GL_ARRAY_BUFFER, VAOManager::getInstance()->getVBO(mb->getVertexType()));
+                else
+                    glBindBuffer(GL_ARRAY_BUFFER, GLmeshes[i].vertex_buffer);
+                GLbitfield bitfield = GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT;
+                buf = glMapBufferRange(GL_ARRAY_BUFFER, offset, size, bitfield);
+            }
             memcpy(buf, mb->getVertices(), size);
-            glUnmapBuffer(GL_ARRAY_BUFFER);
-            glBindBuffer(GL_ARRAY_BUFFER, 0);
+            if (!irr_driver->hasBufferStorageExtension())
+            {
+                glUnmapBuffer(GL_ARRAY_BUFFER);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+            }
         }
         if (mb)
             GLmeshes[i].TextureMatrix = getMaterial(i).getTextureMatrix(0);

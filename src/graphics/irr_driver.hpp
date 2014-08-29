@@ -200,6 +200,7 @@ private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
     bool hasBaseInstance;
+    bool hasBuffserStorage;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
     bool m_need_srgb_workaround;
@@ -308,6 +309,11 @@ public:
     bool hasVSLayerExtension() const
     {
         return hasVSLayer;
+    }
+
+    bool hasBufferStorageExtension() const
+    {
+        return hasBuffserStorage;
     }
 
     video::SColorf getAmbientLight() const;

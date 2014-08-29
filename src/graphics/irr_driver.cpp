@@ -489,6 +489,7 @@ void IrrDriver::initDevice()
     // Parse extensions
     hasVSLayer = false;
     hasBaseInstance = false;
+    hasBuffserStorage = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
@@ -496,6 +497,12 @@ void IrrDriver::initDevice()
             hasVSLayer = true;
             Log::info("GLDriver", "AMD Vertex Shader Layer enabled");
         }
+#ifdef Buffer_Storage
+        if (hasGLExtension("GL_ARB_buffer_storage")) {
+            hasBuffserStorage = true;
+            Log::info("GLDriver", "ARB Buffer Storage enabled");
+        }
+#endif
 #ifdef Base_Instance_Support
         if (hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;

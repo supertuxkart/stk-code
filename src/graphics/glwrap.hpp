@@ -183,6 +183,7 @@ class VAOManager : public Singleton<VAOManager>
     GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
     GLuint instance_vbo[1];
     size_t instance_count[1];
+    void *VBOPtr[VTXTYPE_COUNT];
     std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
     void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
     size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
@@ -201,6 +202,7 @@ public:
     std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
     size_t appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data);
     unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
+    void *getVBOPtr(video::E_VERTEX_TYPE type) { return VBOPtr[getVTXTYPE(type)]; }
     unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
     unsigned getInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
     unsigned getShadowInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return ShadowInstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
