@@ -389,10 +389,12 @@ class TextureRead
 private:
     template<unsigned N, typename...Args>
     void AssignTextureNames_impl(GLuint)
-    {}
+    {
+        static_assert(N == sizeof...(tp), "Wrong number of texture name");
+    }
 
     template<unsigned N, typename...Args>
-    void AssignTextureNames_impl(GLuint Program, GLuint TexUnit, const char *name, Args...args...)
+    void AssignTextureNames_impl(GLuint Program, GLuint TexUnit, const char *name, Args...args)
     {
         GLuint location = glGetUniformLocation(Program, name);
         TextureLocation.push_back(location);
