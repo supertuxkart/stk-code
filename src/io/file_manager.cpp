@@ -738,10 +738,10 @@ void FileManager::checkAndCreateConfigDir()
 
         // Try to use the APPDATA directory to store config files and highscore
         // lists. If not defined, used the current directory.
-        if(getenv("APPDATA")!=NULL)
+        if (getenv("APPDATA") != NULL)
         {
             m_user_config_dir  = getenv("APPDATA");
-            if(!checkAndCreateDirectory(m_user_config_dir))
+            if (!checkAndCreateDirectory(m_user_config_dir))
             {
                 Log::error("[FileManager]", "Can't create config dir '%s"
                             ", falling back to '.'.", m_user_config_dir.c_str());
@@ -755,7 +755,7 @@ void FileManager::checkAndCreateConfigDir()
 
 #elif defined(__APPLE__)
 
-        if (getenv("HOME")!=NULL)
+        if (getenv("HOME") != NULL)
         {
             m_user_config_dir = getenv("HOME");
         }
@@ -775,8 +775,10 @@ void FileManager::checkAndCreateConfigDir()
 
         // Remaining unix variants. Use the new standards for config directory
         // i.e. either XDG_CONFIG_HOME or $HOME/.config
-        if (getenv("XDG_CONFIG_HOME")!=NULL){
+        if (getenv("XDG_CONFIG_HOME") !=NULL)
+        {
             m_user_config_dir = getenv("XDG_CONFIG_HOME");
+            checkAndCreateDirectory(m_user_config_dir);
         }
         else if (!getenv("HOME"))
         {
@@ -788,6 +790,8 @@ void FileManager::checkAndCreateConfigDir()
         else
         {
             m_user_config_dir  = getenv("HOME");
+            checkAndCreateDirectory(m_user_config_dir);
+            
             m_user_config_dir += "/.config";
             if(!checkAndCreateDirectory(m_user_config_dir))
             {
