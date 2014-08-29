@@ -39,6 +39,7 @@ class Rain
     float m_next_lightning;
     bool m_lightning;
     SFXBase* m_thunder_sound;
+    SFXBase* m_rain_sound;
 
 public:
     Rain(Camera* camera, irr::scene::ISceneNode* parent);

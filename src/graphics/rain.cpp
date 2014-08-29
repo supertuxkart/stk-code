@@ -48,6 +48,14 @@ Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent) : m_thunder_sound(0)
 
     if (m_lightning)
         m_thunder_sound = sfx_manager->createSoundSource("thunder");
+        
+    m_rain_sound = sfx_manager->createSoundSource("rain");
+
+    if (m_rain_sound) 
+    {
+        m_rain_sound->setLoop(true);
+        m_rain_sound->play();
+    }
 
     Material* m = material_manager->getMaterial("rain.png");
     assert(m != NULL);
@@ -67,7 +75,11 @@ Rain::~Rain()
 //    m_node->drop();      // drop STK's reference
 //    m_node->remove();    // Then remove it from the scene graph.
 
-    if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
+    if (m_lightning && m_thunder_sound != NULL) 
+        sfx_manager->deleteSFX(m_thunder_sound);
+        
+    if (m_rain_sound != NULL) 
+        sfx_manager->deleteSFX(m_rain_sound);
 }
 
 // ----------------------------------------------------------------------------
