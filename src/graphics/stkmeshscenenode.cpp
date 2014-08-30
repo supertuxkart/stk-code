@@ -80,7 +80,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
           if (!immediate_draw)
           {
               InitTextures(mesh, MatType);
-              MeshSolidMaterials[MatType].push_back(&mesh);
+              MeshSolidMaterial[MatType].push_back(&mesh);
           }
       }
 
@@ -125,7 +125,7 @@ void STKMeshSceneNode::cleanGLMeshes()
     }
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
-        MeshSolidMaterials[i].clearWithoutDeleting();
+        MeshSolidMaterial[i].clearWithoutDeleting();
 }
 
 void STKMeshSceneNode::setMesh(irr::scene::IMesh* mesh)
@@ -241,29 +241,29 @@ void STKMeshSceneNode::render()
         AbsoluteTransformation.getInverse(invmodel);
 
         GLMesh* mesh;
-        for_in(mesh, MeshSolidMaterials[MAT_DEFAULT])
+        for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
             pushVector(ListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_ALPHA_REF])
+        for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
             pushVector(ListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_SPHEREMAP])
+        for_in(mesh, MeshSolidMaterial[MAT_SPHEREMAP])
             pushVector(ListMatSphereMap::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_DETAIL])
+        for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
             pushVector(ListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         windDir = getWind();
-        for_in(mesh, MeshSolidMaterials[MAT_GRASS])
+        for_in(mesh, MeshSolidMaterial[MAT_GRASS])
             pushVector(ListMatGrass::getInstance(), mesh, AbsoluteTransformation, invmodel, windDir);
 
-        for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
+        for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
             pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
+        for_in(mesh, MeshSolidMaterial[MAT_SPLATTING])
             pushVector(ListMatSplatting::getInstance(), mesh, AbsoluteTransformation, invmodel);
 
-        for_in(mesh, MeshSolidMaterials[MAT_NORMAL_MAP])
+        for_in(mesh, MeshSolidMaterial[MAT_NORMAL_MAP])
             pushVector(ListMatNormalMap::getInstance(), mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY);
 
         return;
