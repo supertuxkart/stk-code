@@ -28,6 +28,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -35,6 +36,7 @@
 #include "karts/kart_properties_manager.hpp"
 #include "modes/cutscene_world.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/state_manager.hpp"
 #include "tracks/track.hpp"
@@ -66,23 +68,14 @@ DEFINE_SCREEN_SINGLETON( GrandPrixWin );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixWin::GrandPrixWin() : CutsceneScreen("grand_prix_win.stkgui")
+GrandPrixWin::GrandPrixWin() : GrandPrixCutscene("grand_prix_win.stkgui")
 {
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-
-    m_podium_steps[0] = NULL;
-    m_podium_steps[1] = NULL;
-    m_podium_steps[2] = NULL;
-
+    for (int i = 0; i < 3; i++)
+    {
+        m_kart_node[i] = NULL;
+        m_podium_steps[i] = NULL;
+    }
 }   // GrandPrixWin
-
-// -------------------------------------------------------------------------------------
-
-GrandPrixWin::~GrandPrixWin()
-{
-}
 
 // -------------------------------------------------------------------------------------
 
@@ -99,28 +92,14 @@ void GrandPrixWin::onCutsceneEnd()
         m_unlocked_label = NULL;
     }
 
-    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
-    if (m_kart_node[0] != NULL)
-        m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[1] != NULL)
-        m_kart_node[1]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[2] != NULL)
-        m_kart_node[2]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-
-    m_podium_steps[0] = NULL;
-    m_podium_steps[1] = NULL;
-    m_podium_steps[2] = NULL;
+    for (int i = 0; i < 3; i++)
+    {
+        if (m_kart_node[i] != NULL)
+            m_kart_node[i]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+        m_kart_node[i] = NULL;
+        m_podium_steps[i] = NULL;
+    }
 }
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::loadedFromFile()
-{
-}   // loadedFromFile
 
 // -------------------------------------------------------------------------------------
 
@@ -136,6 +115,7 @@ void GrandPrixWin::init()
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 
 
+    saveGPButton();
     if (PlayerManager::getCurrentPlayer()->getRecentlyCompletedChallenges().size() > 0)
     {
         const core::dimension2d<u32>& frame_size = GUIEngine::getDriver()->getCurrentRenderTargetSize();
@@ -195,21 +175,6 @@ void GrandPrixWin::init()
 
 // -------------------------------------------------------------------------------------
 
-bool GrandPrixWin::onEscapePressed()
-{
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    return false;
-}
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::tearDown()
-{
-    Screen::tearDown();
-}   // tearDown
-
-// -------------------------------------------------------------------------------------
-
 void GrandPrixWin::onUpdate(float dt)
 {
     m_global_time += dt;
@@ -228,17 +193,11 @@ void GrandPrixWin::onUpdate(float dt)
                 if (fabsf(m_kart_z[k] - KARTS_DEST_Z) > dt)
                 {
                     if (m_kart_z[k] < KARTS_DEST_Z - dt)
-                    {
                         m_kart_z[k] += dt;
-                    }
                     else if (m_kart_z[k] > KARTS_DEST_Z + dt)
-                    {
                         m_kart_z[k] -= dt;
-                    }
                     else
-                    {
                         m_kart_z[k] = KARTS_DEST_Z;
-                    }
                     karts_not_yet_done++;
                 }
 
@@ -250,9 +209,7 @@ void GrandPrixWin::onUpdate(float dt)
         } // end for
 
         if (karts_not_yet_done == 0)
-        {
             m_phase = 2;
-        }
     }
 
     // ---- Karts Rotate
@@ -281,7 +238,8 @@ void GrandPrixWin::onUpdate(float dt)
             }
         } // end for
 
-        if (karts_not_yet_done == 0) m_phase = 3;
+        if (karts_not_yet_done == 0)
+            m_phase = 3;
     }
 
     // ---- Podium Rises
@@ -308,7 +266,6 @@ void GrandPrixWin::onUpdate(float dt)
                 }
             }
         } // end for
-
     }
 
 
@@ -325,17 +282,6 @@ void GrandPrixWin::onUpdate(float dt)
                                     true/* center h */, true /* center v */ );
 }   // onUpdate
 
-// -------------------------------------------------------------------------------------
-
-void GrandPrixWin::eventCallback(GUIEngine::Widget* widget,
-                                            const std::string& name,
-                                            const int playerID)
-{
-    if (name == "continue")
-    {
-        ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    }
-}   // eventCallback
 
 // -------------------------------------------------------------------------------------
 
@@ -385,17 +331,11 @@ void GrandPrixWin::setKarts(const std::string idents_arg[3])
         if (meshPresentation != NULL)
         {
             if (meshPresentation->getModelFile() == "gpwin_podium1.b3d")
-            {
                 m_podium_steps[0] = currObj;
-            }
             else if (meshPresentation->getModelFile() == "gpwin_podium2.b3d")
-            {
                 m_podium_steps[1] = currObj;
-            }
             else if (meshPresentation->getModelFile() == "gpwin_podium3.b3d")
-            {
                 m_podium_steps[2] = currObj;
-            }
         }
     }
 

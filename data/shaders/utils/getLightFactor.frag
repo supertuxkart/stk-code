@@ -1,17 +1,12 @@
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D DiffuseMap;
+layout(bindless_sampler) uniform sampler2D SpecularMap;
+layout(bindless_sampler) uniform sampler2D SSAO;
+#else
 uniform sampler2D DiffuseMap;
 uniform sampler2D SpecularMap;
 uniform sampler2D SSAO;
-uniform vec3 ambient;
-
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
+#endif
 
 vec3 getLightFactor(float specMapValue)
 {
@@ -19,6 +14,6 @@ vec3 getLightFactor(float specMapValue)
     vec3 DiffuseComponent = texture(DiffuseMap, tc).xyz;
     vec3 SpecularComponent = texture(SpecularMap, tc).xyz;
     float ao = texture(SSAO, tc).x;
-    vec3 tmp = ao * ambient + DiffuseComponent + SpecularComponent * specMapValue;
+    vec3 tmp = DiffuseComponent + SpecularComponent * specMapValue;
     return tmp * ao;
 }

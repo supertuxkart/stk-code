@@ -446,9 +446,6 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_high_definition_textures
         PARAM_DEFAULT(BoolUserConfigParam(true, "enable_high_definition_textures",
         &m_video_group, "Enable high definition textures"));
-    PARAM_PREFIX BoolUserConfigParam        m_ubo_disabled
-        PARAM_DEFAULT(BoolUserConfigParam(false, "disable_ubo_support",
-        &m_video_group, "Disable UBO support"));
     PARAM_PREFIX BoolUserConfigParam        m_glow
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_glow",
         &m_video_group, "Enable Glow"));
@@ -467,6 +464,9 @@ namespace UserConfigParams
     PARAM_PREFIX BoolUserConfigParam        m_gi
         PARAM_DEFAULT(BoolUserConfigParam(false, "enable_gi",
         &m_video_group, "Enable Global Illumination"));
+    PARAM_PREFIX BoolUserConfigParam        m_azdo
+        PARAM_DEFAULT(BoolUserConfigParam(false, "enable_azdo",
+        &m_video_group, "Enable 'Approaching Zero Driver Overhead' mode (very experimental !)"));
 
     // ---- Debug - not saved to config file
     /** If gamepad debugging is enabled. */
@@ -696,6 +696,12 @@ namespace UserConfigParams
                                                      "server_multiplayer",
                                                      &m_online_group,
                                                     "The server used for online multiplayer."));
+
+    PARAM_PREFIX IntUserConfigParam        m_server_version
+            PARAM_DEFAULT( IntUserConfigParam(   1,
+                                                 "server-version",
+                                                 &m_online_group,
+                                                    "Version of the server API to use."));
 
     // ---- Addon server related entries
     PARAM_PREFIX GroupUserConfigParam       m_addon_group

@@ -54,6 +54,8 @@
                              I18N="Login dialog" text="Add user" label_location="bottom"/>
                 <icon-button id="delete" width="64" height="64" icon="gui/gp_remove_track.png"
                              I18N="Login dialog" text="Delete" label_location="bottom"/>
+                <icon-button id="recover" width="64" height="64" icon="gui/main_options.png"
+                             I18N="Login dialog" text="Recovery" label_location="bottom"/>
                 <icon-button id="rename" width="64" height="64" icon="gui/gp_rename.png"
                              I18N="Login dialog" text="Rename" label_location="bottom"/>
                 <icon-button id="cancel" width="64" height="64" icon="gui/main_quit.png"

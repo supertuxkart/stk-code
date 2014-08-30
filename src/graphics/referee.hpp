@@ -79,6 +79,8 @@ private:
     /** The scene node for an instance of the referee. */
     scene::IAnimatedMeshSceneNode *m_scene_node;
 
+    scene::ISceneNode* m_light;
+
 public:
                 Referee();
                 Referee(const AbstractKart &kart);

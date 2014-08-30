@@ -99,6 +99,10 @@ private:
     float m_scale_affector_factor_x;
     float m_scale_affector_factor_y;
 
+    /** The particle's billboards should face the
+        player by rotating around the Y axis only */
+    bool m_vertical_particles;
+
 public:
 
     /**
@@ -160,6 +164,8 @@ public:
     float     getWindSpeed() const { return m_wind_speed; }
 
     bool      getFlips() const { return m_flips; }
+
+    bool      isVerticalParticles() const { return m_vertical_particles; }
 
     std::string getName() const { return m_name; }
 };

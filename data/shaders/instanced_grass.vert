@@ -1,13 +1,3 @@
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
 uniform vec3 windDir;
 
 #if __VERSION__ >= 330
@@ -19,6 +9,10 @@ layout(location = 3) in vec2 Texcoord;
 layout(location = 7) in vec3 Origin;
 layout(location = 8) in vec3 Orientation;
 layout(location = 9) in vec3 Scale;
+#ifdef GL_ARB_bindless_texture
+layout(location = 10) in sampler2D Handle;
+#endif
+
 #else
 in vec3 Position;
 in vec3 Normal;
@@ -32,6 +26,9 @@ in vec3 Scale;
 
 out vec3 nor;
 out vec2 uv;
+#ifdef GL_ARB_bindless_texture
+flat out sampler2D handle;
+#endif
 
 mat4 getWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
 mat4 getInverseWorldMatrix(vec3 translation, vec3 rotation, vec3 scale);
@@ -43,4 +40,7 @@ void main()
     gl_Position = ProjectionMatrix * ViewMatrix *  ModelMatrix * vec4(Position, 1.);
     nor = (TransposeInverseModelView * vec4(Normal, 0.)).xyz;
     uv = Texcoord;
+#ifdef GL_ARB_bindless_texture
+    handle = Handle;
+#endif
 }

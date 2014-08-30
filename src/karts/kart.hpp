@@ -67,13 +67,13 @@ class Kart : public AbstractKart
     friend class Skidding;
 private:
     /** Handles speed increase and capping due to powerup, terrain, ... */
-    MaxSpeed           *m_max_speed;
+    MaxSpeed *m_max_speed;
 
     /** Stores information about the terrain the kart is on. */
-    TerrainInfo        *m_terrain_info;
+    TerrainInfo *m_terrain_info;
 
     /** Handles the powerup of a kart. */
-    Powerup     *m_powerup;
+    Powerup *m_powerup;
 
     /** True if kart is flying (for debug purposes only). */
     bool m_flying;
@@ -103,6 +103,13 @@ private:
     /** Current race position (1-num_karts). */
     int m_race_position;
 
+    /** The coordinates of the front of the kart, used to determine when a
+     *  new lap is triggered. */
+    Vec3 m_xyz_front;
+
+    /** Offset of the graphical kart chassis from the physical chassis. */
+    float m_graphical_y_offset;
+
     /** True if the kart is eliminated. */
     bool m_eliminated;
 
@@ -113,8 +120,12 @@ private:
      *  determine startup boost. */
     bool         m_has_started;
 
-    /**<Maximum engine rpm's for the current gear*/
+    /** Maximum engine rpm's for the current gear. */
     float        m_max_gear_rpm;
+
+    /** How long the brake key has been pressed - the longer the harder
+     *  the kart will brake. */
+    float        m_brake_time;
 
     /** A short time after a collision acceleration is disabled to allow
      *  the karts to bounce back*/
@@ -228,6 +239,7 @@ public:
                         const PlayerDifficulty *difficulty);
     virtual       ~Kart();
     virtual void   init(RaceManager::KartType type);
+    virtual void   kartIsInRestNow();
     virtual void   updateGraphics(float dt, const Vec3& off_xyz,
                                   const btQuaternion& off_rotation);
     virtual void   createPhysics    ();
@@ -293,6 +305,10 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the current position of this kart in the race. */
     virtual int    getPosition         () const { return m_race_position;    }
+    // ------------------------------------------------------------------------
+    /** Returns the coordinates of the front of the kart. This is used for
+     *  determining when the lap line is crossed. */
+    virtual const Vec3& getFrontXYZ() const { return m_xyz_front; }
     // ------------------------------------------------------------------------
     /** Returns the initial position of this kart. */
     virtual int    getInitialPosition  () const { return m_initial_position; }

@@ -124,3 +124,13 @@ void AbstractKart::setKartAnimation(AbstractKartAnimation *ka)
     assert( (ka!=NULL) ^ (m_kart_animation!=NULL) );
     m_kart_animation = ka;
 }   // setKartAnimation
+
+// ----------------------------------------------------------------------------
+/** Moves the current physical transform into this kart's position.
+ */
+void AbstractKart::kartIsInRestNow()
+{
+    // Update the kart transforms with the newly computed position
+    // after all karts are reset
+    setTrans(getBody()->getWorldTransform());
+}   // kartIsInRest

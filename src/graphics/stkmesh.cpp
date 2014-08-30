@@ -178,6 +178,7 @@ GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb)
     for (unsigned i = 0; i < 6; i++)
         result.textures[i] = mb->getMaterial().getTexture(i);
     result.TextureMatrix = 0;
+    result.VAOType = mb->getVertexType();
     return result;
 }
 
@@ -207,13 +208,14 @@ void fillLocalBuffer(GLMesh &mesh, scene::IMeshBuffer* mb)
     const u32 vertexCount = mb->getVertexCount();
 
     const c8* vbuf = static_cast<const c8*>(vertices);
-    glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertexCount * mesh.Stride, vbuf, GL_STREAM_DRAW);
     assert(vertexCount);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.index_buffer);
     const void* indices = mb->getIndices();
+    mesh.IndexCount = mb->getIndexCount();
 
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * getUnsignedSize(mesh.IndexType), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.IndexCount * getUnsignedSize(mesh.IndexType), indices, GL_STREAM_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -293,17 +295,46 @@ bool isObject(video::E_MATERIAL_TYPE type)
     return false;
 }
 
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatDefault::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatAlphaRef::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatSphereMap::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatDetails::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > ListMatGrass::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListMatUnlit::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > ListMatSplatting::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > ListMatNormalMap::Arguments;
+static void
+SetTexture(GLMesh &mesh, unsigned i, bool isSrgb)
+{
+    if (!mesh.textures[i])
+        mesh.textures[i] = getUnicolorTexture(video::SColor(255, 255, 255, 255));
+    compressTexture(mesh.textures[i], isSrgb);
+#ifdef Bindless_Texture_Support
+    if (UserConfigParams::m_azdo)
+    {
+        if (!mesh.TextureHandles[i])
+            mesh.TextureHandles[i] = glGetTextureSamplerHandleARB(getTextureGLuint(mesh.textures[i]), MeshShader::ObjectPass1Shader::getInstance()->SamplersId[0]);
+        if (!glIsTextureHandleResidentARB(mesh.TextureHandles[i]))
+            glMakeTextureHandleResidentARB(mesh.TextureHandles[i]);
+    }
+#endif
+}
 
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListBlendTransparent::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > ListAdditiveTransparent::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListBlendTransparentFog::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > ListAdditiveTransparentFog::Arguments;
-std::vector<std::tuple<GLMesh *, core::matrix4> > ListDisplacement::Arguments;
+void InitTextures(GLMesh &mesh, MeshMaterial Mat)
+{
+    switch (Mat)
+    {
+    default:
+    case MAT_DEFAULT:
+    case MAT_ALPHA_REF:
+    case MAT_GRASS:
+    case MAT_SPHEREMAP:
+    case MAT_UNLIT:
+        SetTexture(mesh, 0, true);
+        break;
+    case MAT_DETAIL:
+    case MAT_NORMAL_MAP:
+        SetTexture(mesh, 0, true);
+        SetTexture(mesh, 1, false);
+        break;
+    case MAT_SPLATTING:
+        SetTexture(mesh, 0, true);
+        SetTexture(mesh, 1, true);
+        SetTexture(mesh, 2, true);
+        SetTexture(mesh, 3, true);
+        SetTexture(mesh, 4, true);
+        break;
+    }
+}

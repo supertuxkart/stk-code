@@ -5,16 +5,6 @@ uniform sampler2D tex;
 uniform vec2 dir;
 uniform vec2 dir2;
 
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
 #if __VERSION__ >= 130
 in vec2 uv;
 in vec2 uv_bis;

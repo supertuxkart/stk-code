@@ -26,6 +26,7 @@
 #include "graphics/irr_driver.hpp"
 #include "guiengine/engine.hpp"
 #include "guiengine/scalable_font.hpp"
+#include "guiengine/widgets/button_widget.hpp"
 #include "guiengine/widgets/label_widget.hpp"
 #include "io/file_manager.hpp"
 #include "items/item_manager.hpp"
@@ -34,6 +35,7 @@
 #include "modes/cutscene_world.hpp"
 #include "modes/overworld.hpp"
 #include "modes/world.hpp"
+#include "race/race_manager.hpp"
 #include "states_screens/feature_unlocked.hpp"
 #include "states_screens/main_menu_screen.hpp"
 #include "states_screens/state_manager.hpp"
@@ -47,7 +49,6 @@
 #include <ICameraSceneNode.h>
 #include <ILightSceneNode.h>
 #include <IMeshSceneNode.h>
-//#include <iostream>
 
 using namespace irr::core;
 using namespace irr::gui;
@@ -82,42 +83,20 @@ DEFINE_SCREEN_SINGLETON( GrandPrixLose );
 
 // -------------------------------------------------------------------------------------
 
-GrandPrixLose::GrandPrixLose() : CutsceneScreen("grand_prix_lose.stkgui")
-{
-}   // GrandPrixLose
-
-// -------------------------------------------------------------------------------------
-
 void GrandPrixLose::onCutsceneEnd()
 {
-    TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
-    if (m_kart_node[0] != NULL)
-        m_kart_node[0]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[1] != NULL)
-        m_kart_node[1]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[2] != NULL)
-        m_kart_node[2]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
-    if (m_kart_node[3] != NULL)
-        m_kart_node[3]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+    for (int i = 0; i < 4; i++)
+    {
+        if (m_kart_node[i] != NULL)
+            m_kart_node[i]->getPresentation<TrackObjectPresentationSceneNode>()->getNode()->remove();
+        m_kart_node[i] = NULL;
+    }
 
     for (unsigned int i = 0; i<m_all_kart_models.size(); i++)
         delete m_all_kart_models[i];
 
     m_all_kart_models.clear();
-
-    m_kart_node[0] = NULL;
-    m_kart_node[1] = NULL;
-    m_kart_node[2] = NULL;
-    m_kart_node[3] = NULL;
-}
-
-// -------------------------------------------------------------------------------------
-
-bool GrandPrixLose::onEscapePressed()
-{
-    ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    return false;
-}
+}   // onCutsceneEnd
 
 // -------------------------------------------------------------------------------------
 
@@ -142,16 +121,11 @@ void GrandPrixLose::init()
 
     World::getWorld()->setPhase(WorldStatus::RACE_PHASE);
 
+    saveGPButton();
+
     m_phase = 1;
     m_global_time = 0.0f;
 }   // init
-
-// -------------------------------------------------------------------------------------
-
-void GrandPrixLose::tearDown()
-{
-    Screen::tearDown();
-}   // tearDown
 
 // -------------------------------------------------------------------------------------
 
@@ -177,7 +151,7 @@ void GrandPrixLose::onUpdate(float dt)
             }
         }
     }
-    
+
     // ---- title
     const int w = irr_driver->getFrameSize().Width;
     const int h = irr_driver->getFrameSize().Height;
@@ -194,27 +168,13 @@ void GrandPrixLose::onUpdate(float dt)
 
 // -------------------------------------------------------------------------------------
 
-void GrandPrixLose::eventCallback(GUIEngine::Widget* widget,
-                                            const std::string& name,
-                                            const int playerID)
-{
-    if (name == "continue")
-    {
-        ((CutsceneWorld*)World::getWorld())->abortCutscene();
-    }
-}   // eventCallback
-
-// -------------------------------------------------------------------------------------
-
 void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
 {
     TrackObjectManager* tobjman = World::getWorld()->getTrack()->getTrackObjectManager();
 
     assert(ident_arg.size() > 0);
     if ((int)ident_arg.size() > MAX_KART_COUNT)
-    {
         ident_arg.resize(MAX_KART_COUNT);
-    }
 
     // (there is at least one kart so kart node 0 is sure to be set)
     m_kart_node[1] = NULL;
@@ -252,7 +212,8 @@ void GrandPrixLose::setKarts(std::vector<std::string> ident_arg)
         }
         else
         {
-            Log::warn("GrandPrixLose", "Could not find a kart named '%s'.", ident_arg[n].c_str());
+            Log::warn("GrandPrixLose", "A kart named '%s' could not be found\n",
+                      ident_arg[n].c_str());
             m_kart_node[n] = NULL;
         } // if kart != NULL
     }

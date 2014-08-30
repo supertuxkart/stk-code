@@ -1,28 +1,7 @@
 #ifndef GLWRAP_HEADER_H
 #define GLWRAP_HEADER_H
 
-#if defined(__APPLE__)
-#    include <OpenGL/gl.h>
-#    include <OpenGL/gl3.h>
-#    define OGL32CTX
-#    ifdef GL_ARB_instanced_arrays
-#        define glVertexAttribDivisor glVertexAttribDivisorARB
-#    endif
-#    ifndef GL_TEXTURE_SWIZZLE_RGBA
-#        define GL_TEXTURE_SWIZZLE_RGBA 0x8E46
-#    endif
-#elif defined(ANDROID)
-#    include <GLES/gl.h>
-#elif defined(WIN32)
-#    define _WINSOCKAPI_
-// has to be included before gl.h because of WINGDIAPI and APIENTRY definitions
-#    include <windows.h>
-#    include <GL/gl.h>
-#else
-#define GL_GLEXT_PROTOTYPES
-#define DEBUG_OUTPUT_DECLARED
-#    include <GL/gl.h>
-#endif
+#include "gl_headers.hpp"
 
 #include <vector>
 #include "irr_driver.hpp"
@@ -31,82 +10,6 @@
 // already includes glext.h, which defines useful GL constants.
 // COpenGLDriver has already loaded the extension GL functions we use (e.g glBeginQuery)
 #include "../../lib/irrlicht/source/Irrlicht/COpenGLDriver.h"
-#ifdef WIN32
-extern PFNGLGENTRANSFORMFEEDBACKSPROC glGenTransformFeedbacks;
-extern PFNGLBINDTRANSFORMFEEDBACKPROC glBindTransformFeedback;
-extern PFNGLDRAWTRANSFORMFEEDBACKPROC glDrawTransformFeedback;
-extern PFNGLBEGINTRANSFORMFEEDBACKPROC glBeginTransformFeedback;
-extern PFNGLENDTRANSFORMFEEDBACKPROC glEndTransformFeedback;
-extern PFNGLTRANSFORMFEEDBACKVARYINGSPROC glTransformFeedbackVaryings;
-extern PFNGLBINDBUFFERBASEPROC glBindBufferBase;
-extern PFNGLGENBUFFERSPROC glGenBuffers;
-extern PFNGLBINDBUFFERPROC glBindBuffer;
-extern PFNGLBUFFERDATAPROC glBufferData;
-extern PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
-extern PFNGLCREATESHADERPROC glCreateShader;
-extern PFNGLCOMPILESHADERPROC glCompileShader;
-extern PFNGLSHADERSOURCEPROC glShaderSource;
-extern PFNGLCREATEPROGRAMPROC glCreateProgram;
-extern PFNGLATTACHSHADERPROC glAttachShader;
-extern PFNGLLINKPROGRAMPROC glLinkProgram;
-extern PFNGLUSEPROGRAMPROC glUseProgram;
-extern PFNGLENABLEVERTEXATTRIBARRAYPROC glEnableVertexAttribArray;
-extern PFNGLDISABLEVERTEXATTRIBARRAYPROC glDisableVertexAttribArray;
-extern PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
-extern PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
-extern PFNGLUNIFORM1FPROC glUniform1f;
-extern PFNGLUNIFORM3FPROC glUniform3f;
-extern PFNGLUNIFORM1FVPROC glUniform1fv;
-extern PFNGLUNIFORM4FVPROC glUniform4fv;
-extern PFNGLDELETESHADERPROC glDeleteShader;
-extern PFNGLGETSHADERIVPROC glGetShaderiv;
-extern PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
-extern PFNGLACTIVETEXTUREPROC glActiveTexture;
-extern PFNGLUNIFORM2FPROC glUniform2f;
-extern PFNGLUNIFORM1IPROC glUniform1i;
-extern PFNGLUNIFORM3IPROC glUniform3i;
-extern PFNGLUNIFORM4IPROC glUniform4i;
-extern PFNGLGETPROGRAMIVPROC glGetProgramiv;
-extern PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
-extern PFNGLGETATTRIBLOCATIONPROC glGetAttribLocation;
-extern PFNGLBINDATTRIBLOCATIONPROC glBindAttribLocation;
-extern PFNGLBLENDEQUATIONPROC glBlendEquation;
-extern PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor;
-extern PFNGLDRAWARRAYSINSTANCEDPROC glDrawArraysInstanced;
-extern PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex;
-extern PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
-extern PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glDrawElementsInstancedBaseVertex;
-extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
-extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
-extern PFNGLBINDVERTEXARRAYPROC glBindVertexArray;
-extern PFNGLDELETEVERTEXARRAYSPROC glDeleteVertexArrays;
-extern PFNGLTEXBUFFERPROC glTexBuffer;
-extern PFNGLBUFFERSUBDATAPROC glBufferSubData;
-extern PFNGLVERTEXATTRIBIPOINTERPROC glVertexAttribIPointer;
-extern PFNGLGENFRAMEBUFFERSPROC glGenFramebuffers;
-extern PFNGLDELETEFRAMEBUFFERSPROC glDeleteFramebuffers;
-extern PFNGLBINDFRAMEBUFFERPROC glBindFramebuffer;
-extern PFNGLFRAMEBUFFERTEXTURE2DPROC glFramebufferTexture2D;
-extern PFNGLFRAMEBUFFERTEXTUREPROC glFramebufferTexture;
-extern PFNGLTEXIMAGE3DPROC glTexImage3D;
-extern PFNGLGENERATEMIPMAPPROC glGenerateMipmap;
-extern PFNGLCHECKFRAMEBUFFERSTATUSPROC glCheckFramebufferStatus;
-extern PFNGLTEXIMAGE2DMULTISAMPLEPROC glTexImage2DMultisample;
-extern PFNGLBLITFRAMEBUFFERPROC glBlitFramebuffer;
-extern PFNGLGETUNIFORMBLOCKINDEXPROC glGetUniformBlockIndex;
-extern PFNGLUNIFORMBLOCKBINDINGPROC glUniformBlockBinding;
-extern PFNGLBLENDCOLORPROC glBlendColor;
-extern PFNGLCOMPRESSEDTEXIMAGE2DPROC glCompressedTexImage2D;
-extern PFNGLGETCOMPRESSEDTEXIMAGEPROC glGetCompressedTexImage;
-extern PFNGLTEXSTORAGE1DPROC glTexStorage1D;
-extern PFNGLTEXSTORAGE2DPROC glTexStorage2D;
-extern PFNGLTEXSTORAGE3DPROC glTexStorage3D;
-extern PFNGLBINDIMAGETEXTUREPROC glBindImageTexture;
-extern PFNGLDISPATCHCOMPUTEPROC glDispatchCompute;
-#ifdef DEBUG
-extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
-#endif
-#endif
 
 
 void initGL();
@@ -236,10 +139,75 @@ void compressTexture(irr::video::ITexture *tex, bool srgb, bool premul_alpha = f
 bool loadCompressedTexture(const std::string& compressed_tex);
 void saveCompressedTexture(const std::string& compressed_tex);
 
-std::pair<unsigned, unsigned> getVAOOffsetAndBase(scene::IMeshBuffer *mb);
-unsigned getVAO(video::E_VERTEX_TYPE type);
-unsigned getVBO(video::E_VERTEX_TYPE type);
-void resetVAO();
+enum InstanceType
+{
+    InstanceTypeDefault,
+    InstanceTypeCount,
+};
+
+#ifdef WIN32
+#pragma pack(push, 1)
+#endif
+struct InstanceData
+{
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Origin;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Orientation;
+    struct
+    {
+        float X;
+        float Y;
+        float Z;
+    } Scale;
+    uint64_t Texture;
+    uint64_t SecondTexture;
+#ifdef WIN32
+};
+#pragma pack(pop)
+#else
+} __attribute__((packed));
+#endif
+
+class VAOManager : public Singleton<VAOManager>
+{
+    enum VTXTYPE { VTXTYPE_STANDARD, VTXTYPE_TCOORD, VTXTYPE_TANGENT, VTXTYPE_COUNT };
+    GLuint vbo[VTXTYPE_COUNT], ibo[VTXTYPE_COUNT], vao[VTXTYPE_COUNT];
+    GLuint instance_vbo[1];
+    size_t instance_count[1];
+    void *VBOPtr[VTXTYPE_COUNT];
+    std::vector<scene::IMeshBuffer *> storedCPUBuffer[VTXTYPE_COUNT];
+    void *vtx_mirror[VTXTYPE_COUNT], *idx_mirror[VTXTYPE_COUNT];
+    size_t vtx_cnt[VTXTYPE_COUNT], idx_cnt[VTXTYPE_COUNT];
+    std::map<scene::IMeshBuffer*, unsigned> mappedBaseVertex[VTXTYPE_COUNT], mappedBaseIndex[VTXTYPE_COUNT];
+    std::map<std::pair<video::E_VERTEX_TYPE, InstanceType>, GLuint> InstanceVAO, ShadowInstanceVAO;
+
+    void cleanInstanceVAOs();
+    void regenerateBuffer(enum VTXTYPE);
+    void regenerateVAO(enum VTXTYPE);
+    void regenerateInstancedVAO();
+    size_t getVertexPitch(enum VTXTYPE) const;
+    VTXTYPE getVTXTYPE(video::E_VERTEX_TYPE type);
+    void append(scene::IMeshBuffer *, VTXTYPE tp);
+public:
+    VAOManager();
+    std::pair<unsigned, unsigned> getBase(scene::IMeshBuffer *);
+    size_t appendInstance(enum InstanceType, const std::vector<InstanceData> &instance_data);
+    unsigned getVBO(video::E_VERTEX_TYPE type) { return vbo[getVTXTYPE(type)]; }
+    void *getVBOPtr(video::E_VERTEX_TYPE type) { return VBOPtr[getVTXTYPE(type)]; }
+    unsigned getVAO(video::E_VERTEX_TYPE type) { return vao[getVTXTYPE(type)]; }
+    unsigned getInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return InstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
+    unsigned getShadowInstanceVAO(video::E_VERTEX_TYPE vt, enum InstanceType it) { return ShadowInstanceVAO[std::pair<video::E_VERTEX_TYPE, InstanceType>(vt, it)]; }
+    ~VAOManager();
+};
 
 void draw3DLine(const core::vector3df& start,
     const core::vector3df& end, irr::video::SColor color);
@@ -259,4 +227,7 @@ void draw2DImage(const irr::video::ITexture* texture, const irr::core::rect<s32>
 
 void GL32_draw2DRectangle(irr::video::SColor color, const irr::core::rect<s32>& position,
     const irr::core::rect<s32>* clip = 0);
+
+bool hasGLExtension(const char* extension);
+
 #endif

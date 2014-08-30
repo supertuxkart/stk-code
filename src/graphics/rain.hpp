@@ -19,35 +19,20 @@
 #ifndef HEADER_RAIN_HPP
 #define HEADER_RAIN_HPP
 
-class Camera;
-class PerCameraNode;
-
-#include <vector3d.h>
-namespace irr
-{
-    namespace video { class SMaterial; class ITexture; }
-    namespace scene { class ICameraSceneNode; class ISceneNode; }
-}
-using namespace irr;
-
 class SFXBase;
 
 class Rain
 {
-    PerCameraNode* m_node;
-
     float m_next_lightning;
-    bool m_lightning;
     SFXBase* m_thunder_sound;
+    SFXBase* m_rain_sound;
 
 public:
-    Rain(Camera* camera, irr::scene::ISceneNode* parent);
+    Rain();
     virtual ~Rain();
 
     void update(float dt);
-    void setPosition(const irr::core::vector3df& position);
-
-    void setCamera(scene::ICameraSceneNode* camera);
+    void playSound();
 };
 
 #endif

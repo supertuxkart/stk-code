@@ -29,7 +29,6 @@
 
 namespace Online
 {
-
     class OnlineProfile;
 
 /** Class that manages all online profiles. Profiles are used for storing
@@ -81,6 +80,7 @@ public:
         assert(!m_profile_manager);
         m_profile_manager = new ProfileManager();
     }   // create
+
     // ----------------------------------------------------------------
     /** Returns the singleton.
      *  \pre create has been called to create the singleton.
@@ -109,6 +109,7 @@ public:
     bool isInCache(const uint32_t id);
     bool inPersistent(const uint32_t id);
     OnlineProfile* getProfileByID(const uint32_t id);
+
     // ----------------------------------------------------------------
     /** Marks a given profile to be the currently visited one. This
      *  is used to mark the profiles that ave its data display (e.g.
@@ -117,15 +118,12 @@ public:
     {
         m_currently_visiting = getProfileByID(id);
     }   // setVisiting
+
     // ----------------------------------------------------------------
     /** \return the instance of the profile that's currently being
      *  visited */
     OnlineProfile* getVisitingProfile() { return m_currently_visiting; }
 
 };   // class CurrentUser
-
 } // namespace Online
-
-#endif
-
-/*EOF*/
+#endif // HEADER_ONLINE_PROFILE_MANAGER_HPP

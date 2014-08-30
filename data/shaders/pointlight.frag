@@ -1,24 +1,5 @@
 uniform sampler2D ntex;
 uniform sampler2D dtex;
-uniform float spec;
-
-#ifdef UBO_DISABLED
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat4 InverseViewMatrix;
-uniform mat4 InverseProjectionMatrix;
-uniform vec2 screen;
-#else
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-#endif
 
 flat in vec3 center;
 flat in float energy;

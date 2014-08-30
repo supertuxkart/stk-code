@@ -4,6 +4,7 @@
 #include "../lib/irrlicht/source/Irrlicht/CBillboardSceneNode.h"
 #include <IBillboardSceneNode.h>
 #include <irrTypes.h>
+#include "utils/cpp2011.hpp"
 
 class STKBillboard : public irr::scene::CBillboardSceneNode
 {
@@ -13,7 +14,9 @@ public:
         irr::video::SColor colorTop = irr::video::SColor(0xFFFFFFFF),
         irr::video::SColor colorBottom = irr::video::SColor(0xFFFFFFFF));
 
-    virtual void render();
+    virtual void OnRegisterSceneNode() OVERRIDE;
+
+    virtual void render() OVERRIDE;
 };
 
 #endif

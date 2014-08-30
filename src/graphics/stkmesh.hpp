@@ -3,12 +3,12 @@
 
 #include "graphics/glwrap.hpp"
 #include "graphics/irr_driver.hpp"
+#include "utils/tuple.hpp"
 
 #include <IMeshSceneNode.h>
 #include <IMesh.h>
 #include "../lib/irrlicht/source/Irrlicht/CMeshSceneNode.h"
 
-#include <tuple>
 #include <vector>
 
 enum MeshMaterial
@@ -35,9 +35,9 @@ enum TransparentMaterial
 
 struct GLMesh {
     GLuint vao;
-    GLuint vao_shadow_pass;
     GLuint vertex_buffer;
     GLuint index_buffer;
+    GLuint instance_buffer;
     video::ITexture *textures[6];
     GLenum PrimitiveType;
     GLenum IndexType;
@@ -46,7 +46,9 @@ struct GLMesh {
     core::matrix4 TextureMatrix;
     size_t vaoBaseVertex;
     size_t vaoOffset;
+    size_t vaoBaseInstance;
     video::E_VERTEX_TYPE VAOType;
+    uint64_t TextureHandles[6];
 };
 
 GLMesh allocateMeshBuffer(scene::IMeshBuffer* mb);
@@ -58,90 +60,55 @@ bool isObject(video::E_MATERIAL_TYPE type);
 
 core::vector3df getWind();
 
-// Pass 1 shader (ie shaders that outputs normals and depth)
-class ListMatDefault
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
+template<typename T, typename... Args>
+class MeshList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
+{};
 
-class ListMatAlphaRef
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
+class ListMatDefault : public MeshList<ListMatDefault, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+{};
 
-class ListMatNormalMap
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
+class ListMatAlphaRef : public MeshList<ListMatAlphaRef, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+{};
 
-class ListMatGrass
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::vector3df, video::SColorf> > Arguments;
-};
+class ListMatNormalMap : public MeshList<ListMatNormalMap, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+{};
 
-class ListMatSphereMap
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
+class ListMatGrass : public MeshList<ListMatGrass, GLMesh *, core::matrix4, core::matrix4, core::vector3df>
+{};
 
-class ListMatSplatting
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
+class ListMatSphereMap : public MeshList<ListMatSphereMap, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+{};
 
-class ListMatUnlit
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
-};
+class ListMatSplatting : public MeshList<ListMatSplatting, GLMesh *, core::matrix4, core::matrix4>
+{};
 
-class ListMatDetails
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, core::matrix4, video::SColorf> > Arguments;
-};
+class ListMatUnlit : public MeshList<ListMatUnlit, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+{};
 
+class ListMatDetails : public MeshList<ListMatDetails, GLMesh *, core::matrix4, core::matrix4, core::matrix4>
+{};
 
-class ListBlendTransparent
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
-};
+class ListBlendTransparent : public MeshList<ListBlendTransparent, GLMesh *, core::matrix4, core::matrix4>
+{};
 
-class ListAdditiveTransparent
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4> > Arguments;
-};
+class ListAdditiveTransparent : public MeshList<ListAdditiveTransparent, GLMesh *, core::matrix4, core::matrix4>
+{};
 
-class ListBlendTransparentFog
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
-};
+class ListBlendTransparentFog : public MeshList<ListBlendTransparentFog, GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
+{};
 
-class ListAdditiveTransparentFog
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf> > Arguments;
-};
+class ListAdditiveTransparentFog : public MeshList<ListAdditiveTransparentFog, GLMesh *, core::matrix4, core::matrix4, float, float, float, float, float, video::SColorf>
+{};
 
-class ListDisplacement
-{
-public:
-    static std::vector<std::tuple<GLMesh *, core::matrix4> > Arguments;
-};
+class ListDisplacement : public MeshList<ListDisplacement, GLMesh *, core::matrix4>
+{};
 
 // Forward pass (for transparents meshes)
 void drawBubble(const GLMesh &mesh, const core::matrix4 &ModelViewProjectionMatrix);
 
 MeshMaterial MaterialTypeToMeshMaterial(video::E_MATERIAL_TYPE, video::E_VERTEX_TYPE);
 TransparentMaterial MaterialTypeToTransparentMaterial(video::E_MATERIAL_TYPE, f32 MaterialTypeParam);
+
+void InitTextures(GLMesh &mesh, MeshMaterial);
 
 #endif // STKMESH_H

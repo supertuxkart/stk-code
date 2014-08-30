@@ -156,18 +156,34 @@ namespace GUIEngine
         /**
           * \return the maximum value the spinner can take
           */
-        int  getMax()   const { return m_max;   }
-        /**
-          * \brief Sets the maximum value for a spinner.
-          */
-        void setMax(int n) {m_max = n; }
+        // --------------------------------------------------------------------
+        /** Returns the maximum value. */
+        int  getMax()  const { return m_max;   }
+        // --------------------------------------------------------------------
+        /** \brief Sets the maximum value for a spinner.
+         *  If the current value is larger than the new maximum, the current
+         *  value is set to the new maximum. */
+        void setMax(int n)
+        {
+            m_max = n; 
+            if(getValue()>m_max) setValue(m_max);
+        }   // setMax
+        // --------------------------------------------------------------------
         /**
           * \return the minimum value the spinner can take
           */
         int  getMin()   const { return m_min;   }
+        // --------------------------------------------------------------------
+        /** \brief Sets the minimum value for a spinner.
+         *  If the current value is smaller than the new minimum, the current
+         *  value is set to the new minimum. */
+        void setMin(int n)
+        {
+            m_min = n; 
+            if(getValue()<m_min) setValue(m_min);
+        }   // setMin
         
-        void setMin(int n) { m_min = n; }
-        
+        // --------------------------------------------------------------------
         /** Override method from base class Widget */
         virtual void setActivated();
         

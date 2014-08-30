@@ -243,9 +243,9 @@ TrackObject::~TrackObject()
  */
 void TrackObject::reset()
 {
-    if (m_presentation != NULL) m_presentation->reset();
-
-    if (m_animator != NULL) m_animator->reset();
+    if (m_presentation  ) m_presentation->reset();
+    if (m_animator      ) m_animator->reset();
+    if(m_physical_object) m_physical_object->reset();
 }   // reset
 
 // ----------------------------------------------------------------------------

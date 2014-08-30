@@ -157,10 +157,6 @@ private:
     /** The position of all four wheels in the 3d model. */
     Vec3          m_wheel_graphics_position[4];
 
-    /** The position of the wheels for the physics, which can be different
-     *  from the graphical position. */
-    Vec3          m_wheel_physics_position[4];
-
     /** Radius of the graphical wheels.  */
     float         m_wheel_graphics_radius[4];
     
@@ -173,12 +169,16 @@ private:
     /** The speed weighted objects. */
     SpeedWeightedObjectList     m_speed_weighted_objects;
     
-    /** Minimum suspension length. If the displayed suspension is
-     *  shorter than this, the wheel would look wrong. */
+    /** Length of the physics suspension when the kart is at rest. */
+    float m_default_physics_suspension[4];
+
+    /** Minimum suspension length (i.e. most compressed). If the displayed
+     *  suspension is shorter than this, the wheel would look wrong. */
     float         m_min_suspension[4];
 
-    /** Maximum suspension length. If the displayed suspension is
-     *  any longer, the wheel would look too far away from the chassis. */
+    /** Maximum suspension length (i.e. most extended). If the displayed
+     *  suspension is any longer, the wheel would look too far away from the 
+     *  chassis. */
     float         m_max_suspension[4];
 
     /** value used to divide the visual movement of wheels (because the actual movement
@@ -231,10 +231,9 @@ public:
     void          reset();
     void          loadInfo(const XMLNode &node);
     bool          loadModels(const KartProperties &kart_properties);
+    void          setDefaultSuspension();
     void          update(float dt, float rotation_dt, float steer,
-                         const float height_abve_terrain[4], float speed);
-    void          setDefaultPhysicsPosition(const Vec3 &center_shift,
-                                            float wheel_radius);
+                         float speed);
     void          finishedRace();
     scene::ISceneNode*
                   attachModel(bool animatedModels, bool always_animated);
@@ -262,14 +261,6 @@ public:
      */
     const Vec3* getWheelsGraphicsPosition() const
                 {return m_wheel_graphics_position;}
-    // ------------------------------------------------------------------------
-    /** Returns the position of a wheel relative to the kart for the physics.
-     *  The physics wheels can be attached at a different place to make the
-     *  karts more stable.
-     *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear
-     *           right, 3 = rear left.  */
-    const Vec3& getWheelPhysicsPosition(unsigned int i) const
-                {assert(i<4); return m_wheel_physics_position[i];}
     // ------------------------------------------------------------------------
     /** Returns the radius of the graphical wheels.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear

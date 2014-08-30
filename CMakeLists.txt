@@ -17,7 +17,6 @@ option(CHECK_ASSETS "Check if assets are installed in ../stk-assets" ON)
 
 if(UNIX)
     option(USE_CPP2011 "Activate C++ 2011 mode (GCC only)" OFF)
-    option(USE_XRANDR "Use xrandr instead of vidmode" OFF)
 endif()
 if(MSVC)
     # Normally hide the option to build wiiuse on VS, since it depends
@@ -27,6 +26,11 @@ if(MSVC)
     mark_as_advanced(WIIUSE_BUILD)
 else()
     set(WIIUSE_BUILD ON)
+endif()
+
+if(UNIX AND NOT APPLE)
+    option(USE_XRANDR "Use xrandr instead of vidmode" ON)
+    option(USE_ASAN   "Build with Leak/Address sanitizer" OFF)
 endif()
 
 set(STK_SOURCE_DIR "src")
@@ -118,10 +122,6 @@ if(USE_FRIBIDI)
     endif()
 endif()
 
-# Xrandr
-if(UNIX AND USE_XRANDR)
-    find_package(Xrandr REQUIRED)
-endif()
 
 if(UNIX)
 #    if(USE_CPP2011)
@@ -134,12 +134,16 @@ find_package(OpenGL REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 if(UNIX AND NOT APPLE)
-    find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
-    mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
-else()
-    set(IRRLICHT_XF86VM_LIBRARY "")
+    if(USE_XRANDR)
+        find_package(Xrandr REQUIRED)
+        if(NOT XRANDR_FOUND)
+            message(FATAL_ERROR "XRANDR not found.")
+        endif()
+    else()
+        find_library(IRRLICHT_XF86VM_LIBRARY Xxf86vm)
+        mark_as_advanced(IRRLICHT_XF86VM_LIBRARY)
+    endif()
 endif()
-
 
     
 # Set some compiler options
@@ -153,12 +157,12 @@ if(WIN32)
 
     # And shut up about unsafe stuff
     add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-	# VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
-	# Since STK uses DEBUG, this is added for debug compilation only:
+    # VS will automatically add NDEBUG for release mode, but only _DEBUG in debug mode.
+    # Since STK uses DEBUG, this is added for debug compilation only:
     set_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_DEBUG DEBUG)
 else()
     # All non VS generators used create only a single compile mode, so
-	# compile flags can be simplye be added
+    # compile flags can be simplye be added
     if(CMAKE_BUILD_TYPE MATCHES Debug)
         add_definitions(-DDEBUG)
     else()
@@ -169,6 +173,9 @@ endif()
 # TODO: remove this switch
 add_definitions(-DHAVE_OGGVORBIS)
 
+if(WIN32)
+    configure_file("${STK_SOURCE_DIR}/windows_installer/icon_rc.template" "${PROJECT_BINARY_DIR}/tmp/icon.rc")
+endif()
 
 # Provides list of source and header files (STK_SOURCES and STK_HEADERS)
 include(sources.cmake)
@@ -224,7 +231,7 @@ else()
     endif()
 
     # Build the final executable
-    add_executable(supertuxkart ${STK_SOURCES} ${STK_HEADERS})
+    add_executable(supertuxkart ${STK_SOURCES} ${STK_RESOURCES} ${STK_HEADERS})
     target_link_libraries(supertuxkart ${PTHREAD_LIBRARY})
 endif()
 
@@ -245,10 +252,21 @@ target_link_libraries(supertuxkart
     stkirrlicht
     ${CURL_LIBRARIES}
     ${OGGVORBIS_LIBRARIES}
-    ${IRRLICHT_XF86VM_LIBRARY}
     ${OPENAL_LIBRARY}
     ${OPENGL_LIBRARIES})
-
+    
+if(UNIX AND NOT APPLE)
+    if(USE_XRANDR)
+        target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
+    else()
+        target_link_libraries(supertuxkart ${IRRLICHT_XF86VM_LIBRARY})
+    endif()
+    if(USE_ASAN)
+        add_definitions("-fsanitize=address")
+        add_definitions("-fno-omit-frame-pointer")
+        target_link_libraries(supertuxkart "-fsanitize=address")
+    endif()
+endif()
 
 if(APPLE)
     # In theory it would be cleaner to let CMake detect the right dependencies. In practice, this means that if a OSX user has
@@ -282,11 +300,6 @@ if(USE_WIIUSE)
     endif()
     add_definitions(-DENABLE_WIIUSE)
 
-endif()
-
-# Xrandr
-if(UNIX AND USE_XRANDR)
-    target_link_libraries(supertuxkart ${XRANDR_LIBRARIES})
 endif()
 
 if(MSVC)
@@ -355,11 +368,8 @@ install(DIRECTORY ${STK_DATA_DIR} DESTINATION ${STK_INSTALL_DATA_DIR} PATTERN ".
 if(STK_ASSETS_DIR AND CHECK_ASSETS)
   install(DIRECTORY ${STK_ASSETS_DIR} DESTINATION ${STK_INSTALL_DATA_DIR}/data PATTERN ".svn" EXCLUDE PATTERN ".git" EXCLUDE)
 endif()
-install(FILES ${PROJECT_BINARY_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES ${STK_DATA_DIR}/supertuxkart.desktop DESTINATION share/applications)
+install(FILES data/supertuxkart_32.png DESTINATION share/icons/hicolor/32x32 RENAME supertuxkart.png)
+install(FILES data/supertuxkart_128.png DESTINATION share/icons/hicolor/128x128 RENAME supertuxkart.png)
 install(FILES data/supertuxkart_32.png data/supertuxkart_128.png DESTINATION share/pixmaps)
 install(FILES data/supertuxkart.appdata DESTINATION share/appdata)
-
-
-set(PREFIX ${CMAKE_INSTALL_PREFIX})
-configure_file(data/supertuxkart_desktop.template supertuxkart.desktop)
-add_dependencies(supertuxkart supertuxkart.desktop)

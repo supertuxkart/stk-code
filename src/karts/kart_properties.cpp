@@ -57,14 +57,14 @@ KartProperties::KartProperties(const std::string &filename)
     m_shadow_file   = "";
     m_shadow_scale    = 1.0f;
     m_shadow_x_offset = 0.0f;
-    m_shadow_y_offset = 0.0f;
+    m_shadow_z_offset = 0.0f;
 
     m_groups.clear();
     m_custom_sfx_id.resize(SFXManager::NUM_CUSTOMS);
 
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_mass = m_brake_factor =
+    m_mass = m_brake_factor = m_brake_time_increase =
         m_time_reset_steer = m_nitro_consumption = m_nitro_engine_force =
         m_nitro_small_container = m_nitro_big_container = m_nitro_max =
         m_nitro_max_speed_increase = m_nitro_duration = m_nitro_fade_out_time =
@@ -92,6 +92,8 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
+        m_smooth_flying_impulse = m_physical_wheel_position = 
+        m_graphical_y_offset =
             UNDEFINED;
 
     m_engine_power.resize(RaceManager::DIFFICULTY_COUNT, UNDEFINED);
@@ -270,10 +272,16 @@ void KartProperties::load(const std::string &filename, const std::string &node)
         m_gravity_center_shift.setY(m_kart_model->getHeight()*0.5f);
         m_gravity_center_shift.setZ(0);
     }
-    m_kart_model->setDefaultPhysicsPosition(m_gravity_center_shift,
-                                           m_wheel_radius           );
-    m_wheel_base = fabsf( m_kart_model->getWheelPhysicsPosition(0).getZ()
-                         -m_kart_model->getWheelPhysicsPosition(2).getZ());
+
+    if(m_physical_wheel_position < 0)
+        m_wheel_base = fabsf(m_kart_model->getLength() );
+    else
+    {
+        // The new (atm unused) physical position results in steering to be
+        // not sharp enough - therefore decrease the wheel base somewhat to
+        // approximate the behaviour of the old steering.
+        m_wheel_base = fabsf(m_kart_model->getLength() - 0.25f);
+    }
 
     // Now convert the turn radius into turn angle:
     for(unsigned int i=0; i<m_turn_angle_at_speed.size(); i++)
@@ -315,7 +323,7 @@ void KartProperties::getAllData(const XMLNode * root)
 
     root->get("shadow-scale",      &m_shadow_scale     );
     root->get("shadow-x-offset",   &m_shadow_x_offset  );
-    root->get("shadow-y-offset",   &m_shadow_y_offset  );
+    root->get("shadow-z-offset",   &m_shadow_z_offset  );
 
     root->get("type",     &m_kart_type        );
 
@@ -370,6 +378,7 @@ void KartProperties::getAllData(const XMLNode * root)
                                                    &m_downward_impulse_factor);
         stability_node->get("track-connection-accel",
                                                    &m_track_connection_accel );
+        stability_node->get("smooth-flying-impulse", &m_smooth_flying_impulse);
     }
 
     if(const XMLNode *collision_node = root->getNode("collision"))
@@ -379,6 +388,7 @@ void KartProperties::getAllData(const XMLNode * root)
         collision_node->get("terrain-impulse", &m_collision_terrain_impulse);
         collision_node->get("restitution",     &m_restitution              );
         collision_node->get("bevel-factor",    &m_bevel_factor             );
+        collision_node->get("physical-wheel-position",&m_physical_wheel_position);
         std::string s;
         collision_node->get("impulse-type",    &s                          );
         s = StringUtils::toLowerCase(s);
@@ -527,7 +537,8 @@ void KartProperties::getAllData(const XMLNode * root)
 
     if(const XMLNode *engine_node = root->getNode("engine"))
     {
-        engine_node->get("brake-factor", &m_brake_factor);
+        engine_node->get("brake-factor",            &m_brake_factor);
+        engine_node->get("brake-time-increase",     &m_brake_time_increase);
         engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
         engine_node->get("power", &m_engine_power);
         if(m_engine_power.size()!=RaceManager::DIFFICULTY_COUNT)
@@ -605,6 +616,11 @@ void KartProperties::getAllData(const XMLNode * root)
         startup_node->get("boost", &m_startup_boost);
     }
 
+    if(const XMLNode *graphics_node = root->getNode("graphics"))
+    {
+        graphics_node->get("y-offset", &m_graphical_y_offset);
+    }
+
     if(m_kart_model)
         m_kart_model->loadInfo(*root);
 }   // getAllData
@@ -659,8 +675,10 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_chassis_angular_damping, "stability chassis-angular-damping");
     CHECK_NEG(m_downward_impulse_factor, "stability downward-impulse-factor");
     CHECK_NEG(m_track_connection_accel,  "stability track-connection-accel" );
+    CHECK_NEG(m_smooth_flying_impulse,      "smooth-flying-impulse"         );
     CHECK_NEG(m_max_speed_reverse_ratio,    "engine max-speed-reverse-ratio");
     CHECK_NEG(m_brake_factor,               "engine brake-factor"           );
+    CHECK_NEG(m_brake_time_increase,        "engine brake-time-increase"    );
     CHECK_NEG(m_suspension_stiffness,       "suspension stiffness"          );
     CHECK_NEG(m_suspension_rest,            "suspension rest"               );
     CHECK_NEG(m_suspension_travel_cm,       "suspension travel-cm"          );
@@ -672,6 +690,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_bevel_factor.getX(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getY(),        "collision bevel-factor"        );
     CHECK_NEG(m_bevel_factor.getZ(),        "collision bevel-factor"        );
+    CHECK_NEG(m_physical_wheel_position,    "collision physical-wheel-position");
     CHECK_NEG(m_rubber_band_max_length,     "plunger band-max-length"       );
     CHECK_NEG(m_rubber_band_force,          "plunger band-force"            );
     CHECK_NEG(m_rubber_band_duration,       "plunger band-duration"         );
@@ -722,7 +741,7 @@ void KartProperties::checkAllSet(const std::string &filename)
     CHECK_NEG(m_explosion_invulnerability_time,
                                             "explosion invulnerability-time");
     CHECK_NEG(m_explosion_radius,           "explosion radius"              );
-
+    CHECK_NEG(m_graphical_y_offset,         "graphics y-offset"             );
     for(unsigned int i=RaceManager::DIFFICULTY_FIRST;
         i<=RaceManager::DIFFICULTY_LAST; i++)
     {

@@ -10,25 +10,6 @@ uniform vec3 col;
 //uniform vec2 wind;
 //uniform float shadowoffset;
 
-#ifdef UBO_DISABLED
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat4 InverseViewMatrix;
-uniform mat4 InverseProjectionMatrix;
-uniform mat4 ShadowViewProjMatrixes[4];
-uniform vec2 screen;
-#else
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-#endif
-
 in vec2 uv;
 out vec4 Diff;
 out vec4 Spec;

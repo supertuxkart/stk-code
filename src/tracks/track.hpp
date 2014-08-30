@@ -206,7 +206,7 @@ private:
     /** True if this track (textures and track data) should be cached. Used
      *  for the overworld. */
     bool m_cache_track;
-    
+
 
 #ifdef DEBUG
     /** A list of textures that were cached before the track is loaded.
@@ -383,12 +383,17 @@ private:
     float m_bloom_threshold;
 
     bool m_lensflare;
+
     bool m_godrays;
+    core::vector3df m_godrays_position;
+    float m_godrays_opacity;
+    video::SColor m_godrays_color;
+
     bool m_shadows;
 
     float m_displacement_speed;
     float m_caustics_speed;
-    
+
     /** The levels for color correction
      * m_color_inlevel(black, gamma, white)
      * m_color_outlevel(black, white)*/
@@ -397,6 +402,12 @@ private:
 
     /** List of all bezier curves in the track - for e.g. camera, ... */
     std::vector<BezierCurve*> m_all_curves;
+
+    /** The number of laps the track will be raced in a random GP.
+     * m_actual_number_of_laps is initialised with this value.*/
+    int m_default_number_of_laps;
+    /** The number of laps that is predefined in a track info dialog. */
+    int m_actual_number_of_laps;
 
     void loadTrackInfo();
     void loadQuadGraph(unsigned int mode_id, const bool reverse);
@@ -545,6 +556,7 @@ public:
     float  getCameraFar() const { return m_camera_far; }
     // ------------------------------------------------------------------------
     /** Returns the triangle mesh for this track. */
+    const TriangleMesh *getPtrTriangleMesh() const { return m_track_mesh; }
     const TriangleMesh& getTriangleMesh() const {return *m_track_mesh; }
     // ------------------------------------------------------------------------
     /** Returns the graphical effect mesh for this track. */
@@ -599,19 +611,26 @@ public:
 
     bool getBloom() const { return m_bloom; }
     float getBloomThreshold() const { return m_bloom_threshold; }
-    
+
     /** Return the color levels for color correction shader */
     core::vector3df getColorLevelIn() const { return m_color_inlevel; }
     core::vector2df getColorLevelOut() const { return m_color_outlevel; }
 
     bool hasLensFlare() const { return m_lensflare; }
     bool hasGodRays() const { return m_godrays; }
+    core::vector3df getGodRaysPosition() const { return m_godrays_position; }
+    float getGodRaysOpacity() const { return m_godrays_opacity; }
+    video::SColor getGodRaysColor() const { return m_godrays_color; }
     bool hasShadows() const { return m_shadows; }
-    
+
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }
 
-    float getDisplacementSpeed() const { return m_displacement_speed; }
-    float getCausticsSpeed() const { return m_caustics_speed; }
+    float     getDisplacementSpeed()   const { return m_displacement_speed;    }
+    float     getCausticsSpeed()       const { return m_caustics_speed;        }
+    const int getDefaultNumberOfLaps() const { return m_default_number_of_laps;}
+    const int getActualNumberOfLap()   const { return m_actual_number_of_laps; }
+    void      setActualNumberOfLaps(unsigned int laps)
+                                         { m_actual_number_of_laps = laps; }
     bool operator<(const Track &other) const;
 };   // class Track
 

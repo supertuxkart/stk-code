@@ -18,92 +18,61 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
-#include "graphics/camera.hpp"
-#include "graphics/glwrap.hpp"
-#include "graphics/gpuparticles.hpp"
-#include "graphics/irr_driver.hpp"
-#include "graphics/material_manager.hpp"
-#include "graphics/material.hpp"
-#include "graphics/per_camera_node.hpp"
 #include "graphics/rain.hpp"
-#include "graphics/shaders.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui.hpp"
-#include "utils/constants.hpp"
 #include "utils/random_generator.hpp"
 
 
-#include <ISceneManager.h>
-#include <SMeshBuffer.h>
-
-using namespace video;
-using namespace scene;
-using namespace core;
-
 // The rain manager
 
-Rain::Rain(Camera *camera, irr::scene::ISceneNode* parent) : m_thunder_sound(0)
+Rain::Rain()
 {
-    m_lightning = camera->getIndex()==0;
-
-    if (m_lightning)
-        m_thunder_sound = sfx_manager->createSoundSource("thunder");
-
-    Material* m = material_manager->getMaterial("rain.png");
-    assert(m != NULL);
+    m_thunder_sound = sfx_manager->createSoundSource("thunder");        
+    m_rain_sound = sfx_manager->createSoundSource("rain");
 
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
-
-//    RainNode *node = new RainNode(irr_driver->getSceneManager(), m->getTexture());
-//    m_node = irr_driver->addPerCameraNode(node, camera->getCameraSceneNode(), parent);
-//    m_node->setAutomaticCulling(0);
 }   // Rain
 
 // ----------------------------------------------------------------------------
 
 Rain::~Rain()
 {
-//    m_node->drop();      // drop STK's reference
-//    m_node->remove();    // Then remove it from the scene graph.
-
-    if (m_lightning && m_thunder_sound != NULL) sfx_manager->deleteSFX(m_thunder_sound);
+    if (m_thunder_sound != NULL) 
+        sfx_manager->deleteSFX(m_thunder_sound);
+        
+    if (m_rain_sound != NULL) 
+        sfx_manager->deleteSFX(m_rain_sound);
 }
 
 // ----------------------------------------------------------------------------
 
 void Rain::update(float dt)
 {
-    if (m_lightning)
+    m_next_lightning -= dt;
+
+    if (m_next_lightning < 0.0f)
     {
-        m_next_lightning -= dt;
-
-        if (m_next_lightning < 0.0f)
+        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
+        if (gui_base != NULL)
         {
-            RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
-            if (gui_base != NULL)
-            {
-                gui_base->doLightning();
-                if (m_thunder_sound) m_thunder_sound->play();
-            }
-
-            RandomGenerator g;
-            m_next_lightning = 35 + (float)g.get(35);
+            gui_base->doLightning();
+            if (m_thunder_sound) m_thunder_sound->play();
         }
-    }
 
+        RandomGenerator g;
+        m_next_lightning = 35 + (float)g.get(35);
+    }
 }   // update
 
 // ----------------------------------------------------------------------------
 
-void Rain::setPosition(const core::vector3df& position)
+void Rain::playSound()
 {
-//    m_node->getChild()->setPosition(position);
-}   // setPosition
-
-// ----------------------------------------------------------------------------
-
-void Rain::setCamera(scene::ICameraSceneNode* camera)
-{
-//    m_node->setCamera(camera);
+     if (m_rain_sound) 
+    {
+        m_rain_sound->setLoop(true);
+        m_rain_sound->play();
+    }   
 }

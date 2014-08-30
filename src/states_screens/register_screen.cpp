@@ -72,9 +72,9 @@ void RegisterScreen::init()
     getWidget<TextBoxWidget>("local_username")->setText(username);
 
     TextBoxWidget *password_widget = getWidget<TextBoxWidget>("password");
-    password_widget->setPasswordBox(true,L'*');
+    password_widget->setPasswordBox(true, L'*');
     password_widget = getWidget<TextBoxWidget>("password_confirm");
-    password_widget->setPasswordBox(true,L'*');
+    password_widget->setPasswordBox(true, L'*');
 
     m_info_widget = getWidget<LabelWidget>("info");
     assert(m_info_widget);
@@ -129,6 +129,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
         getWidget<LabelWidget>("label_online")->setVisible(false);
         online = false;
     }
+
     getWidget<TextBoxWidget>("username")->setVisible(online);
     getWidget<LabelWidget  >("label_username")->setVisible(online);
     getWidget<TextBoxWidget>("password")->setVisible(online);
@@ -147,7 +148,7 @@ void RegisterScreen::makeEntryFieldsVisible(bool online)
  */
 void RegisterScreen::handleLocalName(const stringw &local_name)
 {
-    if (local_name.size()==0)
+    if (local_name.size() == 0)
         return;
 
     // If a local player with that name does not exist, create one
@@ -223,7 +224,7 @@ void RegisterScreen::doRegister()
     }
     else if (username.size() < 3 || username.size() > 30)
     {
-        m_info_widget->setText(_("Username has to be between 4 and 30 characters long!"), false);
+        m_info_widget->setText(_("Online username has to be between 3 and 30 characters long!"), false);
     }
     else if (password.size() < 8 || password.size() > 30)
     {
@@ -243,16 +244,19 @@ void RegisterScreen::doRegister()
     {
         m_info_widget->setDefaultColor();
         new RegistrationDialog();
+        if (local_name.size() > 0)
+        {
+            PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
+            if (player)
+            {
+                player->setLastOnlineName(username);
+                player->setWasOnlineLastTime(true);
+            }
+        }
         return;
     }
 
     sfx_manager->quickSound( "anvil" );
-    if(local_name.size()>0)
-    {
-        PlayerProfile *player = PlayerManager::get()->getPlayer(local_name);
-        if (player)
-            player->setLastOnlineName(username);
-    }
 }   // doRegister
 
 // -----------------------------------------------------------------------------
@@ -267,9 +271,8 @@ void RegisterScreen::acceptTerms()
     core::stringw password_confirm= getWidget<TextBoxWidget>("password_confirm")->getText().trim();
     core::stringw email = getWidget<TextBoxWidget>("email")->getText().trim();
 
-     m_signup_request = new XMLRequest();
-    m_signup_request->setServerURL("client-user.php");
-    m_signup_request->addParameter("action",           "register"      );
+    m_signup_request = new XMLRequest();
+    m_signup_request->setApiURL(API::USER_PATH, "register");
     m_signup_request->addParameter("username",         username        );
     m_signup_request->addParameter("password",         password        );
     m_signup_request->addParameter("password_confirm", password_confirm);

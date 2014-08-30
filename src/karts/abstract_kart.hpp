@@ -169,8 +169,18 @@ public:
     /** Returns the highest point of the kart (coordinate on up axis) */
     float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
+    /** Called after the kart comes to rest. It can be used to e.g. compute
+     *  differences between graphical and physical chassis. Note that 
+     *  overwriting this function is possible, but this implementation must
+     *  be called. */
+    virtual void kartIsInRestNow();
+    // ------------------------------------------------------------------------
     /** Returns true if this kart has no wheels. */
     bool isWheeless() const;
+    // ------------------------------------------------------------------------
+    /** Returns the coordinates of the front of the kart. This is used for
+     *  determining when the lap line is crossed. */
+    virtual const Vec3& getFrontXYZ() const = 0;
     // ------------------------------------------------------------------------
     /** Returns the position of a wheel relative to the kart.
      *  \param i Index of the wheel: 0=front right, 1 = front left, 2 = rear

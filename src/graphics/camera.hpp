@@ -25,6 +25,7 @@
 #include "utils/no_copy.hpp"
 #include "utils/aligned_array.hpp"
 #include "utils/leak_check.hpp"
+#include "utils/log.hpp"
 #include "utils/vec3.hpp"
 
 #include "SColor.h"
@@ -40,7 +41,6 @@ namespace irr
 using namespace irr;
 
 class AbstractKart;
-class Rain;
 
 /**
   * \brief Handles the game camera
@@ -60,6 +60,8 @@ public:
     };
 
 private:
+    static Camera* s_active_camera;
+
     /** The camera scene node. */
     scene::ICameraSceneNode *m_camera;
 
@@ -116,10 +118,6 @@ private:
 
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
-
-    /** Used to show rain graphical effects. */
-    Rain *m_rain;
-
 
     /** A class that stores information about the different end cameras
      *  which can be specified in the scene.xml file. */
@@ -270,6 +268,9 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the camera scene node. */
     scene::ICameraSceneNode *getCameraSceneNode() { return m_camera; }
+
+    // ------------------------------------------------------------------------
+    static Camera* getActiveCamera() { return s_active_camera; }
 } ;
 
 #endif

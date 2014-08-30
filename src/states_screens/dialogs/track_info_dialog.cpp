@@ -88,9 +88,7 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     screenshotWidget->add();
 
     if (screenshot != NULL)
-    {
         screenshotWidget->setImage(screenshot);
-    }
     m_widgets.push_back(screenshotWidget);
 
 
@@ -98,21 +96,11 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
     if (has_laps)
     {
         m_spinner = getWidget<SpinnerWidget>("lapcountspinner");
-
-        m_spinner->m_properties[PROP_ID] = "lapcountspinner";
         if (UserConfigParams::m_artist_debug_mode)
-        {
             m_spinner->setMin(0);
-        }
 
-        //I18N: In the track setup screen (number of laps choice, where %i is the number)
-        //m_spinner->setText( _("%i laps") );
-        m_spinner->setValue( UserConfigParams::m_num_laps );
-        //m_spinner->getIrrlichtElement()->setTabStop(true);
-        //m_spinner->getIrrlichtElement()->setTabGroup(false);
-
-        const int num_laps = m_spinner->getValue();
-        race_manager->setNumLaps(num_laps);
+        m_spinner->setValue(track->getActualNumberOfLap());
+        race_manager->setNumLaps(m_spinner->getValue());
     }
     else
     {
@@ -149,7 +137,6 @@ TrackInfoDialog::TrackInfoDialog(const std::string& ribbonItem, const std::strin
         m_highscore_entries[2] = getWidget<LabelWidget>("highscore3");
 
         updateHighScores();
-
     }
     else
     {
@@ -249,6 +236,7 @@ void TrackInfoDialog::onEnterPressedInternal()
     const int num_laps = (m_spinner == NULL ? -1 : m_spinner->getValue());
     const bool reverse_track = m_checkbox == NULL ? false
                                                   : m_checkbox->getState();
+    track_manager->getTrack(m_track_ident)->setActualNumberOfLaps(num_laps);
     race_manager->setReverseTrack(reverse_track);
     std::string track_ident = m_track_ident;
     // Disable accidentally unlocking of a challenge

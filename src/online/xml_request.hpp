@@ -21,7 +21,7 @@
 
 #include "io/file_manager.hpp"
 #include "online/http_request.hpp"
-#include "utils/cpp2011.h"
+#include "utils/cpp2011.hpp"
 #include "utils/string_utils.hpp"
 #include "utils/synchronised.hpp"
 
@@ -53,7 +53,7 @@ namespace Online
         virtual void afterOperation() OVERRIDE;
 
     public :
-                 XMLRequest(bool manage_memory = false, int priority = 1);
+        XMLRequest(bool manage_memory = false, int priority = 1);
         virtual ~XMLRequest();
 
         // ------------------------------------------------------------------------
@@ -73,7 +73,7 @@ namespace Online
         * \pre request had to be executed.
         * \return get the info from the request reply
         */
-        const irr::core::stringw & getInfo()   const
+        const irr::core::stringw & getInfo() const
         {
             assert(hasBeenExecuted());
             return m_info;
@@ -90,8 +90,5 @@ namespace Online
         }   // isSuccess
 
     };   // class XMLRequest
-
 } //namespace Online
-
-#endif
-
+#endif // HEADER_XML_REQUEST_HPP

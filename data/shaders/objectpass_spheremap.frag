@@ -1,24 +1,10 @@
 // See http://www.ozone3d.net/tutorials/glsl_texturing_p04.php for ref
 
-#ifdef UBO_DISABLED
-uniform mat4 ViewMatrix;
-uniform mat4 ProjectionMatrix;
-uniform mat4 InverseViewMatrix;
-uniform mat4 InverseProjectionMatrix;
-uniform vec2 screen;
+#ifdef GL_ARB_bindless_texture
+layout(bindless_sampler) uniform sampler2D tex;
 #else
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-#endif
-
 uniform sampler2D tex;
+#endif
 
 #if __VERSION__ >= 130
 in vec3 nor;
@@ -39,6 +25,11 @@ void main() {
     float m = 2.0 * sqrt(r.x * r.x + r.y * r.y + (r.z + 1.0) * (r.z + 1.0));
     r.y = - r.y;
     vec4 detail0 = texture(tex, r.xy / m + .5);
+#ifdef GL_ARB_bindless_texture
+#ifdef SRGBBindlessFix
+    detail0.xyz = pow(detail0.xyz, vec3(2.2));
+#endif
+#endif
     vec3 LightFactor = getLightFactor(1.);
 
     FragColor = vec4(detail0.xyz * LightFactor, 1.);

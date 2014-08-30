@@ -46,9 +46,8 @@ private:
     /** The scene node of the kart to which this shadow belongs. */
     scene::ISceneNode  *m_parent_kart_node;
 public:
-         Shadow(video::ITexture *texture,
-                scene::ISceneNode *node,
-                float scale, float xOffset, float yOffset);
+         Shadow(video::ITexture *texture, scene::ISceneNode *node,
+                float scale, float x_offset, float y_offset,float z_offset);
         ~Shadow();
     void enableShadow();
     void disableShadow();

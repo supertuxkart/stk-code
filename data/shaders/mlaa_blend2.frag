@@ -1,16 +1,6 @@
 uniform sampler2D edgesMap;
 uniform sampler2D areaMap;
 
-layout (std140) uniform MatrixesData
-{
-    mat4 ViewMatrix;
-    mat4 ProjectionMatrix;
-    mat4 InverseViewMatrix;
-    mat4 InverseProjectionMatrix;
-    mat4 ShadowViewProjMatrixes[4];
-    vec2 screen;
-};
-
 #define MAX_SEARCH_STEPS 8.0
 #define MAX_DISTANCE 33.0
 

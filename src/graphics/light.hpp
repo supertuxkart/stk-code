@@ -20,7 +20,7 @@
 #define HEADER_LIGHT_HPP
 
 #include <ISceneNode.h>
-#include <utils/cpp2011.h>
+#include <utils/cpp2011.hpp>
 #include <vector>
 
 using namespace irr;
@@ -59,6 +59,7 @@ public:
     float getEnergy() const { return m_energy; }
     float getEffectiveEnergy() const { return m_energy_multiplier * m_energy; }
     core::vector3df getColor() const { return core::vector3df(m_color[0], m_color[1], m_color[2]); }
+    void setColor(float r, float g, float b) { m_color[0] = r; m_color[1] = g; m_color[2] = b; }
 
     float getEnergyMultiplier() const { return m_energy_multiplier; }
     void setEnergyMultiplier(float newval) { m_energy_multiplier = newval; }

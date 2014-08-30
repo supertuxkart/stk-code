@@ -42,8 +42,8 @@ public:
         UNLOCK_GP,
         UNLOCK_MODE,
         UNLOCK_KART,
-        UNLOCK_DIFFICULTY}
-    ;
+        UNLOCK_DIFFICULTY
+    };
     // ------------------------------------------------------------------------
     class UnlockableFeature
     {

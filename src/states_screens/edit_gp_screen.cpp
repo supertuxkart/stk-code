@@ -103,20 +103,17 @@ void EditGPScreen::eventCallback(GUIEngine::Widget* widget, const std::string& n
                 setModified(true);
             }
         }
-        else if (m_action == "add" || m_action == "edit")
+        else if (m_action == "edit")
         {
-            if (m_action == "edit")
-            {
-                edit();
-            }
-            else
-            {
-                EditTrackScreen* edit = EditTrackScreen::getInstance();
-                assert(edit != NULL);
-                //By default, 3 laps and no reversing
-                edit->setSelection(NULL, 3, false);
-                StateManager::get()->pushScreen(edit);
-            }
+            edit();
+        }
+        else if (m_action == "add")
+        {
+            EditTrackScreen* edit = EditTrackScreen::getInstance();
+            assert(edit != NULL);
+            //By default, 3 laps and no reversing
+            edit->setSelection(NULL, 3, false);
+            StateManager::get()->pushScreen(edit);
         }
         else if (m_action == "remove")
         {

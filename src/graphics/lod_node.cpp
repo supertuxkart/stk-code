@@ -16,12 +16,14 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
+#include "graphics/camera.hpp"
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/hardware_skinning.hpp"
 #include "graphics/material_manager.hpp"
 #include "graphics/material.hpp"
 #include "config/user_config.hpp"
+#include "karts/abstract_kart.hpp"
 
 #include <ISceneManager.h>
 #include <ICameraSceneNode.h>
@@ -70,12 +72,16 @@ int LODNode::getLevel()
     if(m_forced_lod>-1)
         return m_forced_lod;
 
-    // TODO: optimize this, there is no need to check every frame
     scene::ICameraSceneNode* curr_cam = irr_driver->getSceneManager()->getActiveCamera();
+    Camera* camera = Camera::getActiveCamera();
+    if (camera == NULL)
+        return m_detail.size() - 1;
+    AbstractKart* kart = camera->getKart();
+    const Vec3 &pos = kart->getFrontXYZ();
 
     // Assumes all children are at the same location
     const int dist =
-        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( curr_cam->getPosition() ));
+        (int)((getPosition() + m_nodes[0]->getPosition()).getDistanceFromSQ( core::vector3df(pos.getX(), pos.getY(), pos.getZ())));
 
     for (unsigned int n=0; n<m_detail.size(); n++)
     {

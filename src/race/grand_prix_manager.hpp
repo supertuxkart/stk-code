@@ -45,8 +45,6 @@ private:
     /** Generates a new unique indentifier for a user defined grand prix */
     std::string generateId();
 
-    bool existsName(const irr::core::stringw& name) const;
-
 public:
                    GrandPrixManager();
                   ~GrandPrixManager();
@@ -54,6 +52,7 @@ public:
     GrandPrixData* getGrandPrix(const int i) const { return m_gp_data[i];     }
     GrandPrixData* getGrandPrix(const std::string& s) const;
     unsigned int   getNumberOfGrandPrix()    const { return m_gp_data.size(); }
+    bool existsName(const irr::core::stringw& name) const;
     void           checkConsistency();
 
     // Methods for the gp editor

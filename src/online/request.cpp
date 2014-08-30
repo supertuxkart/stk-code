@@ -25,10 +25,8 @@
 
 #include <assert.h>
 
-
 namespace Online
 {
-
     // ========================================================================
     /**
      *  Creates a request that can be handled by the RequestManager
@@ -62,11 +60,17 @@ namespace Online
     void Request::execute()
     {
         assert(isBusy());
+        // Abort as early as possible if abort is requested
+        if(RequestManager::get()->getAbort()) return;
         prepareOperation();
+        if(RequestManager::get()->getAbort()) return;
         operation();
+        if(RequestManager::get()->getAbort()) return;
         setExecuted();
+        if(RequestManager::get()->getAbort()) return;
         afterOperation();
     }   // execute
+
     // ------------------------------------------------------------------------
     /** Executes the request now, i.e. in the main thread and without involving
      *  the manager thread.. This calles prepareOperation, operation, and
@@ -80,6 +84,5 @@ namespace Online
         callback();
         setDone();
     }   // executeNow
-
 
 } // namespace Online

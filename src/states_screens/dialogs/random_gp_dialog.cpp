@@ -33,7 +33,6 @@ using irr::gui::IGUIStaticText;
 typedef GUIEngine::SpinnerWidget Spinner;
 
 RandomGPInfoDialog::RandomGPInfoDialog()
-
 {
     // Defaults - loading selection from last time frrom a file would be better
     m_number_of_tracks = 2; // We can assume that there are at least 2 standard tracks
@@ -88,13 +87,9 @@ void RandomGPInfoDialog::addSpinners()
     const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
     for (unsigned int i = 0; i < groups.size(); i++)
     {
-        // FIXME: The NULL check is necessary until #1348 on github is fixed
-        if (groups[i].c_str() != NULL)
-        {
-            spinner->addLabel(stringw(groups[i].c_str()));
-            if(groups[i] == "standard")
-                index_standard  = i+1;
-        }
+        spinner->addLabel(stringw(groups[i].c_str()));
+        if(groups[i] == "standard")
+            index_standard  = i+1;
     }
     // The value can only be set here because SpinnerWidget resets the value
     // every time a label is added

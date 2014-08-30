@@ -139,25 +139,30 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
 {
     m_users.clear();
     const XMLNode * users_xml = input->getNode("users");
+
     // Try to reserve enough cache space for all found entries.
     unsigned int n = ProfileManager::get()
                    ->guaranteeCacheSize(users_xml->getNumNodes());
 
     if (n >= users_xml->getNumNodes())
+    {
         n = users_xml->getNumNodes();
+    }
     else
     {
         Log::warn("OnlineSearch",
             "Too many results found, only %d will be displayed.", n);
     }
+
     for (unsigned int i = 0; i < n; i++)
     {
         OnlineProfile * profile = new OnlineProfile(users_xml->getNode(i));
+
         // The id must be pushed before adding it to the cache, since
         // the cache might merge the new data with an existing entry
         m_users.push_back(profile->getID());
         ProfileManager::get()->addToCache(profile);
-    }
+    } // for i = 0 ... number of display users
 }   // parseResult
 
 // ----------------------------------------------------------------------------
@@ -166,17 +171,19 @@ void OnlineUserSearch::parseResult(const XMLNode * input)
 void OnlineUserSearch::showList()
 {
     m_user_list_widget->clear();
-    for (unsigned int i=0; i < m_users.size(); i++)
+
+    for (unsigned int i = 0; i < m_users.size(); i++)
     {
         std::vector<GUIEngine::ListWidget::ListCell> row;
         OnlineProfile * profile = ProfileManager::get()->getProfileByID(m_users[i]);
+
         // This could still happen if something pushed results out of the cache.
         if (!profile)
         {
-            Log::warn("OnlineSearch", "User %d not in cache anymore, ignored.",
-                      m_users[i]);
+            Log::warn("OnlineSearch", "User %d not in cache anymore, ignored.", m_users[i]);
             continue;
         }
+
         row.push_back(GUIEngine::ListWidget::ListCell(profile->getUserName(),-1,3));
         m_user_list_widget->addItem("user", row);
     }
@@ -267,6 +274,7 @@ void OnlineUserSearch::onUpdate(float dt)
                 sfx_manager->quickSound( "anvil" );
                 new MessageDialog(m_search_request->getInfo());
             }
+
             delete m_search_request;
             m_search_request = NULL;
             m_back_widget->setActivated();

@@ -534,8 +534,7 @@ irr::core::stringw DynamicRibbonWidget::getSelectionText(const int playerID)
 // -----------------------------------------------------------------------------
 RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w)
 {
-    RibbonWidget* row;
-    for_in (row, m_rows)
+    for_var_in (RibbonWidget*, row, m_rows)
     {
         if (row != NULL)
         {
@@ -548,8 +547,7 @@ RibbonWidget* DynamicRibbonWidget::getRowContaining(Widget* w)
 // -----------------------------------------------------------------------------
 RibbonWidget* DynamicRibbonWidget::getSelectedRibbon(const int playerID)
 {
-    RibbonWidget* row;
-    for_in (row, m_rows)
+    for_var_in (RibbonWidget*, row, m_rows)
     {
         if (GUIEngine::isFocusedForPlayer(row, playerID))
         {
@@ -608,8 +606,7 @@ EventPropagation DynamicRibbonWidget::leftPressed(const int playerID)
         updateLabel();
         propagateSelection();
 
-        DynamicRibbonHoverListener* listener;
-        for_in( listener, m_hover_listeners )
+        for_var_in (DynamicRibbonHoverListener*, listener, m_hover_listeners)
         {
             listener->onSelectionChanged(this, w->getSelectionIDString(playerID),
                                          w->getSelectionText(playerID), playerID);
@@ -666,8 +663,7 @@ EventPropagation DynamicRibbonWidget::mouseHovered(Widget* child, const int play
 
     if (getSelectedRibbon(playerID) != NULL)
     {
-        DynamicRibbonHoverListener* listener;
-        for_in( listener, m_hover_listeners )
+        for_var_in (DynamicRibbonHoverListener*, listener, m_hover_listeners)
         {
             listener->onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
                                          getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
@@ -682,15 +678,13 @@ EventPropagation DynamicRibbonWidget::focused(const int playerID)
     Widget::focused(playerID);
     updateLabel();
 
-    DynamicRibbonHoverListener* listener;
-
     if (getSelectedRibbon(playerID)->getSelectionIDString(playerID) == "")
     {
         //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
         getSelectedRibbon(playerID)->setSelection(0, playerID);
     }
 
-    for_in( listener, m_hover_listeners )
+    for_var_in (DynamicRibbonHoverListener*, listener, m_hover_listeners)
     {
         listener->onSelectionChanged(this, getSelectedRibbon(playerID)->getSelectionIDString(playerID),
                                      getSelectedRibbon(playerID)->getSelectionText(playerID), playerID);
@@ -719,15 +713,13 @@ void DynamicRibbonWidget::onRibbonWidgetFocus(RibbonWidget* emitter, const int p
 
     updateLabel(emitter);
 
-    DynamicRibbonHoverListener* listener;
-
     if (emitter->getSelectionIDString(playerID) == "")
     {
         //fprintf(stderr, "[DynamicRibbonWidget] WARNING: Can't find selection for player %i, selecting first item\n", playerID);
         emitter->setSelection(0, playerID);
     }
 
-    for_in( listener, m_hover_listeners )
+    for_var_in(DynamicRibbonHoverListener*, listener, m_hover_listeners)
     {
         listener->onSelectionChanged(this, emitter->getSelectionIDString(playerID),
                                      emitter->getSelectionText(playerID), playerID);
@@ -802,8 +794,7 @@ void DynamicRibbonWidget::propagateSelection()
         }
 
         // set same selection in all ribbons
-        RibbonWidget* ribbon;
-        for_in( ribbon, m_rows )
+        for_var_in (RibbonWidget*, ribbon, m_rows)
         {
             if (ribbon != selected_ribbon)
             {

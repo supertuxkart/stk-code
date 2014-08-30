@@ -34,6 +34,7 @@
 #include "utils/profiler.hpp"
 #include <IGUIEnvironment.h>
 #include <IGUIContextMenu.h>
+
 using namespace irr;
 using namespace gui;
 
@@ -83,8 +84,7 @@ enum DebugMenuCommand
     DEBUG_TOGGLE_GUI,
     DEBUG_HIDE_KARTS,
     DEBUG_THROTTLE_FPS,
-    DEBUG_TWEAK_SHADER_EXPOSURE,
-    DEBUG_TWEAK_SHADER_LWHITE
+    DEBUG_VISUAL_VALUES,
 };
 
 // -----------------------------------------------------------------------------
@@ -188,10 +188,7 @@ bool onEvent(const SEvent &event)
             sub->addItem(L"Anvil", DEBUG_ATTACHMENT_ANVIL);
             sub->addItem(L"Parachute", DEBUG_ATTACHMENT_PARACHUTE);
 
-            //mnu->addItem(L"Adjust shaders >", -1, true, true);
-            //sub = mnu->getSubMenu(3);
-            //sub->addItem(L"Exposure", DEBUG_TWEAK_SHADER_EXPOSURE);
-            //sub->addItem(L"LWhite", DEBUG_TWEAK_SHADER_LWHITE);
+            mnu->addItem(L"Adjust values", DEBUG_VISUAL_VALUES);
 
             mnu->addItem(L"Profiler",DEBUG_PROFILER);
             if (UserConfigParams::m_profiler_enabled)
@@ -438,13 +435,38 @@ bool onEvent(const SEvent &event)
                             kart->getNode()->setVisible(false);
                     }
                 }
-                else if (cmdID == DEBUG_TWEAK_SHADER_EXPOSURE)
+                else if (cmdID == DEBUG_VISUAL_VALUES)
                 {
-                    new DebugSliderDialog("exposure", "Exposure");
-                }
-                else if (cmdID == DEBUG_TWEAK_SHADER_LWHITE)
-                {
-                    new DebugSliderDialog("lwhite", "LWhite");
+#if !defined(__APPLE__)
+                    DebugSliderDialog *dsd = new DebugSliderDialog();
+                    dsd->setSliderHook( "red_slider", 0, 255, [](){ return irr_driver->getAmbientLight().r * 255.f; },
+                        [](int v){
+                            video::SColorf ambient = irr_driver->getAmbientLight();
+                            ambient.setColorComponentValue(0, v / 255.f);
+                            irr_driver->setAmbientLight(ambient); }
+                    );
+                    dsd->setSliderHook("green_slider", 0, 255, [](){ return irr_driver->getAmbientLight().g * 255.f; },
+                        [](int v){
+                        video::SColorf ambient = irr_driver->getAmbientLight();
+                        ambient.setColorComponentValue(1, v / 255.f);
+                        irr_driver->setAmbientLight(ambient); }
+                    );
+                    dsd->setSliderHook("blue_slider", 0, 255, [](){ return irr_driver->getAmbientLight().b * 255.f; },
+                        [](int v){
+                        video::SColorf ambient = irr_driver->getAmbientLight();
+                        ambient.setColorComponentValue(2, v / 255.f);
+                        irr_driver->setAmbientLight(ambient); }
+                    );
+                    dsd->setSliderHook("ssao_radius", 0, 100, [](){ return irr_driver->getSSAORadius() * 10.f; },
+                        [](int v){irr_driver->setSSAORadius(v / 10.f); }
+                    );
+                    dsd->setSliderHook("ssao_k", 0, 100, [](){ return irr_driver->getSSAOK() * 10.f; },
+                        [](int v){irr_driver->setSSAOK(v / 10.f); }
+                    );
+                    dsd->setSliderHook("ssao_sigma", 0, 100, [](){ return irr_driver->getSSAOSigma() * 10.f; },
+                        [](int v){irr_driver->setSSAOSigma(v / 10.f); }
+                    );
+#endif
                 }
             }
 

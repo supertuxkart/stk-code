@@ -28,6 +28,7 @@
 #include <vector>
 #include <stdexcept>
 
+#include "graphics/rain.hpp"
 #include "modes/world_status.hpp"
 #include "race/highscores.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -162,6 +163,10 @@ protected:
 
     /** Set when the world is online and counts network players. */
     bool m_is_network_world;
+    
+    /** Used to show rain graphical effects. */
+    Rain* m_rain;
+
 
     virtual void  onGo();
     /** Returns true if the race is over. Must be defined by all modes. */
@@ -344,6 +349,9 @@ public:
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
 
     bool isNetworkWorld() const { return m_is_network_world; }
+    
+    /** Returns a pointer to the rain. */
+    Rain* getRain() {return m_rain;}
 };   // World
 
 #endif
