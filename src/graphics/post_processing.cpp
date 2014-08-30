@@ -608,7 +608,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
         if (World::getWorld() != NULL)
             hasgodrays = World::getWorld()->getTrack()->hasGodRays();
 
-        if (isRace && UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
+        if (isRace && UserConfigParams::m_light_shaft && hasgodrays)
         {
             Track* track = World::getWorld()->getTrack();
 

@@ -132,7 +132,7 @@ Track::Track(const std::string &filename)
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
-    m_godrays_energy        = 1.0f;
+    m_godrays_opacity       = 1.0f;
     m_godrays_color         = video::SColor(255, 255, 255, 255);
     m_weather_type          = WEATHER_NONE;
     m_cache_track           = UserConfigParams::m_cache_overworld &&
@@ -442,7 +442,7 @@ void Track::loadTrackInfo()
     m_gravity               = 9.80665f;
     m_smooth_normals        = false;
     m_godrays               = false;
-    m_godrays_energy        = 1.0f;
+    m_godrays_opacity       = 1.0f;
     m_godrays_color         = video::SColor(255, 255, 255, 255);
                               /* ARGB */
     m_fog_color             = video::SColor(255, 77, 179, 230);
@@ -1731,7 +1731,7 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
     if (const XMLNode *node = root->getNode("lightshaft"))
     {
         m_godrays = true;
-        node->get("energy", &m_godrays_energy);
+        node->get("opacity", &m_godrays_opacity);
         node->get("color", &m_godrays_color);
         node->get("xyz", &m_godrays_position);
     }

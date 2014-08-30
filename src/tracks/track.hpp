@@ -386,7 +386,7 @@ private:
 
     bool m_godrays;
     core::vector3df m_godrays_position;
-    float m_godrays_energy;
+    float m_godrays_opacity;
     video::SColor m_godrays_color;
 
     bool m_shadows;
@@ -619,7 +619,7 @@ public:
     bool hasLensFlare() const { return m_lensflare; }
     bool hasGodRays() const { return m_godrays; }
     core::vector3df getGodRaysPosition() const { return m_godrays_position; }
-    float getGodRaysOpacity() const { return m_godrays_energy; }
+    float getGodRaysOpacity() const { return m_godrays_opacity; }
     video::SColor getGodRaysColor() const { return m_godrays_color; }
     bool hasShadows() const { return m_shadows; }
 
