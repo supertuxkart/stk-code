@@ -610,6 +610,8 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
 
         if (isRace && UserConfigParams::m_light_shaft && m_sunpixels > 30 && hasgodrays)
         {
+            Track* track = World::getWorld()->getTrack();
+
             glEnable(GL_DEPTH_TEST);
             // Grab the sky
             out_fbo->Bind();
@@ -617,12 +619,14 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             irr_driver->renderSkybox(camnode);
 
             // Set the sun's color
-            const SColor col = World::getWorld()->getTrack()->getSunColor();
+            const SColor col = track->getGodRaysColor();
             ColorizeProvider * const colcb = (ColorizeProvider *)irr_driver->getCallback(ES_COLORIZE);
             colcb->setColor(col.getRed() / 255.0f, col.getGreen() / 255.0f, col.getBlue() / 255.0f);
 
             // The sun interposer
             STKMeshSceneNode *sun = irr_driver->getSunInterposer();
+            sun->setPosition(track->getGodRaysPosition());
+            sun->updateAbsolutePosition();
             irr_driver->getSceneManager()->drawAll(ESNRP_CAMERA);
             irr_driver->setPhase(GLOW_PASS);
             sun->render();
@@ -637,7 +641,7 @@ FrameBuffer *PostProcessing::render(scene::ICameraSceneNode * const camnode, boo
             renderGaussian3Blur(irr_driver->getFBO(FBO_QUARTER1), irr_driver->getFBO(FBO_QUARTER2));
 
             // Calculate the sun's position in texcoords
-            const core::vector3df pos = sun->getPosition();
+            const core::vector3df pos = track->getGodRaysPosition();
             float ndc[4];
             core::matrix4 trans = camnode->getProjectionMatrix();
             trans *= camnode->getViewMatrix();

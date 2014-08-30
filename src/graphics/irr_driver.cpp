@@ -2437,8 +2437,8 @@ scene::ISceneNode *IrrDriver::addLight(const core::vector3df &pos, float energy,
 
         if (sun)
         {
-            m_sun_interposer->setPosition(pos);
-            m_sun_interposer->updateAbsolutePosition();
+            //m_sun_interposer->setPosition(pos);
+            //m_sun_interposer->updateAbsolutePosition();
 
             m_lensflare->setPosition(pos);
             m_lensflare->updateAbsolutePosition();

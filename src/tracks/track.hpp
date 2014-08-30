@@ -383,7 +383,12 @@ private:
     float m_bloom_threshold;
 
     bool m_lensflare;
+
     bool m_godrays;
+    core::vector3df m_godrays_position;
+    float m_godrays_energy;
+    video::SColor m_godrays_color;
+
     bool m_shadows;
 
     float m_displacement_speed;
@@ -613,6 +618,9 @@ public:
 
     bool hasLensFlare() const { return m_lensflare; }
     bool hasGodRays() const { return m_godrays; }
+    core::vector3df getGodRaysPosition() const { return m_godrays_position; }
+    float getGodRaysOpacity() const { return m_godrays_energy; }
+    video::SColor getGodRaysColor() const { return m_godrays_color; }
     bool hasShadows() const { return m_shadows; }
 
     void addNode(scene::ISceneNode* node) { m_all_nodes.push_back(node); }

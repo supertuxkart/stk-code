@@ -132,6 +132,8 @@ Track::Track(const std::string &filename)
     m_sky_particles         = NULL;
     m_sky_dx                = 0.05f;
     m_sky_dy                = 0.0f;
+    m_godrays_energy        = 1.0f;
+    m_godrays_color         = video::SColor(255, 255, 255, 255);
     m_weather_type          = WEATHER_NONE;
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
@@ -439,6 +441,9 @@ void Track::loadTrackInfo()
     m_fog_height_end        = 100.0f;
     m_gravity               = 9.80665f;
     m_smooth_normals        = false;
+    m_godrays               = false;
+    m_godrays_energy        = 1.0f;
+    m_godrays_color         = video::SColor(255, 255, 255, 255);
                               /* ARGB */
     m_fog_color             = video::SColor(255, 77, 179, 230);
     m_default_ambient_color = video::SColor(255, 120, 120, 120);
@@ -481,7 +486,6 @@ void Track::loadTrackInfo()
     root->get("bloom-threshold",       &m_bloom_threshold);
     root->get("lens-flare",            &m_lensflare);
     root->get("shadows",               &m_shadows);
-    root->get("god-rays",              &m_godrays);
     root->get("displacement-speed",    &m_displacement_speed);
     root->get("caustics-speed",        &m_caustics_speed);
     root->get("color-level-in",        &m_color_inlevel);
@@ -1722,6 +1726,14 @@ void Track::loadTrackModel(bool reverse_track, unsigned int mode_id)
         node->get("fog-end",       &m_fog_end);
         node->get("fog-start-height", &m_fog_height_start);
         node->get("fog-end-height",   &m_fog_height_end);
+    }
+
+    if (const XMLNode *node = root->getNode("lightshaft"))
+    {
+        m_godrays = true;
+        node->get("energy", &m_godrays_energy);
+        node->get("color", &m_godrays_color);
+        node->get("xyz", &m_godrays_position);
     }
 
     loadMainTrack(*root);
