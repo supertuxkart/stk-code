@@ -32,6 +32,7 @@ public:
     virtual ~Rain();
 
     void update(float dt);
+    void playSound();
 };
 
 #endif

@@ -31,12 +31,6 @@ Rain::Rain()
     m_thunder_sound = sfx_manager->createSoundSource("thunder");        
     m_rain_sound = sfx_manager->createSoundSource("rain");
 
-    if (m_rain_sound) 
-    {
-        m_rain_sound->setLoop(true);
-        m_rain_sound->play();
-    }
-
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
 }   // Rain
@@ -71,3 +65,14 @@ void Rain::update(float dt)
         m_next_lightning = 35 + (float)g.get(35);
     }
 }   // update
+
+// ----------------------------------------------------------------------------
+
+void Rain::playSound()
+{
+     if (m_rain_sound) 
+    {
+        m_rain_sound->setLoop(true);
+        m_rain_sound->play();
+    }   
+}

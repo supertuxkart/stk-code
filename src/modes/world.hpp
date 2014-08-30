@@ -348,6 +348,9 @@ public:
     void setNetworkWorld(bool is_networked) { m_is_network_world = is_networked; }
 
     bool isNetworkWorld() const { return m_is_network_world; }
+    
+    /** Returns a pointer to the rain. */
+    Rain* getRain() {return m_rain;}
 };   // World
 
 #endif

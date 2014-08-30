@@ -130,10 +130,17 @@ void WorldStatus::update(const float dt)
         case SETUP_PHASE:
             m_auxiliary_timer = 0.0f;
             m_phase = TRACK_INTRO_PHASE;
+            
             if (m_play_racestart_sounds)
             {
                 m_track_intro_sound->play();
             }
+
+            if (World::getWorld()->getRain() != NULL)
+            {
+                 World::getWorld()->getRain()->playSound();
+            }
+
             return;
         case TRACK_INTRO_PHASE:
             m_auxiliary_timer += dt;
