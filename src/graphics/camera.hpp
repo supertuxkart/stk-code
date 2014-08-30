@@ -41,7 +41,6 @@ namespace irr
 using namespace irr;
 
 class AbstractKart;
-class Rain;
 
 /**
   * \brief Handles the game camera
@@ -119,10 +118,6 @@ private:
 
     /** List of all cameras. */
     static std::vector<Camera*> m_all_cameras;
-
-    /** Used to show rain graphical effects. */
-    Rain *m_rain;
-
 
     /** A class that stores information about the different end cameras
      *  which can be specified in the scene.xml file. */
