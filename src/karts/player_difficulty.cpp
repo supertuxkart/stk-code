@@ -32,8 +32,8 @@ PlayerDifficulty::PlayerDifficulty(const std::string &filename)
 {
     // Set all other values to undefined, so that it can later be tested
     // if everything is defined properly.
-    m_mass = m_brake_factor = m_rescue_time = m_explosion_time =
-        m_explosion_invulnerability_time = m_zipper_time =
+    m_mass = m_brake_factor = m_brake_time_increase = m_rescue_time =
+        m_explosion_time = m_explosion_invulnerability_time = m_zipper_time =
         m_zipper_fade_out_time = m_zipper_force = m_zipper_speed_gain =
         m_zipper_max_speed_increase = m_rubber_band_max_length =
         m_rubber_band_force = m_rubber_band_duration =
@@ -102,10 +102,11 @@ void PlayerDifficulty::getAllData(const XMLNode * root)
 
     if(const XMLNode *engine_node = root->getNode("engine"))
     {
-        engine_node->get("brake-factor", &m_brake_factor);
+        engine_node->get("brake-factor",            &m_brake_factor);
+        engine_node->get("brake-time-increase",     &m_brake_time_increase);
         engine_node->get("max-speed-reverse-ratio", &m_max_speed_reverse_ratio);
-        engine_node->get("power", &m_engine_power);
-        engine_node->get("max-speed", &m_max_speed);
+        engine_node->get("power",                   &m_engine_power);
+        engine_node->get("max-speed",               &m_max_speed);
     }
 
     if(const XMLNode *nitro_node = root->getNode("nitro"))

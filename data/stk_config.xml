@@ -342,7 +342,7 @@
     <difficulties>
         <easiest>
             <mass value="1.0"/>
-            <engine brake-factor="2.5" max-speed-reverse-ratio="1.0" power="1.5" max-speed="1.5"/>
+            <engine brake-factor="2.5" brake-time-increase="1.5" max-speed-reverse-ratio="1.0" power="1.5" max-speed="1.5"/>
             <nitro consumption="0.7" max-speed-increase="1.3" duration="1.0" fade-out-time="1.0"/>
             <bubblegum time="0.5" speed-fraction="0.5" torque="0.5" fade-in-time="1.0"/>
             <rescue time="0.5"/>
@@ -359,7 +359,7 @@
         </easiest>
         <easy>
             <mass value="1.0"/>
-            <engine brake-factor="1.7" max-speed-reverse-ratio="1.0" power="1.2" max-speed="1.2"/>
+            <engine brake-factor="1.7" brake-time-increase="1.2" max-speed-reverse-ratio="1.0" power="1.2" max-speed="1.2"/>
             <nitro consumption="0.9" max-speed-increase="1.1" duration="1.0" fade-out-time="1.0"/>
             <bubblegum time="0.7" speed-fraction="0.7" torque="0.7" fade-in-time="1.0"/>
             <rescue time="0.7"/>
@@ -376,7 +376,7 @@
         </easy>
         <normal>
             <mass value="1.0"/>
-            <engine brake-factor="1.0" max-speed-reverse-ratio="1.0" power="1.0" max-speed="1.0"/>
+            <engine brake-factor="1.0" brake-time-increase="1.0" max-speed-reverse-ratio="1.0" power="1.0" max-speed="1.0"/>
             <nitro consumption="1.0" max-speed-increase="1.0" duration="1.0" fade-out-time="1.0"/>
             <bubblegum time="1.0" speed-fraction="1.0" torque="1.0" fade-in-time="1.0"/>
             <rescue time="1.0"/>
@@ -393,7 +393,7 @@
         </normal>
         <hard>
             <mass value="1.0"/>
-            <engine brake-factor="0.8" max-speed-reverse-ratio="0.8" power="0.8" max-speed="0.8"/>
+            <engine brake-factor="0.8" brake-time-increase="0.85" max-speed-reverse-ratio="0.8" power="0.8" max-speed="0.8"/>
             <nitro consumption="1.1" max-speed-increase="0.9" duration="1.0" fade-out-time="1.0"/>
             <bubblegum time="1.5" speed-fraction="1.5" torque="1.5" fade-in-time="1.0"/>
             <rescue time="1.5"/>
@@ -410,7 +410,7 @@
         </hard>
         <hardest>
             <mass value="1.0"/>
-            <engine brake-factor="0.5" max-speed-reverse-ratio="0.6" power="0.6" max-speed="0.6"/>
+            <engine brake-factor="0.5" brake-time-increase="0.7" max-speed-reverse-ratio="0.6" power="0.6" max-speed="0.6"/>
             <nitro consumption="1.2" max-speed-increase="0.8" duration="1.0" fade-out-time="1.0"/>
             <bubblegum time="2.0" speed-fraction="2.0" torque="2.0" fade-in-time="1.0"/>
             <rescue time="2.0"/>

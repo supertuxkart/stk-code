@@ -52,6 +52,10 @@ private:
     /** Braking factor * engine_power braking force. */
     float m_brake_factor;
 
+    /** Brake_time * m_brake_time_increase will increase the break time
+     * over time. */
+    float m_brake_time_increase;
+
     /** Time a kart is moved upwards after when it is rescued. */
     float m_rescue_time;
 
@@ -166,9 +170,14 @@ public:
     // ------------------------------------------------------------------------
     /** Returns the maximum engine power depending on difficulty. */
     float getMaxPower               () const {return m_engine_power;          }
+
     // ------------------------------------------------------------------------
     /** Get braking information. */
     float getBrakeFactor            () const {return m_brake_factor;          }
+
+    // ------------------------------------------------------------------------
+    /** Returns the additional brake factor which depends on time. */
+    float getBrakeTimeIncrease() const { return m_brake_time_increase; }
 
     // ------------------------------------------------------------------------
     /** Get maximum reverse speed ratio. */
