@@ -197,10 +197,10 @@ void World::init()
 
     powerup_manager->updateWeightsForRace(num_karts);
     
-    if (UserConfigParams::m_weather_effects && 
-        m_track->getWeatherType() == WEATHER_RAIN)
+    if (UserConfigParams::m_weather_effects)
     {
-        m_rain = new Rain();
+        m_rain = new Rain(m_track->getWeatherLightning(), 
+                          m_track->getWeatherSound());
     }
 }   // init
 

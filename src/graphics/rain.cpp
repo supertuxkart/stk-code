@@ -26,10 +26,21 @@
 
 // The rain manager
 
-Rain::Rain()
+Rain::Rain(bool lightning, std::string sound)
 {
-    m_thunder_sound = sfx_manager->createSoundSource("thunder");        
-    m_rain_sound = sfx_manager->createSoundSource("rain");
+    m_lightning = lightning;
+    m_thunder_sound = NULL;
+    m_weather_sound = NULL;
+    
+    if (m_lightning)
+    {
+        m_thunder_sound = sfx_manager->createSoundSource("thunder");        
+    }
+
+    if (sound != "")
+    {
+        m_weather_sound = sfx_manager->createSoundSource(sound);
+    }
 
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
@@ -42,27 +53,35 @@ Rain::~Rain()
     if (m_thunder_sound != NULL) 
         sfx_manager->deleteSFX(m_thunder_sound);
         
-    if (m_rain_sound != NULL) 
-        sfx_manager->deleteSFX(m_rain_sound);
+    if (m_weather_sound != NULL) 
+        sfx_manager->deleteSFX(m_weather_sound);
 }
 
 // ----------------------------------------------------------------------------
 
 void Rain::update(float dt)
 {
-    m_next_lightning -= dt;
-
-    if (m_next_lightning < 0.0f)
+    if (m_lightning)
     {
-        RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
-        if (gui_base != NULL)
+        m_next_lightning -= dt;
+    
+        if (m_next_lightning < 0.0f)
         {
-            gui_base->doLightning();
-            if (m_thunder_sound) m_thunder_sound->play();
-        }
+            RaceGUIBase* gui_base = World::getWorld()->getRaceGUI();
 
-        RandomGenerator g;
-        m_next_lightning = 35 + (float)g.get(35);
+            if (gui_base != NULL)
+            {
+                gui_base->doLightning();
+
+                if (m_thunder_sound) 
+                {
+                    m_thunder_sound->play();
+                }
+            }
+    
+            RandomGenerator g;
+            m_next_lightning = 35 + (float)g.get(35);
+        }
     }
 }   // update
 
@@ -70,9 +89,9 @@ void Rain::update(float dt)
 
 void Rain::playSound()
 {
-     if (m_rain_sound) 
+    if (m_weather_sound) 
     {
-        m_rain_sound->setLoop(true);
-        m_rain_sound->play();
+        m_weather_sound->setLoop(true);
+        m_weather_sound->play();
     }   
 }

@@ -23,12 +23,14 @@ class SFXBase;
 
 class Rain
 {
+    bool m_lightning;
     float m_next_lightning;
+
     SFXBase* m_thunder_sound;
-    SFXBase* m_rain_sound;
+    SFXBase* m_weather_sound;
 
 public:
-    Rain();
+    Rain(bool lightning, std::string sound);
     virtual ~Rain();
 
     void update(float dt);

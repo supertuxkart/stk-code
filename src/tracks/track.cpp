@@ -134,7 +134,8 @@ Track::Track(const std::string &filename)
     m_sky_dy                = 0.0f;
     m_godrays_opacity       = 1.0f;
     m_godrays_color         = video::SColor(255, 255, 255, 255);
-    m_weather_type          = WEATHER_NONE;
+    m_weather_lightning      = false;
+    m_weather_sound         = "";
     m_cache_track           = UserConfigParams::m_cache_overworld &&
                               m_ident=="overworld";
     m_minimap_x_scale       = 1.0f;
@@ -2101,31 +2102,15 @@ void Track::loadObjects(const XMLNode* root, const std::string& path, ModelDefin
         else if (name == "weather")
         {
             std::string weather_particles;
-            std::string weather_type;
+
             node->get("particles", &weather_particles);
-            node->get("type", &weather_type);
+            node->get("lightning", &m_weather_lightning);
+            node->get("sound", &m_weather_sound);
 
             if (weather_particles.size() > 0)
             {
-                if (weather_particles == "rain.xml")
-                {
-                    m_weather_type = WEATHER_RAIN;
-                }
-
                 m_sky_particles =
                     ParticleKindManager::get()->getParticles(weather_particles);
-            }
-            else if (weather_type.size() > 0)
-            {
-                if (weather_type == "rain")
-                {
-                    m_weather_type = WEATHER_RAIN;
-                }
-                else
-                {
-                    Log::error("track", "Unknown weather type : '%s'",
-                               weather_type.c_str());
-                }
             }
             else
             {

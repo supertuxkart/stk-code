@@ -62,12 +62,6 @@ class XMLNode;
 
 const int HEIGHT_MAP_RESOLUTION = 256;
 
-enum WeatherType
-{
-    WEATHER_NONE,
-    WEATHER_RAIN
-};
-
 struct OverworldForceField
 {
     core::vector3df m_position;
@@ -310,7 +304,8 @@ private:
     ParticleKind*            m_sky_particles;
 
     /** Use a special built-in wheather */
-    WeatherType              m_weather_type;
+    bool                     m_weather_lightning;
+    std::string              m_weather_sound;
 
     /** A simple class to keep information about a track mode. */
     class TrackMode
@@ -566,7 +561,9 @@ public:
     unsigned int getNumberOfStartPositions() const
                                           { return m_start_transforms.size(); }
     // ------------------------------------------------------------------------
-    WeatherType   getWeatherType          () const { return m_weather_type; }
+    bool getWeatherLightning() {return m_weather_lightning;}
+    // ------------------------------------------------------------------------
+    std::string getWeatherSound() {return m_weather_sound;}
     // ------------------------------------------------------------------------
     ParticleKind* getSkyParticles         () { return m_sky_particles; }
     // ------------------------------------------------------------------------
