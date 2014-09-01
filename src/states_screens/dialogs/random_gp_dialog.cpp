@@ -143,7 +143,7 @@ GUIEngine::EventPropagation RandomGPInfoDialog::processEvent(
         // Save GP data, since dismiss will delete this object.
         GrandPrixData gp = m_gp;
         ModalDialog::dismiss();
-        race_manager->startGP(&gp, false, false);
+        race_manager->startGP(gp, false, false);
         return GUIEngine::EVENT_BLOCK;
     }
     else if (eventSource == "Number of tracks")

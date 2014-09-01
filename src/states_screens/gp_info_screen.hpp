@@ -21,32 +21,36 @@
 #define HEADER_GP_INFO_SCREEN_HPP
 
 #include "guiengine/screen.hpp"
+#include "race/grand_prix_data.hpp"
 
 class GrandPrixData;
 
 namespace GUIEngine
 {
     class IconButtonWidget;
+    class SpinnerWidget;
 }
 
 /**
  * \brief Dialog that shows information about a specific grand prix
  * \ingroup states_screens
  */
-class GPInfoScreen : public GUIEngine::Screen,
-                     public GUIEngine::ScreenSingleton<GPInfoScreen>
+class BaseGPInfoScreen : public GUIEngine::Screen
 {
-protected: // Necessary for RandomGPInfoScreen
+private:
+    GUIEngine::SpinnerWidget *m_group_spinner;
+    GUIEngine::SpinnerWidget *m_reverse_spinner;
+    GUIEngine::SpinnerWidget *m_num_tracks_spinner;
+
+    /** The currently selected group name. */
+    std::string m_group_name;
+
+protected: // Necessary for RandomBaseGPInfoScreen
     GUIEngine::IconButtonWidget* m_screenshot_widget;
     float m_curr_time;
 
     /** The grand prix data. */
-    GrandPrixData *m_gp;
-
-    /** height of the separator over the body */
-    int m_over_body;
-    /** height of the seperator over the buttons */
-    int m_lower_bound;
+    GrandPrixData m_gp;
 
     /** \brief display all the tracks according to the current gp
      * For a normal gp info dialog, it just creates a label for every track.
@@ -54,12 +58,14 @@ protected: // Necessary for RandomGPInfoScreen
      * labels as possible by just changing their text. */
     void addTracks();
     void addScreenshot();
+    void updateRandomGP();
+    GrandPrixData::GPReverseType getReverse() const;
 
 public:
-    GPInfoScreen();
+    BaseGPInfoScreen(const std::string &name);
     /** Places the focus back on the selected GP, in the case that the dialog
      * was cancelled and we're returning to the track selection screen */
-    virtual ~GPInfoScreen();
+    virtual ~BaseGPInfoScreen();
 
     void onEnterPressedInternal();
     virtual void eventCallback(GUIEngine::Widget *, const std::string &name,
@@ -70,6 +76,28 @@ public:
     virtual void onUpdate(float dt);
 
     void setGP(const std::string &gp_ident);
-};
+};   // BaseGPInfoScreen
+
+// ============================================================================
+class GPInfoScreen: public BaseGPInfoScreen,
+                    public GUIEngine::ScreenSingleton<GPInfoScreen>
+{
+private:
+    GPInfoScreen() : BaseGPInfoScreen("gp_info.stkgui")
+    {};
+public:
+    friend class GUIEngine::ScreenSingleton<GPInfoScreen>;
+};   // class GPInfoScreen
+
+// ============================================================================
+class RandomGPInfoScreen: public BaseGPInfoScreen,
+                          public GUIEngine::ScreenSingleton<RandomGPInfoScreen>
+{
+private:
+    RandomGPInfoScreen() : BaseGPInfoScreen("random_gp_info.stkgui")
+    {};
+public:
+    friend class GUIEngine::ScreenSingleton<RandomGPInfoScreen>;
+};   // class RandomGPInfoScreen
 
 #endif

@@ -8,7 +8,7 @@
 
         <spacer width="1" height="5%"/>
 
-        <box width="95%" height="50%" padding="10" layout="horizontal-row">
+        <box width="95%" height="40%" padding="10" layout="horizontal-row">
             <spacer width="10" height="100%"/>
             <!-- Left pane -->
             <div width="45%" height="95%" align="center" layout="vertical-row">
@@ -25,37 +25,35 @@
 
         </box>
         <spacer width="1" height="3%"/>
-        <box width="95%" height="17%" padding="10" layout="horizontal-row">
+        <box width="95%" height="30%" padding="10" layout="horizontal-row">
             <spacer width="1" height="5%"/>
             <div width="50%" height="100%" layout="vertical-row">
 
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="ai-text" height="100%" width="40%" I18N="Number of AI karts" text="AI karts"/>
-                    <spinner id="ai-spinner" width="40%" min_value="1" max_value="20" align="center"
+                    <label id="ai-text" height="100%" width="50%" I18N="Number of AI karts" text="AI karts"/>
+                    <spinner id="ai-spinner" width="50%" min_value="1" max_value="20" align="center"
                              wrap_around="true" />
-                    <spacer proportion="1" height="2" />
                 </div>
+                <spacer height="5%" />
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="reverse-text" height="100%" width="40%" I18N="Drive the track reverse" text="Reverse"/>
+                    <label id="reverse-text"      width="50%" height="100%" I18N="Drive the track reverse" text="Reverse"/>
                     <spinner id="reverse-spinner" width="50%" align="center" wrap_around="true" />
-                    <spacer proportion="1" height="2" />
                 </div>
-            </div>
-            <div width="50%" height="100%" layout="vertical-row">
-                <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="track-text" height="100%" width="50%"  text="Tracks"
+                <spacer height="5%" />
+                <div width="100%" height="fit" layout="horizontal-row">
+                    <label id="track-text" width="50%" height="100%" text="Tracks"
                            I18N="Number of tracks to pick in a random Grand Prix."/>
                     <spinner id="track-spinner" width="50%" min_value="1" max_value="20" align="center"
                              wrap_around="true" />
-                    <spacer proportion="1" height="2" />
+                    <spacer height="1%" />
                 </div>
+                <spacer height="5%" />
                 <div width="100%" height="fit" layout="horizontal-row" >
-                    <label id="group-text" height="100%" width="50%" I18N="Number of AI karts" text="Track group"/>
+                    <label   id="group-text"    width="50%" height="100%" I18N="Number of AI karts" text="Track group"/>
                     <spinner id="group-spinner" width="50%" align="center" wrap_around="true" />
                     <spacer proportion="1" height="2" />
                 </div>
             </div>
-            <spacer width="1" height="2%"/>
         </box>
         <spacer width="1" height="2%"/>
         <buttonbar id="buttons" height="15%" width="100%" align="center">

@@ -116,7 +116,11 @@ void TracksScreen::eventCallback(Widget* widget, const std::string& name,
         else
         {
             if (selection == "Random Grand Prix")
-                new RandomGPInfoDialog();
+            {
+                RandomGPInfoScreen *gpis = RandomGPInfoScreen::getInstance();
+                gpis->setGP("random");
+                StateManager::get()->pushScreen(gpis);
+            }
             else
             {
                 GPInfoScreen *gpis = GPInfoScreen::getInstance();

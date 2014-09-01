@@ -254,7 +254,7 @@ void GPInfoDialog::onEnterPressedInternal()
     ModalDialog::dismiss();
     // Disable accidentally unlocking of a challenge
     PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
-    race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false, false);
+    race_manager->startGP(*grand_prix_manager->getGrandPrix(gp_id), false, false);
 }
 
 // ----------------------------------------------------------------------------
@@ -270,8 +270,8 @@ GUIEngine::EventPropagation GPInfoDialog::processEvent(const std::string& event_
         // becomes invalid!
         std::string save_source = event_source;
         ModalDialog::dismiss();
-        race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false,
-                              (save_source == "continue"));
+        //race_manager->startGP(grand_prix_manager->getGrandPrix(gp_id), false,
+        //                      (save_source == "continue"));
         return GUIEngine::EVENT_BLOCK;
     }
 
