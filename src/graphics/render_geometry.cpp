@@ -210,6 +210,8 @@ void renderInstancedMeshes1stPass(const std::vector<TexUnit> &TexUnits, std::vec
 }
 
 static GLsync m_sync;
+
+#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void multidraw1stPass(Args...args)
 {
@@ -224,6 +226,7 @@ void multidraw1stPass(Args...args)
             sizeof(DrawElementsIndirectCommand));
     }
 }
+#endif
 
 
 void IrrDriver::renderSolidFirstPass()
@@ -442,6 +445,7 @@ void renderInstancedMeshes2ndPass(const std::vector<TexUnit> &TexUnits, std::vec
     }
 }
 
+#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
 {
@@ -457,6 +461,7 @@ void multidraw2ndPass(const std::vector<uint64_t> &Handles, Args... args)
             sizeof(DrawElementsIndirectCommand));
     }
 }
+#endif
 
 
 void IrrDriver::renderSolidSecondPass()
@@ -910,6 +915,8 @@ void renderInstancedShadow(const std::vector<GLuint> TextureUnits, unsigned casc
     }
 }
 
+
+#ifdef Multi_Draw_Indirect
 template<typename Shader, MeshMaterial Mat, video::E_VERTEX_TYPE VT, typename...Args>
 static void multidrawShadow(unsigned i, Args ...args)
 {
@@ -921,6 +928,7 @@ static void multidrawShadow(unsigned i, Args ...args)
         glMultiDrawElementsIndirect(GL_TRIANGLES, GL_UNSIGNED_SHORT, (const void*)(ShadowPassCmd::getInstance()->Offset[i][Mat] * sizeof(DrawElementsIndirectCommand)), ShadowPassCmd::getInstance()->Size[i][Mat], sizeof(DrawElementsIndirectCommand));
     }
 }
+#endif
 
 void IrrDriver::renderShadows()
 {
