@@ -507,6 +507,16 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
 
     newPlayerWidget->add();
 
+    // Add badge for per player difficulty if necessary
+    if (!m_from_overworld && (m_multiplayer || !profile_to_use->isSingleplayerDifficulty()))
+    {
+        PerPlayerDifficulty difficulty = profile_to_use->getDifficulty();
+        if (difficulty < PLAYER_DIFFICULTY_NORMAL)
+            m_kart_widgets[new_player_id].m_model_view->setBadge(ZIPPER_BADGE);
+        else if (difficulty > PLAYER_DIFFICULTY_NORMAL)
+            m_kart_widgets[new_player_id].m_model_view->setBadge(ANCHOR_BADGE);
+    }
+
     // ---- Divide screen space among all karts
     const int amount = m_kart_widgets.size();
     Widget* fullarea = getWidget("playerskarts");
@@ -1179,6 +1189,10 @@ void KartSelectionScreen::allPlayersDone()
         // std::cout << "selection=" << selection.c_str() << std::endl;
 
         race_manager->setLocalKartInfo(n, selected_kart);
+        // Set per player difficulty if needed
+        const PlayerProfile* profile = StateManager::get()->getActivePlayerProfile(n);
+        if (!m_from_overworld && (m_multiplayer || !profile->isSingleplayerDifficulty()))
+            race_manager->setPlayerDifficulty(n, profile->getDifficulty());
     }
 
     // ---- Switch to assign mode

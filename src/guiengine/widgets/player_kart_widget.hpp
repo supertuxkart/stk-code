@@ -53,7 +53,6 @@ namespace GUIEngine
         int model_x, model_y, model_w, model_h;
         int kart_name_x, kart_name_y, kart_name_w, kart_name_h;
         int m_kart_stats_x, m_kart_stats_y, m_kart_stats_w, m_kart_stats_h;
-        int m_difficulty_x, m_difficulty_y, m_difficulty_w, m_difficulty_h;
 
         /** A reserved ID for this widget if any, -1 otherwise.  (If no ID is
          *  reserved, widget will not be in the regular tabbing order */
@@ -85,7 +84,6 @@ namespace GUIEngine
 
         /** Sub-widgets created by this widget */
         PlayerNameSpinner* m_player_ident_spinner;
-        SpinnerWidget* m_difficulty;
         KartStatsWidget* m_kart_stats;
         ModelViewWidget* m_model_view;
         LabelWidget* m_kart_name;

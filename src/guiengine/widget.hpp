@@ -60,19 +60,23 @@ namespace GUIEngine
     enum BadgeType
     {
         /** display a lock on the widget, to mean a certain game feature is locked */
-        LOCKED_BADGE = 1,
+        LOCKED_BADGE   = 1,
         /** display a green check on a widget, useful e.g. to display confirmation */
-        OK_BADGE     = 2,
+        OK_BADGE       = 1 << 1,
         /** display a red mark badge on the widget, useful e.g. to warn of an invalid choice */
-        BAD_BADGE    = 4,
+        BAD_BADGE      = 1 << 2,
         /** display a trophy badge on the widget, useful e.g. for challenges */
-        TROPHY_BADGE = 8,
+        TROPHY_BADGE   = 1 << 3,
         /** A gamepad icon */
-        GAMEPAD_BADGE = 16,
+        GAMEPAD_BADGE  = 1 << 4,
         /** A keyboard icon */
-        KEYBOARD_BADGE = 32,
+        KEYBOARD_BADGE = 1 << 5,
         /** An hourglass badge to indicate loading */
-        LOADING_BADGE = 64
+        LOADING_BADGE  = 1 << 6,
+        /** A zipper badge to indicate that this player receives a boost */
+        ZIPPER_BADGE   = 1 << 7,
+        /** A anchor badge to indicate that this player receives a handicap */
+        ANCHOR_BADGE   = 1 << 8
     };
 
 

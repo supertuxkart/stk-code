@@ -307,7 +307,8 @@ void RaceManager::startNew(bool from_overworld)
     // Create the kart status data structure to keep track of scores, times, ...
     // ==========================================================================
     m_kart_status.clear();
-    Log::verbose("RaceManager", "Nb of karts=%u, ai:%lu players:%lu\n", (unsigned int)m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
+    Log::verbose("RaceManager", "Nb of karts=%u, ai:%lu players:%lu\n",
+        (unsigned int) m_num_karts, m_ai_kart_list.size(), m_player_karts.size());
 
     assert((unsigned int)m_num_karts == m_ai_kart_list.size()+m_player_karts.size());
     // First add the AI karts (randomly chosen)

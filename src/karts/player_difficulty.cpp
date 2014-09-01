@@ -26,7 +26,7 @@
 #include "utils/log.hpp"
 
 /**
- * The constructor initialises all values with default values (mostly 1).
+ * The constructor initialises all values with default values.
  */
 PlayerDifficulty::PlayerDifficulty(const std::string &filename)
 {

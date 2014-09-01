@@ -25,7 +25,7 @@
             <div width="80%" align="center" layout="vertical-row" height="fit">
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label proportion="1" height="100%" text_align="left" I18N="In the user screen" text="Multiplayer Boost/Handicap"/>
-                    <gauge id="difficulty" min_value="1" max_value="5" width="300" align="center" />
+                    <gauge id="difficulty" min_value="0" max_value="4" width="300" align="center" />
                 </div>
                 <div width="100%" height="fit" layout="horizontal-row" >
                     <label proportion="1" height="100%" text_align="left" I18N="In the user screen" text="Apply Boost/Handicap in singleplayer too"/>

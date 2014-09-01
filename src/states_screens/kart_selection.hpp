@@ -48,7 +48,6 @@ class KartSelectionScreen : public GUIEngine::Screen
     friend class KartHoverListener;
     friend class PlayerNameSpinner;
     friend class FocusDispatcher;
-    friend class FocusDispatcher2;
 protected:
     /** Contains the custom widget shown for every player. (ref only since
      *  we're adding them to a Screen, and the Screen will take ownership
@@ -195,14 +194,6 @@ public:
 
     virtual GUIEngine::EventPropagation focused(const int playerID);
 };   // FocusDispatcher
-
-class FocusDispatcher2 : public FocusDispatcher
-{
-public:
-	FocusDispatcher2(KartSelectionScreen *parent);
-
-	virtual GUIEngine::EventPropagation focused(const int playerID);
-};
 
 //!----------------------------------------------------------------------------
 //! KartHoverListener :

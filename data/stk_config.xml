@@ -338,7 +338,9 @@
     </ai>
 
     <!-- The per-player difficulties in multiplayer games.
-         These values are multiplied with the current values of a car. -->
+         These values are multiplied with the current values of a car
+         so 1 means that nothing changes.
+         The meaning of the different values is explained below this tag. -->
     <difficulties>
         <easiest>
             <mass value="1.0"/>

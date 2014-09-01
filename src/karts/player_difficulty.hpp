@@ -27,12 +27,10 @@
 class XMLNode;
 
 /**
- *  \brief This class stores the properties of a kart.
- *  This includes size, name, identifier, physical properties etc.
- *  It is atm also the base class for STKConfig, which stores the default values
- *  for all physics constants.
- *  Note that KartProperies is copied (when setting the default values from
- *  stk_config.
+ * \brief This class stores values that modify the properties of a kart.
+ * This includes physical properties like speed and the effect of items.
+ * The values stored in this class get multiplied with the current
+ * properties of the kart. If all values here are set to 1, nothing changes.
  *
  * \ingroup karts
  */
@@ -161,8 +159,8 @@ private:
 
 
 public:
-          PlayerDifficulty  (const std::string &filename="");
-         ~PlayerDifficulty  ();
+    PlayerDifficulty  (const std::string &filename="");
+    ~PlayerDifficulty  ();
     void  getAllData        (const XMLNode * root);
     std::string getIdent() const;
     float getStartupBoost   () const;

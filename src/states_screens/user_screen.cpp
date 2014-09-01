@@ -59,6 +59,17 @@ void BaseUserScreen::loadedFromFile()
 
 void BaseUserScreen::init()
 {
+    m_difficulty = getWidget<SpinnerWidget>("difficulty");
+    assert(m_difficulty);
+    m_difficulty->clearLabels();
+    m_difficulty->addLabel(_("Big boost"));
+    m_difficulty->addLabel(_("Boost"));
+    m_difficulty->addLabel(_("Normal"));
+    m_difficulty->addLabel(_("Handicap"));
+    m_difficulty->addLabel(_("Big handicap"));
+
+    m_singleplayer_difficulty = getWidget<CheckBoxWidget>("singleplayer-difficulty");
+    assert(m_singleplayer_difficulty);
     m_online_cb = getWidget<CheckBoxWidget>("online");
     assert(m_online_cb);
     m_username_tb = getWidget<TextBoxWidget >("username");
@@ -155,23 +166,15 @@ void BaseUserScreen::selectUser(int index)
     m_players->setSelection(StringUtils::toString(index), PLAYER_ID_GAME_MASTER,
                             /*focusIt*/ true);
 
-    // Last game was not online, so make the offline settings the default
-    // (i.e. unckeck online checkbox, and make entry fields invisible).
-    
-    if (!profile->wasOnlineLastTime() || profile->getLastOnlineName() == "")
-    {
-        m_online_cb->setState(false);
-        makeEntryFieldsVisible();
-        return;
-    }
-
-    // Now last use was with online --> Display the saved data
-    m_online_cb->setState(true);
+    // Display the saved data if the user was online last time and change the visibility
+    m_difficulty->setValue(profile->getDifficulty());
+    m_singleplayer_difficulty->setState(profile->isSingleplayerDifficulty());
+    m_online_cb->setState(profile->wasOnlineLastTime() && profile->getLastOnlineName().size() > 0);
     makeEntryFieldsVisible();
     m_username_tb->setText(profile->getLastOnlineName());
     getWidget<CheckBoxWidget>("remember-user")->setState(
         profile->rememberPassword());
-    if(profile->getLastOnlineName().size()>0)
+    if(profile->getLastOnlineName().size() > 0)
         m_username_tb->setDeactivated();
     else
         m_username_tb->setActivated();
@@ -352,6 +355,10 @@ void BaseUserScreen::login()
     }
     PlayerManager::get()->setCurrentPlayer(player);
     assert(player);
+
+    // Save difficulty
+    player->setDifficulty((PerPlayerDifficulty) m_difficulty->getValue());
+    player->setSingleplayerDifficulty(m_singleplayer_difficulty->getState());
 
     // If no online login requested, log the player out (if necessary)
     // and go to the main menu screen (though logout needs to finish first)

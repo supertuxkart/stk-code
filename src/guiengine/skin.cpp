@@ -2082,6 +2082,20 @@ void Skin::drawBadgeOn(const Widget* widget, const core::recti& rect)
                                                           "hourglass.png");
         doDrawBadge(texture, rect, max_icon_size, true);
     }
+    if (widget->m_badges & ZIPPER_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::MODEL,
+                                                          "zipper_collect.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
+    if (widget->m_badges & ANCHOR_BADGE)
+    {
+        float max_icon_size = 0.43f;
+        video::ITexture* texture = irr_driver->getTexture(FileManager::MODEL,
+                                                          "anchor-icon.png");
+        doDrawBadge(texture, rect, max_icon_size, false);
+    }
 }   // drawBadgeOn
 
 // -----------------------------------------------------------------------------
