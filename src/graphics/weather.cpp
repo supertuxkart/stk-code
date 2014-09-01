@@ -18,15 +18,15 @@
 
 #include "audio/sfx_base.hpp"
 #include "audio/sfx_manager.hpp"
-#include "graphics/rain.hpp"
+#include "graphics/weather.hpp"
 #include "modes/world.hpp"
 #include "states_screens/race_gui.hpp"
 #include "utils/random_generator.hpp"
 
 
-// The rain manager
+// The weather manager
 
-Rain::Rain(bool lightning, std::string sound)
+Weather::Weather(bool lightning, std::string sound)
 {
     m_lightning = lightning;
     m_thunder_sound = NULL;
@@ -44,11 +44,11 @@ Rain::Rain(bool lightning, std::string sound)
 
     RandomGenerator g;
     m_next_lightning = (float)g.get(35);
-}   // Rain
+}   // Weather
 
 // ----------------------------------------------------------------------------
 
-Rain::~Rain()
+Weather::~Weather()
 {
     if (m_thunder_sound != NULL) 
         sfx_manager->deleteSFX(m_thunder_sound);
@@ -59,7 +59,7 @@ Rain::~Rain()
 
 // ----------------------------------------------------------------------------
 
-void Rain::update(float dt)
+void Weather::update(float dt)
 {
     if (m_lightning)
     {
@@ -87,7 +87,7 @@ void Rain::update(float dt)
 
 // ----------------------------------------------------------------------------
 
-void Rain::playSound()
+void Weather::playSound()
 {
     if (m_weather_sound) 
     {

@@ -121,7 +121,7 @@ World::World() : WorldStatus(), m_clear_color(255,100,101,140)
     m_self_destruct      = false;
     m_schedule_tutorial  = false;
     m_is_network_world   = false;
-    m_rain               = NULL;
+    m_weather            = NULL;
 
     m_stop_music_when_dialog_open = true;
 
@@ -199,7 +199,7 @@ void World::init()
     
     if (UserConfigParams::m_weather_effects)
     {
-        m_rain = new Rain(m_track->getWeatherLightning(), 
+        m_weather = new Weather(m_track->getWeatherLightning(), 
                           m_track->getWeatherSound());
     }
 }   // init
@@ -383,8 +383,8 @@ World::~World()
         delete m_race_gui;
     }
     
-    if (m_rain != NULL)
-        delete m_rain;
+    if (m_weather != NULL)
+        delete m_weather;
 
     for ( unsigned int i = 0 ; i < m_karts.size() ; i++ )
         delete m_karts[i];
@@ -935,9 +935,9 @@ void World::update(float dt)
         Camera::getCamera(i)->update(dt);
     }
     
-    if (UserConfigParams::m_graphical_effects && m_rain)
+    if (UserConfigParams::m_graphical_effects && m_weather)
     {
-        m_rain->update(dt);
+        m_weather->update(dt);
     }
 
     projectile_manager->update(dt);

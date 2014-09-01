@@ -140,9 +140,9 @@ void WorldStatus::update(const float dt)
                 m_track_intro_sound->play();
             }
 
-            if (World::getWorld()->getRain() != NULL)
+            if (World::getWorld()->getWeather() != NULL)
             {
-                 World::getWorld()->getRain()->playSound();
+                 World::getWorld()->getWeather()->playSound();
             }
 
             return;
