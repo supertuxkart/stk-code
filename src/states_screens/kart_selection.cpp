@@ -54,7 +54,6 @@ static const char ID_LOCKED[] = "locked/";
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
 
 static int g_root_id;
-static int g_root_id2;
 
 /** Currently, navigation for multiple players at the same time is implemented
     in a somewhat clunky way. An invisible "dispatcher" widget is added above
@@ -147,41 +146,7 @@ EventPropagation FocusDispatcher::focused(const int playerID)
     return GUIEngine::EVENT_LET;
 }   // focused
 
-FocusDispatcher2::FocusDispatcher2(KartSelectionScreen *parent) :
-	FocusDispatcher(parent)
-{
-}
-
-GUIEngine::EventPropagation FocusDispatcher2::focused(const int playerID)
-{
-    if (!m_is_initialised) return EVENT_LET;
-
-    if(UserConfigParams::logGUI())
-        Log::info("KartSelectionScreen", "FocusDispatcher2 focused by player %u",
-                  playerID);
-
-    // since this screen is multiplayer, redirect focus to the right widget
-    const int amount = m_parent->m_kart_widgets.size();
-    for (int n=0; n<amount; n++)
-    {
-        if (m_parent->m_kart_widgets[n].getPlayerID() == playerID)
-        {
-            // If player is done, don't do anything with focus
-            if (m_parent->m_kart_widgets[n].isReady())
-                return GUIEngine::EVENT_BLOCK;
-
-            m_parent->m_kart_widgets[n].m_difficulty
-            ->setFocusForPlayer(playerID);
-
-            return GUIEngine::EVENT_BLOCK;
-        }
-    }
-
-    return GUIEngine::EVENT_LET;
-} // focused
-
 static FocusDispatcher  *g_dispatcher = NULL;
-static FocusDispatcher2 *g_dispatcher2 = NULL;
 
 #if 0
 #pragma mark -
@@ -270,7 +235,6 @@ KartSelectionScreen* KartSelectionScreen::getRunningInstance()
 void KartSelectionScreen::loadedFromFile()
 {
     g_dispatcher          = new FocusDispatcher(this);
-    g_dispatcher2         = new FocusDispatcher2(this);
     m_first_widget        = g_dispatcher;
     m_game_master_confirmed    = false;
     m_multiplayer_message = NULL;
@@ -339,16 +303,12 @@ void KartSelectionScreen::init()
 
     Widget* placeholder = getWidget("playerskarts");
     assert(placeholder != NULL);
-    Widget* placeholder2 = getWidget("perPlayerDifficulty");
-    assert(placeholder2 != NULL);
 
     // FIXME : The reserved id value is -1 when we switch from KSS to NKSS and vice-versa
 
     g_dispatcher->setRootID(placeholder->m_reserved_id);
-    g_dispatcher2->setRootID(placeholder2->m_reserved_id);
 
     g_root_id = placeholder->m_reserved_id;
-    g_root_id2 = placeholder2->m_reserved_id;
     if (!m_widgets.contains(g_dispatcher))
     {
         m_widgets.push_back(g_dispatcher);
@@ -357,15 +317,6 @@ void KartSelectionScreen::init()
         // the list of widgets. If it already was, it was added along
         // other widgets.
         g_dispatcher->add();
-    }
-    if (!m_widgets.contains(g_dispatcher2))
-    {
-        m_widgets.push_back(g_dispatcher2);
-
-        // this is only needed if the dispatcher wasn't already in
-        // the list of widgets. If it already was, it was added along
-        // other widgets.
-        g_dispatcher2->add();
     }
 
     m_game_master_confirmed = false;
@@ -464,9 +415,8 @@ void KartSelectionScreen::tearDown()
 
 void KartSelectionScreen::unloaded()
 {
-    // these pointers are no more valid (have been deleted along other widgets)
+    // these pointer is no more valid (have been deleted along other widgets)
     g_dispatcher = NULL;
-    g_dispatcher2 = NULL;
 }
 
 // ----------------------------------------------------------------------------
@@ -478,7 +428,6 @@ bool KartSelectionScreen::joinPlayer(InputDevice* device, bool first_player)
     if (!m_multiplayer && !first_player) return false;
 
     assert (g_dispatcher != NULL);
-    assert (g_dispatcher2 != NULL);
 
     DynamicRibbonWidget* w = getWidget<DynamicRibbonWidget>("karts");
     if (w == NULL)
@@ -752,7 +701,7 @@ bool KartSelectionScreen::playerQuit(StateManager::ActivePlayer* player)
             break;
         }
     }
-    if (allPlayersReady) allPlayersDone();
+    if (allPlayersReady && (!m_multiplayer || amount > 1)) allPlayersDone();
 
     return true;
 }   // playerQuit
@@ -1230,8 +1179,6 @@ void KartSelectionScreen::allPlayersDone()
         // std::cout << "selection=" << selection.c_str() << std::endl;
 
         race_manager->setLocalKartInfo(n, selected_kart);
-        race_manager->setPlayerDifficulty(n,
-		    (PerPlayerDifficulty) m_kart_widgets[n].m_difficulty->getValue());
     }
 
     // ---- Switch to assign mode

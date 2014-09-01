@@ -29,7 +29,6 @@
 #include <IGUIEnvironment.h>
 
 static int g_root_id;
-static int g_root_id2;
 static const char RANDOM_KART_ID[] = "randomkart";
 
 using namespace GUIEngine;
@@ -104,9 +103,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     m_kart_stats->m_properties[PROP_ID] = StringUtils::insertValues("@p%i_stats", m_player_id);
     m_children.push_back(m_kart_stats);
 
-    m_difficulty = new GUIEngine::SpinnerWidget();
-    m_children.push_back(m_difficulty);
-
     if (parent->m_multiplayer && associated_player)
     {
         if (associated_player->getDevice()->getType() == DT_KEYBOARD)
@@ -126,7 +122,6 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
     if (irrlicht_widget_id == -1)
     {
         m_player_ident_spinner->m_tab_down_root = g_root_id;
-        m_difficulty->m_tab_down_root = g_root_id2;
     }
 
     spinnerID = StringUtils::insertValues("@p%i_spinner", m_player_id);
@@ -139,15 +134,11 @@ PlayerKartWidget::PlayerKartWidget(KartSelectionScreen* parent,
         m_player_ident_spinner->m_properties[PROP_MAX_VALUE] =
             StringUtils::toString(player_amount-1);
         m_player_ident_spinner->m_properties[PROP_WRAP_AROUND] = "true";
-        m_difficulty->m_properties[PROP_MIN_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_EASIEST);
-        m_difficulty->m_properties[PROP_MAX_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_HARDEST);
     }
     else
     {
         m_player_ident_spinner->m_properties[PROP_MIN_VALUE] = "0";
         m_player_ident_spinner->m_properties[PROP_MAX_VALUE] = "0";
-        m_difficulty->m_properties[PROP_MIN_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_NORMAL);
-        m_difficulty->m_properties[PROP_MAX_VALUE] = StringUtils::toString(PLAYER_DIFFICULTY_NORMAL);
     }
 
     //m_player_ident_spinner->m_event_handler = this;
@@ -289,7 +280,8 @@ void PlayerKartWidget::setPlayerID(const int newPlayerID)
 
     // Change the player ID
     m_player_id = newPlayerID;
-    m_player_ident_spinner->setID(m_player_id);
+    if (!m_ready)
+        m_player_ident_spinner->setID(m_player_id);
     m_kart_stats->setDisplayText(m_player_id == 0);
     // restore previous focus, but with new player ID
     if (focus != NULL) focus->setFocusForPlayer(m_player_id);
@@ -344,7 +336,6 @@ void PlayerKartWidget::add()
     m_player_ident_spinner->add();
     m_player_ident_spinner->getIrrlichtElement()->setTabStop(false);
     m_player_ident_spinner->setListener(this);
-    m_difficulty->add();
     m_kart_stats->add();
     m_model_view->add();
     m_kart_name->add();
@@ -352,7 +343,6 @@ void PlayerKartWidget::add()
     m_model_view->update(0);
 
     m_player_ident_spinner->clearLabels();
-    m_difficulty->clearLabels();
 
     irr::core::stringw name; // name of the player
     if (m_associated_player)
@@ -371,19 +361,11 @@ void PlayerKartWidget::add()
 
         // select the right player profile in the spinner
         m_player_ident_spinner->setValue(name);
-        m_difficulty->addLabel(_("Easiest"));
-        m_difficulty->addLabel(_("Easy"));
-        m_difficulty->addLabel(_("Normal"));
-        m_difficulty->addLabel(_("Hard"));
-        m_difficulty->addLabel(_("Hardest"));
-        m_difficulty->setValue(PLAYER_DIFFICULTY_NORMAL);
     }
     else
     {
         m_player_ident_spinner->addLabel(name);
         m_player_ident_spinner->setVisible(false);
-        m_difficulty->addLabel(_("Normal"));
-        m_difficulty->setVisible(false);
     }
 
     assert(m_player_ident_spinner->getStringValue() == name);
@@ -553,8 +535,6 @@ void PlayerKartWidget::onUpdate(float delta)
     {
         m_kart_stats->move(m_x, m_y + m_h/2,
                            m_w, m_h/2);
-        m_difficulty->move(m_difficulty_x, m_difficulty_y,
-                           m_difficulty_w, m_difficulty_h);
     }
 
 
@@ -633,8 +613,6 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
     player_id_w = w;
     player_id_h = GUIEngine::getFontHeight();
 
-    m_difficulty_h = GUIEngine::getFontHeight();
-
     player_name_h = 40;
     player_name_w = std::min(400, w);
 
@@ -659,8 +637,8 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     if (m_parent_screen->m_multiplayer)
     {
-        const int modelMaxHeight =  (h - kart_name_h - player_name_h
-                                    - player_id_h - m_difficulty_h)/2;
+        const int modelMaxHeight = (h - kart_name_h - player_name_h
+                                   - player_id_h)/2;
         const int modelMaxWidth =  w;
         const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
         model_x = x + w/2 - (int)(bestSize/2);
@@ -671,12 +649,12 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
         m_kart_stats_w = model_w;
         m_kart_stats_h = model_h;
         m_kart_stats_x = x + w/2 - (int)(bestSize/2);
-        m_kart_stats_y = model_y + model_h + m_difficulty_h;
+        m_kart_stats_y = model_y + model_h;
     }
     else
     {
-        const int modelMaxHeight =  h - kart_name_h - player_name_h
-                                    - player_id_h - m_difficulty_h;
+        const int modelMaxHeight = h - kart_name_h - player_name_h
+                                   - player_id_h;
         const int modelMaxWidth =  w;
         const int bestSize = std::min(modelMaxWidth, modelMaxHeight);
         const int modelY = y + player_name_h + player_id_h;
@@ -693,10 +671,6 @@ void PlayerKartWidget::setSize(const int x, const int y, const int w, const int 
 
     kart_name_x = x;
     kart_name_y = y + h - kart_name_h;
-
-    m_difficulty_w = w * 2 / 3;
-    m_difficulty_x = x + (w - m_difficulty_w) / 2;
-    m_difficulty_y = model_y + model_h;
 }   // setSize
 
 // -------------------------------------------------------------------------
