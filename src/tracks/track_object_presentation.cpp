@@ -168,59 +168,6 @@ TrackObjectPresentationLOD::~TrackObjectPresentationLOD()
 
 // ----------------------------------------------------------------------------
 
-TrackObjectPresentationInstancing::TrackObjectPresentationInstancing(const XMLNode& xml_node,
-    scene::ISceneNode* parent,
-    ModelDefinitionLoader& model_def_loader) : TrackObjectPresentationSceneNode(xml_node)
-{
-    m_instancing_group = NULL;
-    m_fallback_scene_node = NULL;
-
-    std::string instancing_model;
-    xml_node.get("instancing_model", &instancing_model);
-
-    m_node = irr_driver->getSceneManager()->addEmptySceneNode(parent);
-    m_node->setPosition(m_init_xyz);
-    m_node->setRotation(m_init_hpr);
-    m_node->setScale(m_init_scale);
-    m_node->updateAbsolutePosition();
-    if (irr_driver->isGLSL())
-    {
-        m_instancing_group = model_def_loader.instanciate(m_node->getAbsolutePosition(),
-            m_node->getAbsoluteTransformation().getRotationDegrees(), m_node->getAbsoluteTransformation().getScale(),
-            instancing_model);
-    }
-    else
-    {
-        scene::IMesh* mesh = model_def_loader.getFirstMeshFor(instancing_model);
-        scene::IMeshSceneNode* node = irr_driver->addMesh(mesh, m_node);
-        node->grab();
-        irr_driver->grabAllTextures(mesh);
-        mesh->grab();
-        World::getWorld()->getTrack()->addNode(node);
-
-        m_fallback_scene_node = node;
-    }
-}
-
-TrackObjectPresentationInstancing::~TrackObjectPresentationInstancing()
-{
-    if (m_instancing_group != NULL)
-        m_instancing_group->instanceDrop();
-
-    if (m_fallback_scene_node != NULL)
-    {
-        scene::IMesh* mesh = m_fallback_scene_node->getMesh();
-        irr_driver->dropAllTextures(mesh);
-        mesh->drop();
-        if (mesh->getReferenceCount() == 1)
-            irr_driver->removeMeshFromCache(mesh);
-
-        m_fallback_scene_node->drop();
-    }
-}
-
-// ----------------------------------------------------------------------------
-
 TrackObjectPresentationMesh::TrackObjectPresentationMesh(const XMLNode& xml_node,
     bool enabled, scene::ISceneNode* parent) :
     TrackObjectPresentationSceneNode(xml_node)

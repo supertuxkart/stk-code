@@ -241,16 +241,6 @@ void PhysicalObject::init()
             Log::fatal("PhysicalObject", "Unknown node type");
         }
     }
-    else if (dynamic_cast<TrackObjectPresentationInstancing*>(presentation) != NULL)
-    {
-        TrackObjectPresentationInstancing* instancing = dynamic_cast<TrackObjectPresentationInstancing*>(presentation);
-        STKInstancedSceneNode* instancing_group = instancing->getInstancingGroup();
-        if (instancing_group != NULL)
-        {
-            scene::IMesh* mesh = instancing_group->getMesh();
-            MeshTools::minMax3D(mesh, &min, &max);
-        }
-    }
     else
     {
         Log::fatal("PhysicalObject", "Unknown node type");
