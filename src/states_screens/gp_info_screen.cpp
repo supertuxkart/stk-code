@@ -125,7 +125,7 @@ void BaseGPInfoScreen::init()
     Screen::init();
     m_curr_time = 0.0f;
 
-    bool random = m_gp.getId()=="random";
+    bool random = m_gp.isRandomGP();
 
     SpinnerWidget *reverse_spinner = getWidget<SpinnerWidget>("reverse-spinner");
     getWidget<LabelWidget  >("track-text"   )->setVisible(random);
