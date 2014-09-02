@@ -90,26 +90,27 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
     // The problem with the track groups is that "all" isn't a track group
     // TODO: Add "all" to the track groups and rewrite this more elegant
     std::vector<int> track_indices;
-    size_t available_tracks;
     if (track_group == "all")
     {
-        available_tracks = track_manager->getNumberOfTracks();
+        for(unsigned int i=0; i<track_manager->getNumberOfTracks(); i++)
+        {
+            const Track *track = track_manager->getTrack(i);
+            if(!track->isArena() && !track->isSoccer() && !track->isInternal())
+                track_indices.push_back(i);
+        }
     }
     else
     {
         track_indices = track_manager->getTracksInGroup(track_group);
-        available_tracks = track_indices.size();
     }
-    assert(number_of_tracks <= available_tracks);
+    assert(number_of_tracks <= track_indices.size());
 
     // add or remove the right number of tracks
     if (m_tracks.size() < number_of_tracks)
     {
         while (m_tracks.size() < number_of_tracks)
         {
-            int index = (track_group == "all") ?
-                         rand() % available_tracks :
-                         track_indices[rand() % available_tracks];
+            int index = track_indices[rand() % track_indices.size()];
 
             const Track *track = track_manager->getTrack(index);
             std::string id = track->getIdent();
