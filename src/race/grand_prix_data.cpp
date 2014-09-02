@@ -101,7 +101,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
         {
             const Track *track = track_manager->getTrack(i);
             // Ignore no-racing tracks:
-            if(track->isArena() || track->isSoccer() || track->isInternal())
+            if(!track->isRaceTrack())
                 continue;
 
             // Only add tracks that are not already picked.
