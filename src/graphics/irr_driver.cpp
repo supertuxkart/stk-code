@@ -490,6 +490,7 @@ void IrrDriver::initDevice()
     hasVSLayer = false;
     hasBaseInstance = false;
     hasBuffserStorage = false;
+    hasDrawIndirect = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
@@ -507,6 +508,12 @@ void IrrDriver::initDevice()
         if (hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;
             Log::info("GLDriver", "ARB Instance enabled");
+        }
+#endif
+#ifdef Draw_Indirect
+        if (hasGLExtension("GL_ARB_draw_indirect")) {
+            hasDrawIndirect = true;
+            Log::info("GLDriver", "ARB Draw Indirect enabled");
         }
 #endif
     }

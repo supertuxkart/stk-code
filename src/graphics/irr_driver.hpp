@@ -200,6 +200,7 @@ private:
     int GLMajorVersion, GLMinorVersion;
     bool hasVSLayer;
     bool hasBaseInstance;
+    bool hasDrawIndirect;
     bool hasBuffserStorage;
     bool m_need_ubo_workaround;
     bool m_need_rh_workaround;
@@ -304,6 +305,11 @@ public:
     bool hasARB_base_instance() const
     {
         return hasBaseInstance;
+    }
+
+    bool hasARB_draw_indirect() const
+    {
+        return hasDrawIndirect;
     }
 
     bool hasVSLayerExtension() const

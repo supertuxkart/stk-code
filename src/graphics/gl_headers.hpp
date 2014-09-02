@@ -132,6 +132,7 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #define Base_Instance_Support
 #define Buffer_Storage
 #define Multi_Draw_Indirect
+#define Draw_Indirect
 #endif
 
 
