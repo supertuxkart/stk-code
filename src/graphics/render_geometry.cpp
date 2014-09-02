@@ -959,7 +959,7 @@ void IrrDriver::renderRSM()
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_DEFAULT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatDefault::getInstance()->RSM, rsm_matrix);
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_ALPHA_REF, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatAlphaRef::getInstance()->RSM, rsm_matrix);
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_UNLIT, video::EVT_STANDARD>(std::vector < GLuint > { 0 }, ListInstancedMatUnlit::getInstance()->RSM, rsm_matrix);
-        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(std::vector<GLuint>(), ListInstancedMatNormalMap::getInstance()->RSM, rsm_matrix);
+        renderRSMShadow<MeshShader::InstancedRSMShader, MAT_NORMAL_MAP, video::EVT_TANGENTS>(std::vector < GLuint > { 0 }, ListInstancedMatNormalMap::getInstance()->RSM, rsm_matrix);
         renderRSMShadow<MeshShader::InstancedRSMShader, MAT_DETAIL, video::EVT_2TCOORDS>(std::vector < GLuint > { 0 }, ListInstancedMatDetails::getInstance()->RSM, rsm_matrix);
     }
 #endif
