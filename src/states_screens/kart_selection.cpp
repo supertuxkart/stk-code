@@ -53,7 +53,7 @@ static const char ID_LOCKED[] = "locked/";
 //DEFINE_SCREEN_SINGLETON( KartSelectionScreen );
 KartSelectionScreen* KartSelectionScreen::m_instance_ptr = NULL;
 
-static int g_root_id;
+int g_root_id;
 
 /** Currently, navigation for multiple players at the same time is implemented
     in a somewhat clunky way. An invisible "dispatcher" widget is added above

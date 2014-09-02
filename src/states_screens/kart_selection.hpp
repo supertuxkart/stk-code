@@ -39,6 +39,8 @@ namespace Online
 class InputDevice;
 class KartHoverListener;
 
+extern int g_root_id;
+
 /**
   * \brief screen where players can choose their kart
   * \ingroup states_screens

@@ -28,7 +28,6 @@
 #include "states_screens/kart_selection.hpp"
 #include <IGUIEnvironment.h>
 
-static int g_root_id;
 static const char RANDOM_KART_ID[] = "randomkart";
 
 using namespace GUIEngine;
