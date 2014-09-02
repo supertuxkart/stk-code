@@ -22,7 +22,6 @@ using namespace irr;
 #include "graphics/irr_driver.hpp"
 #include "graphics/lod_node.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "io/xml_node.hpp"
 #include "tracks/track.hpp"
 

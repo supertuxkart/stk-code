@@ -1,6 +1,5 @@
 #include "stkscenemanager.hpp"
 #include "stkmesh.hpp"
-#include "stkinstancedscenenode.hpp"
 #include "irr_driver.hpp"
 #include <ISceneManager.h>
 #include <ISceneNode.h>
