@@ -113,7 +113,7 @@ KartModel::KartModel(bool is_master)
 
         // default value for kart suspensions. move to config file later
         // if we find each kart needs custom values
-        m_min_suspension[i] = -0.07;
+        m_min_suspension[i] = -0.07f;
         m_max_suspension[i] = 0.20f;
         m_dampen_suspension_amplitude[i] = 2.5f;
     }
