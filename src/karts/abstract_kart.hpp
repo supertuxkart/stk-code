@@ -64,7 +64,7 @@ protected:
     /** The kart properties. */
     const KartProperties *m_kart_properties;
 
-	/** The per-player difficulty. */
+    /** The per-player difficulty. */
     const PlayerDifficulty *m_difficulty;
 
     /** This stores a copy of the kart model. It has to be a copy
@@ -170,7 +170,7 @@ public:
     float getHighestPoint() const { return m_kart_highest_point;  }
     // ------------------------------------------------------------------------
     /** Called after the kart comes to rest. It can be used to e.g. compute
-     *  differences between graphical and physical chassis. Note that 
+     *  differences between graphical and physical chassis. Note that
      *  overwriting this function is possible, but this implementation must
      *  be called. */
     virtual void kartIsInRestNow();

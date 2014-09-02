@@ -294,7 +294,7 @@ void Swatter::squashThingsAround()
         if(dist2 >= min_dist2) continue;   // too far away, ignore this kart
 
         kart->setSquash(kp->getSquashDuration() * kart->getPlayerDifficulty()->getSquashDuration(),
-		    kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
+            kp->getSquashSlowdown() * kart->getPlayerDifficulty()->getSquashSlowdown());
 
         if (kart->getAttachment()->getType()==Attachment::ATTACH_BOMB)
         {   // make bomb explode

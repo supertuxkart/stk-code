@@ -177,7 +177,7 @@ private:
     float         m_min_suspension[4];
 
     /** Maximum suspension length (i.e. most extended). If the displayed
-     *  suspension is any longer, the wheel would look too far away from the 
+     *  suspension is any longer, the wheel would look too far away from the
      *  chassis. */
     float         m_max_suspension[4];
 

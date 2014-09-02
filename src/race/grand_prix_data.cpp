@@ -57,7 +57,7 @@ GrandPrixData::GrandPrixData(const std::string& filename)
  *  \param new_tracks If true, new tracks are selected, otherwise existing
  *         tracks will not be changed (used to e.g. increase the number of
  *         tracks in an already existing random grand prix).
- * 
+ *
  */
 void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
                                    const std::string &track_group,

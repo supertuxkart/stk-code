@@ -374,8 +374,8 @@ public:
     */
     void setLocalKartSoccerTeam(unsigned int player_id, SoccerTeam team);
 
-	/** Sets the per-player difficulty for a player.
-	 */
+    /** Sets the per-player difficulty for a player.
+     */
     void setPlayerDifficulty(unsigned int player_id, PerPlayerDifficulty difficulty);
 
     /** Sets the number of local players playing on this computer (including

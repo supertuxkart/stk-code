@@ -92,7 +92,7 @@ KartProperties::KartProperties(const std::string &filename)
         m_squash_duration = m_downward_impulse_factor =
         m_bubblegum_fade_in_time = m_bubblegum_speed_fraction =
         m_bubblegum_time = m_bubblegum_torque = m_jump_animation_time =
-        m_smooth_flying_impulse = m_physical_wheel_position = 
+        m_smooth_flying_impulse = m_physical_wheel_position =
         m_graphical_y_offset =
             UNDEFINED;
 

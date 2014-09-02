@@ -4,7 +4,7 @@
 namespace STK {
 
 
-    // tuple 
+    // tuple
     template<typename... _Types> class Tuple;
 
     // empty tuple

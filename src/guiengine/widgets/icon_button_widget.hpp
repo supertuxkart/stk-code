@@ -109,7 +109,7 @@ namespace GUIEngine
          */
         void setImage(const char* path_to_texture,
                       IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE);
-        // --------------------------------------------------------------------        
+        // --------------------------------------------------------------------
         /** Convenience function taking std::string. */
         void setImage(const std::string &path_to_texture,
                       IconPathType path_type=ICON_PATH_TYPE_NO_CHANGE)

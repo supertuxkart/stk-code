@@ -179,7 +179,7 @@ void World::init()
         int local_player_id  = race_manager->getKartLocalPlayerId(i);
         int global_player_id = race_manager->getKartGlobalPlayerId(i);
         const PlayerDifficulty *player_difficulty =
-	        stk_config->getPlayerDifficulty(race_manager->getPlayerDifficulty(i));
+            stk_config->getPlayerDifficulty(race_manager->getPlayerDifficulty(i));
         AbstractKart* newkart = createKart(kart_ident, i, local_player_id,
                                    global_player_id,
                                    race_manager->getKartType(i),
@@ -202,7 +202,7 @@ void World::init()
     
     if (UserConfigParams::m_weather_effects)
     {
-        m_weather = new Weather(m_track->getWeatherLightning(), 
+        m_weather = new Weather(m_track->getWeatherLightning(),
                           m_track->getWeatherSound());
     }
 }   // init
@@ -299,7 +299,7 @@ AbstractKart *World::createKart(const std::string &kart_ident, int index,
     int position           = index+1;
     btTransform init_pos   = m_track->getStartTransform(index);
     AbstractKart *new_kart = new Kart(kart_ident, index, position, init_pos,
-		    difficulty);
+            difficulty);
     new_kart->init(race_manager->getKartType(index));
     Controller *controller = NULL;
     switch(kart_type)

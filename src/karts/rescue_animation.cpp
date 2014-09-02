@@ -40,7 +40,7 @@ RescueAnimation::RescueAnimation(AbstractKart *kart, bool is_auto_rescue)
     m_referee     = new Referee(*m_kart);
     m_kart->getNode()->addChild(m_referee->getSceneNode());
     m_timer       = m_kart->getKartProperties()->getRescueTime() *
-	                m_kart->getPlayerDifficulty()->getRescueTime();
+                    m_kart->getPlayerDifficulty()->getRescueTime();
     m_velocity    = m_kart->getKartProperties()->getRescueHeight() / m_timer;
     m_xyz         = m_kart->getXYZ();
 

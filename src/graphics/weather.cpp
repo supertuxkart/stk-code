@@ -34,7 +34,7 @@ Weather::Weather(bool lightning, std::string sound)
     
     if (m_lightning)
     {
-        m_thunder_sound = sfx_manager->createSoundSource("thunder");        
+        m_thunder_sound = sfx_manager->createSoundSource("thunder");
     }
 
     if (sound != "")
@@ -50,10 +50,10 @@ Weather::Weather(bool lightning, std::string sound)
 
 Weather::~Weather()
 {
-    if (m_thunder_sound != NULL) 
+    if (m_thunder_sound != NULL)
         sfx_manager->deleteSFX(m_thunder_sound);
         
-    if (m_weather_sound != NULL) 
+    if (m_weather_sound != NULL)
         sfx_manager->deleteSFX(m_weather_sound);
 }
 
@@ -73,7 +73,7 @@ void Weather::update(float dt)
             {
                 gui_base->doLightning();
 
-                if (m_thunder_sound) 
+                if (m_thunder_sound)
                 {
                     m_thunder_sound->play();
                 }
@@ -89,9 +89,9 @@ void Weather::update(float dt)
 
 void Weather::playSound()
 {
-    if (m_weather_sound) 
+    if (m_weather_sound)
     {
         m_weather_sound->setLoop(true);
         m_weather_sound->play();
-    }   
+    }
 }

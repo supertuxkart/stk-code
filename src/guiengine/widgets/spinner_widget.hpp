@@ -165,7 +165,7 @@ namespace GUIEngine
          *  value is set to the new maximum. */
         void setMax(int n)
         {
-            m_max = n; 
+            m_max = n;
             if(getValue()>m_max) setValue(m_max);
         }   // setMax
         // --------------------------------------------------------------------
@@ -179,7 +179,7 @@ namespace GUIEngine
          *  value is set to the new minimum. */
         void setMin(int n)
         {
-            m_min = n; 
+            m_min = n;
             if(getValue()<m_min) setValue(m_min);
         }   // setMin
         

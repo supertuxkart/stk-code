@@ -276,7 +276,7 @@ void KartGFX::updateTerrain(const ParticleKind *pk)
         rate = fabsf(m_kart->getControls().m_steer) > 0.8 ? skidding - 1 : 0;
     else if (speed >= 0.5f && on_ground)
         rate = speed/m_kart->getKartProperties()->getMaxSpeed() *
-	           m_kart->getPlayerDifficulty()->getMaxSpeed();
+               m_kart->getPlayerDifficulty()->getMaxSpeed();
     else
     {
         pe->setCreationRateAbsolute(0);

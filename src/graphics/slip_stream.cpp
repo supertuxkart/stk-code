@@ -70,10 +70,10 @@ SlipStream::SlipStream(AbstractKart* kart) : MovingTexture(0, 0), m_kart(kart)
     m_slipstream_time      = 0.0f;
 
     float length = m_kart->getKartProperties()->getSlipstreamLength() *
-	               m_kart->getPlayerDifficulty()->getSlipstreamLength();
+                   m_kart->getPlayerDifficulty()->getSlipstreamLength();
     float kw     = m_kart->getKartWidth();
     float ew     = m_kart->getKartProperties()->getSlipstreamWidth() *
-	               m_kart->getPlayerDifficulty()->getSlipstreamWidth();
+                   m_kart->getPlayerDifficulty()->getSlipstreamWidth();
     float kl     = m_kart->getKartLength();
 
     Vec3 p[4];
@@ -380,7 +380,7 @@ void SlipStream::update(float dt)
 #undef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
 #ifndef DISPLAY_SLIPSTREAM_WITH_0_SPEED_FOR_DEBUGGING
     if(m_kart->getSpeed()<m_kart->getKartProperties()->getSlipstreamMinSpeed() *
-		                  m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())
+                          m_kart->getPlayerDifficulty()->getSlipstreamMinSpeed())
     {
         setIntensity(0, NULL);
         m_slipstream_mode = SS_NONE;
@@ -438,7 +438,7 @@ void SlipStream::update(float dt)
         // away from the other kart
         Vec3 delta = m_kart->getXYZ() - m_target_kart->getXYZ();
         float l    = m_kart->getKartProperties()->getSlipstreamLength() *
-	                 m_kart->getPlayerDifficulty()->getSlipstreamLength()
+                     m_kart->getPlayerDifficulty()->getSlipstreamLength()
                    + 0.5f*( m_target_kart->getKartLength()
                            +m_kart->getKartLength()        );
         if(delta.length2_2d() > l*l)
@@ -502,7 +502,7 @@ void SlipStream::update(float dt)
 
     m_slipstream_mode = SS_COLLECT;
     if(m_slipstream_time>m_kart->getKartProperties()->getSlipstreamCollectTime() *
-		                 m_kart->getPlayerDifficulty()->getSlipstreamCollectTime())
+                         m_kart->getPlayerDifficulty()->getSlipstreamCollectTime())
     {
         setIntensity(1.0f, m_target_kart);
     }

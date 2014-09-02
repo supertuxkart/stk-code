@@ -147,7 +147,7 @@ void RubberBand::update(float dt)
     // ------------------------------
     float l = (m_end_position-k).length2();
     float max_len = m_owner->getKartProperties()->getRubberBandMaxLength() *
-	                m_owner->getPlayerDifficulty()->getRubberBandMaxLength();
+                    m_owner->getPlayerDifficulty()->getRubberBandMaxLength();
     if(l>max_len*max_len)
     {
         // Rubber band snaps
@@ -161,7 +161,7 @@ void RubberBand::update(float dt)
     if(m_attached_state!=RB_TO_PLUNGER)
     {
         float force = m_owner->getKartProperties()->getRubberBandForce() *
-	                  m_owner->getPlayerDifficulty()->getRubberBandForce();
+                      m_owner->getPlayerDifficulty()->getRubberBandForce();
         Vec3 diff   = m_end_position-k;
 
         // detach rubber band if kart gets very close to hit point

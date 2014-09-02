@@ -609,7 +609,7 @@ void Kart::createPhysics()
                 {
                     int index = (x + 1) / 2 + 1 - z;  // get index of wheel
                     float f = getKartProperties()->getPhysicalWheelPosition();
-                    // f < 0 indicates to use the old physics position, i.e. 
+                    // f < 0 indicates to use the old physics position, i.e.
                     // to place the wheels outside of the chassis
                     if(f<0)
                     {
@@ -925,7 +925,7 @@ void Kart::collectedItem(Item *item, int add_info)
         m_bubblegum_torque = ((rand()%2)
                            ?  m_kart_properties->getBubblegumTorque()
                            : -m_kart_properties->getBubblegumTorque()) *
-	                       m_difficulty->getBubblegumTorque();
+                           m_difficulty->getBubblegumTorque();
         m_max_speed->setSlowdown(MaxSpeed::MS_DECREASE_BUBBLE,
                                  m_kart_properties->getBubblegumSpeedFraction() *
                                  m_difficulty->getBubblegumSpeedFraction(),
@@ -958,13 +958,13 @@ float Kart::getActualWheelForce()
     for(unsigned int i=0; i<gear_ratio.size(); i++)
     {
         if(m_speed <= m_kart_properties->getMaxSpeed() *
-		              m_difficulty->getMaxSpeed() * gear_ratio[i])
+                      m_difficulty->getMaxSpeed() * gear_ratio[i])
         {
             assert(!isnan(m_kart_properties->getMaxPower() *
-			              m_difficulty->getMaxPower()));
+                          m_difficulty->getMaxPower()));
             assert(!isnan(m_kart_properties->getGearPowerIncrease()[i]));
             return m_kart_properties->getMaxPower() *
-	               m_difficulty->getMaxPower()
+                   m_difficulty->getMaxPower()
                   *m_kart_properties->getGearPowerIncrease()[i]
                   +add_force;
         }
@@ -1642,32 +1642,32 @@ void Kart::handleZipper(const Material *material, bool play_sound)
                                      &speed_gain, &fade_out_time, &engine_force);
         if(max_speed_increase<0)
             max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease() *
-	                             m_difficulty->getZipperMaxSpeedIncrease();
+                                 m_difficulty->getZipperMaxSpeedIncrease();
         if(duration<0)
             duration           = m_kart_properties->getZipperTime() *
-	                             m_difficulty->getZipperTime();
+                                 m_difficulty->getZipperTime();
         if(speed_gain<0)
             speed_gain         = m_kart_properties->getZipperSpeedGain() *
-	                             m_difficulty->getZipperSpeedGain();
+                                 m_difficulty->getZipperSpeedGain();
         if(fade_out_time<0)
             fade_out_time      = m_kart_properties->getZipperFadeOutTime() *
-	                             m_difficulty->getZipperFadeOutTime();
+                                 m_difficulty->getZipperFadeOutTime();
         if(engine_force<0)
             engine_force       = m_kart_properties->getZipperForce() *
-	                             m_difficulty->getZipperForce();
+                                 m_difficulty->getZipperForce();
     }
     else
     {
         max_speed_increase = m_kart_properties->getZipperMaxSpeedIncrease() *
-	                         m_difficulty->getZipperMaxSpeedIncrease();
+                             m_difficulty->getZipperMaxSpeedIncrease();
         duration           = m_kart_properties->getZipperTime() *
-	                         m_difficulty->getZipperTime();
+                             m_difficulty->getZipperTime();
         speed_gain         = m_kart_properties->getZipperSpeedGain() *
-	                         m_difficulty->getZipperSpeedGain();
+                             m_difficulty->getZipperSpeedGain();
         fade_out_time      = m_kart_properties->getZipperFadeOutTime() *
-	                         m_difficulty->getZipperFadeOutTime();
+                             m_difficulty->getZipperFadeOutTime();
         engine_force       = m_kart_properties->getZipperForce() *
-	                         m_difficulty->getZipperForce();
+                             m_difficulty->getZipperForce();
     }
     // Ignore a zipper that's activated while braking
     if(m_controls.m_brake || m_speed<0) return;
@@ -1706,7 +1706,7 @@ void Kart::updateNitro(float dt)
         return;
     }
     m_collected_energy -= dt * m_kart_properties->getNitroConsumption() *
-	                      m_difficulty->getNitroConsumption();
+                          m_difficulty->getNitroConsumption();
     if (m_collected_energy < 0)
     {
         m_collected_energy = 0;
@@ -2458,7 +2458,7 @@ void Kart::kartIsInRestNow()
         f +=  wi.m_chassisConnectionPointCS.getY()
             - wi.m_raycastInfo.m_suspensionLength - wi.m_wheelsRadius;
     }
-    m_graphical_y_offset = f/m_vehicle->getNumWheels() 
+    m_graphical_y_offset = f/m_vehicle->getNumWheels()
                          + getKartProperties()->getGraphicalYOffset();
 
     m_kart_model->setDefaultSuspension();
@@ -2485,7 +2485,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
         // fabs(speed) is important, otherwise the negative number will
         // become a huge unsigned number in the particle scene node!
         float f = fabsf(getSpeed())/m_kart_properties->getMaxSpeed() *
-	              m_difficulty->getMaxSpeed();
+                  m_difficulty->getMaxSpeed();
         // The speed of the kart can be higher (due to powerups) than
         // the normal maximum speed of the kart.
         if(f>1.0f) f = 1.0f;
@@ -2517,7 +2517,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     // its maximum speed, but not the current speed (by much). On the
     // other hand, that ratio can often be greater than 1.
     float speed_frac = m_speed / m_kart_properties->getMaxSpeed() *
-	                   m_difficulty->getMaxSpeed();
+                       m_difficulty->getMaxSpeed();
     if(speed_frac>1.0f)
         speed_frac = 1.0f;
     else if (speed_frac < 0.0f)  // no leaning when backwards driving
@@ -2573,7 +2573,7 @@ void Kart::updateGraphics(float dt, const Vec3& offset_xyz,
     float lean_height = tan(fabsf(m_current_lean)) * getKartWidth()*0.5f;
 
     float heading = m_skidding->getVisualSkidRotation();
-    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset() 
+    Vec3 center_shift = Vec3(0, m_skidding->getGraphicalJumpOffset()
                               + lean_height +m_graphical_y_offset, 0);
     center_shift = getTrans().getBasis() * center_shift;
 
