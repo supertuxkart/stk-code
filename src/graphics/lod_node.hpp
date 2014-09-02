@@ -83,6 +83,8 @@ public:
 
     int getLevel();
 
+    void updateVisibility(bool* shown = NULL);
+
     /*
     //! Returns a reference to the current relative transformation matrix.
     //! This is the matrix, this scene node uses instead of scale, translation

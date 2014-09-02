@@ -28,7 +28,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "graphics/rain.hpp"
+#include "graphics/weather.hpp"
 #include "modes/world_status.hpp"
 #include "race/highscores.hpp"
 #include "states_screens/race_gui_base.hpp"
@@ -164,8 +164,8 @@ protected:
     /** Set when the world is online and counts network players. */
     bool m_is_network_world;
     
-    /** Used to show rain graphical effects. */
-    Rain* m_rain;
+    /** Used to show weather graphical effects. */
+    Weather* m_weather;
 
 
     virtual void  onGo();
@@ -350,8 +350,8 @@ public:
 
     bool isNetworkWorld() const { return m_is_network_world; }
     
-    /** Returns a pointer to the rain. */
-    Rain* getRain() {return m_rain;}
+    /** Returns a pointer to the weather. */
+    Weather* getWeather() {return m_weather;}
 };   // World
 
 #endif

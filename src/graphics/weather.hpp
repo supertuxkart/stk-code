@@ -16,20 +16,22 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 
-#ifndef HEADER_RAIN_HPP
-#define HEADER_RAIN_HPP
+#ifndef HEADER_WEATHER_HPP
+#define HEADER_WEATHER_HPP
 
 class SFXBase;
 
-class Rain
+class Weather
 {
+    bool m_lightning;
     float m_next_lightning;
+
     SFXBase* m_thunder_sound;
-    SFXBase* m_rain_sound;
+    SFXBase* m_weather_sound;
 
 public:
-    Rain();
-    virtual ~Rain();
+    Weather(bool lightning, std::string sound);
+    virtual ~Weather();
 
     void update(float dt);
     void playSound();

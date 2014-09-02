@@ -60,6 +60,18 @@ bool isObject(video::E_MATERIAL_TYPE type);
 
 core::vector3df getWind();
 
+
+class STKMeshCommon
+{
+protected:
+    PtrVector<GLMesh, REF> MeshSolidMaterial[MAT_COUNT];
+    PtrVector<GLMesh, REF> TransparentMesh[TM_COUNT];
+public:
+    virtual void update() = 0;
+    virtual bool isImmediateDraw() const { return false; }
+};
+
+
 template<typename T, typename... Args>
 class MeshList : public Singleton<T>, public std::vector<STK::Tuple<Args...> >
 {};

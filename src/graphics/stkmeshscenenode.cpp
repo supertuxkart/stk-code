@@ -80,7 +80,7 @@ void STKMeshSceneNode::setFirstTimeMaterial()
           if (!immediate_draw)
           {
               InitTextures(mesh, MatType);
-              MeshSolidMaterials[MatType].push_back(&mesh);
+              MeshSolidMaterial[MatType].push_back(&mesh);
           }
       }
 
@@ -125,7 +125,7 @@ void STKMeshSceneNode::cleanGLMeshes()
     }
     GLmeshes.clear();
     for (unsigned i = 0; i < MAT_COUNT; i++)
-        MeshSolidMaterials[i].clearWithoutDeleting();
+        MeshSolidMaterial[i].clearWithoutDeleting();
 }
 
 void STKMeshSceneNode::setMesh(irr::scene::IMesh* mesh)
@@ -241,29 +241,29 @@ void STKMeshSceneNode::render()
         AbsoluteTransformation.getInverse(invmodel);
 
         GLMesh* mesh;
-        for_in(mesh, MeshSolidMaterials[MAT_DEFAULT])
+        for_in(mesh, MeshSolidMaterial[MAT_DEFAULT])
             pushVector(ListMatDefault::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_ALPHA_REF])
+        for_in(mesh, MeshSolidMaterial[MAT_ALPHA_REF])
             pushVector(ListMatAlphaRef::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_SPHEREMAP])
+        for_in(mesh, MeshSolidMaterial[MAT_SPHEREMAP])
             pushVector(ListMatSphereMap::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_DETAIL])
+        for_in(mesh, MeshSolidMaterial[MAT_DETAIL])
             pushVector(ListMatDetails::getInstance(), mesh, AbsoluteTransformation, invmodel, mesh->TextureMatrix);
 
         windDir = getWind();
-        for_in(mesh, MeshSolidMaterials[MAT_GRASS])
+        for_in(mesh, MeshSolidMaterial[MAT_GRASS])
             pushVector(ListMatGrass::getInstance(), mesh, AbsoluteTransformation, invmodel, windDir);
 
-        for_in(mesh, MeshSolidMaterials[MAT_UNLIT])
+        for_in(mesh, MeshSolidMaterial[MAT_UNLIT])
             pushVector(ListMatUnlit::getInstance(), mesh, AbsoluteTransformation, core::matrix4::EM4CONST_IDENTITY, mesh->TextureMatrix);
 
-        for_in(mesh, MeshSolidMaterials[MAT_SPLATTING])
+        for_in(mesh, MeshSolidMaterial[MAT_SPLATTING])
             pushVector(ListMatSplatting::getInstance(), mesh, AbsoluteTransformation, invmodel);
 
-        for_in(mesh, MeshSolidMaterials[MAT_NORMAL_MAP])
+        for_in(mesh, MeshSolidMaterial[MAT_NORMAL_MAP])
             pushVector(ListMatNormalMap::getInstance(), mesh, AbsoluteTransformation, invmodel, core::matrix4::EM4CONST_IDENTITY);
 
         return;
@@ -289,7 +289,35 @@ void STKMeshSceneNode::render()
                 GLenum itype = mesh.IndexType;
                 size_t count = mesh.IndexCount;
 
-                MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(std::vector<GLuint>{ getTextureGLuint(spareWhiteTex) });
+                if (UserConfigParams::m_azdo)
+                {
+#ifdef Bindless_Texture_Support
+                    GLuint DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
+                    if (!glIsTextureHandleResidentARB(DiffuseHandle))
+                        glMakeTextureHandleResidentARB(DiffuseHandle);
+
+                    GLuint SpecularHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[1]);
+                    if (!glIsTextureHandleResidentARB(SpecularHandle))
+                        glMakeTextureHandleResidentARB(SpecularHandle);
+
+                    GLuint SSAOHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[2]);
+                    if (!glIsTextureHandleResidentARB(SSAOHandle))
+                        glMakeTextureHandleResidentARB(SSAOHandle);
+
+                    if (!mesh.TextureHandles[0])
+                        mesh.TextureHandles[0] = glGetTextureSamplerHandleARB(getTextureGLuint(spareWhiteTex), MeshShader::TransparentFogShader::getInstance()->SamplersId[0]);
+                    if (!glIsTextureHandleResidentARB(mesh.TextureHandles[0]))
+                        glMakeTextureHandleResidentARB(mesh.TextureHandles[0]);
+                    MeshShader::ObjectPass2Shader::getInstance()->SetTextureHandles(createVector<uint64_t>(DiffuseHandle, SpecularHandle, SSAOHandle, mesh.TextureHandles[0]));
+#endif
+                }
+                else
+                    MeshShader::ObjectPass2Shader::getInstance()->SetTextureUnits(createVector<GLuint>(
+                    irr_driver->getRenderTargetTexture(RTT_DIFFUSE),
+                    irr_driver->getRenderTargetTexture(RTT_SPECULAR),
+                    irr_driver->getRenderTargetTexture(RTT_HALF1_R),
+                    getTextureGLuint(spareWhiteTex)));
+
                 MeshShader::ObjectPass2Shader::getInstance()->setUniforms(AbsoluteTransformation, mesh.TextureMatrix);
                 assert(mesh.vao);
                 glBindVertexArray(mesh.vao);
