@@ -464,8 +464,16 @@ public:
     /** Returns true if this track has an arena mode. */
     bool isArena() const { return m_is_arena; }
     // ------------------------------------------------------------------------
+    /** Returns true if this track is a racing track. This means it is not an
+     *  internal track (like cut scenes), arena, or soccer field. */
+    bool isRaceTrack() const 
+    {
+        return !m_internal && !m_is_arena && !m_is_soccer;
+    }   // isRaceTrack
+    // ------------------------------------------------------------------------
     /** Returns true if this track has easter eggs. */
     bool hasEasterEggs() const { return m_has_easter_eggs; }
+    // ------------------------------------------------------------------------
     bool               isSoccer             () const { return m_is_soccer; }
     // ------------------------------------------------------------------------
     void               loadTrackModel  (World* parent,

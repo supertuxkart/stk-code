@@ -83,7 +83,7 @@ void BaseGPInfoScreen::loadedFromFile()
     m_num_tracks_spinner = getWidget<SpinnerWidget>("track-spinner");
     // Only init the number of tracks here, this way the previously selected
     // number of tracks will be the default.
-    m_num_tracks_spinner->setValue(4);
+    m_num_tracks_spinner->setValue(1);
     int number_of_tracks = m_num_tracks_spinner->getValue();
 }   // loadedFromFile
 
@@ -163,9 +163,10 @@ void BaseGPInfoScreen::init()
         // If there are more tracks selected atm as in the group (which can 
         // happen if the group has been changed since last time this screen
         // was shown), adjust it:
-        int max_num_tracks = 
-            m_group_name=="all" ? track_manager->getNumberOfTracks()
-                                : track_manager->getTracksInGroup(m_group_name).size();
+        int max_num_tracks = m_group_name=="all" 
+                           ? track_manager->getNumberOfRaceTracks()
+                           : track_manager->getTracksInGroup(m_group_name).size();
+        m_num_tracks_spinner->setMax(max_num_tracks);
         if(m_num_tracks_spinner->getValue() > max_num_tracks)
         {
             m_num_tracks_spinner->setValue(max_num_tracks);
@@ -287,14 +288,7 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
 
         if (button == "start" || button=="continue")
         {
-            // Save GP identifier, since dismiss will delete this object.
-            GrandPrixData gp_data = m_gp;
-            // Also create a copy of the string: it is a reference to data
-            // in a widget in the dialog - so if we call dismiss, this reference
-            // becomes invalid!
-            std::string save_source = name;
-            // FIXME ModalDialog::dismiss();
-            race_manager->startGP(gp_data, false, (save_source == "continue"));
+            race_manager->startGP(m_gp, false, (name == "continue"));
         }
     }   // name=="buttons"
     else if (name=="group-spinner")
@@ -305,20 +299,20 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
         // the current track. The current value in the Number-of-tracks-spinner
         // has to be updated, since otherwise the displayed (and used) value
         // can be bigger than the maximum. (Might be a TODO to fix this)
-        unsigned int max = (m_group_name == "all") ?
-                           track_manager->getNumberOfTracks() :
-                           track_manager->getTracksInGroup(m_group_name).size();
-        m_num_tracks_spinner->setMax(max);
-        int number_of_tracks = std::min((int)max, m_num_tracks_spinner->getValue());
-        if (m_num_tracks_spinner->getValue() > (signed)max)
-            m_num_tracks_spinner->setValue(max);
+        int max_num_tracks = m_group_name=="all" 
+                           ? track_manager->getNumberOfRaceTracks()
+                           : track_manager->getTracksInGroup(m_group_name).size();
+        m_num_tracks_spinner->setMax(max_num_tracks);
+        int number_of_tracks = std::min(max_num_tracks,
+                                        m_num_tracks_spinner->getValue());
+        if (m_num_tracks_spinner->getValue() > max_num_tracks)
+            m_num_tracks_spinner->setValue(max_num_tracks);
         // Create a new (i.e. with new tracks) random gp, since the old
         // tracks might not all belong to the newly selected group.
         
         m_gp.createRandomGP(m_num_tracks_spinner->getValue(), m_group_name,
                             getReverse(),  /*new_tracks*/true);
         addTracks();
-
     }
     else if (name=="track-spinner")
     {

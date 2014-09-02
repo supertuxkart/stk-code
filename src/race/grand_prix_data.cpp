@@ -81,9 +81,14 @@ void GrandPrixData::createRandomGP(const unsigned int number_of_tracks,
 
     changeTrackNumber(number_of_tracks, track_group);
     changeReverse(use_reverse);
-}
+}   // createRandomGP
 
 // ----------------------------------------------------------------------------
+/** Either adds or removes tracks to get the requested numder of tracks in
+ *  a random GP.
+ *  \param number_of_tracks How many tracks should be in the random list.
+ *  \param track_group From which group to select the tracks.
+ */
 void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
                                       const std::string& track_group)
 {
@@ -95,7 +100,13 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
         for(unsigned int i=0; i<track_manager->getNumberOfTracks(); i++)
         {
             const Track *track = track_manager->getTrack(i);
-            if(!track->isArena() && !track->isSoccer() && !track->isInternal())
+            // Ignore no-racing tracks:
+            if(track->isArena() || track->isSoccer() || track->isInternal())
+                continue;
+
+            // Only add tracks that are not already picked.
+            if(std::find(m_tracks.begin(), m_tracks.end(), track->getIdent())==
+                m_tracks.end())
                 track_indices.push_back(i);
         }
     }
@@ -103,24 +114,23 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
     {
         track_indices = track_manager->getTracksInGroup(track_group);
     }
-    assert(number_of_tracks <= track_indices.size());
+    assert(number_of_tracks <= track_indices.size() + m_tracks.size());
 
     // add or remove the right number of tracks
     if (m_tracks.size() < number_of_tracks)
     {
         while (m_tracks.size() < number_of_tracks)
         {
-            int index = track_indices[rand() % track_indices.size()];
+            int index       = rand() % track_indices.size();
+            int track_index = track_indices[index];
 
-            const Track *track = track_manager->getTrack(index);
+            const Track *track = track_manager->getTrack(track_index);
             std::string id = track->getIdent();
-            // Avoid duplicate tracks
-            if (std::find(m_tracks.begin(), m_tracks.end(), id) != m_tracks.end())
-                continue;
 
             m_tracks.push_back(id);
             m_laps.push_back(track->getDefaultNumberOfLaps());
             m_reversed.push_back(false); // This will be changed later in the code
+            track_indices.erase(track_indices.begin()+index);
         }
     }
     else if (m_tracks.size() > number_of_tracks)
@@ -135,7 +145,7 @@ void GrandPrixData::changeTrackNumber(const unsigned int number_of_tracks,
 
     assert(m_tracks.size() == m_laps.size()    );
     assert(m_laps.size()   == m_reversed.size());
-}
+}   // changeTrackNumber
 
 // ----------------------------------------------------------------------------
 /** Updates the GP data with newly decided reverse requirements.
