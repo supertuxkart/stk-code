@@ -352,18 +352,19 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
         if (!(*I)->isVisible())
             continue;
         (*I)->updateAbsolutePosition();
-        core::aabbox3d<f32> tbox = (*I)->getBoundingBox();
-        (*I)->getAbsoluteTransformation().transformBoxEx(tbox);
 
         const scene::ICameraSceneNode* cam = irr_driver->getSceneManager()->getActiveCamera();
-        bool IsCulledForSolid = !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
+        bool IsCulledForSolid = irr_driver->getSceneManager()->isCulled(*I);
         bool IsCulledForShadow[4];
-        bool IsCulledForRSM = false;
         for (unsigned i = 0; i < 4; ++i)
         {
-            const scene::ICameraSceneNode* cam = shadowCams[i];
-            IsCulledForShadow[i] = !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
+            scene::ICameraSceneNode* cam = shadowCams[i];
+            irr_driver->getSceneManager()->setActiveCamera(cam);
+            IsCulledForShadow[i] = irr_driver->getSceneManager()->isCulled(*I);
         }
+
+        irr_driver->getSceneManager()->setActiveCamera(RSM_cam);
+        bool IsCulledForRSM = irr_driver->getSceneManager()->isCulled(*I);
 
         if (IsCulledForSolid && IsCulledForShadow[0] && IsCulledForShadow[1] && IsCulledForShadow[2] && IsCulledForShadow[3])
             continue;
@@ -378,7 +379,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             }
         }
 
-        handleSTKCommon(*I, ImmediateDraw, IsCulledForSolid, IsCulledForShadow, false);
+        handleSTKCommon(*I, ImmediateDraw, IsCulledForSolid, IsCulledForShadow, IsCulledForRSM);
 
         parseSceneManager((*I)->getChildren(), ImmediateDraw, shadowCams, RSM_cam);
     }
