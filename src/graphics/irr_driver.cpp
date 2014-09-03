@@ -166,6 +166,11 @@ void IrrDriver::IncreaseObjectCount()
     object_count[m_phase]++;
 }
 
+void IrrDriver::IncreasePolyCount(unsigned Polys)
+{
+    poly_count[m_phase] += Polys;
+}
+
 core::array<video::IRenderTarget> &IrrDriver::getMainSetup()
 {
   return m_mrt;
@@ -490,6 +495,7 @@ void IrrDriver::initDevice()
     hasVSLayer = false;
     hasBaseInstance = false;
     hasBuffserStorage = false;
+    hasDrawIndirect = false;
     // Default false value for hasVSLayer if --no-graphics argument is used
     if (!ProfileWorld::isNoGraphics())
     {
@@ -507,6 +513,12 @@ void IrrDriver::initDevice()
         if (hasGLExtension("GL_ARB_base_instance")) {
             hasBaseInstance = true;
             Log::info("GLDriver", "ARB Instance enabled");
+        }
+#endif
+#ifdef Draw_Indirect
+        if (hasGLExtension("GL_ARB_draw_indirect")) {
+            hasDrawIndirect = true;
+            Log::info("GLDriver", "ARB Draw Indirect enabled");
         }
 #endif
     }
@@ -1624,6 +1636,7 @@ video::ITexture* IrrDriver::applyMask(video::ITexture* texture,
 // ----------------------------------------------------------------------------
 void IrrDriver::setRTT(RTT* rtt)
 {
+    memset(m_shadow_camnodes, 0, 4 * sizeof(void*));
     m_rtts = rtt;
 }
 // ----------------------------------------------------------------------------
@@ -1726,13 +1739,14 @@ void IrrDriver::displayFPS()
     if (UserConfigParams::m_artist_debug_mode)
     {
         sprintf(
-            buffer, "FPS: %i/%i/%i - Objects (P1:%d P2:%d T:%d) - LightDst : ~%d",
+            buffer, "FPS: %i/%i/%i - PolyCount (Solid:%d Shadows:%d) - LightDst : ~%d",
             min, fps, max,
-            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            object_count[SOLID_NORMAL_AND_DEPTH_PASS],
-            object_count[TRANSPARENT_PASS],
+            poly_count[SOLID_NORMAL_AND_DEPTH_PASS],
+            poly_count[SHADOW_PASS],
             m_last_light_bucket_distance
         );
+        poly_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
+        poly_count[SHADOW_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[SOLID_NORMAL_AND_DEPTH_PASS] = 0;
         object_count[TRANSPARENT_PASS] = 0;

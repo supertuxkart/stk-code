@@ -73,6 +73,7 @@ extern PFNGLDRAWELEMENTSBASEVERTEXPROC glDrawElementsBaseVertex;
 extern PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced;
 extern PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXPROC glDrawElementsInstancedBaseVertex;
 extern PFNGLDRAWELEMENTSINSTANCEDBASEVERTEXBASEINSTANCEPROC glDrawElementsInstancedBaseVertexBaseInstance;
+extern PFNGLDRAWELEMENTSINDIRECTPROC glDrawElementsIndirect;
 extern PFNGLMULTIDRAWELEMENTSINDIRECTPROC glMultiDrawElementsIndirect;
 extern PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 extern PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
@@ -131,6 +132,7 @@ extern PFNGLDEBUGMESSAGECALLBACKARBPROC glDebugMessageCallbackARB;
 #define Base_Instance_Support
 #define Buffer_Storage
 #define Multi_Draw_Indirect
+#define Draw_Indirect
 #endif
 
 

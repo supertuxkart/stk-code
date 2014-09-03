@@ -25,7 +25,6 @@ using namespace irr;
 
 #include "graphics/material_manager.hpp"
 #include "graphics/mesh_tools.hpp"
-#include "graphics/stkinstancedscenenode.hpp"
 #include "io/file_manager.hpp"
 #include "io/xml_node.hpp"
 #include "modes/world.hpp"
@@ -239,16 +238,6 @@ void PhysicalObject::init()
         else
         {
             Log::fatal("PhysicalObject", "Unknown node type");
-        }
-    }
-    else if (dynamic_cast<TrackObjectPresentationInstancing*>(presentation) != NULL)
-    {
-        TrackObjectPresentationInstancing* instancing = dynamic_cast<TrackObjectPresentationInstancing*>(presentation);
-        STKInstancedSceneNode* instancing_group = instancing->getInstancingGroup();
-        if (instancing_group != NULL)
-        {
-            scene::IMesh* mesh = instancing_group->getMesh();
-            MeshTools::minMax3D(mesh, &min, &max);
         }
     }
     else

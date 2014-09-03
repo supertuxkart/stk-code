@@ -615,6 +615,12 @@ public:
     ColorizeShader();
 };
 
+class InstancedColorizeShader : public ShaderHelperSingleton<InstancedColorizeShader>
+{
+public:
+    InstancedColorizeShader();
+};
+
 class ShadowShader : public ShaderHelperSingleton<ShadowShader, int, core::matrix4>, public TextureRead<>
 {
 public:
@@ -625,6 +631,12 @@ class RSMShader : public ShaderHelperSingleton<RSMShader, core::matrix4, core::m
 {
 public:
     RSMShader();
+};
+
+class InstancedRSMShader : public ShaderHelperSingleton<InstancedRSMShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+{
+public:
+    InstancedRSMShader();
 };
 
 class SplattingRSMShader : public ShaderHelperSingleton<SplattingRSMShader, core::matrix4, core::matrix4>,

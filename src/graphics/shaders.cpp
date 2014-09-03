@@ -1137,6 +1137,18 @@ namespace MeshShader
         glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
     }
 
+    InstancedColorizeShader::InstancedColorizeShader()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/glow_object.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/glow_object.frag").c_str());
+        AssignUniforms();
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
     ShadowShader::ShadowShader()
     {
         // Geometry shader needed
@@ -1167,6 +1179,20 @@ namespace MeshShader
             GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/rsm.frag").c_str());
 
         AssignUniforms("RSMMatrix", "ModelMatrix", "TextureMatrix");
+        AssignSamplerNames(Program, 0, "tex");
+
+        GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
+        glUniformBlockBinding(Program, uniform_ViewProjectionMatrixesUBO, 0);
+    }
+
+    InstancedRSMShader::InstancedRSMShader()
+    {
+        Program = LoadProgram(
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/utils/getworldmatrix.vert").c_str(),
+            GL_VERTEX_SHADER, file_manager->getAsset("shaders/instanced_rsm.vert").c_str(),
+            GL_FRAGMENT_SHADER, file_manager->getAsset("shaders/instanced_rsm.frag").c_str());
+
+        AssignUniforms("RSMMatrix");
         AssignSamplerNames(Program, 0, "tex");
 
         GLuint uniform_ViewProjectionMatrixesUBO = glGetUniformBlockIndex(Program, "MatrixesData");
