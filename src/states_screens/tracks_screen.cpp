@@ -30,7 +30,6 @@
 #include "states_screens/state_manager.hpp"
 #include "states_screens/track_info_screen.hpp"
 #include "states_screens/gp_info_screen.hpp"
-#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track.hpp"
 #include "tracks/track_manager.hpp"
 #include "utils/translation.hpp"

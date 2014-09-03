@@ -24,7 +24,6 @@
 #include "config/player_manager.hpp"
 #include "io/file_manager.hpp"
 #include "io/utf_writer.hpp"
-#include "states_screens/dialogs/random_gp_dialog.hpp"
 #include "tracks/track_manager.hpp"
 #include "tracks/track.hpp"
 #include "utils/string_utils.hpp"
