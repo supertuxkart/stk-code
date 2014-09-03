@@ -75,12 +75,12 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
 
     for (unsigned int i = 0; i < m_chars.size(); i++)
     {
-        core::vector3df char_pos(m_chars[i].m_destRect.UpperLeftCorner.X,
-            m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
+        core::vector3df char_pos((float) m_chars[i].m_destRect.UpperLeftCorner.X,
+            (float) m_chars[i].m_destRect.UpperLeftCorner.Y, 0);
         char_pos *= scale;
 
-        core::vector3df char_pos2(m_chars[i].m_destRect.LowerRightCorner.X,
-            m_chars[i].m_destRect.LowerRightCorner.Y, 0);
+        core::vector3df char_pos2((float)m_chars[i].m_destRect.LowerRightCorner.X,
+            (float) m_chars[i].m_destRect.LowerRightCorner.Y, 0);
         char_pos2 *= scale;
 
         core::dimension2di char_size_i = m_chars[i].m_destRect.getSize();
@@ -100,8 +100,8 @@ scene::IMesh* STKTextBillboard::getTextMesh(core::stringw text, gui::ScalableFon
             buffer = map_itr->second;
         }
 
-        float tex_width = m_chars[i].m_texture->getSize().Width;
-        float tex_height = m_chars[i].m_texture->getSize().Height;
+        float tex_width = (float) m_chars[i].m_texture->getSize().Width;
+        float tex_height = (float)m_chars[i].m_texture->getSize().Height;
 
 
         video::S3DVertex vertices[] =
