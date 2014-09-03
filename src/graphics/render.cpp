@@ -737,6 +737,7 @@ void IrrDriver::computeCameraMatrix(scene::ICameraSceneNode * const camnode, siz
         assert(sun_ortho_matrix.size() == 4);
         camnode->setNearValue(oldnear);
         camnode->setFarValue(oldfar);
+        camnode->render();
 
         size_t size = irr_driver->getShadowViewProj().size();
         for (unsigned i = 0; i < size; i++)
