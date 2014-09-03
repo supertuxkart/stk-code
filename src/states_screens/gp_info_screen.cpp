@@ -319,6 +319,10 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
         m_gp.changeTrackNumber(m_num_tracks_spinner->getValue(), m_group_name);
         addTracks();
     }
+    else if (name=="reverse-spinner")
+    {
+        m_gp.changeReverse(getReverse());
+    }
 
 }   // eventCallback
 
