@@ -16,6 +16,9 @@ add_definitions(-DNDEBUG=1 -DIRRLICHT_EXPORTS=1 -DPNG_THREAD_UNSAFE_OK -DPNG_NO_
 if(MSVC)
   add_definitions(/D_IRR_STATIC_LIB_)
   add_definitions(/D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
+elseif(MINGW)
+  add_definitions(-D_IRR_STATIC_LIB_)
+  add_definitions(-D_CRT_SECURE_NO_WARNINGS) # Shut up about unsafe stuff
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
   set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS} -Wall -pipe -O3  -fno-exceptions  -fstrict-aliasing -fexpensive-optimizations -I/usr/X11R6/include")
@@ -766,16 +769,16 @@ if(APPLE)
         source/Irrlicht/MacOSX/AppDelegate.mm
         source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm
         source/Irrlicht/MacOSX/OSXClipboard.mm)
-    
+
     #list(APPEND CMAKE_C_SOURCE_FILE_EXTENSIONS mm)
     #set(CMAKE_CXX_SOURCE_FILE_EXTENSIONS cpp)
-    
+
     set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
     set_source_files_properties(source/Irrlicht/MacOSX/AppDelegate.mm PROPERTIES LANGUAGE C)
-    
+
     set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3  -fno-rtti")
     set_source_files_properties(source/Irrlicht/MacOSX/CIrrDeviceMacOSX.mm PROPERTIES LANGUAGE C)
-    
+
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES COMPILE_FLAGS "-x objective-c++ -O3 -fno-rtti")
     set_source_files_properties(source/Irrlicht/MacOSX/OSXClipboard.mm PROPERTIES LANGUAGE C)
 endif()

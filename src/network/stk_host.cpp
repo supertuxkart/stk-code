@@ -24,9 +24,16 @@
 #include "utils/time.hpp"
 
 #include <string.h>
-#ifdef WIN32
+#if defined(WIN32) && !defined(__MINGW32__)
 #  include "Ws2tcpip.h"
 #  define   inet_ntop  InetNtop
+
+// TODO: It's very ugly hack which allows to compile STK on windows using gcc.
+// Solution would be nice seen.
+#elif defined(__MINGW32__)
+#  include "Ws2tcpip.h"
+#  define   inet_ntop
+
 #else
 #  include <arpa/inet.h>
 #  include <errno.h>
