@@ -288,6 +288,9 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
 
         if (button == "start" || button=="continue")
         {
+            int n = getWidget<SpinnerWidget>("ai-spinner")->getValue();
+
+            race_manager->setNumKarts(race_manager->getNumLocalPlayers() + n);
             race_manager->startGP(m_gp, false, (name == "continue"));
         }
     }   // name=="buttons"
