@@ -791,6 +791,8 @@ static void multidrawShadow(unsigned i, Args ...args)
 
 void IrrDriver::renderShadows()
 {
+    ScopedGPUTimer Timer(getGPUTimer(Q_SHADOWS));
+
     glDepthFunc(GL_LEQUAL);
     glDepthMask(GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -929,6 +931,7 @@ void multidrawRSM(Args...args)
 
 void IrrDriver::renderRSM()
 {
+    ScopedGPUTimer Timer(getGPUTimer(Q_RSM));
     m_rtts->getRSM().Bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

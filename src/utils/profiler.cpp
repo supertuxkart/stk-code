@@ -33,6 +33,7 @@ static const char* GPU_Phase[Q_LAST] =
 {
     "Solid Pass 1",
     "Shadows",
+    "RSM",
     "RH",
     "GI",
     "Env Map",
