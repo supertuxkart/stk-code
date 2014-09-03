@@ -2,9 +2,9 @@
 <stkgui>
     <icon-button id="back" x="0" y="0" height="8%" icon="gui/back.png"/>
 
-    <div x="1%" y="1%" width="98%" height="98%" layout="vertical-row">
+    <div x="1%" y="1%" width="96%" height="98%" layout="vertical-row">
 
-        <header id="name" width="100%" text_align="center"/>
+        <header id="name" width="80%" align="center" text_align="center"/>
 
         <spacer width="1" height="5%"/>
 
@@ -62,7 +62,7 @@
                     I18N="Start race" text="Start Race"/>
 
             <icon-button id="continue" width="64" height="64" icon="gui/green_check.png"
-                    I18N="Continue race" text="Continue Race"/>
+                    I18N="Continue saved GP" text="Continue saved GP"/>
         </buttonbar>
 
     </div>

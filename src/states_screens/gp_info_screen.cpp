@@ -73,7 +73,7 @@ void BaseGPInfoScreen::loadedFromFile()
     // The group spinner is filled in init every time the screen is shown
     // (since the groups can change if addons are added/deleted).
     m_group_spinner      = getWidget<SpinnerWidget>("group-spinner");
-
+    m_continue_button    = getWidget<IconButtonWidget>("continue");
     m_reverse_spinner    = getWidget<SpinnerWidget>("reverse-spinner");
     m_reverse_spinner->addLabel(_("No"));
     m_reverse_spinner->addLabel(_("Yes"));
@@ -136,8 +136,12 @@ void BaseGPInfoScreen::init()
 
     if(random)
     {
+        RibbonWidget *rb = getWidget<RibbonWidget>("buttons");
+        rb->setLabel(1,_(L"Reload") );
         getWidget<LabelWidget>("name")->setText(_("Random Grand Prix"), false);
-        getWidget<IconButtonWidget>("continue")->setVisible(false);
+        std::string restart = file_manager->getAsset(FileManager::GUI, "restart.png");
+        m_continue_button->setImage(restart, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        m_continue_button->setVisible(true);
 
         // We have to recreate the group spinner, but a new group might have
         // been added or deleted since the last time this screen was shown.
@@ -190,7 +194,9 @@ void BaseGPInfoScreen::init()
                                        race_manager->getNumberOfKarts(),
                                        race_manager->getNumLocalPlayers());
 
-        getWidget<IconButtonWidget>("continue")->setVisible(saved_gp != NULL);
+        //I18N: Continue a previously saved Grand Prix.
+        m_continue_button->setText(_(L"Continue saved GP"));
+        m_continue_button->setVisible(saved_gp != NULL);
     }
 
     addTracks();
@@ -198,7 +204,8 @@ void BaseGPInfoScreen::init()
 }   // init
 
 // ----------------------------------------------------------------------------
-
+/** Updates the list of tracks shown.
+ */
 void BaseGPInfoScreen::addTracks()
 {
     const std::vector<std::string> tracks = m_gp.getTrackNames();
@@ -214,7 +221,8 @@ void BaseGPInfoScreen::addTracks()
 }   // addTracks
 
 // ----------------------------------------------------------------------------
-
+/** Creates a screenshot widget in the placeholder of the GUI.
+ */
 void BaseGPInfoScreen::addScreenshot()
 {
     Widget* screenshot_div = getWidget("screenshot_div");
@@ -277,7 +285,8 @@ void BaseGPInfoScreen::updateRandomGP()
 }   // updateRandomGP
 
 // ----------------------------------------------------------------------------
-
+/** Handle user input.
+ */
 void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &name,
                                  const int player_id)
 {
@@ -286,8 +295,18 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
         const std::string &button = getWidget<GUIEngine::RibbonWidget>("buttons")
                                   ->getSelectionIDString(PLAYER_ID_GAME_MASTER);
 
-        if (button == "start" || button=="continue")
+        // The continue button becomes a 'reload' button in random GP:
+        if(button=="continue" && m_gp.isRandomGP())
         {
+            // Create a new GP:
+            m_gp.createRandomGP(m_num_tracks_spinner->getValue(),
+                                m_group_name, getReverse(),
+                                /*new tracks*/ true );
+            addTracks();
+        }
+        else if (button == "start" || button=="continue")
+        {
+            // Normal GP: start/continue a saved GP
             int n = getWidget<SpinnerWidget>("ai-spinner")->getValue();
 
             race_manager->setNumKarts(race_manager->getNumLocalPlayers() + n);
@@ -326,11 +345,17 @@ void BaseGPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &nam
     {
         m_gp.changeReverse(getReverse());
     }
+    else if(name=="back")
+    {
+        StateManager::get()->escapePressed();
+    }
 
 }   // eventCallback
 
 // ----------------------------------------------------------------------------
-
+/** Called every update. Used to cycle the screenshots.
+ *  \param dt Time step size.
+ */
 void BaseGPInfoScreen::onUpdate(float dt)
 {
     if (dt == 0)

@@ -38,9 +38,17 @@ namespace GUIEngine
 class BaseGPInfoScreen : public GUIEngine::Screen
 {
 private:
+    /** Spinner for the different track groups. */
     GUIEngine::SpinnerWidget *m_group_spinner;
+
+    /** Spinner for reverse mode. */
     GUIEngine::SpinnerWidget *m_reverse_spinner;
+
+    /** Spinner for number of tracks (in case of random GP). */
     GUIEngine::SpinnerWidget *m_num_tracks_spinner;
+
+    /** The continue/reload (in case of random GP) icon. */
+    GUIEngine::IconButtonWidget *m_continue_button;
 
     /** The currently selected group name. */
     std::string m_group_name;
