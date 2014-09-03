@@ -186,6 +186,7 @@ enum SamplerType {
     Nearest_Filtered,
     Shadow_Sampler,
     Volume_Linear_Filtered,
+    Trilinear_cubemap,
 };
 
 void setTextureSampler(GLenum, GLuint, GLuint, GLuint);
@@ -324,6 +325,29 @@ struct CreateSamplers<Trilinear_Anisotropic_Filtered, tp...>
 };
 
 void BindTextureTrilinearAnisotropic(unsigned TU, unsigned tex);
+
+template<SamplerType...tp>
+struct CreateSamplers<Trilinear_cubemap, tp...>
+{
+    static void exec(std::vector<unsigned> &v, std::vector<GLenum> &e)
+    {
+        v.push_back(createTrilinearSampler());
+        e.push_back(GL_TEXTURE_CUBE_MAP);
+        CreateSamplers<tp...>::exec(v, e);
+    }
+};
+
+void BindCubemapTrilinear(unsigned TU, unsigned tex);
+
+template<SamplerType...tp>
+struct BindTexture<Trilinear_cubemap, tp...>
+{
+    static void exec(const std::vector<unsigned> &TU, const std::vector<unsigned> &TexId, unsigned N)
+    {
+        BindCubemapTrilinear(TU[N], TexId[N]);
+        BindTexture<tp...>::exec(TU, TexId, N + 1);
+    }
+};
 
 template<SamplerType...tp>
 struct BindTexture<Trilinear_Anisotropic_Filtered, tp...>
@@ -688,16 +712,11 @@ public:
     DisplaceShader();
 };
 
-class SkyboxShader
+class SkyboxShader : public ShaderHelperSingleton<SkyboxShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
 {
 public:
-    static GLuint Program;
-    static GLuint attrib_position;
-    static GLuint uniform_MM, uniform_tex;
-    static GLuint cubevao;
-
-    static void init();
-    static void setUniforms(const core::matrix4 &ModelMatrix, const core::vector2df &screen, unsigned TU_tex);
+    SkyboxShader();
+    GLuint cubevao;
 };
 
 class NormalVisualizer : public ShaderHelperSingleton<NormalVisualizer, core::matrix4, core::matrix4, video::SColor>

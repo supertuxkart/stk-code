@@ -552,7 +552,7 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
         return;
     if (!SkyboxCubeMap)
         generateSkyboxCubemap();
-    glBindVertexArray(MeshShader::SkyboxShader::cubevao);
+    glBindVertexArray(MeshShader::SkyboxShader::getInstance()->cubevao);
     glDisable(GL_CULL_FACE);
     assert(SkyboxTextures.size() == 6);
 
@@ -567,15 +567,10 @@ void IrrDriver::renderSkybox(const scene::ICameraSceneNode *camera)
     core::matrix4 invtransform;
     transform.getInverse(invtransform);
 
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, SkyboxCubeMap);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glUseProgram(MeshShader::SkyboxShader::Program);
-    MeshShader::SkyboxShader::setUniforms(transform,
-        core::vector2df(float(UserConfigParams::m_width),
-        float(UserConfigParams::m_height)),
-        0);
+    glUseProgram(MeshShader::SkyboxShader::getInstance()->Program);
+    MeshShader::SkyboxShader::getInstance()->setUniforms(transform);
+    MeshShader::SkyboxShader::getInstance()->SetTextureUnits(createVector<GLuint>(SkyboxCubeMap));
+
     glDrawElements(GL_TRIANGLES, 6 * 6, GL_UNSIGNED_INT, 0);
     glBindVertexArray(0);
 }
