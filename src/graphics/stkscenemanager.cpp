@@ -17,7 +17,7 @@
 
 static void
 FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > InstanceList, InstanceData * InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer,
-    size_t &InstanceBufferOffset, size_t &CommandBufferOffset, int cascade)
+    size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
 {
     // Should never be empty
     GLMesh *mesh = InstanceList.front().first;
@@ -29,7 +29,7 @@ FillInstances_impl(std::vector<std::pair<GLMesh *, scene::ISceneNode *> > Instan
     CurrentCommand.baseInstance = InstanceBufferOffset;
     CurrentCommand.instanceCount = InstanceList.size();
 
-    irr_driver->IncreasePolyCount(InstanceList.size() * mesh->IndexCount / 3);
+    PolyCount += InstanceList.size() * mesh->IndexCount / 3;
 
     for (unsigned i = 0; i < InstanceList.size(); i++)
     {
@@ -69,8 +69,6 @@ size_t &InstanceBufferOffset, size_t &CommandBufferOffset)
     CurrentCommand.baseInstance = InstanceBufferOffset;
     CurrentCommand.instanceCount = InstanceList.size();
 
-    irr_driver->IncreasePolyCount(InstanceList.size() * mesh->IndexCount / 3);
-
     for (unsigned i = 0; i < InstanceList.size(); i++)
     {
         STKMeshSceneNode *node = dynamic_cast<STKMeshSceneNode*>(InstanceList[i].second);
@@ -95,12 +93,12 @@ size_t &InstanceBufferOffset, size_t &CommandBufferOffset)
 
 static
 void FillInstances(const std::map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
-    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, int cascade)
+    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &Polycount)
 {
     auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
     for (; It != E; ++It)
     {
-        FillInstances_impl(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, cascade);
+        FillInstances_impl(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, Polycount);
         if (!UserConfigParams::m_azdo)
             InstancedList.push_back(It->second.front().first);
     }
@@ -108,13 +106,13 @@ void FillInstances(const std::map<scene::IMeshBuffer *, std::vector<std::pair<GL
 
 static
 void FillInstancesGrass(const std::map<scene::IMeshBuffer *, std::vector<std::pair<GLMesh *, scene::ISceneNode*> > > &GatheredGLMesh, std::vector<GLMesh *> &InstancedList,
-    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, int cascade, const core::vector3df &dir)
+    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, const core::vector3df &dir, size_t &PolyCount)
 {
     auto It = GatheredGLMesh.begin(), E = GatheredGLMesh.end();
     SunLightProvider * const cb = (SunLightProvider *)irr_driver->getCallback(ES_SUNLIGHT);
     for (; It != E; ++It)
     {
-        FillInstances_impl(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, cascade);
+        FillInstances_impl(It->second, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount);
         if (!UserConfigParams::m_azdo)
             InstancedList.push_back(It->second.front().first);
     }
@@ -387,22 +385,22 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
 template<MeshMaterial Mat> static void
 GenDrawCalls(unsigned cascade, std::vector<GLMesh *> &InstancedList,
-    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset)
+    InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, size_t &PolyCount)
 {
     if (irr_driver->hasARB_draw_indirect())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
-    FillInstances(MeshForShadowPass[cascade][Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, cascade);
+    FillInstances(MeshForShadowPass[cascade][Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, PolyCount);
     if (UserConfigParams::m_azdo)
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
 template<MeshMaterial Mat> static void
 GenDrawCallsGrass(unsigned cascade, std::vector<GLMesh *> &InstancedList,
-InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, const core::vector3df &dir)
+InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t &InstanceBufferOffset, size_t &CommandBufferOffset, const core::vector3df &dir, size_t &PolyCount)
 {
     if (irr_driver->hasARB_draw_indirect())
         ShadowPassCmd::getInstance()->Offset[cascade][Mat] = CommandBufferOffset; // Store command buffer offset
-    FillInstancesGrass(MeshForShadowPass[cascade][Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, cascade, dir);
+    FillInstancesGrass(MeshForShadowPass[cascade][Mat], InstancedList, InstanceBuffer, CommandBuffer, InstanceBufferOffset, CommandBufferOffset, dir, PolyCount);
     if (UserConfigParams::m_azdo)
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
@@ -472,6 +470,8 @@ void IrrDriver::PrepareDrawCalls()
     ListInstancedMatDetails::getInstance()->clear();
     ListInstancedMatUnlit::getInstance()->clear();
 
+    size_t SolidPoly = 0, ShadowPoly = 0, MiscPoly = 0;
+
 #pragma omp parallel sections
     {
 #pragma omp section
@@ -487,32 +487,32 @@ void IrrDriver::PrepareDrawCalls()
 
             // Default Material
             SolidPassCmd::getInstance()->Offset[MAT_DEFAULT] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForSolidPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_DEFAULT] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_DEFAULT];
             // Alpha Ref
             SolidPassCmd::getInstance()->Offset[MAT_ALPHA_REF] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForSolidPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_ALPHA_REF] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_ALPHA_REF];
             // Unlit
             SolidPassCmd::getInstance()->Offset[MAT_UNLIT] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForSolidPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_UNLIT] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_UNLIT];
             // Spheremap
             SolidPassCmd::getInstance()->Offset[MAT_SPHEREMAP] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_SPHEREMAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForSolidPass[MAT_SPHEREMAP], ListInstancedMatSphereMap::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_SPHEREMAP] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_SPHEREMAP];
             // Detail
             SolidPassCmd::getInstance()->Offset[MAT_DETAIL] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForSolidPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_DETAIL] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_DETAIL];
             // Normal Map
             SolidPassCmd::getInstance()->Offset[MAT_NORMAL_MAP] = current_cmd;
-            FillInstances(MeshForSolidPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForSolidPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_NORMAL_MAP] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_NORMAL_MAP];
 
             // Grass
             SolidPassCmd::getInstance()->Offset[MAT_GRASS] = current_cmd;
-            FillInstancesGrass(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, -1, windDir);
+            FillInstancesGrass(MeshForSolidPass[MAT_GRASS], ListInstancedMatGrass::getInstance()->SolidPass, InstanceBuffer, CmdBuffer, offset, current_cmd, windDir, SolidPoly);
             SolidPassCmd::getInstance()->Size[MAT_GRASS] = current_cmd - SolidPassCmd::getInstance()->Offset[MAT_GRASS];
 
             if (!irr_driver->hasBufferStorageExtension())
@@ -570,19 +570,19 @@ void IrrDriver::PrepareDrawCalls()
             for (unsigned i = 0; i < 4; i++)
             {
                 // Mat default
-                GenDrawCalls<MAT_DEFAULT>(i, ListInstancedMatDefault::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd);
+                GenDrawCalls<MAT_DEFAULT>(i, ListInstancedMatDefault::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat AlphaRef
-                GenDrawCalls<MAT_ALPHA_REF>(i, ListInstancedMatAlphaRef::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd);
+                GenDrawCalls<MAT_ALPHA_REF>(i, ListInstancedMatAlphaRef::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat Unlit
-                GenDrawCalls<MAT_UNLIT>(i, ListInstancedMatUnlit::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd);
+                GenDrawCalls<MAT_UNLIT>(i, ListInstancedMatUnlit::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat NormalMap
-                GenDrawCalls<MAT_NORMAL_MAP>(i, ListInstancedMatNormalMap::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd);
+                GenDrawCalls<MAT_NORMAL_MAP>(i, ListInstancedMatNormalMap::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat Spheremap
-                GenDrawCalls<MAT_SPHEREMAP>(i, ListInstancedMatSphereMap::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd);
+                GenDrawCalls<MAT_SPHEREMAP>(i, ListInstancedMatSphereMap::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat Detail
-                GenDrawCalls<MAT_DETAIL>(i, ListInstancedMatDetails::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd);
+                GenDrawCalls<MAT_DETAIL>(i, ListInstancedMatDetails::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, ShadowPoly);
                 // Mat Grass
-                GenDrawCallsGrass<MAT_GRASS>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, windDir);
+                GenDrawCallsGrass<MAT_GRASS>(i, ListInstancedMatGrass::getInstance()->Shadows[i], ShadowInstanceBuffer, ShadowCmdBuffer, offset, current_cmd, windDir, ShadowPoly);
             }
             if (!irr_driver->hasBufferStorageExtension())
             {
@@ -603,23 +603,23 @@ void IrrDriver::PrepareDrawCalls()
 
             // Default Material
             RSMPassCmd::getInstance()->Offset[MAT_DEFAULT] = current_cmd;
-            FillInstances(MeshForRSMPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForRSMPass[MAT_DEFAULT], ListInstancedMatDefault::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[MAT_DEFAULT] = current_cmd - RSMPassCmd::getInstance()->Offset[MAT_DEFAULT];
             // Alpha Ref
             RSMPassCmd::getInstance()->Offset[MAT_ALPHA_REF] = current_cmd;
-            FillInstances(MeshForRSMPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForRSMPass[MAT_ALPHA_REF], ListInstancedMatAlphaRef::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[MAT_ALPHA_REF] = current_cmd - RSMPassCmd::getInstance()->Offset[MAT_ALPHA_REF];
             // Unlit
             RSMPassCmd::getInstance()->Offset[MAT_UNLIT] = current_cmd;
-            FillInstances(MeshForRSMPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForRSMPass[MAT_UNLIT], ListInstancedMatUnlit::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[MAT_UNLIT] = current_cmd - RSMPassCmd::getInstance()->Offset[MAT_UNLIT];
             // Detail
             RSMPassCmd::getInstance()->Offset[MAT_DETAIL] = current_cmd;
-            FillInstances(MeshForRSMPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForRSMPass[MAT_DETAIL], ListInstancedMatDetails::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[MAT_DETAIL] = current_cmd - RSMPassCmd::getInstance()->Offset[MAT_DETAIL];
             // Normal Map
             RSMPassCmd::getInstance()->Offset[MAT_NORMAL_MAP] = current_cmd;
-            FillInstances(MeshForRSMPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, -1);
+            FillInstances(MeshForRSMPass[MAT_NORMAL_MAP], ListInstancedMatNormalMap::getInstance()->RSM, RSMInstanceBuffer, RSMCmdBuffer, offset, current_cmd, MiscPoly);
             RSMPassCmd::getInstance()->Size[MAT_NORMAL_MAP] = current_cmd - RSMPassCmd::getInstance()->Offset[MAT_NORMAL_MAP];
 
             if (!irr_driver->hasBufferStorageExtension())
@@ -629,6 +629,8 @@ void IrrDriver::PrepareDrawCalls()
             }
         }
     }
+    poly_count[SOLID_NORMAL_AND_DEPTH_PASS] += SolidPoly;
+    poly_count[SHADOW_PASS] += ShadowPoly;
 
     glMemoryBarrier(GL_CLIENT_MAPPED_BUFFER_BARRIER_BIT);
 }
