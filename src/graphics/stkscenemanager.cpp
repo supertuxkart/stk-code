@@ -351,7 +351,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             continue;
         (*I)->updateAbsolutePosition();
 
-        const scene::ICameraSceneNode* cam = irr_driver->getSceneManager()->getActiveCamera();
+        scene::ICameraSceneNode* cam = irr_driver->getSceneManager()->getActiveCamera();
         bool IsCulledForSolid = irr_driver->getSceneManager()->isCulled(*I);
         bool IsCulledForShadow[4];
         for (unsigned i = 0; i < 4; ++i)
@@ -363,6 +363,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         irr_driver->getSceneManager()->setActiveCamera(RSM_cam);
         bool IsCulledForRSM = irr_driver->getSceneManager()->isCulled(*I);
+        irr_driver->getSceneManager()->setActiveCamera(cam);
 
         if (IsCulledForSolid && IsCulledForShadow[0] && IsCulledForShadow[1] && IsCulledForShadow[2] && IsCulledForShadow[3])
             continue;
