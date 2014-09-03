@@ -712,7 +712,7 @@ public:
     DisplaceShader();
 };
 
-class SkyboxShader : public ShaderHelperSingleton<SkyboxShader, core::matrix4>, public TextureRead<Trilinear_Anisotropic_Filtered>
+class SkyboxShader : public ShaderHelperSingleton<SkyboxShader, core::matrix4>, public TextureRead<Trilinear_cubemap>
 {
 public:
     SkyboxShader();
