@@ -293,15 +293,15 @@ void STKMeshSceneNode::render()
                 if (UserConfigParams::m_azdo)
                 {
 #ifdef Bindless_Texture_Support
-                    GLuint DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
+                    GLuint64 DiffuseHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_DIFFUSE), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[0]);
                     if (!glIsTextureHandleResidentARB(DiffuseHandle))
                         glMakeTextureHandleResidentARB(DiffuseHandle);
 
-                    GLuint SpecularHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[1]);
+                    GLuint64 SpecularHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_SPECULAR), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[1]);
                     if (!glIsTextureHandleResidentARB(SpecularHandle))
                         glMakeTextureHandleResidentARB(SpecularHandle);
 
-                    GLuint SSAOHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[2]);
+                    GLuint64 SSAOHandle = glGetTextureSamplerHandleARB(irr_driver->getRenderTargetTexture(RTT_HALF1_R), MeshShader::ObjectPass2Shader::getInstance()->SamplersId[2]);
                     if (!glIsTextureHandleResidentARB(SSAOHandle))
                         glMakeTextureHandleResidentARB(SSAOHandle);
 
