@@ -269,32 +269,11 @@ void IrrDriver::renderGLSL(float dt)
     getPostProcessing()->update(dt);
 }
 
-static GLsync m_sync;
-
 void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned pointlightcount, std::vector<GlowData>& glows, float dt, bool hasShadow, bool forceRTT)
 {
     glBindBufferBase(GL_UNIFORM_BUFFER, 0, SharedObject::ViewProjectionMatrixesUBO);
     m_scene_manager->setActiveCamera(camnode);
 
-    // Add a 1 s timeout
-    if (!m_sync)
-        m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000000);
-    /*    switch (reason)
-    {
-    case GL_ALREADY_SIGNALED:
-    printf("Already Signaled\n");
-    break;
-    case GL_TIMEOUT_EXPIRED:
-    printf("Timeout Expired\n");
-    break;
-    case GL_CONDITION_SATISFIED:
-    printf("Condition Satisfied\n");
-    break;
-    case GL_WAIT_FAILED:
-    printf("Wait Failed\n");
-    break;
-    }*/
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
     PrepareDrawCalls();
     PROFILER_POP_CPU_MARKER();

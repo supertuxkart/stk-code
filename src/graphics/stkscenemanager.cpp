@@ -440,6 +440,27 @@ void IrrDriver::PrepareDrawCalls()
     parseSceneManager(List, ImmediateDrawList::getInstance(), m_shadow_camnodes, m_suncam);
     if (!irr_driver->hasARB_draw_indirect())
         return;
+
+    // Add a 20 ms timeout
+    if (!m_sync)
+        m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+    GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 20000000);
+    /*    switch (reason)
+    {
+    case GL_ALREADY_SIGNALED:
+    printf("Already Signaled\n");
+    break;
+    case GL_TIMEOUT_EXPIRED:
+    printf("Timeout Expired\n");
+    break;
+    case GL_CONDITION_SATISFIED:
+    printf("Condition Satisfied\n");
+    break;
+    case GL_WAIT_FAILED:
+    printf("Wait Failed\n");
+    break;
+    }*/
+
     InstanceData *InstanceBuffer;
     InstanceData *ShadowInstanceBuffer;
     InstanceData *RSMInstanceBuffer;
