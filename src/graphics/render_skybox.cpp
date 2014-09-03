@@ -448,6 +448,7 @@ GLuint generateCubeMapFromTextures(const std::vector<video::ITexture *> &texture
         else
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_SRGB_ALPHA, size, size, 0, GL_BGRA, GL_UNSIGNED_BYTE, (GLvoid*)rgba[i]);
     }
+    glGenerateMipmap(GL_TEXTURE_CUBE_MAP);
     for (unsigned i = 0; i < 6; i++)
         delete[] rgba[i];
     return result;
