@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <stkgui>
-    <div x="5%" y="5%" width="90%" height="90%" layout="vertical-row" >
+    <div x="2%" y="2%" width="96%" height="96%" layout="vertical-row" >
 
-        <header width="80%" text="Race Setup" align="center" text_align="center" />
+        <header height="5%" width="80%" text="Race Setup" align="center" text_align="center" />
 
         <spacer height="5%" width="25"/>
         <box width="95%" height="40%" padding="10" layout="vertical-row">
