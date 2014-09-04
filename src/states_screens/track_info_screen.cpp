@@ -59,6 +59,7 @@ DEFINE_SCREEN_SINGLETON( TrackInfoScreen );
 TrackInfoScreen::TrackInfoScreen()
           : Screen("track_info.stkgui")
 {
+    m_screenshot = NULL;
 }   // TrackInfoScreen
 
 // ----------------------------------------------------------------------------
@@ -94,27 +95,30 @@ void TrackInfoScreen::init()
 
     // ---- Track screenshot
     Widget* screenshot_div = getWidget("screenshot_div");
-    IconButtonWidget* screenshot_widget = 
-        new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-                             false /* tab stop */, false /* focusable */);
-    // images are saved squared, but must be stretched to 4:
-    screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
+    if(!m_screenshot)
+    {
+        m_screenshot =
+            new IconButtonWidget(IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+                                 false /* tab stop */, false /* focusable */);
+        m_screenshot->setCustomAspectRatio(4.0f / 3.0f);
 
-    screenshot_widget->m_x = screenshot_div->m_x;
-    screenshot_widget->m_y = screenshot_div->m_y;
-    screenshot_widget->m_w = screenshot_div->m_w;
-    screenshot_widget->m_h = screenshot_div->m_h;
+        m_screenshot->m_x = screenshot_div->m_x;
+        m_screenshot->m_y = screenshot_div->m_y;
+        m_screenshot->m_w = screenshot_div->m_w;
+        m_screenshot->m_h = screenshot_div->m_h;
+        m_screenshot->add();
+        m_widgets.push_back(m_screenshot);
+    }
+    // images are saved squared, but must be stretched to 4:
 
     // temporary icon, will replace it just after (but it will be shown if the given icon is not found)
-    screenshot_widget->m_properties[PROP_ICON] = "gui/main_help.png";
-    screenshot_widget->add();
+    m_screenshot->m_properties[PROP_ICON] = "gui/main_help.png";
 
     ITexture* screenshot = irr_driver->getTexture(m_track->getScreenshotFile(),
                                     "While loading screenshot for track '%s':",
                                            m_track->getFilename()            );
     if (screenshot != NULL)
-        screenshot_widget->setImage(screenshot);
-    m_widgets.push_back(screenshot_widget);
+        m_screenshot->setImage(screenshot);
 
     // Lap count m_lap_spinner
     // -----------------------
