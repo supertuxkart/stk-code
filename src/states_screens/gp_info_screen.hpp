@@ -74,7 +74,7 @@ public:
     GPInfoScreen();
     /** Places the focus back on the selected GP, in the case that the dialog
      * was cancelled and we're returning to the track selection screen */
-    virtual ~GPInfoScreen();
+    virtual ~GPInfoScreen() {}
 
     void onEnterPressedInternal();
     virtual void eventCallback(GUIEngine::Widget *, const std::string &name,

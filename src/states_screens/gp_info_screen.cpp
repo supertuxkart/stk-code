@@ -52,6 +52,9 @@ using namespace GUIEngine;
 
 DEFINE_SCREEN_SINGLETON( GPInfoScreen );
 
+/** Constructor, initialised some variables which might be used before
+ *  loadedFromFile is called.
+ */
 GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
 {
     m_curr_time = 0.0f;
@@ -60,12 +63,9 @@ GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
 }   // GPInfoScreen
 
 // ----------------------------------------------------------------------------
-
-GPInfoScreen::~GPInfoScreen()
-{
-}   // ~GPInfoScreen
-
-// ----------------------------------------------------------------------------
+/** Called when the stkgui file is read. It stores the pointer to various
+ *  widgets and adds the right names for reverse mode.
+ */
 void GPInfoScreen::loadedFromFile()
 {
     // The group spinner is filled in init every time the screen is shown
@@ -104,6 +104,9 @@ void GPInfoScreen::setGP(const std::string &gp_ident)
 }   // setGP
 
 // ----------------------------------------------------------------------------
+/** Converts the currently selected reverse status into a value of type 
+*  GPReverseType .
+*/
 GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
 {
     switch (m_reverse_spinner->getValue())
@@ -118,6 +121,10 @@ GrandPrixData::GPReverseType GPInfoScreen::getReverse() const
 }   // getReverse
 
 // ----------------------------------------------------------------------------
+/** Called before the screen is shown. It adds the screenshot icon, and
+ *  initialises all widgets depending on GP mode (random or not), if a saved
+ *  GP is available etc.
+ */
 void GPInfoScreen::init()
 {
     Screen::init();
@@ -251,38 +258,6 @@ void GPInfoScreen::addScreenshot()
 }   // addScreenShot
 
 // ----------------------------------------------------------------------------
-
-void GPInfoScreen::onEnterPressedInternal()
-{
-    // Save the GP id because dismiss() will destroy this instance
-    GrandPrixData gp_data = m_gp;
-    // Disable accidentally unlocking of a challenge
-    PlayerManager::getCurrentPlayer()->setCurrentChallenge("");
-    race_manager->startGP(m_gp, false, false);
-}
-
-// ----------------------------------------------------------------------------
-void GPInfoScreen::updateRandomGP()
-{
-    // First get the right track group to use
-    const std::vector<std::string>& groups = track_manager->getAllTrackGroups();
-
-    int n = m_group_spinner->getValue();
-    std::string track_group;
-    if(n>=0 && n < (int)groups.size())
-    {
-        track_group = groups[m_group_spinner->getValue()];
-    }
-    else
-    {
-        m_group_spinner->setValue(0);
-        track_group = groups[0];
-    }
-
-    int number_of_tracks = getWidget<SpinnerWidget>("track-spinner")->getValue();
-}   // updateRandomGP
-
-// ----------------------------------------------------------------------------
 /** Handle user input.
  */
 void GPInfoScreen::eventCallback(GUIEngine::Widget *, const std::string &name,
@@ -360,16 +335,16 @@ void GPInfoScreen::onUpdate(float dt)
         return; // if nothing changed, return right now
 
     m_curr_time += dt;
-    int frameAfter = (int)(m_curr_time / 1.5f);
+    int frame_after = (int)(m_curr_time / 1.5f);
 
     const std::vector<std::string> tracks = m_gp.getTrackNames();
-    if (frameAfter >= (int)tracks.size())
+    if (frame_after >= (int)tracks.size())
     {
-        frameAfter = 0;
+        frame_after = 0;
         m_curr_time = 0;
     }
 
-    Track* track = track_manager->getTrack(tracks[frameAfter]);
+    Track* track = track_manager->getTrack(tracks[frame_after]);
     std::string file = track->getScreenshotFile();
     m_screenshot_widget->setImage(file, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
     m_screenshot_widget->m_properties[GUIEngine::PROP_ICON] = file;
