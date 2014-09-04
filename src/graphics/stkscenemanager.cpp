@@ -340,7 +340,7 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
 
 static void
 parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::ISceneNode *> *ImmediateDraw,
-    scene::ICameraSceneNode *shadowCams[4], scene::ICameraSceneNode *RSM_cam)
+    scene::ICameraSceneNode* cam, scene::ICameraSceneNode *shadowCams[4], scene::ICameraSceneNode *RSM_cam)
 {
     core::list<scene::ISceneNode*>::Iterator I = List.begin(), E = List.end();
     for (; I != E; ++I)
@@ -351,20 +351,16 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
             continue;
         (*I)->updateAbsolutePosition();
 
-        scene::ICameraSceneNode* cam = irr_driver->getSceneManager()->getActiveCamera();
-        bool IsCulledForSolid = irr_driver->getSceneManager()->isCulled(*I);
+        core::aabbox3d<f32> tbox = (*I)->getBoundingBox();
+        (*I)->getAbsoluteTransformation().transformBoxEx(tbox);
+
+        bool IsCulledForSolid = !(tbox.intersectsWithBox(cam->getViewFrustum()->getBoundingBox()));
+
         bool IsCulledForShadow[4];
-
         for (unsigned i = 0; i < 4; ++i)
-        {
-            scene::ICameraSceneNode* cam = shadowCams[i];
-            irr_driver->getSceneManager()->setActiveCamera(cam);
-            IsCulledForShadow[i] = irr_driver->getSceneManager()->isCulled(*I);
-        }
+            IsCulledForShadow[i] = !(tbox.intersectsWithBox(shadowCams[i]->getViewFrustum()->getBoundingBox()));
 
-        irr_driver->getSceneManager()->setActiveCamera(RSM_cam);
-        bool IsCulledForRSM = irr_driver->getSceneManager()->isCulled(*I);
-        irr_driver->getSceneManager()->setActiveCamera(cam);
+        bool IsCulledForRSM = !(tbox.intersectsWithBox(RSM_cam->getViewFrustum()->getBoundingBox()));
 
         if (!IsCulledForSolid)
         {
@@ -378,7 +374,7 @@ parseSceneManager(core::list<scene::ISceneNode*> List, std::vector<scene::IScene
 
         handleSTKCommon(*I, ImmediateDraw, IsCulledForSolid, IsCulledForShadow, IsCulledForRSM);
 
-        parseSceneManager((*I)->getChildren(), ImmediateDraw, shadowCams, RSM_cam);
+        parseSceneManager((*I)->getChildren(), ImmediateDraw, cam, shadowCams, RSM_cam);
     }
 }
 
@@ -404,7 +400,7 @@ InstanceData *InstanceBuffer, DrawElementsIndirectCommand *CommandBuffer, size_t
         ShadowPassCmd::getInstance()->Size[cascade][Mat] = CommandBufferOffset - ShadowPassCmd::getInstance()->Offset[cascade][Mat];
 }
 
-void IrrDriver::PrepareDrawCalls()
+void IrrDriver::PrepareDrawCalls(scene::ICameraSceneNode *camnode)
 {
     windDir = getWindDir();
     ListBlendTransparent::getInstance()->clear();
@@ -437,14 +433,11 @@ void IrrDriver::PrepareDrawCalls()
     core::list<scene::ISceneNode*> List = m_scene_manager->getRootSceneNode()->getChildren();
 
     bool isCulled[4] = {};
-    parseSceneManager(List, ImmediateDrawList::getInstance(), m_shadow_camnodes, m_suncam);
-    if (!irr_driver->hasARB_draw_indirect())
-        return;
 
     // Add a 20 ms timeout
     if (!m_sync)
         m_sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-    GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 20000000);
+    GLenum reason = glClientWaitSync(m_sync, GL_SYNC_FLUSH_COMMANDS_BIT, 1000000000);
     /*    switch (reason)
     {
     case GL_ALREADY_SIGNALED:
@@ -460,6 +453,9 @@ void IrrDriver::PrepareDrawCalls()
     printf("Wait Failed\n");
     break;
     }*/
+    parseSceneManager(List, ImmediateDrawList::getInstance(), camnode, m_shadow_camnodes, m_suncam);
+    if (!irr_driver->hasARB_draw_indirect())
+        return;
 
     InstanceData *InstanceBuffer;
     InstanceData *ShadowInstanceBuffer;

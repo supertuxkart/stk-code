@@ -275,7 +275,7 @@ void IrrDriver::renderScene(scene::ICameraSceneNode * const camnode, unsigned po
     m_scene_manager->setActiveCamera(camnode);
 
     PROFILER_PUSH_CPU_MARKER("- Draw Call Generation", 0xFF, 0xFF, 0xFF);
-    PrepareDrawCalls();
+    PrepareDrawCalls(camnode);
     PROFILER_POP_CPU_MARKER();
     // Shadows
     {

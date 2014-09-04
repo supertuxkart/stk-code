@@ -410,7 +410,7 @@ private:
     void renderLights(unsigned pointlightCount);
     void renderShadowsDebug();
     void doScreenShot();
-    void PrepareDrawCalls();
+    void PrepareDrawCalls(scene::ICameraSceneNode *camnode);
 public:
          IrrDriver();
         ~IrrDriver();
