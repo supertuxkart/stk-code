@@ -264,7 +264,7 @@ void Profiler::draw()
     // Force to show the pointer
     irr_driver->showPointer();
 
-    int read_id = (m_freeze_state == FROZEN ? !m_write_id : m_write_id);
+    int read_id = !m_write_id;
 
     // Compute some values for drawing (unit: pixels, but we keep floats for reducing errors accumulation)
     core::dimension2d<u32>    screen_size    = driver->getScreenSize();
