@@ -209,6 +209,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 }
             }
         }
+        if (!UserConfigParams::m_shadows)
+            return;
         for (unsigned cascade = 0; cascade < 4; ++cascade)
         {
             if (!IsCulledForShadow[cascade])
@@ -255,6 +257,8 @@ handleSTKCommon(scene::ISceneNode *Node, std::vector<scene::ISceneNode *> *Immed
                 }
             }
         }
+        if (!UserConfigParams::m_gi)
+            return;
         if (!IsCulledForRSM)
         {
             if (irr_driver->hasARB_draw_indirect())
