@@ -57,7 +57,8 @@ GPInfoScreen::GPInfoScreen() : Screen("gp_info.stkgui")
 {
     m_curr_time = 0.0f;
     // Necessary to test if loadedFroMFile() was executed (in setGP)
-    m_reverse_spinner = NULL;
+    m_reverse_spinner   = NULL;
+    m_screenshot_widget = NULL;
 }   // GPInfoScreen
 
 // ----------------------------------------------------------------------------
@@ -230,9 +231,13 @@ void GPInfoScreen::addScreenshot()
 {
     Widget* screenshot_div = getWidget("screenshot_div");
 
-    m_screenshot_widget = new IconButtonWidget(
-        IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
-        false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+    if(!m_screenshot_widget)
+    {
+        m_screenshot_widget = new IconButtonWidget(
+            IconButtonWidget::SCALE_MODE_KEEP_CUSTOM_ASPECT_RATIO,
+            false, false, IconButtonWidget::ICON_PATH_TYPE_ABSOLUTE);
+        m_widgets.push_back(m_screenshot_widget);
+    }
     // images are saved squared, but must be stretched to 4:3
     m_screenshot_widget->setCustomAspectRatio(4.0f / 3.0f);
     m_screenshot_widget->m_x = screenshot_div->m_x;
@@ -252,7 +257,6 @@ void GPInfoScreen::addScreenshot()
                                            track->getFilename()            );
     if (screenshot != NULL)
         m_screenshot_widget->setImage(screenshot);
-    m_widgets.push_back(m_screenshot_widget);
 }   // addScreenShot
 
 // ----------------------------------------------------------------------------
